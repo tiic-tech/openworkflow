@@ -35,6 +35,15 @@
         "runtime"
       ]
     },
+    "artifact_type": {
+      "type": "string",
+      "enum": [
+        "vision_session",
+        "validation_target",
+        "prototype_evidence",
+        "decision_record"
+      ]
+    },
     "title": {
       "type": "string",
       "minLength": 1

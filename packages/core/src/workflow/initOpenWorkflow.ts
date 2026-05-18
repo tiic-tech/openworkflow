@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { getDiscoveryArtifactContracts, getDisclosureLevels } from "../artifacts/registry.js";
 import { getWorkflowCommands } from "../commands/registry.js";
 import { SCHEMA_VERSION, type InitOptions } from "../contracts/index.js";
 import { dumpYaml } from "../contracts/yaml.js";
@@ -18,6 +19,7 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
     ".openworkflow/workflow/archive",
     ".openworkflow/context/archive",
     ".openworkflow/vision/archive",
+    ".openworkflow/vision/sessions/archive",
     ".openworkflow/validation/archive",
     ".openworkflow/prototypes/archive",
     ".openworkflow/decisions/archive",
@@ -40,6 +42,8 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
   await writeContract(root, ".openworkflow/config.yaml", workflowConfig(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", commandAuditIndex(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets(options), options.force, written, skipped);
+  await writeContract(root, ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", artifactContracts(options), options.force, written, skipped);
+  await writeContract(root, ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", disclosureLevels(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/context/CONTEXT.md", contextDoc(options.projectTitle), options.force, written, skipped);
   await writeContract(root, ".openworkflow/context/CONTEXT_MAP.yaml", contextMap(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/vision/VISION.md", visionDoc(options.projectTitle), options.force, written, skipped);
@@ -111,6 +115,8 @@ function workflowIndex(options: InitOptions): string {
       contractEntry("workflow:contract-graph", "workflow", ".openworkflow/workflow/CONTRACT_GRAPH.yaml", "active"),
       contractEntry("audit:command-index", "workflow", ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", "active"),
       contractEntry("audit:context-packets", "workflow", ".openworkflow/audit/CONTEXT_PACKETS.yaml", "active"),
+      contractEntry("audit:artifact-contracts", "workflow", ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", "active"),
+      contractEntry("audit:disclosure-levels", "workflow", ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", "active"),
       contractEntry("context:default", "context", ".openworkflow/context/CONTEXT_MAP.yaml", "draft"),
       contractEntry("vision:default", "vision", ".openworkflow/vision/VISION_CONTRACT.yaml", "draft"),
       contractEntry("validation:index", "validation", ".openworkflow/validation/VALIDATION_INDEX.yaml", "active"),
@@ -161,6 +167,42 @@ function contextPackets(options: InitOptions): string {
   });
 }
 
+function artifactContracts(options: InitOptions): string {
+  return dumpYaml({
+    ...common("audit:artifact-contracts", "workflow", `${options.projectTitle} artifact contracts`),
+    source_of_truth: ".openworkflow",
+    artifacts: getDiscoveryArtifactContracts().map((artifact) => ({
+      artifact_type: artifact.artifactType,
+      contract_type: artifact.contractType,
+      command: artifact.command,
+      title: artifact.title,
+      source_of_truth_path: artifact.sourceOfTruthPath,
+      index_path: artifact.indexPath,
+      note_path: artifact.notePath,
+      review_path: artifact.reviewPath,
+      disclosure_level: artifact.disclosureLevel,
+      required_keys: artifact.requiredKeys,
+      evidence_policy: artifact.evidencePolicy,
+      handoff_key: artifact.handoffKey,
+    })),
+    updated_at: null,
+  });
+}
+
+function disclosureLevels(options: InitOptions): string {
+  return dumpYaml({
+    ...common("audit:disclosure-levels", "workflow", `${options.projectTitle} disclosure levels`),
+    levels: getDisclosureLevels().map((level) => ({
+      level: level.level,
+      name: level.name,
+      default_for_agents: level.defaultForAgents,
+      purpose: level.purpose,
+      examples: level.examples,
+    })),
+    updated_at: null,
+  });
+}
+
 function contractGraph(options: InitOptions): string {
   const workflowId = `workflow:${options.projectSlug}`;
   return dumpYaml({
@@ -169,6 +211,8 @@ function contractGraph(options: InitOptions): string {
       node(workflowId, "workflow", ".openworkflow/workflow/WORKFLOW_INDEX.yaml"),
       node("audit:command-index", "workflow", ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml"),
       node("audit:context-packets", "workflow", ".openworkflow/audit/CONTEXT_PACKETS.yaml"),
+      node("audit:artifact-contracts", "workflow", ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml"),
+      node("audit:disclosure-levels", "workflow", ".openworkflow/audit/DISCLOSURE_LEVELS.yaml"),
       node("context:default", "context", ".openworkflow/context/CONTEXT_MAP.yaml"),
       node("vision:default", "vision", ".openworkflow/vision/VISION_CONTRACT.yaml"),
       node("validation:index", "validation", ".openworkflow/validation/VALIDATION_INDEX.yaml"),
@@ -182,6 +226,8 @@ function contractGraph(options: InitOptions): string {
       edge(workflowId, "context:default", "initializes"),
       edge(workflowId, "audit:command-index", "audits"),
       edge("audit:command-index", "audit:context-packets", "defines_context"),
+      edge("audit:command-index", "audit:artifact-contracts", "defines_outputs"),
+      edge("audit:artifact-contracts", "audit:disclosure-levels", "uses_disclosure"),
       edge("context:default", "vision:default", "informs"),
       edge("vision:default", "validation:index", "prioritizes"),
       edge("validation:index", "prototype:index", "prototypes"),
@@ -211,6 +257,9 @@ function visionContract(options: InitOptions): string {
     ...common("vision:default", "vision", `${options.projectTitle} vision`, "draft"),
     depends_on: ["context:default"],
     produces: ["validation:index"],
+    artifact_contracts: ["vision_session"],
+    current_session: null,
+    sessions: [],
     one_sentence: "",
     goals: [],
     non_goals: [],
@@ -225,6 +274,8 @@ function validationIndex(options: InitOptions): string {
     ...common("validation:index", "validation", `${options.projectTitle} validation index`),
     depends_on: ["vision:default"],
     produces: ["prototype:index"],
+    artifact_contracts: ["validation_target"],
+    current_validation: null,
     validations: [],
     updated_at: null,
   });
@@ -235,6 +286,8 @@ function prototypeIndex(options: InitOptions): string {
     ...common("prototype:index", "prototype", `${options.projectTitle} prototype index`),
     depends_on: ["validation:index"],
     produces: ["decision:index"],
+    artifact_contracts: ["prototype_evidence"],
+    current_prototype: null,
     prototypes: [],
     updated_at: null,
   });
@@ -245,6 +298,8 @@ function decisionIndex(options: InitOptions): string {
     ...common("decision:index", "decision", `${options.projectTitle} decision index`),
     depends_on: ["prototype:index"],
     produces: ["spec:index"],
+    artifact_contracts: ["decision_record"],
+    current_decision: null,
     decisions: [],
     updated_at: null,
   });

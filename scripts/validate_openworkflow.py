@@ -18,9 +18,16 @@ REQUIRED_FILES = [
     "references/npm-cli-architecture.md",
     "references/engineering-skill-reference-research.md",
     "references/audit-first-discovery-loop.md",
+    "references/discovery-artifact-contracts.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
+    "schemas/artifact-contracts.schema.json",
+    "schemas/disclosure-levels.schema.json",
+    "schemas/vision-session.schema.json",
+    "schemas/validation-target.schema.json",
+    "schemas/prototype-evidence.schema.json",
+    "schemas/decision-record.schema.json",
     "schemas/change.schema.json",
     "schemas/validation.schema.json",
     "schemas/prototype.schema.json",
@@ -32,6 +39,7 @@ REQUIRED_FILES = [
     "packages/cli/src/commands/validate.ts",
     "packages/cli/src/commands/sync.ts",
     "packages/cli/src/commands/doctor.ts",
+    "packages/core/src/artifacts/registry.ts",
     "packages/core/src/contracts/index.ts",
     "packages/core/src/contracts/yaml.ts",
     "packages/core/src/commands/registry.ts",
@@ -73,6 +81,8 @@ REQUIRED_FILES = [
     "changes/M08-engineering-skill-reference-research/WORK_ITEMS.yaml",
     "changes/M09-audit-first-discovery-loop/CHANGE.yaml",
     "changes/M09-audit-first-discovery-loop/WORK_ITEMS.yaml",
+    "changes/M10-discovery-artifact-contracts/CHANGE.yaml",
+    "changes/M10-discovery-artifact-contracts/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
@@ -295,6 +305,113 @@ def validate_prototype(root: Path, path: Path, data: Any, errors: list[str]) -> 
             errors.append(f"{rel(root, path)} decision_handoff.requires_user_review must be true")
 
 
+def validate_artifact_contracts(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    if path.name != "ARTIFACT_CONTRACTS.yaml":
+        return
+    artifacts = data.get("artifacts")
+    if not isinstance(artifacts, list) or not artifacts:
+        errors.append(f"{rel(root, path)} must contain artifacts")
+        return
+    missing = {"vision_session", "validation_target", "prototype_evidence", "decision_record"}
+    for index, artifact in enumerate(artifacts):
+        if not isinstance(artifact, dict):
+            errors.append(f"{rel(root, path)} artifact {index} is not a mapping")
+            continue
+        artifact_type = artifact.get("artifact_type")
+        if isinstance(artifact_type, str):
+            missing.discard(artifact_type)
+        for key in ("artifact_type", "contract_type", "command", "source_of_truth_path", "required_keys"):
+            if key not in artifact:
+                errors.append(f"{rel(root, path)} artifact {index} missing {key}")
+    for artifact_type in sorted(missing):
+        errors.append(f"{rel(root, path)} missing artifact_type {artifact_type}")
+
+
+def validate_disclosure_levels(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    if path.name != "DISCLOSURE_LEVELS.yaml":
+        return
+    levels = data.get("levels")
+    if not isinstance(levels, list) or len(levels) < 5:
+        errors.append(f"{rel(root, path)} must contain disclosure levels 0 through 4")
+        return
+    seen: set[int] = set()
+    for index, level in enumerate(levels):
+        if not isinstance(level, dict):
+            errors.append(f"{rel(root, path)} level {index} is not a mapping")
+            continue
+        level_number = level.get("level")
+        if isinstance(level_number, int):
+            seen.add(level_number)
+        for key in ("name", "default_for_agents", "purpose", "examples"):
+            if key not in level:
+                errors.append(f"{rel(root, path)} level {index} missing {key}")
+    for level_number in range(5):
+        if level_number not in seen:
+            errors.append(f"{rel(root, path)} missing disclosure level {level_number}")
+
+
+def validate_discovery_artifact(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    artifact_type = data.get("artifact_type")
+    if not isinstance(artifact_type, str):
+        return
+    required_by_type = {
+        "vision_session": [
+            "current_question",
+            "stable_answers",
+            "unresolved_questions",
+            "vision_delta",
+            "handoff",
+        ],
+        "validation_target": [
+            "core_question",
+            "feature_classification",
+            "critical_assumptions",
+            "prototype_scope",
+            "acceptance",
+            "decision_options",
+        ],
+        "prototype_evidence": [
+            "validation_target",
+            "core_question",
+            "prototype_artifact",
+            "run",
+            "observations",
+            "evidence",
+            "result",
+            "handoff",
+        ],
+        "decision_record": [
+            "reviewed_evidence",
+            "outcome",
+            "rationale",
+            "accepted_scope",
+            "rejected_scope",
+            "next_command",
+            "follow_up_questions",
+        ],
+    }
+    required = required_by_type.get(artifact_type)
+    if required is None:
+        errors.append(f"{rel(root, path)} has unknown artifact_type {artifact_type}")
+        return
+    for key in required:
+        if key not in data:
+            errors.append(f"{rel(root, path)} missing artifact key {key}")
+    if artifact_type == "validation_target":
+        validate_validation(root, path, data, errors)
+    elif artifact_type == "prototype_evidence":
+        prototype_artifact = data.get("prototype_artifact")
+        if isinstance(prototype_artifact, dict):
+            for key in ("path", "type"):
+                if key not in prototype_artifact:
+                    errors.append(f"{rel(root, path)} prototype_artifact missing {key}")
+        if data.get("result") not in {"pass", "fail", "unclear", "not_reviewed"}:
+            errors.append(f"{rel(root, path)} has invalid result {data.get('result')}")
+    elif artifact_type == "decision_record":
+        if data.get("outcome") not in {"continue", "pivot", "stop", "needs_more_evidence"}:
+            errors.append(f"{rel(root, path)} has invalid outcome {data.get('outcome')}")
+
+
 def workflow_root_for(path: Path) -> Path:
     # <project>/.codex/workflow/WORKFLOW_INDEX.yaml
     return path.parents[2]
@@ -349,6 +466,9 @@ def validate_yaml_contracts(root: Path, errors: list[str]) -> None:
             validate_work_items(root, path, data, errors)
             validate_validation(root, path, data, errors)
             validate_prototype(root, path, data, errors)
+            validate_artifact_contracts(root, path, data, errors)
+            validate_disclosure_levels(root, path, data, errors)
+            validate_discovery_artifact(root, path, data, errors)
             validate_workflow_index(root, path, data, errors)
             validate_contract_graph(root, path, data, errors)
 

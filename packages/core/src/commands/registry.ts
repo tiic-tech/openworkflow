@@ -110,6 +110,7 @@ function visionProtocol(): CommandProtocol {
     interactionMode: "one-question-at-a-time",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/context/CONTEXT_MAP.yaml",
       ".openworkflow/vision/VISION_CONTRACT.yaml",
     ],
@@ -122,6 +123,8 @@ function visionProtocol(): CommandProtocol {
     allowedOutputs: [
       ".openworkflow/vision/VISION.md",
       ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/vision/sessions/<id>/VISION_SESSION.yaml",
+      ".openworkflow/vision/sessions/<id>/NOTE.md",
       ".openworkflow/context/CONTEXT.md",
       ".openworkflow/context/CONTEXT_MAP.yaml",
     ],
@@ -152,6 +155,7 @@ function validationProtocol(): CommandProtocol {
     interactionMode: "audit-and-rank",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/vision/VISION_CONTRACT.yaml",
       ".openworkflow/validation/VALIDATION_INDEX.yaml",
     ],
@@ -161,7 +165,11 @@ function validationProtocol(): CommandProtocol {
       ".openworkflow/context/CONTEXT_MAP.yaml",
     ],
     forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**"],
-    allowedOutputs: [".openworkflow/validation/**"],
+    allowedOutputs: [
+      ".openworkflow/validation/VALIDATION_INDEX.yaml",
+      ".openworkflow/validation/<id>/VALIDATION.yaml",
+      ".openworkflow/validation/<id>/NOTE.md",
+    ],
     forbiddenOutputs: [
       ".openworkflow/prototypes/**",
       ".openworkflow/specs/**",
@@ -188,6 +196,7 @@ function prototypeProtocol(): CommandProtocol {
     interactionMode: "smallest-runnable-evidence",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/validation/VALIDATION_INDEX.yaml",
       ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
     ],
@@ -197,7 +206,13 @@ function prototypeProtocol(): CommandProtocol {
       "package.json",
     ],
     forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
-    allowedOutputs: [".openworkflow/prototypes/**"],
+    allowedOutputs: [
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+      ".openworkflow/prototypes/<id>/NOTE.md",
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/prototypes/<id>/evidence/**",
+    ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
       before: ["Confirm validation target exists.", "Choose logic/state or UI/experience prototype branch."],
@@ -219,6 +234,7 @@ function decisionProtocol(): CommandProtocol {
     interactionMode: "review-and-record",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
       ".openworkflow/decisions/DECISION_INDEX.yaml",
     ],
@@ -228,7 +244,13 @@ function decisionProtocol(): CommandProtocol {
       ".openworkflow/validation/**/VALIDATION.yaml",
     ],
     forbiddenContext: [".openworkflow/runtime/**"],
-    allowedOutputs: [".openworkflow/decisions/**", ".openworkflow/prototypes/**/RESULT.md"],
+    allowedOutputs: [
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+      ".openworkflow/decisions/<id>/DECISION.yaml",
+      ".openworkflow/decisions/<id>/NOTE.md",
+      ".openworkflow/decisions/<id>/review.html",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+    ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
       before: ["Confirm prototype evidence exists.", "Load only prototype result and decision index context."],

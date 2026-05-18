@@ -14,6 +14,8 @@ const REQUIRED_OPENWORKFLOW_FILES = [
   ".openworkflow/workflow/CONTRACT_GRAPH.yaml",
   ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
   ".openworkflow/audit/CONTEXT_PACKETS.yaml",
+  ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+  ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
   ".openworkflow/context/CONTEXT_MAP.yaml",
   ".openworkflow/vision/VISION_CONTRACT.yaml",
   ".openworkflow/validation/VALIDATION_INDEX.yaml",
@@ -44,9 +46,163 @@ export async function validateOpenWorkflow(root: string): Promise<ValidationResu
     validateCommon(root, file, data, errors);
     validateWorkflowIndex(root, file, data, errors);
     validateContractGraph(root, file, data, errors);
+    validateArtifactContracts(root, file, data, errors);
+    validateDisclosureLevels(root, file, data, errors);
+    validateDiscoveryArtifact(root, file, data, errors);
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+function validateArtifactContracts(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("ARTIFACT_CONTRACTS.yaml") || !isRecord(data)) {
+    return;
+  }
+  const artifacts = data.artifacts;
+  if (!Array.isArray(artifacts) || artifacts.length === 0) {
+    errors.push(`${relative(root, file)} must contain artifacts`);
+    return;
+  }
+  const required = new Set(["vision_session", "validation_target", "prototype_evidence", "decision_record"]);
+  for (const artifact of artifacts) {
+    if (!isRecord(artifact)) {
+      errors.push(`${relative(root, file)} has invalid artifact entry`);
+      continue;
+    }
+    const artifactType = artifact.artifact_type;
+    if (typeof artifactType === "string") {
+      required.delete(artifactType);
+    }
+    for (const key of ["artifact_type", "contract_type", "command", "source_of_truth_path", "required_keys"]) {
+      if (!(key in artifact)) {
+        errors.push(`${relative(root, file)} artifact entry missing ${key}`);
+      }
+    }
+  }
+  for (const artifactType of required) {
+    errors.push(`${relative(root, file)} missing artifact_type ${artifactType}`);
+  }
+}
+
+function validateDisclosureLevels(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("DISCLOSURE_LEVELS.yaml") || !isRecord(data)) {
+    return;
+  }
+  const levels = data.levels;
+  if (!Array.isArray(levels) || levels.length < 5) {
+    errors.push(`${relative(root, file)} must contain disclosure levels 0 through 4`);
+    return;
+  }
+  const seen = new Set<number>();
+  for (const level of levels) {
+    if (!isRecord(level) || typeof level.level !== "number") {
+      errors.push(`${relative(root, file)} has invalid disclosure level entry`);
+      continue;
+    }
+    seen.add(level.level);
+    for (const key of ["name", "default_for_agents", "purpose", "examples"]) {
+      if (!(key in level)) {
+        errors.push(`${relative(root, file)} level ${level.level} missing ${key}`);
+      }
+    }
+  }
+  for (let level = 0; level <= 4; level += 1) {
+    if (!seen.has(level)) {
+      errors.push(`${relative(root, file)} missing disclosure level ${level}`);
+    }
+  }
+}
+
+function validateDiscoveryArtifact(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!isRecord(data) || typeof data.artifact_type !== "string") {
+    return;
+  }
+  const label = relative(root, file);
+  const requiredKeys = artifactRequiredKeys(data.artifact_type);
+  if (!requiredKeys) {
+    errors.push(`${label} has unknown artifact_type ${data.artifact_type}`);
+    return;
+  }
+  for (const key of requiredKeys) {
+    if (!(key in data)) {
+      errors.push(`${label} missing artifact key ${key}`);
+    }
+  }
+  if (data.artifact_type === "validation_target") {
+    validateValidationTarget(label, data, errors);
+  }
+  if (data.artifact_type === "prototype_evidence") {
+    validatePrototypeEvidence(label, data, errors);
+  }
+  if (data.artifact_type === "decision_record") {
+    validateDecisionRecord(label, data, errors);
+  }
+}
+
+function artifactRequiredKeys(artifactType: string): string[] | null {
+  if (artifactType === "vision_session") {
+    return ["current_question", "stable_answers", "unresolved_questions", "vision_delta", "handoff"];
+  }
+  if (artifactType === "validation_target") {
+    return ["core_question", "feature_classification", "critical_assumptions", "prototype_scope", "acceptance", "decision_options"];
+  }
+  if (artifactType === "prototype_evidence") {
+    return ["validation_target", "core_question", "prototype_artifact", "run", "observations", "evidence", "result", "handoff"];
+  }
+  if (artifactType === "decision_record") {
+    return [
+      "reviewed_evidence",
+      "outcome",
+      "rationale",
+      "accepted_scope",
+      "rejected_scope",
+      "next_command",
+      "follow_up_questions",
+    ];
+  }
+  return null;
+}
+
+function validateValidationTarget(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const featureClassification = data.feature_classification;
+  if (isRecord(featureClassification)) {
+    for (const key of ["existential", "supporting", "later", "out_of_scope"]) {
+      if (!(key in featureClassification)) {
+        errors.push(`${label} feature_classification missing ${key}`);
+      }
+    }
+  }
+  const prototypeScope = data.prototype_scope;
+  if (isRecord(prototypeScope)) {
+    for (const key of ["include", "exclude"]) {
+      if (!(key in prototypeScope)) {
+        errors.push(`${label} prototype_scope missing ${key}`);
+      }
+    }
+  }
+}
+
+function validatePrototypeEvidence(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const prototypeArtifact = data.prototype_artifact;
+  if (isRecord(prototypeArtifact)) {
+    for (const key of ["path", "type"]) {
+      if (!(key in prototypeArtifact)) {
+        errors.push(`${label} prototype_artifact missing ${key}`);
+      }
+    }
+  }
+  if (typeof data.result === "string" && !["pass", "fail", "unclear", "not_reviewed"].includes(data.result)) {
+    errors.push(`${label} has invalid result ${data.result}`);
+  }
+}
+
+function validateDecisionRecord(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (
+    typeof data.outcome === "string" &&
+    !["continue", "pivot", "stop", "needs_more_evidence"].includes(data.outcome)
+  ) {
+    errors.push(`${label} has invalid outcome ${data.outcome}`);
+  }
 }
 
 async function exists(path: string): Promise<boolean> {

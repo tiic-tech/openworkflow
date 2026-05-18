@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: change:M10-discovery-artifact-contracts
+contract_type: change
+title: M10 Discovery artifact contracts
+status: active
+source_artifacts:
+  - changes/M09-audit-first-discovery-loop/CHANGE.yaml
+  - references/audit-first-discovery-loop.md
+depends_on:
+  - change:M09-audit-first-discovery-loop
+produces:
+  - work_items:M10-discovery-artifact-contracts
+  - references/discovery-artifact-contracts.md
+summary: >
+  Define progressive-disclosure artifact contracts for the discovery loop so
+  agents can consume small machine-readable YAML first, short human notes only
+  when needed, and generated review surfaces only as referenced evidence.
+problem: >
+  M09 controls command context and command boundaries, but it does not yet
+  define the shape of the artifacts that commands produce. Without explicit
+  artifact contracts, agents may still write verbose notes, skip critical
+  decision fields, or require excessive context to resume work accurately.
+goals:
+  - Define first-class artifact contracts for vision sessions, validation targets, prototype evidence, and decision records.
+  - Encode progressive disclosure levels in initialized target repos.
+  - Keep YAML as the source of truth for agent consumption.
+  - Keep Markdown as optional short human audit notes, not as durable state.
+  - Treat HTML as optional generated review UI, not as source of truth.
+  - Update generated commands to name the artifact contracts they may produce.
+non_goals:
+  - Do not build an HTML review UI generator in M10.
+  - Do not add a full JSON Schema validation engine dependency.
+  - Do not deepen spec/change/team artifacts yet.
+  - Do not replace existing command and context packet contracts.
+decisions:
+  - Artifact contracts are layered on top of existing contract_type values through artifact_type.
+  - Agents load Level 0 and Level 1 indexes first, then load specific YAML artifacts only when needed.
+  - Human-readable Markdown is capped to audit summaries and cannot be the only source of a workflow decision.
+  - HTML review surfaces must be generated from YAML or evidence manifests and should not be loaded by default.
+affected_paths:
+  - packages/core/src/artifacts/
+  - packages/core/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - schemas/
+  - scripts/validate_openworkflow.py
+  - references/discovery-artifact-contracts.md
+  - changes/M10-discovery-artifact-contracts/
+acceptance:
+  - M10 change artifacts include a task breakdown and TODO list.
+  - Core exposes a registry for discovery artifact contracts and progressive disclosure levels.
+  - init writes .openworkflow/audit/ARTIFACT_CONTRACTS.yaml and .openworkflow/audit/DISCLOSURE_LEVELS.yaml.
+  - Generated discovery commands list artifact contracts and their source-of-truth paths.
+  - Schemas exist for vision_session, validation_target, prototype_evidence, decision_record, and artifact contract indexes.
+  - Validators enforce required initialized audit files and validate known discovery artifact YAML shapes.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null

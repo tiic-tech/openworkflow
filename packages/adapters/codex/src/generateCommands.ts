@@ -1,4 +1,5 @@
 import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
+import { getDiscoveryArtifactContractsForCommand } from "../../../core/src/artifacts/registry.js";
 import type { CodexTemplate } from "./templates.js";
 
 export function generateCommandTemplates(): CodexTemplate[] {
@@ -29,8 +30,9 @@ export function legacyCodexCommandPaths(): string[] {
 
 function commandDoc(command: WorkflowCommand): string {
   const protocol = command.protocol;
+  const artifacts = getDiscoveryArtifactContractsForCommand(command.trigger);
   if (!protocol || protocol.depth === "shallow") {
-    return shallowCommandDoc(command);
+    return shallowCommandDoc(command, artifacts);
   }
 
   return `# ${command.trigger}
@@ -58,6 +60,10 @@ ${list(protocol.forbiddenContext)}
 ## Allowed Outputs
 
 ${list(protocol.allowedOutputs)}
+
+## Artifact Contracts
+
+${artifactList(artifacts)}
 
 ## Forbidden Outputs
 
@@ -95,7 +101,7 @@ ${list(protocol.handoffCommands)}
 `;
 }
 
-function shallowCommandDoc(command: WorkflowCommand): string {
+function shallowCommandDoc(command: WorkflowCommand, artifacts = getDiscoveryArtifactContractsForCommand(command.trigger)): string {
   return `# ${command.trigger}
 
 ${command.description}
@@ -108,6 +114,10 @@ Target artifacts:
 
 ${command.targetArtifacts.map((artifact) => `- \`${artifact}\``).join("\n")}
 
+Artifact contracts:
+
+${artifactList(artifacts)}
+
 Load only the contract files required for this stage. Keep artifacts short, scoped, and traceable through \`.openworkflow/workflow/CONTRACT_GRAPH.yaml\`.
 `;
 }
@@ -117,4 +127,16 @@ function list(items: string[]): string {
     return "- None";
   }
   return items.map((item) => `- \`${item}\``).join("\n");
+}
+
+function artifactList(artifacts: ReturnType<typeof getDiscoveryArtifactContractsForCommand>): string {
+  if (artifacts.length === 0) {
+    return "- None";
+  }
+  return artifacts
+    .map(
+      (artifact) =>
+        `- \`${artifact.artifactType}\`: source \`${artifact.sourceOfTruthPath}\`, note \`${artifact.notePath}\`, review \`${artifact.reviewPath ?? "none"}\``,
+    )
+    .join("\n");
 }
