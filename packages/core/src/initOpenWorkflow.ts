@@ -23,6 +23,7 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
     ".openworkflow/specs/archive",
     ".openworkflow/changes/archive",
     ".openworkflow/runtime/archive",
+    ".openworkflow/adapters/archive",
   ];
 
   for (const dir of dirs) {
@@ -34,6 +35,7 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
 
   await writeContract(root, ".openworkflow/workflow/WORKFLOW_INDEX.yaml", workflowIndex(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/workflow/CONTRACT_GRAPH.yaml", contractGraph(options), options.force, written, skipped);
+  await writeContract(root, ".openworkflow/config.yaml", workflowConfig(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/context/CONTEXT.md", contextDoc(options.projectTitle), options.force, written, skipped);
   await writeContract(root, ".openworkflow/context/CONTEXT_MAP.yaml", contextMap(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/vision/VISION.md", visionDoc(options.projectTitle), options.force, written, skipped);
@@ -46,6 +48,20 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
   await writeContract(root, ".openworkflow/runtime/RUNTIME_INDEX.yaml", runtimeIndex(options), options.force, written, skipped);
 
   return { root, written, skipped };
+}
+
+function workflowConfig(options: InitOptions): string {
+  return dumpYaml({
+    project_slug: options.projectSlug,
+    project_title: options.projectTitle,
+    workflow_root: ".openworkflow",
+    tools: options.tools,
+    adapter_policy: {
+      source_of_truth: ".openworkflow",
+      default_delivery: "project-local",
+      generated_surfaces: [".codex/commands", ".codex/skills", ".codex/agents"],
+    },
+  });
 }
 
 async function writeContract(
@@ -236,4 +252,3 @@ function node(contract_id: string, contract_type: string, path: string): Record<
 function edge(from: string, to: string, relation: string): Record<string, string> {
   return { from, to, relation };
 }
-

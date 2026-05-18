@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M05-codex-adapter-sync
+contract_type: change
+title: M05 Codex adapter sync and template registry
+status: active
+source_artifacts:
+  - references/npm-cli-architecture.md
+  - changes/M04-npm-first-cli-architecture/CHANGE.yaml
+depends_on:
+  - change:M04-npm-first-cli-architecture
+produces:
+  - work_items:M05-codex-adapter-sync
+summary: >
+  Turn the Codex adapter from one-shot hardcoded generation into a reusable
+  project-local sync layer backed by packaged templates, generated markers,
+  adapter manifests, and stale-file checks.
+problem: >
+  M04 can initialize .openworkflow and .codex, but the adapter surface is still
+  embedded directly in a generator. There is no template identity, no adapter
+  manifest, and no command to refresh generated files after the npm package
+  evolves. This makes target repos vulnerable to stale generated artifacts and
+  blurs the boundary between .openworkflow as source of truth and .codex as a
+  tool-facing adapter.
+goals:
+  - Keep .openworkflow as the durable source of truth.
+  - Keep canonical Codex adapter content in the npm package.
+  - Write only lightweight project-local Codex commands, skill dispatcher, agent notes, and adapter manifest into target repos.
+  - Add a sync command that can safely refresh generated adapter files.
+  - Add a doctor command that detects missing or stale adapter output.
+non_goals:
+  - Do not implement global ~/.codex prompt installation.
+  - Do not copy the full OpenWorkflow protocol into target repo skills.
+  - Do not add multi-tool adapter support beyond Codex in this milestone.
+decisions:
+  - Default delivery is project-local.
+  - Generated files must carry a generated-by marker, adapter version, and template id.
+  - Sync may overwrite generated files, but must avoid overwriting unmarked user files unless --force is supplied.
+  - Adapter manifest lives under .openworkflow/adapters/ so the source-of-truth tree records the generated tool surface.
+affected_paths:
+  - packages/adapters/codex/
+  - packages/cli/
+  - packages/core/
+  - changes/M05-codex-adapter-sync/
+acceptance:
+  - openworkflow init <folder> --tools codex writes .openworkflow/config.yaml and .openworkflow/adapters/codex.yaml.
+  - openworkflow sync --root <folder> --tools codex refreshes generated Codex files from packaged templates.
+  - openworkflow doctor --root <folder> --tools codex reports missing or stale generated Codex files.
+  - npm run build, smoke init, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null
