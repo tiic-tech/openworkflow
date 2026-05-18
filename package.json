@@ -1,0 +1,31 @@
+{
+  "name": "openworkflow",
+  "version": "0.1.0",
+  "description": "Contract-first workflow system for AI-assisted software development.",
+  "type": "module",
+  "bin": {
+    "openworkflow": "dist/cli/src/index.js"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "references",
+    "skills"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "validate": "python3 scripts/validate_openworkflow.py --root .",
+    "validate:cli": "node dist/cli/src/index.js validate --root /tmp/openworkflow-m04-smoke",
+    "smoke:init": "node dist/cli/src/index.js init /tmp/openworkflow-m04-smoke --tools codex --force"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

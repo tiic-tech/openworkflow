@@ -14,6 +14,8 @@ repositories.
 - `build_system_vision.md` captures the initial system vision and proposed
   skill map.
 - `references/contract-graph.md` defines OpenWorkflow v0 contract graph rules.
+- `references/npm-cli-architecture.md` defines the npm-first CLI architecture
+  and `.openworkflow` versus adapter boundary.
 - `schemas/` contains the v0 schema surface for common contracts, workflow
   indexes, contract graphs, changes, and work items.
 - `changes/M01-contract-foundation/` records the active M01 change contract,
@@ -22,6 +24,10 @@ repositories.
   contract for validation-first prioritization.
 - `changes/M03-prototype-discovery-loop/` records the active M03 change
   contract for prototype discovery.
+- `changes/M04-npm-first-cli-architecture/` records the active M04 change
+  contract for npm-first CLI architecture.
+- `package.json`, `tsconfig.json`, and `packages/` contain the npm-first
+  TypeScript CLI implementation.
 - `skills/` contains repo-local skill implementations. `build-team` and
   `run-team` preserve the initial downstream execution skills; `build-workflow`
   initializes upstream contract infrastructure, `build-validation` identifies
@@ -72,6 +78,10 @@ architecture governance
 
 Runtime state is not a replacement for vision, spec, or change contracts.
 
+`.openworkflow/` is the platform-independent source of truth for initialized
+target repositories. Tool folders such as `.codex/` are generated adapter
+surfaces and should not become the canonical workflow state.
+
 ## Directory Conventions
 
 Use this project-level shape while the system is being designed:
@@ -80,6 +90,9 @@ Use this project-level shape while the system is being designed:
 openworkflow/
   AGENT.md
   build_system_vision.md
+  package.json
+  tsconfig.json
+  packages/
   changes/
   skills/
   schemas/
@@ -126,6 +139,7 @@ Start with the shared system before individual skills:
 
 For any future implementation:
 
+- Run `npm run build` before handoff when changing the TypeScript CLI.
 - Run `python3 scripts/validate_openworkflow.py --root .` before handoff when
   changing contracts, schemas, examples, or skills.
 - Run schema validation when schemas exist.

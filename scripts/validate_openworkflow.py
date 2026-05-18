@@ -15,6 +15,7 @@ REQUIRED_FILES = [
     "AGENT.md",
     "build_system_vision.md",
     "references/contract-graph.md",
+    "references/npm-cli-architecture.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
@@ -22,6 +23,12 @@ REQUIRED_FILES = [
     "schemas/validation.schema.json",
     "schemas/prototype.schema.json",
     "schemas/work-items.schema.json",
+    "package.json",
+    "tsconfig.json",
+    "packages/cli/src/index.ts",
+    "packages/core/src/initOpenWorkflow.ts",
+    "packages/core/src/validateOpenWorkflow.ts",
+    "packages/adapters/codex/src/generateCodexAdapter.ts",
     "skills/build-validation/SKILL.md",
     "skills/build-validation/scripts/init_validation.py",
     "skills/build-prototype/SKILL.md",
@@ -36,6 +43,8 @@ REQUIRED_FILES = [
     "changes/M02-validation-first-prioritization/WORK_ITEMS.yaml",
     "changes/M03-prototype-discovery-loop/CHANGE.yaml",
     "changes/M03-prototype-discovery-loop/WORK_ITEMS.yaml",
+    "changes/M04-npm-first-cli-architecture/CHANGE.yaml",
+    "changes/M04-npm-first-cli-architecture/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [

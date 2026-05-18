@@ -3,8 +3,10 @@
 ## Purpose
 
 The contract graph is the durable map between upstream intent and downstream
-runtime execution. It makes every Agent Team action traceable to repo-local
-files instead of chat history.
+runtime execution. In initialized projects, `.openworkflow/` is the
+platform-independent source of truth; tool folders such as `.codex/` are
+generated adapter surfaces. The graph makes every Agent Team action traceable
+to repo-local files instead of chat history.
 
 ## Contract Types
 

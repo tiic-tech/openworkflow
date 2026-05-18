@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: work_items:m04-npm-first-cli-architecture
+contract_type: work_items
+title: M04 npm-first CLI Architecture work items
+status: active
+change_contract: changes/M04-npm-first-cli-architecture/CHANGE.yaml
+items:
+  - task_id: M04-T001
+    title: Add npm and TypeScript project skeleton
+    status: done
+    depends_on: []
+    owned_paths:
+      - package.json
+      - package-lock.json
+      - tsconfig.json
+      - packages/
+    acceptance:
+      - package exposes an openworkflow bin.
+      - npm run build compiles TS to dist/.
+  - task_id: M04-T002
+    title: Implement init command and Codex adapter output
+    status: done
+    depends_on:
+      - M04-T001
+    owned_paths:
+      - packages/cli/
+      - packages/core/
+      - packages/adapters/
+    acceptance:
+      - init creates .openworkflow platform contracts.
+      - init --tools codex creates .codex agents, skills, and commands.
+  - task_id: M04-T003
+    title: Implement TypeScript validate command
+    status: done
+    depends_on:
+      - M04-T001
+    owned_paths:
+      - packages/cli/
+      - packages/core/
+    acceptance:
+      - validate checks required .openworkflow files and YAML contract metadata.
+      - validate does not depend on Python or Ruby.
+  - task_id: M04-T004
+    title: Update docs and repository validation
+    status: done
+    depends_on:
+      - M04-T002
+      - M04-T003
+    owned_paths:
+      - AGENT.md
+      - references/
+      - scripts/validate_openworkflow.py
+    acceptance:
+      - project guide documents npm-first architecture.
+      - existing repository validator accepts M04 artifacts.

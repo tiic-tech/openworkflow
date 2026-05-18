@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: change:m04-npm-first-cli-architecture
+contract_type: change
+title: M04 npm-first CLI Architecture
+status: active
+source_artifacts:
+  - AGENT.md
+  - references/contract-graph.md
+  - changes/M03-prototype-discovery-loop/CHANGE.yaml
+depends_on:
+  - change:m03-prototype-discovery-loop
+produces:
+  - work_items:m04-npm-first-cli-architecture
+problem: >
+  OpenWorkflow has repo-local protocol prototypes and Python helper scripts,
+  but it is not yet installable as an npm/npx CLI that can initialize a target
+  project with platform-independent .openworkflow contracts and Codex adapter
+  files.
+goals:
+  - Add an npm-first TypeScript CLI architecture.
+  - Support openworkflow init <folder> --tools codex.
+  - Generate .openworkflow as the platform-independent source of truth.
+  - Generate .codex agents, skills, and commands as a Codex adapter surface.
+  - Add openworkflow validate for .openworkflow and repository protocol checks.
+  - Preserve existing Python scripts as prototype-era helpers while making TS the production path.
+non_goals:
+  - Publish to npm in M04.
+  - Fully replace every Python helper script.
+  - Implement every future OpenWorkflow command.
+  - Generate production-ready Codex skill implementations for all workflow stages.
+affected_paths:
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - packages/
+  - AGENT.md
+  - references/
+  - changes/M04-npm-first-cli-architecture/
+acceptance:
+  - npm install completes and records dependencies.
+  - npm run build compiles the TypeScript CLI.
+  - node dist/cli/src/index.js init <folder> --tools codex creates .openworkflow and .codex.
+  - node dist/cli/src/index.js validate --root <folder> validates generated .openworkflow files.
+  - Existing python3 scripts/validate_openworkflow.py --root . still passes.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js init /tmp/openworkflow-m04-smoke --tools codex --force
+  - node dist/cli/src/index.js validate --root /tmp/openworkflow-m04-smoke
+  - python3 scripts/validate_openworkflow.py --root .
