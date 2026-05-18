@@ -1,3 +1,4 @@
+import { statSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { CONTRACT_TYPES, SCHEMA_VERSION } from "../contracts/index.js";
@@ -18,9 +19,13 @@ const REQUIRED_OPENWORKFLOW_FILES = [
   ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
   ".openworkflow/context/CONTEXT_MAP.yaml",
   ".openworkflow/vision/VISION_CONTRACT.yaml",
+  ".openworkflow/vision/_templates/VISION_SESSION.yaml",
   ".openworkflow/validation/VALIDATION_INDEX.yaml",
+  ".openworkflow/validation/_templates/VALIDATION.yaml",
   ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+  ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
   ".openworkflow/decisions/DECISION_INDEX.yaml",
+  ".openworkflow/decisions/_templates/DECISION.yaml",
   ".openworkflow/specs/SPEC_INDEX.yaml",
   ".openworkflow/changes/CHANGE_INDEX.yaml",
   ".openworkflow/runtime/RUNTIME_INDEX.yaml",
@@ -48,6 +53,7 @@ export async function validateOpenWorkflow(root: string): Promise<ValidationResu
     validateContractGraph(root, file, data, errors);
     validateArtifactContracts(root, file, data, errors);
     validateDisclosureLevels(root, file, data, errors);
+    validateActivePointer(root, file, data, errors);
     validateDiscoveryArtifact(root, file, data, errors);
   }
 
@@ -73,14 +79,123 @@ function validateArtifactContracts(root: string, file: string, data: unknown, er
     if (typeof artifactType === "string") {
       required.delete(artifactType);
     }
-    for (const key of ["artifact_type", "contract_type", "command", "source_of_truth_path", "required_keys"]) {
+    for (const key of [
+      "artifact_type",
+      "contract_type",
+      "command",
+      "source_of_truth_path",
+      "template_path",
+      "read_policy",
+      "active_pointer",
+      "required_keys",
+    ]) {
       if (!(key in artifact)) {
         errors.push(`${relative(root, file)} artifact entry missing ${key}`);
       }
     }
+    validateArtifactContractMetadata(root, file, artifact, errors);
   }
   for (const artifactType of required) {
     errors.push(`${relative(root, file)} missing artifact_type ${artifactType}`);
+  }
+}
+
+function validateArtifactContractMetadata(
+  root: string,
+  file: string,
+  artifact: Record<string, unknown>,
+  errors: string[],
+): void {
+  const label = relative(root, file);
+  if (typeof artifact.template_path === "string") {
+    const templatePath = join(root, artifact.template_path);
+    if (!templatePath.startsWith(root)) {
+      errors.push(`${label} references template path outside root: ${artifact.template_path}`);
+    }
+  }
+  const readPolicy = artifact.read_policy;
+  if (isRecord(readPolicy)) {
+    for (const key of ["load_by_default", "agent_read_order", "max_yaml_lines", "max_note_lines", "raw_evidence"]) {
+      if (!(key in readPolicy)) {
+        errors.push(`${label} ${String(artifact.artifact_type)} read_policy missing ${key}`);
+      }
+    }
+  } else {
+    errors.push(`${label} ${String(artifact.artifact_type)} read_policy must be a mapping`);
+  }
+  const activePointer = artifact.active_pointer;
+  if (isRecord(activePointer)) {
+    for (const key of ["index_path", "pointer_key", "collection_key", "id_key", "path_key"]) {
+      if (!(key in activePointer)) {
+        errors.push(`${label} ${String(artifact.artifact_type)} active_pointer missing ${key}`);
+      }
+    }
+  } else {
+    errors.push(`${label} ${String(artifact.artifact_type)} active_pointer must be a mapping`);
+  }
+}
+
+function validateActivePointer(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!isRecord(data)) {
+    return;
+  }
+  const label = relative(root, file);
+  const rules = [
+    pointerRule("VISION_CONTRACT.yaml", "current_session", "sessions", "session_id", "path"),
+    pointerRule("VALIDATION_INDEX.yaml", "current_validation", "validations", "validation_id", "path"),
+    pointerRule("PROTOTYPE_INDEX.yaml", "current_prototype", "prototypes", "prototype_id", "path"),
+    pointerRule("DECISION_INDEX.yaml", "current_decision", "decisions", "decision_id", "path"),
+  ];
+  const rule = rules.find((item) => file.endsWith(item.fileName));
+  if (!rule) {
+    return;
+  }
+  const pointer = data[rule.pointerKey];
+  if (pointer === null || pointer === undefined) {
+    return;
+  }
+  if (typeof pointer !== "string" || pointer.length === 0) {
+    errors.push(`${label} ${rule.pointerKey} must be null or a non-empty string`);
+    return;
+  }
+  const collection = data[rule.collectionKey];
+  if (!Array.isArray(collection)) {
+    errors.push(`${label} ${rule.collectionKey} must be a list when ${rule.pointerKey} is set`);
+    return;
+  }
+  const entry = collection.find((item) => isRecord(item) && item[rule.idKey] === pointer);
+  if (!isRecord(entry)) {
+    errors.push(`${label} ${rule.pointerKey} references missing ${rule.collectionKey} entry ${pointer}`);
+    return;
+  }
+  const artifactPath = entry[rule.pathKey];
+  if (typeof artifactPath !== "string" || artifactPath.length === 0) {
+    errors.push(`${label} ${pointer} missing ${rule.pathKey}`);
+    return;
+  }
+  const resolved = join(root, artifactPath);
+  if (!resolved.startsWith(root)) {
+    errors.push(`${label} ${pointer} path is outside root: ${artifactPath}`);
+    return;
+  }
+  if (!existsSyncMarker(resolved)) {
+    errors.push(`${label} ${rule.pointerKey} references missing artifact path ${artifactPath}`);
+  }
+}
+
+function pointerRule(fileName: string, pointerKey: string, collectionKey: string, idKey: string, pathKey: string) {
+  return { fileName, pointerKey, collectionKey, idKey, pathKey };
+}
+
+function existsSyncMarker(path: string): boolean {
+  try {
+    statSync(path);
+    return true;
+  } catch (error) {
+    if (isNotFound(error)) {
+      return false;
+    }
+    throw error;
   }
 }
 

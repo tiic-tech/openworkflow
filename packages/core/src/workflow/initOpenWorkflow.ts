@@ -19,9 +19,13 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
     ".openworkflow/workflow/archive",
     ".openworkflow/context/archive",
     ".openworkflow/vision/archive",
+    ".openworkflow/vision/_templates",
     ".openworkflow/vision/sessions/archive",
+    ".openworkflow/validation/_templates",
     ".openworkflow/validation/archive",
+    ".openworkflow/prototypes/_templates",
     ".openworkflow/prototypes/archive",
+    ".openworkflow/decisions/_templates",
     ".openworkflow/decisions/archive",
     ".openworkflow/specs/archive",
     ".openworkflow/changes/archive",
@@ -44,6 +48,9 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
   await writeContract(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", artifactContracts(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", disclosureLevels(options), options.force, written, skipped);
+  for (const artifact of getDiscoveryArtifactContracts()) {
+    await writeContract(root, artifact.templatePath, artifactTemplate(artifact.template), options.force, written, skipped);
+  }
   await writeContract(root, ".openworkflow/context/CONTEXT.md", contextDoc(options.projectTitle), options.force, written, skipped);
   await writeContract(root, ".openworkflow/context/CONTEXT_MAP.yaml", contextMap(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/vision/VISION.md", visionDoc(options.projectTitle), options.force, written, skipped);
@@ -177,16 +184,36 @@ function artifactContracts(options: InitOptions): string {
       command: artifact.command,
       title: artifact.title,
       source_of_truth_path: artifact.sourceOfTruthPath,
+      template_path: artifact.templatePath,
       index_path: artifact.indexPath,
+      index_collection_key: artifact.indexCollectionKey,
       note_path: artifact.notePath,
       review_path: artifact.reviewPath,
       disclosure_level: artifact.disclosureLevel,
       required_keys: artifact.requiredKeys,
+      read_policy: {
+        load_by_default: artifact.readPolicy.loadByDefault,
+        agent_read_order: artifact.readPolicy.agentReadOrder,
+        max_yaml_lines: artifact.readPolicy.maxYamlLines,
+        max_note_lines: artifact.readPolicy.maxNoteLines,
+        raw_evidence: artifact.readPolicy.rawEvidence,
+      },
+      active_pointer: {
+        index_path: artifact.activePointer.indexPath,
+        pointer_key: artifact.activePointer.pointerKey,
+        collection_key: artifact.activePointer.collectionKey,
+        id_key: artifact.activePointer.idKey,
+        path_key: artifact.activePointer.pathKey,
+      },
       evidence_policy: artifact.evidencePolicy,
       handoff_key: artifact.handoffKey,
     })),
     updated_at: null,
   });
+}
+
+function artifactTemplate(template: Record<string, unknown>): string {
+  return dumpYaml(template);
 }
 
 function disclosureLevels(options: InitOptions): string {

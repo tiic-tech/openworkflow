@@ -136,7 +136,7 @@ function artifactList(artifacts: ReturnType<typeof getDiscoveryArtifactContracts
   return artifacts
     .map(
       (artifact) =>
-        `- \`${artifact.artifactType}\`: source \`${artifact.sourceOfTruthPath}\`, note \`${artifact.notePath}\`, review \`${artifact.reviewPath ?? "none"}\``,
+        `- \`${artifact.artifactType}\`: template \`${artifact.templatePath}\`, source \`${artifact.sourceOfTruthPath}\`, note \`${artifact.notePath}\`, review \`${artifact.reviewPath ?? "none"}\`, load_by_default \`${artifact.readPolicy.loadByDefault}\`, max_yaml_lines \`${artifact.readPolicy.maxYamlLines}\``,
     )
     .join("\n");
 }

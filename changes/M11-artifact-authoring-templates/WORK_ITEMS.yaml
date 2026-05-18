@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: work_items:M11-artifact-authoring-templates
+contract_type: work_items
+title: M11 Artifact authoring templates work items
+status: active
+change_contract: changes/M11-artifact-authoring-templates/CHANGE.yaml
+items:
+  - task_id: M11-T001
+    title: Define authoring template reference and TODO
+    status: done
+    depends_on: []
+    owned_paths:
+      - references/artifact-authoring-templates.md
+      - changes/M11-artifact-authoring-templates/TODO.md
+    acceptance:
+      - Reference defines template purpose, active pointer semantics, and read policy expectations.
+      - TODO lists ordered implementation and verification steps.
+  - task_id: M11-T002
+    title: Extend artifact registry with templates and read policies
+    status: done
+    depends_on:
+      - M11-T001
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+    acceptance:
+      - Registry exposes template_path, read_policy, context_budget, and active_pointer metadata for each discovery artifact.
+  - task_id: M11-T003
+    title: Generate authoring templates during init
+    status: done
+    depends_on:
+      - M11-T002
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+    acceptance:
+      - init writes all discovery artifact templates under stage-local _templates directories.
+      - Artifact contract audit file includes template and read policy metadata.
+  - task_id: M11-T004
+    title: Update command rendering for templates and read policies
+    status: done
+    depends_on:
+      - M11-T002
+    owned_paths:
+      - packages/adapters/codex/src/generateCommands.ts
+    acceptance:
+      - Generated discovery commands show each artifact template path.
+      - Generated discovery commands show load-by-default and context budget guidance.
+  - task_id: M11-T005
+    title: Validate templates and active pointers
+    status: done
+    depends_on:
+      - M11-T003
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - scripts/validate_openworkflow.py
+      - schemas/
+    acceptance:
+      - Validators require generated template files in initialized repos.
+      - Validators report current pointer references that do not match an indexed artifact path.
+  - task_id: M11-T006
+    title: Verify M11 behavior
+    status: done
+    depends_on:
+      - M11-T001
+      - M11-T002
+      - M11-T003
+      - M11-T004
+      - M11-T005
+    owned_paths:
+      - changes/M11-artifact-authoring-templates/ACCEPTANCE.md
+    acceptance:
+      - Full M11 validation command list passes.
+updated_at: null

@@ -35,13 +35,14 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "artifact_type",
-          "contract_type",
-          "command",
-          "source_of_truth_path",
-          "required_keys"
-        ],
+          "required": [
+            "artifact_type",
+            "contract_type",
+            "command",
+            "source_of_truth_path",
+            "template_path",
+            "required_keys"
+          ],
         "properties": {
           "artifact_type": {
             "type": "string"
@@ -54,6 +55,65 @@
           },
           "source_of_truth_path": {
             "type": "string"
+          },
+          "template_path": {
+            "type": "string"
+          },
+          "read_policy": {
+            "type": "object",
+            "required": [
+              "load_by_default",
+              "agent_read_order",
+              "max_yaml_lines",
+              "max_note_lines",
+              "raw_evidence"
+            ],
+            "properties": {
+              "load_by_default": {
+                "type": "boolean"
+              },
+              "agent_read_order": {
+                "type": "integer"
+              },
+              "max_yaml_lines": {
+                "type": "integer"
+              },
+              "max_note_lines": {
+                "type": "integer"
+              },
+              "raw_evidence": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          },
+          "active_pointer": {
+            "type": "object",
+            "required": [
+              "index_path",
+              "pointer_key",
+              "collection_key",
+              "id_key",
+              "path_key"
+            ],
+            "properties": {
+              "index_path": {
+                "type": "string"
+              },
+              "pointer_key": {
+                "type": "string"
+              },
+              "collection_key": {
+                "type": "string"
+              },
+              "id_key": {
+                "type": "string"
+              },
+              "path_key": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
           },
           "required_keys": {
             "type": "array",

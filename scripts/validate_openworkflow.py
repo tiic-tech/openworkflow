@@ -19,6 +19,7 @@ REQUIRED_FILES = [
     "references/engineering-skill-reference-research.md",
     "references/audit-first-discovery-loop.md",
     "references/discovery-artifact-contracts.md",
+    "references/artifact-authoring-templates.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
@@ -83,6 +84,8 @@ REQUIRED_FILES = [
     "changes/M09-audit-first-discovery-loop/WORK_ITEMS.yaml",
     "changes/M10-discovery-artifact-contracts/CHANGE.yaml",
     "changes/M10-discovery-artifact-contracts/WORK_ITEMS.yaml",
+    "changes/M11-artifact-authoring-templates/CHANGE.yaml",
+    "changes/M11-artifact-authoring-templates/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
@@ -320,9 +323,32 @@ def validate_artifact_contracts(root: Path, path: Path, data: Any, errors: list[
         artifact_type = artifact.get("artifact_type")
         if isinstance(artifact_type, str):
             missing.discard(artifact_type)
-        for key in ("artifact_type", "contract_type", "command", "source_of_truth_path", "required_keys"):
+        for key in (
+            "artifact_type",
+            "contract_type",
+            "command",
+            "source_of_truth_path",
+            "template_path",
+            "read_policy",
+            "active_pointer",
+            "required_keys",
+        ):
             if key not in artifact:
                 errors.append(f"{rel(root, path)} artifact {index} missing {key}")
+        read_policy = artifact.get("read_policy")
+        if isinstance(read_policy, dict):
+            for key in ("load_by_default", "agent_read_order", "max_yaml_lines", "max_note_lines", "raw_evidence"):
+                if key not in read_policy:
+                    errors.append(f"{rel(root, path)} artifact {index} read_policy missing {key}")
+        else:
+            errors.append(f"{rel(root, path)} artifact {index} read_policy must be a mapping")
+        active_pointer = artifact.get("active_pointer")
+        if isinstance(active_pointer, dict):
+            for key in ("index_path", "pointer_key", "collection_key", "id_key", "path_key"):
+                if key not in active_pointer:
+                    errors.append(f"{rel(root, path)} artifact {index} active_pointer missing {key}")
+        else:
+            errors.append(f"{rel(root, path)} artifact {index} active_pointer must be a mapping")
     for artifact_type in sorted(missing):
         errors.append(f"{rel(root, path)} missing artifact_type {artifact_type}")
 
@@ -412,6 +438,40 @@ def validate_discovery_artifact(root: Path, path: Path, data: Any, errors: list[
             errors.append(f"{rel(root, path)} has invalid outcome {data.get('outcome')}")
 
 
+def validate_active_pointer(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    rules = {
+        "VISION_CONTRACT.yaml": ("current_session", "sessions", "session_id", "path"),
+        "VALIDATION_INDEX.yaml": ("current_validation", "validations", "validation_id", "path"),
+        "PROTOTYPE_INDEX.yaml": ("current_prototype", "prototypes", "prototype_id", "path"),
+        "DECISION_INDEX.yaml": ("current_decision", "decisions", "decision_id", "path"),
+    }
+    rule = rules.get(path.name)
+    if rule is None:
+        return
+    pointer_key, collection_key, id_key, path_key = rule
+    pointer = data.get(pointer_key)
+    if pointer is None:
+        return
+    if not isinstance(pointer, str) or not pointer:
+        errors.append(f"{rel(root, path)} {pointer_key} must be null or a non-empty string")
+        return
+    collection = data.get(collection_key)
+    if not isinstance(collection, list):
+        errors.append(f"{rel(root, path)} {collection_key} must be a list when {pointer_key} is set")
+        return
+    entry = next((item for item in collection if isinstance(item, dict) and item.get(id_key) == pointer), None)
+    if entry is None:
+        errors.append(f"{rel(root, path)} {pointer_key} references missing {collection_key} entry {pointer}")
+        return
+    artifact_path = entry.get(path_key)
+    if not isinstance(artifact_path, str) or not artifact_path:
+        errors.append(f"{rel(root, path)} {pointer} missing {path_key}")
+        return
+    artifact_root = contract_root_for(root, path)
+    if not (artifact_root / artifact_path).exists():
+        errors.append(f"{rel(root, path)} {pointer_key} references missing artifact path {artifact_path}")
+
+
 def workflow_root_for(path: Path) -> Path:
     # <project>/.codex/workflow/WORKFLOW_INDEX.yaml
     return path.parents[2]
@@ -468,6 +528,7 @@ def validate_yaml_contracts(root: Path, errors: list[str]) -> None:
             validate_prototype(root, path, data, errors)
             validate_artifact_contracts(root, path, data, errors)
             validate_disclosure_levels(root, path, data, errors)
+            validate_active_pointer(root, path, data, errors)
             validate_discovery_artifact(root, path, data, errors)
             validate_workflow_index(root, path, data, errors)
             validate_contract_graph(root, path, data, errors)
