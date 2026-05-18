@@ -11,24 +11,12 @@ export interface ValidationResult {
 }
 
 const REQUIRED_OPENWORKFLOW_FILES = [
+  ".openworkflow/config.yaml",
   ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
-  ".openworkflow/workflow/CONTRACT_GRAPH.yaml",
   ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
   ".openworkflow/audit/CONTEXT_PACKETS.yaml",
   ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
   ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
-  ".openworkflow/context/CONTEXT_MAP.yaml",
-  ".openworkflow/vision/VISION_CONTRACT.yaml",
-  ".openworkflow/vision/_templates/VISION_SESSION.yaml",
-  ".openworkflow/validation/VALIDATION_INDEX.yaml",
-  ".openworkflow/validation/_templates/VALIDATION.yaml",
-  ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
-  ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
-  ".openworkflow/decisions/DECISION_INDEX.yaml",
-  ".openworkflow/decisions/_templates/DECISION.yaml",
-  ".openworkflow/specs/SPEC_INDEX.yaml",
-  ".openworkflow/changes/CHANGE_INDEX.yaml",
-  ".openworkflow/runtime/RUNTIME_INDEX.yaml",
 ];
 
 export async function validateOpenWorkflow(root: string): Promise<ValidationResult> {
@@ -69,7 +57,13 @@ function validateArtifactContracts(root: string, file: string, data: unknown, er
     errors.push(`${relative(root, file)} must contain artifacts`);
     return;
   }
-  const required = new Set(["vision_session", "validation_target", "prototype_evidence", "decision_record"]);
+  const required = new Set([
+    "vision_session",
+    "validation_target",
+    "prototype_evidence",
+    "decision_record",
+    "product_design",
+  ]);
   for (const artifact of artifacts) {
     if (!isRecord(artifact)) {
       errors.push(`${relative(root, file)} has invalid artifact entry`);
@@ -145,6 +139,7 @@ function validateActivePointer(root: string, file: string, data: unknown, errors
     pointerRule("VALIDATION_INDEX.yaml", "current_validation", "validations", "validation_id", "path"),
     pointerRule("PROTOTYPE_INDEX.yaml", "current_prototype", "prototypes", "prototype_id", "path"),
     pointerRule("DECISION_INDEX.yaml", "current_decision", "decisions", "decision_id", "path"),
+    pointerRule("DESIGN_INDEX.yaml", "current_design", "designs", "design_id", "path"),
   ];
   const rule = rules.find((item) => file.endsWith(item.fileName));
   if (!rule) {
@@ -252,6 +247,9 @@ function validateDiscoveryArtifact(root: string, file: string, data: unknown, er
   if (data.artifact_type === "decision_record") {
     validateDecisionRecord(label, data, errors);
   }
+  if (data.artifact_type === "product_design") {
+    validateProductDesign(label, data, errors);
+  }
 }
 
 function artifactRequiredKeys(artifactType: string): string[] | null {
@@ -273,6 +271,22 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "rejected_scope",
       "next_command",
       "follow_up_questions",
+    ];
+  }
+  if (artifactType === "product_design") {
+    return [
+      "accepted_prototype_evidence",
+      "personas",
+      "journey_map",
+      "user_stories",
+      "feature_matrix",
+      "kano_classification",
+      "behavior_model",
+      "ux_states",
+      "scope",
+      "open_questions",
+      "conditional_packets",
+      "spec_readiness",
     ];
   }
   return null;
@@ -317,6 +331,17 @@ function validateDecisionRecord(label: string, data: Record<string, unknown>, er
     !["continue", "pivot", "stop", "needs_more_evidence"].includes(data.outcome)
   ) {
     errors.push(`${label} has invalid outcome ${data.outcome}`);
+  }
+}
+
+function validateProductDesign(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const specReadiness = data.spec_readiness;
+  if (isRecord(specReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in specReadiness)) {
+        errors.push(`${label} spec_readiness missing ${key}`);
+      }
+    }
   }
 }
 

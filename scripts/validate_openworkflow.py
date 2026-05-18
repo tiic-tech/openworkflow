@@ -20,6 +20,7 @@ REQUIRED_FILES = [
     "references/audit-first-discovery-loop.md",
     "references/discovery-artifact-contracts.md",
     "references/artifact-authoring-templates.md",
+    "references/runtime-command-surface.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
@@ -29,10 +30,12 @@ REQUIRED_FILES = [
     "schemas/validation-target.schema.json",
     "schemas/prototype-evidence.schema.json",
     "schemas/decision-record.schema.json",
+    "schemas/product-design.schema.json",
     "schemas/change.schema.json",
     "schemas/validation.schema.json",
     "schemas/prototype.schema.json",
     "schemas/work-items.schema.json",
+    "scripts/verify_m12_runtime_surface.py",
     "package.json",
     "tsconfig.json",
     "packages/cli/src/index.ts",
@@ -86,6 +89,8 @@ REQUIRED_FILES = [
     "changes/M10-discovery-artifact-contracts/WORK_ITEMS.yaml",
     "changes/M11-artifact-authoring-templates/CHANGE.yaml",
     "changes/M11-artifact-authoring-templates/WORK_ITEMS.yaml",
+    "changes/M12-runtime-command-surface/CHANGE.yaml",
+    "changes/M12-runtime-command-surface/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
@@ -315,7 +320,7 @@ def validate_artifact_contracts(root: Path, path: Path, data: Any, errors: list[
     if not isinstance(artifacts, list) or not artifacts:
         errors.append(f"{rel(root, path)} must contain artifacts")
         return
-    missing = {"vision_session", "validation_target", "prototype_evidence", "decision_record"}
+    missing = {"vision_session", "validation_target", "prototype_evidence", "decision_record", "product_design"}
     for index, artifact in enumerate(artifacts):
         if not isinstance(artifact, dict):
             errors.append(f"{rel(root, path)} artifact {index} is not a mapping")
@@ -415,6 +420,20 @@ def validate_discovery_artifact(root: Path, path: Path, data: Any, errors: list[
             "next_command",
             "follow_up_questions",
         ],
+        "product_design": [
+            "accepted_prototype_evidence",
+            "personas",
+            "journey_map",
+            "user_stories",
+            "feature_matrix",
+            "kano_classification",
+            "behavior_model",
+            "ux_states",
+            "scope",
+            "open_questions",
+            "conditional_packets",
+            "spec_readiness",
+        ],
     }
     required = required_by_type.get(artifact_type)
     if required is None:
@@ -436,6 +455,13 @@ def validate_discovery_artifact(root: Path, path: Path, data: Any, errors: list[
     elif artifact_type == "decision_record":
         if data.get("outcome") not in {"continue", "pivot", "stop", "needs_more_evidence"}:
             errors.append(f"{rel(root, path)} has invalid outcome {data.get('outcome')}")
+    elif artifact_type == "product_design":
+        spec_readiness = data.get("spec_readiness")
+        if isinstance(spec_readiness, dict):
+            if "ready" not in spec_readiness:
+                errors.append(f"{rel(root, path)} spec_readiness missing ready")
+            if "next_command" not in spec_readiness:
+                errors.append(f"{rel(root, path)} spec_readiness missing next_command")
 
 
 def validate_active_pointer(root: Path, path: Path, data: Any, errors: list[str]) -> None:
@@ -444,6 +470,7 @@ def validate_active_pointer(root: Path, path: Path, data: Any, errors: list[str]
         "VALIDATION_INDEX.yaml": ("current_validation", "validations", "validation_id", "path"),
         "PROTOTYPE_INDEX.yaml": ("current_prototype", "prototypes", "prototype_id", "path"),
         "DECISION_INDEX.yaml": ("current_decision", "decisions", "decision_id", "path"),
+        "DESIGN_INDEX.yaml": ("current_design", "designs", "design_id", "path"),
     }
     rule = rules.get(path.name)
     if rule is None:

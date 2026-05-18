@@ -17,7 +17,7 @@ Use this adapter to operate OpenWorkflow from Codex. The durable workflow contra
 
 Rules:
 
-- Do not create production specs before validation and prototype decision.
+- Do not create production specs before validation, prototype decision, and design readiness.
 - Do not create Agent Team runtime before a focused change exists.
 - Keep \`.codex/\` generated or tool-facing; keep product truth in \`.openworkflow/\`.
 - Run \`openworkflow sync --tools codex\` after upgrading the npm package or changing adapter templates.

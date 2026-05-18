@@ -16,6 +16,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "validate": "python3 scripts/validate_openworkflow.py --root .",
+    "verify:m12": "python3 scripts/verify_m12_runtime_surface.py",
     "validate:cli": "node dist/cli/src/index.js validate --root /tmp/openworkflow-m04-smoke",
     "smoke:init": "node dist/cli/src/index.js init /tmp/openworkflow-m04-smoke --tools codex --force"
   },

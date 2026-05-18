@@ -2,11 +2,12 @@ export type DiscoveryArtifactType =
   | "vision_session"
   | "validation_target"
   | "prototype_evidence"
-  | "decision_record";
+  | "decision_record"
+  | "product_design";
 
 export interface DiscoveryArtifactContract {
   artifactType: DiscoveryArtifactType;
-  contractType: "vision" | "validation" | "prototype" | "decision";
+  contractType: "vision" | "validation" | "prototype" | "decision" | "design";
   command: string;
   title: string;
   sourceOfTruthPath: string;
@@ -22,6 +23,14 @@ export interface DiscoveryArtifactContract {
   evidencePolicy: string;
   handoffKey: string;
   template: Record<string, unknown>;
+  conditionalPackets?: readonly ConditionalPacketMetadata[];
+}
+
+export interface ConditionalPacketMetadata {
+  artifactType: string;
+  path: string;
+  requiredByDefault: boolean;
+  when: string;
 }
 
 export interface ArtifactReadPolicy {
@@ -226,7 +235,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
   {
     artifactType: "prototype_evidence",
     contractType: "prototype",
-    command: "/ow:prototype",
+    command: "/ow:proto",
     title: "Prototype evidence",
     sourceOfTruthPath: ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
     templatePath: ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
@@ -340,6 +349,128 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       rejected_scope: [],
       next_command: null,
       follow_up_questions: [],
+      updated_at: null,
+    },
+  },
+  {
+    artifactType: "product_design",
+    contractType: "design",
+    command: "/ow:design",
+    title: "Product design",
+    sourceOfTruthPath: ".openworkflow/design/<id>/PRODUCT_DESIGN.yaml",
+    templatePath: ".openworkflow/design/_templates/PRODUCT_DESIGN.yaml",
+    indexPath: ".openworkflow/design/DESIGN_INDEX.yaml",
+    indexCollectionKey: "designs",
+    notePath: ".openworkflow/design/<id>/NOTE.md",
+    reviewPath: null,
+    disclosureLevel: 2,
+    requiredKeys: [
+      "artifact_type",
+      "accepted_prototype_evidence",
+      "personas",
+      "journey_map",
+      "user_stories",
+      "feature_matrix",
+      "kano_classification",
+      "behavior_model",
+      "ux_states",
+      "scope",
+      "open_questions",
+      "conditional_packets",
+      "spec_readiness",
+    ],
+    readPolicy: {
+      loadByDefault: true,
+      agentReadOrder: 60,
+      maxYamlLines: 220,
+      maxNoteLines: 60,
+      rawEvidence: "only_when_referenced",
+    },
+    activePointer: {
+      indexPath: ".openworkflow/design/DESIGN_INDEX.yaml",
+      pointerKey: "current_design",
+      collectionKey: "designs",
+      idKey: "design_id",
+      pathKey: "path",
+    },
+    evidencePolicy: "Reference accepted prototype evidence and decision records by path; keep product design decisions in PRODUCT_DESIGN.yaml.",
+    handoffKey: "spec_readiness.next_command",
+    conditionalPackets: [
+      {
+        artifactType: "tech_spec",
+        path: ".openworkflow/design/<id>/TECH_SPEC.yaml",
+        requiredByDefault: false,
+        when: "Use when implementation constraints, architecture, integrations, or non-functional requirements must be clarified before /ow:spec.",
+      },
+      {
+        artifactType: "frontend_spec",
+        path: ".openworkflow/design/<id>/FRONTEND_SPEC.yaml",
+        requiredByDefault: false,
+        when: "Use when UI structure, component behavior, visual states, or accessibility details need a dedicated packet.",
+      },
+      {
+        artifactType: "backend_spec",
+        path: ".openworkflow/design/<id>/BACKEND_SPEC.yaml",
+        requiredByDefault: false,
+        when: "Use when server behavior, jobs, services, permissions, or operational boundaries need a dedicated packet.",
+      },
+      {
+        artifactType: "api_contract",
+        path: ".openworkflow/design/<id>/API_CONTRACT.yaml",
+        requiredByDefault: false,
+        when: "Use when external or internal API request, response, error, or compatibility contracts are needed.",
+      },
+      {
+        artifactType: "db_schema_model",
+        path: ".openworkflow/design/<id>/DB_SCHEMA_MODEL.yaml",
+        requiredByDefault: false,
+        when: "Use when persistent entities, relationships, migrations, or retention rules need explicit modeling.",
+      },
+    ],
+    template: {
+      schema_version: "0.1.0",
+      contract_id: "design:<id>",
+      contract_type: "design",
+      artifact_type: "product_design",
+      title: "<short product design title>",
+      status: "draft",
+      accepted_prototype_evidence: [],
+      personas: [],
+      journey_map: [],
+      user_stories: [],
+      feature_matrix: [],
+      kano_classification: {
+        must_have: [],
+        performance: [],
+        delighters: [],
+        indifferent: [],
+        reverse: [],
+      },
+      behavior_model: {
+        entities: [],
+        states: [],
+        transitions: [],
+        rules: [],
+      },
+      ux_states: {
+        empty: [],
+        loading: [],
+        success: [],
+        error: [],
+        edge_cases: [],
+      },
+      scope: {
+        in: [],
+        out: [],
+        deferred: [],
+      },
+      open_questions: [],
+      conditional_packets: [],
+      spec_readiness: {
+        ready: false,
+        blockers: [],
+        next_command: null,
+      },
       updated_at: null,
     },
   },

@@ -35,7 +35,7 @@ Read \`.openworkflow/workflow/WORKFLOW_INDEX.yaml\` first. Do not treat \`.codex
 Default journey:
 
 \`\`\`txt
-vision -> validation -> prototype -> decision -> spec -> change -> runtime
+vision -> validation -> proto -> decision -> design -> spec -> change -> runtime
 \`\`\`
 
 Prototype discovery must not create production specs, changes, teams, or runtime state before a decision authorizes continuation.

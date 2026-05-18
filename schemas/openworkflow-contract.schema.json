@@ -25,6 +25,7 @@
         "workflow",
         "context",
         "vision",
+        "design",
         "decision",
         "spec",
         "validation",
@@ -41,7 +42,8 @@
         "vision_session",
         "validation_target",
         "prototype_evidence",
-        "decision_record"
+        "decision_record",
+        "product_design"
       ]
     },
     "title": {

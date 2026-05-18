@@ -7,6 +7,13 @@ export function renderGeneratedFile(path: string, content: string, templateId: s
   if (path.endsWith(".yaml") || path.endsWith(".yml")) {
     return `# ${marker}\n${content}`;
   }
+  if (content.startsWith("---\n")) {
+    const frontmatterEnd = content.indexOf("\n---\n", 4);
+    if (frontmatterEnd !== -1) {
+      const endOffset = frontmatterEnd + "\n---\n".length;
+      return `${content.slice(0, endOffset)}<!-- ${marker} -->\n${content.slice(endOffset)}`;
+    }
+  }
   return `<!-- ${marker} -->\n${content}`;
 }
 

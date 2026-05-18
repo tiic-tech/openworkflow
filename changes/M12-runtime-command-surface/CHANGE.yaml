@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: change:M12-runtime-command-surface
+contract_type: change
+title: M12 Minimal runtime substrate and command surface alignment
+status: active
+source_artifacts:
+  - changes/M11-artifact-authoring-templates/CHANGE.yaml
+  - references/artifact-authoring-templates.md
+depends_on:
+  - change:M11-artifact-authoring-templates
+produces:
+  - work_items:M12-runtime-command-surface
+  - references/runtime-command-surface.md
+summary: >
+  Align OpenWorkflow with real command usage by minimizing init output,
+  installing Codex slash prompts in Codex's global prompt surface, separating
+  agent-only command protocol from user-facing behavior, and defining the
+  /ow:design bridge from validated prototype to product development.
+problem: >
+  M10 and M11 established auditable artifacts, but real dogfooding showed that
+  init creates too much stage state too early, Codex does not natively register
+  repo-local .codex/commands/ow files as slash commands, and interactive
+  commands expose too much internal reading, writing, and validation activity to
+  the user. The workflow also lacks a design bridge between accepted prototype
+  evidence and production specs.
+goals:
+  - Make init create only the minimal OpenWorkflow substrate: config, workflow index, and audit indexes.
+  - Remove eager empty stage directory and stage index creation from init.
+  - Install Codex command prompts to $CODEX_HOME/prompts/ow-*.md using frontmatter.
+  - Keep repo-local command files as generated references, not the primary Codex slash registration path.
+  - Refactor generated command docs to separate agent-only protocol blocks from user-facing behavior.
+  - Add /ow:design and its product design artifact contract.
+  - Define conditional downstream design packets for technical, frontend, backend, API, and database concerns without generating them by default.
+non_goals:
+  - Do not fully implement /ow:tune in M12.
+  - Do not build the complete design conversation runtime.
+  - Do not publish the npm package in M12.
+  - Do not remove existing sync, doctor, or validate commands.
+decisions:
+  - Stage artifacts are lazy-created by their command, not by init.
+  - Codex slash command prompts are global under $CODEX_HOME/prompts/.
+  - Generated command files should use XML-style tags and HTML comments to mark agent-only instructions.
+  - /ow:design produces a compact PRODUCT_DESIGN.yaml as the required bridge to /ow:spec.
+  - TECH_SPEC, FRONTEND_SPEC, BACKEND_SPEC, API_CONTRACT, and DB_SCHEMA_MODEL are conditional design packets, not default artifacts.
+affected_paths:
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/core/src/commands/
+  - packages/core/src/artifacts/
+  - packages/adapters/codex/src/
+  - schemas/
+  - scripts/validate_openworkflow.py
+  - references/runtime-command-surface.md
+  - changes/M12-runtime-command-surface/
+acceptance:
+  - M12 change artifacts include a task breakdown and TODO list.
+  - init creates only .openworkflow/config.yaml, .openworkflow/workflow/WORKFLOW_INDEX.yaml, and .openworkflow/audit/*.yaml under .openworkflow.
+  - Target repo validation accepts the minimal initialized state.
+  - Codex sync writes slash prompts to $CODEX_HOME/prompts/ow-*.md with description and argument-hint frontmatter.
+  - Generated repo-local command references use agent-only XML/comment blocks and concise user-facing behavior sections.
+  - /ow:design appears in command registry, audit indexes, and artifact contracts.
+  - Product design schema and template exist, while technical/frontend/backend/API/database packets are conditional.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null

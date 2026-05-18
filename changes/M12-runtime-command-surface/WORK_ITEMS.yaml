@@ -1,0 +1,93 @@
+schema_version: 0.1.0
+contract_id: work_items:M12-runtime-command-surface
+contract_type: work_items
+title: M12 Runtime command surface work items
+status: active
+change_contract: changes/M12-runtime-command-surface/CHANGE.yaml
+items:
+  - task_id: M12-T001
+    title: Define runtime command surface reference and TODO
+    status: completed
+    depends_on: []
+    owned_paths:
+      - references/runtime-command-surface.md
+      - changes/M12-runtime-command-surface/TODO.md
+    acceptance:
+      - Reference records OpenSpec findings and OpenWorkflow decisions.
+      - TODO lists implementation and verification order.
+  - task_id: M12-T002
+    title: Minimize init and relax validation for lazy stage artifacts
+    status: completed
+    depends_on:
+      - M12-T001
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - scripts/validate_openworkflow.py
+    acceptance:
+      - init no longer creates eager stage directories or stage indexes.
+      - validators accept minimal init while still checking present stage artifacts.
+  - task_id: M12-T003
+    title: Align Codex command registration with global prompt surface
+    status: completed
+    depends_on:
+      - M12-T001
+    owned_paths:
+      - packages/adapters/codex/src/
+    acceptance:
+      - Codex adapter writes $CODEX_HOME/prompts/ow-*.md prompt files.
+      - Prompt files include description and argument-hint frontmatter.
+      - Repo-local command references remain generated for audit/debug.
+  - task_id: M12-T004
+    title: Refactor command instructions into hidden protocol and concise user behavior
+    status: completed
+    depends_on:
+      - M12-T001
+      - M12-T003
+    owned_paths:
+      - packages/adapters/codex/src/generateCommands.ts
+    acceptance:
+      - Generated command content contains XML-style agent protocol blocks.
+      - Interactive commands instruct agents to ask one question without exposing internal read/write/validation chatter.
+  - task_id: M12-T005
+    title: Add /ow:design artifact contract and schema
+    status: completed
+    depends_on:
+      - M12-T001
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - schemas/product-design.schema.json
+      - schemas/openworkflow-contract.schema.json
+    acceptance:
+      - /ow:design is registered after /ow:proto and before /ow:spec.
+      - product_design artifact contract names required and conditional design packets.
+      - Product design schema captures users, journeys, stories, feature matrix, KANO ranking, scope, and spec readiness.
+  - task_id: M12-T006
+    title: Integrate and verify M12
+    status: completed
+    depends_on:
+      - M12-T002
+      - M12-T003
+      - M12-T004
+      - M12-T005
+    owned_paths:
+      - changes/M12-runtime-command-surface/ACCEPTANCE.md
+    acceptance:
+      - Full M12 validation command list passes.
+  - task_id: M12-T007
+    title: Fix M12 self-review issues
+    status: completed
+    depends_on:
+      - M12-T006
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/generateCommands.ts
+      - scripts/verify_m12_runtime_surface.py
+      - package.json
+    acceptance:
+      - Config adapter policy names global Codex prompts as the primary command delivery surface.
+      - /ow:design separates required outputs from conditional design packets.
+      - Automated runtime surface verification checks minimal init and Codex prompt registration artifacts.
+updated_at: null
