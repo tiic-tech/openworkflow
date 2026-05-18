@@ -82,7 +82,7 @@ architecture governance
 Runtime state is not a replacement for vision, spec, or change contracts.
 
 `.openworkflow/` is the platform-independent source of truth for initialized
-target repositories. Tool folders such as `.codex/` are generated adapter
+target repositories. Tool folders such as `.agents/` are generated adapter
 surfaces and should not become the canonical workflow state.
 
 ## Directory Conventions

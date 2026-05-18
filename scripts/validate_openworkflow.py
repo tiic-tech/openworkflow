@@ -35,7 +35,7 @@ REQUIRED_FILES = [
     "schemas/validation.schema.json",
     "schemas/prototype.schema.json",
     "schemas/work-items.schema.json",
-    "scripts/verify_m12_runtime_surface.py",
+    "scripts/verify_runtime_surface.py",
     "package.json",
     "tsconfig.json",
     "packages/cli/src/index.ts",
@@ -52,7 +52,6 @@ REQUIRED_FILES = [
     "packages/core/src/validators/validateOpenWorkflow.ts",
     "packages/core/src/graph/README.md",
     "packages/adapters/codex/src/generateCodexAdapter.ts",
-    "packages/adapters/codex/src/generateAgents.ts",
     "packages/adapters/codex/src/generateCommands.ts",
     "packages/adapters/codex/src/generateSkills.ts",
     "packages/adapters/codex/src/doctorCodexAdapter.ts",
@@ -91,6 +90,8 @@ REQUIRED_FILES = [
     "changes/M11-artifact-authoring-templates/WORK_ITEMS.yaml",
     "changes/M12-runtime-command-surface/CHANGE.yaml",
     "changes/M12-runtime-command-surface/WORK_ITEMS.yaml",
+    "changes/M13-codex-skill-adapter-alignment/CHANGE.yaml",
+    "changes/M13-codex-skill-adapter-alignment/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [

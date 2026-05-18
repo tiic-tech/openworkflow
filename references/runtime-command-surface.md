@@ -1,6 +1,6 @@
 # Runtime Command Surface
 
-M12 responds to dogfooding feedback from a real
+This reference records runtime command-surface decisions from dogfooding a real
 `/ow:vision -> /ow:validation -> /ow:proto -> /ow:decision` run.
 
 ## OpenSpec Findings
@@ -10,9 +10,9 @@ to live:
 
 - Command content is tool-agnostic.
 - Tool adapters decide file path and frontmatter.
-- Codex commands are global prompts under `$CODEX_HOME/prompts/`, not
-  project-local command files.
-- Skills remain project-local under `.codex/skills/`.
+- OpenSpec's older Codex adapter used global prompt files, but Codex's official
+  custom workflow mechanism is repo-local Skills.
+- OpenWorkflow's Codex adapter should generate Skills under `.agents/skills/`.
 - Artifact instructions use XML-style tags such as `<task>`, `<rules>`, and
   `<template>`.
 - HTML comments tell the agent which sections are constraints and must not be
@@ -48,28 +48,44 @@ Stage directories are lazy-created by commands:
 This keeps a new target repo from pretending every workflow stage already
 exists.
 
-## Codex Command Registration
+## Codex Skill Registration
 
-For Codex, slash prompts should be generated at:
+For Codex, OpenWorkflow commands should be generated as repo-local Skills:
 
 ```txt
-$CODEX_HOME/prompts/ow-vision.md
-$CODEX_HOME/prompts/ow-validation.md
-$CODEX_HOME/prompts/ow-proto.md
-$CODEX_HOME/prompts/ow-design.md
+.agents/skills/ow-vision/SKILL.md
+.agents/skills/ow-validation/SKILL.md
+.agents/skills/ow-proto/SKILL.md
+.agents/skills/ow-design/SKILL.md
 ```
 
-Each prompt uses frontmatter:
+Each `SKILL.md` uses frontmatter:
 
 ```yaml
 ---
-description: Start or continue OpenWorkflow vision discovery
-argument-hint: user intent or stage feedback
+name: ow-vision
+description: Create or refine the product vision contract through focused collaboration.
 ---
 ```
 
-Repo-local `.codex/commands/ow/*.md` files may still be generated as references,
-but they are not the assumed Codex slash registration surface.
+Each skill may include `agents/openai.yaml` for Codex App display metadata:
+
+```yaml
+interface:
+  display_name: "/ow:vision"
+  short_description: "Create or refine the product vision contract through focused collaboration."
+  default_prompt: "Use /ow:vision for this OpenWorkflow repository."
+```
+
+The durable OpenWorkflow semantic command remains `/ow:vision`; the explicit
+Codex invocation is `$ow-vision`. Codex may also expose enabled Skills in the
+slash command list, but OpenWorkflow treats Skill registration as the adapter
+contract.
+
+OpenWorkflow should not generate `.codex/commands/ow/*.md`,
+`.codex/skills/*`, or `$CODEX_HOME/prompts/ow-*.md` as the default Codex
+surface. Generated legacy files in those locations may be safely removed when
+they carry the OpenWorkflow generated marker.
 
 ## Interactive Command Behavior
 

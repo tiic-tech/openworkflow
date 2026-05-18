@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify M12 runtime command surface behavior against the built CLI."""
+"""Verify OpenWorkflow runtime command surface behavior against the built CLI."""
 
 from __future__ import annotations
 
@@ -62,25 +62,33 @@ def verify_minimal_openworkflow(root: Path) -> None:
 
 def verify_config(root: Path) -> None:
     config = read(root / ".openworkflow" / "config.yaml")
-    assert_true("default_command_delivery: codex-global-prompts" in config, "config missing global prompt delivery")
-    assert_true("$CODEX_HOME/prompts" in config, "config missing CODEX_HOME prompt surface")
-    assert_true("repo_local_commands: reference/audit only" in config, "config missing reference-only command policy")
+    assert_true("default_command_delivery: codex-repo-skills" in config, "config missing Codex skill delivery")
+    assert_true(".agents/skills" in config, "config missing Codex skill surface")
+    assert_true("explicit_invocation: $ow-<id>" in config, "config missing explicit skill invocation policy")
 
 
-def verify_prompts(codex_home: Path) -> None:
+def verify_no_default_prompts(codex_home: Path) -> None:
     prompt_dir = codex_home / "prompts"
     for name in ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-design.md", "ow-spec.md"]:
-        path = prompt_dir / name
-        assert_file(path)
-        content = read(path)
-        assert_true(content.startswith("---\n"), f"{name} missing frontmatter")
-        assert_true("description:" in content, f"{name} missing description frontmatter")
-        assert_true("argument-hint:" in content, f"{name} missing argument-hint frontmatter")
-        assert_true("generated-by: openworkflow" in content, f"{name} missing generated marker")
-        assert_true("<user_behavior>" in content, f"{name} missing user behavior block")
-        assert_true("<agent_protocol>" in content, f"{name} missing agent protocol block")
-    proto = read(prompt_dir / "ow-proto.md")
-    assert_true("# /ow:proto" in proto, "ow-proto prompt does not expose /ow:proto")
+        assert_true(not (prompt_dir / name).exists(), f"default global prompt generated unexpectedly: {name}")
+
+
+def verify_skills(root: Path) -> None:
+    for name in ["ow-vision", "ow-validation", "ow-proto", "ow-decision", "ow-design", "ow-spec"]:
+        skill = root / ".agents" / "skills" / name / "SKILL.md"
+        interface = root / ".agents" / "skills" / name / "agents" / "openai.yaml"
+        assert_file(skill)
+        assert_file(interface)
+        skill_content = read(skill)
+        interface_content = read(interface)
+        assert_true(skill_content.startswith("---\n"), f"{name} missing SKILL.md frontmatter")
+        assert_true(f"name: \"{name}\"" in skill_content, f"{name} missing skill name")
+        assert_true("description:" in skill_content, f"{name} missing skill description")
+        assert_true("generated-by: openworkflow" in skill_content, f"{name} missing generated marker")
+        assert_true("<user_behavior>" in skill_content, f"{name} missing user behavior block")
+        assert_true("<agent_protocol>" in skill_content, f"{name} missing agent protocol block")
+        assert_true("display_name:" in interface_content, f"{name} missing display name")
+        assert_true("default_prompt:" in interface_content, f"{name} missing default prompt")
 
 
 def verify_design_contract(root: Path) -> None:
@@ -96,11 +104,9 @@ def verify_design_contract(root: Path) -> None:
     assert_true("conditional_packets:" in artifacts, "artifact contracts missing conditional packets")
 
 
-def verify_reference_commands(root: Path) -> None:
-    command = root / ".codex" / "commands" / "ow" / "vision.md"
-    assert_file(command)
-    content = read(command)
-    assert_true("Reference/audit copy only" in content, "repo-local command is not marked reference-only")
+def verify_no_default_codex_commands(root: Path) -> None:
+    assert_true(not (root / ".codex" / "commands" / "ow").exists(), ".codex command references generated unexpectedly")
+    assert_true(not (root / ".codex" / "skills").exists(), ".codex skills generated unexpectedly")
 
 
 def extract_block(content: str, key: str) -> str:
@@ -127,7 +133,7 @@ def extract_block(content: str, key: str) -> str:
 
 def main() -> int:
     assert_file(CLI)
-    with tempfile.TemporaryDirectory(prefix="openworkflow-m12-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="openworkflow-runtime-surface-") as tmp:
         tmp_root = Path(tmp)
         target = tmp_root / "target"
         codex_home = tmp_root / "codex-home"
@@ -141,11 +147,12 @@ def main() -> int:
 
         verify_minimal_openworkflow(target)
         verify_config(target)
-        verify_prompts(codex_home)
+        verify_skills(target)
+        verify_no_default_prompts(codex_home)
         verify_design_contract(target)
-        verify_reference_commands(target)
+        verify_no_default_codex_commands(target)
 
-    print("M12 runtime surface verification passed.")
+    print("OpenWorkflow runtime surface verification passed.")
     return 0
 
 

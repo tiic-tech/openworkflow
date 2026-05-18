@@ -34,14 +34,14 @@ function workflowConfig(options: InitOptions): string {
     tools: options.tools,
     adapter_policy: {
       source_of_truth: ".openworkflow",
-      default_command_delivery: options.tools.includes("codex") ? "codex-global-prompts" : "project-local",
+      default_command_delivery: options.tools.includes("codex") ? "codex-repo-skills" : "project-local",
       generated_surfaces: generatedSurfaces(options.tools),
-      codex_prompt_surface: options.tools.includes("codex")
+      codex_skill_surface: options.tools.includes("codex")
         ? {
-            directory: "$CODEX_HOME/prompts",
-            fallback_directory: "~/.codex/prompts",
-            path_pattern: "ow-<id>.md",
-            repo_local_commands: "reference/audit only",
+            directory: ".agents/skills",
+            path_pattern: ".agents/skills/ow-<id>/SKILL.md",
+            interface_metadata: "agents/openai.yaml",
+            explicit_invocation: "$ow-<id>",
           }
         : null,
     },
@@ -51,7 +51,7 @@ function workflowConfig(options: InitOptions): string {
 function generatedSurfaces(tools: string[]): string[] {
   const surfaces = [".openworkflow"];
   if (tools.includes("codex")) {
-    surfaces.push("$CODEX_HOME/prompts", ".codex/agents", ".codex/skills", ".codex/commands/ow", ".codex/openworkflow-adapter.yaml");
+    surfaces.push(".agents/skills", ".agents/openworkflow-adapter.yaml");
   }
   return surfaces;
 }

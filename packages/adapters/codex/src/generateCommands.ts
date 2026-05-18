@@ -1,66 +1,18 @@
-import { homedir } from "node:os";
-import { join } from "node:path";
 import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
 import { getDiscoveryArtifactContractsForCommand } from "../../../core/src/artifacts/registry.js";
-import type { CodexTemplate } from "./templates.js";
-
-const PROMPT_ARGUMENT_HINT = "optional user intent or stage feedback";
-
-export function generateCommandTemplates(): CodexTemplate[] {
-  return getWorkflowCommands().map((command) => ({
-    id: `codex.command-reference.${command.namespace}.${command.id}`,
-    path: codexCommandPath(command),
-    content: commandReferenceDoc(command),
-  }));
-}
-
-export function generatePromptTemplates(): CodexTemplate[] {
-  return getWorkflowCommands().flatMap((command) => {
-    const templates: CodexTemplate[] = [
-      {
-        id: `codex.prompt.${command.namespace}.${command.id}`,
-        path: codexPromptPath(command),
-        content: commandPromptDoc(command),
-      },
-    ];
-    for (const legacyTrigger of command.legacyTriggers) {
-      const legacyPromptId = codexPromptIdFromTrigger(legacyTrigger);
-      if (!legacyPromptId || legacyPromptId === command.id) {
-        continue;
-      }
-      templates.push({
-        id: `codex.prompt.${command.namespace}.${legacyPromptId}`,
-        path: codexPromptPathForId(legacyPromptId),
-        content: commandPromptDoc(command, legacyTrigger),
-      });
-    }
-    return templates;
-  });
-}
 
 export function codexCommandPath(command: WorkflowCommand): string {
   return `.codex/commands/${command.namespace}/${command.id}.md`;
-}
-
-export function codexPromptPath(command: WorkflowCommand): string {
-  return codexPromptPathForId(command.id);
 }
 
 export function codexPromptPathForId(id: string): string {
   return `ow-${id}.md`;
 }
 
-export function codexPromptsDir(): string {
-  const codexHome = process.env.CODEX_HOME?.trim() || join(homedir(), ".codex");
-  return join(codexHome, "prompts");
-}
-
-export function codexPromptDisplayPath(command: WorkflowCommand): string {
-  return `$CODEX_HOME/prompts/${codexPromptPath(command)}`;
-}
-
 export function legacyCodexCommandPaths(): string[] {
+  const commandPaths = getWorkflowCommands().map((command) => codexCommandPath(command));
   return [
+    ...commandPaths,
     ".codex/commands/build-workflow.md",
     ".codex/commands/build-context.md",
     ".codex/commands/build-vision.md",
@@ -75,25 +27,7 @@ export function legacyCodexCommandPaths(): string[] {
   ];
 }
 
-function commandReferenceDoc(command: WorkflowCommand): string {
-  return `# ${command.trigger} Reference
-
-Reference/audit copy only. Codex slash registration is generated globally at \`$CODEX_HOME/prompts/${codexPromptPath(command)}\`, or \`~/.codex/prompts/${codexPromptPath(command)}\` when \`CODEX_HOME\` is unset.
-
-${commandDoc(command)}
-`;
-}
-
-function commandPromptDoc(command: WorkflowCommand, trigger = command.trigger): string {
-  return `---
-description: ${yamlString(command.description)}
-argument-hint: ${yamlString(PROMPT_ARGUMENT_HINT)}
----
-${commandDoc(command, trigger)}
-`;
-}
-
-function commandDoc(command: WorkflowCommand, trigger = command.trigger): string {
+export function commandDoc(command: WorkflowCommand, trigger = command.trigger): string {
   const protocol = command.protocol;
   const artifacts = getDiscoveryArtifactContractsForCommand(command.trigger);
   if (!protocol || protocol.depth === "shallow") {
@@ -242,7 +176,7 @@ function escapeXml(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
-function codexPromptIdFromTrigger(trigger: string): string | null {
+export function codexPromptIdFromTrigger(trigger: string): string | null {
   const match = trigger.match(/^\/ow:([a-z0-9-]+)$/);
   return match?.[1] ?? null;
 }

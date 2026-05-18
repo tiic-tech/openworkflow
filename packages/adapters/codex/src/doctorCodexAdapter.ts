@@ -1,7 +1,8 @@
 import { join } from "node:path";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
 import { hasGeneratedMarker, renderGeneratedFile } from "./generatedFiles.js";
-import { codexPromptsDir, generatePromptTemplates, legacyCodexCommandPaths } from "./generateCommands.js";
+import { legacyCodexCommandPaths } from "./generateCommands.js";
+import { legacyCodexSkillPaths } from "./generateSkills.js";
 import { CODEX_MANIFEST_PATH, CODEX_MANIFEST_TEMPLATE_ID, LEGACY_CODEX_MANIFEST_PATHS, codexManifest } from "./manifest.js";
 import { getCodexTemplates } from "./templates.js";
 
@@ -15,8 +16,6 @@ export async function doctorCodexAdapter(root: string): Promise<AdapterDoctorRes
   const errors: string[] = [];
   const warnings: string[] = [];
   const templates = getCodexTemplates();
-  const promptTemplates = generatePromptTemplates();
-  const promptDir = codexPromptsDir();
 
   for (const template of templates) {
     const path = join(root, template.path);
@@ -40,31 +39,6 @@ export async function doctorCodexAdapter(root: string): Promise<AdapterDoctorRes
     }
     if (actual !== expected) {
       warnings.push(`Codex adapter file is stale: ${template.path}`);
-    }
-  }
-
-  for (const template of promptTemplates) {
-    const path = join(promptDir, template.path);
-    const expected = renderGeneratedFile(template.path, template.content, template.id);
-    let actual: string;
-    try {
-      actual = await readTextFile(path);
-    } catch (error) {
-      if (isNotFound(error)) {
-        errors.push(`missing Codex global prompt file: ${path}`);
-        continue;
-      }
-      throw error;
-    }
-    if (!hasGeneratedMarker(actual)) {
-      errors.push(`Codex global prompt file is not marked as generated: ${path}`);
-      continue;
-    }
-    if (!actual.includes(`template-id: ${template.id}`)) {
-      errors.push(`Codex global prompt file has unexpected template id: ${path}`);
-    }
-    if (actual !== expected) {
-      warnings.push(`Codex global prompt file is stale: ${path}`);
     }
   }
 
@@ -103,6 +77,36 @@ export async function doctorCodexAdapter(root: string): Promise<AdapterDoctorRes
     }
   }
 
+  for (const legacyPath of legacyCodexSkillPaths()) {
+    try {
+      const legacyContent = await readTextFile(join(root, legacyPath));
+      if (hasGeneratedMarker(legacyContent)) {
+        errors.push(`legacy generated Codex skill remains: ${legacyPath}`);
+      } else {
+        warnings.push(`legacy non-generated Codex skill exists: ${legacyPath}`);
+      }
+    } catch (error) {
+      if (!isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
+  for (const legacyPath of legacyCodexAgentPaths()) {
+    try {
+      const legacyContent = await readTextFile(join(root, legacyPath));
+      if (hasGeneratedMarker(legacyContent)) {
+        errors.push(`legacy generated Codex agent file remains: ${legacyPath}`);
+      } else {
+        warnings.push(`legacy non-generated Codex agent file exists: ${legacyPath}`);
+      }
+    } catch (error) {
+      if (!isNotFound(error)) {
+        throw error;
+      }
+    }
+  }
+
   for (const legacyPath of LEGACY_CODEX_MANIFEST_PATHS) {
     try {
       const legacyContent = await readTextFile(join(root, legacyPath));
@@ -119,4 +123,8 @@ export async function doctorCodexAdapter(root: string): Promise<AdapterDoctorRes
   }
 
   return { ok: errors.length === 0, errors, warnings };
+}
+
+function legacyCodexAgentPaths(): string[] {
+  return [".codex/agents/README.md", ".codex/agents/openworkflow-orchestrator.md"];
 }

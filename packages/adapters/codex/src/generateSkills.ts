@@ -1,25 +1,62 @@
 import type { CodexTemplate } from "./templates.js";
+import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
+import { commandDoc } from "./generateCommands.js";
 
 export function generateSkillTemplates(): CodexTemplate[] {
-  return [
+  return getWorkflowCommands().flatMap((command) => [
     {
-      id: "codex.skill.openworkflow",
-      path: ".codex/skills/openworkflow.md",
-      content: codexSkill(),
+      id: `codex.skill.${command.namespace}.${command.id}`,
+      path: codexSkillPath(command),
+      content: codexSkill(command),
     },
-  ];
+    {
+      id: `codex.skill-interface.${command.namespace}.${command.id}`,
+      path: codexSkillInterfacePath(command),
+      content: codexSkillInterface(command),
+    },
+  ]);
 }
 
-function codexSkill(): string {
-  return `# OpenWorkflow Codex Adapter
+export function codexSkillName(command: WorkflowCommand): string {
+  return `${command.namespace}-${command.id}`;
+}
 
-Use this adapter to operate OpenWorkflow from Codex. The durable workflow contracts live in \`.openworkflow/\`.
+export function codexSkillPath(command: WorkflowCommand): string {
+  return `.agents/skills/${codexSkillName(command)}/SKILL.md`;
+}
 
-Rules:
+export function codexSkillInterfacePath(command: WorkflowCommand): string {
+  return `.agents/skills/${codexSkillName(command)}/agents/openai.yaml`;
+}
 
-- Do not create production specs before validation, prototype decision, and design readiness.
-- Do not create Agent Team runtime before a focused change exists.
-- Keep \`.codex/\` generated or tool-facing; keep product truth in \`.openworkflow/\`.
-- Run \`openworkflow sync --tools codex\` after upgrading the npm package or changing adapter templates.
+export function legacyCodexSkillPaths(): string[] {
+  return [".codex/skills/openworkflow.md"];
+}
+
+function codexSkill(command: WorkflowCommand): string {
+  const skillName = codexSkillName(command);
+  return `---
+name: ${yamlString(skillName)}
+description: ${yamlString(`${command.description} Use this skill for ${command.trigger} in OpenWorkflow repositories.`)}
+---
+${commandDoc(command)}
+
+<codex_skill>
+- Skill name: ${skillName}
+- Explicit invocation: $${skillName}
+- Semantic command: ${command.trigger}
+</codex_skill>
 `;
+}
+
+function codexSkillInterface(command: WorkflowCommand): string {
+  return `interface:
+  display_name: ${yamlString(command.trigger)}
+  short_description: ${yamlString(command.description)}
+  default_prompt: ${yamlString(`Use ${command.trigger} for this OpenWorkflow repository.`)}
+`;
+}
+
+function yamlString(value: string): string {
+  return JSON.stringify(value);
 }

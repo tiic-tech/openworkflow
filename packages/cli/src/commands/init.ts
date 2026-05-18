@@ -51,7 +51,7 @@ export async function initCommand(positional: string[], flags: Map<string, strin
   console.log(`Initialized OpenWorkflow at ${root}`);
   console.log(`.openworkflow written: ${result.written.length}, skipped: ${result.skipped.length}`);
   if (tools.includes("codex")) {
-    console.log(`.codex adapter written: ${adapterWritten}, skipped: ${adapterSkipped}, unchanged: ${adapterUnchanged}, removed: ${adapterRemoved}`);
+    console.log(`Codex adapter written: ${adapterWritten}, skipped: ${adapterSkipped}, unchanged: ${adapterUnchanged}, removed: ${adapterRemoved}`);
   }
   return 0;
 }
