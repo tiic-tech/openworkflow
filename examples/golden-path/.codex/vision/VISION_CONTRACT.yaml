@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+contract_id: vision:default
+contract_type: vision
+title: "Golden Path vision"
+status: draft
+depends_on:
+  - context:default
+produces:
+  - decision:index
+goals: []
+non_goals: []
+users: []
+quality_bar: []
+decision_priorities: []
+updated_at: null

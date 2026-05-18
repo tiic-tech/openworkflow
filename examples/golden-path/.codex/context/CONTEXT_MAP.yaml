@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+contract_id: context:default
+contract_type: context
+title: "Golden Path shared context"
+status: draft
+source_artifacts:
+  - "TRACE.md"
+glossary: .codex/context/GLOSSARY.yaml
+repo_map: []
+source_references: []
+depends_on:
+  - workflow:contract-graph
+produces:
+  - vision:default
+updated_at: null

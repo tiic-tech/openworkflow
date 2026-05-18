@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: workflow:contract-graph
+contract_type: workflow
+title: OpenWorkflow contract graph
+status: active
+nodes:
+  - contract_id: workflow:golden-path
+    contract_type: workflow
+    path: .codex/workflow/WORKFLOW_INDEX.yaml
+  - contract_id: context:default
+    contract_type: context
+    path: .codex/context/CONTEXT_MAP.yaml
+  - contract_id: vision:default
+    contract_type: vision
+    path: .codex/vision/VISION_CONTRACT.yaml
+  - contract_id: decision:index
+    contract_type: decision
+    path: .codex/decisions/DECISION_INDEX.yaml
+  - contract_id: spec:index
+    contract_type: spec
+    path: .codex/spec/SPEC_INDEX.yaml
+  - contract_id: change:golden-path-m01
+    contract_type: change
+    path: .codex/changes/M01/CHANGE.yaml
+  - contract_id: work_items:golden-path-m01
+    contract_type: work_items
+    path: .codex/changes/M01/WORK_ITEMS.yaml
+edges:
+  - from: workflow:golden-path
+    to: context:default
+    relation: initializes
+  - from: context:default
+    to: vision:default
+    relation: informs
+  - from: vision:default
+    to: decision:index
+    relation: constrains
+  - from: decision:index
+    to: spec:index
+    relation: constrains
+  - from: spec:index
+    to: change:golden-path-m01
+    relation: scopes
+  - from: change:golden-path-m01
+    to: work_items:golden-path-m01
+    relation: decomposes_to

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/openworkflow-contract.schema.json",
+  "title": "OpenWorkflow Common Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "title",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^0\\.1\\.0$"
+    },
+    "contract_id": {
+      "type": "string",
+      "pattern": "^[a-z_]+:[A-Za-z0-9_.-]+$"
+    },
+    "contract_type": {
+      "type": "string",
+      "enum": [
+        "workflow",
+        "context",
+        "vision",
+        "decision",
+        "spec",
+        "change",
+        "work_items",
+        "team",
+        "runtime"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "superseded",
+        "archived"
+      ]
+    },
+    "source_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "produces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": true
+}
+

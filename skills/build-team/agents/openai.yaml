@@ -1,0 +1,4 @@
+interface:
+  display_name: "Build Team"
+  short_description: "Create a repo-specific Agent Team workflow"
+  default_prompt: "Use $build-team to create an Agent Team workflow for this repository."

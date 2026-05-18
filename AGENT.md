@@ -13,6 +13,15 @@ repositories.
 
 - `build_system_vision.md` captures the initial system vision and proposed
   skill map.
+- `references/contract-graph.md` defines OpenWorkflow v0 contract graph rules.
+- `schemas/` contains the v0 schema surface for common contracts, workflow
+  indexes, contract graphs, changes, and work items.
+- `changes/M01-contract-foundation/` records the active M01 change contract,
+  acceptance bar, and work item breakdown.
+- `skills/` contains repo-local skill implementations. `build-team` and
+  `run-team` preserve the initial downstream execution skills; `build-workflow`
+  initializes upstream contract infrastructure.
+- `examples/golden-path/` is the minimum executable contract trace.
 - Future changes should preserve the principle that workflow execution is
   derived from durable upstream contracts, not from chat memory.
 
@@ -62,6 +71,7 @@ Use this project-level shape while the system is being designed:
 openworkflow/
   AGENT.md
   build_system_vision.md
+  changes/
   skills/
   schemas/
   examples/
@@ -104,6 +114,8 @@ Start with the shared system before individual skills:
 
 For any future implementation:
 
+- Run `python3 scripts/validate_openworkflow.py --root .` before handoff when
+  changing contracts, schemas, examples, or skills.
 - Run schema validation when schemas exist.
 - Confirm generated paths are repo-local and portable.
 - Confirm each skill can run after context compaction.

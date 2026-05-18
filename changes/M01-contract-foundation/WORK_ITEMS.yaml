@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: work_items:m01-contract-foundation
+contract_type: work_items
+title: M01 OpenWorkflow contract foundation work items
+status: active
+change_contract: changes/M01-contract-foundation/CHANGE.yaml
+items:
+  - task_id: M01-T001
+    title: Migrate existing downstream skills into the repository
+    status: done
+    depends_on: []
+    owned_paths:
+      - skills/build-team/
+      - skills/run-team/
+    acceptance:
+      - build-team and run-team SKILL.md files exist under skills/.
+      - Existing references, scripts, and UI metadata are preserved.
+  - task_id: M01-T002
+    title: Define v0 contract graph and schema files
+    status: done
+    depends_on:
+      - M01-T001
+    owned_paths:
+      - references/contract-graph.md
+      - schemas/
+      - changes/M01-contract-foundation/
+    acceptance:
+      - Contract graph rules define types, metadata, status values, and references.
+      - Core schemas cover workflow index, contract graph, change, and work items.
+  - task_id: M01-T003
+    title: Implement build-workflow initialization skill
+    status: done
+    depends_on:
+      - M01-T002
+    owned_paths:
+      - skills/build-workflow/
+    acceptance:
+      - build-workflow has SKILL.md, UI metadata, layout reference, and init script.
+      - init script creates missing workflow contract folders without overwriting by default.
+  - task_id: M01-T004
+    title: Add validation and golden path example
+    status: done
+    depends_on:
+      - M01-T003
+    owned_paths:
+      - scripts/validate_openworkflow.py
+      - examples/golden-path/
+    acceptance:
+      - Validator passes on the repository.
+      - Golden path contains a minimum workflow trace and parseable contracts.
+  - task_id: M01-T005
+    title: Update project guide for M01 artifacts
+    status: done
+    depends_on:
+      - M01-T004
+    owned_paths:
+      - AGENT.md
+    acceptance:
+      - AGENT.md names current source-of-truth files and validation command.

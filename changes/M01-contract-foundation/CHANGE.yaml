@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: change:m01-contract-foundation
+contract_type: change
+title: M01 OpenWorkflow contract foundation
+status: active
+source_artifacts:
+  - AGENT.md
+  - build_system_vision.md
+depends_on: []
+produces:
+  - workflow:openworkflow
+  - work_items:m01-contract-foundation
+problem: >
+  OpenWorkflow has a clear downstream Agent Team runtime through build-team and
+  run-team, but the upstream contract layer is not yet repo-local,
+  schema-backed, or executable as a minimal workflow initialization path.
+goals:
+  - Bring the existing build-team and run-team skills into this repository.
+  - Define v0 contract graph semantics and core schema files.
+  - Add a build-workflow skill that initializes repo-local workflow contracts.
+  - Add validation that can run without chat history.
+  - Add a golden path example that demonstrates the minimum contract chain.
+non_goals:
+  - Implement every proposed build-* skill in M01.
+  - Replace the existing build-team or run-team runtime protocols.
+  - Build a package manager or installer for OpenWorkflow.
+affected_paths:
+  - skills/
+  - schemas/
+  - scripts/
+  - references/
+  - examples/
+  - changes/M01-contract-foundation/
+acceptance:
+  - Existing build-team and run-team skills are present under skills/.
+  - Core v0 schemas exist for common contracts, workflow index, contract graph, change, and work items.
+  - build-workflow can initialize .codex workflow, context, vision, decision, spec, and change folders in a target repo.
+  - The validator checks schema JSON, known YAML contracts, graph edge references, and M01 work item shape.
+  - Golden path example is present and passes the validator.
+validation:
+  - python3 scripts/validate_openworkflow.py --root .
+handoff:
+  next_skill: build-workflow
+  downstream_skills:
+    - build-team
+    - run-team
+

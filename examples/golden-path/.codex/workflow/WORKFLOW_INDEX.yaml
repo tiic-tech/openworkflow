@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: workflow:golden-path
+contract_type: workflow
+title: "Golden Path workflow index"
+status: active
+workflow_root: .codex
+active_change: change:golden-path-m01
+source_artifacts:
+  - "TRACE.md"
+base_git_ref: null
+contracts:
+  - contract_id: workflow:golden-path
+    contract_type: workflow
+    path: .codex/workflow/WORKFLOW_INDEX.yaml
+    status: active
+  - contract_id: workflow:contract-graph
+    contract_type: workflow
+    path: .codex/workflow/CONTRACT_GRAPH.yaml
+    status: active
+  - contract_id: context:default
+    contract_type: context
+    path: .codex/context/CONTEXT_MAP.yaml
+    status: draft
+  - contract_id: vision:default
+    contract_type: vision
+    path: .codex/vision/VISION_CONTRACT.yaml
+    status: draft
+  - contract_id: decision:index
+    contract_type: decision
+    path: .codex/decisions/DECISION_INDEX.yaml
+    status: active
+  - contract_id: spec:index
+    contract_type: spec
+    path: .codex/spec/SPEC_INDEX.yaml
+    status: active
+  - contract_id: change:golden-path-m01
+    contract_type: change
+    path: .codex/changes/M01/CHANGE.yaml
+    status: active
+  - contract_id: work_items:golden-path-m01
+    contract_type: work_items
+    path: .codex/changes/M01/WORK_ITEMS.yaml
+    status: active

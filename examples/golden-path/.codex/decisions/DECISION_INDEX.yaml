@@ -1,0 +1,11 @@
+schema_version: 0.1.0
+contract_id: decision:index
+contract_type: decision
+title: "Golden Path decision index"
+status: active
+depends_on:
+  - vision:default
+produces:
+  - spec:index
+decisions: []
+updated_at: null

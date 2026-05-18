@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: work_items:golden-path-m01
+contract_type: work_items
+title: Golden path M01 work items
+status: active
+change_contract: .codex/changes/M01/CHANGE.yaml
+items:
+  - task_id: M01-T001
+    title: Initialize workflow contracts
+    status: done
+    depends_on: []
+    owned_paths:
+      - .codex/workflow/
+      - .codex/context/
+      - .codex/vision/
+      - .codex/decisions/
+      - .codex/spec/
+    acceptance:
+      - Workflow index and contract graph are present.
+      - Context, vision, decision, and spec seed contracts are present.
+  - task_id: M01-T002
+    title: Define change and work item contracts
+    status: done
+    depends_on:
+      - M01-T001
+    owned_paths:
+      - .codex/changes/M01/
+    acceptance:
+      - Change contract defines scope, goals, non-goals, affected paths, and validation.
+      - Work item contract contains dependency-ordered task entries.
+

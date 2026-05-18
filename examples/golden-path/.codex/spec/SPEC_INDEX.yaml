@@ -1,0 +1,10 @@
+schema_version: 0.1.0
+contract_id: spec:index
+contract_type: spec
+title: "Golden Path spec index"
+status: active
+depends_on:
+  - decision:index
+produces: []
+specs: []
+updated_at: null

@@ -1,0 +1,28 @@
+schema_version: 0.1.0
+contract_id: change:golden-path-m01
+contract_type: change
+title: Golden path M01 change
+status: active
+source_artifacts:
+  - TRACE.md
+depends_on:
+  - spec:index
+produces:
+  - work_items:golden-path-m01
+problem: >
+  The example repository needs a small, concrete change contract so the
+  upstream graph can demonstrate handoff into work item slicing.
+goals:
+  - Demonstrate a bounded change contract.
+  - Demonstrate a work item contract that can feed build-team.
+non_goals:
+  - Initialize runtime state.
+  - Implement product code.
+affected_paths:
+  - .codex/changes/M01/
+acceptance:
+  - CHANGE.yaml is parseable and references the upstream spec index.
+  - WORK_ITEMS.yaml decomposes the change into assignable slices.
+validation:
+  - python3 scripts/validate_openworkflow.py --root .
+
