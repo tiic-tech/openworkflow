@@ -1,0 +1,5 @@
+interface:
+  display_name: "Build Validation"
+  short_description: "Prioritize the core assumption to validate first"
+  default_prompt: "Use $build-validation to identify what must be proven before implementation."
+

@@ -33,6 +33,14 @@ contracts:
     contract_type: spec
     path: .codex/spec/SPEC_INDEX.yaml
     status: active
+  - contract_id: validation:index
+    contract_type: validation
+    path: .codex/validation/VALIDATION_INDEX.yaml
+    status: active
+  - contract_id: validation:V001-travel-globe-core
+    contract_type: validation
+    path: .codex/validation/V001-travel-globe-core/VALIDATION.yaml
+    status: active
   - contract_id: change:golden-path-m01
     contract_type: change
     path: .codex/changes/M01/CHANGE.yaml

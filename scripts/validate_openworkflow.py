@@ -19,13 +19,18 @@ REQUIRED_FILES = [
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
     "schemas/change.schema.json",
+    "schemas/validation.schema.json",
     "schemas/work-items.schema.json",
+    "skills/build-validation/SKILL.md",
+    "skills/build-validation/scripts/init_validation.py",
     "skills/build-workflow/SKILL.md",
     "skills/build-workflow/scripts/init_workflow.py",
     "skills/build-team/SKILL.md",
     "skills/run-team/SKILL.md",
     "changes/M01-contract-foundation/CHANGE.yaml",
     "changes/M01-contract-foundation/WORK_ITEMS.yaml",
+    "changes/M02-validation-first-prioritization/CHANGE.yaml",
+    "changes/M02-validation-first-prioritization/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
@@ -162,6 +167,40 @@ def validate_work_items(root: Path, path: Path, data: Any, errors: list[str]) ->
                 errors.append(f"{rel(root, path)} {task_id} missing {key}")
 
 
+def validate_validation(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    if path.name != "VALIDATION.yaml":
+        return
+    if data.get("contract_type") != "validation":
+        errors.append(f"{rel(root, path)} contract_type must be validation")
+    required = [
+        "core_question",
+        "feature_classification",
+        "critical_assumptions",
+        "prototype_scope",
+        "acceptance",
+        "decision_options",
+    ]
+    for key in required:
+        if key not in data:
+            errors.append(f"{rel(root, path)} missing validation key {key}")
+    feature_classification = data.get("feature_classification")
+    if isinstance(feature_classification, dict):
+        for key in ("existential", "supporting", "later", "out_of_scope"):
+            if key not in feature_classification:
+                errors.append(f"{rel(root, path)} feature_classification missing {key}")
+    prototype_scope = data.get("prototype_scope")
+    if isinstance(prototype_scope, dict):
+        for key in ("include", "exclude"):
+            if key not in prototype_scope:
+                errors.append(f"{rel(root, path)} prototype_scope missing {key}")
+    decision_options = data.get("decision_options")
+    allowed = {"continue", "pivot", "stop", "needs_more_evidence"}
+    if isinstance(decision_options, list):
+        for option in decision_options:
+            if option not in allowed:
+                errors.append(f"{rel(root, path)} has invalid decision option {option}")
+
+
 def workflow_root_for(path: Path) -> Path:
     # <project>/.codex/workflow/WORKFLOW_INDEX.yaml
     return path.parents[2]
@@ -214,6 +253,7 @@ def validate_yaml_contracts(root: Path, errors: list[str]) -> None:
         if isinstance(data, dict):
             validate_change(root, path, data, errors)
             validate_work_items(root, path, data, errors)
+            validate_validation(root, path, data, errors)
             validate_workflow_index(root, path, data, errors)
             validate_contract_graph(root, path, data, errors)
 

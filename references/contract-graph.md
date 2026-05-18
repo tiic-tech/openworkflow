@@ -15,6 +15,8 @@ OpenWorkflow v0 recognizes these contract types:
 - `vision`: durable project direction, goals, non-goals, and priorities
 - `decision`: architectural, product, tooling, and workflow decisions
 - `spec`: binding product, technical, UX, QA, security, or performance specs
+- `validation`: critical assumption ranking and prototype briefs that decide
+  what must be proven before a change becomes implementation work
 - `change`: the current bounded delivery scope
 - `work_items`: dependency-ordered slices and atom tasks for a change
 - `team`: Agent Team role topology and delegation boundaries
@@ -63,12 +65,28 @@ workflow
   -> vision
   -> decision
   -> spec
+  -> validation
   -> change
   -> work_items
   -> team
   -> runtime
 ```
 
-Early repositories may skip context, vision, decisions, or specs only by
-recording the missing upstream layer in the change contract assumptions.
+Validation precedes binding change contracts when the core experience,
+technical feasibility, or product value is uncertain. Early repositories may
+skip context, vision, decisions, specs, or validation only by recording the
+missing upstream layer in the change contract assumptions.
 
+## Validation-First Rule
+
+Do not convert a broad idea directly into implementation tasks when the core
+product assumption is unproven. First identify the feature or behavior without
+which the vision fails, then write the smallest prototype brief that can test
+that assumption.
+
+Validation artifacts should answer:
+
+- Which features are existential, supporting, later, or explicitly out of scope?
+- Which assumption is most likely to invalidate the vision?
+- What is the smallest prototype that can prove or disprove it?
+- What evidence will decide whether to continue, pivot, or stop?

@@ -19,6 +19,7 @@ It owns workflow infrastructure only:
 - `.codex/vision/`
 - `.codex/decisions/`
 - `.codex/spec/`
+- `.codex/validation/`
 - `.codex/changes/`
 
 It must not initialize `.codex/runtime/`; runtime remains owned by `build-team`
@@ -62,4 +63,3 @@ python3 scripts/validate_openworkflow.py --root .
 After `/build-workflow`, the next upstream skills may create context, vision,
 decision, spec, change, and work item contracts. `build-team` should consume the
 change and work item contracts when they exist.
-

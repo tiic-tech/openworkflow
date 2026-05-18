@@ -26,6 +26,9 @@ infrastructure.
   spec/
     SPEC_INDEX.yaml
     archive/
+  validation/
+    VALIDATION_INDEX.yaml
+    archive/
   changes/
     archive/
 ```
@@ -38,6 +41,8 @@ infrastructure.
 - `build-decision` should add decision records and update
   `.codex/decisions/DECISION_INDEX.yaml`.
 - `build-spec` should add specs and update `.codex/spec/SPEC_INDEX.yaml`.
+- `build-validation` should add validation-first prioritization artifacts and
+  update `.codex/validation/VALIDATION_INDEX.yaml`.
 - `build-change` and `build-slices` should write under `.codex/changes/<id>/`.
 - `build-team` and `run-team` own `.codex/runtime/**`.
 
@@ -45,4 +50,3 @@ infrastructure.
 
 Create missing files and directories. Do not overwrite existing contract files
 unless the user explicitly requests regeneration.
-

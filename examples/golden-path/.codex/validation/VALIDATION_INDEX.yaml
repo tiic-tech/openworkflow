@@ -1,0 +1,16 @@
+schema_version: 0.1.0
+contract_id: validation:index
+contract_type: validation
+title: "Golden Path validation index"
+status: active
+depends_on:
+  - spec:index
+produces:
+  - validation:V001-travel-globe-core
+validations:
+  - validation_id: V001-travel-globe-core
+    contract_id: validation:V001-travel-globe-core
+    title: Validate interactive travel globe as core experience
+    status: active
+    path: .codex/validation/V001-travel-globe-core/VALIDATION.yaml
+updated_at: null

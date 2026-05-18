@@ -27,6 +27,7 @@
         "vision",
         "decision",
         "spec",
+        "validation",
         "change",
         "work_items",
         "team",
@@ -73,4 +74,3 @@
   },
   "additionalProperties": true
 }
-

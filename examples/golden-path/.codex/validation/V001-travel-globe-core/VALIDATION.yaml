@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: validation:V001-travel-globe-core
+contract_type: validation
+title: "Validate interactive travel globe as core experience"
+status: active
+source_artifacts:
+  - "TRACE.md"
+depends_on:
+  - vision:default
+produces: []
+core_question: "Can an interactive globe with travel flags, hover photo previews, and a detail panel become the central experience that makes an AI-native travel memory app distinct from a normal photo journal?"
+feature_classification:
+  existential:
+    - "Interactive rotatable globe"
+    - "Destination flags anchored to visited locations"
+    - "Photo and diary preview from globe interaction"
+  supporting:
+    - "Photo detail panel"
+    - "Location metadata"
+    - "Sample travel memory data"
+  later:
+    - "Authentication"
+    - "Photo upload pipeline"
+    - "Full LLM travel query integration"
+    - "Flight and hotel bill import"
+  out_of_scope:
+    - "Production database"
+    - "Account system"
+    - "Deployment hardening"
+critical_assumptions:
+  - "A Web 3D globe can feel smooth, legible, and emotionally central."
+  - "Flags and previews can show memories without cluttering the globe."
+  - "Users understand the product faster through globe navigation than through a normal album list."
+prototype_scope:
+  include:
+    - "Rotatable 3D globe"
+    - "Three to five sample destination flags"
+    - "Hover thumbnails for a flag"
+    - "Click detail panel with photo and diary sample"
+  exclude:
+    - "Login"
+    - "Persistence"
+    - "Upload"
+    - "Production AI integration"
+acceptance:
+  - "A user can rotate the globe and inspect sample destinations."
+  - "A user can hover a flag and see relevant photo thumbnails."
+  - "A user can click into a photo and diary detail experience."
+  - "The prototype is strong enough to decide continue, pivot, stop, or needs_more_evidence."
+decision_options:
+  - continue
+  - pivot
+  - stop
+  - needs_more_evidence
+result_artifact: RESULT.md
+prototype_brief: PROTOTYPE_BRIEF.md
+updated_at: null

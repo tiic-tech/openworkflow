@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/validation.schema.json",
+  "title": "OpenWorkflow Validation Contract",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "title",
+    "status",
+    "core_question",
+    "feature_classification",
+    "critical_assumptions",
+    "prototype_scope",
+    "acceptance",
+    "decision_options"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "validation"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "core_question": {
+      "type": "string"
+    },
+    "feature_classification": {
+      "type": "object",
+      "required": [
+        "existential",
+        "supporting",
+        "later",
+        "out_of_scope"
+      ],
+      "properties": {
+        "existential": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supporting": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "later": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "critical_assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prototype_scope": {
+      "type": "object",
+      "required": [
+        "include",
+        "exclude"
+      ],
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decision_options": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "continue",
+          "pivot",
+          "stop",
+          "needs_more_evidence"
+        ]
+      }
+    }
+  },
+  "additionalProperties": true
+}
+

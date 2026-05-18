@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: work_items:m02-validation-first-prioritization
+contract_type: work_items
+title: M02 Validation-First Prioritization work items
+status: active
+change_contract: changes/M02-validation-first-prioritization/CHANGE.yaml
+items:
+  - task_id: M02-T001
+    title: Add validation contract semantics and schema
+    status: done
+    depends_on: []
+    owned_paths:
+      - references/contract-graph.md
+      - schemas/openworkflow-contract.schema.json
+      - schemas/validation.schema.json
+      - changes/M02-validation-first-prioritization/
+    acceptance:
+      - validation is listed as a contract type.
+      - schema captures critical assumptions and prototype scope.
+  - task_id: M02-T002
+    title: Implement build-validation skill
+    status: done
+    depends_on:
+      - M02-T001
+    owned_paths:
+      - skills/build-validation/
+    acceptance:
+      - skill explains validation-first prioritization and boundaries.
+      - script initializes validation artifacts without overwriting by default.
+  - task_id: M02-T003
+    title: Update workflow initialization and validation tooling
+    status: done
+    depends_on:
+      - M02-T002
+    owned_paths:
+      - skills/build-workflow/
+      - scripts/validate_openworkflow.py
+      - AGENT.md
+    acceptance:
+      - build-workflow creates validation folders and indexes.
+      - validator checks validation contracts.
+      - project guide identifies M02 as active priority.
+  - task_id: M02-T004
+    title: Add validation-first example
+    status: done
+    depends_on:
+      - M02-T003
+    owned_paths:
+      - examples/
+    acceptance:
+      - example shows existential feature selection before implementation tasks.
+      - example validation artifact passes repository validation.

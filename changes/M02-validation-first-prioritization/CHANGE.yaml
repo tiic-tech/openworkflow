@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: change:m02-validation-first-prioritization
+contract_type: change
+title: M02 Validation-First Prioritization Protocol
+status: active
+source_artifacts:
+  - AGENT.md
+  - build_system_vision.md
+  - references/contract-graph.md
+depends_on:
+  - change:m01-contract-foundation
+produces:
+  - validation:m02-validation-first-prioritization
+  - work_items:m02-validation-first-prioritization
+problem: >
+  OpenWorkflow can initialize contract infrastructure, but it does not yet
+  distinguish implementation task ordering from validation-first prioritization.
+  Without a dedicated validation layer, agents may split broad ideas into many
+  peripheral tasks before proving the core assumption that makes a vision work.
+goals:
+  - Add validation as a first-class OpenWorkflow contract type.
+  - Define how to classify existential, supporting, later, and out-of-scope features.
+  - Add a build-validation skill that produces critical assumption and prototype brief artifacts.
+  - Keep validation artifacts small enough to focus the work instead of expanding documentation.
+  - Update examples and validation tooling so the new layer is executable.
+non_goals:
+  - Implement production prototypes for user products.
+  - Replace build-change or build-slices.
+  - Create a general backlog management system.
+affected_paths:
+  - AGENT.md
+  - references/
+  - schemas/
+  - skills/build-validation/
+  - skills/build-workflow/
+  - scripts/
+  - examples/
+  - changes/M02-validation-first-prioritization/
+acceptance:
+  - validation is recognized as an OpenWorkflow contract type.
+  - build-validation has a clear skill boundary and a deterministic artifact initializer.
+  - validation contracts capture core question, feature classification, assumptions, prototype scope, acceptance, and decision options.
+  - Golden path demonstrates validation before change/work item execution.
+  - The repository validator checks validation contracts.
+validation:
+  - python3 scripts/validate_openworkflow.py --root .
+

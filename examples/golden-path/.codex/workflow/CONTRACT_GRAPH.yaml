@@ -19,6 +19,12 @@ nodes:
   - contract_id: spec:index
     contract_type: spec
     path: .codex/spec/SPEC_INDEX.yaml
+  - contract_id: validation:index
+    contract_type: validation
+    path: .codex/validation/VALIDATION_INDEX.yaml
+  - contract_id: validation:V001-travel-globe-core
+    contract_type: validation
+    path: .codex/validation/V001-travel-globe-core/VALIDATION.yaml
   - contract_id: change:golden-path-m01
     contract_type: change
     path: .codex/changes/M01/CHANGE.yaml
@@ -39,8 +45,14 @@ edges:
     to: spec:index
     relation: constrains
   - from: spec:index
-    to: change:golden-path-m01
+    to: validation:index
     relation: scopes
+  - from: validation:index
+    to: validation:V001-travel-globe-core
+    relation: includes
+  - from: validation:V001-travel-globe-core
+    to: change:golden-path-m01
+    relation: validates_before
   - from: change:golden-path-m01
     to: work_items:golden-path-m01
     relation: decomposes_to

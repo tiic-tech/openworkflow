@@ -56,6 +56,7 @@ Each layer must be stored in files, not only in chat history.
   -> /build-vision
   -> /build-decision
   -> /build-spec
+  -> /build-validation
   -> /build-prototype
   -> /build-change
   -> /build-slices
@@ -138,6 +139,20 @@ Expected contribution:
 - validates uncertain interaction, architecture, state-machine, or UX ideas
 - prevents speculative ideas from being prematurely locked into specs
 - feeds validated findings back into decisions, specs, or changes
+
+### /build-validation
+
+Ranks the assumptions that must be proven before a broad vision becomes
+implementation scope.
+
+Expected contribution:
+
+- classifies features as existential, supporting, later, or out of scope
+- identifies the critical assumption that makes the vision succeed or fail
+- creates prototype briefs that answer validation questions before specs and
+  tasks expand
+- prevents task decomposition from prioritizing peripheral work before the
+  product's core experience is proven
 
 ### /build-change
 
@@ -248,6 +263,12 @@ OpenWorkflow should eventually define a portable project layout similar to:
       WORK_ITEMS.yaml
       AGENT_BRIEFS/
       archive/
+  validation/
+    <validation_id>/
+      VALIDATION.yaml
+      PROTOTYPE_BRIEF.md
+      RESULT.md
+      archive/
   runtime/
     RUNTIME_INDEX.yaml
     STATE_MACHINE.md
@@ -277,7 +298,7 @@ Before implementing individual skills, define the shared OpenWorkflow file
 schema and contract graph:
 
 ```txt
-workflow -> context -> vision -> decisions -> spec -> change -> slices -> team -> runtime
+workflow -> context -> vision -> decisions -> spec -> validation -> change -> slices -> team -> runtime
 ```
 
 This keeps future `build-*` commands interoperable instead of becoming a set of

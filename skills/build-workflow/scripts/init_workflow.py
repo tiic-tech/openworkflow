@@ -129,6 +129,10 @@ def workflow_index(project_slug: str, project_title: str, sources: list[str], re
         "    contract_type: spec\n"
         "    path: .codex/spec/SPEC_INDEX.yaml\n"
         "    status: active\n"
+        "  - contract_id: validation:index\n"
+        "    contract_type: validation\n"
+        "    path: .codex/validation/VALIDATION_INDEX.yaml\n"
+        "    status: active\n"
     )
 
 
@@ -156,6 +160,9 @@ def contract_graph(project_slug: str) -> str:
         "  - contract_id: spec:index\n"
         "    contract_type: spec\n"
         "    path: .codex/spec/SPEC_INDEX.yaml\n"
+        "  - contract_id: validation:index\n"
+        "    contract_type: validation\n"
+        "    path: .codex/validation/VALIDATION_INDEX.yaml\n"
         "edges:\n"
         f"  - from: {workflow_id}\n"
         "    to: context:default\n"
@@ -169,6 +176,9 @@ def contract_graph(project_slug: str) -> str:
         "  - from: decision:index\n"
         "    to: spec:index\n"
         "    relation: constrains\n"
+        "  - from: spec:index\n"
+        "    to: validation:index\n"
+        "    relation: scopes\n"
     )
 
 
@@ -255,6 +265,21 @@ def spec_index(project_title: str) -> str:
     )
 
 
+def validation_index(project_title: str) -> str:
+    return (
+        "schema_version: 0.1.0\n"
+        "contract_id: validation:index\n"
+        "contract_type: validation\n"
+        f"title: {q(project_title + ' validation index')}\n"
+        "status: active\n"
+        "depends_on:\n"
+        "  - spec:index\n"
+        "produces: []\n"
+        "validations: []\n"
+        "updated_at: null\n"
+    )
+
+
 def context_doc(project_title: str) -> str:
     return (
         f"# {project_title} Context\n\n"
@@ -292,6 +317,8 @@ def init_workflow(args: argparse.Namespace) -> None:
         codex / "decisions" / "archive",
         codex / "spec",
         codex / "spec" / "archive",
+        codex / "validation",
+        codex / "validation" / "archive",
         codex / "changes",
         codex / "changes" / "archive",
     ]
@@ -335,6 +362,12 @@ def init_workflow(args: argparse.Namespace) -> None:
         args.dry_run,
     )
     write_file(codex / "spec" / "SPEC_INDEX.yaml", spec_index(project_title), args.force, args.dry_run)
+    write_file(
+        codex / "validation" / "VALIDATION_INDEX.yaml",
+        validation_index(project_title),
+        args.force,
+        args.dry_run,
+    )
 
 
 def parser() -> argparse.ArgumentParser:
@@ -355,4 +388,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

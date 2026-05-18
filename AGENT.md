@@ -18,9 +18,12 @@ repositories.
   indexes, contract graphs, changes, and work items.
 - `changes/M01-contract-foundation/` records the active M01 change contract,
   acceptance bar, and work item breakdown.
+- `changes/M02-validation-first-prioritization/` records the active M02 change
+  contract for validation-first prioritization.
 - `skills/` contains repo-local skill implementations. `build-team` and
   `run-team` preserve the initial downstream execution skills; `build-workflow`
-  initializes upstream contract infrastructure.
+  initializes upstream contract infrastructure, and `build-validation`
+  identifies core assumptions before implementation scope is created.
 - `examples/golden-path/` is the minimum executable contract trace.
 - Future changes should preserve the principle that workflow execution is
   derived from durable upstream contracts, not from chat memory.
@@ -52,6 +55,7 @@ context
 vision
 decisions
 specs
+validation
 changes
 slices
 team
@@ -74,6 +78,7 @@ openworkflow/
   changes/
   skills/
   schemas/
+  scripts/
   examples/
   references/
   decisions/
@@ -106,9 +111,10 @@ Start with the shared system before individual skills:
 5. Design `/build-vision`.
 6. Design `/build-decision`.
 7. Design `/build-spec`.
-8. Design `/build-change`.
-9. Design `/build-slices`.
-10. Integrate with `/build-team` and `/run-team`.
+8. Design `/build-validation`.
+9. Design `/build-change`.
+10. Design `/build-slices`.
+11. Integrate with `/build-team` and `/run-team`.
 
 ## Validation Expectations
 
