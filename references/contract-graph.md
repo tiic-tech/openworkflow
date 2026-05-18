@@ -17,6 +17,8 @@ OpenWorkflow v0 recognizes these contract types:
 - `spec`: binding product, technical, UX, QA, security, or performance specs
 - `validation`: critical assumption ranking and prototype briefs that decide
   what must be proven before a change becomes implementation work
+- `prototype`: low-ceremony executable proof artifacts that answer validation
+  questions before production specs, changes, or teams are created
 - `change`: the current bounded delivery scope
 - `work_items`: dependency-ordered slices and atom tasks for a change
 - `team`: Agent Team role topology and delegation boundaries
@@ -66,6 +68,8 @@ workflow
   -> decision
   -> spec
   -> validation
+  -> prototype
+  -> decision
   -> change
   -> work_items
   -> team
@@ -90,3 +94,34 @@ Validation artifacts should answer:
 - Which assumption is most likely to invalidate the vision?
 - What is the smallest prototype that can prove or disprove it?
 - What evidence will decide whether to continue, pivot, or stop?
+
+## Prototype Discovery Loop
+
+Prototype discovery is not the production workflow. It is a fast loop for
+proving whether the vision deserves a production slice.
+
+```txt
+vision -> validation -> prototype -> decision -> vision update or production slice
+```
+
+Prototype artifacts may be single-file demos, hardcoded data, mock
+interactions, or other constrained proofs. They should avoid specs, changes,
+runtime state, team setup, persistence, authentication, deployment, and
+production hardening unless one of those is the critical assumption being
+validated.
+
+No `spec`, `change`, or `team` contract should be created from a prototype
+until a decision records that the prototype evidence supports continuing.
+
+## Production Validation Loop
+
+Once a prototype is accepted, production work should still advance one core
+feature at a time:
+
+```txt
+accepted prototype -> focused spec -> focused change -> team/runtime -> decision
+```
+
+Each production slice should trace back to the accepted prototype or decision
+that justifies it. Avoid creating multiple broad specs or changes from a single
+idea when only the next core feature needs validation.

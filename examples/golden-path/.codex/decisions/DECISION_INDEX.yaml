@@ -7,5 +7,12 @@ depends_on:
   - vision:default
 produces:
   - spec:index
-decisions: []
+  - decision:D001-travel-globe-prototype
+decisions:
+  - decision_id: D001-travel-globe-prototype
+    contract_id: decision:D001-travel-globe-prototype
+    title: Travel globe prototype review decision
+    status: active
+    path: .codex/decisions/DECISION-0001-travel-globe-prototype.yaml
+    outcome: continue
 updated_at: null

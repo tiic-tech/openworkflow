@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: prototype:P001-travel-globe-core
+contract_type: prototype
+title: "Travel globe core interaction prototype"
+status: planned
+source_artifacts:
+  - ".codex/validation/V001-travel-globe-core/VALIDATION.yaml"
+  - ".codex/validation/V001-travel-globe-core/PROTOTYPE_BRIEF.md"
+depends_on:
+  - validation:V001-travel-globe-core
+produces: []
+validation_contract: validation:V001-travel-globe-core
+core_question: "Can an interactive globe with travel flags, hover photo previews, and a detail panel become the central experience that makes an AI-native travel memory app distinct from a normal photo journal?"
+prototype_scope:
+  include:
+    - "Rotatable 3D globe"
+    - "Three to five sample destination flags"
+    - "Hover thumbnails for a flag"
+    - "Click detail panel with photo and diary sample"
+  exclude:
+    - "Login"
+    - "Persistence"
+    - "Upload"
+    - "Production AI integration"
+todo:
+  - task_id: P001
+    title: "Create a single local HTML prototype shell"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Create a single local HTML prototype shell"
+  - task_id: P002
+    title: "Render a rotatable globe-like interaction surface"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Render a rotatable globe-like interaction surface"
+  - task_id: P003
+    title: "Place sample destination flags"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Place sample destination flags"
+  - task_id: P004
+    title: "Show hover photo thumbnails from a flag"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Show hover photo thumbnails from a flag"
+  - task_id: P005
+    title: "Open a photo and diary detail panel on click"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Open a photo and diary detail panel on click"
+  - task_id: P006
+    title: "Record evidence for build-decision"
+    status: planned
+    acceptance:
+      - "Prototype demonstrates: Record evidence for build-decision"
+acceptance:
+  - "A user can rotate the globe and inspect sample destinations."
+  - "A user can hover a flag and see relevant photo thumbnails."
+  - "A user can click into a photo and diary detail experience."
+  - "The prototype is strong enough to decide continue, pivot, stop, or needs_more_evidence."
+artifact:
+  path: .codex/prototypes/P001-travel-globe-core/artifact/index.html
+  type: single_html
+decision_handoff:
+  target: build-decision
+  requires_user_review: true
+result_artifact: RESULT.md
+evidence_artifact: EVIDENCE.md
+prototype_plan: PROTOTYPE_PLAN.md
+updated_at: null

@@ -29,6 +29,9 @@ infrastructure.
   validation/
     VALIDATION_INDEX.yaml
     archive/
+  prototypes/
+    PROTOTYPE_INDEX.yaml
+    archive/
   changes/
     archive/
 ```
@@ -43,6 +46,8 @@ infrastructure.
 - `build-spec` should add specs and update `.codex/spec/SPEC_INDEX.yaml`.
 - `build-validation` should add validation-first prioritization artifacts and
   update `.codex/validation/VALIDATION_INDEX.yaml`.
+- `build-prototype` should add prototype discovery artifacts and update
+  `.codex/prototypes/PROTOTYPE_INDEX.yaml`.
 - `build-change` and `build-slices` should write under `.codex/changes/<id>/`.
 - `build-team` and `run-team` own `.codex/runtime/**`.
 

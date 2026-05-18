@@ -20,10 +20,14 @@ repositories.
   acceptance bar, and work item breakdown.
 - `changes/M02-validation-first-prioritization/` records the active M02 change
   contract for validation-first prioritization.
+- `changes/M03-prototype-discovery-loop/` records the active M03 change
+  contract for prototype discovery.
 - `skills/` contains repo-local skill implementations. `build-team` and
   `run-team` preserve the initial downstream execution skills; `build-workflow`
-  initializes upstream contract infrastructure, and `build-validation`
-  identifies core assumptions before implementation scope is created.
+  initializes upstream contract infrastructure, `build-validation` identifies
+  core assumptions before implementation scope is created, and
+  `build-prototype` creates lightweight local prototype loops before specs,
+  changes, or teams.
 - `examples/golden-path/` is the minimum executable contract trace.
 - Future changes should preserve the principle that workflow execution is
   derived from durable upstream contracts, not from chat memory.
@@ -56,6 +60,7 @@ vision
 decisions
 specs
 validation
+prototypes
 changes
 slices
 team
@@ -109,12 +114,13 @@ Start with the shared system before individual skills:
 3. Design `/build-workflow`.
 4. Design `/build-context`.
 5. Design `/build-vision`.
-6. Design `/build-decision`.
-7. Design `/build-spec`.
-8. Design `/build-validation`.
-9. Design `/build-change`.
-10. Design `/build-slices`.
-11. Integrate with `/build-team` and `/run-team`.
+6. Design `/build-validation`.
+7. Design `/build-prototype`.
+8. Design `/build-decision`.
+9. Design `/build-spec`.
+10. Design `/build-change`.
+11. Design `/build-slices`.
+12. Integrate with `/build-team` and `/run-team`.
 
 ## Validation Expectations
 

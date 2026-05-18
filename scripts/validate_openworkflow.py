@@ -20,9 +20,12 @@ REQUIRED_FILES = [
     "schemas/contract-graph.schema.json",
     "schemas/change.schema.json",
     "schemas/validation.schema.json",
+    "schemas/prototype.schema.json",
     "schemas/work-items.schema.json",
     "skills/build-validation/SKILL.md",
     "skills/build-validation/scripts/init_validation.py",
+    "skills/build-prototype/SKILL.md",
+    "skills/build-prototype/scripts/init_prototype.py",
     "skills/build-workflow/SKILL.md",
     "skills/build-workflow/scripts/init_workflow.py",
     "skills/build-team/SKILL.md",
@@ -31,6 +34,8 @@ REQUIRED_FILES = [
     "changes/M01-contract-foundation/WORK_ITEMS.yaml",
     "changes/M02-validation-first-prioritization/CHANGE.yaml",
     "changes/M02-validation-first-prioritization/WORK_ITEMS.yaml",
+    "changes/M03-prototype-discovery-loop/CHANGE.yaml",
+    "changes/M03-prototype-discovery-loop/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
@@ -201,6 +206,58 @@ def validate_validation(root: Path, path: Path, data: Any, errors: list[str]) ->
                 errors.append(f"{rel(root, path)} has invalid decision option {option}")
 
 
+def validate_prototype(root: Path, path: Path, data: Any, errors: list[str]) -> None:
+    if path.name != "TODO.yaml":
+        return
+    if data.get("contract_type") != "prototype":
+        return
+    required = [
+        "validation_contract",
+        "core_question",
+        "prototype_scope",
+        "todo",
+        "acceptance",
+        "artifact",
+        "decision_handoff",
+    ]
+    for key in required:
+        if key not in data:
+            errors.append(f"{rel(root, path)} missing prototype key {key}")
+    prototype_scope = data.get("prototype_scope")
+    if isinstance(prototype_scope, dict):
+        for key in ("include", "exclude"):
+            if key not in prototype_scope:
+                errors.append(f"{rel(root, path)} prototype_scope missing {key}")
+    todo = data.get("todo")
+    if not isinstance(todo, list) or not todo:
+        errors.append(f"{rel(root, path)} must contain non-empty todo list")
+    else:
+        seen: set[str] = set()
+        for index, item in enumerate(todo):
+            if not isinstance(item, dict):
+                errors.append(f"{rel(root, path)} todo item {index} is not a mapping")
+                continue
+            task_id = item.get("task_id")
+            if not isinstance(task_id, str) or not task_id:
+                errors.append(f"{rel(root, path)} todo item {index} missing task_id")
+                continue
+            if task_id in seen:
+                errors.append(f"{rel(root, path)} duplicate prototype task_id {task_id}")
+            seen.add(task_id)
+            for key in ("title", "status", "acceptance"):
+                if key not in item:
+                    errors.append(f"{rel(root, path)} {task_id} missing {key}")
+    artifact = data.get("artifact")
+    if isinstance(artifact, dict):
+        artifact_path = artifact.get("path")
+        if isinstance(artifact_path, str) and not (contract_root_for(root, path) / artifact_path).exists():
+            errors.append(f"{rel(root, path)} references missing artifact path {artifact_path}")
+    decision_handoff = data.get("decision_handoff")
+    if isinstance(decision_handoff, dict):
+        if decision_handoff.get("requires_user_review") is not True:
+            errors.append(f"{rel(root, path)} decision_handoff.requires_user_review must be true")
+
+
 def workflow_root_for(path: Path) -> Path:
     # <project>/.codex/workflow/WORKFLOW_INDEX.yaml
     return path.parents[2]
@@ -254,6 +311,7 @@ def validate_yaml_contracts(root: Path, errors: list[str]) -> None:
             validate_change(root, path, data, errors)
             validate_work_items(root, path, data, errors)
             validate_validation(root, path, data, errors)
+            validate_prototype(root, path, data, errors)
             validate_workflow_index(root, path, data, errors)
             validate_contract_graph(root, path, data, errors)
 

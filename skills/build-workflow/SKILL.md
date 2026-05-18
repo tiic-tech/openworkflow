@@ -20,6 +20,7 @@ It owns workflow infrastructure only:
 - `.codex/decisions/`
 - `.codex/spec/`
 - `.codex/validation/`
+- `.codex/prototypes/`
 - `.codex/changes/`
 
 It must not initialize `.codex/runtime/`; runtime remains owned by `build-team`

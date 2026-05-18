@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: work_items:m03-prototype-discovery-loop
+contract_type: work_items
+title: M03 Prototype Discovery Loop work items
+status: active
+change_contract: changes/M03-prototype-discovery-loop/CHANGE.yaml
+items:
+  - task_id: M03-T001
+    title: Add prototype contract semantics and schema
+    status: done
+    depends_on: []
+    owned_paths:
+      - references/contract-graph.md
+      - schemas/openworkflow-contract.schema.json
+      - schemas/prototype.schema.json
+      - changes/M03-prototype-discovery-loop/
+    acceptance:
+      - prototype is listed as a contract type.
+      - schema captures validation source, scope, todo list, artifact, and decision handoff.
+  - task_id: M03-T002
+    title: Implement build-prototype skill
+    status: done
+    depends_on:
+      - M03-T001
+    owned_paths:
+      - skills/build-prototype/
+    acceptance:
+      - skill defines lightweight prototype execution boundaries.
+      - script initializes prototype artifacts without overwriting by default.
+  - task_id: M03-T003
+    title: Update workflow initialization and validation tooling
+    status: done
+    depends_on:
+      - M03-T002
+    owned_paths:
+      - skills/build-workflow/
+      - scripts/validate_openworkflow.py
+      - AGENT.md
+      - build_system_vision.md
+    acceptance:
+      - build-workflow creates prototype folders and indexes.
+      - validator checks prototype contracts.
+      - project guide identifies M03 as active priority.
+  - task_id: M03-T004
+    title: Upgrade golden path to prototype discovery loop
+    status: done
+    depends_on:
+      - M03-T003
+    owned_paths:
+      - examples/golden-path/
+    acceptance:
+      - example shows validation feeding prototype before production change.
+      - example prototype artifact passes repository validation.

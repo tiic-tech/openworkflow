@@ -133,6 +133,10 @@ def workflow_index(project_slug: str, project_title: str, sources: list[str], re
         "    contract_type: validation\n"
         "    path: .codex/validation/VALIDATION_INDEX.yaml\n"
         "    status: active\n"
+        "  - contract_id: prototype:index\n"
+        "    contract_type: prototype\n"
+        "    path: .codex/prototypes/PROTOTYPE_INDEX.yaml\n"
+        "    status: active\n"
     )
 
 
@@ -163,6 +167,9 @@ def contract_graph(project_slug: str) -> str:
         "  - contract_id: validation:index\n"
         "    contract_type: validation\n"
         "    path: .codex/validation/VALIDATION_INDEX.yaml\n"
+        "  - contract_id: prototype:index\n"
+        "    contract_type: prototype\n"
+        "    path: .codex/prototypes/PROTOTYPE_INDEX.yaml\n"
         "edges:\n"
         f"  - from: {workflow_id}\n"
         "    to: context:default\n"
@@ -179,6 +186,9 @@ def contract_graph(project_slug: str) -> str:
         "  - from: spec:index\n"
         "    to: validation:index\n"
         "    relation: scopes\n"
+        "  - from: validation:index\n"
+        "    to: prototype:index\n"
+        "    relation: prototypes\n"
     )
 
 
@@ -280,6 +290,21 @@ def validation_index(project_title: str) -> str:
     )
 
 
+def prototype_index(project_title: str) -> str:
+    return (
+        "schema_version: 0.1.0\n"
+        "contract_id: prototype:index\n"
+        "contract_type: prototype\n"
+        f"title: {q(project_title + ' prototype index')}\n"
+        "status: active\n"
+        "depends_on:\n"
+        "  - validation:index\n"
+        "produces: []\n"
+        "prototypes: []\n"
+        "updated_at: null\n"
+    )
+
+
 def context_doc(project_title: str) -> str:
     return (
         f"# {project_title} Context\n\n"
@@ -319,6 +344,8 @@ def init_workflow(args: argparse.Namespace) -> None:
         codex / "spec" / "archive",
         codex / "validation",
         codex / "validation" / "archive",
+        codex / "prototypes",
+        codex / "prototypes" / "archive",
         codex / "changes",
         codex / "changes" / "archive",
     ]
@@ -365,6 +392,12 @@ def init_workflow(args: argparse.Namespace) -> None:
     write_file(
         codex / "validation" / "VALIDATION_INDEX.yaml",
         validation_index(project_title),
+        args.force,
+        args.dry_run,
+    )
+    write_file(
+        codex / "prototypes" / "PROTOTYPE_INDEX.yaml",
+        prototype_index(project_title),
         args.force,
         args.dry_run,
     )

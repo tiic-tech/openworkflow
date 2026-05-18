@@ -13,4 +13,5 @@ validations:
     title: Validate interactive travel globe as core experience
     status: active
     path: .codex/validation/V001-travel-globe-core/VALIDATION.yaml
+    prototype: prototype:P001-travel-globe-core
 updated_at: null

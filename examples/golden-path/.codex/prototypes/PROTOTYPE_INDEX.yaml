@@ -1,0 +1,17 @@
+schema_version: 0.1.0
+contract_id: prototype:index
+contract_type: prototype
+title: "Golden Path prototype index"
+status: active
+depends_on:
+  - validation:index
+produces:
+  - prototype:P001-travel-globe-core
+prototypes:
+  - prototype_id: P001-travel-globe-core
+    contract_id: prototype:P001-travel-globe-core
+    title: Travel globe core interaction prototype
+    status: planned
+    path: .codex/prototypes/P001-travel-globe-core/TODO.yaml
+    validation_contract: validation:V001-travel-globe-core
+updated_at: null

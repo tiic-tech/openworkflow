@@ -7,7 +7,8 @@ source_artifacts:
   - "TRACE.md"
 depends_on:
   - vision:default
-produces: []
+produces:
+  - prototype:P001-travel-globe-core
 core_question: "Can an interactive globe with travel flags, hover photo previews, and a detail panel become the central experience that makes an AI-native travel memory app distinct from a normal photo journal?"
 feature_classification:
   existential:

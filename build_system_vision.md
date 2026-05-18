@@ -34,13 +34,16 @@ OpenWorkflow exists to fill that gap.
 
 ## Contract Stack
 
-The workflow should be built around five durable layers:
+The workflow should be built around durable layers:
 
 ```txt
 Vision Contract
   -> Context Contract
   -> Decision Contract
   -> Spec Contract
+  -> Validation Contract
+  -> Prototype Contract
+  -> Prototype Decision
   -> Change Contract
   -> Team Contract
   -> Runtime State
@@ -54,10 +57,10 @@ Each layer must be stored in files, not only in chat history.
 /build-workflow
   -> /build-context
   -> /build-vision
-  -> /build-decision
-  -> /build-spec
   -> /build-validation
   -> /build-prototype
+  -> /build-decision
+  -> /build-spec
   -> /build-change
   -> /build-slices
   -> /build-team
@@ -130,16 +133,6 @@ Expected contribution:
 - gives review and QA objective acceptance bars
 - provides the upstream contract for scope and team design
 
-### /build-prototype
-
-Creates throwaway or bounded prototypes when a spec is not yet knowable.
-
-Expected contribution:
-
-- validates uncertain interaction, architecture, state-machine, or UX ideas
-- prevents speculative ideas from being prematurely locked into specs
-- feeds validated findings back into decisions, specs, or changes
-
 ### /build-validation
 
 Ranks the assumptions that must be proven before a broad vision becomes
@@ -153,6 +146,19 @@ Expected contribution:
   tasks expand
 - prevents task decomposition from prioritizing peripheral work before the
   product's core experience is proven
+
+### /build-prototype
+
+Creates fast, local prototypes directly from validation artifacts before specs,
+changes, runtime state, or Agent Teams exist.
+
+Expected contribution:
+
+- turns a validation core question into a small prototype plan and todo list
+- uses hardcoded data, single-file demos, or narrow local artifacts when enough
+  to answer the question
+- records evidence for user review and `/build-decision`
+- prevents prototype work from expanding into production scope
 
 ### /build-change
 
@@ -269,6 +275,14 @@ OpenWorkflow should eventually define a portable project layout similar to:
       PROTOTYPE_BRIEF.md
       RESULT.md
       archive/
+  prototypes/
+    <prototype_id>/
+      PROTOTYPE_PLAN.md
+      TODO.yaml
+      RESULT.md
+      EVIDENCE.md
+      artifact/
+      archive/
   runtime/
     RUNTIME_INDEX.yaml
     STATE_MACHINE.md
@@ -298,7 +312,7 @@ Before implementing individual skills, define the shared OpenWorkflow file
 schema and contract graph:
 
 ```txt
-workflow -> context -> vision -> decisions -> spec -> validation -> change -> slices -> team -> runtime
+workflow -> context -> vision -> decisions -> spec -> validation -> prototype -> decision -> change -> slices -> team -> runtime
 ```
 
 This keeps future `build-*` commands interoperable instead of becoming a set of

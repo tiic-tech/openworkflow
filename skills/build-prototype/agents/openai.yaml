@@ -1,0 +1,5 @@
+interface:
+  display_name: "Build Prototype"
+  short_description: "Create a focused prototype from validation artifacts"
+  default_prompt: "Use $build-prototype to turn a validation target into a local prototype plan."
+

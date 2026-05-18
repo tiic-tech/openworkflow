@@ -6,17 +6,17 @@ status: active
 source_artifacts:
   - TRACE.md
 depends_on:
-  - validation:V001-travel-globe-core
+  - decision:D001-travel-globe-prototype
 produces:
   - work_items:golden-path-m01
 problem: >
-  The example repository needs a small, concrete change contract after the
-  core travel globe assumption is identified, so the upstream graph can
-  demonstrate handoff from validation into work item slicing.
+  The example repository needs a small, concrete change contract only after the
+  core travel globe prototype is reviewed and accepted, so the upstream graph
+  can demonstrate handoff from prototype discovery into production slicing.
 goals:
   - Demonstrate a bounded change contract.
   - Demonstrate a work item contract that can feed build-team.
-  - Keep implementation work downstream of validation-first prioritization.
+  - Keep implementation work downstream of prototype evidence and decision.
 non_goals:
   - Initialize runtime state.
   - Implement product code.

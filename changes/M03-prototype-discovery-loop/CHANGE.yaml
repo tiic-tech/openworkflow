@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: change:m03-prototype-discovery-loop
+contract_type: change
+title: M03 Prototype Discovery Loop Protocol
+status: active
+source_artifacts:
+  - AGENT.md
+  - build_system_vision.md
+  - references/contract-graph.md
+  - changes/M02-validation-first-prioritization/CHANGE.yaml
+depends_on:
+  - change:m02-validation-first-prioritization
+produces:
+  - prototype:m03-prototype-discovery-loop
+  - work_items:m03-prototype-discovery-loop
+problem: >
+  OpenWorkflow can identify core assumptions, but it does not yet define how a
+  validation artifact becomes a fast prototype without prematurely creating
+  specs, changes, runtime state, or an Agent Team.
+goals:
+  - Add prototype as a first-class contract type.
+  - Define the prototype discovery loop from validation to user decision.
+  - Add a build-prototype skill that consumes validation artifacts and creates a focused prototype plan and todo contract.
+  - Keep prototype execution intentionally lightweight and outside build-team governance.
+  - Update the golden path to show validation feeding prototype before production contracts.
+non_goals:
+  - Implement a production application.
+  - Implement build-decision, build-vision-with-clean, or production slice governance.
+  - Require prototypes to use any specific frontend framework.
+affected_paths:
+  - AGENT.md
+  - build_system_vision.md
+  - references/
+  - schemas/
+  - skills/build-prototype/
+  - skills/build-workflow/
+  - scripts/
+  - examples/
+  - changes/M03-prototype-discovery-loop/
+acceptance:
+  - prototype is recognized as an OpenWorkflow contract type.
+  - build-prototype initializes PROTOTYPE_PLAN.md, TODO.yaml, RESULT.md, EVIDENCE.md, artifact/, and archive/.
+  - Prototype contracts require validation source, core question, include/exclude scope, todo list, acceptance, artifact path, and decision handoff.
+  - Golden path demonstrates validation -> prototype -> decision before change/work item production flow.
+  - The repository validator checks prototype contracts.
+validation:
+  - python3 scripts/validate_openworkflow.py --root .
+

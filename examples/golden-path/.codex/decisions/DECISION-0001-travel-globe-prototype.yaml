@@ -1,0 +1,22 @@
+schema_version: 0.1.0
+contract_id: decision:D001-travel-globe-prototype
+contract_type: decision
+title: Travel globe prototype review decision
+status: active
+source_artifacts:
+  - .codex/prototypes/P001-travel-globe-core/TODO.yaml
+  - .codex/prototypes/P001-travel-globe-core/RESULT.md
+  - .codex/prototypes/P001-travel-globe-core/EVIDENCE.md
+depends_on:
+  - prototype:P001-travel-globe-core
+produces:
+  - change:golden-path-m01
+decision_type: prototype_review
+outcome: continue
+accepted:
+  - Globe interaction is the correct first production slice when user review supports the prototype.
+rejected: []
+needs_iteration: []
+next_step:
+  - Create a focused production change only for the accepted core globe interaction.
+updated_at: null

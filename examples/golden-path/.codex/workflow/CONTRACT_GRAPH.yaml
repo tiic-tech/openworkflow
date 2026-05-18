@@ -25,6 +25,15 @@ nodes:
   - contract_id: validation:V001-travel-globe-core
     contract_type: validation
     path: .codex/validation/V001-travel-globe-core/VALIDATION.yaml
+  - contract_id: prototype:index
+    contract_type: prototype
+    path: .codex/prototypes/PROTOTYPE_INDEX.yaml
+  - contract_id: prototype:P001-travel-globe-core
+    contract_type: prototype
+    path: .codex/prototypes/P001-travel-globe-core/TODO.yaml
+  - contract_id: decision:D001-travel-globe-prototype
+    contract_type: decision
+    path: .codex/decisions/DECISION-0001-travel-globe-prototype.yaml
   - contract_id: change:golden-path-m01
     contract_type: change
     path: .codex/changes/M01/CHANGE.yaml
@@ -51,8 +60,17 @@ edges:
     to: validation:V001-travel-globe-core
     relation: includes
   - from: validation:V001-travel-globe-core
+    to: prototype:P001-travel-globe-core
+    relation: prototypes
+  - from: prototype:index
+    to: prototype:P001-travel-globe-core
+    relation: includes
+  - from: prototype:P001-travel-globe-core
+    to: decision:D001-travel-globe-prototype
+    relation: awaits_decision
+  - from: decision:D001-travel-globe-prototype
     to: change:golden-path-m01
-    relation: validates_before
+    relation: authorizes
   - from: change:golden-path-m01
     to: work_items:golden-path-m01
     relation: decomposes_to
