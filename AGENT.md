@@ -29,6 +29,9 @@ repositories.
 - `changes/M08-engineering-skill-reference-research/` and
   `references/engineering-skill-reference-research.md` record the external
   engineering skill research that should inform M09 command protocol depth.
+- `changes/M09-audit-first-discovery-loop/` and
+  `references/audit-first-discovery-loop.md` define the audit-first discovery
+  loop protocol.
 - `package.json`, `tsconfig.json`, and `packages/` contain the npm-first
   TypeScript CLI implementation.
 - `skills/` contains repo-local skill prototypes. User-facing workflow commands

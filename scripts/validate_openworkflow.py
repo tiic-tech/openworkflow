@@ -17,6 +17,7 @@ REQUIRED_FILES = [
     "references/contract-graph.md",
     "references/npm-cli-architecture.md",
     "references/engineering-skill-reference-research.md",
+    "references/audit-first-discovery-loop.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
@@ -70,6 +71,8 @@ REQUIRED_FILES = [
     "changes/M07-command-namespace-contract/WORK_ITEMS.yaml",
     "changes/M08-engineering-skill-reference-research/CHANGE.yaml",
     "changes/M08-engineering-skill-reference-research/WORK_ITEMS.yaml",
+    "changes/M09-audit-first-discovery-loop/CHANGE.yaml",
+    "changes/M09-audit-first-discovery-loop/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [

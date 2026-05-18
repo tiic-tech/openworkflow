@@ -8,6 +8,24 @@ export interface WorkflowCommand {
   description: string;
   stage: string;
   targetArtifacts: string[];
+  protocol?: CommandProtocol;
+}
+
+export interface CommandProtocol {
+  depth: "deep" | "shallow";
+  interactionMode: string;
+  requiredContext: string[];
+  optionalContext: string[];
+  forbiddenContext: string[];
+  allowedOutputs: string[];
+  forbiddenOutputs: string[];
+  auditCheckpoints: {
+    before: string[];
+    during: string[];
+    after: string[];
+  };
+  antiPatterns: string[];
+  handoffCommands: string[];
 }
 
 export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
@@ -19,19 +37,38 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     ".openworkflow/context/CONTEXT.md",
     ".openworkflow/context/CONTEXT_MAP.yaml",
   ]),
-  command("vision", ["build-vision"], "Create or refine the product vision contract through focused collaboration.", "vision", [
-    ".openworkflow/vision/VISION.md",
-    ".openworkflow/vision/VISION_CONTRACT.yaml",
-  ]),
-  command("validation", ["build-validation"], "Prioritize the core feature or assumption that must be validated first.", "validation", [
-    ".openworkflow/validation/",
-  ]),
-  command("prototype", ["build-prototype"], "Build the smallest prototype needed to validate the current core feature.", "prototype", [
-    ".openworkflow/prototypes/",
-  ]),
-  command("decision", ["build-decision"], "Record user review outcomes and decide whether the current evidence is accepted.", "decision", [
-    ".openworkflow/decisions/",
-  ]),
+  command(
+    "vision",
+    ["build-vision"],
+    "Create or refine the product vision contract through focused collaboration.",
+    "vision",
+    [".openworkflow/vision/VISION.md", ".openworkflow/vision/VISION_CONTRACT.yaml"],
+    visionProtocol(),
+  ),
+  command(
+    "validation",
+    ["build-validation"],
+    "Prioritize the core feature or assumption that must be validated first.",
+    "validation",
+    [".openworkflow/validation/"],
+    validationProtocol(),
+  ),
+  command(
+    "prototype",
+    ["build-prototype"],
+    "Build the smallest prototype needed to validate the current core feature.",
+    "prototype",
+    [".openworkflow/prototypes/"],
+    prototypeProtocol(),
+  ),
+  command(
+    "decision",
+    ["build-decision"],
+    "Record user review outcomes and decide whether the current evidence is accepted.",
+    "decision",
+    [".openworkflow/decisions/"],
+    decisionProtocol(),
+  ),
   command("spec", ["build-spec"], "Create one focused production spec from an accepted decision.", "spec", [
     ".openworkflow/specs/",
   ]),
@@ -53,6 +90,7 @@ function command(
   description: string,
   stage: string,
   targetArtifacts: string[],
+  protocol?: CommandProtocol,
 ): WorkflowCommand {
   return {
     id,
@@ -62,5 +100,146 @@ function command(
     description,
     stage,
     targetArtifacts,
+    protocol,
+  };
+}
+
+function visionProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "one-question-at-a-time",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/GLOSSARY.yaml",
+      "AGENT.md",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**"],
+    allowedOutputs: [
+      ".openworkflow/vision/VISION.md",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
+    ],
+    forbiddenOutputs: [
+      ".openworkflow/validation/**",
+      ".openworkflow/prototypes/**",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
+    auditCheckpoints: {
+      before: ["Confirm workflow and context indexes exist.", "Load only the vision context packet."],
+      during: ["Ask one question at a time.", "Update only stable vision or context terms."],
+      after: ["Summarize unresolved questions.", "Confirm no validation, prototype, spec, change, or runtime artifacts were created."],
+    },
+    antiPatterns: [
+      "Do not create validation rankings during vision work.",
+      "Do not create specs, changes, tasks, or teams from a vision session.",
+      "Do not batch many interview questions into one turn.",
+    ],
+    handoffCommands: ["/ow:validation"],
+  };
+}
+
+function validationProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "audit-and-rank",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/validation/VALIDATION_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/vision/VISION.md",
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**"],
+    allowedOutputs: [".openworkflow/validation/**"],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/**",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
+    auditCheckpoints: {
+      before: ["Confirm a vision contract exists.", "Load only vision and validation index context."],
+      during: ["Classify features as existential, supporting, later, or out of scope.", "Name the single highest-risk validation question."],
+      after: ["Record the validation target and prototype brief.", "Confirm no prototype, spec, change, or runtime artifacts were created."],
+    },
+    antiPatterns: [
+      "Do not turn feature ranking into a production task list.",
+      "Do not prototype before naming the validation question.",
+      "Do not treat supporting features as blockers for existential validation.",
+    ],
+    handoffCommands: ["/ow:prototype", "/ow:vision"],
+  };
+}
+
+function prototypeProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "smallest-runnable-evidence",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/validation/VALIDATION_INDEX.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/validation/**/VALIDATION.yaml",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+      "package.json",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
+    allowedOutputs: [".openworkflow/prototypes/**"],
+    forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    auditCheckpoints: {
+      before: ["Confirm validation target exists.", "Choose logic/state or UI/experience prototype branch."],
+      during: ["Build only what answers the validation question.", "Keep one command or URL to run the prototype."],
+      after: ["Write evidence and result artifacts.", "Confirm no spec, change, team, persistence, or production hardening was created."],
+    },
+    antiPatterns: [
+      "Do not polish the prototype into production code.",
+      "Do not add persistence unless persistence is the validation question.",
+      "Do not create specs, changes, or teams from prototype work.",
+    ],
+    handoffCommands: ["/ow:decision", "/ow:validation"],
+  };
+}
+
+function decisionProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "review-and-record",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/prototypes/**/RESULT.md",
+      ".openworkflow/prototypes/**/EVIDENCE.md",
+      ".openworkflow/validation/**/VALIDATION.yaml",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**"],
+    allowedOutputs: [".openworkflow/decisions/**", ".openworkflow/prototypes/**/RESULT.md"],
+    forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    auditCheckpoints: {
+      before: ["Confirm prototype evidence exists.", "Load only prototype result and decision index context."],
+      during: ["Record user review outcome as continue, pivot, stop, or needs_more_evidence.", "Keep only decision-rich evidence."],
+      after: ["Write the decision record.", "Authorize /ow:spec only when outcome is continue."],
+    },
+    antiPatterns: [
+      "Do not infer acceptance without user review or explicit evidence.",
+      "Do not create specs or changes during decision capture.",
+      "Do not leave unresolved prototype evidence as accepted.",
+    ],
+    handoffCommands: ["/ow:spec", "/ow:prototype", "/ow:vision"],
   };
 }

@@ -12,6 +12,8 @@ export interface ValidationResult {
 const REQUIRED_OPENWORKFLOW_FILES = [
   ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
   ".openworkflow/workflow/CONTRACT_GRAPH.yaml",
+  ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
+  ".openworkflow/audit/CONTEXT_PACKETS.yaml",
   ".openworkflow/context/CONTEXT_MAP.yaml",
   ".openworkflow/vision/VISION_CONTRACT.yaml",
   ".openworkflow/validation/VALIDATION_INDEX.yaml",

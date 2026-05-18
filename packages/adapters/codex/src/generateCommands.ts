@@ -28,6 +28,74 @@ export function legacyCodexCommandPaths(): string[] {
 }
 
 function commandDoc(command: WorkflowCommand): string {
+  const protocol = command.protocol;
+  if (!protocol || protocol.depth === "shallow") {
+    return shallowCommandDoc(command);
+  }
+
+  return `# ${command.trigger}
+
+${command.description}
+
+Source of truth: \`.openworkflow/\`.
+
+Stage: \`${command.stage}\`.
+
+Interaction mode: \`${protocol.interactionMode}\`.
+
+## Required Context
+
+${list(protocol.requiredContext)}
+
+## Optional Context
+
+${list(protocol.optionalContext)}
+
+## Forbidden Context
+
+${list(protocol.forbiddenContext)}
+
+## Allowed Outputs
+
+${list(protocol.allowedOutputs)}
+
+## Forbidden Outputs
+
+${list(protocol.forbiddenOutputs)}
+
+## Audit Checkpoints
+
+Before:
+
+${list(protocol.auditCheckpoints.before)}
+
+During:
+
+${list(protocol.auditCheckpoints.during)}
+
+After:
+
+${list(protocol.auditCheckpoints.after)}
+
+## Working Protocol
+
+1. Load only the required context packet first.
+2. Use optional context only when the required packet is insufficient.
+3. Stay inside allowed outputs.
+4. Stop before creating any forbidden output.
+5. Record unresolved questions instead of expanding scope.
+
+## Anti-Patterns
+
+${list(protocol.antiPatterns)}
+
+## Handoff
+
+${list(protocol.handoffCommands)}
+`;
+}
+
+function shallowCommandDoc(command: WorkflowCommand): string {
   return `# ${command.trigger}
 
 ${command.description}
@@ -42,4 +110,11 @@ ${command.targetArtifacts.map((artifact) => `- \`${artifact}\``).join("\n")}
 
 Load only the contract files required for this stage. Keep artifacts short, scoped, and traceable through \`.openworkflow/workflow/CONTRACT_GRAPH.yaml\`.
 `;
+}
+
+function list(items: string[]): string {
+  if (items.length === 0) {
+    return "- None";
+  }
+  return items.map((item) => `- \`${item}\``).join("\n");
 }
