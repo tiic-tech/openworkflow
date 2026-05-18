@@ -1,6 +1,6 @@
 ---
 name: build-workflow
-description: Initialize or reconcile OpenWorkflow repo-local contract infrastructure. Use when the user invokes /build-workflow CONTENT or asks Codex to set up workflow indexes, contract graph files, context, vision, decision, spec, and change folders before build-team or run-team execution.
+description: Initialize or reconcile OpenWorkflow repo-local contract infrastructure. Use when the user invokes /ow:workflow CONTENT or asks Codex to set up workflow indexes, contract graph files, context, vision, decision, spec, and change folders before /ow:team execution.
 ---
 
 # Build Workflow
@@ -23,8 +23,7 @@ It owns workflow infrastructure only:
 - `.codex/prototypes/`
 - `.codex/changes/`
 
-It must not initialize `.codex/runtime/`; runtime remains owned by `build-team`
-and `run-team`.
+It must not initialize `.codex/runtime/`; runtime remains owned by `/ow:team`.
 
 ## Required Scan
 
@@ -61,6 +60,6 @@ python3 scripts/validate_openworkflow.py --root .
 
 ## Handoff
 
-After `/build-workflow`, the next upstream skills may create context, vision,
-decision, spec, change, and work item contracts. `build-team` should consume the
+After `/ow:workflow`, the next upstream skills may create context, vision,
+decision, spec, change, and work item contracts. `/ow:team` should consume the
 change and work item contracts when they exist.

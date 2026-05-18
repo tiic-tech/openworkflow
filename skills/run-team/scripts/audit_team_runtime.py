@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit a repo-local Agent Team runtime before /run-team execution."""
+"""Audit a repo-local Agent Team runtime before /ow:team execution."""
 
 from __future__ import annotations
 

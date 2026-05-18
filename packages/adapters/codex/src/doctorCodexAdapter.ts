@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
 import { hasGeneratedMarker, renderGeneratedFile } from "./generatedFiles.js";
+import { legacyCodexCommandPaths } from "./generateCommands.js";
 import { CODEX_MANIFEST_PATH, CODEX_MANIFEST_TEMPLATE_ID, codexManifest } from "./manifest.js";
 import { getCodexTemplates } from "./templates.js";
 
@@ -57,6 +58,21 @@ export async function doctorCodexAdapter(root: string): Promise<AdapterDoctorRes
       errors.push(`missing Codex adapter manifest: ${CODEX_MANIFEST_PATH}`);
     } else {
       throw error;
+    }
+  }
+
+  for (const legacyPath of legacyCodexCommandPaths()) {
+    try {
+      const legacyContent = await readTextFile(join(root, legacyPath));
+      if (hasGeneratedMarker(legacyContent)) {
+        errors.push(`legacy generated Codex command remains: ${legacyPath}`);
+      } else {
+        warnings.push(`legacy non-generated Codex command exists: ${legacyPath}`);
+      }
+    } catch (error) {
+      if (!isNotFound(error)) {
+        throw error;
+      }
     }
   }
 

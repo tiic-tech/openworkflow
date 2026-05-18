@@ -1,4 +1,4 @@
 interface:
   display_name: "Run Team"
   short_description: "Start formal Agent Team development"
-  default_prompt: "Use $run-team to start formal Agent Team development for the next repository goal."
+  default_prompt: "Use /ow:team to start formal Agent Team development for the next repository goal."

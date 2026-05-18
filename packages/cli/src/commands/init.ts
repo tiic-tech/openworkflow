@@ -32,6 +32,7 @@ export async function initCommand(positional: string[], flags: Map<string, strin
   let adapterWritten = 0;
   let adapterSkipped = 0;
   let adapterUnchanged = 0;
+  let adapterRemoved = 0;
   if (tools.includes("codex")) {
     const adapter = await generateCodexAdapter({
       root,
@@ -43,13 +44,14 @@ export async function initCommand(positional: string[], flags: Map<string, strin
     adapterWritten = adapter.written.length;
     adapterSkipped = adapter.skipped.length;
     adapterUnchanged = adapter.unchanged.length;
+    adapterRemoved = adapter.removed.length;
     printWarnings(adapter.warnings);
   }
 
   console.log(`Initialized OpenWorkflow at ${root}`);
   console.log(`.openworkflow written: ${result.written.length}, skipped: ${result.skipped.length}`);
   if (tools.includes("codex")) {
-    console.log(`.codex adapter written: ${adapterWritten}, skipped: ${adapterSkipped}, unchanged: ${adapterUnchanged}`);
+    console.log(`.codex adapter written: ${adapterWritten}, skipped: ${adapterSkipped}, unchanged: ${adapterUnchanged}, removed: ${adapterRemoved}`);
   }
   return 0;
 }

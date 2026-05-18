@@ -28,12 +28,9 @@ repositories.
   contract for npm-first CLI architecture.
 - `package.json`, `tsconfig.json`, and `packages/` contain the npm-first
   TypeScript CLI implementation.
-- `skills/` contains repo-local skill implementations. `build-team` and
-  `run-team` preserve the initial downstream execution skills; `build-workflow`
-  initializes upstream contract infrastructure, `build-validation` identifies
-  core assumptions before implementation scope is created, and
-  `build-prototype` creates lightweight local prototype loops before specs,
-  changes, or teams.
+- `skills/` contains repo-local skill prototypes. User-facing workflow commands
+  use the `/ow:*` namespace; the current prototype folders keep their historical
+  names until they are template-backed.
 - `examples/golden-path/` is the minimum executable contract trace.
 - Future changes should preserve the principle that workflow execution is
   derived from durable upstream contracts, not from chat memory.
@@ -124,16 +121,16 @@ Start with the shared system before individual skills:
 
 1. Define the OpenWorkflow contract graph.
 2. Define core folder and index schemas.
-3. Design `/build-workflow`.
-4. Design `/build-context`.
-5. Design `/build-vision`.
-6. Design `/build-validation`.
-7. Design `/build-prototype`.
-8. Design `/build-decision`.
-9. Design `/build-spec`.
-10. Design `/build-change`.
-11. Design `/build-slices`.
-12. Integrate with `/build-team` and `/run-team`.
+3. Design `/ow:workflow`.
+4. Design `/ow:context`.
+5. Design `/ow:vision`.
+6. Design `/ow:validation`.
+7. Design `/ow:prototype`.
+8. Design `/ow:decision`.
+9. Design `/ow:spec`.
+10. Design `/ow:change`.
+11. Design slice planning.
+12. Integrate with `/ow:team`.
 
 ## Validation Expectations
 

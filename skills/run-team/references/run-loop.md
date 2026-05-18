@@ -1,6 +1,6 @@
 # Run Loop
 
-Use this reference to drive `/run-team CONTENT` from inspection into execution.
+Use this reference to drive `/ow:team CONTENT` from inspection into execution.
 
 ## Execution Flow
 

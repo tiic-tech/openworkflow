@@ -61,7 +61,7 @@ after local review or user feedback.
 7. Implement the prototype directly when the user asks for execution and the
    scope remains small enough for the main agent.
 8. Use subagents only for narrow parallel work; prototype orchestration does not
-   require `build-team`.
+   require `/ow:team`.
 9. Record what was tested in `EVIDENCE.md` and the user-facing outcome in
    `RESULT.md`.
 
@@ -77,7 +77,7 @@ after local review or user feedback.
 
 ## Handoff
 
-After user review, hand off to `/build-decision`.
+After user review, hand off to `/ow:decision`.
 
 Expected decision outcomes:
 
@@ -85,4 +85,3 @@ Expected decision outcomes:
 - `pivot`: adjust the vision or validation target
 - `stop`: archive or clean the prototype path
 - `needs_more_evidence`: revise the prototype scope and test again
-

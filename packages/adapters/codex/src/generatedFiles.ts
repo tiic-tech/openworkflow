@@ -1,3 +1,4 @@
+import { rm } from "node:fs/promises";
 import { readTextFile, writeTextFile, isNotFound } from "../../../core/src/fs/index.js";
 import { CODEX_ADAPTER_VERSION } from "./templates.js";
 
@@ -48,4 +49,31 @@ export async function writeGenerated(
   } else {
     skipped.push(path);
   }
+}
+
+export async function removeGenerated(
+  path: string,
+  force: boolean,
+  removed: string[],
+  skipped: string[],
+  warnings: string[],
+): Promise<void> {
+  let existing: string;
+  try {
+    existing = await readTextFile(path);
+  } catch (error) {
+    if (isNotFound(error)) {
+      return;
+    }
+    throw error;
+  }
+
+  if (!hasGeneratedMarker(existing) && !force) {
+    skipped.push(path);
+    warnings.push(`Skipped legacy non-generated file: ${path}`);
+    return;
+  }
+
+  await rm(path);
+  removed.push(path);
 }

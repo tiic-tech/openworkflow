@@ -38,18 +38,18 @@ infrastructure.
 
 ## Ownership
 
-- `build-workflow` owns the folders and indexes above.
-- `build-context` should update `.codex/context/**`.
-- `build-vision` should update `.codex/vision/**`.
-- `build-decision` should add decision records and update
-  `.codex/decisions/DECISION_INDEX.yaml`.
-- `build-spec` should add specs and update `.codex/spec/SPEC_INDEX.yaml`.
-- `build-validation` should add validation-first prioritization artifacts and
-  update `.codex/validation/VALIDATION_INDEX.yaml`.
-- `build-prototype` should add prototype discovery artifacts and update
-  `.codex/prototypes/PROTOTYPE_INDEX.yaml`.
-- `build-change` and `build-slices` should write under `.codex/changes/<id>/`.
-- `build-team` and `run-team` own `.codex/runtime/**`.
+- `/ow:workflow` owns the folders and indexes above.
+- `/ow:context` should update `.openworkflow/context/**`.
+- `/ow:vision` should update `.openworkflow/vision/**`.
+- `/ow:decision` should add decision records and update
+  `.openworkflow/decisions/DECISION_INDEX.yaml`.
+- `/ow:spec` should add specs and update `.openworkflow/specs/SPEC_INDEX.yaml`.
+- `/ow:validation` should add validation-first prioritization artifacts and
+  update `.openworkflow/validation/VALIDATION_INDEX.yaml`.
+- `/ow:prototype` should add prototype discovery artifacts and update
+  `.openworkflow/prototypes/PROTOTYPE_INDEX.yaml`.
+- `/ow:change` should write under `.openworkflow/changes/<id>/`.
+- `/ow:team` owns `.openworkflow/runtime/**`.
 
 ## Initialization Rule
 

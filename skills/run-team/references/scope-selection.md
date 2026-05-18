@@ -1,6 +1,6 @@
 # Scope Selection
 
-Use this reference when `/run-team CONTENT` may need a new scope.
+Use this reference when `/ow:team CONTENT` may need a new scope.
 
 ## Continue Current Scope When
 

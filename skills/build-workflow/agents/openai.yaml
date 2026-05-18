@@ -1,5 +1,4 @@
 interface:
   display_name: "Build Workflow"
   short_description: "Initialize OpenWorkflow contract infrastructure"
-  default_prompt: "Use $build-workflow to initialize workflow contracts for this repository."
-
+  default_prompt: "Use /ow:workflow to initialize workflow contracts for this repository."

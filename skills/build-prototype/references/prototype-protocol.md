@@ -51,6 +51,6 @@ Evidence can be lightweight:
 - known constraints
 - decision recommendation
 
-Evidence should be enough for `/build-decision` to record continue, pivot,
+Evidence should be enough for `/ow:decision` to record continue, pivot,
 stop, or needs_more_evidence.
 

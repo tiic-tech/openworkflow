@@ -25,6 +25,6 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
 
   printWarnings(adapter.warnings);
   console.log(`Synced Codex adapter at ${root}`);
-  console.log(`written: ${adapter.written.length}, skipped: ${adapter.skipped.length}, unchanged: ${adapter.unchanged.length}`);
+  console.log(`written: ${adapter.written.length}, skipped: ${adapter.skipped.length}, unchanged: ${adapter.unchanged.length}, removed: ${adapter.removed.length}`);
   return adapter.skipped.length > 0 ? 1 : 0;
 }

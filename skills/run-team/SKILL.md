@@ -1,17 +1,17 @@
 ---
 name: run-team
-description: Start and drive formal Agent Team development from the current repository state. Use when the user invokes /run-team CONTENT or asks Codex to continue a governed multi-agent workflow, choose the next scope after MVP or another completed phase, inspect runtime/archive/git state, initialize or reconcile scope runtime, plan milestones and atom tasks, spawn or resume persistent agents, record agent_id values, and execute development through review, QA, issue-fix, and git checkpoint loops.
+description: Start and drive formal Agent Team development from the current repository state. Use when the user invokes /ow:team CONTENT or asks Codex to continue a governed multi-agent workflow, choose the next scope after MVP or another completed phase, inspect runtime/archive/git state, initialize or reconcile scope runtime, plan milestones and atom tasks, spawn or resume persistent agents, record agent_id values, and execute development through review, QA, issue-fix, and git checkpoint loops.
 ---
 
 # Run Team
 
 ## Purpose
 
-Use this skill as the execution entrypoint for an existing Agent Team. It does not create the team from scratch; use `build-team` for that. `run-team` reads the current repo, runtime state, and user `CONTENT`, then drives the team through planning and actual development.
+Use this skill as the execution entrypoint for an existing Agent Team. `/ow:team` is the user-facing entrypoint for both team creation and execution modes. This repo-local skill reads the current repo, runtime state, and user `CONTENT`, then drives the team through planning and actual development.
 
 ## Start Protocol
 
-On `/run-team CONTENT`, do not start coding immediately.
+On `/ow:team CONTENT`, do not start coding immediately.
 
 1. Audit the current state.
    - Run `scripts/audit_team_runtime.py --root . --format markdown`.

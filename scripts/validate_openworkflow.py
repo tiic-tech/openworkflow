@@ -32,6 +32,7 @@ REQUIRED_FILES = [
     "packages/cli/src/commands/doctor.ts",
     "packages/core/src/contracts/index.ts",
     "packages/core/src/contracts/yaml.ts",
+    "packages/core/src/commands/registry.ts",
     "packages/core/src/fs/index.ts",
     "packages/core/src/workflow/initOpenWorkflow.ts",
     "packages/core/src/validators/validateOpenWorkflow.ts",
@@ -64,6 +65,8 @@ REQUIRED_FILES = [
     "changes/M05-codex-adapter-sync/WORK_ITEMS.yaml",
     "changes/M06-repository-architecture-scaffold/CHANGE.yaml",
     "changes/M06-repository-architecture-scaffold/WORK_ITEMS.yaml",
+    "changes/M07-command-namespace-contract/CHANGE.yaml",
+    "changes/M07-command-namespace-contract/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [
