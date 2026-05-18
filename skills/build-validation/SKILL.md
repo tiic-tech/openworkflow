@@ -58,8 +58,7 @@ Write validation artifacts under:
 4. Define one minimum prototype scope.
 5. Define acceptance as evidence questions, not implementation completeness.
 6. Initialize artifacts with `scripts/init_validation.py`.
-7. Validate with `python3 scripts/validate_openworkflow.py --root .` when the
-   repository validator exists.
+7. Validate with `npm run validate` when the repository validator exists.
 
 ## Boundaries
 

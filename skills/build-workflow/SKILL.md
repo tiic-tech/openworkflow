@@ -55,7 +55,7 @@ Read the likely source artifacts:
 5. Validate with the repository validator when available:
 
 ```bash
-python3 scripts/validate_openworkflow.py --root .
+npm run validate
 ```
 
 ## Handoff

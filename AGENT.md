@@ -99,7 +99,6 @@ openworkflow/
   changes/
   skills/
   schemas/
-  scripts/
   examples/
   references/
   decisions/
@@ -143,8 +142,8 @@ Start with the shared system before individual skills:
 For any future implementation:
 
 - Run `npm run build` before handoff when changing the TypeScript CLI.
-- Run `python3 scripts/validate_openworkflow.py --root .` before handoff when
-  changing contracts, schemas, examples, or skills.
+- Run `npm run validate` before handoff when changing contracts, schemas,
+  examples, or skills.
 - Run schema validation when schemas exist.
 - Confirm generated paths are repo-local and portable.
 - Confirm each skill can run after context compaction.
