@@ -16,6 +16,7 @@ REQUIRED_FILES = [
     "build_system_vision.md",
     "references/contract-graph.md",
     "references/npm-cli-architecture.md",
+    "references/engineering-skill-reference-research.md",
     "schemas/openworkflow-contract.schema.json",
     "schemas/workflow-index.schema.json",
     "schemas/contract-graph.schema.json",
@@ -67,6 +68,8 @@ REQUIRED_FILES = [
     "changes/M06-repository-architecture-scaffold/WORK_ITEMS.yaml",
     "changes/M07-command-namespace-contract/CHANGE.yaml",
     "changes/M07-command-namespace-contract/WORK_ITEMS.yaml",
+    "changes/M08-engineering-skill-reference-research/CHANGE.yaml",
+    "changes/M08-engineering-skill-reference-research/WORK_ITEMS.yaml",
 ]
 
 COMMON_REQUIRED = [

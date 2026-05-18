@@ -26,6 +26,9 @@ repositories.
   contract for prototype discovery.
 - `changes/M04-npm-first-cli-architecture/` records the active M04 change
   contract for npm-first CLI architecture.
+- `changes/M08-engineering-skill-reference-research/` and
+  `references/engineering-skill-reference-research.md` record the external
+  engineering skill research that should inform M09 command protocol depth.
 - `package.json`, `tsconfig.json`, and `packages/` contain the npm-first
   TypeScript CLI implementation.
 - `skills/` contains repo-local skill prototypes. User-facing workflow commands
