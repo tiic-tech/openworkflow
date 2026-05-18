@@ -1,8 +1,8 @@
 import { readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { CONTRACT_TYPES, SCHEMA_VERSION } from "./contracts.js";
-import { isNotFound, readTextFile } from "./fs.js";
-import { parseYaml } from "./yaml.js";
+import { CONTRACT_TYPES, SCHEMA_VERSION } from "../contracts/index.js";
+import { parseYaml } from "../contracts/yaml.js";
+import { isNotFound, readTextFile } from "../fs/index.js";
 
 export interface ValidationResult {
   ok: boolean;
@@ -154,4 +154,3 @@ function validateContractGraph(root: string, file: string, data: unknown, errors
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
-

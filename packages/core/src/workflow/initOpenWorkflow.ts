@@ -1,7 +1,7 @@
 import { join } from "node:path";
-import { SCHEMA_VERSION, type InitOptions } from "./contracts.js";
-import { ensureDir, writeTextFile } from "./fs.js";
-import { dumpYaml } from "./yaml.js";
+import { SCHEMA_VERSION, type InitOptions } from "../contracts/index.js";
+import { dumpYaml } from "../contracts/yaml.js";
+import { ensureDir, writeTextFile } from "../fs/index.js";
 
 export interface InitResult {
   root: string;

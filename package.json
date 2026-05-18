@@ -10,7 +10,8 @@
     "dist",
     "schemas",
     "references",
-    "skills"
+    "skills",
+    "templates"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

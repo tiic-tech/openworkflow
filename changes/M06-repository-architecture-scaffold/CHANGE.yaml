@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M06-repository-architecture-scaffold
+contract_type: change
+title: M06 Repository architecture scaffold
+status: active
+source_artifacts:
+  - references/npm-cli-architecture.md
+  - changes/M05-codex-adapter-sync/CHANGE.yaml
+depends_on:
+  - change:M05-codex-adapter-sync
+produces:
+  - work_items:M06-repository-architecture-scaffold
+summary: >
+  Reshape the npm-first codebase into the intended package architecture so
+  future workflow commands, core services, adapters, and templates have clear
+  ownership boundaries before additional behavior is added.
+problem: >
+  M04 and M05 proved the npm-first CLI and Codex adapter sync path, but the
+  implementation is still too flat. CLI command handlers are concentrated in
+  one entrypoint, core services are single files, and the Codex adapter mixes
+  command, skill, agent, manifest, and doctor behavior. Continuing in this
+  shape would make later workflow features drift into large files without a
+  clear project structure constraint.
+goals:
+  - Split CLI command handlers into packages/cli/src/commands/.
+  - Move core files into domain folders for contracts, fs, workflow, and validators.
+  - Split Codex adapter generation into agents, skills, commands, templates, and sync orchestration modules.
+  - Add lightweight template directory placeholders that document the future external template boundary.
+  - Preserve current CLI behavior and validation results.
+non_goals:
+  - Do not externalize templates from TypeScript strings in M06.
+  - Do not add new workflow product behavior.
+  - Do not support non-Codex adapters.
+  - Do not change generated artifact content except where import paths or generated structure require it.
+decisions:
+  - M06 is a behavior-preserving architecture migration.
+  - Directories with no runnable implementation should use README placeholders rather than empty TypeScript modules.
+  - Existing public CLI commands must keep working: init, validate, sync, doctor.
+  - M07 can move template bodies from TypeScript registry into templates/codex/.
+affected_paths:
+  - packages/cli/src/
+  - packages/core/src/
+  - packages/adapters/codex/src/
+  - templates/
+  - package.json
+  - scripts/validate_openworkflow.py
+  - changes/M06-repository-architecture-scaffold/
+acceptance:
+  - CLI commands are implemented in packages/cli/src/commands/.
+  - Core code is grouped under contracts, fs, workflow, and validators folders.
+  - Codex adapter code is split into generation-specific modules.
+  - Template root placeholders exist without changing runtime template loading.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null
