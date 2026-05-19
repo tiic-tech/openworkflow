@@ -61,3 +61,9 @@ implementation evidence, browser or screenshot verification, self-critique, and
 known limits in their own fields. The generic `evidence` list may still point to
 the most important files, but downstream agents should not have to infer whether
 an image was a concept, a screenshot, or an implementation artifact.
+
+When a visual prototype does not use image generation, record
+`visual_concept_policy.image_generation: skipped_by_user` plus a concrete
+`skip_reason`. Otherwise local `ref` values in concept, implementation,
+verification, or generic evidence fields should point to existing files inside
+the workflow root.

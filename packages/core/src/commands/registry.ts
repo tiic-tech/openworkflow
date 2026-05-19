@@ -277,6 +277,7 @@ function prototypeProtocol(): CommandProtocol {
         items: [
           "For visual, product-experience, 3D/material, and aesthetic-sensitive interaction prototypes, default to a high-fidelity static concept before runnable HTML.",
           "Use image generation as the default first visual pass for composition, mood, material, visual hierarchy, and brand direction unless the user asks to skip image generation.",
+          "Record visual_concept_policy.image_generation as generated, skipped_by_user, or not_applicable; skipped_by_user requires a concrete skip reason.",
           "Discuss or confirm the static concept before spending implementation effort when the user is actively collaborating; if the user asked for autonomous execution, proceed after the concept establishes clear direction.",
           "Do not require image generation for data/logic, API, or pure technical feasibility prototypes.",
         ],

@@ -128,6 +128,7 @@ function verifyProtoSkill(content: string): void {
     "<visual_first_path>",
     "high-fidelity static concept",
     "image generation",
+    "visual_concept_policy.image_generation",
     "<design_seed_protocol>",
     "design system, template seed",
     "<verification_protocol>",

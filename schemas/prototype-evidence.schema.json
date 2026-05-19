@@ -15,6 +15,7 @@
     "prototype_mode",
     "reference_analysis",
     "visual_direction",
+    "visual_concept_policy",
     "concept_evidence",
     "prototype_artifact",
     "run",
@@ -111,6 +112,30 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      },
+      "additionalProperties": true
+    },
+    "visual_concept_policy": {
+      "type": "object",
+      "required": [
+        "image_generation",
+        "skip_reason"
+      ],
+      "properties": {
+        "image_generation": {
+          "type": "string",
+          "enum": [
+            "generated",
+            "skipped_by_user",
+            "not_applicable"
+          ]
+        },
+        "skip_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": true
@@ -227,6 +252,16 @@
     },
     "self_critique": {
       "type": "object",
+      "required": [
+        "philosophy",
+        "hierarchy",
+        "execution",
+        "specificity",
+        "restraint",
+        "accessibility",
+        "responsive_behavior",
+        "repairs"
+      ],
       "properties": {
         "philosophy": {
           "type": "string"

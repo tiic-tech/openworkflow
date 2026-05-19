@@ -251,6 +251,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       "prototype_mode",
       "reference_analysis",
       "visual_direction",
+      "visual_concept_policy",
       "concept_evidence",
       "prototype_artifact",
       "run",
@@ -308,6 +309,10 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
           motion: "",
           density: "",
         },
+      },
+      visual_concept_policy: {
+        image_generation: "generated|skipped_by_user|not_applicable",
+        skip_reason: null,
       },
       concept_evidence: [],
       prototype_artifact: {

@@ -91,6 +91,7 @@ Required facts:
 - prototype mode
 - reference analysis
 - visual direction
+- visual concept policy
 - static concept evidence
 - prototype artifact
 - run command or URL
@@ -101,6 +102,14 @@ Required facts:
 - self-critique
 - known limits
 - result status
+
+Validation notes:
+
+- Local evidence references must point to files inside the workflow root.
+- Visual, interaction, and 3D/material prototypes must either record generated
+  concept evidence or explicitly record that the user skipped image generation
+  with a reason.
+- Self-critique dimensions must be populated before handoff.
 
 ### decision_record
 

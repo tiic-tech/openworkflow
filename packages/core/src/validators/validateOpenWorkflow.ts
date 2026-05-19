@@ -1,6 +1,6 @@
 import { statSync } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { CONTRACT_TYPES, SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound, readTextFile } from "../fs/index.js";
@@ -242,7 +242,7 @@ function validateDiscoveryArtifact(root: string, file: string, data: unknown, er
     validateValidationTarget(label, data, errors);
   }
   if (data.artifact_type === "prototype_evidence") {
-    validatePrototypeEvidence(label, data, errors);
+    validatePrototypeEvidence(root, label, data, errors);
   }
   if (data.artifact_type === "decision_record") {
     validateDecisionRecord(label, data, errors);
@@ -266,6 +266,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "prototype_mode",
       "reference_analysis",
       "visual_direction",
+      "visual_concept_policy",
       "concept_evidence",
       "prototype_artifact",
       "run",
@@ -328,7 +329,7 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
   }
 }
 
-function validatePrototypeEvidence(label: string, data: Record<string, unknown>, errors: string[]): void {
+function validatePrototypeEvidence(root: string, label: string, data: Record<string, unknown>, errors: string[]): void {
   if (
     typeof data.prototype_mode === "string" &&
     !["visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(data.prototype_mode)
@@ -343,11 +344,14 @@ function validatePrototypeEvidence(label: string, data: Record<string, unknown>,
   if ("visual_direction" in data && !isRecord(data.visual_direction)) {
     errors.push(`${label} visual_direction must be a mapping`);
   }
+  validateVisualConceptPolicy(label, data, errors);
   if ("verification" in data && !isRecord(data.verification)) {
     errors.push(`${label} verification must be a mapping`);
   }
   if ("self_critique" in data && !isRecord(data.self_critique)) {
     errors.push(`${label} self_critique must be a mapping`);
+  } else {
+    validateSelfCritique(label, data.self_critique, errors);
   }
   const prototypeArtifact = data.prototype_artifact;
   if (isRecord(prototypeArtifact)) {
@@ -356,10 +360,97 @@ function validatePrototypeEvidence(label: string, data: Record<string, unknown>,
         errors.push(`${label} prototype_artifact missing ${key}`);
       }
     }
+    validateLocalRef(root, label, "prototype_artifact.path", prototypeArtifact.path, errors);
   }
+  validateEvidenceRefs(root, label, data, errors);
   if (typeof data.result === "string" && !["pass", "fail", "unclear", "not_reviewed"].includes(data.result)) {
     errors.push(`${label} has invalid result ${data.result}`);
   }
+}
+
+function validateVisualConceptPolicy(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const policy = data.visual_concept_policy;
+  if (!isRecord(policy)) {
+    errors.push(`${label} visual_concept_policy must be a mapping`);
+    return;
+  }
+  const imageGeneration = policy.image_generation;
+  if (!["generated", "skipped_by_user", "not_applicable"].includes(String(imageGeneration))) {
+    errors.push(`${label} visual_concept_policy.image_generation has invalid value ${String(imageGeneration)}`);
+    return;
+  }
+  if (imageGeneration === "skipped_by_user" && !nonEmptyString(policy.skip_reason)) {
+    errors.push(`${label} visual_concept_policy.skip_reason is required when image generation is skipped`);
+  }
+  if (["visual", "interaction", "3d_material"].includes(String(data.prototype_mode))) {
+    if (imageGeneration === "not_applicable") {
+      errors.push(`${label} visual_concept_policy.image_generation cannot be not_applicable for ${String(data.prototype_mode)} prototypes`);
+    }
+    if (imageGeneration === "generated" && (!Array.isArray(data.concept_evidence) || data.concept_evidence.length === 0)) {
+      errors.push(`${label} concept_evidence is required when image generation is generated`);
+    }
+  }
+}
+
+function validateSelfCritique(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["philosophy", "hierarchy", "execution", "specificity", "restraint", "accessibility", "responsive_behavior"]) {
+    if (!nonEmptyString(value[key])) {
+      errors.push(`${label} self_critique.${key} must be a non-empty string`);
+    }
+  }
+  if (!Array.isArray(value.repairs)) {
+    errors.push(`${label} self_critique.repairs must be an array`);
+  }
+}
+
+function validateEvidenceRefs(root: string, label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["reference_analysis", "concept_evidence", "implementation_evidence", "evidence"]) {
+    const items = data[key];
+    if (!Array.isArray(items)) {
+      continue;
+    }
+    items.forEach((item, index) => {
+      if (isRecord(item)) {
+        validateLocalRef(root, label, `${key}[${index}].ref`, item.ref, errors);
+      }
+    });
+  }
+  const verification = data.verification;
+  if (!isRecord(verification)) {
+    return;
+  }
+  for (const key of ["screenshots", "logs"]) {
+    const refs = verification[key];
+    if (!Array.isArray(refs)) {
+      continue;
+    }
+    refs.forEach((ref, index) => validateLocalRef(root, label, `verification.${key}[${index}]`, ref, errors));
+  }
+}
+
+function validateLocalRef(root: string, label: string, field: string, value: unknown, errors: string[]): void {
+  if (typeof value !== "string" || value.length === 0 || isExternalRef(value)) {
+    return;
+  }
+  const resolved = resolve(root, value);
+  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+    errors.push(`${label} ${field} references path outside root: ${value}`);
+    return;
+  }
+  if (!existsSyncMarker(resolved)) {
+    errors.push(`${label} ${field} references missing path ${value}`);
+  }
+}
+
+function isExternalRef(value: string): boolean {
+  return /^[a-z][a-z0-9+.-]*:/i.test(value);
+}
+
+function nonEmptyString(value: unknown): boolean {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function validateDecisionRecord(label: string, data: Record<string, unknown>, errors: string[]): void {
