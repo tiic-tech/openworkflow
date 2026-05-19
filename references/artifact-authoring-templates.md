@@ -52,3 +52,12 @@ An agent should resume discovery work in this order:
 
 This makes the current artifact the default working state and keeps historical
 artifacts out of context until requested.
+
+## Prototype Evidence Shape
+
+Prototype evidence should keep creative direction and runnable proof separate.
+For `/ow:proto`, record reference analysis, static concept assets, runnable
+implementation evidence, browser or screenshot verification, self-critique, and
+known limits in their own fields. The generic `evidence` list may still point to
+the most important files, but downstream agents should not have to infer whether
+an image was a concept, a screenshot, or an implementation artifact.

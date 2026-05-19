@@ -102,6 +102,9 @@ Agent-only protocol should live in XML-style blocks and comments, for example:
 ```xml
 <agent_protocol>
 <!-- Internal instructions. Do not expose routine protocol steps to the user. -->
+<inner_thinking>
+Private reasoning, critique, and scope checks. Do not expose chain-of-thought.
+</inner_thinking>
 </agent_protocol>
 
 <user_behavior>

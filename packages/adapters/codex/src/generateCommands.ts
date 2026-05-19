@@ -52,6 +52,11 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 <stage>${escapeXml(command.stage)}</stage>
 <interaction_mode>${escapeXml(protocol.interactionMode)}</interaction_mode>
 
+<inner_thinking>
+Use this protocol for private reasoning, classification, critique, and scope checks.
+Do not expose chain-of-thought, routine checklist results, context-loading traces, or generated-file bookkeeping to the user.
+</inner_thinking>
+
 <required_context>
 ${xmlList(protocol.requiredContext)}
 </required_context>
@@ -101,6 +106,8 @@ ${xmlList(protocol.auditCheckpoints.after)}
 6. Record unresolved questions instead of expanding scope.
 </working_protocol>
 
+${internalSectionsXml(protocol.internalSections ?? [])}
+
 <anti_patterns>
 ${xmlList(protocol.antiPatterns)}
 </anti_patterns>
@@ -132,6 +139,11 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 
 <source_of_truth>.openworkflow/</source_of_truth>
 <stage>${escapeXml(command.stage)}</stage>
+
+<inner_thinking>
+Use this protocol for private reasoning and scope checks.
+Do not expose chain-of-thought, routine checklist results, context-loading traces, or generated-file bookkeeping to the user.
+</inner_thinking>
 
 <target_artifacts>
 ${xmlList(command.targetArtifacts)}
@@ -166,6 +178,15 @@ function artifactXmlList(artifacts: ReturnType<typeof getDiscoveryArtifactContra
         `- ${escapeXml(artifact.artifactType)}: template ${escapeXml(artifact.templatePath)}, source ${escapeXml(artifact.sourceOfTruthPath)}, note ${escapeXml(artifact.notePath)}, review ${escapeXml(artifact.reviewPath ?? "none")}, load_by_default ${artifact.readPolicy.loadByDefault}, max_yaml_lines ${artifact.readPolicy.maxYamlLines}`,
     )
     .join("\n");
+}
+
+function internalSectionsXml(sections: NonNullable<WorkflowCommand["protocol"]>["internalSections"]): string {
+  if (!sections || sections.length === 0) {
+    return "";
+  }
+  return sections
+    .map((section) => `<${section.tag}>\n${xmlList(section.items)}\n</${section.tag}>`)
+    .join("\n\n");
 }
 
 function yamlString(value: string): string {

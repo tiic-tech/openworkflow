@@ -27,6 +27,12 @@ export interface CommandProtocol {
   };
   antiPatterns: string[];
   handoffCommands: string[];
+  internalSections?: CommandProtocolSection[];
+}
+
+export interface CommandProtocolSection {
+  tag: string;
+  items: string[];
 }
 
 export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
@@ -202,7 +208,7 @@ function validationProtocol(): CommandProtocol {
 function prototypeProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "smallest-runnable-evidence",
+    interactionMode: "classified-prototype-creation",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -224,14 +230,89 @@ function prototypeProtocol(): CommandProtocol {
     ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
-      before: ["Confirm validation target exists.", "Choose logic/state or UI/experience prototype branch."],
-      during: ["Build only what answers the validation question.", "Keep one command or URL to run the prototype."],
-      after: ["Write evidence and result artifacts.", "Confirm no design, spec, change, team, persistence, or production hardening was created."],
+      before: [
+        "Confirm validation target exists.",
+        "Classify prototype mode before implementation: visual, interaction, technical feasibility, 3D/material, workflow, or data/logic.",
+        "Detect reference inputs: image, URL, screenshot, HTML/CSS source, existing artifact, or design-system hint.",
+      ],
+      during: [
+        "For visual-first prototypes, extract reference patterns and create a high-fidelity static concept with image generation before HTML unless the user explicitly skips it.",
+        "Derive a compact visual direction and token packet before implementation.",
+        "Build only what answers the validation question and keep one command or URL to run the prototype.",
+        "Verify rendered prototypes with browser and screenshot checks before handoff.",
+      ],
+      after: [
+        "Record reference analysis, static concept evidence, runnable implementation evidence, verification, self-critique, and known limits separately.",
+        "Write evidence and result artifacts.",
+        "Confirm no design, spec, change, team, persistence, or production hardening was created.",
+      ],
     },
     antiPatterns: [
+      "Do not jump directly to HTML for a visual-first prototype before a visual direction or static concept unless the user explicitly skips it.",
+      "Do not ignore user-provided reference images, URLs, screenshots, or HTML/CSS source.",
+      "Do not force image generation for logic-only, data-flow, API, or technical feasibility prototypes.",
       "Do not polish the prototype into production code.",
       "Do not add persistence unless persistence is the validation question.",
       "Do not create design, specs, changes, or teams from unaccepted prototype work.",
+    ],
+    internalSections: [
+      {
+        tag: "prototype_classification",
+        items: [
+          "Classify the prototype as visual, interaction, technical feasibility, 3D/material, workflow, or data/logic before choosing tools or writing files.",
+          "Name the validation question, the riskiest assumption, and the smallest success signal.",
+          "If classification is ambiguous, ask one clarifying question; otherwise proceed with the most likely mode and record the assumption.",
+        ],
+      },
+      {
+        tag: "reference_extraction",
+        items: [
+          "When the user provides a target image, URL, screenshot, HTML/CSS, or reference artifact, perform reference-pattern extraction before visual generation or HTML implementation.",
+          "Extract transferable patterns: information architecture, layout rhythm, component grammar, typography posture, palette, motion, interaction details, and anti-patterns to avoid.",
+          "Record reference analysis as evidence by path or URL; do not paste bulky source or screenshots into YAML.",
+        ],
+      },
+      {
+        tag: "visual_first_path",
+        items: [
+          "For visual, product-experience, 3D/material, and aesthetic-sensitive interaction prototypes, default to a high-fidelity static concept before runnable HTML.",
+          "Use image generation as the default first visual pass for composition, mood, material, visual hierarchy, and brand direction unless the user asks to skip image generation.",
+          "Discuss or confirm the static concept before spending implementation effort when the user is actively collaborating; if the user asked for autonomous execution, proceed after the concept establishes clear direction.",
+          "Do not require image generation for data/logic, API, or pure technical feasibility prototypes.",
+        ],
+      },
+      {
+        tag: "design_seed_protocol",
+        items: [
+          "Do not design from a blank aesthetic when a direction, design system, template seed, or reference exists.",
+          "Derive a compact visual packet before implementation: background, surface, foreground, muted, border, accent, display font, body font, radius, spacing, motion, and density.",
+          "Choose domain-appropriate posture: operational tools should be dense and restrained, editorial surfaces can be expressive, games can be playful, and dashboards should avoid marketing hero treatment.",
+        ],
+      },
+      {
+        tag: "implementation_protocol",
+        items: [
+          "Implement the smallest runnable artifact that validates the current question, not a production app.",
+          "For HTML prototypes, keep final review surfaces free of designer-only controls unless those controls are part of the validation target.",
+          "Keep generated assets, screenshots, logs, and review HTML in the prototype evidence folder.",
+        ],
+      },
+      {
+        tag: "verification_protocol",
+        items: [
+          "For rendered HTML or 3D prototypes, run browser verification and capture screenshots or notes for desktop and mobile when practical.",
+          "Verify that the page is nonblank, core interactions work, primary assets render, text does not overlap, and responsive layout remains coherent.",
+          "Record known limits separately from observations so downstream decision work can judge evidence quality.",
+        ],
+      },
+      {
+        tag: "self_critique",
+        items: [
+          "Before handoff, critique the prototype across philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior.",
+          "Any weak dimension must trigger one repair pass before evidence handoff unless the weakness is intentionally out of scope for the validation question.",
+          "Record critique findings and repairs as compact evidence references or YAML summary fields.",
+        ],
+      },
     ],
     handoffCommands: ["/ow:decision", "/ow:design", "/ow:validation"],
   };

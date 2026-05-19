@@ -12,10 +12,18 @@
     "status",
     "validation_target",
     "core_question",
+    "prototype_mode",
+    "reference_analysis",
+    "visual_direction",
+    "concept_evidence",
     "prototype_artifact",
     "run",
+    "implementation_evidence",
     "observations",
     "evidence",
+    "verification",
+    "self_critique",
+    "known_limits",
     "result",
     "handoff"
   ],
@@ -44,6 +52,91 @@
     "core_question": {
       "type": "string"
     },
+    "prototype_mode": {
+      "type": "string",
+      "enum": [
+        "visual",
+        "interaction",
+        "technical_feasibility",
+        "3d_material",
+        "workflow",
+        "data_logic"
+      ]
+    },
+    "reference_analysis": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "anti_patterns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "visual_direction": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "tokens": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "concept_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "prototype_artifact": {
       "type": "object",
       "required": [
@@ -63,6 +156,25 @@
     "run": {
       "type": "object",
       "additionalProperties": true
+    },
+    "implementation_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "ref"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
     },
     "observations": {
       "type": "array",
@@ -87,6 +199,69 @@
           }
         },
         "additionalProperties": true
+      }
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "browser_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "screenshots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "self_critique": {
+      "type": "object",
+      "properties": {
+        "philosophy": {
+          "type": "string"
+        },
+        "hierarchy": {
+          "type": "string"
+        },
+        "execution": {
+          "type": "string"
+        },
+        "specificity": {
+          "type": "string"
+        },
+        "restraint": {
+          "type": "string"
+        },
+        "accessibility": {
+          "type": "string"
+        },
+        "responsive_behavior": {
+          "type": "string"
+        },
+        "repairs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "known_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
     "result": {

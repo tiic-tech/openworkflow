@@ -108,8 +108,36 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.includes("generated-by: openworkflow"), `${name} missing generated marker`);
     assert(skillContent.includes("<user_behavior>"), `${name} missing user behavior block`);
     assert(skillContent.includes("<agent_protocol>"), `${name} missing agent protocol block`);
+    assert(skillContent.includes("<inner_thinking>"), `${name} missing inner thinking block`);
+    if (name === "ow-proto") {
+      verifyProtoSkill(skillContent);
+    }
     assert(interfaceContent.includes("display_name:"), `${name} missing display name`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
+  }
+}
+
+function verifyProtoSkill(content: string): void {
+  for (const required of [
+    "<prototype_classification>",
+    "prototype mode",
+    "visual, interaction, technical feasibility, 3D/material, workflow, or data/logic",
+    "<reference_extraction>",
+    "reference-pattern extraction",
+    "target image, URL, screenshot, HTML/CSS",
+    "<visual_first_path>",
+    "high-fidelity static concept",
+    "image generation",
+    "<design_seed_protocol>",
+    "design system, template seed",
+    "<verification_protocol>",
+    "browser verification",
+    "screenshot",
+    "<self_critique>",
+    "philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior",
+    "repair pass before evidence handoff",
+  ]) {
+    assert(content.includes(required), `ow-proto missing M16 guidance: ${required}`);
   }
 }
 

@@ -451,10 +451,18 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
     prototype_evidence: [
       "validation_target",
       "core_question",
+      "prototype_mode",
+      "reference_analysis",
+      "visual_direction",
+      "concept_evidence",
       "prototype_artifact",
       "run",
+      "implementation_evidence",
       "observations",
       "evidence",
+      "verification",
+      "self_critique",
+      "known_limits",
       "result",
       "handoff",
     ],
@@ -537,6 +545,23 @@ function validatePrototypeTodo(label: string, value: unknown, errors: string[]):
 }
 
 function validatePrototypeEvidence(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (!["visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(String(data.prototype_mode))) {
+    errors.push(`${label} has invalid prototype_mode ${String(data.prototype_mode)}`);
+  }
+  for (const key of ["reference_analysis", "concept_evidence", "implementation_evidence", "known_limits"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if ("visual_direction" in data && !isRecord(data.visual_direction)) {
+    errors.push(`${label} visual_direction must be a mapping`);
+  }
+  if ("verification" in data && !isRecord(data.verification)) {
+    errors.push(`${label} verification must be a mapping`);
+  }
+  if ("self_critique" in data && !isRecord(data.self_critique)) {
+    errors.push(`${label} self_critique must be a mapping`);
+  }
   const prototypeArtifact = data.prototype_artifact;
   if (isRecord(prototypeArtifact)) {
     for (const key of ["path", "type"]) {

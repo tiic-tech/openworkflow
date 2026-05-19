@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:M16-prototype-creation-skill-upgrade
 contract_type: change
 title: M16 Prototype creation skill upgrade
-status: active
+status: completed
 source_artifacts:
   - changes/M15-interactive-vision-design-flow/CHANGE.yaml
   - changes/M16-prototype-creation-skill-upgrade/OPEN_DESIGN_RESEARCH.md
@@ -71,4 +71,4 @@ validation:
   - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
   - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
   - npm run validate:cli
-updated_at: null
+updated_at: 2026-05-19

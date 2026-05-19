@@ -74,23 +74,32 @@ Required facts:
 
 ### prototype_evidence
 
-Produced by `/ow:prototype`.
+Produced by `/ow:proto`.
 
 Source of truth path:
 `.openworkflow/prototypes/<id>/EVIDENCE.yaml`
 
 Purpose:
-Record what was built, how to run or inspect it, what evidence was collected,
-and what remains unknown.
+Record the prototype mode, reference analysis, static concept direction,
+runnable implementation, verification evidence, self-critique, and what remains
+unknown.
 
 Required facts:
 
 - validation target
 - core question
+- prototype mode
+- reference analysis
+- visual direction
+- static concept evidence
 - prototype artifact
 - run command or URL
+- implementation evidence
 - observations
 - evidence references
+- verification
+- self-critique
+- known limits
 - result status
 
 ### decision_record

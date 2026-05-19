@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M16-prototype-creation-skill-upgrade
 contract_type: work_items
 title: M16 Prototype creation skill upgrade work items
-status: active
+status: completed
 change_contract: changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml
 items:
   - task_id: M16-T001
     title: Define prototype-mode classification and evidence model
-    status: pending
+    status: completed
     depends_on: []
     owned_paths:
       - changes/M16-prototype-creation-skill-upgrade/
@@ -19,7 +19,7 @@ items:
       - Logic-only prototypes are not forced through image generation.
   - task_id: M16-T002
     title: Update ow-proto command and context protocol
-    status: pending
+    status: completed
     depends_on:
       - M16-T001
     owned_paths:
@@ -32,7 +32,7 @@ items:
       - Audit checkpoints distinguish concept pass, implementation pass, verification pass, and handoff.
   - task_id: M16-T003
     title: Rewrite Codex ow-proto skill generation
-    status: pending
+    status: completed
     depends_on:
       - M16-T002
     owned_paths:
@@ -45,7 +45,7 @@ items:
       - Generated ow-proto skill includes design-system/template-seed guidance without adding a template marketplace.
   - task_id: M16-T004
     title: Add prototype self-critique and verification guidance
-    status: pending
+    status: completed
     depends_on:
       - M16-T003
     owned_paths:
@@ -58,7 +58,7 @@ items:
       - Browser/screenshot verification expectations are explicit for HTML and 3D prototypes.
   - task_id: M16-T005
     title: Verify runtime surface and repository contracts
-    status: pending
+    status: completed
     depends_on:
       - M16-T004
     owned_paths:
@@ -69,4 +69,4 @@ items:
       - Runtime surface verification checks generated ow-proto includes classification, static concept, reference extraction, and self-critique language.
       - Repository validation includes M16 change contracts.
       - Full validation command list passes.
-updated_at: null
+updated_at: 2026-05-19
