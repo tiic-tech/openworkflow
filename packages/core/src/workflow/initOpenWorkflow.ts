@@ -22,6 +22,9 @@ export async function initOpenWorkflow(options: InitOptions): Promise<InitResult
   await writeContract(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", artifactContracts(options), options.force, written, skipped);
   await writeContract(root, ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", disclosureLevels(options), options.force, written, skipped);
+  for (const artifact of getDiscoveryArtifactContracts()) {
+    await writeContract(root, artifact.templatePath, dumpYaml(artifact.template), options.force, written, skipped);
+  }
 
   return { root, written, skipped };
 }

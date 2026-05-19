@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: work_items:M18-e2e-friction-fixes
+contract_type: work_items
+title: M18 E2E friction fixes work items
+status: completed
+change_contract: changes/M18-e2e-friction-fixes/CHANGE.yaml
+items:
+  - task_id: M18-T001
+    title: Fix tune required context
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/core/src/commands/
+      - packages/cli/src/dev/
+    acceptance:
+      - ow-tune required context does not require PROTOTYPE_INDEX.yaml.
+      - ow-tune optional context still allows loading PROTOTYPE_INDEX.yaml when present.
+      - Runtime verification checks this behavior.
+  - task_id: M18-T002
+    title: Remove manual decision handoff from design
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/core/src/commands/
+      - packages/cli/src/dev/
+    acceptance:
+      - design handoff commands do not include /ow:decision.
+      - Runtime verification fails if design leaks manual decision again.
+  - task_id: M18-T003
+    title: Generate artifact templates on init
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/dev/
+      - references/
+    acceptance:
+      - Every artifact contract template_path exists after init.
+      - Templates are generated from the artifact contract templates.
+      - Runtime surface verification checks template files.
+  - task_id: M18-T004
+    title: Fix CLI help exit code
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/cli/src/
+    acceptance:
+      - openworkflow --help exits 0.
+      - openworkflow -h exits 0.
+      - Unknown commands still exit 1.
+  - task_id: M18-T005
+    title: Validate E2E friction fixes
+    status: completed
+    depends_on:
+      - M18-T001
+      - M18-T002
+      - M18-T003
+      - M18-T004
+    owned_paths:
+      - changes/M18-e2e-friction-fixes/
+    acceptance:
+      - Full validation list passes.
+      - M18 change work items are marked completed.
+updated_at: 2026-05-19

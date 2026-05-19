@@ -23,7 +23,8 @@ but keep its own validation-first discovery loop.
 
 ## Minimal Init
 
-`openworkflow init` should create only the runtime substrate:
+`openworkflow init` should create the runtime substrate plus inert artifact
+templates advertised by `ARTIFACT_CONTRACTS.yaml`:
 
 ```txt
 .openworkflow/
@@ -35,9 +36,14 @@ but keep its own validation-first discovery loop.
     CONTEXT_PACKETS.yaml
     ARTIFACT_CONTRACTS.yaml
     DISCLOSURE_LEVELS.yaml
+  vision/_templates/VISION_SESSION.yaml
+  validation/_templates/VALIDATION.yaml
+  prototypes/_templates/EVIDENCE.yaml
+  decisions/_templates/DECISION.yaml
+  design/_templates/PRODUCT_DESIGN.yaml
 ```
 
-Stage directories are lazy-created by commands:
+Stage indexes and active artifacts are lazy-created by commands:
 
 - `/ow:vision` creates `.openworkflow/vision/`.
 - `/ow:validation` creates `.openworkflow/validation/`.
@@ -47,7 +53,7 @@ Stage directories are lazy-created by commands:
 - `/ow:spec` creates `.openworkflow/specs/`.
 
 This keeps a new target repo from pretending every workflow stage already
-exists.
+exists while still making advertised authoring templates available to agents.
 
 ## Codex Skill Registration
 

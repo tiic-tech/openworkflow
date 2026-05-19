@@ -352,11 +352,11 @@ function tuneProtocol(): CommandProtocol {
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
-      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
     ],
     optionalContext: [
       ".openworkflow/validation/VALIDATION_INDEX.yaml",
       ".openworkflow/validation/**/VALIDATION.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
       ".openworkflow/prototypes/**/EVIDENCE.yaml",
       ".openworkflow/prototypes/**/NOTE.md",
       ".openworkflow/decisions/DECISION_INDEX.yaml",
@@ -527,6 +527,6 @@ function designProtocol(): CommandProtocol {
       "Do not create production specs or changes during design.",
       "Do not generate conditional technical packets by default.",
     ],
-    handoffCommands: ["/ow:spec", "/ow:proto", "/ow:decision"],
+    handoffCommands: ["/ow:spec", "/ow:tune", "/ow:validation"],
   };
 }

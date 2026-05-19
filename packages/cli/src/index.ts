@@ -8,7 +8,7 @@ import { validateCommand } from "./commands/validate.js";
 async function main(): Promise<number> {
   const parsed = parseArgs(process.argv.slice(2));
 
-  if (!parsed.command || parsed.command === "help" || booleanFlag(parsed.flags, "help")) {
+  if (!parsed.command || parsed.command === "help" || parsed.command === "--help" || parsed.command === "-h" || booleanFlag(parsed.flags, "help")) {
     printHelp();
     return 0;
   }

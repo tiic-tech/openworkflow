@@ -68,6 +68,11 @@ async function verifyMinimalOpenWorkflow(root: string): Promise<void> {
       ".openworkflow/audit/CONTEXT_PACKETS.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
+      ".openworkflow/decisions/_templates/DECISION.yaml",
+      ".openworkflow/design/_templates/PRODUCT_DESIGN.yaml",
+      ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
+      ".openworkflow/validation/_templates/VALIDATION.yaml",
+      ".openworkflow/vision/_templates/VISION_SESSION.yaml",
     ]),
     "unexpected .openworkflow files",
   );
@@ -77,7 +82,21 @@ async function verifyMinimalOpenWorkflow(root: string): Promise<void> {
   );
   assertSetEqual(
     actualDirs,
-    new Set([".openworkflow", ".openworkflow/audit", ".openworkflow/workflow"]),
+    new Set([
+      ".openworkflow",
+      ".openworkflow/audit",
+      ".openworkflow/decisions",
+      ".openworkflow/decisions/_templates",
+      ".openworkflow/design",
+      ".openworkflow/design/_templates",
+      ".openworkflow/prototypes",
+      ".openworkflow/prototypes/_templates",
+      ".openworkflow/validation",
+      ".openworkflow/validation/_templates",
+      ".openworkflow/vision",
+      ".openworkflow/vision/_templates",
+      ".openworkflow/workflow",
+    ]),
     "unexpected .openworkflow dirs",
   );
 }
@@ -196,13 +215,29 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const protoSection = commandIndex.split("trigger: /ow:proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const tuneSection = commandIndex.split("trigger: /ow:tune", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
   assert(!extractBlock(tuneSection, "handoff_commands").includes("/ow:decision"), "tune exposes manual decision handoff");
+  assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
 
+  const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
+  const tunePacket = contextPackets.split("command: /ow:tune", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  assert(!extractBlock(tunePacket, "required").includes("PROTOTYPE_INDEX.yaml"), "tune requires prototype index");
+  assert(extractBlock(tunePacket, "optional").includes("PROTOTYPE_INDEX.yaml"), "tune optional context missing prototype index");
+
   const artifacts = await read(join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   assert(artifacts.includes("revision_scope"), "decision artifact contracts missing revision_scope");
+  for (const templatePath of [
+    ".openworkflow/vision/_templates/VISION_SESSION.yaml",
+    ".openworkflow/validation/_templates/VALIDATION.yaml",
+    ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
+    ".openworkflow/decisions/_templates/DECISION.yaml",
+    ".openworkflow/design/_templates/PRODUCT_DESIGN.yaml",
+  ]) {
+    await assertFile(join(root, templatePath));
+  }
 }
 
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {

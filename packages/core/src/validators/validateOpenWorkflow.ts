@@ -496,7 +496,9 @@ async function findYamlFiles(root: string): Promise<string[]> {
     for (const entry of entries) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) {
-        await walk(path);
+        if (entry.name !== "_templates") {
+          await walk(path);
+        }
       } else if (entry.isFile() && (entry.name.endsWith(".yaml") || entry.name.endsWith(".yml"))) {
         found.push(path);
       }

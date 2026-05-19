@@ -7,6 +7,7 @@ what must exist; a template tells the agent how to write it compactly.
 
 - Templates live in stage-local `_templates/` folders.
 - Templates are not active workflow artifacts.
+- Validators skip `_templates/` folders when scanning active artifacts.
 - Templates preserve recommended field order.
 - Empty strings and empty arrays are intentional placeholders.
 - Agents should copy a template into a new artifact folder, replace `<id>`, and
