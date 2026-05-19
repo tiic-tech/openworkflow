@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Initialize a next Agent Team scope for /run-team execution."""
+"""Initialize a next Agent Team scope for /ow:team execution."""
 
 from __future__ import annotations
 

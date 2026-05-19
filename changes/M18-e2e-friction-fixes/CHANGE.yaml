@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: change:M18-e2e-friction-fixes
+contract_type: change
+title: M18 E2E friction fixes
+status: completed
+source_artifacts:
+  - changes/M17-tune-orchestration-internal-decision/CHANGE.yaml
+depends_on:
+  - change:M17-tune-orchestration-internal-decision
+produces:
+  - work_items:M18-e2e-friction-fixes
+summary: >
+  Fix E2E friction found in the M17 vision -> validation -> prototype -> tune
+  review: tune should not require a prototype index before it can orchestrate
+  proto behavior, design should not expose manual decision handoff, artifact
+  templates referenced by contracts should exist, and CLI help should return a
+  successful exit code.
+problem: >
+  M17 successfully introduced tune orchestration and internal decision audit,
+  but E2E review found rough edges that can still break first-consumer
+  expectations. Tune's required context can block the no-prototype path,
+  design leaks /ow:decision as a user-facing handoff, template paths point to
+  missing files after init, and --help exits as an error.
+goals:
+  - Move tune's prototype index from required context to optional context.
+  - Remove manual /ow:decision handoff from design.
+  - Generate stage-local artifact template files referenced by artifact contracts.
+  - Make CLI --help and -h return exit code 0.
+  - Add runtime verification that guards these E2E behaviors.
+non_goals:
+  - Do not change M17's core tune orchestration model.
+  - Do not remove decision artifacts or internal decision skill generation.
+  - Do not implement a full command executor for discovery commands.
+  - Do not change prototype evidence semantics from M16/M17.
+decisions:
+  - Tune can load prototype index optionally because the no-prototype path must start from validation.
+  - Design may hand off to tune, spec, or validation, but not manual decision.
+  - Template files are generated during init because artifact contracts advertise concrete template paths.
+  - Generated template files are not active workflow state; indexes remain the source of active artifacts.
+affected_paths:
+  - packages/core/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/cli/src/
+  - packages/cli/src/dev/
+  - references/
+  - changes/M18-e2e-friction-fixes/
+acceptance:
+  - Generated ow-tune skill no longer lists .openworkflow/prototypes/PROTOTYPE_INDEX.yaml as required context.
+  - Generated design command handoffs do not include /ow:decision.
+  - openworkflow init writes artifact templates at every advertised template_path.
+  - openworkflow --help and openworkflow -h exit with code 0.
+  - Runtime surface verification checks template files exist and the M18 handoff/context fixes are present.
+  - Existing validation, sync, doctor, runtime surface checks, and CLI smoke checks pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - node dist/cli/src/index.js --help
+updated_at: 2026-05-19

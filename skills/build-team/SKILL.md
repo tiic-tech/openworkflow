@@ -1,13 +1,13 @@
 ---
 name: build-team
-description: Build or regenerate a repo-specific Agent Team workflow from the current repository goal. Use when the user invokes /build-team CONTENT or asks Codex to create, adapt, or formalize an Agent Team with orchestrator/subagent roles, scoped responsibilities, runtime state machine, milestone/task planning, review/QA loops, git checkpoint rules, and .codex/runtime initialization or maintenance.
+description: Build or regenerate a repo-specific Agent Team workflow from the current repository goal. Use when the user invokes /ow:team CONTENT or asks Codex to create, adapt, or formalize an Agent Team with orchestrator/subagent roles, scoped responsibilities, runtime state machine, milestone/task planning, review/QA loops, git checkpoint rules, and .codex/runtime initialization or maintenance.
 ---
 
 # Build Team
 
 ## Purpose
 
-Create a repeatable Agent Team operating system for the current repository. Treat `CONTENT` from `/build-team CONTENT` as the user's seed intent, then derive the team from the actual repo instead of copying a fixed roster blindly.
+Create a repeatable Agent Team operating system for the current repository. Treat `CONTENT` from `/ow:team CONTENT` as the user's seed intent, then derive the team from the actual repo instead of copying a fixed roster blindly.
 
 The final team must include:
 
@@ -54,7 +54,7 @@ After the repo scan, ask one question and only one question before designing the
 Use this shape:
 
 ```txt
-I infer this repo is aiming at <repo_goal>. For this /build-team run, what delivery target should the team optimize for, what counts as done for the first milestone, and are there any agent roles/tools that must be included or forbidden?
+I infer this repo is aiming at <repo_goal>. For this /ow:team run, what delivery target should the team optimize for, what counts as done for the first milestone, and are there any agent roles/tools that must be included or forbidden?
 ```
 
 Parameter slots filled by the answer:

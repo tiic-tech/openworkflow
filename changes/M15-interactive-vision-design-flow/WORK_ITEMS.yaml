@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: work_items:M15-interactive-vision-design-flow
+contract_type: work_items
+title: M15 Interactive vision and design flow work items
+status: completed
+change_contract: changes/M15-interactive-vision-design-flow/CHANGE.yaml
+items:
+  - task_id: M15-T001
+    title: Define conversation-first readiness gates for vision and design
+    status: completed
+    depends_on: []
+    owned_paths:
+      - changes/M15-interactive-vision-design-flow/
+      - references/
+      - packages/core/src/artifacts/
+    acceptance:
+      - Vision has explicit mandatory coverage dimensions before validation handoff.
+      - Design has explicit mandatory coverage dimensions before spec handoff.
+      - Grabout-style one-question-at-a-time behavior is adapted without importing unrelated final document format.
+  - task_id: M15-T002
+    title: Define XML output-isolation protocol for built-in skills
+    status: completed
+    depends_on:
+      - M15-T001
+    owned_paths:
+      - changes/M15-interactive-vision-design-flow/
+      - references/
+      - packages/adapters/codex/src/
+    acceptance:
+      - Built-in skill template sections use XML-style tags inspired by OpenSpec.
+      - Internal thinking, private checklists, and routine artifact work are clearly marked non-user-facing.
+      - User-facing output guidance is separated from internal protocol.
+  - task_id: M15-T003
+    title: Update command and context contracts for interactive discovery
+    status: completed
+    depends_on:
+      - M15-T002
+    owned_paths:
+      - packages/core/src/commands/
+      - packages/core/src/workflow/
+      - packages/core/src/artifacts/
+      - schemas/
+    acceptance:
+      - /ow:vision context allows conversation-first operation before artifact checkpointing.
+      - /ow:design context allows conversation-first operation before artifact checkpointing.
+      - Audit checkpoints distinguish asking, summarizing, checkpoint persistence, and handoff.
+  - task_id: M15-T004
+    title: Regenerate Codex skill templates for vision and design
+    status: completed
+    depends_on:
+      - M15-T003
+    owned_paths:
+      - packages/adapters/codex/src/
+      - templates/
+    acceptance:
+      - Generated ow-vision skill instructs sustained grill behavior and premature-handoff prevention.
+      - Generated ow-design skill instructs product design clarification before artifact authoring.
+      - Generated skills preserve XML-tagged output isolation and mark inner thinking as private.
+      - Skills keep visible responses concise while preserving interactive flow.
+  - task_id: M15-T005
+    title: Add verification coverage for interactive skill behavior
+    status: completed
+    depends_on:
+      - M15-T004
+    owned_paths:
+      - packages/core/src/validators/
+      - packages/cli/src/dev/
+      - changes/M15-interactive-vision-design-flow/
+    acceptance:
+      - Runtime surface verification checks generated vision/design skills include conversation-first guidance.
+      - Runtime surface verification checks generated skills include XML output-isolation sections.
+      - Repository validation includes M15 change contracts.
+      - Full validation command list passes.
+updated_at: 2026-05-19

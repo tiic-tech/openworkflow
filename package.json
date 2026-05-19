@@ -10,11 +10,14 @@
     "dist",
     "schemas",
     "references",
-    "skills"
+    "skills",
+    "templates"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "validate": "python3 scripts/validate_openworkflow.py --root .",
+    "validate": "npm run build && node dist/cli/src/dev/validateRepositoryContractsCli.js --root .",
+    "verify:runtime-surface": "npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js",
+    "verify:e2e-workflow": "npm run build && node dist/cli/src/dev/verifyWorkflowE2E.js",
     "validate:cli": "node dist/cli/src/index.js validate --root /tmp/openworkflow-m04-smoke",
     "smoke:init": "node dist/cli/src/index.js init /tmp/openworkflow-m04-smoke --tools codex --force"
   },

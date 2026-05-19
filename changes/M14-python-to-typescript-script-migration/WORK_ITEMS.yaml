@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: work_items:M14-python-to-typescript-script-migration
+contract_type: work_items
+title: M14 Python to TypeScript script migration work items
+status: active
+change_contract: changes/M14-python-to-typescript-script-migration/CHANGE.yaml
+items:
+  - task_id: M14-T001
+    title: Port repository contract validation into TypeScript core
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/core/src/validators/
+    acceptance:
+      - TypeScript validator checks required repository files.
+      - TypeScript validator parses JSON schemas and YAML contracts.
+      - TypeScript validator preserves change, work item, artifact, pointer, workflow index, and graph checks.
+  - task_id: M14-T002
+    title: Port runtime surface verification into TypeScript CLI dev tooling
+    status: completed
+    depends_on:
+      - M14-T001
+    owned_paths:
+      - packages/cli/src/dev/
+    acceptance:
+      - Runtime verifier runs built CLI against a temporary target repo.
+      - Runtime verifier checks minimal .openworkflow output and Codex skill surface.
+      - Runtime verifier checks absence of legacy default prompt and .codex command surfaces.
+  - task_id: M14-T003
+    title: Update npm scripts and remove active root Python scripts
+    status: completed
+    depends_on:
+      - M14-T001
+      - M14-T002
+    owned_paths:
+      - package.json
+      - scripts/
+      - AGENT.md
+    acceptance:
+      - npm run validate uses Node/TypeScript output.
+      - npm run verify:runtime-surface uses Node/TypeScript output.
+      - Active root scripts no longer include Python implementations.
+  - task_id: M14-T004
+    title: Inventory legacy skill helper scripts
+    status: completed
+    depends_on:
+      - M14-T003
+    owned_paths:
+      - skills/
+      - changes/M14-python-to-typescript-script-migration/
+    acceptance:
+      - Legacy skill helper scripts are documented as intentionally out of scope.
+      - Their future migration is separated from the npm-first active runtime path.
+  - task_id: M14-T005
+    title: Verify migration end to end
+    status: completed
+    depends_on:
+      - M14-T004
+    owned_paths:
+      - changes/M14-python-to-typescript-script-migration/
+    acceptance:
+      - Full M14 validation command list passes.
+      - Work items are marked complete only after verification.
+updated_at: null

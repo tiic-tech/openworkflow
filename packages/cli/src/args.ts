@@ -11,7 +11,9 @@ export function parseArgs(argv: string[]): ParsedArgs {
 
   for (let index = 0; index < rest.length; index += 1) {
     const value = rest[index];
-    if (value?.startsWith("--")) {
+    if (value === "-h") {
+      flags.set("help", true);
+    } else if (value?.startsWith("--")) {
       const key = value.slice(2);
       const next = rest[index + 1];
       if (next && !next.startsWith("--")) {
@@ -36,4 +38,3 @@ export function stringFlag(flags: Map<string, string | boolean>, name: string, f
 export function booleanFlag(flags: Map<string, string | boolean>, name: string): boolean {
   return flags.get(name) === true || flags.get(name) === "true";
 }
-

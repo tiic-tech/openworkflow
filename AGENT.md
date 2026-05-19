@@ -26,14 +26,17 @@ repositories.
   contract for prototype discovery.
 - `changes/M04-npm-first-cli-architecture/` records the active M04 change
   contract for npm-first CLI architecture.
+- `changes/M08-engineering-skill-reference-research/` and
+  `references/engineering-skill-reference-research.md` record the external
+  engineering skill research that should inform M09 command protocol depth.
+- `changes/M09-audit-first-discovery-loop/` and
+  `references/audit-first-discovery-loop.md` define the audit-first discovery
+  loop protocol.
 - `package.json`, `tsconfig.json`, and `packages/` contain the npm-first
   TypeScript CLI implementation.
-- `skills/` contains repo-local skill implementations. `build-team` and
-  `run-team` preserve the initial downstream execution skills; `build-workflow`
-  initializes upstream contract infrastructure, `build-validation` identifies
-  core assumptions before implementation scope is created, and
-  `build-prototype` creates lightweight local prototype loops before specs,
-  changes, or teams.
+- `skills/` contains repo-local skill prototypes. User-facing workflow commands
+  use the `/ow:*` namespace; the current prototype folders keep their historical
+  names until they are template-backed.
 - `examples/golden-path/` is the minimum executable contract trace.
 - Future changes should preserve the principle that workflow execution is
   derived from durable upstream contracts, not from chat memory.
@@ -79,7 +82,7 @@ architecture governance
 Runtime state is not a replacement for vision, spec, or change contracts.
 
 `.openworkflow/` is the platform-independent source of truth for initialized
-target repositories. Tool folders such as `.codex/` are generated adapter
+target repositories. Tool folders such as `.agents/` are generated adapter
 surfaces and should not become the canonical workflow state.
 
 ## Directory Conventions
@@ -96,7 +99,6 @@ openworkflow/
   changes/
   skills/
   schemas/
-  scripts/
   examples/
   references/
   decisions/
@@ -124,24 +126,24 @@ Start with the shared system before individual skills:
 
 1. Define the OpenWorkflow contract graph.
 2. Define core folder and index schemas.
-3. Design `/build-workflow`.
-4. Design `/build-context`.
-5. Design `/build-vision`.
-6. Design `/build-validation`.
-7. Design `/build-prototype`.
-8. Design `/build-decision`.
-9. Design `/build-spec`.
-10. Design `/build-change`.
-11. Design `/build-slices`.
-12. Integrate with `/build-team` and `/run-team`.
+3. Design `/ow:workflow`.
+4. Design `/ow:context`.
+5. Design `/ow:vision`.
+6. Design `/ow:validation`.
+7. Design `/ow:prototype`.
+8. Design `/ow:decision`.
+9. Design `/ow:spec`.
+10. Design `/ow:change`.
+11. Design slice planning.
+12. Integrate with `/ow:team`.
 
 ## Validation Expectations
 
 For any future implementation:
 
 - Run `npm run build` before handoff when changing the TypeScript CLI.
-- Run `python3 scripts/validate_openworkflow.py --root .` before handoff when
-  changing contracts, schemas, examples, or skills.
+- Run `npm run validate` before handoff when changing contracts, schemas,
+  examples, or skills.
 - Run schema validation when schemas exist.
 - Confirm generated paths are repo-local and portable.
 - Confirm each skill can run after context compaction.

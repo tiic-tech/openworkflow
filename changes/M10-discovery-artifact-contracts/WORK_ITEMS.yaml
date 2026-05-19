@@ -1,0 +1,76 @@
+schema_version: 0.1.0
+contract_id: work_items:M10-discovery-artifact-contracts
+contract_type: work_items
+title: M10 Discovery artifact contracts work items
+status: active
+change_contract: changes/M10-discovery-artifact-contracts/CHANGE.yaml
+items:
+  - task_id: M10-T001
+    title: Define artifact contract reference and implementation TODO
+    status: done
+    depends_on: []
+    owned_paths:
+      - references/discovery-artifact-contracts.md
+      - changes/M10-discovery-artifact-contracts/TODO.md
+    acceptance:
+      - Reference defines YAML, Markdown, HTML, and raw evidence responsibilities.
+      - Reference defines progressive disclosure levels and first-consumer rules.
+  - task_id: M10-T002
+    title: Add core artifact registry
+    status: done
+    depends_on:
+      - M10-T001
+    owned_paths:
+      - packages/core/src/artifacts/
+    acceptance:
+      - Registry exposes discovery artifact contracts and disclosure levels.
+      - Registry can be consumed by init and generated command rendering.
+  - task_id: M10-T003
+    title: Add discovery artifact schemas
+    status: done
+    depends_on:
+      - M10-T001
+    owned_paths:
+      - schemas/
+    acceptance:
+      - Schemas exist for artifact contracts and all M10 discovery artifact types.
+      - Common contract schema accepts the artifact_type extension.
+  - task_id: M10-T004
+    title: Wire init and workflow graph to artifact contracts
+    status: done
+    depends_on:
+      - M10-T002
+      - M10-T003
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+    acceptance:
+      - Target repo init writes artifact contract and disclosure level audit files.
+      - Workflow index and contract graph reference the new audit files.
+  - task_id: M10-T005
+    title: Update command generation and validators
+    status: done
+    depends_on:
+      - M10-T002
+      - M10-T004
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/adapters/codex/src/generateCommands.ts
+      - scripts/validate_openworkflow.py
+    acceptance:
+      - Generated discovery commands show artifact contracts.
+      - CLI and repository validators enforce M10 required files and known artifact shapes.
+  - task_id: M10-T006
+    title: Verify M10 behavior
+    status: done
+    depends_on:
+      - M10-T001
+      - M10-T002
+      - M10-T003
+      - M10-T004
+      - M10-T005
+    owned_paths:
+      - changes/M10-discovery-artifact-contracts/ACCEPTANCE.md
+    acceptance:
+      - Full M10 validation command list passes.
+updated_at: null

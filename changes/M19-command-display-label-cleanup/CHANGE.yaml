@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M19-command-display-label-cleanup
+contract_type: change
+title: M19 Command display label cleanup
+status: completed
+source_artifacts:
+  - changes/M15-interactive-vision-design-flow/CHANGE.yaml
+  - changes/M18-e2e-friction-fixes/CHANGE.yaml
+depends_on:
+  - change:M18-e2e-friction-fixes
+produces:
+  - work_items:M19-command-display-label-cleanup
+summary: >
+  Clean up Codex skill interface display labels so users see ow:<command>
+  instead of /ow:<command>, while preserving the semantic command trigger and
+  explicit skill invocation contracts.
+problem: >
+  OpenWorkflow commands use semantic triggers such as /ow:vision internally,
+  but the Codex UI display label currently shows the leading slash. This makes
+  the UI look like raw slash-command plumbing instead of the intended
+  OpenWorkflow command label. The cleanup should affect presentation only, not
+  command semantics.
+goals:
+  - Display Codex skill interface names as ow:<id> without the leading slash.
+  - Preserve semantic command triggers such as /ow:vision in command docs,
+    manifest metadata, audit indexes, and artifact contracts.
+  - Preserve explicit skill invocation such as $ow-vision.
+  - Add runtime verification that generated interface metadata uses clean
+    display labels and does not regress.
+non_goals:
+  - Do not change command namespace or trigger parsing.
+  - Do not remove /ow:<id> semantic command references from generated skill docs.
+  - Do not change artifact paths, workflow contracts, or validators unrelated to display metadata.
+decisions:
+  - agents/openai.yaml display_name is presentation metadata and should use ow:<id>.
+  - Generated SKILL.md content should still show the semantic command /ow:<id>.
+  - Manifest trigger values remain /ow:<id>.
+affected_paths:
+  - packages/adapters/codex/src/
+  - packages/cli/src/dev/
+  - changes/M19-command-display-label-cleanup/
+acceptance:
+  - Generated .agents/skills/ow-vision/agents/openai.yaml has display_name ow:vision.
+  - Generated interface display names for all OpenWorkflow skills omit the leading slash.
+  - Generated SKILL.md files still preserve semantic command text such as /ow:vision.
+  - Runtime surface verification checks clean display labels.
+  - Existing validation, sync, doctor, runtime surface checks, and CLI smoke checks pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: 2026-05-19

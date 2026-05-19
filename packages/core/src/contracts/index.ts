@@ -5,6 +5,7 @@ export const CONTRACT_TYPES = [
   "context",
   "vision",
   "decision",
+  "design",
   "spec",
   "validation",
   "prototype",
@@ -38,4 +39,3 @@ export interface InitOptions {
   tools: string[];
   force: boolean;
 }
-

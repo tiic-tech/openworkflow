@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: work_items:M06-repository-architecture-scaffold
+contract_type: work_items
+title: M06 Repository architecture scaffold work items
+status: active
+change_contract: changes/M06-repository-architecture-scaffold/CHANGE.yaml
+items:
+  - task_id: M06-T001
+    title: Split CLI commands into command modules
+    status: done
+    depends_on: []
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/
+    acceptance:
+      - init, validate, sync, and doctor handlers live under packages/cli/src/commands/.
+      - packages/cli/src/index.ts remains a thin dispatcher.
+  - task_id: M06-T002
+    title: Group core services into domain folders
+    status: done
+    depends_on:
+      - M06-T001
+    owned_paths:
+      - packages/core/src/contracts/
+      - packages/core/src/fs/
+      - packages/core/src/workflow/
+      - packages/core/src/validators/
+    acceptance:
+      - Existing core exports move into domain folders without changing behavior.
+      - Import paths are updated across CLI and adapters.
+  - task_id: M06-T003
+    title: Split Codex adapter generation modules
+    status: done
+    depends_on:
+      - M06-T002
+    owned_paths:
+      - packages/adapters/codex/src/
+    acceptance:
+      - Agent, command, skill, template, manifest, sync, and doctor responsibilities are separated.
+  - task_id: M06-T004
+    title: Add template root placeholders
+    status: done
+    depends_on:
+      - M06-T003
+    owned_paths:
+      - templates/openworkflow/
+      - templates/codex/
+    acceptance:
+      - Template directories document future externalization without changing runtime loading.
+  - task_id: M06-T005
+    title: Verify architecture migration
+    status: done
+    depends_on:
+      - M06-T001
+      - M06-T002
+      - M06-T003
+      - M06-T004
+    owned_paths:
+      - changes/M06-repository-architecture-scaffold/ACCEPTANCE.md
+    acceptance:
+      - Full M06 validation command list passes.
+updated_at: null

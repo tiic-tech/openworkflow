@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: change:M20-workflow-e2e-regression
+contract_type: change
+title: M20 Workflow E2E regression verification
+status: completed
+source_artifacts:
+  - changes/M15-interactive-vision-design-flow/CHANGE.yaml
+  - changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml
+  - changes/M17-tune-orchestration-internal-decision/CHANGE.yaml
+  - changes/M18-e2e-friction-fixes/CHANGE.yaml
+  - changes/M19-command-display-label-cleanup/CHANGE.yaml
+depends_on:
+  - change:M19-command-display-label-cleanup
+produces:
+  - work_items:M20-workflow-e2e-regression
+summary: >
+  Add an executable regression harness for the OpenWorkflow discovery loop so
+  the behavior contracts from M15 through M19 are checked as a workflow story,
+  not only as isolated static skill-surface assertions.
+problem: >
+  Recent changes improved vision, validation, prototype, tune, internal
+  decision audit, and Codex display labels. Current validation mostly checks
+  generated files and required text fragments. It can miss regressions where
+  the combined user journey becomes fragmented again, such as vision handing
+  off too early, prototype skipping visual-first work, tune exposing decision,
+  or display labels regressing to raw slash-command presentation.
+goals:
+  - Add a single E2E regression command for the vision to validation to prototype to tune loop.
+  - Encode the M15 through M19 behavior contracts as workflow-level assertions.
+  - Keep the harness deterministic and local; it should not require live model calls.
+  - Make the harness part of the documented validation path for future changes.
+non_goals:
+  - Do not replace real manual or subagent E2E experience testing.
+  - Do not introduce browser automation or network-dependent checks in this change.
+  - Do not change command semantics, artifact paths, or generated runtime files unless required by the harness.
+  - Do not implement a full prompt simulator or judge model.
+decisions:
+  - The first M20 harness should validate generated runtime surfaces and handoff contracts as a complete workflow story.
+  - The harness should assert behavior gates rather than only checking arbitrary keyword presence.
+  - Agent behavior that depends on actual model execution remains covered by separate manual E2E review, but M20 should catch prompt and contract drift before that review.
+affected_paths:
+  - packages/cli/src/dev/
+  - packages/core/src/
+  - package.json
+  - changes/M20-workflow-e2e-regression/
+acceptance:
+  - A new npm script verifies the workflow E2E regression contract.
+  - The regression checks cover vision sustained grill and readiness gating.
+  - The regression checks cover validation handoff into prototype without manual decision exposure.
+  - The regression checks cover prototype visual-first and reference extraction behavior.
+  - The regression checks cover tune defaulting to prototype and internal decision audit behavior.
+  - The regression checks cover slashless Codex display labels while preserving /ow semantic commands.
+  - Existing build, repository validation, runtime surface, smoke, sync, doctor, CLI validation, and the new E2E regression command pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: 2026-05-19

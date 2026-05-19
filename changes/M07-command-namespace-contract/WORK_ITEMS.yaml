@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: work_items:M07-command-namespace-contract
+contract_type: work_items
+title: M07 Command namespace contract work items
+status: active
+change_contract: changes/M07-command-namespace-contract/CHANGE.yaml
+items:
+  - task_id: M07-T001
+    title: Add canonical command registry
+    status: done
+    depends_on: []
+    owned_paths:
+      - packages/core/src/commands/
+    acceptance:
+      - Registry exposes ow namespace, canonical triggers, legacy triggers, and stage metadata.
+  - task_id: M07-T002
+    title: Generate namespaced Codex commands
+    status: done
+    depends_on:
+      - M07-T001
+    owned_paths:
+      - packages/adapters/codex/src/generateCommands.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/doctorCodexAdapter.ts
+    acceptance:
+      - Generated command paths use .codex/commands/ow/<command>.md.
+      - Generated command content uses /ow:<command>.
+      - Manifest records command ids, triggers, paths, and legacy triggers.
+  - task_id: M07-T003
+    title: Migrate repository command references
+    status: done
+    depends_on:
+      - M07-T001
+    owned_paths:
+      - AGENT.md
+      - skills/
+      - references/
+    acceptance:
+      - Legacy slash triggers are replaced with canonical /ow:* triggers.
+      - Repo-local skill names can remain as prototype folder names, but their user-facing command references use /ow:*.
+  - task_id: M07-T004
+    title: Update repository validation
+    status: done
+    depends_on:
+      - M07-T001
+      - M07-T002
+    owned_paths:
+      - scripts/validate_openworkflow.py
+    acceptance:
+      - Validator requires the command registry and M07 artifacts.
+  - task_id: M07-T005
+    title: Verify M07 behavior
+    status: done
+    depends_on:
+      - M07-T001
+      - M07-T002
+      - M07-T003
+      - M07-T004
+    owned_paths:
+      - changes/M07-command-namespace-contract/ACCEPTANCE.md
+    acceptance:
+      - Full M07 validation command list passes.
+updated_at: null

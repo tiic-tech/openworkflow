@@ -1,73 +1,96 @@
+import { homedir } from "node:os";
 import { join } from "node:path";
-import type { InitOptions } from "../../../core/src/contracts.js";
-import { ensureDir, writeTextFile } from "../../../core/src/fs.js";
+import { getWorkflowCommands } from "../../../core/src/commands/registry.js";
+import type { InitOptions } from "../../../core/src/contracts/index.js";
+import { ensureDir } from "../../../core/src/fs/index.js";
+import { removeGenerated, renderGeneratedFile, writeGenerated } from "./generatedFiles.js";
+import { codexPromptIdFromTrigger, codexPromptPathForId, legacyCodexCommandPaths } from "./generateCommands.js";
+import { legacyCodexSkillPaths } from "./generateSkills.js";
+import {
+  CODEX_MANIFEST_PATH,
+  CODEX_MANIFEST_TEMPLATE_ID,
+  LEGACY_CODEX_MANIFEST_PATHS,
+  codexManifest,
+} from "./manifest.js";
+import { getCodexTemplates } from "./templates.js";
 
 export interface AdapterResult {
   written: string[];
   skipped: string[];
+  unchanged: string[];
+  removed: string[];
+  warnings: string[];
 }
 
 export async function generateCodexAdapter(options: InitOptions): Promise<AdapterResult> {
   const written: string[] = [];
   const skipped: string[] = [];
-  const dirs = [
-    ".codex/agents",
-    ".codex/skills",
-    ".codex/commands",
-  ];
+  const unchanged: string[] = [];
+  const removed: string[] = [];
+  const warnings: string[] = [];
+  const templates = getCodexTemplates();
+  const dirs = [".agents"];
 
   for (const dir of dirs) {
     await ensureDir(join(options.root, dir));
   }
 
-  await write(join(options.root, ".codex/agents/README.md"), agentsReadme(), options.force, written, skipped);
-  await write(join(options.root, ".codex/agents/openworkflow-orchestrator.md"), orchestratorAgent(), options.force, written, skipped);
-
-  const commands = [
-    ["build-workflow.md", buildWorkflowCommand()],
-    ["build-vision.md", commandDoc("build-vision", "Use one-question-at-a-time collaboration to create or refine `.openworkflow/vision/VISION_CONTRACT.yaml`.")],
-    ["build-validation.md", commandDoc("build-validation", "Read vision artifacts and create validation-first prioritization under `.openworkflow/validation/`.")],
-    ["build-prototype.md", commandDoc("build-prototype", "Read validation artifacts and create a focused local prototype under `.openworkflow/prototypes/`.")],
-    ["build-decision.md", commandDoc("build-decision", "Record user review outcomes from prototype or production slices under `.openworkflow/decisions/`.")],
-    ["build-spec.md", commandDoc("build-spec", "Create one focused production spec from an accepted prototype decision.")],
-    ["build-change.md", commandDoc("build-change", "Create one focused production change from a spec for the current core feature.")],
-    ["run-team.md", commandDoc("run-team", "Execute approved production runtime work after spec and change contracts exist.")],
-  ];
-  for (const [name, content] of commands) {
-    await write(join(options.root, ".codex/commands", name), content, options.force, written, skipped);
+  for (const template of templates) {
+    await writeGenerated(
+      join(options.root, template.path),
+      renderGeneratedFile(template.path, template.content, template.id),
+      options.force,
+      written,
+      skipped,
+      unchanged,
+      warnings,
+    );
   }
 
-  await write(join(options.root, ".codex/skills/openworkflow.md"), codexSkill(), options.force, written, skipped);
+  await writeGenerated(
+    join(options.root, CODEX_MANIFEST_PATH),
+    renderGeneratedFile(CODEX_MANIFEST_PATH, codexManifest(options.root, templates.map((template) => template.path)), CODEX_MANIFEST_TEMPLATE_ID),
+    options.force,
+    written,
+    skipped,
+    unchanged,
+    warnings,
+  );
 
-  return { written, skipped };
-}
-
-async function write(path: string, content: string, force: boolean, written: string[], skipped: string[]): Promise<void> {
-  const action = await writeTextFile(path, content, force);
-  if (action === "write") {
-    written.push(path);
-  } else {
-    skipped.push(path);
+  for (const legacyPath of legacyCodexCommandPaths()) {
+    await removeGenerated(join(options.root, legacyPath), options.force, removed, skipped, warnings);
   }
+  for (const legacyPath of legacyCodexSkillPaths()) {
+    await removeGenerated(join(options.root, legacyPath), options.force, removed, skipped, warnings);
+  }
+  for (const legacyPath of legacyCodexAgentPaths()) {
+    await removeGenerated(join(options.root, legacyPath), options.force, removed, skipped, warnings);
+  }
+  for (const legacyPath of LEGACY_CODEX_MANIFEST_PATHS) {
+    await removeGenerated(join(options.root, legacyPath), options.force, removed, skipped, warnings);
+  }
+  for (const legacyPromptPath of legacyCodexPromptPaths()) {
+    await removeGenerated(legacyPromptPath, false, removed, skipped, warnings);
+  }
+
+  return { written, skipped, unchanged, removed, warnings };
 }
 
-function agentsReadme(): string {
-  return `# Codex Agents for OpenWorkflow\n\nThis folder is generated by the OpenWorkflow Codex adapter. The canonical workflow state lives in \`.openworkflow/\`.\n`;
+function legacyCodexAgentPaths(): string[] {
+  return [".codex/agents/README.md", ".codex/agents/openworkflow-orchestrator.md"];
 }
 
-function orchestratorAgent(): string {
-  return `---\nname: openworkflow-orchestrator\ndescription: Coordinates OpenWorkflow contract stages while keeping .openworkflow as source of truth.\n---\n\n# OpenWorkflow Orchestrator\n\nRead \`.openworkflow/workflow/WORKFLOW_INDEX.yaml\` first. Do not treat \`.codex/\` as the source of truth; it is an adapter layer.\n\nDefault journey:\n\n\`\`\`txt\nvision -> validation -> prototype -> decision -> spec -> change -> runtime\n\`\`\`\n\nPrototype discovery must not create production specs, changes, teams, or runtime state before a decision authorizes continuation.\n`;
+function legacyCodexPromptPaths(): string[] {
+  const codexHome = process.env.CODEX_HOME?.trim() || join(homedir(), ".codex");
+  const promptIds = new Set<string>();
+  for (const command of getWorkflowCommands()) {
+    promptIds.add(command.id);
+    for (const legacyTrigger of command.legacyTriggers) {
+      const id = codexPromptIdFromTrigger(legacyTrigger);
+      if (id) {
+        promptIds.add(id);
+      }
+    }
+  }
+  return [...promptIds].map((id) => join(codexHome, "prompts", codexPromptPathForId(id)));
 }
-
-function buildWorkflowCommand(): string {
-  return `# /build-workflow\n\nInitialize or reconcile OpenWorkflow contracts. Use \`.openworkflow/\` as the platform-independent source of truth and \`.codex/\` only as this tool adapter.\n\nRecommended CLI:\n\n\`\`\`bash\nopenworkflow init . --tools codex\nopenworkflow validate --root .\n\`\`\`\n`;
-}
-
-function commandDoc(name: string, purpose: string): string {
-  return `# /${name}\n\n${purpose}\n\nSource of truth: \`.openworkflow/\`.\n\nKeep artifacts short, scoped, and traceable through \`.openworkflow/workflow/CONTRACT_GRAPH.yaml\`.\n`;
-}
-
-function codexSkill(): string {
-  return `# OpenWorkflow Codex Adapter\n\nUse this adapter to operate OpenWorkflow from Codex. The durable workflow contracts live in \`.openworkflow/\`.\n\nRules:\n\n- Do not create production specs before validation and prototype decision.\n- Do not create Agent Team runtime before a focused change exists.\n- Keep \`.codex/\` generated or tool-facing; keep product truth in \`.openworkflow/\`.\n`;
-}
-

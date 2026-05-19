@@ -1,6 +1,6 @@
 ---
 name: build-validation
-description: Create validation-first prioritization artifacts from a product vision or change idea. Use when the user asks what should be prioritized, what must be proven first, which feature is core versus supporting, or when a broad idea needs a prototype brief before build-change, build-slices, build-team, or implementation work.
+description: Create validation-first prioritization artifacts from a product vision or change idea. Use when the user asks what should be prioritized, what must be proven first, which feature is core versus supporting, or when a broad idea needs a prototype brief before /ow:change, /ow:team, or implementation work.
 ---
 
 # Build Validation
@@ -58,8 +58,7 @@ Write validation artifacts under:
 4. Define one minimum prototype scope.
 5. Define acceptance as evidence questions, not implementation completeness.
 6. Initialize artifacts with `scripts/init_validation.py`.
-7. Validate with `python3 scripts/validate_openworkflow.py --root .` when the
-   repository validator exists.
+7. Validate with `npm run validate` when the repository validator exists.
 
 ## Boundaries
 
@@ -72,12 +71,11 @@ Write validation artifacts under:
 
 ## Handoff
 
-If validation is planned, hand off to `/build-prototype` or an implementation
+If validation is planned, hand off to `/ow:prototype` or an implementation
 agent with the prototype brief only.
 
 If validation passes, feed `VALIDATION.yaml` and `RESULT.md` into
-`/build-decision`, `/build-spec`, or `/build-change`.
+`/ow:decision`, `/ow:spec`, or `/ow:change`.
 
 If validation fails, revise the vision or create a new validation contract
 before generating implementation tasks.
-

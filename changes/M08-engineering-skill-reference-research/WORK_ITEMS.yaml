@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: work_items:M08-engineering-skill-reference-research
+contract_type: work_items
+title: M08 Engineering skill reference research work items
+status: active
+change_contract: changes/M08-engineering-skill-reference-research/CHANGE.yaml
+items:
+  - task_id: M08-T001
+    title: Clone and inventory reference skills
+    status: done
+    depends_on: []
+    owned_paths:
+      - /tmp/mattpocock-skills
+    acceptance:
+      - Repository is cloned locally.
+      - Engineering skill list and support files are inventoried.
+  - task_id: M08-T002
+    title: Analyze reusable skill design patterns
+    status: done
+    depends_on:
+      - M08-T001
+    owned_paths:
+      - references/engineering-skill-reference-research.md
+    acceptance:
+      - Research captures skill structure, invocation rules, feedback-loop discipline, progressive disclosure, and anti-pattern handling.
+  - task_id: M08-T003
+    title: Define OpenWorkflow adoption boundaries
+    status: done
+    depends_on:
+      - M08-T002
+    owned_paths:
+      - references/engineering-skill-reference-research.md
+    acceptance:
+      - Research distinguishes adopt, adapt, and reject categories.
+      - Research preserves .openworkflow as the durable artifact model.
+  - task_id: M08-T004
+    title: Prepare M09 handoff
+    status: done
+    depends_on:
+      - M08-T003
+    owned_paths:
+      - references/engineering-skill-reference-research.md
+      - AGENT.md
+    acceptance:
+      - Research gives concrete M09 implications for the discovery loop commands.
+  - task_id: M08-T005
+    title: Verify M08 artifacts
+    status: done
+    depends_on:
+      - M08-T004
+    owned_paths:
+      - scripts/validate_openworkflow.py
+      - changes/M08-engineering-skill-reference-research/ACCEPTANCE.md
+    acceptance:
+      - Repository validation passes.
+updated_at: null

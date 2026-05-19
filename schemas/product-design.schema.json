@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/product-design.schema.json",
+  "title": "OpenWorkflow Product Design Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "artifact_type",
+    "title",
+    "status",
+    "accepted_prototype_evidence",
+    "personas",
+    "journey_map",
+    "user_stories",
+    "feature_matrix",
+    "kano_classification",
+    "behavior_model",
+    "ux_states",
+    "scope",
+    "open_questions",
+    "conditional_packets",
+    "spec_readiness"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "design"
+    },
+    "artifact_type": {
+      "const": "product_design"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "accepted_prototype_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ref",
+          "decision_ref",
+          "accepted_outcome"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "decision_ref": {
+            "type": "string"
+          },
+          "accepted_outcome": {
+            "type": "string",
+            "enum": [
+              "continue",
+              "accepted"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "personas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "goals",
+          "pain_points"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "goals": {
+            "$ref": "#/$defs/stringList"
+          },
+          "pain_points": {
+            "$ref": "#/$defs/stringList"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "journey_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "user_goal",
+          "actions",
+          "system_response"
+        ],
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "user_goal": {
+            "type": "string"
+          },
+          "actions": {
+            "$ref": "#/$defs/stringList"
+          },
+          "system_response": {
+            "$ref": "#/$defs/stringList"
+          },
+          "risks": {
+            "$ref": "#/$defs/stringList"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "user_stories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "persona",
+          "story",
+          "acceptance"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "persona": {
+            "type": "string"
+          },
+          "story": {
+            "type": "string"
+          },
+          "acceptance": {
+            "$ref": "#/$defs/stringList"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "feature_matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "feature",
+          "priority",
+          "evidence_refs",
+          "included"
+        ],
+        "properties": {
+          "feature": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "$ref": "#/$defs/stringList"
+          },
+          "included": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "kano_classification": {
+      "type": "object",
+      "required": [
+        "must_have",
+        "performance",
+        "delighters",
+        "indifferent",
+        "reverse"
+      ],
+      "properties": {
+        "must_have": {
+          "$ref": "#/$defs/stringList"
+        },
+        "performance": {
+          "$ref": "#/$defs/stringList"
+        },
+        "delighters": {
+          "$ref": "#/$defs/stringList"
+        },
+        "indifferent": {
+          "$ref": "#/$defs/stringList"
+        },
+        "reverse": {
+          "$ref": "#/$defs/stringList"
+        }
+      },
+      "additionalProperties": true
+    },
+    "behavior_model": {
+      "type": "object",
+      "required": [
+        "entities",
+        "states",
+        "transitions",
+        "rules"
+      ],
+      "properties": {
+        "entities": {
+          "$ref": "#/$defs/stringList"
+        },
+        "states": {
+          "$ref": "#/$defs/stringList"
+        },
+        "transitions": {
+          "$ref": "#/$defs/stringList"
+        },
+        "rules": {
+          "$ref": "#/$defs/stringList"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ux_states": {
+      "type": "object",
+      "required": [
+        "empty",
+        "loading",
+        "success",
+        "error",
+        "edge_cases"
+      ],
+      "properties": {
+        "empty": {
+          "$ref": "#/$defs/stringList"
+        },
+        "loading": {
+          "$ref": "#/$defs/stringList"
+        },
+        "success": {
+          "$ref": "#/$defs/stringList"
+        },
+        "error": {
+          "$ref": "#/$defs/stringList"
+        },
+        "edge_cases": {
+          "$ref": "#/$defs/stringList"
+        }
+      },
+      "additionalProperties": true
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "in",
+        "out",
+        "deferred"
+      ],
+      "properties": {
+        "in": {
+          "$ref": "#/$defs/stringList"
+        },
+        "out": {
+          "$ref": "#/$defs/stringList"
+        },
+        "deferred": {
+          "$ref": "#/$defs/stringList"
+        }
+      },
+      "additionalProperties": true
+    },
+    "open_questions": {
+      "$ref": "#/$defs/stringList"
+    },
+    "conditional_packets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact_type",
+          "path",
+          "included",
+          "reason"
+        ],
+        "properties": {
+          "artifact_type": {
+            "type": "string",
+            "enum": [
+              "tech_spec",
+              "frontend_spec",
+              "backend_spec",
+              "api_contract",
+              "db_schema_model"
+            ]
+          },
+          "path": {
+            "type": "string"
+          },
+          "included": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "spec_readiness": {
+      "type": "object",
+      "required": [
+        "ready",
+        "blockers",
+        "next_command"
+      ],
+      "properties": {
+        "ready": {
+          "type": "boolean"
+        },
+        "blockers": {
+          "$ref": "#/$defs/stringList"
+        },
+        "next_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

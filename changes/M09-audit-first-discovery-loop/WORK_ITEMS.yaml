@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: work_items:M09-audit-first-discovery-loop
+contract_type: work_items
+title: M09 Audit-first discovery loop work items
+status: active
+change_contract: changes/M09-audit-first-discovery-loop/CHANGE.yaml
+items:
+  - task_id: M09-T001
+    title: Define audit-first discovery loop reference
+    status: done
+    depends_on: []
+    owned_paths:
+      - references/audit-first-discovery-loop.md
+      - changes/M09-audit-first-discovery-loop/TODO.md
+    acceptance:
+      - Reference states audit-first principles, context packet shape, and discovery loop invariants.
+      - TODO list orders implementation steps and verification.
+  - task_id: M09-T002
+    title: Extend command registry with protocol metadata
+    status: done
+    depends_on:
+      - M09-T001
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    acceptance:
+      - Discovery loop commands expose interaction mode, context files, allowed outputs, forbidden outputs, checkpoints, and anti-patterns.
+  - task_id: M09-T003
+    title: Generate audit files during init
+    status: done
+    depends_on:
+      - M09-T002
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+    acceptance:
+      - init writes .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml.
+      - init writes .openworkflow/audit/CONTEXT_PACKETS.yaml.
+  - task_id: M09-T004
+    title: Deepen generated Codex discovery commands
+    status: done
+    depends_on:
+      - M09-T002
+    owned_paths:
+      - packages/adapters/codex/src/generateCommands.ts
+    acceptance:
+      - /ow:vision, /ow:validation, /ow:prototype, and /ow:decision generated commands include operational protocol depth.
+      - Non-discovery commands remain concise.
+  - task_id: M09-T005
+    title: Update validation and project guide
+    status: done
+    depends_on:
+      - M09-T003
+      - M09-T004
+    owned_paths:
+      - scripts/validate_openworkflow.py
+      - AGENT.md
+    acceptance:
+      - Validator requires M09 artifacts and audit-init source files.
+      - Project guide points future work to the M09 reference.
+  - task_id: M09-T006
+    title: Verify M09 behavior
+    status: done
+    depends_on:
+      - M09-T001
+      - M09-T002
+      - M09-T003
+      - M09-T004
+      - M09-T005
+    owned_paths:
+      - changes/M09-audit-first-discovery-loop/ACCEPTANCE.md
+    acceptance:
+      - Full M09 validation command list passes.
+updated_at: null

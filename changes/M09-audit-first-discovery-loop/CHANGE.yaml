@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: change:M09-audit-first-discovery-loop
+contract_type: change
+title: M09 Audit-first discovery loop protocol
+status: active
+source_artifacts:
+  - changes/M08-engineering-skill-reference-research/CHANGE.yaml
+  - references/engineering-skill-reference-research.md
+depends_on:
+  - change:M08-engineering-skill-reference-research
+produces:
+  - work_items:M09-audit-first-discovery-loop
+  - references/audit-first-discovery-loop.md
+summary: >
+  Deepen the /ow:vision -> /ow:validation -> /ow:prototype -> /ow:decision
+  discovery loop with audit-first command protocols, context packets, and
+  target-repo audit indexes so agents can work precisely from small context
+  slices at any workflow state.
+problem: >
+  M07 established stable /ow:* command names and M08 extracted useful skill
+  design principles, but generated commands still describe stages at a shallow
+  level. Without explicit context packets, read/write boundaries, forbidden
+  artifacts, and audit checkpoints, future agents may over-load context, create
+  artifacts too early, or drift from the product discovery loop.
+goals:
+  - Add machine-readable command protocol metadata for the discovery loop.
+  - Generate target repo audit files under .openworkflow/audit/.
+  - Make generated Codex commands for /ow:vision, /ow:validation, /ow:prototype, and /ow:decision operationally precise.
+  - Define minimal context packets for each discovery command.
+  - Preserve .openworkflow as the durable source of truth.
+  - Keep spec/change/team commands shallow until the discovery loop is accepted.
+non_goals:
+  - Do not implement production spec/change/team protocol depth.
+  - Do not externalize command templates into templates/codex yet.
+  - Do not add issue tracker integration.
+  - Do not copy third-party skill text into OpenWorkflow.
+decisions:
+  - Audit files live under .openworkflow/audit/.
+  - Context packets are explicit lists of required, optional, and forbidden files.
+  - Commands must list allowed outputs and forbidden outputs.
+  - Discovery loop commands must include audit checkpoints before and after work.
+  - Prototype remains validation evidence, not production implementation.
+affected_paths:
+  - packages/core/src/commands/
+  - packages/core/src/workflow/
+  - packages/adapters/codex/src/
+  - scripts/validate_openworkflow.py
+  - references/audit-first-discovery-loop.md
+  - changes/M09-audit-first-discovery-loop/
+acceptance:
+  - M09 change artifacts include a task breakdown and TODO list.
+  - Command registry exposes audit-first protocol fields for discovery loop commands.
+  - init writes .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml and .openworkflow/audit/CONTEXT_PACKETS.yaml.
+  - Generated Codex commands for vision, validation, prototype, and decision include required context, allowed outputs, forbidden outputs, checkpoints, and anti-patterns.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null

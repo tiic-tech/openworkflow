@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: work_items:M16-prototype-creation-skill-upgrade
+contract_type: work_items
+title: M16 Prototype creation skill upgrade work items
+status: completed
+change_contract: changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml
+items:
+  - task_id: M16-T001
+    title: Define prototype-mode classification and evidence model
+    status: completed
+    depends_on: []
+    owned_paths:
+      - changes/M16-prototype-creation-skill-upgrade/
+      - packages/core/src/artifacts/
+      - schemas/
+    acceptance:
+      - Prototype modes include visual, interaction, technical feasibility, 3D/material, workflow, and data/logic.
+      - Prototype evidence can record concept images, reference analyses, runnable artifacts, screenshots, logs, critique, and known limits separately.
+      - Logic-only prototypes are not forced through image generation.
+  - task_id: M16-T002
+    title: Update ow-proto command and context protocol
+    status: completed
+    depends_on:
+      - M16-T001
+    owned_paths:
+      - packages/core/src/commands/
+      - packages/core/src/workflow/
+      - packages/core/src/artifacts/
+    acceptance:
+      - /ow:proto working protocol requires classification before implementation.
+      - Visual-first path requires reference extraction and/or static concept generation before HTML implementation.
+      - Audit checkpoints distinguish concept pass, implementation pass, verification pass, and handoff.
+  - task_id: M16-T003
+    title: Rewrite Codex ow-proto skill generation
+    status: completed
+    depends_on:
+      - M16-T002
+    owned_paths:
+      - packages/adapters/codex/src/
+      - templates/
+    acceptance:
+      - Generated ow-proto skill uses XML output-isolation sections.
+      - Generated ow-proto skill includes image-generation-first guidance for visual prototypes.
+      - Generated ow-proto skill includes reference-pattern extraction triggers for images, URLs, screenshots, and HTML/CSS.
+      - Generated ow-proto skill includes design-system/template-seed guidance without adding a template marketplace.
+  - task_id: M16-T004
+    title: Add prototype self-critique and verification guidance
+    status: completed
+    depends_on:
+      - M16-T003
+    owned_paths:
+      - packages/adapters/codex/src/
+      - references/
+      - changes/M16-prototype-creation-skill-upgrade/
+    acceptance:
+      - Self-critique covers philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior.
+      - Any weak dimension must trigger a repair pass before evidence handoff.
+      - Browser/screenshot verification expectations are explicit for HTML and 3D prototypes.
+  - task_id: M16-T005
+    title: Verify runtime surface and repository contracts
+    status: completed
+    depends_on:
+      - M16-T004
+    owned_paths:
+      - packages/core/src/validators/
+      - packages/cli/src/dev/
+      - changes/M16-prototype-creation-skill-upgrade/
+    acceptance:
+      - Runtime surface verification checks generated ow-proto includes classification, static concept, reference extraction, and self-critique language.
+      - Repository validation includes M16 change contracts.
+      - Full validation command list passes.
+updated_at: 2026-05-19

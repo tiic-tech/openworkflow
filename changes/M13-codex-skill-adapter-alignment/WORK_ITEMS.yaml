@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: work_items:M13-codex-skill-adapter-alignment
+contract_type: work_items
+title: M13 Codex skill adapter alignment work items
+status: active
+change_contract: changes/M13-codex-skill-adapter-alignment/CHANGE.yaml
+items:
+  - task_id: M13-T001
+    title: Replace Codex command prompt surface with skill generation
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/adapters/codex/src/
+    acceptance:
+      - Adapter generates .agents/skills/ow-* folders.
+      - SKILL.md contains command protocol and required frontmatter.
+      - agents/openai.yaml contains display metadata.
+  - task_id: M13-T002
+    title: Align config and manifest with skill delivery
+    status: completed
+    depends_on:
+      - M13-T001
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/adapters/codex/src/manifest.ts
+    acceptance:
+      - Config names .agents/skills as primary Codex delivery.
+      - Manifest records skill entries and legacy cleanup paths.
+  - task_id: M13-T003
+    title: Update verification and legacy cleanup
+    status: completed
+    depends_on:
+      - M13-T001
+      - M13-T002
+    owned_paths:
+      - scripts/verify_runtime_surface.py
+      - package.json
+      - packages/adapters/codex/src/doctorCodexAdapter.ts
+      - packages/adapters/codex/src/generateCodexAdapter.ts
+    acceptance:
+      - Runtime verifier checks skills and absence of default prompt files.
+      - Doctor validates generated skills.
+      - Legacy prompt and .codex generated files are removed when safe.
+  - task_id: M13-T004
+    title: Integrate and verify
+    status: completed
+    depends_on:
+      - M13-T003
+    owned_paths:
+      - changes/M13-codex-skill-adapter-alignment/
+      - references/runtime-command-surface.md
+    acceptance:
+      - Full validation command list passes.
+      - M13 work items are marked complete after verification.
+updated_at: null

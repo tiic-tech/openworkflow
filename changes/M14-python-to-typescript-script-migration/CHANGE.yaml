@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: change:M14-python-to-typescript-script-migration
+contract_type: change
+title: M14 Python to TypeScript script migration
+status: active
+source_artifacts:
+  - changes/M13-codex-skill-adapter-alignment/CHANGE.yaml
+  - references/npm-cli-architecture.md
+depends_on:
+  - change:M13-codex-skill-adapter-alignment
+produces:
+  - work_items:M14-python-to-typescript-script-migration
+summary: >
+  Move the active repository validation and runtime surface verification scripts
+  from Python into the TypeScript package structure, keeping milestone labels out
+  of production code names and preserving the current audit checks.
+problem: >
+  OpenWorkflow is moving toward an npm-first architecture, but the active
+  validation path still depends on root-level Python scripts. This creates a
+  split implementation model and makes it harder to ship a single TypeScript
+  package with consistent CLI, core validation, and adapter verification.
+goals:
+  - Replace root-level Python validation scripts with TypeScript modules.
+  - Keep repository contract validation in core-owned TypeScript code.
+  - Keep runtime surface smoke verification in CLI/dev TypeScript code.
+  - Update npm scripts so the active project workflow no longer calls python3.
+  - Preserve the current validation coverage for repository contracts and runtime surface behavior.
+  - Document legacy skill helper scripts as a separate migration queue instead of translating stale assumptions.
+non_goals:
+  - Do not migrate legacy repo-local skill helper scripts in this change.
+  - Do not publish the npm package.
+  - Do not redesign command names or Codex skill registration.
+  - Do not add milestone labels to production code filenames or exported symbols.
+decisions:
+  - Repository validation belongs in packages/core/src/validators.
+  - Developer-facing executable wrappers belong in packages/cli/src/dev.
+  - The active npm validation path must be TypeScript/Node only.
+  - Legacy skill helper scripts remain inventoried until their behavior is redesigned around .agents/skills and .openworkflow.
+affected_paths:
+  - package.json
+  - scripts/
+  - packages/core/src/validators/
+  - packages/cli/src/dev/
+  - AGENT.md
+  - skills/
+  - changes/M14-python-to-typescript-script-migration/
+acceptance:
+  - npm run validate executes the TypeScript repository validator.
+  - npm run verify:runtime-surface executes the TypeScript runtime surface verifier.
+  - Root-level active scripts no longer depend on Python.
+  - Repository validation preserves required file, schema, YAML contract, change, work item, artifact, pointer, workflow index, and contract graph checks.
+  - Runtime surface verification preserves the M13 Codex skill adapter checks.
+  - Legacy skill helper Python scripts are explicitly documented as out-of-scope for this migration.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: null

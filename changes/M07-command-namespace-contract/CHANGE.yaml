@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: change:M07-command-namespace-contract
+contract_type: change
+title: M07 Command namespace contract
+status: active
+source_artifacts:
+  - changes/M06-repository-architecture-scaffold/CHANGE.yaml
+depends_on:
+  - change:M06-repository-architecture-scaffold
+produces:
+  - work_items:M07-command-namespace-contract
+summary: >
+  Establish the ow command namespace as the stable user-facing workflow command
+  contract and remove the build- prefix from workflow command triggers.
+problem: >
+  Existing workflow commands use mixed names such as /build-vision,
+  /build-prototype, and /run-team. That naming leaks implementation history
+  into the user journey, makes future command and skill design less precise,
+  and risks spreading legacy names through newly generated adapter files and
+  repo-local skill content.
+goals:
+  - Define a canonical command registry with namespace ow.
+  - Use short user-facing triggers such as /ow:context, /ow:vision, /ow:validation, and /ow:prototype.
+  - Generate Codex command files from the registry instead of hardcoded build-* names.
+  - Record canonical command triggers and physical adapter paths in the Codex manifest.
+  - Update current repo-local skill and protocol references away from legacy triggers such as /build-* and /run-team.
+non_goals:
+  - Do not deepen the behavior of each workflow command.
+  - Do not externalize templates from TypeScript strings.
+  - Do not implement non-Codex adapters.
+  - Do not rename repo-local prototype skill folders in this milestone.
+decisions:
+  - The canonical user-facing namespace is ow.
+  - The canonical trigger format is /ow:<command>.
+  - The build- prefix is removed from user-facing command names.
+  - Existing command ids map to shorter stage ids: build-vision becomes vision, build-prototype becomes prototype, and run-team becomes team.
+  - Codex project-local command files use .codex/commands/ow/<command>.md to represent the /ow:<command> namespace.
+affected_paths:
+  - packages/core/src/commands/
+  - packages/adapters/codex/src/
+  - skills/
+  - AGENT.md
+  - references/
+  - scripts/validate_openworkflow.py
+  - changes/M07-command-namespace-contract/
+acceptance:
+  - Command registry declares namespace ow and all canonical workflow command triggers.
+  - Codex adapter generates .codex/commands/ow/*.md files.
+  - Generated command files use /ow:<command> headings and handoffs.
+  - Codex manifest records command ids, triggers, generated paths, and legacy triggers.
+  - Repository references no longer use legacy slash triggers such as /build-vision or /run-team.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null

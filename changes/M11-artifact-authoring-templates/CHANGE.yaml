@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: change:M11-artifact-authoring-templates
+contract_type: change
+title: M11 Artifact authoring templates and active pointers
+status: active
+source_artifacts:
+  - changes/M10-discovery-artifact-contracts/CHANGE.yaml
+  - references/discovery-artifact-contracts.md
+depends_on:
+  - change:M10-discovery-artifact-contracts
+produces:
+  - work_items:M11-artifact-authoring-templates
+  - references/artifact-authoring-templates.md
+summary: >
+  Turn M10 artifact contracts into practical authoring surfaces by adding
+  minimal YAML templates, explicit read policies, and active pointer semantics
+  that let agents resume from the current artifact without scanning folders.
+problem: >
+  M10 defines artifact contracts, but agents still need to invent field order,
+  load budgets, and current-artifact pointer rules. That leaves too much room
+  for verbose artifacts, inconsistent status transitions, and unnecessary
+  context loading.
+goals:
+  - Generate minimal YAML templates for vision_session, validation_target, prototype_evidence, and decision_record.
+  - Add read policy and context budget metadata to artifact contracts.
+  - Define active pointer semantics for current_session, current_validation, current_prototype, and current_decision.
+  - Update validators to ensure non-null active pointers reference existing indexed artifacts.
+  - Render template and read policy guidance into generated discovery commands.
+non_goals:
+  - Do not implement HTML review generation.
+  - Do not add a full JSON Schema validation dependency.
+  - Do not change the public /ow:* command namespace.
+  - Do not deepen production spec/change/team artifacts.
+decisions:
+  - Templates are generated under stage-local `_templates/` directories.
+  - Templates are authoring aids, not active workflow artifacts.
+  - Current pointers may be null in a new repo, but when set they must match an indexed artifact id and existing path.
+  - Agents should treat YAML templates as field order and brevity guidance.
+affected_paths:
+  - packages/core/src/artifacts/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - schemas/
+  - scripts/validate_openworkflow.py
+  - references/artifact-authoring-templates.md
+  - changes/M11-artifact-authoring-templates/
+acceptance:
+  - M11 change artifacts include a task breakdown and TODO list.
+  - init writes stage-local YAML templates for all discovery artifact types.
+  - Artifact contract audit file includes template_path, read_policy, context_budget, and active_pointer fields.
+  - Generated discovery commands show template path and read policy for their artifact contracts.
+  - Validators enforce required template files and active pointer consistency when pointers are set.
+  - npm run build, smoke init, sync, doctor, CLI validate, and root validation pass.
+validation:
+  - npm run build
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm run validate
+updated_at: null

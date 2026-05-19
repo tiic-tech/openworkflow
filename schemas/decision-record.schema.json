@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/decision-record.schema.json",
+  "title": "OpenWorkflow Decision Record Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "artifact_type",
+    "title",
+    "status",
+    "reviewed_evidence",
+    "outcome",
+    "rationale",
+    "accepted_scope",
+    "rejected_scope",
+    "revision_scope",
+    "next_command",
+    "follow_up_questions"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "decision"
+    },
+    "artifact_type": {
+      "const": "decision_record"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "reviewed_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "continue",
+        "revise",
+        "pivot",
+        "stop",
+        "needs_more_evidence"
+      ]
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "accepted_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rejected_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "revision_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "follow_up_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

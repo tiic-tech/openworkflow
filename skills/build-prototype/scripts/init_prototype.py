@@ -99,7 +99,7 @@ def todo_yaml(args: argparse.Namespace, prototype_id: str, artifact_path: str) -
             f"  path: {artifact_path}",
             f"  type: {args.artifact_type}",
             "decision_handoff:",
-            "  target: build-decision",
+            "  target: /ow:decision",
             "  requires_user_review: true",
             "result_artifact: RESULT.md",
             "evidence_artifact: EVIDENCE.md",
@@ -140,7 +140,7 @@ Validation source: `{args.validation_contract}`
 
 ## Decision Handoff
 
-After local review, use `/build-decision` to record whether this prototype
+After local review, use `/ow:decision` to record whether this prototype
 supports `continue`, `pivot`, `stop`, or `needs_more_evidence`.
 """
 
@@ -154,7 +154,7 @@ Status: pending user review
 
 ## Outcome
 
-Pending. Do not create production specs or changes until `/build-decision`
+Pending. Do not create production specs or changes until `/ow:decision`
 records the outcome.
 """
 
@@ -258,4 +258,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: change:M08-engineering-skill-reference-research
+contract_type: change
+title: M08 Engineering skill reference research
+status: active
+source_artifacts:
+  - changes/M07-command-namespace-contract/CHANGE.yaml
+  - https://github.com/mattpocock/skills/tree/main/skills/engineering
+depends_on:
+  - change:M07-command-namespace-contract
+produces:
+  - work_items:M08-engineering-skill-reference-research
+  - references/engineering-skill-reference-research.md
+summary: >
+  Study mattpocock/skills engineering workflows as an external reference before
+  deepening OpenWorkflow command protocols, so M09 can adopt useful skill design
+  patterns without losing OpenWorkflow's contract-first architecture.
+problem: >
+  M07 established the /ow:* command namespace, but M09 will deepen the actual
+  command protocols. Before writing those protocols, OpenWorkflow needs a
+  focused external comparison against a mature set of small engineering skills
+  to avoid inventing from scratch and to clarify which patterns should be
+  adopted, adapted, or rejected.
+goals:
+  - Clone and inspect mattpocock/skills engineering skills locally.
+  - Identify reusable skill design patterns for OpenWorkflow.
+  - Identify patterns that conflict with OpenWorkflow's contract-first goals.
+  - Produce a concise reference document that M09 can consume directly.
+  - Keep M08 research-only; no command behavior changes.
+non_goals:
+  - Do not copy third-party skill content into OpenWorkflow commands.
+  - Do not deepen /ow:vision, /ow:validation, /ow:prototype, or /ow:decision in M08.
+  - Do not add issue tracker integration.
+  - Do not adopt GitHub issue workflows as OpenWorkflow's core artifact model.
+decisions:
+  - Treat mattpocock/skills as design inspiration, not as a template source.
+  - Prefer small, composable command protocols with explicit anti-patterns.
+  - Preserve .openworkflow contracts as the source of truth.
+  - Defer discovery-loop protocol depth to M09.
+affected_paths:
+  - references/engineering-skill-reference-research.md
+  - AGENT.md
+  - scripts/validate_openworkflow.py
+  - changes/M08-engineering-skill-reference-research/
+acceptance:
+  - Reference project is cloned to /tmp/mattpocock-skills and inspected.
+  - Research document summarizes the engineering skills and their distinguishing patterns.
+  - Research document states what OpenWorkflow should adopt, adapt, and reject.
+  - Research document gives concrete M09 implications for /ow:vision, /ow:validation, /ow:prototype, and /ow:decision.
+  - npm run validate passes.
+validation:
+  - npm run validate
+updated_at: null

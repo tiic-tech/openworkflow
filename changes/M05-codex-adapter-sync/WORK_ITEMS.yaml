@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: work_items:M05-codex-adapter-sync
+contract_type: work_items
+title: M05 Codex adapter sync work items
+status: active
+change_contract: changes/M05-codex-adapter-sync/CHANGE.yaml
+items:
+  - task_id: M05-T001
+    title: Add Codex adapter template registry
+    status: done
+    depends_on: []
+    owned_paths:
+      - packages/adapters/codex/src/templates.ts
+      - packages/adapters/codex/src/generateCodexAdapter.ts
+    acceptance:
+      - Codex generated commands, skill dispatcher, and agent notes are defined through template ids.
+  - task_id: M05-T002
+    title: Add generated markers and adapter manifest
+    status: done
+    depends_on:
+      - M05-T001
+    owned_paths:
+      - packages/adapters/codex/src/generateCodexAdapter.ts
+      - packages/core/src/initOpenWorkflow.ts
+    acceptance:
+      - Generated .codex files and .openworkflow/adapters/codex.yaml record adapter version, template identity, and source-of-truth policy.
+  - task_id: M05-T003
+    title: Add CLI sync command
+    status: done
+    depends_on:
+      - M05-T001
+      - M05-T002
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/adapters/codex/src/generateCodexAdapter.ts
+    acceptance:
+      - openworkflow sync --tools codex regenerates project-local adapter files without overwriting unmarked user files by default.
+  - task_id: M05-T004
+    title: Add CLI doctor command
+    status: done
+    depends_on:
+      - M05-T001
+      - M05-T002
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/adapters/codex/src/generateCodexAdapter.ts
+    acceptance:
+      - openworkflow doctor --tools codex detects missing or stale generated adapter files.
+  - task_id: M05-T005
+    title: Verify M05 behavior
+    status: done
+    depends_on:
+      - M05-T001
+      - M05-T002
+      - M05-T003
+      - M05-T004
+    owned_paths:
+      - changes/M05-codex-adapter-sync/ACCEPTANCE.md
+    acceptance:
+      - Build, smoke init, sync, doctor, CLI validate, and root validation pass.
+updated_at: null
