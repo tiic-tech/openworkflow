@@ -1,0 +1,79 @@
+schema_version: 0.1.0
+contract_id: change:M17-tune-orchestration-internal-decision
+contract_type: change
+title: M17 Tune orchestration with internal decision audit
+status: proposed
+source_artifacts:
+  - changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml
+  - changes/M16-prototype-creation-skill-upgrade/OPEN_DESIGN_RESEARCH.md
+depends_on:
+  - change:M16-prototype-creation-skill-upgrade
+produces:
+  - work_items:M17-tune-orchestration-internal-decision
+summary: >
+  Add /ow:tune as the user-facing prototype iteration command and make
+  /ow:decision an internal audit command that is automatically written by proto
+  and tune flows. Tune should reduce user friction by orchestrating prototype
+  creation or revision plus decision audit recording without requiring users to
+  manually switch between proto and decision commands.
+problem: >
+  The current discovery loop asks users to manually move between /ow:proto and
+  /ow:decision even when they are only trying to refine the current prototype.
+  This makes iteration feel mechanical, exposes an audit-only command as a user
+  workflow step, and increases the chance that decision records are skipped or
+  written inconsistently. M16 improved prototype creation quality, but it did
+  not address the command-level ergonomics of repeated prototype tuning.
+goals:
+  - Add /ow:tune as the primary user-facing command for prototype revision.
+  - Make /ow:decision internal/audit-only for normal discovery handoffs while preserving the decision artifact contract.
+  - Have /ow:proto automatically write or update a decision audit record after prototype evidence is created or revised.
+  - Have /ow:tune automatically write or update a decision audit record after each tuning pass.
+  - Let /ow:tune default to the current prototype target.
+  - Let /ow:tune:proto explicitly tune the current prototype and invoke /ow:proto behavior when no current prototype exists but a validation target exists.
+  - Support /ow:tune:<target> for future explicit artifact targets without forcing all target implementations in this change.
+  - Extend decision outcomes to distinguish revision loops from accepted, pivoted, stopped, or insufficient-evidence states.
+  - Keep user-visible handoffs focused on tune, design, validation, or spec rather than manual decision.
+non_goals:
+  - Do not remove decision artifacts or the decision contract.
+  - Do not make /ow:decision disappear from internal registries or validators.
+  - Do not implement a full multi-artifact tune router for every future target in this change.
+  - Do not change M15 vision/design conversation-first behavior.
+  - Do not turn tune into production implementation, specs, changes, or team execution.
+  - Do not make tune bypass validation scope or accepted prototype evidence requirements.
+decisions:
+  - /ow:tune is the user-facing orchestration command for prototype iteration.
+  - /ow:decision becomes internal/audit-only in the normal command surface; users should not need to invoke it manually.
+  - /ow:proto and /ow:tune must record decision audit artifacts automatically when evidence changes or when a user accepts/rejects/requests revision.
+  - /ow:tune defaults to current prototype; /ow:tune:proto is an explicit alias for that same path.
+  - If /ow:tune or /ow:tune:proto is invoked with no current prototype but with a current validation target, tune should orchestrate prototype creation through proto behavior.
+  - Decision outcome should include revise to represent user-requested iteration that is not a rejection and not merely missing evidence.
+  - Generated skills must keep OpenSpec-style XML output isolation, including private inner thinking and user-visible response boundaries.
+affected_paths:
+  - packages/core/src/commands/
+  - packages/core/src/artifacts/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - packages/cli/src/dev/
+  - schemas/
+  - references/
+  - changes/M17-tune-orchestration-internal-decision/
+acceptance:
+  - Generated Codex surface includes ow-tune as a repo-local skill.
+  - Generated ow-tune skill uses XML output-isolation sections and defaults to tuning the current prototype.
+  - /ow:tune and /ow:tune:proto can orchestrate /ow:proto behavior when no current prototype exists but a validation target exists.
+  - /ow:tune:<target> has a defined routing contract, even if only prototype target is implemented in M17.
+  - /ow:decision remains available as an internal audit command but is not presented as a normal user handoff from proto or tune.
+  - /ow:proto and /ow:tune protocols require automatic decision audit recording after evidence creation, revision, acceptance, rejection, or revise requests.
+  - Decision artifact outcomes include revise and validators accept it.
+  - Runtime surface verification checks ow-tune generation, internal decision behavior, and absence of manual decision handoff from normal proto/tune paths.
+  - Existing OpenWorkflow validation, sync, doctor, runtime surface checks, and M16 prototype evidence validation continue to pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: 2026-05-19
