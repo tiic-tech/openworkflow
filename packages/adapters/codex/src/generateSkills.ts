@@ -55,10 +55,14 @@ ${commandDoc(command)}
 
 function codexSkillInterface(command: WorkflowCommand): string {
   return `interface:
-  display_name: ${yamlString(command.trigger)}
+  display_name: ${yamlString(displayName(command))}
   short_description: ${yamlString(command.visibility === "internal" ? `${command.description} Internal audit only.` : command.description)}
   default_prompt: ${yamlString(`Use ${command.trigger} for this OpenWorkflow repository.`)}
 `;
+}
+
+function displayName(command: WorkflowCommand): string {
+  return command.trigger.startsWith("/") ? command.trigger.slice(1) : command.trigger;
 }
 
 function yamlString(value: string): string {

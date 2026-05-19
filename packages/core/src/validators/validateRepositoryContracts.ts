@@ -100,6 +100,8 @@ const REQUIRED_FILES = [
   "changes/M17-tune-orchestration-internal-decision/WORK_ITEMS.yaml",
   "changes/M18-e2e-friction-fixes/CHANGE.yaml",
   "changes/M18-e2e-friction-fixes/WORK_ITEMS.yaml",
+  "changes/M19-command-display-label-cleanup/CHANGE.yaml",
+  "changes/M19-command-display-label-cleanup/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

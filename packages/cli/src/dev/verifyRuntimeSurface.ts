@@ -146,9 +146,17 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-design") {
       verifyDesignSkill(skillContent);
     }
-    assert(interfaceContent.includes("display_name:"), `${name} missing display name`);
+    const semanticCommand = `/${name.replace("ow-", "ow:")}`;
+    const displayName = semanticCommand.slice(1);
+    assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
+    assert(!hasYamlScalar(interfaceContent, "display_name", semanticCommand), `${name} display name includes semantic slash`);
+    assert(skillContent.includes(`Semantic command: ${semanticCommand}`), `${name} missing semantic command`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
   }
+}
+
+function hasYamlScalar(content: string, key: string, value: string): boolean {
+  return content.includes(`${key}: ${value}`) || content.includes(`${key}: "${value}"`);
 }
 
 function verifyVisionSkill(content: string): void {

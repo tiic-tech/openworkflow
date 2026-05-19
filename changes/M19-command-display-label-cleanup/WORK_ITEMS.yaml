@@ -1,0 +1,38 @@
+schema_version: 0.1.0
+contract_id: work_items:M19-command-display-label-cleanup
+contract_type: work_items
+title: M19 Command display label cleanup work items
+status: completed
+change_contract: changes/M19-command-display-label-cleanup/CHANGE.yaml
+items:
+  - task_id: M19-T001
+    title: Generate slashless Codex display names
+    status: completed
+    depends_on: []
+    owned_paths:
+      - packages/adapters/codex/src/
+    acceptance:
+      - display_name uses ow:<id>.
+      - Semantic command docs still use /ow:<id>.
+      - Explicit invocation remains $ow-<id>.
+  - task_id: M19-T002
+    title: Add runtime verification for display labels
+    status: completed
+    depends_on:
+      - M19-T001
+    owned_paths:
+      - packages/cli/src/dev/
+    acceptance:
+      - Runtime surface verification rejects `display_name: /ow:`.
+      - Runtime surface verification confirms at least one `display_name: ow:` per generated skill interface.
+  - task_id: M19-T003
+    title: Validate display cleanup
+    status: completed
+    depends_on:
+      - M19-T002
+    owned_paths:
+      - changes/M19-command-display-label-cleanup/
+    acceptance:
+      - Full validation command list passes.
+      - M19 change work items are marked completed.
+updated_at: 2026-05-19
