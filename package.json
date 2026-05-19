@@ -1,6 +1,6 @@
 {
   "name": "@tiic-tech/openworkflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Contract-first workflow system for AI-assisted software development.",
   "license": "MIT",
   "repository": {
@@ -37,8 +37,9 @@
     "validate": "npm run build && node dist/cli/src/dev/validateRepositoryContractsCli.js --root .",
     "verify:runtime-surface": "npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js",
     "verify:e2e-workflow": "npm run build && node dist/cli/src/dev/verifyWorkflowE2E.js",
+    "verify:clean": "npm run build && node dist/cli/src/dev/verifyCleanCommand.js",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run validate && npm run verify:runtime-surface && npm run verify:e2e-workflow",
+    "prepublishOnly": "npm run validate && npm run verify:runtime-surface && npm run verify:e2e-workflow && npm run verify:clean",
     "validate:cli": "node dist/cli/src/index.js validate --root /tmp/openworkflow-m04-smoke",
     "smoke:init": "node dist/cli/src/index.js init /tmp/openworkflow-m04-smoke --tools codex --force"
   },
