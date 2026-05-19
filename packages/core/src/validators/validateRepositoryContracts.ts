@@ -94,6 +94,8 @@ const REQUIRED_FILES = [
   "changes/M14-python-to-typescript-script-migration/LEGACY_SKILL_SCRIPTS.md",
   "changes/M15-interactive-vision-design-flow/CHANGE.yaml",
   "changes/M15-interactive-vision-design-flow/WORK_ITEMS.yaml",
+  "changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml",
+  "changes/M16-prototype-creation-skill-upgrade/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

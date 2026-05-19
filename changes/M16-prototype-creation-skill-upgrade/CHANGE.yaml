@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: change:M16-prototype-creation-skill-upgrade
+contract_type: change
+title: M16 Prototype creation skill upgrade
+status: active
+source_artifacts:
+  - changes/M15-interactive-vision-design-flow/CHANGE.yaml
+  - changes/M16-prototype-creation-skill-upgrade/OPEN_DESIGN_RESEARCH.md
+  - /Users/archy/Projects/GitClone/open-design@75498838a911d5d7ab4299ac817774ab5e560824
+depends_on:
+  - change:M15-interactive-vision-design-flow
+produces:
+  - work_items:M16-prototype-creation-skill-upgrade
+summary: >
+  Upgrade /ow:proto from a runnable-proof generator into a design-capable
+  prototype creation workflow that can choose the right prototype mode,
+  establish visual direction before implementation, use reference extraction
+  and image-generation for high-fidelity first passes, and self-critique before
+  handing evidence to users.
+problem: >
+  Current prototype creation can produce runnable HTML evidence, but its visual
+  judgment, problem decomposition, and UX execution are inconsistent. It tends
+  to jump into implementation before establishing a high-fidelity direction,
+  especially for visual or product-experience prototypes. This creates long
+  proto/decision loops, makes users carry too much art direction manually, and
+  weakens downstream evidence.
+goals:
+  - Rewrite /ow:proto skill protocol around prototype-mode classification and design planning.
+  - For visual-first prototypes, require a high-fidelity static image concept before HTML implementation unless the user explicitly skips it.
+  - Use image generation as the default first visual pass for aesthetic direction, layout mood, and material/brand exploration.
+  - Require reference-pattern extraction when the user provides a target image, URL, screenshot, or HTML/CSS source.
+  - Introduce design-system and template-seed concepts so agents do not design every prototype from a blank page.
+  - Add a self-critique loop covering philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior.
+  - Record visual concept evidence and implementation evidence distinctly in prototype artifacts.
+  - Preserve scope discipline: do not turn prototypes into production apps, persistence, auth, or specs unless the validation question requires it.
+non_goals:
+  - Do not implement /ow:tune in this change.
+  - Do not change vision/design conversation-first behavior from M15.
+  - Do not add a full design-system registry or template marketplace in this change.
+  - Do not require image generation for logic-only, data-flow, API, or technical feasibility prototypes.
+  - Do not create production design specs from unaccepted prototype evidence.
+decisions:
+  - /ow:proto must first classify the prototype as visual, interaction, technical feasibility, 3D/material, workflow, or data/logic.
+  - Visual and product-experience prototypes should normally produce a high-fidelity static concept before HTML.
+  - Reference inputs are first-class evidence and should be analyzed before new visual work begins.
+  - Image concepts, reference analyses, screenshots, runnable HTML, logs, and self-critique reports should be separate evidence entries.
+  - Open Design's design-system, template-seed, checklist, and critique patterns are useful references, but M16 will adapt them to OpenWorkflow rather than copy Open Design's full daemon architecture.
+affected_paths:
+  - packages/core/src/artifacts/
+  - packages/core/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - schemas/
+  - references/
+  - changes/M16-prototype-creation-skill-upgrade/
+acceptance:
+  - Generated ow-proto skill starts with prototype-mode classification before implementation.
+  - Visual-first prototype paths require a static high-fidelity concept pass using image generation unless the user explicitly asks to skip.
+  - User-provided images, URLs, screenshots, or HTML/CSS sources trigger reference-pattern extraction before visual generation or HTML implementation.
+  - ow-proto protocol distinguishes visual concept evidence from runnable implementation evidence.
+  - ow-proto includes a design self-critique checkpoint with explicit dimensions and repair behavior before handoff.
+  - Artifact contracts and templates can record static concept assets, reference analysis, browser screenshots, verification logs, and known limits.
+  - Runtime surface verification checks generated ow-proto includes the new creative workflow guidance.
+  - Existing OpenWorkflow validation, sync, doctor, and runtime surface checks pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: null
