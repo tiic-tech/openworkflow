@@ -8,6 +8,8 @@ import type { ValidationResult } from "./validateOpenWorkflow.js";
 
 const REQUIRED_FILES = [
   "AGENT.md",
+  "README.md",
+  "LICENSE",
   "build_system_vision.md",
   "references/contract-graph.md",
   "references/npm-cli-architecture.md",
@@ -105,6 +107,8 @@ const REQUIRED_FILES = [
   "changes/M19-command-display-label-cleanup/WORK_ITEMS.yaml",
   "changes/M20-workflow-e2e-regression/CHANGE.yaml",
   "changes/M20-workflow-e2e-regression/WORK_ITEMS.yaml",
+  "changes/M21-npm-package-release-readiness/CHANGE.yaml",
+  "changes/M21-npm-package-release-readiness/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

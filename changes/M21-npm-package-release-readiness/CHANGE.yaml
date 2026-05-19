@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: change:M21-npm-package-release-readiness
+contract_type: change
+title: M21 npm package release readiness
+status: completed
+source_artifacts:
+  - changes/M20-workflow-e2e-regression/CHANGE.yaml
+depends_on:
+  - change:M20-workflow-e2e-regression
+produces:
+  - work_items:M21-npm-package-release-readiness
+summary: >
+  Prepare OpenWorkflow for its first public npm release under the scoped package
+  name @tiic-tech/openworkflow while preserving the installed openworkflow CLI
+  command.
+problem: >
+  The unscoped openworkflow npm package name is already occupied on the public
+  registry, so the project cannot publish as openworkflow@0.1.0. The package
+  also needs public scoped-package metadata and a README before release.
+goals:
+  - Rename the npm package to @tiic-tech/openworkflow.
+  - Preserve the openworkflow binary command.
+  - Add public scoped publish configuration.
+  - Add GitHub repository, bugs, homepage, keyword, and MIT license metadata.
+  - Add a README with install, CLI usage, and release check instructions.
+  - Add npm lifecycle checks so pack rebuilds dist and publish runs core validation.
+  - Verify build, repository validation, runtime surface, E2E workflow, smoke, and pack dry-run.
+non_goals:
+  - Do not publish to npm in this change.
+  - Do not publish to npm before release approval.
+  - Do not change CLI command semantics or generated runtime contracts.
+decisions:
+  - Use @tiic-tech/openworkflow because the unscoped openworkflow package name is already taken.
+  - Keep bin.openworkflow so users install the scoped package but run openworkflow.
+  - Use publishConfig.access public for the scoped package.
+  - Use MIT after explicit owner approval.
+affected_paths:
+  - package.json
+  - package-lock.json
+  - LICENSE
+  - README.md
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M21-npm-package-release-readiness/
+acceptance:
+  - package.json name is @tiic-tech/openworkflow.
+  - package.json keeps bin.openworkflow.
+  - package.json has publishConfig.access public.
+  - package metadata points to tiic-tech/openworkflow on GitHub.
+  - LICENSE contains the MIT license.
+  - README documents install and basic CLI usage.
+  - npm pack rebuilds dist through prepack.
+  - npm publish runs core validation through prepublishOnly.
+  - npm pack --dry-run succeeds and reports @tiic-tech/openworkflow@0.1.0.
+  - Existing validation, runtime surface, workflow E2E, smoke, sync, doctor, and CLI validation pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+  - npm pack --dry-run
+updated_at: 2026-05-19
