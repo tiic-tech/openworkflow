@@ -7,6 +7,7 @@ export interface WorkflowCommand {
   legacyTriggers: string[];
   description: string;
   stage: string;
+  visibility: "user" | "internal";
   targetArtifacts: string[];
   protocol?: CommandProtocol;
 }
@@ -69,12 +70,21 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     prototypeProtocol(),
   ),
   command(
+    "tune",
+    ["ow:tune:proto"],
+    "Revise the current prototype and record the decision audit automatically.",
+    "prototype",
+    [".openworkflow/prototypes/", ".openworkflow/decisions/"],
+    tuneProtocol(),
+  ),
+  command(
     "decision",
     ["build-decision"],
-    "Record user review outcomes and decide whether the current evidence is accepted.",
+    "Internally record prototype review outcomes for audit.",
     "decision",
     [".openworkflow/decisions/"],
     decisionProtocol(),
+    "internal",
   ),
   command(
     "design",
@@ -106,6 +116,7 @@ function command(
   stage: string,
   targetArtifacts: string[],
   protocol?: CommandProtocol,
+  visibility: WorkflowCommand["visibility"] = "user",
 ): WorkflowCommand {
   return {
     id,
@@ -114,6 +125,7 @@ function command(
     legacyTriggers: legacyIds.map((legacyId) => `/${legacyId}`),
     description,
     stage,
+    visibility,
     targetArtifacts,
     protocol,
   };
@@ -227,6 +239,10 @@ function prototypeProtocol(): CommandProtocol {
       ".openworkflow/prototypes/<id>/NOTE.md",
       ".openworkflow/prototypes/<id>/review.html",
       ".openworkflow/prototypes/<id>/evidence/**",
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+      ".openworkflow/decisions/<id>/DECISION.yaml",
+      ".openworkflow/decisions/<id>/NOTE.md",
+      ".openworkflow/decisions/<id>/review.html",
     ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
@@ -243,6 +259,7 @@ function prototypeProtocol(): CommandProtocol {
       ],
       after: [
         "Record reference analysis, static concept evidence, runnable implementation evidence, verification, self-critique, and known limits separately.",
+        "Write a decision audit record internally after prototype evidence changes.",
         "Write evidence and result artifacts.",
         "Confirm no design, spec, change, team, persistence, or production hardening was created.",
       ],
@@ -254,6 +271,7 @@ function prototypeProtocol(): CommandProtocol {
       "Do not polish the prototype into production code.",
       "Do not add persistence unless persistence is the validation question.",
       "Do not create design, specs, changes, or teams from unaccepted prototype work.",
+      "Do not ask the user to manually invoke /ow:decision after prototype work; record the decision audit internally.",
     ],
     internalSections: [
       {
@@ -314,15 +332,116 @@ function prototypeProtocol(): CommandProtocol {
           "Record critique findings and repairs as compact evidence references or YAML summary fields.",
         ],
       },
+      {
+        tag: "internal_decision_audit",
+        items: [
+          "After creating or revising prototype evidence, write or update a decision audit record without asking the user to invoke /ow:decision.",
+          "Use revise when the user asks for another tuning pass, continue when the user explicitly accepts evidence for design, pivot or stop when explicitly directed, and needs_more_evidence when evidence is inconclusive.",
+          "Keep decision audit output in .openworkflow/decisions/** and do not expose internal bookkeeping as the user-facing workflow step.",
+        ],
+      },
     ],
-    handoffCommands: ["/ow:decision", "/ow:design", "/ow:validation"],
+    handoffCommands: ["/ow:tune", "/ow:design", "/ow:validation"],
+  };
+}
+
+function tuneProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "prototype-revision-orchestration",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/validation/VALIDATION_INDEX.yaml",
+      ".openworkflow/validation/**/VALIDATION.yaml",
+      ".openworkflow/prototypes/**/EVIDENCE.yaml",
+      ".openworkflow/prototypes/**/NOTE.md",
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+      ".openworkflow/decisions/**/DECISION.yaml",
+      "package.json",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
+    allowedOutputs: [
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+      ".openworkflow/prototypes/<id>/NOTE.md",
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/prototypes/<id>/evidence/**",
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+      ".openworkflow/decisions/<id>/DECISION.yaml",
+      ".openworkflow/decisions/<id>/NOTE.md",
+      ".openworkflow/decisions/<id>/review.html",
+    ],
+    forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    auditCheckpoints: {
+      before: [
+        "Resolve tune target: /ow:tune and /ow:tune:proto default to the current prototype.",
+        "If no current prototype exists but a current validation target exists, orchestrate prototype creation through /ow:proto behavior.",
+        "Load only the current prototype evidence, relevant validation target, and latest decision audit context.",
+      ],
+      during: [
+        "Apply exactly one focused revision loop from user feedback.",
+        "Preserve M16 prototype evidence separation for concept, implementation, verification, self-critique, and known limits.",
+        "Run required verification for changed rendered artifacts.",
+        "Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.",
+      ],
+      after: [
+        "Write updated prototype evidence and review artifacts.",
+        "Write or update the internal decision audit record.",
+        "Show the user only the tuning result, unresolved question if any, and the next user-facing command.",
+      ],
+    },
+    antiPatterns: [
+      "Do not ask the user to manually invoke /ow:decision during a tune loop.",
+      "Do not restart full prototype discovery when a focused revision is enough.",
+      "Do not create design, specs, changes, or runtime work from unaccepted tune evidence.",
+      "Do not tune outside the current validation scope unless the user explicitly changes the target or validation.",
+    ],
+    internalSections: [
+      {
+        tag: "target_resolution",
+        items: [
+          "/ow:tune resolves to the current prototype by default.",
+          "/ow:tune:proto is an explicit alias for tuning the current prototype.",
+          "/ow:tune:<target> reserves routing for explicit future artifact targets; in M17, implement prototype target behavior and record unsupported targets as unresolved.",
+        ],
+      },
+      {
+        tag: "proto_orchestration",
+        items: [
+          "When no current prototype exists but a current validation target exists, use /ow:proto behavior to create the first prototype evidence before tuning.",
+          "When a current prototype exists, revise it in place unless the user explicitly requests a new prototype branch.",
+          "Keep the revision scoped to the user's feedback and the active validation question.",
+        ],
+      },
+      {
+        tag: "revision_protocol",
+        items: [
+          "Treat user feedback as the tune brief; ask one clarifying question only when the requested revision is ambiguous or unsafe.",
+          "Update the smallest artifact set needed: prototype evidence, note, review surface, and evidence files.",
+          "Preserve visual concept policy, evidence refs, verification, and self-critique integrity from the prototype evidence contract.",
+        ],
+      },
+      {
+        tag: "internal_decision_audit",
+        items: [
+          "Every tune pass must write or update a decision audit record internally.",
+          "Use outcome revise when the user asks for another iteration, continue when the user explicitly accepts the prototype for design, pivot or stop when explicitly directed, and needs_more_evidence when evidence is inconclusive.",
+          "Do not expose /ow:decision as the next manual user step; expose /ow:tune, /ow:design, or /ow:validation as appropriate.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:tune", "/ow:design", "/ow:validation"],
   };
 }
 
 function decisionProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "review-and-record",
+    interactionMode: "internal-audit-recording",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -330,8 +449,7 @@ function decisionProtocol(): CommandProtocol {
     ],
     optionalContext: [
       ".openworkflow/decisions/DECISION_INDEX.yaml",
-      ".openworkflow/prototypes/**/RESULT.md",
-      ".openworkflow/prototypes/**/EVIDENCE.md",
+      ".openworkflow/prototypes/**/EVIDENCE.yaml",
       ".openworkflow/validation/**/VALIDATION.yaml",
     ],
     forbiddenContext: [".openworkflow/runtime/**"],
@@ -344,16 +462,27 @@ function decisionProtocol(): CommandProtocol {
     ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
-      before: ["Confirm prototype evidence exists.", "Load only prototype result and decision index context."],
-      during: ["Record user review outcome as continue, pivot, stop, or needs_more_evidence.", "Keep only decision-rich evidence."],
-      after: ["Write the decision record.", "Authorize /ow:design only when outcome is continue."],
+      before: ["Confirm prototype evidence exists.", "Load only prototype evidence, user feedback summary, and decision index context."],
+      during: ["Record audit outcome as continue, revise, pivot, stop, or needs_more_evidence.", "Keep only decision-rich evidence."],
+      after: ["Write the decision record.", "Authorize /ow:design only when outcome is continue.", "Return control to the user-facing proto or tune command."],
     },
     antiPatterns: [
       "Do not infer acceptance without user review or explicit evidence.",
       "Do not create design, specs, or changes during decision capture.",
       "Do not leave unresolved prototype evidence as accepted.",
+      "Do not present /ow:decision as a normal user handoff; this is an internal audit command.",
     ],
-    handoffCommands: ["/ow:design", "/ow:proto", "/ow:vision"],
+    internalSections: [
+      {
+        tag: "internal_audit_only",
+        items: [
+          "/ow:decision is preserved for durable audit records, not as a normal user-facing workflow step.",
+          "Proto and tune flows invoke this audit behavior internally after evidence changes or user review outcomes.",
+          "Visible user handoffs should name /ow:tune, /ow:design, /ow:validation, or /ow:vision instead of asking for manual /ow:decision.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:design", "/ow:tune", "/ow:validation", "/ow:vision"],
   };
 }
 

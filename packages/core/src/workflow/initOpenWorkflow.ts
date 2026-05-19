@@ -113,6 +113,7 @@ function commandAuditIndex(options: InitOptions): string {
       id: command.id,
       trigger: command.trigger,
       stage: command.stage,
+      visibility: command.visibility,
       depth: command.protocol?.depth ?? "shallow",
       context_packet: `context:${command.id}`,
       allowed_outputs: command.protocol?.allowedOutputs ?? command.targetArtifacts,
@@ -130,6 +131,7 @@ function contextPackets(options: InitOptions): string {
     packets: getWorkflowCommands().map((command) => ({
       packet_id: `context:${command.id}`,
       command: command.trigger,
+      visibility: command.visibility,
       required: command.protocol?.requiredContext ?? [".openworkflow/workflow/WORKFLOW_INDEX.yaml"],
       optional: command.protocol?.optionalContext ?? [],
       forbidden: command.protocol?.forbiddenContext ?? [],

@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M17-tune-orchestration-internal-decision
 contract_type: work_items
 title: M17 Tune orchestration with internal decision audit work items
-status: proposed
+status: completed
 change_contract: changes/M17-tune-orchestration-internal-decision/CHANGE.yaml
 items:
   - task_id: M17-T001
     title: Define tune command model and target routing
-    status: pending
+    status: completed
     depends_on: []
     owned_paths:
       - changes/M17-tune-orchestration-internal-decision/
@@ -20,7 +20,7 @@ items:
       - Tune does not create specs, changes, runtime work, auth, or persistence unless already in prototype validation scope.
   - task_id: M17-T002
     title: Convert decision to internal audit behavior
-    status: pending
+    status: completed
     depends_on:
       - M17-T001
     owned_paths:
@@ -35,7 +35,7 @@ items:
       - Internal decision guidance stays XML-wrapped and output-isolated.
   - task_id: M17-T003
     title: Extend decision artifact outcomes for tune loops
-    status: pending
+    status: completed
     depends_on:
       - M17-T002
     owned_paths:
@@ -48,7 +48,7 @@ items:
       - Decision templates explain when revise differs from needs_more_evidence.
   - task_id: M17-T004
     title: Generate Codex ow-tune skill
-    status: pending
+    status: completed
     depends_on:
       - M17-T001
       - M17-T002
@@ -62,7 +62,7 @@ items:
       - ow-tune skill includes <user_behavior>, <agent_protocol>, <inner_thinking>, and tune-specific XML sections.
   - task_id: M17-T005
     title: Update runtime verification and E2E coverage
-    status: pending
+    status: completed
     depends_on:
       - M17-T003
       - M17-T004

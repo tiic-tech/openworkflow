@@ -113,14 +113,15 @@ Validation notes:
 
 ### decision_record
 
-Produced by `/ow:decision`.
+Produced internally by `/ow:decision` through `/ow:proto` or `/ow:tune`.
 
 Source of truth path:
 `.openworkflow/decisions/<id>/DECISION.yaml`
 
 Purpose:
-Record the user-reviewed outcome of the prototype loop and the authorized next
-command.
+Record the user-reviewed or tune-reviewed outcome of the prototype loop and the
+authorized next user-facing command. This is an audit artifact; users should not
+need to invoke `/ow:decision` manually during normal proto/tune loops.
 
 Required facts:
 
@@ -129,8 +130,17 @@ Required facts:
 - rationale
 - accepted scope
 - rejected scope
+- revision scope
 - next command
 - follow-up questions
+
+Outcome values:
+
+- `continue`: evidence is accepted and may hand off to design.
+- `revise`: user requested another tune pass.
+- `pivot`: user wants to change direction.
+- `stop`: user wants to stop the loop.
+- `needs_more_evidence`: evidence is inconclusive.
 
 ## First-Consumer Rules
 

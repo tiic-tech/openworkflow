@@ -35,9 +35,13 @@ export function legacyCodexSkillPaths(): string[] {
 
 function codexSkill(command: WorkflowCommand): string {
   const skillName = codexSkillName(command);
+  const description =
+    command.visibility === "internal"
+      ? `${command.description} Internal audit skill for ${command.trigger} in OpenWorkflow repositories.`
+      : `${command.description} Use this skill for ${command.trigger} in OpenWorkflow repositories.`;
   return `---
 name: ${yamlString(skillName)}
-description: ${yamlString(`${command.description} Use this skill for ${command.trigger} in OpenWorkflow repositories.`)}
+description: ${yamlString(description)}
 ---
 ${commandDoc(command)}
 
@@ -52,7 +56,7 @@ ${commandDoc(command)}
 function codexSkillInterface(command: WorkflowCommand): string {
   return `interface:
   display_name: ${yamlString(command.trigger)}
-  short_description: ${yamlString(command.description)}
+  short_description: ${yamlString(command.visibility === "internal" ? `${command.description} Internal audit only.` : command.description)}
   default_prompt: ${yamlString(`Use ${command.trigger} for this OpenWorkflow repository.`)}
 `;
 }

@@ -27,6 +27,7 @@ async function main(): Promise<number> {
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
     await verifyDesignContract(target);
+    await verifyTuneDecisionSurface(target);
     await verifyNoDefaultCodexCommands(target);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
@@ -89,13 +90,13 @@ async function verifyConfig(root: string): Promise<void> {
 }
 
 async function verifyNoDefaultPrompts(codexHome: string): Promise<void> {
-  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-design.md", "ow-spec.md"]) {
+  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-tune.md", "ow-design.md", "ow-spec.md"]) {
     assert(!(await exists(join(codexHome, "prompts", name))), `default global prompt generated unexpectedly: ${name}`);
   }
 }
 
 async function verifySkills(root: string): Promise<void> {
-  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-decision", "ow-design", "ow-spec"]) {
+  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-tune", "ow-decision", "ow-design", "ow-spec"]) {
     const skill = join(root, ".agents", "skills", name, "SKILL.md");
     const interfaceFile = join(root, ".agents", "skills", name, "agents", "openai.yaml");
     await assertFile(skill);
@@ -111,6 +112,12 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.includes("<inner_thinking>"), `${name} missing inner thinking block`);
     if (name === "ow-proto") {
       verifyProtoSkill(skillContent);
+    }
+    if (name === "ow-tune") {
+      verifyTuneSkill(skillContent);
+    }
+    if (name === "ow-decision") {
+      verifyDecisionSkill(skillContent);
     }
     assert(interfaceContent.includes("display_name:"), `${name} missing display name`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
@@ -142,6 +149,32 @@ function verifyProtoSkill(content: string): void {
   }
 }
 
+function verifyTuneSkill(content: string): void {
+  for (const required of [
+    "<target_resolution>",
+    "/ow:tune resolves to the current prototype by default.",
+    "/ow:tune:proto is an explicit alias",
+    "<proto_orchestration>",
+    "no current prototype exists but a current validation target exists",
+    "<revision_protocol>",
+    "<internal_decision_audit>",
+    "Every tune pass must write or update a decision audit record internally.",
+    "Do not expose /ow:decision as the next manual user step",
+  ]) {
+    assert(content.includes(required), `ow-tune missing M17 guidance: ${required}`);
+  }
+}
+
+function verifyDecisionSkill(content: string): void {
+  for (const required of [
+    "<command_visibility>internal</command_visibility>",
+    "<internal_audit_only>",
+    "/ow:decision is preserved for durable audit records, not as a normal user-facing workflow step.",
+  ]) {
+    assert(content.includes(required), `ow-decision missing internal audit guidance: ${required}`);
+  }
+}
+
 async function verifyDesignContract(root: string): Promise<void> {
   const commandIndex = await read(join(root, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"));
   assert(commandIndex.includes("trigger: /ow:design"), "command audit missing /ow:design");
@@ -153,6 +186,23 @@ async function verifyDesignContract(root: string): Promise<void> {
   const artifacts = await read(join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   assert(artifacts.includes("artifact_type: product_design"), "artifact contracts missing product_design");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
+}
+
+async function verifyTuneDecisionSurface(root: string): Promise<void> {
+  const commandIndex = await read(join(root, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"));
+  assert(commandIndex.includes("trigger: /ow:tune"), "command audit missing /ow:tune");
+  assert(commandIndex.includes("visibility: internal"), "command audit missing internal command visibility");
+
+  const protoSection = commandIndex.split("trigger: /ow:proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const tuneSection = commandIndex.split("trigger: /ow:tune", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
+  assert(!extractBlock(tuneSection, "handoff_commands").includes("/ow:decision"), "tune exposes manual decision handoff");
+  assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
+  assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
+
+  const artifacts = await read(join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
+  assert(artifacts.includes("revision_scope"), "decision artifact contracts missing revision_scope");
 }
 
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {

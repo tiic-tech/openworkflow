@@ -50,6 +50,7 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 
 <source_of_truth>.openworkflow/</source_of_truth>
 <stage>${escapeXml(command.stage)}</stage>
+<command_visibility>${escapeXml(command.visibility)}</command_visibility>
 <interaction_mode>${escapeXml(protocol.interactionMode)}</interaction_mode>
 
 <inner_thinking>
@@ -139,6 +140,7 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 
 <source_of_truth>.openworkflow/</source_of_truth>
 <stage>${escapeXml(command.stage)}</stage>
+<command_visibility>${escapeXml(command.visibility)}</command_visibility>
 
 <inner_thinking>
 Use this protocol for private reasoning and scope checks.

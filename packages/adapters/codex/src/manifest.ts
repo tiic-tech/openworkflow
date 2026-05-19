@@ -28,6 +28,7 @@ export function codexManifest(root: string, files: string[]): string {
     commands: getWorkflowCommands().map((command) => ({
       id: command.id,
       trigger: command.trigger,
+      visibility: command.visibility,
       skill_name: codexSkillName(command),
       explicit_invocation: `$${codexSkillName(command)}`,
       skill_path: codexSkillPath(command),

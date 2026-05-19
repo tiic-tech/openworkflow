@@ -67,3 +67,11 @@ When a visual prototype does not use image generation, record
 `skip_reason`. Otherwise local `ref` values in concept, implementation,
 verification, or generic evidence fields should point to existing files inside
 the workflow root.
+
+## Decision Audit
+
+Decision records are durable audit artifacts. In normal prototype iteration,
+agents should write them from `/ow:proto` or `/ow:tune` without asking the user
+to invoke `/ow:decision` manually. Use `outcome: revise` when user feedback asks
+for another tuning pass; reserve `needs_more_evidence` for inconclusive evidence
+rather than ordinary revision requests.

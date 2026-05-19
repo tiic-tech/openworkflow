@@ -96,6 +96,8 @@ const REQUIRED_FILES = [
   "changes/M15-interactive-vision-design-flow/WORK_ITEMS.yaml",
   "changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml",
   "changes/M16-prototype-creation-skill-upgrade/WORK_ITEMS.yaml",
+  "changes/M17-tune-orchestration-internal-decision/CHANGE.yaml",
+  "changes/M17-tune-orchestration-internal-decision/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
@@ -272,7 +274,7 @@ function validateValidation(root: string, path: string, data: Record<string, unk
   }
   const decisionOptions = data.decision_options;
   if (Array.isArray(decisionOptions)) {
-    const allowed = new Set(["continue", "pivot", "stop", "needs_more_evidence"]);
+    const allowed = new Set(["continue", "revise", "pivot", "stop", "needs_more_evidence"]);
     for (const option of decisionOptions) {
       if (typeof option !== "string" || !allowed.has(option)) {
         errors.push(`${label} has invalid decision option ${String(option)}`);
@@ -473,6 +475,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "rationale",
       "accepted_scope",
       "rejected_scope",
+      "revision_scope",
       "next_command",
       "follow_up_questions",
     ],
@@ -667,7 +670,7 @@ function nonEmptyString(value: unknown): boolean {
 }
 
 function validateDecisionRecord(label: string, data: Record<string, unknown>, errors: string[]): void {
-  if (!["continue", "pivot", "stop", "needs_more_evidence"].includes(String(data.outcome))) {
+  if (!["continue", "revise", "pivot", "stop", "needs_more_evidence"].includes(String(data.outcome))) {
     errors.push(`${label} has invalid outcome ${String(data.outcome)}`);
   }
 }

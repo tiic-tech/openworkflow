@@ -115,6 +115,7 @@
         "type": "string",
         "enum": [
           "continue",
+          "revise",
           "pivot",
           "stop",
           "needs_more_evidence"

@@ -228,7 +228,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
         exclude: [],
       },
       acceptance: [],
-      decision_options: ["continue", "pivot", "stop", "needs_more_evidence"],
+      decision_options: ["continue", "revise", "pivot", "stop", "needs_more_evidence"],
       updated_at: null,
     },
   },
@@ -368,6 +368,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       "rationale",
       "accepted_scope",
       "rejected_scope",
+      "revision_scope",
       "next_command",
       "follow_up_questions",
     ],
@@ -399,6 +400,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       rationale: "",
       accepted_scope: [],
       rejected_scope: [],
+      revision_scope: [],
       next_command: null,
       follow_up_questions: [],
       updated_at: null,
@@ -537,5 +539,10 @@ export function getDisclosureLevels(): readonly DisclosureLevel[] {
 }
 
 export function getDiscoveryArtifactContractsForCommand(command: string): DiscoveryArtifactContract[] {
+  if (command === "/ow:proto" || command === "/ow:tune") {
+    return DISCOVERY_ARTIFACT_CONTRACTS.filter((contract) =>
+      ["prototype_evidence", "decision_record"].includes(contract.artifactType),
+    );
+  }
   return DISCOVERY_ARTIFACT_CONTRACTS.filter((contract) => contract.command === command);
 }

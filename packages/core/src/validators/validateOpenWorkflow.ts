@@ -287,6 +287,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "rationale",
       "accepted_scope",
       "rejected_scope",
+      "revision_scope",
       "next_command",
       "follow_up_questions",
     ];
@@ -456,7 +457,7 @@ function nonEmptyString(value: unknown): boolean {
 function validateDecisionRecord(label: string, data: Record<string, unknown>, errors: string[]): void {
   if (
     typeof data.outcome === "string" &&
-    !["continue", "pivot", "stop", "needs_more_evidence"].includes(data.outcome)
+    !["continue", "revise", "pivot", "stop", "needs_more_evidence"].includes(data.outcome)
   ) {
     errors.push(`${label} has invalid outcome ${data.outcome}`);
   }

@@ -42,6 +42,7 @@ Stage directories are lazy-created by commands:
 - `/ow:vision` creates `.openworkflow/vision/`.
 - `/ow:validation` creates `.openworkflow/validation/`.
 - `/ow:proto` creates `.openworkflow/prototypes/`.
+- `/ow:tune` updates `.openworkflow/prototypes/` and writes internal decision audit records.
 - `/ow:design` creates `.openworkflow/design/`.
 - `/ow:spec` creates `.openworkflow/specs/`.
 
@@ -56,6 +57,7 @@ For Codex, OpenWorkflow commands should be generated as repo-local Skills:
 .agents/skills/ow-vision/SKILL.md
 .agents/skills/ow-validation/SKILL.md
 .agents/skills/ow-proto/SKILL.md
+.agents/skills/ow-tune/SKILL.md
 .agents/skills/ow-design/SKILL.md
 ```
 
@@ -111,6 +113,18 @@ Private reasoning, critique, and scope checks. Do not expose chain-of-thought.
 Ask one question at a time. Keep the visible response short.
 </user_behavior>
 ```
+
+## /ow:tune And Internal Decision Audit
+
+`/ow:tune` is the user-facing prototype iteration command. `/ow:tune` and
+`/ow:tune:proto` default to the current prototype. If no current prototype
+exists but a current validation target exists, tune may orchestrate first
+prototype creation through `/ow:proto` behavior.
+
+`/ow:decision` remains an internal audit command. Proto and tune flows write
+decision records automatically after evidence changes or user review outcomes.
+Normal user-facing handoffs should point to `/ow:tune`, `/ow:design`, or
+`/ow:validation`, not ask users to manually invoke `/ow:decision`.
 
 ## /ow:design
 

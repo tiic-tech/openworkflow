@@ -15,6 +15,7 @@
     "rationale",
     "accepted_scope",
     "rejected_scope",
+    "revision_scope",
     "next_command",
     "follow_up_questions"
   ],
@@ -47,6 +48,7 @@
       "type": "string",
       "enum": [
         "continue",
+        "revise",
         "pivot",
         "stop",
         "needs_more_evidence"
@@ -62,6 +64,12 @@
       }
     },
     "rejected_scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "revision_scope": {
       "type": "array",
       "items": {
         "type": "string"

@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:M17-tune-orchestration-internal-decision
 contract_type: change
 title: M17 Tune orchestration with internal decision audit
-status: proposed
+status: completed
 source_artifacts:
   - changes/M16-prototype-creation-skill-upgrade/CHANGE.yaml
   - changes/M16-prototype-creation-skill-upgrade/OPEN_DESIGN_RESEARCH.md
