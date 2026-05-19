@@ -39,6 +39,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/commands/doctor.ts",
   "packages/cli/src/dev/validateRepositoryContractsCli.ts",
   "packages/cli/src/dev/verifyRuntimeSurface.ts",
+  "packages/cli/src/dev/verifyWorkflowE2E.ts",
   "packages/core/src/artifacts/registry.ts",
   "packages/core/src/contracts/index.ts",
   "packages/core/src/contracts/yaml.ts",
@@ -102,6 +103,8 @@ const REQUIRED_FILES = [
   "changes/M18-e2e-friction-fixes/WORK_ITEMS.yaml",
   "changes/M19-command-display-label-cleanup/CHANGE.yaml",
   "changes/M19-command-display-label-cleanup/WORK_ITEMS.yaml",
+  "changes/M20-workflow-e2e-regression/CHANGE.yaml",
+  "changes/M20-workflow-e2e-regression/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

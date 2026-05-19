@@ -344,7 +344,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       known_limits: [],
       result: "not_reviewed",
       handoff: {
-        next_command: "/ow:decision",
+        next_command: "/ow:tune",
       },
       updated_at: null,
     },
