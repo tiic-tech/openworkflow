@@ -107,11 +107,21 @@ ${xmlList(protocol.auditCheckpoints.after)}
 6. Record unresolved questions instead of expanding scope.
 </working_protocol>
 
+<artifact_checkpoint>
+Write durable .openworkflow artifacts only at meaningful checkpoints: stable user answers, explicit save requests, completed evidence changes, or handoff readiness.
+Do not treat artifact writing as the opening move for conversation-first commands.
+</artifact_checkpoint>
+
 ${internalSectionsXml(protocol.internalSections ?? [])}
 
 <anti_patterns>
 ${xmlList(protocol.antiPatterns)}
 </anti_patterns>
+
+<handoff>
+Use handoff commands only after the command-specific readiness gate is satisfied.
+When readiness is not satisfied, keep asking one focused question or record unresolved blockers instead of handing off prematurely.
+</handoff>
 
 <handoff_commands>
 ${xmlList(protocol.handoffCommands)}
@@ -159,6 +169,14 @@ ${artifactXmlList(artifacts)}
 Load only the contract files required for this stage.
 Keep artifacts short, scoped, and traceable through .openworkflow/workflow/WORKFLOW_INDEX.yaml plus .openworkflow/audit/.
 </working_protocol>
+
+<artifact_checkpoint>
+Write durable .openworkflow artifacts only at meaningful checkpoints.
+</artifact_checkpoint>
+
+<handoff>
+Use handoff commands only after readiness is satisfied.
+</handoff>
 </agent_protocol>
 `;
 }

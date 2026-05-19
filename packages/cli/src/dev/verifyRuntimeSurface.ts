@@ -129,6 +129,11 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.includes("<user_behavior>"), `${name} missing user behavior block`);
     assert(skillContent.includes("<agent_protocol>"), `${name} missing agent protocol block`);
     assert(skillContent.includes("<inner_thinking>"), `${name} missing inner thinking block`);
+    assert(skillContent.includes("<artifact_checkpoint>"), `${name} missing artifact checkpoint block`);
+    assert(skillContent.includes("<handoff>"), `${name} missing handoff block`);
+    if (name === "ow-vision") {
+      verifyVisionSkill(skillContent);
+    }
     if (name === "ow-proto") {
       verifyProtoSkill(skillContent);
     }
@@ -138,8 +143,30 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-decision") {
       verifyDecisionSkill(skillContent);
     }
+    if (name === "ow-design") {
+      verifyDesignSkill(skillContent);
+    }
     assert(interfaceContent.includes("display_name:"), `${name} missing display name`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
+  }
+}
+
+function verifyVisionSkill(content: string): void {
+  for (const required of [
+    "conversation-first-sustained-grill",
+    "<conversation_first>",
+    "<mandatory_coverage>",
+    "Cover target user and beneficiary.",
+    "Cover the problem, motivation, and emotional or quality bar.",
+    "Cover AI-native role, boundaries, and failure modes.",
+    "Cover privacy, data, sharing, and retention assumptions.",
+    "Cover success signals and failure signals.",
+    "<readiness_gate>",
+    "Do not hand off to /ow:validation until mandatory coverage is addressed",
+    "Vision readiness is based on coverage and user confirmation, not on a fixed number of turns.",
+    "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers",
+  ]) {
+    assert(content.includes(required), `ow-vision missing M15 guidance: ${required}`);
   }
 }
 
@@ -191,6 +218,25 @@ function verifyDecisionSkill(content: string): void {
     "/ow:decision is preserved for durable audit records, not as a normal user-facing workflow step.",
   ]) {
     assert(content.includes(required), `ow-decision missing internal audit guidance: ${required}`);
+  }
+}
+
+function verifyDesignSkill(content: string): void {
+  for (const required of [
+    "conversation-first-product-design",
+    "<conversation_first>",
+    "<mandatory_coverage>",
+    "Cover journey map and key flows.",
+    "Cover UX states, state transitions, and feedback timing.",
+    "Cover edge cases and failure states.",
+    "Cover responsive behavior and accessibility expectations.",
+    "Cover spec readiness and blockers.",
+    "<readiness_gate>",
+    "Do not hand off to /ow:spec until design coverage is sufficient",
+    "If accepted prototype evidence is thin, ask targeted design questions or hand back to /ow:tune.",
+    "Persist PRODUCT_DESIGN.yaml after stable design answers or explicit checkpoint request.",
+  ]) {
+    assert(content.includes(required), `ow-design missing M15 guidance: ${required}`);
   }
 }
 

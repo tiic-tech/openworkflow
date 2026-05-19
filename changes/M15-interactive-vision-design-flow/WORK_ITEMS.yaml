@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M15-interactive-vision-design-flow
 contract_type: work_items
 title: M15 Interactive vision and design flow work items
-status: active
+status: completed
 change_contract: changes/M15-interactive-vision-design-flow/CHANGE.yaml
 items:
   - task_id: M15-T001
     title: Define conversation-first readiness gates for vision and design
-    status: pending
+    status: completed
     depends_on: []
     owned_paths:
       - changes/M15-interactive-vision-design-flow/
@@ -19,7 +19,7 @@ items:
       - Grabout-style one-question-at-a-time behavior is adapted without importing unrelated final document format.
   - task_id: M15-T002
     title: Define XML output-isolation protocol for built-in skills
-    status: pending
+    status: completed
     depends_on:
       - M15-T001
     owned_paths:
@@ -32,7 +32,7 @@ items:
       - User-facing output guidance is separated from internal protocol.
   - task_id: M15-T003
     title: Update command and context contracts for interactive discovery
-    status: pending
+    status: completed
     depends_on:
       - M15-T002
     owned_paths:
@@ -46,7 +46,7 @@ items:
       - Audit checkpoints distinguish asking, summarizing, checkpoint persistence, and handoff.
   - task_id: M15-T004
     title: Regenerate Codex skill templates for vision and design
-    status: pending
+    status: completed
     depends_on:
       - M15-T003
     owned_paths:
@@ -59,7 +59,7 @@ items:
       - Skills keep visible responses concise while preserving interactive flow.
   - task_id: M15-T005
     title: Add verification coverage for interactive skill behavior
-    status: pending
+    status: completed
     depends_on:
       - M15-T004
     owned_paths:
@@ -71,4 +71,4 @@ items:
       - Runtime surface verification checks generated skills include XML output-isolation sections.
       - Repository validation includes M15 change contracts.
       - Full validation command list passes.
-updated_at: null
+updated_at: 2026-05-19

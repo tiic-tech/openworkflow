@@ -134,7 +134,7 @@ function command(
 function visionProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "one-question-at-a-time",
+    interactionMode: "conversation-first-sustained-grill",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -163,14 +163,66 @@ function visionProtocol(): CommandProtocol {
       ".openworkflow/runtime/**",
     ],
     auditCheckpoints: {
-      before: ["Confirm workflow and context indexes exist.", "Load only the vision context packet."],
-      during: ["Ask one question at a time.", "Update only stable vision or context terms."],
-      after: ["Summarize unresolved questions.", "Confirm no validation, prototype, spec, change, or runtime artifacts were created."],
+      before: [
+        "Confirm workflow and context indexes exist.",
+        "Start in conversation mode and ask the next useful vision question before writing artifacts.",
+      ],
+      during: [
+        "Ask one focused question at a time and make each question depend on the previous answer.",
+        "Cover mandatory vision dimensions before validation handoff.",
+        "Provide concrete examples or options when the user is stuck.",
+      ],
+      after: [
+        "Persist artifacts only after stable answers, explicit save request, or readiness checkpoint.",
+        "Handoff to validation only after mandatory coverage, unresolved blockers are named, and the user confirms readiness.",
+        "Confirm no validation, prototype, spec, change, or runtime artifacts were created.",
+      ],
     },
     antiPatterns: [
+      "Do not open by writing vision artifacts before the conversation has stable answers.",
       "Do not create validation rankings during vision work.",
       "Do not create specs, changes, tasks, or teams from a vision session.",
       "Do not batch many interview questions into one turn.",
+      "Do not hand off to validation after a fixed small number of questions.",
+    ],
+    internalSections: [
+      {
+        tag: "conversation_first",
+        items: [
+          "Treat /ow:vision as a focused product conversation, not an artifact fill-out task.",
+          "Ask exactly one question unless the user explicitly requests a summary or save checkpoint.",
+          "Let each answer drive the next deeper question; do not run a generic questionnaire mechanically.",
+        ],
+      },
+      {
+        tag: "mandatory_coverage",
+        items: [
+          "Cover target user and beneficiary.",
+          "Cover the problem, motivation, and emotional or quality bar.",
+          "Cover the core product surface and primary job to be done.",
+          "Cover explicit non-goals and exclusions.",
+          "Cover AI-native role, boundaries, and failure modes.",
+          "Cover privacy, data, sharing, and retention assumptions.",
+          "Cover alternatives or competing mental models.",
+          "Cover success signals and failure signals.",
+        ],
+      },
+      {
+        tag: "readiness_gate",
+        items: [
+          "Do not hand off to /ow:validation until mandatory coverage is addressed, unresolved questions are explicit, and the user confirms readiness.",
+          "If a dimension is thin, ask another targeted question instead of writing a final artifact.",
+          "Vision readiness is based on coverage and user confirmation, not on a fixed number of turns.",
+        ],
+      },
+      {
+        tag: "artifact_checkpoint",
+        items: [
+          "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers or an explicit checkpoint request.",
+          "Keep brainstorming and tentative hypotheses in NOTE.md or unresolved_questions rather than presenting them as stable product truth.",
+          "Summarize at meaningful checkpoints before persisting durable vision state.",
+        ],
+      },
     ],
     handoffCommands: ["/ow:validation"],
   };
@@ -489,7 +541,7 @@ function decisionProtocol(): CommandProtocol {
 function designProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "evidence-to-product-design",
+    interactionMode: "conversation-first-product-design",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -518,14 +570,64 @@ function designProtocol(): CommandProtocol {
     ],
     forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
     auditCheckpoints: {
-      before: ["Confirm accepted prototype evidence or a continue decision exists.", "Load only the accepted evidence needed for product design."],
-      during: ["Translate evidence into product behavior, UX states, scope, and readiness.", "Create conditional packets only when explicitly needed."],
-      after: ["Write PRODUCT_DESIGN.yaml.", "Hand off to /ow:spec only when spec readiness is true."],
+      before: [
+        "Confirm accepted prototype evidence or a continue decision exists.",
+        "Start by clarifying product behavior and UX gaps before writing PRODUCT_DESIGN.yaml.",
+      ],
+      during: [
+        "Ask one focused design question at a time when behavior, states, edge cases, or scope are thin.",
+        "Cover mandatory design dimensions before spec handoff.",
+        "Create conditional packets only when explicitly needed.",
+      ],
+      after: [
+        "Write PRODUCT_DESIGN.yaml only after enough design meaning is stable.",
+        "Hand off to /ow:spec only when spec readiness is true and blockers are explicit.",
+      ],
     },
     antiPatterns: [
       "Do not treat unreviewed prototype evidence as accepted.",
+      "Do not convert thin prototype evidence into design artifacts prematurely.",
       "Do not create production specs or changes during design.",
       "Do not generate conditional technical packets by default.",
+    ],
+    internalSections: [
+      {
+        tag: "conversation_first",
+        items: [
+          "Treat /ow:design as product-design clarification before specification.",
+          "Ask one focused question when accepted evidence does not yet support durable product design.",
+          "Do not begin by authoring PRODUCT_DESIGN.yaml when journey, states, flows, or scope are still unclear.",
+        ],
+      },
+      {
+        tag: "mandatory_coverage",
+        items: [
+          "Cover personas and usage context.",
+          "Cover journey map and key flows.",
+          "Cover UX states, state transitions, and feedback timing.",
+          "Cover interaction details and recovery behavior.",
+          "Cover edge cases and failure states.",
+          "Cover responsive behavior and accessibility expectations.",
+          "Cover scope boundaries, priority, and what remains out of scope.",
+          "Cover spec readiness and blockers.",
+        ],
+      },
+      {
+        tag: "readiness_gate",
+        items: [
+          "Do not hand off to /ow:spec until design coverage is sufficient, blockers are explicit, and spec_readiness.ready is true.",
+          "If accepted prototype evidence is thin, ask targeted design questions or hand back to /ow:tune.",
+          "Design readiness depends on behavior clarity, not on having a long document.",
+        ],
+      },
+      {
+        tag: "artifact_checkpoint",
+        items: [
+          "Persist PRODUCT_DESIGN.yaml after stable design answers or explicit checkpoint request.",
+          "Use conditional packets only when implementation constraints genuinely need a separate packet.",
+          "Keep unresolved design questions visible instead of silently inventing product behavior.",
+        ],
+      },
     ],
     handoffCommands: ["/ow:spec", "/ow:tune", "/ow:validation"],
   };
