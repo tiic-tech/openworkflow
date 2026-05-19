@@ -1,0 +1,78 @@
+schema_version: 0.1.0
+contract_id: change:M15-interactive-vision-design-flow
+contract_type: change
+title: M15 Interactive vision and design flow
+status: active
+source_artifacts:
+  - changes/M14-python-to-typescript-script-migration/CHANGE.yaml
+  - changes/M15-interactive-vision-design-flow/GRABOUT_ADAPTATION.md
+  - changes/M15-interactive-vision-design-flow/BUILTIN_SKILL_XML_PROTOCOL.md
+  - references/discovery-artifact-contracts.md
+  - references/artifact-authoring-templates.md
+depends_on:
+  - change:M14-python-to-typescript-script-migration
+produces:
+  - work_items:M15-interactive-vision-design-flow
+summary: >
+  Rework the vision and design discovery commands so they behave as
+  conversation-first clarification modes with sustained grill gates, using
+  artifacts as staged memory after enough product meaning has been uncovered
+  instead of forcing artifact writes at the start of the interaction.
+problem: >
+  The current /ow:vision and /ow:design flows are too artifact-first for
+  high-interaction discovery. Agents tend to read guidance and write workflow
+  files before the conversation has enough substance, then prematurely hand off
+  from vision to validation after only a few questions. This creates fragmented
+  user experience and low-nutrition downstream validation artifacts.
+goals:
+  - Make /ow:vision and /ow:design conversation-first modes.
+  - Adapt the grabout-style progressive questioning model into OpenWorkflow skill protocol.
+  - Require built-in skill instructions to use OpenSpec-style XML-tagged sections that isolate internal protocol from user-facing output.
+  - Require one-question-at-a-time sustained grill behavior before handoff.
+  - Add readiness gates that prevent premature transition from vision to validation.
+  - Define when agents should keep asking, when they should summarize, and when they should write artifacts.
+  - Preserve contract-first artifacts as durable state once the conversation reaches stable checkpoints.
+  - Improve generated Codex skill instructions for vision and design without changing the public command namespace.
+non_goals:
+  - Do not implement /ow:tune in this change.
+  - Do not rewrite /ow:proto or prototype creation behavior.
+  - Do not change command display labels or Codex adapter presentation.
+  - Do not redesign validation, decision, spec, change, or team command semantics.
+  - Do not copy the grabout output document format as-is into OpenWorkflow.
+decisions:
+  - Vision and design are strong-interaction modes; user conversation has priority over immediate artifact authoring.
+  - Agents should ask one focused question at a time and let each answer drive the next question.
+  - Built-in skills must separate internal thinking, routine protocol, artifact checkpointing, and user-visible response guidance with XML-style tags.
+  - Inner thinking and routine protocol sections are internal instructions and must never be exposed as user-facing output.
+  - Vision readiness requires covered dimensions and explicit user confirmation, not a small fixed number of turns.
+  - Design readiness requires accepted discovery context plus enough UX behavior detail to support specification work.
+  - OpenWorkflow should adapt grabout's questioning discipline while keeping stage-specific artifacts under .openworkflow.
+affected_paths:
+  - packages/core/src/artifacts/
+  - packages/core/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - schemas/
+  - references/
+  - changes/M15-interactive-vision-design-flow/
+acceptance:
+  - /ow:vision generated skill starts in conversation mode and does not require artifact writes before asking the next useful question.
+  - /ow:design generated skill starts in conversation mode and does not convert thin evidence into design artifacts prematurely.
+  - Generated built-in skills use XML-style sections to separate user-facing behavior, inner thinking, working protocol, artifact checkpointing, and handoff.
+  - Internal sections explicitly state that inner thinking, private reasoning, checklists, routine reads, and artifact bookkeeping must not be shown to the user.
+  - Vision protocol includes mandatory coverage gates for user, problem, core surface, emotional/quality bar, non-goals, AI-native boundary, privacy/data assumptions, alternatives, and success/failure signals.
+  - Design protocol includes mandatory coverage gates for journey, UX states, interaction flows, edge cases, responsive behavior, accessibility expectations, and scope readiness.
+  - Handoff from vision to validation requires explicit readiness criteria and user confirmation.
+  - Agents are instructed to ask one focused question at a time, provide examples when the user is stuck, and summarize only at meaningful checkpoints.
+  - Artifact writing is framed as checkpoint persistence after stable answers, not as the opening move of vision or design.
+  - Existing OpenWorkflow validation, sync, doctor, and runtime surface checks pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run smoke:init
+  - node dist/cli/src/index.js sync --root /tmp/openworkflow-m04-smoke --tools codex
+  - node dist/cli/src/index.js doctor --root /tmp/openworkflow-m04-smoke --tools codex
+  - npm run validate:cli
+updated_at: null
