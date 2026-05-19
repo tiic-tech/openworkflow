@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: work_items:M21-npm-package-release-readiness
+contract_type: work_items
+title: M21 npm package release readiness work items
+status: completed
+change_contract: changes/M21-npm-package-release-readiness/CHANGE.yaml
+items:
+  - task_id: M21-T001
+    title: Rename package to scoped npm name
+    status: completed
+    depends_on: []
+    owned_paths:
+      - package.json
+      - package-lock.json
+    acceptance:
+      - package name is @tiic-tech/openworkflow.
+      - openworkflow binary command is preserved.
+      - package lock matches package metadata.
+  - task_id: M21-T002
+    title: Add publish metadata and README
+    status: completed
+    depends_on:
+      - M21-T001
+    owned_paths:
+      - package.json
+      - README.md
+      - LICENSE
+    acceptance:
+      - publishConfig.access is public.
+      - repository, bugs, homepage, keywords, and license fields are present.
+      - LICENSE contains the MIT license.
+      - README documents scoped install and CLI usage.
+      - prepack and prepublishOnly release safety scripts are present.
+  - task_id: M21-T003
+    title: Validate release readiness
+    status: completed
+    depends_on:
+      - M21-T002
+    owned_paths:
+      - changes/M21-npm-package-release-readiness/
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - M21 change files are required repository contracts.
+      - Full validation command list passes.
+      - npm pack --dry-run reports @tiic-tech/openworkflow@0.1.0.
+updated_at: 2026-05-19
