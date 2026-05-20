@@ -144,6 +144,8 @@ const REQUIRED_FILES = [
   "changes/M30-artifact-summary-health/WORK_ITEMS.yaml",
   "changes/M31-unified-health-semantics/CHANGE.yaml",
   "changes/M31-unified-health-semantics/WORK_ITEMS.yaml",
+  "changes/M32-agent-inspect-entry/CHANGE.yaml",
+  "changes/M32-agent-inspect-entry/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
