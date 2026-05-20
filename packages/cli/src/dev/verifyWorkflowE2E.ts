@@ -470,6 +470,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "openworkflow status --root .", "AGENTS.md does not mention status command");
   assertIncludes(phase, guide, "openworkflow check /ow:<command> --root . --json", "AGENTS.md does not mention check command");
   assertIncludes(phase, guide, "openworkflow summaries --root . --json", "AGENTS.md does not mention summaries command");
+  assertIncludes(phase, guide, "openworkflow summarize --root . --artifact <path> --json", "AGENTS.md does not mention summarize command");
   assertIncludes(phase, guide, "SUMMARY.yaml trust is checked by `summaries`, not by `validate`", "AGENTS.md does not explain validate/summaries boundary");
   assertIncludes(phase, guide, "Repo-local workflow commands are delivered as Agent skills", "AGENTS.md does not distinguish workflow skill commands");
   assertIncludes(phase, guide, "Respect lazy creation", "AGENTS.md does not preserve lazy artifact creation boundary");
@@ -482,6 +483,8 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "inspect", "help missing inspect command");
   assertIncludes(phase, help, "check", "help missing check command");
   assertIncludes(phase, help, "summaries", "help missing summaries command");
+  assertIncludes(phase, help, "summarize", "help missing summarize command");
+  assertIncludes(phase, help, "pass --write to update summary files", "help missing summarize write boundary");
   assertIncludes(phase, help, "SUMMARY.yaml freshness is checked by summaries", "help missing validate/summaries boundary");
 }
 

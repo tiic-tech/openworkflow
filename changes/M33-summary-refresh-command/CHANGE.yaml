@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: change:M33-summary-refresh-command
+contract_type: change
+title: M33 Summary refresh command
+status: accepted
+source_artifacts:
+  - changes/M32-agent-inspect-entry/CHANGE.yaml
+depends_on:
+  - change:M32-agent-inspect-entry
+produces:
+  - work_items:M33-summary-refresh-command
+summary: >
+  Add a read-model repair command that can generate or refresh SUMMARY.yaml
+  files for summary_policy artifacts so `summaries` health can move from
+  detection to an explicit repair loop.
+problem: >
+  M30-M32 let Agents detect missing or stale summaries and route around
+  untrusted low-context reads, but OpenWorkflow still cannot repair summary
+  health. As a result, a project can report missing or stale summary files
+  without offering an Agent-safe command to produce the low-context artifact
+  that the workflow expects.
+goals:
+  - Add `openworkflow summarize --root <folder> [--artifact <path>|--all] [--write] [--json]`.
+  - Default to dry-run so Agents can preview planned SUMMARY.yaml writes.
+  - Generate deterministic SUMMARY.yaml files from source-of-truth YAML artifacts without modifying those source artifacts.
+  - Support targeted refresh by artifact path and bulk refresh for missing or stale summary_file contracts.
+  - Report current_slice contracts as guidance rather than writing source artifact fields.
+  - Use M28 JSON envelope and include planned/written/skipped effects.
+  - Update `openworkflow --help` and AGENTS.md managed block because a new CLI command is introduced.
+non_goals:
+  - Do not use an LLM inside the CLI.
+  - Do not modify source-of-truth artifacts, indexes, CURRENT_STATE.yaml, or raw evidence.
+  - Do not generate summaries for current_slice strategy artifacts.
+  - Do not scan raw evidence directories by default.
+decisions:
+  - "`summarize` is a deterministic CLI repair command, not a content-quality replacement for human or Agent-authored synthesis."
+  - "The first implementation should produce concise extractive YAML summaries from source artifact fields and metadata."
+  - "`--write` is required for file writes; no `--write` means dry-run."
+open_questions:
+  - question: "Should `--all` refresh every instantiated summary_file artifact, or only missing/stale artifacts by default?"
+    outcome: "`--all --write` refreshes missing or stale summary_file artifacts and skips current summaries."
+  - question: "What minimal SUMMARY.yaml schema is sufficient for Agent low-context reads without pretending to be human-authored synthesis?"
+    outcome: "Generated summaries use deterministic extractive YAML with source identity, source path, source status, key fields, handoff, and generator metadata."
+  - question: "Should summarize ever update mtime of a current summary when content is unchanged?"
+    outcome: "`--all` skips current summaries; targeted `--artifact --write` may rewrite the matching SUMMARY.yaml because it is an explicit repair request."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/summarize.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M33-summary-refresh-command/
+acceptance:
+  - "`openworkflow summarize --root <folder> --artifact <path> --json` reports a planned SUMMARY.yaml write without changing files."
+  - "`openworkflow summarize --root <folder> --artifact <path> --write --json` writes or updates the corresponding SUMMARY.yaml."
+  - "`openworkflow summarize --root <folder> --all --write --json` refreshes missing or stale summary_file artifacts and skips current/current_slice artifacts."
+  - "The command never modifies source-of-truth artifacts, CURRENT_STATE.yaml, indexes, or raw evidence."
+  - "After summarize writes a missing or stale summary, `openworkflow summaries --json` reports the artifact as current."
+  - "Non-OpenWorkflow roots return an explicit not-initialized error."
+  - "`openworkflow --help` and AGENTS.md managed block mention summarize and dry-run/write behavior."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, create source artifact, summaries, summarize dry-run, summarize --write, summaries, clean
+created_at: 2026-05-20
+updated_at: 2026-05-20

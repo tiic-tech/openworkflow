@@ -7,6 +7,7 @@ import { doctorCommand } from "./commands/doctor.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
 import { summariesCommand } from "./commands/summaries.js";
+import { summarizeCommand } from "./commands/summarize.js";
 import { syncCommand } from "./commands/sync.js";
 import { validateCommand } from "./commands/validate.js";
 
@@ -54,6 +55,10 @@ async function main(): Promise<number> {
     return summariesCommand(parsed.flags);
   }
 
+  if (parsed.command === "summarize") {
+    return summarizeCommand(parsed.flags);
+  }
+
   console.error(`Unknown command: ${parsed.command}`);
   printHelp();
   return 1;
@@ -72,6 +77,7 @@ Usage:
   openworkflow inspect --root <folder> [--json]
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--json]
+  openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -84,6 +90,7 @@ Commands:
   inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
+  summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
   clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -103,6 +110,7 @@ Two command surfaces:
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context before starting a /ow:* command.
     summaries  Check whether low-context summaries can be trusted before raw evidence; requires an initialized .openworkflow root.
+    summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
 
   Agent-readable JSON:

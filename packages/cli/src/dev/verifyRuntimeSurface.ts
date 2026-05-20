@@ -124,6 +124,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
     "openworkflow summaries --root . --json",
+    "openworkflow summarize --root . --artifact <path> --json",
     "SUMMARY.yaml trust is checked by `summaries`, not by `validate`",
     "/ow:vision",
     "/ow:spec",
@@ -159,6 +160,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "inspect",
     "check",
     "summaries",
+    "summarize",
+    "pass --write to update summary files",
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
@@ -232,6 +235,9 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
   parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
+  assert(summarizeStatus.code === 0, "summarize --all dry-run should succeed");
+  parseJsonReport(summarizeStatus.output, "summarize");
 }
 
 async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -252,6 +258,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const inspectUninitializedSummaries = record(inspectUninitializedData.summaries, "uninitialized inspect summaries");
   assert(inspectUninitializedReport.ok === false, "uninitialized inspect should not be ok");
   assert(inspectUninitializedSummaries.initialized === false, "uninitialized inspect should expose summary initialized=false");
+
+  const summarizeUninitialized = await runCaptureStatus(["node", CLI, "summarize", "--root", missingRoot, "--all", "--json"], env);
+  assert(summarizeUninitialized.code !== 0, "summarize should fail clearly outside an initialized OpenWorkflow root");
+  const summarizeUninitializedReport = parseJsonReport(summarizeUninitialized.output, "summarize");
+  assert(summarizeUninitializedReport.ok === false, "uninitialized summarize should not be ok");
 
   const summaryBoundaryRoot = join(tempRoot, "summary-validate-boundary");
   await run(["node", CLI, "init", summaryBoundaryRoot, "--tools", "codex", "--force"], env);
@@ -279,12 +290,34 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
 
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
   await mkdir(artifactDir, { recursive: true });
-  await writeFile(join(artifactDir, "EVIDENCE.yaml"), "artifact_type: prototype_evidence\ncore_question: Test\n", "utf8");
+  await writeFile(join(artifactDir, "EVIDENCE.yaml"), "artifact_type: prototype_evidence\ncore_question: Test\nresult: promising\nhandoff:\n  next_command: /ow:design\n", "utf8");
   const missing = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const missingData = record(missing.data, "summary health data");
   const entries = missingData.entries;
   assert(Array.isArray(entries), "summary health entries must be array");
   assert(entries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "missing"), "summary health did not report missing prototype summary");
+  const missingCheckStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(missingCheckStatus.code !== 0, "proto check should fail without required validation context");
+  const missingCheck = parseJsonReport(missingCheckStatus.output, "check");
+  assert(Array.isArray(missingCheck.warnings) && missingCheck.warnings.some((item) => String(item).includes("summary health for prototype_evidence")), "check warnings missing summary health promotion");
+
+  const dryRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--json"], env), "summarize");
+  const dryEffects = record(dryRun.effects, "summarize dry-run effects");
+  assert(Array.isArray(dryEffects.planned) && dryEffects.planned.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize dry-run did not plan summary write");
+  assert(!(await exists(join(artifactDir, "SUMMARY.yaml"))), "summarize dry-run wrote SUMMARY.yaml");
+  const invalidArtifact = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/missing/EVIDENCE.yaml", "--json"], env);
+  assert(invalidArtifact.code !== 0, "summarize should fail clearly for a missing artifact");
+  const invalidArtifactReport = parseJsonReport(invalidArtifact.output, "summarize");
+  assert(invalidArtifactReport.ok === false, "invalid summarize artifact should return ok=false JSON");
+
+  const writeRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--write", "--json"], env), "summarize");
+  const writeEffects = record(writeRun.effects, "summarize write effects");
+  assert(Array.isArray(writeEffects.written) && writeEffects.written.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize write did not report summary write");
+  assert(await exists(join(artifactDir, "SUMMARY.yaml")), "summarize --write did not create SUMMARY.yaml");
+  const currentAfterWrite = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const currentEntries = record(currentAfterWrite.data, "summary health data").entries;
+  assert(Array.isArray(currentEntries), "summary health entries must be array");
+  assert(currentEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "current"), "summary health did not report current prototype after summarize write");
 
   const validationDir = join(root, ".openworkflow", "validation", "val-1");
   await mkdir(validationDir, { recursive: true });
@@ -295,13 +328,15 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "missing"), "summary health did not report missing validation current_slice");
 
   const summaryPath = join(artifactDir, "SUMMARY.yaml");
-  await writeFile(summaryPath, "artifact_type: prototype_summary\n", "utf8");
   const old = new Date(0);
   await utimes(summaryPath, old, old);
   const stale = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const staleEntries = record(stale.data, "summary health data").entries;
   assert(Array.isArray(staleEntries), "summary health entries must be array");
   assert(staleEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "stale_unknown"), "summary health did not report stale prototype summary");
+  const allWrite = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--all", "--write", "--json"], env), "summarize");
+  const allEffects = record(allWrite.effects, "summarize all effects");
+  assert(Array.isArray(allEffects.written) && allEffects.written.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize --all --write did not refresh stale summary");
 
   const brief = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
   const briefData = record(brief.data, "brief data");
@@ -321,7 +356,6 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const check = parseJsonReport(checkStatus.output, "check");
   const checkData = record(check.data, "check data");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
-  assert(Array.isArray(check.warnings) && check.warnings.some((item) => String(item).includes("summary health for prototype_evidence")), "check warnings missing summary health promotion");
 
 }
 

@@ -43,6 +43,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/commands/init.ts",
   "packages/cli/src/commands/inspect.ts",
   "packages/cli/src/commands/summaries.ts",
+  "packages/cli/src/commands/summarize.ts",
   "packages/cli/src/commands/validate.ts",
   "packages/cli/src/commands/sync.ts",
   "packages/cli/src/commands/doctor.ts",
@@ -147,6 +148,8 @@ const REQUIRED_FILES = [
   "changes/M31-unified-health-semantics/WORK_ITEMS.yaml",
   "changes/M32-agent-inspect-entry/CHANGE.yaml",
   "changes/M32-agent-inspect-entry/WORK_ITEMS.yaml",
+  "changes/M33-summary-refresh-command/CHANGE.yaml",
+  "changes/M33-summary-refresh-command/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
