@@ -63,6 +63,9 @@ function validateArtifactContracts(root: string, file: string, data: unknown, er
     "prototype_evidence",
     "decision_record",
     "product_design",
+    "production_spec",
+    "production_change",
+    "team_runtime",
   ]);
   for (const artifact of artifacts) {
     if (!isRecord(artifact)) {
@@ -140,6 +143,9 @@ function validateActivePointer(root: string, file: string, data: unknown, errors
     pointerRule("PROTOTYPE_INDEX.yaml", "current_prototype", "prototypes", "prototype_id", "path"),
     pointerRule("DECISION_INDEX.yaml", "current_decision", "decisions", "decision_id", "path"),
     pointerRule("DESIGN_INDEX.yaml", "current_design", "designs", "design_id", "path"),
+    pointerRule("SPEC_INDEX.yaml", "current_spec", "specs", "spec_id", "path"),
+    pointerRule("CHANGE_INDEX.yaml", "current_change", "changes", "change_id", "path"),
+    pointerRule("RUNTIME_INDEX.yaml", "current_run", "runs", "run_id", "path"),
   ];
   const rule = rules.find((item) => file.endsWith(item.fileName));
   if (!rule) {
@@ -250,6 +256,15 @@ function validateDiscoveryArtifact(root: string, file: string, data: unknown, er
   if (data.artifact_type === "product_design") {
     validateProductDesign(label, data, errors);
   }
+  if (data.artifact_type === "production_spec") {
+    validateProductionSpec(label, data, errors);
+  }
+  if (data.artifact_type === "production_change") {
+    validateProductionChange(label, data, errors);
+  }
+  if (data.artifact_type === "team_runtime") {
+    validateTeamRuntime(label, data, errors);
+  }
 }
 
 function artifactRequiredKeys(artifactType: string): string[] | null {
@@ -306,6 +321,46 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "open_questions",
       "conditional_packets",
       "spec_readiness",
+    ];
+  }
+  if (artifactType === "production_spec") {
+    return [
+      "source_design",
+      "goal",
+      "scope",
+      "requirements",
+      "interfaces",
+      "acceptance",
+      "verification",
+      "risks",
+      "change_readiness",
+    ];
+  }
+  if (artifactType === "production_change") {
+    return [
+      "source_spec",
+      "problem",
+      "goals",
+      "non_goals",
+      "affected_paths",
+      "acceptance",
+      "validation",
+      "work_items",
+      "risks",
+      "runtime_readiness",
+    ];
+  }
+  if (artifactType === "team_runtime") {
+    return [
+      "source_change",
+      "active_work_item",
+      "execution_mode",
+      "work_queue",
+      "agents",
+      "verification",
+      "issues",
+      "checkpoints",
+      "handoff",
     ];
   }
   return null;
@@ -471,6 +526,55 @@ function validateProductDesign(label: string, data: Record<string, unknown>, err
         errors.push(`${label} spec_readiness missing ${key}`);
       }
     }
+  }
+}
+
+function validateProductionSpec(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["scope", "requirements", "interfaces", "verification", "change_readiness"]) {
+    if (key in data && !isRecord(data[key])) {
+      errors.push(`${label} ${key} must be a mapping`);
+    }
+  }
+  const changeReadiness = data.change_readiness;
+  if (isRecord(changeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in changeReadiness)) {
+        errors.push(`${label} change_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateProductionChange(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["goals", "non_goals", "affected_paths", "acceptance", "validation", "risks"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  const runtimeReadiness = data.runtime_readiness;
+  if (isRecord(runtimeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in runtimeReadiness)) {
+        errors.push(`${label} runtime_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateTeamRuntime(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (typeof data.execution_mode === "string" && !["single_agent", "agent_team", "reconcile", "qa_fix"].includes(data.execution_mode)) {
+    errors.push(`${label} has invalid execution_mode ${data.execution_mode}`);
+  }
+  for (const key of ["work_queue", "agents", "issues", "checkpoints"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if ("verification" in data && !isRecord(data.verification)) {
+    errors.push(`${label} verification must be a mapping`);
+  }
+  if ("handoff" in data && !isRecord(data.handoff)) {
+    errors.push(`${label} handoff must be a mapping`);
   }
 }
 

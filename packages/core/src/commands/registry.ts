@@ -94,15 +94,30 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     [".openworkflow/design/"],
     designProtocol(),
   ),
-  command("spec", ["build-spec"], "Create one focused production spec from accepted product design.", "spec", [
-    ".openworkflow/specs/",
-  ]),
-  command("change", ["build-change"], "Create one focused production change for the current core feature.", "change", [
-    ".openworkflow/changes/",
-  ]),
-  command("team", ["run-team", "build-team"], "Execute approved production work through the Agent Team runtime.", "runtime", [
-    ".openworkflow/runtime/",
-  ]),
+  command(
+    "spec",
+    ["build-spec"],
+    "Create one focused production spec from accepted product design.",
+    "spec",
+    [".openworkflow/specs/"],
+    specProtocol(),
+  ),
+  command(
+    "change",
+    ["build-change"],
+    "Create one focused production change for the current core feature.",
+    "change",
+    [".openworkflow/changes/"],
+    changeProtocol(),
+  ),
+  command(
+    "team",
+    ["run-team", "build-team"],
+    "Execute approved production work through the Agent Team runtime.",
+    "runtime",
+    [".openworkflow/runtime/"],
+    teamProtocol(),
+  ),
 ] as const;
 
 export function getWorkflowCommands(): readonly WorkflowCommand[] {
@@ -630,5 +645,238 @@ function designProtocol(): CommandProtocol {
       },
     ],
     handoffCommands: ["/ow:spec", "/ow:tune", "/ow:validation"],
+  };
+}
+
+function specProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "accepted-design-to-production-spec",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/design/DESIGN_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/design/**/PRODUCT_DESIGN.yaml",
+      ".openworkflow/design/**/TECH_SPEC.yaml",
+      ".openworkflow/design/**/FRONTEND_SPEC.yaml",
+      ".openworkflow/design/**/BACKEND_SPEC.yaml",
+      ".openworkflow/design/**/API_CONTRACT.yaml",
+      ".openworkflow/design/**/DB_SCHEMA_MODEL.yaml",
+      ".openworkflow/specs/SPEC_INDEX.yaml",
+      "AGENT.md",
+      "package.json",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**"],
+    allowedOutputs: [
+      ".openworkflow/specs/SPEC_INDEX.yaml",
+      ".openworkflow/specs/<id>/SPEC.yaml",
+      ".openworkflow/specs/<id>/NOTE.md",
+    ],
+    forbiddenOutputs: [".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    auditCheckpoints: {
+      before: [
+        "Confirm a product design exists and spec_readiness.ready is true.",
+        "Load only the current design and any conditional design packets named by that design.",
+        "Lazy-create the specs index and spec artifact only when /ow:spec is invoked.",
+      ],
+      during: [
+        "Translate accepted product behavior into one implementable production slice.",
+        "Preserve traceability to design evidence, accepted scope, and known blockers.",
+        "Separate user-facing requirements, technical constraints, interfaces, acceptance criteria, and verification plan.",
+      ],
+      after: [
+        "Write the spec artifact and update SPEC_INDEX.yaml.",
+        "Hand off to /ow:change only when the spec has bounded scope, acceptance, and verification.",
+        "Confirm no change or runtime artifacts were created.",
+      ],
+    },
+    antiPatterns: [
+      "Do not create specs from unaccepted or unready product design.",
+      "Do not turn a broad product design into a multi-feature implementation plan.",
+      "Do not create change or runtime artifacts during spec work.",
+      "Do not precreate spec artifacts during init or sync; create them only on /ow:spec.",
+    ],
+    internalSections: [
+      {
+        tag: "lazy_create",
+        items: [
+          "OpenWorkflow init is minimal: it creates only workflow, audit, and config files.",
+          "If .openworkflow/specs/ or SPEC_INDEX.yaml is absent, create it during /ow:spec from ARTIFACT_CONTRACTS.yaml.",
+          "Do not create unrelated stage directories, templates, changes, or runtime files while authoring the spec.",
+        ],
+      },
+      {
+        tag: "spec_quality_bar",
+        items: [
+          "A production spec must be enough for an implementation agent to work without rereading the full discovery history.",
+          "Name the exact scope, affected user behavior, interface contracts, non-goals, acceptance checks, verification commands, and risks.",
+          "Keep rationale compact and reference source artifacts by path instead of copying long evidence.",
+        ],
+      },
+      {
+        tag: "readiness_gate",
+        items: [
+          "Do not hand off to /ow:change until implementation scope, acceptance, and test plan are explicit.",
+          "If design packets are missing or contradictory, ask one focused question or hand back to /ow:design.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:change", "/ow:design"],
+  };
+}
+
+function changeProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "production-change-planning",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/specs/SPEC_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/specs/**/SPEC.yaml",
+      ".openworkflow/specs/**/NOTE.md",
+      ".openworkflow/changes/CHANGE_INDEX.yaml",
+      "AGENT.md",
+      "package.json",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**"],
+    allowedOutputs: [
+      ".openworkflow/changes/CHANGE_INDEX.yaml",
+      ".openworkflow/changes/<id>/CHANGE.yaml",
+      ".openworkflow/changes/<id>/NOTE.md",
+      ".openworkflow/changes/<id>/WORK_ITEMS.yaml",
+    ],
+    forbiddenOutputs: [".openworkflow/runtime/**"],
+    auditCheckpoints: {
+      before: [
+        "Confirm a focused production spec exists.",
+        "Inspect the repository just enough to identify affected paths, integration points, and verification commands.",
+        "Lazy-create the changes index, change artifact, and work items only when /ow:change is invoked.",
+      ],
+      during: [
+        "Convert the spec into one bounded implementation change with non-goals and rollback notes.",
+        "Split work into ordered items with owned paths, dependencies, acceptance, and verification.",
+        "Record unresolved implementation risks instead of expanding scope.",
+      ],
+      after: [
+        "Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.",
+        "Hand off to /ow:team only when work items are implementable and verification is explicit.",
+        "Confirm no runtime artifacts were created.",
+      ],
+    },
+    antiPatterns: [
+      "Do not implement product code during /ow:change.",
+      "Do not create runtime or agent team files before the change plan is accepted.",
+      "Do not plan work that is not traceable to the current spec.",
+      "Do not precreate change artifacts during init or sync; create them only on /ow:change.",
+    ],
+    internalSections: [
+      {
+        tag: "lazy_create",
+        items: [
+          "OpenWorkflow init is minimal and does not create .openworkflow/changes/.",
+          "If CHANGE_INDEX.yaml is absent, create it together with the first change artifact during /ow:change.",
+          "Create WORK_ITEMS.yaml only for the active change, not as a global task backlog.",
+        ],
+      },
+      {
+        tag: "planning_quality_bar",
+        items: [
+          "A change plan must let an implementation agent start with bounded files, ordered tasks, acceptance checks, and rollback awareness.",
+          "Prefer small coherent work items with explicit owned_paths and verification over broad task buckets.",
+          "Keep the user-facing summary short and keep detailed implementation intelligence in the artifacts.",
+        ],
+      },
+      {
+        tag: "readiness_gate",
+        items: [
+          "Do not hand off to /ow:team until CHANGE.yaml and WORK_ITEMS.yaml agree on scope and verification.",
+          "If the spec is too broad or thin, ask one focused question or hand back to /ow:spec.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:team", "/ow:spec"],
+  };
+}
+
+function teamProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "approved-change-team-execution",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/changes/CHANGE_INDEX.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/changes/**/CHANGE.yaml",
+      ".openworkflow/changes/**/WORK_ITEMS.yaml",
+      ".openworkflow/runtime/RUNTIME_INDEX.yaml",
+      ".openworkflow/runtime/**/STATE.yaml",
+      "AGENT.md",
+      "package.json",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      ".openworkflow/runtime/RUNTIME_INDEX.yaml",
+      ".openworkflow/runtime/<id>/STATE.yaml",
+      ".openworkflow/runtime/<id>/NOTE.md",
+      ".openworkflow/runtime/<id>/ISSUES.yaml",
+      ".openworkflow/runtime/<id>/CHECKPOINTS.yaml",
+    ],
+    forbiddenOutputs: [],
+    auditCheckpoints: {
+      before: [
+        "Confirm an approved or active change plan and work items exist.",
+        "Audit git status, relevant source files, and any existing runtime state before execution.",
+        "Lazy-create runtime state only when /ow:team is invoked for an approved change.",
+      ],
+      during: [
+        "Execute work items in dependency order and keep runtime state current.",
+        "Delegate only when the task can run independently with clear owned paths and acceptance.",
+        "Record issues, verification results, checkpoints, and residual risks as development proceeds.",
+      ],
+      after: [
+        "Update runtime state, issues, and checkpoints.",
+        "Run the verification named by the change plan when practical.",
+        "Report changed artifacts, verification result, and remaining blockers.",
+      ],
+    },
+    antiPatterns: [
+      "Do not start runtime work without a current change plan and work items.",
+      "Do not create team runtime during init, sync, spec, or change planning.",
+      "Do not leave delegated work without ownership, acceptance, or status.",
+      "Do not hide failed verification; record it in runtime issues or checkpoints.",
+    ],
+    internalSections: [
+      {
+        tag: "lazy_create",
+        items: [
+          "OpenWorkflow init is minimal and does not create .openworkflow/runtime/.",
+          "Create RUNTIME_INDEX.yaml and the first runtime state only when /ow:team begins approved execution.",
+          "If runtime already exists, reconcile it instead of replacing historical state.",
+        ],
+      },
+      {
+        tag: "execution_quality_bar",
+        items: [
+          "Team runtime must preserve enough state for another agent to continue without reading the full conversation.",
+          "Track active change, active work item, assigned owner or agent, status, verification, issues, and checkpoints.",
+          "Keep implementation and QA evidence linked to the change plan.",
+        ],
+      },
+      {
+        tag: "handoff_gate",
+        items: [
+          "When work is incomplete, leave the next action and blocker explicit in runtime state.",
+          "When work is complete, record verification and checkpoint readiness before final handoff.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:change"],
   };
 }

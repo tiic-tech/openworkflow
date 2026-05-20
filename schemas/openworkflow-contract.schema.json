@@ -43,7 +43,10 @@
         "validation_target",
         "prototype_evidence",
         "decision_record",
-        "product_design"
+        "product_design",
+        "production_spec",
+        "production_change",
+        "team_runtime"
       ]
     },
     "title": {

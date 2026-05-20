@@ -68,11 +68,6 @@ async function verifyMinimalOpenWorkflow(root: string): Promise<void> {
       ".openworkflow/audit/CONTEXT_PACKETS.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
-      ".openworkflow/decisions/_templates/DECISION.yaml",
-      ".openworkflow/design/_templates/PRODUCT_DESIGN.yaml",
-      ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
-      ".openworkflow/validation/_templates/VALIDATION.yaml",
-      ".openworkflow/vision/_templates/VISION_SESSION.yaml",
     ]),
     "unexpected .openworkflow files",
   );
@@ -85,16 +80,6 @@ async function verifyMinimalOpenWorkflow(root: string): Promise<void> {
     new Set([
       ".openworkflow",
       ".openworkflow/audit",
-      ".openworkflow/decisions",
-      ".openworkflow/decisions/_templates",
-      ".openworkflow/design",
-      ".openworkflow/design/_templates",
-      ".openworkflow/prototypes",
-      ".openworkflow/prototypes/_templates",
-      ".openworkflow/validation",
-      ".openworkflow/validation/_templates",
-      ".openworkflow/vision",
-      ".openworkflow/vision/_templates",
       ".openworkflow/workflow",
     ]),
     "unexpected .openworkflow dirs",
@@ -109,13 +94,13 @@ async function verifyConfig(root: string): Promise<void> {
 }
 
 async function verifyNoDefaultPrompts(codexHome: string): Promise<void> {
-  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-tune.md", "ow-design.md", "ow-spec.md"]) {
+  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-tune.md", "ow-design.md", "ow-spec.md", "ow-change.md", "ow-team.md"]) {
     assert(!(await exists(join(codexHome, "prompts", name))), `default global prompt generated unexpectedly: ${name}`);
   }
 }
 
 async function verifySkills(root: string): Promise<void> {
-  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-tune", "ow-decision", "ow-design", "ow-spec"]) {
+  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-tune", "ow-decision", "ow-design", "ow-spec", "ow-change", "ow-team"]) {
     const skill = join(root, ".agents", "skills", name, "SKILL.md");
     const interfaceFile = join(root, ".agents", "skills", name, "agents", "openai.yaml");
     await assertFile(skill);
@@ -146,12 +131,61 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-design") {
       verifyDesignSkill(skillContent);
     }
+    if (name === "ow-spec") {
+      verifySpecSkill(skillContent);
+    }
+    if (name === "ow-change") {
+      verifyChangeSkill(skillContent);
+    }
+    if (name === "ow-team") {
+      verifyTeamSkill(skillContent);
+    }
     const semanticCommand = `/${name.replace("ow-", "ow:")}`;
     const displayName = semanticCommand.slice(1);
     assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
     assert(!hasYamlScalar(interfaceContent, "display_name", semanticCommand), `${name} display name includes semantic slash`);
     assert(skillContent.includes(`Semantic command: ${semanticCommand}`), `${name} missing semantic command`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
+  }
+}
+
+function verifySpecSkill(content: string): void {
+  for (const required of [
+    "accepted-design-to-production-spec",
+    "<lazy_create>",
+    "OpenWorkflow init is minimal",
+    "create it during /ow:spec",
+    "<spec_quality_bar>",
+    "A production spec must be enough for an implementation agent",
+    "Do not hand off to /ow:change until implementation scope, acceptance, and test plan are explicit.",
+  ]) {
+    assert(content.includes(required), `ow-spec missing production guidance: ${required}`);
+  }
+}
+
+function verifyChangeSkill(content: string): void {
+  for (const required of [
+    "production-change-planning",
+    "<lazy_create>",
+    "create it together with the first change artifact during /ow:change",
+    "<planning_quality_bar>",
+    "owned_paths",
+    "Do not hand off to /ow:team until CHANGE.yaml and WORK_ITEMS.yaml agree on scope and verification.",
+  ]) {
+    assert(content.includes(required), `ow-change missing production guidance: ${required}`);
+  }
+}
+
+function verifyTeamSkill(content: string): void {
+  for (const required of [
+    "approved-change-team-execution",
+    "<lazy_create>",
+    "Create RUNTIME_INDEX.yaml and the first runtime state only when /ow:team begins approved execution.",
+    "<execution_quality_bar>",
+    "Track active change, active work item",
+    "When work is incomplete, leave the next action and blocker explicit in runtime state.",
+  ]) {
+    assert(content.includes(required), `ow-team missing production guidance: ${required}`);
   }
 }
 
@@ -258,6 +292,11 @@ async function verifyDesignContract(root: string): Promise<void> {
 
   const artifacts = await read(join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   assert(artifacts.includes("artifact_type: product_design"), "artifact contracts missing product_design");
+  assert(artifacts.includes("artifact_type: production_spec"), "artifact contracts missing production_spec");
+  assert(artifacts.includes("artifact_type: production_change"), "artifact contracts missing production_change");
+  assert(artifacts.includes("artifact_type: team_runtime"), "artifact contracts missing team_runtime");
+  assert(artifacts.includes("lazy_create: true"), "artifact contracts missing lazy_create markers");
+  assert(artifacts.includes("template:"), "artifact contracts missing embedded templates");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
 }
 
@@ -283,14 +322,17 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
 
   const artifacts = await read(join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   assert(artifacts.includes("revision_scope"), "decision artifact contracts missing revision_scope");
-  for (const templatePath of [
-    ".openworkflow/vision/_templates/VISION_SESSION.yaml",
-    ".openworkflow/validation/_templates/VALIDATION.yaml",
-    ".openworkflow/prototypes/_templates/EVIDENCE.yaml",
-    ".openworkflow/decisions/_templates/DECISION.yaml",
-    ".openworkflow/design/_templates/PRODUCT_DESIGN.yaml",
+  for (const forbiddenPath of [
+    ".openworkflow/vision",
+    ".openworkflow/validation",
+    ".openworkflow/prototypes",
+    ".openworkflow/decisions",
+    ".openworkflow/design",
+    ".openworkflow/specs",
+    ".openworkflow/changes",
+    ".openworkflow/runtime",
   ]) {
-    await assertFile(join(root, templatePath));
+    assert(!(await exists(join(root, forbiddenPath))), `init eagerly created stage path: ${forbiddenPath}`);
   }
 }
 

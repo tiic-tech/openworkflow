@@ -17,6 +17,7 @@ interface Runtime {
   target: string;
   commands: Record<string, unknown>[];
   packets: Record<string, unknown>[];
+  artifacts: Record<string, unknown>[];
 }
 
 async function main(): Promise<number> {
@@ -38,6 +39,7 @@ async function main(): Promise<number> {
     await verifyPrototypePhase(runtime);
     await verifyTunePhase(runtime);
     await verifyInternalDecisionPhase(runtime);
+    await verifyProductionCommandPhases(runtime);
     await verifyDisplayLabels(runtime);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
@@ -50,10 +52,12 @@ async function main(): Promise<number> {
 async function loadRuntime(target: string): Promise<Runtime> {
   const commandIndex = await readYaml(join(target, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"));
   const contextPackets = await readYaml(join(target, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
+  const artifactContracts = await readYaml(join(target, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   return {
     target,
     commands: records(commandIndex, "commands", "runtime"),
     packets: records(contextPackets, "packets", "runtime"),
+    artifacts: records(artifactContracts, "artifacts", "runtime"),
   };
 }
 
@@ -87,7 +91,7 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertIncludes(phase, skill, "not on a fixed number of turns", "skill permits fixed-turn readiness");
   assertIncludes(phase, skill, "<artifact_checkpoint>", "skill missing artifact checkpoint separation");
 
-  const template = await readYaml(join(runtime.target, ".openworkflow", "vision", "_templates", "VISION_SESSION.yaml"));
+  const template = recordField(artifactRecord(runtime, "vision_session", phase), "template", phase);
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.ready === false, "vision template should default to not ready");
   assertPhase(phase, handoff.next_command === null, "vision template should not default to validation handoff");
@@ -111,7 +115,7 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "single highest-risk validation question", "validation does not focus the core risk");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "prototype brief", "validation does not produce prototype brief");
 
-  const template = await readYaml(join(runtime.target, ".openworkflow", "validation", "_templates", "VALIDATION.yaml"));
+  const template = recordField(artifactRecord(runtime, "validation_target", phase), "template", phase);
   assertPhase(phase, "prototype_scope" in template, "validation template missing prototype_scope");
   assertPhase(phase, stringList(template, "decision_options", phase).includes("needs_more_evidence"), "validation template missing decision options");
 }
@@ -159,7 +163,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, artifacts, "prototype_evidence", "source proto artifacts missing prototype evidence");
   assertListIncludes(phase, artifacts, "decision_record", "source proto artifacts missing decision record");
 
-  const template = await readYaml(join(runtime.target, ".openworkflow", "prototypes", "_templates", "EVIDENCE.yaml"));
+  const template = recordField(artifactRecord(runtime, "prototype_evidence", phase), "template", phase);
   assertPhase(phase, "reference_analysis" in template, "prototype template missing reference analysis");
   assertPhase(phase, "visual_concept_policy" in template, "prototype template missing visual concept policy");
   assertPhase(phase, "concept_evidence" in template, "prototype template missing concept evidence");
@@ -231,9 +235,103 @@ async function verifyInternalDecisionPhase(runtime: Runtime): Promise<void> {
   assertIncludes(phase, skill, "not as a normal user-facing workflow step", "decision skill exposes normal user workflow");
 }
 
+async function verifyProductionCommandPhases(runtime: Runtime): Promise<void> {
+  await verifySpecPhase(runtime);
+  await verifyChangePhase(runtime);
+  await verifyTeamPhase(runtime);
+}
+
+async function verifySpecPhase(runtime: Runtime): Promise<void> {
+  const phase = "spec";
+  const source = command("spec", phase);
+  const protocol = protocolFor(source, phase);
+  assertPhase(phase, protocol.interactionMode === "accepted-design-to-production-spec", "spec source protocol is not production spec");
+  assertListIncludes(phase, protocol.requiredContext, ".openworkflow/design/DESIGN_INDEX.yaml", "spec does not require design index");
+  assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/specs/<id>/SPEC.yaml", "spec cannot write SPEC.yaml");
+  assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/changes/**", "spec can create changes");
+  assertExactList(phase, protocol.handoffCommands, ["/ow:change", "/ow:design"], "spec source handoffs changed");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Lazy-create", "spec missing lazy-create checkpoint");
+
+  const generated = commandRecord(runtime, "spec", phase);
+  assertPhase(phase, stringField(generated, "depth", phase) === "deep", "generated spec is not deep");
+  assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/specs/<id>/SPEC.yaml", "generated spec cannot write SPEC.yaml");
+
+  const packet = packetRecord(runtime, "/ow:spec", phase);
+  assertListIncludes(phase, stringList(packet, "required", phase), ".openworkflow/design/DESIGN_INDEX.yaml", "spec packet does not require design index");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "Lazy-create", "spec packet lost lazy-create checkpoint");
+
+  const skill = await readSkill(runtime, "ow-spec");
+  for (const required of ["<lazy_create>", "<spec_quality_bar>", "<readiness_gate>", "A production spec must be enough for an implementation agent"]) {
+    assertIncludes(phase, skill, required, `spec skill missing ${required}`);
+  }
+
+  const artifact = artifactRecord(runtime, "production_spec", phase);
+  assertPhase(phase, artifact.command === "/ow:spec", "production_spec command mismatch");
+  assertPhase(phase, artifact.lazy_create === true, "production_spec is not marked lazy_create");
+  const template = recordField(artifact, "template", phase);
+  assertPhase(phase, "change_readiness" in template, "production_spec template missing change_readiness");
+}
+
+async function verifyChangePhase(runtime: Runtime): Promise<void> {
+  const phase = "change";
+  const source = command("change", phase);
+  const protocol = protocolFor(source, phase);
+  assertPhase(phase, protocol.interactionMode === "production-change-planning", "change source protocol is not production planning");
+  assertListIncludes(phase, protocol.requiredContext, ".openworkflow/specs/SPEC_INDEX.yaml", "change does not require spec index");
+  assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/changes/<id>/WORK_ITEMS.yaml", "change cannot write work items");
+  assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/runtime/**", "change can create runtime");
+  assertExactList(phase, protocol.handoffCommands, ["/ow:team", "/ow:spec"], "change source handoffs changed");
+
+  const generated = commandRecord(runtime, "change", phase);
+  assertPhase(phase, stringField(generated, "depth", phase) === "deep", "generated change is not deep");
+
+  const packet = packetRecord(runtime, "/ow:change", phase);
+  assertListIncludes(phase, stringList(packet, "required", phase), ".openworkflow/specs/SPEC_INDEX.yaml", "change packet does not require spec index");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "owned paths", "change packet lost work-item planning guidance");
+
+  const skill = await readSkill(runtime, "ow-change");
+  for (const required of ["<lazy_create>", "<planning_quality_bar>", "<readiness_gate>", "owned_paths"]) {
+    assertIncludes(phase, skill, required, `change skill missing ${required}`);
+  }
+
+  const artifact = artifactRecord(runtime, "production_change", phase);
+  assertPhase(phase, artifact.command === "/ow:change", "production_change command mismatch");
+  assertPhase(phase, artifact.lazy_create === true, "production_change is not marked lazy_create");
+  const template = recordField(artifact, "template", phase);
+  assertPhase(phase, "runtime_readiness" in template, "production_change template missing runtime_readiness");
+}
+
+async function verifyTeamPhase(runtime: Runtime): Promise<void> {
+  const phase = "team";
+  const source = command("team", phase);
+  const protocol = protocolFor(source, phase);
+  assertPhase(phase, protocol.interactionMode === "approved-change-team-execution", "team source protocol is not approved execution");
+  assertListIncludes(phase, protocol.requiredContext, ".openworkflow/changes/CHANGE_INDEX.yaml", "team does not require change index");
+  assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/runtime/<id>/STATE.yaml", "team cannot write runtime state");
+  assertExactList(phase, protocol.handoffCommands, ["/ow:change"], "team source handoffs changed");
+
+  const generated = commandRecord(runtime, "team", phase);
+  assertPhase(phase, stringField(generated, "depth", phase) === "deep", "generated team is not deep");
+
+  const packet = packetRecord(runtime, "/ow:team", phase);
+  assertListIncludes(phase, stringList(packet, "required", phase), ".openworkflow/changes/CHANGE_INDEX.yaml", "team packet does not require change index");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "Lazy-create runtime state", "team packet lost lazy-create checkpoint");
+
+  const skill = await readSkill(runtime, "ow-team");
+  for (const required of ["<lazy_create>", "<execution_quality_bar>", "<handoff_gate>", "Track active change, active work item"]) {
+    assertIncludes(phase, skill, required, `team skill missing ${required}`);
+  }
+
+  const artifact = artifactRecord(runtime, "team_runtime", phase);
+  assertPhase(phase, artifact.command === "/ow:team", "team_runtime command mismatch");
+  assertPhase(phase, artifact.lazy_create === true, "team_runtime is not marked lazy_create");
+  const template = recordField(artifact, "template", phase);
+  assertPhase(phase, "handoff" in template, "team_runtime template missing handoff");
+}
+
 async function verifyDisplayLabels(runtime: Runtime): Promise<void> {
   const phase = "display-labels";
-  for (const id of ["vision", "validation", "proto", "tune", "decision", "design", "spec"]) {
+  for (const id of ["vision", "validation", "proto", "tune", "decision", "design", "spec", "change", "team"]) {
     const skillName = `ow-${id}`;
     const semanticCommand = `/ow:${id}`;
     const displayName = `ow:${id}`;
@@ -285,6 +383,10 @@ function commandRecord(runtime: Runtime, id: string, phase: string): Record<stri
 
 function packetRecord(runtime: Runtime, command: string, phase: string): Record<string, unknown> {
   return findRecord(runtime.packets, "command", command, phase, `context packet missing ${command}`);
+}
+
+function artifactRecord(runtime: Runtime, artifactType: string, phase: string): Record<string, unknown> {
+  return findRecord(runtime.artifacts, "artifact_type", artifactType, phase, `artifact contract missing ${artifactType}`);
 }
 
 function findRecord(records: Record<string, unknown>[], key: string, value: string, phase: string, message: string): Record<string, unknown> {
