@@ -118,7 +118,8 @@ Agent quick start:
   Read AGENTS.md, then run openworkflow inspect --root . --json. Inspect starts
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
   full evidence. Prefer SUMMARY.yaml/current_slice guidance when a long artifact
-  offers it. Use --json when an Agent needs structured command output.
+  offers it, but check summary quality fields before treating a current summary
+  as a complete handoff. Use --json when an Agent needs structured command output.
   Use openworkflow context --root . --json when you want OpenWorkflow to package
   the next command's compact startup context instead of reading files one by one.
 
@@ -135,7 +136,7 @@ Two command surfaces:
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context, output boundaries, and current artifact usability before starting a /ow:* command.
-    summaries  Check whether low-context summaries can be trusted before raw evidence; requires an initialized .openworkflow root.
+    summaries  Check summary freshness and source quality before raw evidence; requires an initialized .openworkflow root.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
@@ -147,7 +148,7 @@ Two command surfaces:
     for blocking health/readiness failures, errors for command/runtime failures,
     and warnings for non-blocking guidance.
     Use summaries --json before loading raw evidence when summary/current-slice
-    health is unknown.
+    health or source quality is unknown.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

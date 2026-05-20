@@ -397,6 +397,17 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const currentEntries = record(currentAfterWrite.data, "summary health data").entries;
   assert(Array.isArray(currentEntries), "summary health entries must be array");
   assert(currentEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "current"), "summary health did not report current prototype after summarize write");
+  const currentPrototypeEntry = currentEntries.find((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence");
+  assert(currentPrototypeEntry !== undefined, "summary health missing prototype entry");
+  const currentPrototypeItems = record(currentPrototypeEntry, "prototype summary entry").items;
+  assert(Array.isArray(currentPrototypeItems), "prototype summary entry items must be array");
+  const currentPrototypeItem = currentPrototypeItems.find((item) => record(item, "prototype summary item").artifact_path === ".openworkflow/prototypes/proto-1/EVIDENCE.yaml");
+  assert(currentPrototypeItem !== undefined, "summary health missing prototype item");
+  const currentPrototypeRecord = record(currentPrototypeItem, "prototype summary item");
+  assert(currentPrototypeRecord.quality_status === "current_but_thin", "fresh thin prototype summary should report current_but_thin quality");
+  assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prototype_artifact"), "thin prototype summary should report empty key fields");
+  assert(Array.isArray(currentPrototypeRecord.quality_warnings) && currentPrototypeRecord.quality_warnings.some((item) => String(item).includes("empty handoff fields")), "thin prototype summary should report quality warnings");
+  assert(currentAfterWrite.ok === true, "current but thin summary should not fail freshness health");
   const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
   assert(designContextStatus.code !== 0, "design context should return nonzero while readiness blockers exist");
   const designContext = parseJsonReport(designContextStatus.output, "context");

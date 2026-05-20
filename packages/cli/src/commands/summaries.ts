@@ -53,6 +53,9 @@ function printSummaries(health: SummaryHealthModel): void {
       continue;
     }
     console.log(`${entry.artifact_type}: ${entry.status} (${entry.instantiated_count} instantiated, ${entry.strategy})`);
+    for (const item of entry.items.filter((candidate) => candidate.quality_status === "current_but_thin")) {
+      console.log(`  quality: ${item.quality_status} (${item.artifact_path})`);
+    }
   }
   if (health.next_actions.length > 0) {
     console.log("next_actions:");

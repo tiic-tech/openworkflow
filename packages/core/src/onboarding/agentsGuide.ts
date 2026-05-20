@@ -34,7 +34,7 @@ export function renderAgentsGuide(): string {
 - Use \`openworkflow register --root . --artifact <path> --json\` after a source artifact exists to preview index registration; add \`--write\` to make it visible to read models, and \`--current\` only when it should become the active pointer.
 - Use \`openworkflow brief --root .\` or \`openworkflow status --root .\` for a low-context Agent read model before deciding what to inspect next; use \`--json\` when another tool needs structured data.
 - Use \`openworkflow check /ow:<command> --root . --json\` before uncertain workflow work to verify required context, forbidden context, output boundaries, current artifact usability, and next actions.
-- Use \`openworkflow summaries --root . --json\` before loading raw evidence when artifact summaries or current slices may be missing or stale.
+- Use \`openworkflow summaries --root . --json\` before loading raw evidence when artifact summaries or current slices may be missing, stale, or current-but-thin; freshness and source artifact quality are separate signals.
 - Use \`openworkflow summarize --root . --artifact <path> --json\` to preview SUMMARY.yaml refreshes; add \`--write\` only when you intend to update summary files without changing source artifacts.
 - Use \`openworkflow validate --root . --json\` for contract shape; SUMMARY.yaml trust is checked by \`summaries\`, not by \`validate\`.
 - Use \`openworkflow clean --root . --tools codex --json\` to preview managed/generated cleanup; \`--yes\` removes OpenWorkflow managed metadata and generated adapter files while preserving source artifacts, SUMMARY.yaml, evidence, notes, and user AGENTS.md content.

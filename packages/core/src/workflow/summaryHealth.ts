@@ -4,12 +4,17 @@ import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound, readTextFile } from "../fs/index.js";
 
 export type SummaryHealthStatus = "not_applicable" | "not_instantiated" | "missing" | "present" | "stale_unknown" | "current";
+export type SummaryQualityStatus = "unknown" | "usable" | "current_but_thin";
 
 export interface SummaryHealthItem {
   artifact_path: string;
   summary_path: string | null;
   current_slice: string[] | null;
   status: SummaryHealthStatus;
+  source_status: string | null;
+  empty_key_fields: string[];
+  quality_status: SummaryQualityStatus;
+  quality_warnings: string[];
   warnings: string[];
 }
 
@@ -183,20 +188,29 @@ async function evaluateArtifact(root: string, artifactPath: string, contract: Su
       summary_path: null,
       current_slice: null,
       status: "not_applicable",
+      source_status: null,
+      empty_key_fields: [],
+      quality_status: "unknown",
+      quality_warnings: [],
       warnings: [],
     };
   }
 
+  const source = await readYamlRecord(join(root, artifactPath));
+  const quality = qualityForArtifact(artifactPath, contract.artifactType, source);
   if (contract.summaryPolicy.strategy === "current_slice") {
     const fields = currentSliceFields(contract.summaryPolicy.path);
-    const content = await readYamlRecord(join(root, artifactPath));
-    const missing = fields.filter((field) => !hasNonEmptyValue(content?.[field]));
+    const missing = fields.filter((field) => !hasNonEmptyValue(source?.[field]));
     return {
       artifact_path: artifactPath,
       summary_path: null,
       current_slice: fields,
       status: missing.length === 0 ? "current" : "missing",
-      warnings: missing.map((field) => `missing current_slice field ${field} in ${artifactPath}`),
+      ...quality,
+      warnings: [
+        ...missing.map((field) => `missing current_slice field ${field} in ${artifactPath}`),
+        ...quality.quality_warnings,
+      ],
     };
   }
 
@@ -209,6 +223,7 @@ async function evaluateArtifact(root: string, artifactPath: string, contract: Su
       summary_path: summaryPath,
       current_slice: null,
       status: "missing",
+      ...quality,
       warnings: [`missing summary file: ${summaryPath}`],
     };
   }
@@ -218,8 +233,64 @@ async function evaluateArtifact(root: string, artifactPath: string, contract: Su
     summary_path: summaryPath,
     current_slice: null,
     status: current ? "current" : "stale_unknown",
-    warnings: current ? [] : [`summary may be stale: ${summaryPath}`],
+    ...quality,
+    warnings: current ? quality.quality_warnings : [`summary may be stale: ${summaryPath}`, ...quality.quality_warnings],
   };
+}
+
+function qualityForArtifact(
+  artifactPath: string,
+  artifactType: string,
+  source: Record<string, unknown> | null,
+): Pick<SummaryHealthItem, "source_status" | "empty_key_fields" | "quality_status" | "quality_warnings"> {
+  if (!source) {
+    return {
+      source_status: null,
+      empty_key_fields: qualityFieldsForArtifact(artifactType),
+      quality_status: "current_but_thin",
+      quality_warnings: [`source artifact could not be read for quality assessment: ${artifactPath}`],
+    };
+  }
+  const sourceStatus = stringValue(source.status);
+  const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(source[field]));
+  const qualityWarnings = [
+    ...(sourceStatus === "draft" ? [`source artifact is draft: ${artifactPath}`] : []),
+    ...(emptyKeyFields.length > 0 ? [`source artifact has empty handoff fields in ${artifactPath}: ${emptyKeyFields.join(", ")}`] : []),
+  ];
+  return {
+    source_status: sourceStatus,
+    empty_key_fields: emptyKeyFields,
+    quality_status: qualityWarnings.length > 0 ? "current_but_thin" : "usable",
+    quality_warnings: qualityWarnings,
+  };
+}
+
+function qualityFieldsForArtifact(artifactType: string): string[] {
+  if (artifactType === "vision_session") {
+    return ["vision_delta"];
+  }
+  if (artifactType === "validation_target") {
+    return ["core_question", "prototype_scope", "acceptance"];
+  }
+  if (artifactType === "prototype_evidence") {
+    return ["core_question", "prototype_artifact", "verification", "result"];
+  }
+  if (artifactType === "decision_record") {
+    return ["outcome", "rationale", "next_command"];
+  }
+  if (artifactType === "product_design") {
+    return ["personas", "journey_map", "user_stories", "spec_readiness"];
+  }
+  if (artifactType === "production_spec") {
+    return ["goal", "scope", "requirements", "verification", "change_readiness"];
+  }
+  if (artifactType === "production_change") {
+    return ["problem", "goals", "affected_paths", "acceptance", "validation", "work_items", "runtime_readiness"];
+  }
+  if (artifactType === "team_runtime") {
+    return ["active_work_item", "work_queue", "verification", "handoff"];
+  }
+  return [];
 }
 
 async function findInstantiatedArtifacts(root: string, contract: SummaryArtifactContract): Promise<string[]> {
