@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, stat, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,12 +32,34 @@ async function main(): Promise<number> {
     await verifyDesignContract(target);
     await verifyTuneDecisionSurface(target);
     await verifyNoDefaultCodexCommands(target);
+    await verifyNonDestructiveSyncMigration(tempRoot, env);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
 
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
+}
+
+async function runCaptureStatus(command: string[], env: NodeJS.ProcessEnv): Promise<{ code: number | null; output: string }> {
+  return new Promise<{ code: number | null; output: string }>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd: REPO_ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      resolvePromise({ code, output });
+    });
+  });
 }
 
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {
@@ -121,9 +143,40 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "/ow:vision",
     "/ow:team",
     "Lazy creation boundary",
+    "Sync safety",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
   }
+}
+
+async function verifyNonDestructiveSyncMigration(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const older = join(tempRoot, "older-project");
+  await run(["node", CLI, "init", older, "--tools", "codex", "--force"], env);
+  const userArtifact = join(older, ".openworkflow", "validation", "VALIDATION.yaml");
+  await mkdir(join(older, ".openworkflow", "validation"), { recursive: true });
+  await writeFile(userArtifact, "user validation artifact\n", "utf8");
+  await unlink(join(older, ".openworkflow", "CURRENT_STATE.yaml"));
+  await writeFile(join(older, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"), "stale managed contract\n", "utf8");
+
+  const doctor = await runCaptureStatus(["node", CLI, "doctor", "--root", older, "--tools", "auto"], env);
+  assert(doctor.code !== 0, "doctor should fail before sync repairs missing managed workflow files");
+  assert(doctor.output.includes("missing managed workflow file: .openworkflow/CURRENT_STATE.yaml"), "doctor did not report missing current state");
+  assert(doctor.output.includes("stale managed workflow file: .openworkflow/audit/ARTIFACT_CONTRACTS.yaml"), "doctor did not report stale artifact contracts");
+
+  const syncAuto = await runCapture(["node", CLI, "sync", "--root", older], env);
+  assert(syncAuto.includes("Detected tools: codex"), "sync without --tools did not auto-detect codex");
+  assert(syncAuto.includes("Workflow files added:"), "sync report missing workflow phase");
+  assert(syncAuto.includes("codex adapter written:"), "sync report missing codex adapter phase");
+  await assertFile(join(older, ".openworkflow", "CURRENT_STATE.yaml"));
+  const contracts = await read(join(older, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
+  assert(contracts.includes("artifact_type: product_design"), "sync did not refresh managed artifact contracts");
+  assert((await read(userArtifact)) === "user validation artifact\n", "sync modified user stage artifact");
+
+  const syncExplicitAuto = await runCapture(["node", CLI, "sync", "--root", older, "--tools", "auto"], env);
+  assert(syncExplicitAuto.includes("Detected tools: codex"), "sync --tools auto did not auto-detect codex");
+  const syncExplicitCodex = await runCapture(["node", CLI, "sync", "--root", older, "--tools", "codex"], env);
+  assert(syncExplicitCodex.includes("codex adapter written:"), "sync --tools codex did not sync codex explicitly");
+  assert(!syncExplicitCodex.includes("claude-code"), "explicit codex sync mentioned an unrequested future platform");
 }
 
 async function verifyMinimalOpenWorkflow(root: string): Promise<void> {

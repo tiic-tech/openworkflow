@@ -45,15 +45,15 @@ function printHelp(): void {
 Usage:
   openworkflow init <folder> --tools codex [--force]
   openworkflow validate --root <folder>
-  openworkflow sync --root <folder> --tools codex [--force]
-  openworkflow doctor --root <folder> --tools codex
+  openworkflow sync --root <folder> [--tools auto|codex] [--force]
+  openworkflow doctor --root <folder> [--tools auto|codex]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
   init       Initialize .openworkflow contracts and optional tool adapters.
   validate   Validate .openworkflow contract files.
-  sync       Regenerate project-local tool adapters from packaged templates.
-  doctor     Check generated adapter files for missing or stale templates.
+  sync       Non-destructively refresh workflow contracts and detected adapters.
+  doctor     Check managed workflow and adapter files for missing or stale templates.
   clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -64,7 +64,7 @@ Agent quick start:
 Two command surfaces:
   CLI maintenance commands keep OpenWorkflow installed and current:
     init       Create the minimal workflow root, AGENTS.md guide, and tool adapters.
-    sync       Refresh generated adapters and managed onboarding blocks.
+    sync       Detect current platforms, refresh managed workflow files, and sync adapters.
     validate   Check .openworkflow contract shape.
     doctor     Report missing or stale generated surfaces.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
@@ -82,6 +82,11 @@ Two command surfaces:
 Lazy creation boundary:
   openworkflow init creates only the minimal .openworkflow setup. Stage artifacts
   are created by the first matching /ow:* workflow command, not by init.
+
+Sync safety:
+  sync may add missing managed workflow files and refresh audit/index metadata,
+  but it preserves CURRENT_STATE pointers and never creates or rewrites stage
+  artifacts such as validation, prototype, design, spec, change, or runtime files.
 `);
 }
 

@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:M26-non-destructive-multi-platform-sync
 contract_type: change
 title: M26 Non-destructive multi-platform sync
-status: draft
+status: accepted
 source_artifacts:
   - changes/M25-agent-onboarding-entrypoint/CHANGE.yaml
 depends_on:
@@ -44,10 +44,11 @@ decisions:
   - Workflow-level managed contracts may be refreshed from the current package because they describe OpenWorkflow capabilities, not user product decisions.
   - Artifact contracts can gain new artifact types and templates through sync without creating those stage artifacts.
   - Adapter detection should be registry-driven so Codex is not hard-coded as the only sync path.
-open_questions:
-  - Should stale workflow-level managed files be updated by default or only when marker/version checks confirm safe replacement?
-  - Should `sync --tools auto` be an explicit alias, or should omitted `--tools` be the only auto mode?
-  - Should sync write a durable migration report under `.openworkflow/audit/`, or only print to stdout?
+open_questions: []
+resolved_questions:
+  - sync refreshes workflow-level managed audit/index/config contracts by default, while preserving CURRENT_STATE.yaml when it already exists.
+  - Both omitted `--tools` and explicit `--tools auto` use platform detection.
+  - M26 prints migration notes to stdout and does not write a durable migration artifact.
 affected_paths:
   - packages/cli/src/commands/sync.ts
   - packages/cli/src/commands/doctor.ts

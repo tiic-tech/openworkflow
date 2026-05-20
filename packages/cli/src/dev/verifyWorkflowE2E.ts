@@ -30,7 +30,7 @@ async function main(): Promise<number> {
     const env = { ...process.env, CODEX_HOME: codexHome };
 
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
-    await run(["node", CLI, "sync", "--root", target, "--tools", "codex"], env);
+    await run(["node", CLI, "sync", "--root", target], env);
     await run(["node", CLI, "doctor", "--root", target, "--tools", "codex"], env);
     await run(["node", CLI, "validate", "--root", target], env);
     await verifyAgentOnboarding(target, env);

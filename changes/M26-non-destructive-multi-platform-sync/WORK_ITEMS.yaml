@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M26-non-destructive-multi-platform-sync
 contract_type: work_items
 title: M26 Non-destructive multi-platform sync work items
-status: draft
+status: accepted
 change_contract: changes/M26-non-destructive-multi-platform-sync/CHANGE.yaml
 items:
   - task_id: M26-T001
     title: Define adapter registry and platform detection
-    status: planned
+    status: completed
     owned_paths:
       - packages/adapters/
       - packages/adapters/codex/src/
@@ -18,7 +18,7 @@ items:
       - Unknown or future platforms are reported clearly without being created.
   - task_id: M26-T002
     title: Implement workflow-level sync migration
-    status: planned
+    status: completed
     owned_paths:
       - packages/core/src/workflow/
       - packages/cli/src/commands/sync.ts
@@ -28,7 +28,7 @@ items:
       - Existing stage artifacts are not overwritten or created by workflow sync.
   - task_id: M26-T003
     title: Update sync reporting and CLI semantics
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/commands/sync.ts
       - packages/cli/src/index.ts
@@ -38,7 +38,7 @@ items:
       - Output separates workflow results from each adapter result.
   - task_id: M26-T004
     title: Extend doctor for workflow and adapter drift
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/commands/doctor.ts
       - packages/adapters/codex/src/doctorCodexAdapter.ts
@@ -49,7 +49,7 @@ items:
       - Messages identify whether sync can safely fix the issue.
   - task_id: M26-T005
     title: Add non-destructive sync regression tests
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
