@@ -1,0 +1,82 @@
+schema_version: 0.1.0
+contract_id: change:M26-non-destructive-multi-platform-sync
+contract_type: change
+title: M26 Non-destructive multi-platform sync
+status: accepted
+source_artifacts:
+  - changes/M25-agent-onboarding-entrypoint/CHANGE.yaml
+depends_on:
+  - change:M25-agent-onboarding-entrypoint
+produces:
+  - work_items:M26-non-destructive-multi-platform-sync
+summary: >
+  Redesign openworkflow sync from a Codex-only adapter regeneration command into
+  a non-destructive workflow migration and multi-platform adapter sync command
+  that can auto-detect existing project platforms.
+problem: >
+  Current sync only regenerates the Codex adapter surface. As OpenWorkflow
+  evolves, users may initialize a project on version 0.1.0 and later install
+  0.1.1 or newer, where workflow-level files, audit contracts, managed
+  onboarding blocks, and platform adapters may have changed. Users need sync to
+  detect the current repo state, fill in new managed OpenWorkflow surfaces, and
+  refresh the correct platform adapters without overwriting existing workflow
+  artifacts or enabling platforms they did not choose.
+goals:
+  - Split sync into workflow sync and adapter sync phases.
+  - Make workflow sync non-destructively add or refresh managed workflow-level files such as CURRENT_STATE.yaml, config, audit contracts, and managed onboarding blocks.
+  - Preserve existing user artifacts and stage artifacts; never rewrite VALIDATION.yaml, EVIDENCE.yaml, PRODUCT_DESIGN.yaml, SPEC.yaml, CHANGE.yaml, runtime state, or user notes by default.
+  - Add platform detection for current repo adapters, starting with Codex and designed for future claude-code and opencode adapters.
+  - Make Codex the first supported adapter while introducing an adapter registry abstraction.
+  - Support `--tools auto` or omitted tools by detecting existing project platforms.
+  - Support explicit `--tools codex`, and future `--tools codex,claude-code,opencode`, without auto-enabling unrequested platforms.
+  - Produce a clear sync report separating workflow updates from per-platform adapter updates, skips, unchanged files, warnings, and migration notes.
+  - Update doctor to report missing or stale managed workflow surfaces and adapter surfaces consistently.
+non_goals:
+  - Do not implement full Claude Code or opencode adapters in M26 unless a minimal registry placeholder is needed.
+  - Do not rewrite existing user-authored OpenWorkflow stage artifacts.
+  - Do not silently migrate artifact content schemas beyond managed workflow/audit metadata.
+  - Do not make `--force` overwrite user artifacts without generated markers.
+  - Do not make sync create stage directories or active stage artifacts that have not been invoked.
+decisions:
+  - Sync should default to auto-detection when `--tools` is omitted.
+  - A configured tool in `.openworkflow/config.yaml` is stronger evidence than file heuristics.
+  - Managed markers and known adapter manifest files determine whether a file can be refreshed in place.
+  - Workflow-level managed contracts may be refreshed from the current package because they describe OpenWorkflow capabilities, not user product decisions.
+  - Artifact contracts can gain new artifact types and templates through sync without creating those stage artifacts.
+  - Adapter detection should be registry-driven so Codex is not hard-coded as the only sync path.
+open_questions: []
+resolved_questions:
+  - sync refreshes workflow-level managed audit/index/config contracts by default, while preserving CURRENT_STATE.yaml when it already exists.
+  - Both omitted `--tools` and explicit `--tools auto` use platform detection.
+  - M26 prints migration notes to stdout and does not write a durable migration artifact.
+affected_paths:
+  - packages/cli/src/commands/sync.ts
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/commands/init.ts
+  - packages/core/src/workflow/
+  - packages/core/src/validators/
+  - packages/adapters/codex/src/
+  - packages/adapters/
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - changes/M26-non-destructive-multi-platform-sync/
+acceptance:
+  - sync can run without `--tools` on an existing Codex project and detect/sync the Codex adapter.
+  - sync can run with `--tools auto` and produce the same detected platform behavior.
+  - sync with explicit `--tools codex` only syncs Codex and does not create future platform surfaces.
+  - sync fills in missing managed workflow-level files introduced by newer OpenWorkflow versions, including CURRENT_STATE.yaml and updated audit contracts.
+  - sync updates managed audit contracts to include newly added artifact contract metadata without changing existing user stage artifacts.
+  - sync preserves existing user artifacts and notes even when `--force` is absent.
+  - sync report separates workflow and adapter results.
+  - doctor reports missing/stale managed workflow surfaces and adapter surfaces with actionable messages.
+  - Regression tests simulate an older initialized project and verify sync upgrades managed files without modifying user artifacts.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - npm run smoke:init
+  - npm run validate:cli
+updated_at: 2026-05-20

@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: work_items:M45-sync-state-reconciliation
+contract_type: work_items
+title: M45 Sync state reconciliation work items
+status: completed
+change_contract: changes/M45-sync-state-reconciliation/CHANGE.yaml
+items:
+  - task_id: M45-T001
+    title: Reconcile current state from preserved indexes
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/syncOpenWorkflow.ts
+    acceptance:
+      - Recreated CURRENT_STATE.yaml is patched from preserved current pointers.
+      - Existing non-default CURRENT_STATE.yaml is preserved.
+      - Reconciliation warnings explain unrecoverable index or artifact cases.
+  - task_id: M45-T002
+    title: Surface sync reconciliation in CLI JSON
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/sync.ts
+    acceptance:
+      - Sync JSON data includes state_reconciliation.
+      - Sync effects or migration notes identify CURRENT_STATE reconciliation.
+  - task_id: M45-T003
+    title: Add clean recovery regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyCleanCommand.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Clean verifier proves current pointers and next command survive clean/sync recovery.
+      - Repository validation requires M45 contracts.

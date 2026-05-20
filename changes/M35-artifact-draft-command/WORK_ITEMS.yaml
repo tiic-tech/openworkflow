@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: work_items:M35-artifact-draft-command
+contract_type: work_items
+title: M35 Artifact draft command work items
+status: completed
+change_contract: changes/M35-artifact-draft-command/CHANGE.yaml
+items:
+  - task_id: M35-T001
+    title: Define draft render model
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/draft.ts
+      - packages/core/src/artifacts/registry.ts
+    acceptance:
+      - Model resolves artifact type to contract, source path, rendered content, and write policy.
+      - Model replaces `<id>` placeholders in paths and template values.
+      - Model rejects ids that could escape the workflow root.
+  - task_id: M35-T002
+    title: Implement draft CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/draft.ts
+    acceptance:
+      - Dry-run reports planned path and content.
+      - "`--write` writes the source artifact only."
+      - Duplicate writes require `--force`.
+  - task_id: M35-T003
+    title: Preserve lazy and workflow-state boundaries
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/draft.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - CURRENT_STATE.yaml and indexes remain unchanged.
+      - No unrelated stage directories, notes, summaries, reviews, or evidence folders are created.
+      - Non-OpenWorkflow roots fail explicitly.
+  - task_id: M35-T004
+    title: Update Agent-facing command surfaces
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help documents draft, dry-run default, `--write`, and `--force`.
+      - AGENTS.md tells Agents to use draft only for contract-shaped artifact starts.
+      - Existing context/summarize guidance remains consistent.
+  - task_id: M35-T005
+    title: Add draft regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime tests cover dry-run, write, duplicate refusal, force overwrite, invalid id, invalid artifact type, and non-OpenWorkflow root.
+      - Workflow E2E verifies help and AGENTS.md draft guidance.
+      - Repository validation includes M35 change contracts and new source files.

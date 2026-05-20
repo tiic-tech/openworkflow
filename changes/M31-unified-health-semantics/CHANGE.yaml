@@ -1,0 +1,76 @@
+schema_version: 0.1.0
+contract_id: change:M31-unified-health-semantics
+contract_type: change
+title: M31 Unified health semantics and artifact validation boundary
+status: accepted
+source_artifacts:
+  - changes/M30-artifact-summary-health/CHANGE.yaml
+depends_on:
+  - change:M30-artifact-summary-health
+produces:
+  - work_items:M31-unified-health-semantics
+summary: >
+  Unify OpenWorkflow health semantics across brief/status, summaries, check,
+  doctor, and validate so Agent consumers receive one coherent signal about
+  workflow readiness, summary trust, and validation scope.
+problem: >
+  M30 added summary health detection, but E2E consumer testing found that the
+  signal is not yet consistently consumed. `summaries --json` can report
+  `ok: false` while `brief/status --json` still report an overall healthy
+  status. `summaries` can also treat a non-OpenWorkflow directory as a healthy
+  project with no instantiated artifacts. Separately, `validate` currently has
+  an unclear boundary around SUMMARY.yaml files: summary files are required by
+  summary_policy, but the artifact validator does not model them as first-class
+  artifacts.
+goals:
+  - Make `brief/status.data.health.ok` include summary health so the Agent entrypoint cannot report healthy when summaries are missing or stale.
+  - Make `summaries --json` distinguish initialized OpenWorkflow projects from missing or cleaned workflow directories.
+  - Decide and encode the validation boundary for SUMMARY.yaml files: either model summary contracts explicitly or make validate/help state that summaries are checked by `summaries`.
+  - Ensure `check <command>` raises relevant summary health problems into warnings while keeping blockers focused on hard command readiness.
+  - Clarify doctor and validate scope in `openworkflow --help` and JSON next_actions so Agents know which command checks which health layer.
+  - Preserve init minimality and lazy artifact creation.
+  - Keep all command outputs in the shared M28 JSON envelope.
+non_goals:
+  - Do not generate, refresh, or rewrite SUMMARY.yaml files.
+  - Do not make `doctor` mutate artifacts or create missing stage directories.
+  - Do not require raw evidence scanning by default.
+  - Do not change existing /ow:* command behavior beyond clearer health/readiness reporting.
+decisions:
+  - "`brief/status` are Agent entrypoints and must provide conservative health semantics."
+  - "Summary health is advisory for `check` readiness unless the command explicitly requires a summary artifact in a future contract."
+  - "`summaries` must fail clearly on non-OpenWorkflow roots instead of silently falling back to package defaults."
+resolved_questions:
+  - "`validate` validates managed workflow contracts and source-of-truth artifacts; SUMMARY.yaml trust is delegated to `summaries`."
+  - "`doctor` reports summary health warnings and next actions, but its ok value remains scoped to generated managed surfaces and selected adapters."
+  - "Stale or missing summaries make `brief/status` JSON `ok` and `data.health.ok` false while preserving a zero process exit for read-model consumption."
+affected_paths:
+  - packages/cli/src/commands/brief.ts
+  - packages/cli/src/commands/check.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/commands/validate.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/validators/
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M31-unified-health-semantics/
+acceptance:
+  - "When summary health is missing or stale, `brief/status --json` exposes a false health signal consistently instead of reporting overall healthy."
+  - "`summaries --root <non-openworkflow> --json` returns a clear not-initialized error or status instead of healthy not_instantiated counts."
+  - "`check <command> --json` includes relevant summary issues in warnings while preserving blocker semantics for required/forbidden context."
+  - "The project has an explicit policy for SUMMARY.yaml validation, backed by help text and regression tests."
+  - "`doctor` and `validate` outputs document or expose their boundary relative to summary health."
+  - "No M31 command creates stage directories or missing artifacts."
+  - "`openworkflow --help` and AGENTS.md managed block remain synchronized with any command-surface behavior changes."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, brief/status, summaries, check, sync, doctor, validate, clean with missing and stale summaries
+created_at: 2026-05-20
+updated_at: 2026-05-20
+completed_at: 2026-05-20

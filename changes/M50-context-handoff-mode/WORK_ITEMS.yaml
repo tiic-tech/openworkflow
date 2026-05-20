@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: work_items:M50-context-handoff-mode
+contract_type: work_items
+title: M50 Context handoff mode work items
+status: completed
+change_contract: changes/M50-context-handoff-mode/CHANGE.yaml
+items:
+  - task_id: M50-T001
+    title: Add context handoff mode
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+    acceptance:
+      - Context JSON includes handoff_mode.
+      - Default context remains non-strict.
+      - Handoff mode fails on strict summary quality blockers.
+  - task_id: M50-T002
+    title: Update Agent guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help distinguishes `handoff --json` from `context --handoff --json`.
+      - AGENTS.md managed block tells Agents when to request handoff-gated context.
+  - task_id: M50-T003
+    title: Add runtime verification
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier covers thin summary default context and handoff context behavior.
+      - Repository validation requires M50 contracts.

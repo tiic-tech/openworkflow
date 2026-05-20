@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: change:M35-artifact-draft-command
+contract_type: change
+title: M35 Artifact draft command
+status: accepted
+source_artifacts:
+  - changes/M34-agent-context-packet/CHANGE.yaml
+depends_on:
+  - change:M34-agent-context-packet
+produces:
+  - work_items:M35-artifact-draft-command
+summary: >
+  Add a contract-aware artifact draft command so Agents can preview and create
+  first-class source artifacts from OpenWorkflow templates without hand-building
+  paths or violating lazy creation boundaries.
+problem: >
+  M34 gives Agents a bounded context packet, but the next high-risk step is
+  artifact authoring. Today an Agent must manually infer the right artifact
+  contract, choose an id, create parent directories, replace `<id>` placeholders,
+  and preserve lazy boundaries. That manual step is easy to get wrong and can
+  produce malformed artifacts before `validate` catches the problem.
+goals:
+  - Add `openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--json]`.
+  - Support artifact type lookup from the managed artifact contract registry.
+  - Default to dry-run with planned path and rendered YAML content.
+  - Write only the source-of-truth artifact path when `--write` is present.
+  - Create only the target artifact parent directory, not unrelated stage directories or indexes.
+  - Refuse to overwrite existing artifacts unless `--force` is provided.
+  - Use the M28 JSON envelope and report planned/written/skipped effects.
+  - Update `openworkflow --help` and AGENTS.md managed block because a new CLI command is introduced.
+non_goals:
+  - Do not update CURRENT_STATE.yaml, indexes, active pointers, or summary files.
+  - Do not create NOTE.md, review assets, raw evidence folders, or conditional packets.
+  - Do not decide which workflow command should run next.
+  - Do not replace `/ow:*` skills; this command only creates a safe starting file.
+decisions:
+  - "`draft` is a low-level artifact creation helper; workflow state progression remains explicit in the Agent skill."
+  - "Dry-run should expose rendered content so Agents can inspect contract shape before writing."
+  - "The first implementation should require explicit `--artifact` and `--id` rather than guessing ids from current state."
+open_questions:
+  - question: "Should `draft` accept command names as an alias for the primary artifact type?"
+    outcome: "The first implementation requires explicit artifact types to avoid ambiguous commands like /ow:proto that can produce more than one artifact."
+  - question: "Should `draft --write` validate the rendered artifact immediately or leave validation to `openworkflow validate`?"
+    outcome: "`draft` returns a next action to run `openworkflow validate --root . --json`; it does not inline validation so write effects stay narrow and deterministic."
+  - question: "How should generated ids be constrained to avoid unsafe paths?"
+    outcome: "Ids must match lowercase letters, numbers, dots, underscores, and hyphens, must start with an alphanumeric character, and cannot contain path traversal or separators."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/draft.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M35-artifact-draft-command/
+acceptance:
+  - "`openworkflow draft --root <folder> --artifact validation_target --id val-1 --json` reports planned path and rendered YAML without writing."
+  - "`openworkflow draft --root <folder> --artifact validation_target --id val-1 --write --json` writes the source artifact and creates only the target parent directory."
+  - "A second write without `--force` refuses to overwrite and returns `ok:false` in JSON mode."
+  - "`--force --write` overwrites the source artifact and reports the effect explicitly."
+  - "Invalid artifact types, invalid ids, and non-OpenWorkflow roots return explicit JSON errors."
+  - "The command does not update CURRENT_STATE.yaml, indexes, SUMMARY.yaml, NOTE.md, or raw evidence paths."
+  - "`openworkflow --help` and AGENTS.md managed block mention draft and dry-run/write behavior."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, draft dry-run, draft --write, validate, duplicate refusal, force overwrite, clean
+created_at: 2026-05-20
+updated_at: 2026-05-20

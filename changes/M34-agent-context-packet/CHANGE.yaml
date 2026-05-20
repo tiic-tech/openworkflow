@@ -1,0 +1,73 @@
+schema_version: 0.1.0
+contract_id: change:M34-agent-context-packet
+contract_type: change
+title: M34 Agent context packet command
+status: accepted
+source_artifacts:
+  - changes/M32-agent-inspect-entry/CHANGE.yaml
+  - changes/M33-summary-refresh-command/CHANGE.yaml
+depends_on:
+  - change:M32-agent-inspect-entry
+  - change:M33-summary-refresh-command
+produces:
+  - work_items:M34-agent-context-packet
+summary: >
+  Add an Agent-facing context packet command that materializes the low-context
+  read plan into bounded, structured content so Agents can start workflow work
+  with fewer file reads and less raw evidence loading.
+problem: >
+  M32 tells Agents which files to read and M33 can repair SUMMARY.yaml files,
+  but the first consumer still has to issue multiple file reads, manually
+  decide whether to trust summaries/current_slice data, and avoid accidentally
+  loading raw evidence. OpenWorkflow should provide one read-only command that
+  packages the current workflow state, command readiness, and trusted summary
+  content under an explicit context budget.
+goals:
+  - Add `openworkflow context --root <folder> [--for <ow-command>] [--max-bytes <n>] [--json]`.
+  - Default `--for` to CURRENT_STATE.next_command so a fresh Agent can run one command after `openworkflow --help`.
+  - Materialize `.openworkflow/audit/CONTEXT_PACKETS.yaml` plus `check` and `inspect` read models into a bounded context packet.
+  - Include small required workflow files directly, prefer SUMMARY.yaml/current_slice over source artifacts, and omit raw evidence by default with explicit omission reasons.
+  - Keep the command read-only: no artifact creation, no SUMMARY.yaml repair, no CURRENT_STATE mutation, and no stage directory creation.
+  - Use the M28 JSON envelope and expose included, missing, omitted, truncated, warnings, blockers, and recommended next actions.
+  - Update `openworkflow --help` and the AGENTS.md managed block because a new CLI command is introduced.
+non_goals:
+  - Do not replace `/ow:*` workflow skills or author stage artifacts.
+  - Do not call an LLM to summarize content.
+  - Do not scan raw evidence directories or visual review assets by default.
+  - Do not make `validate` responsible for context freshness; summary trust remains owned by `summaries`.
+decisions:
+  - "`context` is a read-only consumption command; repair remains explicit through `summarize --write`."
+  - "The first implementation should optimize for deterministic Agent startup, not exhaustive project understanding."
+  - "Text output should be human-scannable, while `--json` remains the primary Agent integration surface."
+open_questions:
+  - question: "Should `--max-bytes` apply to total packet content only, or to both per-file and total budgets?"
+    outcome: "`--max-bytes` is the total included-content budget; each item is also capped at min(6000, max-bytes) with explicit truncation metadata."
+  - question: "Should a not-ready command return nonzero while still emitting partial context?"
+    outcome: "Not-ready commands return nonzero when blockers exist, but still emit the same JSON envelope with partial included context, blockers, warnings, and next actions."
+  - question: "What exact schema should represent included content versus omitted paths so downstream Agents can trust it?"
+    outcome: "Context packets expose included entries with path, source, reason, bytes, truncated, and content; omitted/truncated entries use path plus reason; missing uses context status records."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/context.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M34-agent-context-packet/
+acceptance:
+  - "`openworkflow context --root <folder> --json` uses CURRENT_STATE.next_command and returns a bounded context packet."
+  - "`openworkflow context --root <folder> --for /ow:<command> --json` includes command readiness, required context status, and packet metadata."
+  - "The packet includes trusted SUMMARY.yaml/current_slice content before full source artifacts and reports missing or stale summaries as warnings with repair actions."
+  - "Raw evidence and forbidden context are omitted by default with explicit reasons."
+  - "The command never writes files or creates lazy stage directories."
+  - "Non-OpenWorkflow roots return an explicit not-initialized JSON error."
+  - "`openworkflow --help` and AGENTS.md managed block mention context, `--for`, and budgeted read behavior."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, context --json, create evidence plus SUMMARY.yaml, context --for, stale summary warning, clean
+created_at: 2026-05-20
+updated_at: 2026-05-20

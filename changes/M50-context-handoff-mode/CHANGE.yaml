@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M50-context-handoff-mode
+contract_type: change
+title: M50 Context handoff mode
+status: accepted
+source_artifacts:
+  - changes/M49-single-handoff-entry/CHANGE.yaml
+depends_on:
+  - change:M49-single-handoff-entry
+produces:
+  - work_items:M50-context-handoff-mode
+summary: >
+  Add an explicit handoff mode to context so Agents can request a bounded
+  startup packet only when strict handoff quality is trustworthy.
+problem: >
+  The default context command is a packet materializer and intentionally keeps
+  non-strict exit semantics. That is correct for exploration, but a first
+  consumer can still mistake default `context --json ok:true` as approval that
+  current summaries are trustworthy. M49 adds a separate trust gate; M50 should
+  let Agents combine the packet and trust gate when they explicitly request
+  handoff semantics.
+goals:
+  - Add `openworkflow context --root <folder> --handoff --json`.
+  - Keep default context behavior unchanged.
+  - In handoff mode, make strict summary quality and next-command readiness block context ok/exit status.
+  - Reuse existing quality_summary and handoff_quality_ok signals.
+  - Add handoff_mode metadata so JSON consumers can distinguish packet-only versus handoff-gated context.
+  - Update help and AGENTS.md managed guidance.
+  - Add runtime coverage for default context ok with thin summaries and handoff context failure.
+non_goals:
+  - Do not replace the standalone `handoff` command.
+  - Do not make default context strict.
+  - Do not mutate workflow state or artifacts.
+decisions:
+  - "`context --handoff` is a strict read-only context packet, not a new workflow stage."
+  - "Default context remains optimized for bounded orientation and may carry handoff warnings without failing."
+  - "Agents should use `handoff --json` for a boolean trust gate and `context --handoff --json` when they need both trust and packet content."
+open_questions:
+  - question: "Should `--strict` be an alias for `--handoff`?"
+    outcome: "Not in M50; use one explicit handoff flag to avoid ambiguity with inspect/summaries strict."
+affected_paths:
+  - packages/cli/src/commands/context.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M50-context-handoff-mode/
+acceptance:
+  - "`context --json` keeps existing non-strict behavior."
+  - "`context --handoff --json` includes handoff_mode:true."
+  - "`context --handoff --json` fails when quality_summary reports current_but_thin."
+  - "`context --handoff --json` exposes strict summary quality blockers in health_errors."
+  - "Handoff context remains read-only and does not create lazy stage artifacts."
+  - "Help and AGENTS.md explain when to use context --handoff versus handoff."
+  - "Runtime verification covers default context behavior and handoff context failure."
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M51-agent-first-e2e-suite
+contract_type: change
+title: M51 Agent-first E2E suite
+status: accepted
+source_artifacts:
+  - changes/M49-single-handoff-entry/CHANGE.yaml
+  - changes/M50-context-handoff-mode/CHANGE.yaml
+depends_on:
+  - change:M49-single-handoff-entry
+  - change:M50-context-handoff-mode
+produces:
+  - work_items:M51-agent-first-e2e-suite
+summary: >
+  Promote the temporary first-consumer audit flow into a repeatable npm
+  verification suite that validates OpenWorkflow from init through handoff,
+  context, strict quality gates, clean, and sync recovery.
+problem: >
+  The recent Agent-first audits used temporary scripts to verify that an Agent
+  can consume OpenWorkflow artifacts with low context and reliable trust
+  signals. Those checks proved valuable but are not yet a durable regression
+  suite. Future changes need a single command that exercises the end-to-end
+  consumer journey instead of relying on ad hoc tmp-folder audits.
+goals:
+  - Add `npm run verify:agent-e2e`.
+  - Simulate a fresh consumer project initialized with OpenWorkflow.
+  - Verify minimal init and lazy artifact boundaries.
+  - Exercise draft/register/summarize/summaries/check/handoff/context/doctor/clean/sync.
+  - Assert strict handoff failures for current-but-thin summaries and recovery after sync.
+  - Assert source artifacts and user content are preserved across clean and sync.
+  - Register the suite in repository validation expectations.
+non_goals:
+  - Do not replace targeted runtime surface tests.
+  - Do not require network access or npm publishing.
+  - Do not create persistent files outside temporary directories.
+decisions:
+  - "The suite should run against built dist output so it matches published CLI behavior."
+  - "The suite should encode first-consumer expectations as assertions, not snapshot-only output."
+  - "The suite should remain deterministic and self-contained in a tmp project."
+open_questions:
+  - question: "Should the suite run in every validation command?"
+    outcome: "Not in M51; expose it as an explicit npm script to keep targeted validation fast."
+affected_paths:
+  - package.json
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M51-agent-first-e2e-suite/
+acceptance:
+  - "`npm run verify:agent-e2e` exists and runs successfully."
+  - "The suite verifies minimal init does not create lazy stage artifacts."
+  - "The suite verifies handoff and context --handoff fail on current-but-thin summaries."
+  - "The suite verifies default context remains non-strict."
+  - "The suite verifies clean preserves source artifacts and user AGENTS.md content."
+  - "The suite verifies sync recovers CURRENT_STATE pointers and next command after clean."
+  - "Repository validation requires M51 contracts."
+validation:
+  - npm run build
+  - npm run verify:agent-e2e
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

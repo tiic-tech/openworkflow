@@ -19,6 +19,7 @@ const REQUIRED_FILES = [
   "references/artifact-authoring-templates.md",
   "references/runtime-command-surface.md",
   "schemas/openworkflow-contract.schema.json",
+  "schemas/current-state.schema.json",
   "schemas/workflow-index.schema.json",
   "schemas/contract-graph.schema.json",
   "schemas/artifact-contracts.schema.json",
@@ -35,19 +36,39 @@ const REQUIRED_FILES = [
   "package.json",
   "tsconfig.json",
   "packages/cli/src/index.ts",
+  "packages/cli/src/report.ts",
+  "packages/cli/src/commands/brief.ts",
+  "packages/cli/src/commands/check.ts",
+  "packages/cli/src/commands/clean.ts",
+  "packages/cli/src/commands/context.ts",
+  "packages/cli/src/commands/draft.ts",
   "packages/cli/src/commands/init.ts",
+  "packages/cli/src/commands/inspect.ts",
+  "packages/cli/src/commands/register.ts",
+  "packages/cli/src/commands/summaries.ts",
+  "packages/cli/src/commands/summarize.ts",
   "packages/cli/src/commands/validate.ts",
   "packages/cli/src/commands/sync.ts",
   "packages/cli/src/commands/doctor.ts",
   "packages/cli/src/dev/validateRepositoryContractsCli.ts",
   "packages/cli/src/dev/verifyRuntimeSurface.ts",
   "packages/cli/src/dev/verifyWorkflowE2E.ts",
+  "packages/cli/src/dev/verifyAgentE2E.ts",
+  "packages/cli/src/dev/verifyCleanCommand.ts",
+  "packages/adapters/src/registry.ts",
   "packages/core/src/artifacts/registry.ts",
+  "packages/core/src/artifacts/readiness.ts",
   "packages/core/src/contracts/index.ts",
   "packages/core/src/contracts/yaml.ts",
   "packages/core/src/commands/registry.ts",
   "packages/core/src/fs/index.ts",
+  "packages/core/src/onboarding/agentsGuide.ts",
+  "packages/core/src/workflow/doctorOpenWorkflow.ts",
   "packages/core/src/workflow/initOpenWorkflow.ts",
+  "packages/core/src/workflow/readWorkflowConfig.ts",
+  "packages/core/src/workflow/cleanOpenWorkflow.ts",
+  "packages/core/src/workflow/summaryHealth.ts",
+  "packages/core/src/workflow/syncOpenWorkflow.ts",
   "packages/core/src/validators/validateOpenWorkflow.ts",
   "packages/core/src/validators/validateRepositoryContracts.ts",
   "packages/core/src/graph/README.md",
@@ -55,6 +76,7 @@ const REQUIRED_FILES = [
   "packages/adapters/codex/src/generateCommands.ts",
   "packages/adapters/codex/src/generateSkills.ts",
   "packages/adapters/codex/src/doctorCodexAdapter.ts",
+  "packages/adapters/codex/src/cleanCodexAdapter.ts",
   "packages/adapters/codex/src/templates.ts",
   "templates/openworkflow/README.md",
   "templates/codex/README.md",
@@ -109,6 +131,68 @@ const REQUIRED_FILES = [
   "changes/M20-workflow-e2e-regression/WORK_ITEMS.yaml",
   "changes/M21-npm-package-release-readiness/CHANGE.yaml",
   "changes/M21-npm-package-release-readiness/WORK_ITEMS.yaml",
+  "changes/M22-project-clean-command/CHANGE.yaml",
+  "changes/M22-project-clean-command/WORK_ITEMS.yaml",
+  "changes/M23-production-command-lazy-contracts/CHANGE.yaml",
+  "changes/M23-production-command-lazy-contracts/WORK_ITEMS.yaml",
+  "changes/M24-agent-context-state-and-summaries/CHANGE.yaml",
+  "changes/M24-agent-context-state-and-summaries/WORK_ITEMS.yaml",
+  "changes/M25-agent-onboarding-entrypoint/CHANGE.yaml",
+  "changes/M25-agent-onboarding-entrypoint/WORK_ITEMS.yaml",
+  "changes/M26-non-destructive-multi-platform-sync/CHANGE.yaml",
+  "changes/M26-non-destructive-multi-platform-sync/WORK_ITEMS.yaml",
+  "changes/M27-agent-brief-status/CHANGE.yaml",
+  "changes/M27-agent-brief-status/WORK_ITEMS.yaml",
+  "changes/M28-cli-json-report-surface/CHANGE.yaml",
+  "changes/M28-cli-json-report-surface/WORK_ITEMS.yaml",
+  "changes/M29-command-readiness-check/CHANGE.yaml",
+  "changes/M29-command-readiness-check/WORK_ITEMS.yaml",
+  "changes/M30-artifact-summary-health/CHANGE.yaml",
+  "changes/M30-artifact-summary-health/WORK_ITEMS.yaml",
+  "changes/M31-unified-health-semantics/CHANGE.yaml",
+  "changes/M31-unified-health-semantics/WORK_ITEMS.yaml",
+  "changes/M32-agent-inspect-entry/CHANGE.yaml",
+  "changes/M32-agent-inspect-entry/WORK_ITEMS.yaml",
+  "changes/M33-summary-refresh-command/CHANGE.yaml",
+  "changes/M33-summary-refresh-command/WORK_ITEMS.yaml",
+  "changes/M34-agent-context-packet/CHANGE.yaml",
+  "changes/M34-agent-context-packet/WORK_ITEMS.yaml",
+  "changes/M35-artifact-draft-command/CHANGE.yaml",
+  "changes/M35-artifact-draft-command/WORK_ITEMS.yaml",
+  "changes/M36-artifact-register-command/CHANGE.yaml",
+  "changes/M36-artifact-register-command/WORK_ITEMS.yaml",
+  "changes/M37-managed-clean-boundary/CHANGE.yaml",
+  "changes/M37-managed-clean-boundary/WORK_ITEMS.yaml",
+  "changes/M38-json-exit-code-semantics/CHANGE.yaml",
+  "changes/M38-json-exit-code-semantics/WORK_ITEMS.yaml",
+  "changes/M39-stage-readiness-gates/CHANGE.yaml",
+  "changes/M39-stage-readiness-gates/WORK_ITEMS.yaml",
+  "changes/M40-compact-context-default/CHANGE.yaml",
+  "changes/M40-compact-context-default/WORK_ITEMS.yaml",
+  "changes/M41-compact-command-audit-slice/CHANGE.yaml",
+  "changes/M41-compact-command-audit-slice/WORK_ITEMS.yaml",
+  "changes/M42-health-errors-surface/CHANGE.yaml",
+  "changes/M42-health-errors-surface/WORK_ITEMS.yaml",
+  "changes/M43-summary-quality-signals/CHANGE.yaml",
+  "changes/M43-summary-quality-signals/WORK_ITEMS.yaml",
+  "changes/M44-clean-sync-recovery-e2e/CHANGE.yaml",
+  "changes/M44-clean-sync-recovery-e2e/WORK_ITEMS.yaml",
+  "changes/M45-sync-state-reconciliation/CHANGE.yaml",
+  "changes/M45-sync-state-reconciliation/WORK_ITEMS.yaml",
+  "changes/M46-strict-summary-quality/CHANGE.yaml",
+  "changes/M46-strict-summary-quality/WORK_ITEMS.yaml",
+  "changes/M47-doctor-handoff-quality-split/CHANGE.yaml",
+  "changes/M47-doctor-handoff-quality-split/WORK_ITEMS.yaml",
+  "changes/M48-handoff-quality-summary/CHANGE.yaml",
+  "changes/M48-handoff-quality-summary/WORK_ITEMS.yaml",
+  "changes/M49-single-handoff-entry/CHANGE.yaml",
+  "changes/M49-single-handoff-entry/WORK_ITEMS.yaml",
+  "changes/M50-context-handoff-mode/CHANGE.yaml",
+  "changes/M50-context-handoff-mode/WORK_ITEMS.yaml",
+  "changes/M51-agent-first-e2e-suite/CHANGE.yaml",
+  "changes/M51-agent-first-e2e-suite/WORK_ITEMS.yaml",
+  "changes/M52-default-sync-adapter-recovery/CHANGE.yaml",
+  "changes/M52-default-sync-adapter-recovery/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
@@ -170,11 +254,52 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validatePrototype(root, path, data, errors);
       validateArtifactContracts(root, path, data, errors);
       validateDisclosureLevels(root, path, data, errors);
+      validateConfig(root, path, data, errors);
+      validateCurrentState(root, path, data, errors);
       validateActivePointer(root, path, data, errors);
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
     }
+  }
+}
+
+function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "config.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  if (!nonEmptyString(data.project_slug) || data.project_slug === "project") {
+    errors.push(`${label} project_slug must be a useful non-empty slug`);
+  }
+  if (!nonEmptyString(data.project_title) || data.project_title === ".") {
+    errors.push(`${label} project_title must be a useful non-empty title`);
+  }
+}
+
+function validateCurrentState(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "CURRENT_STATE.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  for (const key of ["active_stage", "next_command", "blocked_by", "read_this_first", "last_decision"]) {
+    if (!(key in data)) {
+      errors.push(`${label} missing current state key ${key}`);
+    }
+  }
+  if (!nonEmptyString(data.active_stage)) {
+    errors.push(`${label} active_stage must be a non-empty string`);
+  }
+  if (typeof data.next_command !== "string" && data.next_command !== null) {
+    errors.push(`${label} next_command must be a string or null`);
+  }
+  for (const key of ["blocked_by", "read_this_first"]) {
+    if (!Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if (!isRecord(data.last_decision)) {
+    errors.push(`${label} last_decision must be a mapping`);
   }
 }
 
@@ -334,7 +459,16 @@ function validateArtifactContracts(root: string, path: string, data: Record<stri
     errors.push(`${label} must contain artifacts`);
     return;
   }
-  const missing = new Set(["vision_session", "validation_target", "prototype_evidence", "decision_record", "product_design"]);
+  const missing = new Set([
+    "vision_session",
+    "validation_target",
+    "prototype_evidence",
+    "decision_record",
+    "product_design",
+    "production_spec",
+    "production_change",
+    "team_runtime",
+  ]);
   artifacts.forEach((artifact, index) => {
     if (!isRecord(artifact)) {
       errors.push(`${label} artifact ${index} is not a mapping`);
@@ -389,6 +523,18 @@ function validateArtifactContractMetadata(
     }
   } else {
     errors.push(`${label} artifact ${index} active_pointer must be a mapping`);
+  }
+  const summaryPolicy = artifact.summary_policy;
+  if (summaryPolicy !== null && summaryPolicy !== undefined) {
+    if (!isRecord(summaryPolicy)) {
+      errors.push(`${label} artifact ${index} summary_policy must be null or a mapping`);
+    } else {
+      for (const key of ["strategy", "path", "load_before_full", "refresh_when"]) {
+        if (!(key in summaryPolicy)) {
+          errors.push(`${label} artifact ${index} summary_policy missing ${key}`);
+        }
+      }
+    }
   }
 }
 
@@ -447,6 +593,12 @@ function validateDiscoveryArtifact(root: string, path: string, data: Record<stri
     validateDecisionRecord(label, data, errors);
   } else if (data.artifact_type === "product_design") {
     validateProductDesign(label, data, errors);
+  } else if (data.artifact_type === "production_spec") {
+    validateProductionSpec(label, data, errors);
+  } else if (data.artifact_type === "production_change") {
+    validateProductionChange(label, data, errors);
+  } else if (data.artifact_type === "team_runtime") {
+    validateTeamRuntime(label, data, errors);
   }
 }
 
@@ -503,6 +655,40 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "open_questions",
       "conditional_packets",
       "spec_readiness",
+    ],
+    production_spec: [
+      "source_design",
+      "goal",
+      "scope",
+      "requirements",
+      "interfaces",
+      "acceptance",
+      "verification",
+      "risks",
+      "change_readiness",
+    ],
+    production_change: [
+      "source_spec",
+      "problem",
+      "goals",
+      "non_goals",
+      "affected_paths",
+      "acceptance",
+      "validation",
+      "work_items",
+      "risks",
+      "runtime_readiness",
+    ],
+    team_runtime: [
+      "source_change",
+      "active_work_item",
+      "execution_mode",
+      "work_queue",
+      "agents",
+      "verification",
+      "issues",
+      "checkpoints",
+      "handoff",
     ],
   };
   return requiredByType[artifactType] ?? null;
@@ -697,6 +883,55 @@ function validateProductDesign(label: string, data: Record<string, unknown>, err
   }
 }
 
+function validateProductionSpec(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["scope", "requirements", "interfaces", "verification", "change_readiness"]) {
+    if (key in data && !isRecord(data[key])) {
+      errors.push(`${label} ${key} must be a mapping`);
+    }
+  }
+  const changeReadiness = data.change_readiness;
+  if (isRecord(changeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in changeReadiness)) {
+        errors.push(`${label} change_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateProductionChange(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["goals", "non_goals", "affected_paths", "acceptance", "validation", "risks"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  const runtimeReadiness = data.runtime_readiness;
+  if (isRecord(runtimeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in runtimeReadiness)) {
+        errors.push(`${label} runtime_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateTeamRuntime(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (typeof data.execution_mode === "string" && !["single_agent", "agent_team", "reconcile", "qa_fix"].includes(data.execution_mode)) {
+    errors.push(`${label} has invalid execution_mode ${data.execution_mode}`);
+  }
+  for (const key of ["work_queue", "agents", "issues", "checkpoints"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if ("verification" in data && !isRecord(data.verification)) {
+    errors.push(`${label} verification must be a mapping`);
+  }
+  if ("handoff" in data && !isRecord(data.handoff)) {
+    errors.push(`${label} handoff must be a mapping`);
+  }
+}
+
 function validateActivePointer(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
   const rule = [
     pointerRule("VISION_CONTRACT.yaml", "current_session", "sessions", "session_id", "path"),
@@ -704,6 +939,9 @@ function validateActivePointer(root: string, path: string, data: Record<string, 
     pointerRule("PROTOTYPE_INDEX.yaml", "current_prototype", "prototypes", "prototype_id", "path"),
     pointerRule("DECISION_INDEX.yaml", "current_decision", "decisions", "decision_id", "path"),
     pointerRule("DESIGN_INDEX.yaml", "current_design", "designs", "design_id", "path"),
+    pointerRule("SPEC_INDEX.yaml", "current_spec", "specs", "spec_id", "path"),
+    pointerRule("CHANGE_INDEX.yaml", "current_change", "changes", "change_id", "path"),
+    pointerRule("RUNTIME_INDEX.yaml", "current_run", "runs", "run_id", "path"),
   ].find((item) => basename(path) === item.fileName);
   if (!rule) {
     return;

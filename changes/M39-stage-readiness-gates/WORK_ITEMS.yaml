@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: work_items:M39-stage-readiness-gates
+contract_type: work_items
+title: M39 Stage readiness gates work items
+status: completed
+change_contract: changes/M39-stage-readiness-gates/CHANGE.yaml
+items:
+  - task_id: M39-T001
+    title: Implement reusable artifact readiness gates
+    status: completed
+    owned_paths:
+      - packages/core/src/artifacts/readiness.ts
+    acceptance:
+      - Readiness checks return explicit blockers and warnings.
+      - Draft or placeholder current artifacts are blocked for downstream commands.
+      - Historical drafts remain readable and are not deleted or rewritten.
+  - task_id: M39-T002
+    title: Wire gates into check command
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/check.ts
+    acceptance:
+      - "/ow:proto, /ow:design, /ow:spec, /ow:change, and /ow:team include semantic gate blockers."
+      - JSON output exposes blockers and next_actions without losing existing context status data.
+  - task_id: M39-T003
+    title: Update Agent-facing readiness guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - "Help and AGENTS.md state that check validates artifact usability, not only file presence."
+  - task_id: M39-T004
+    title: Add regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier covers blocked draft validation and passing filled validation.
+      - Repository validation requires M39 contracts and new source file.

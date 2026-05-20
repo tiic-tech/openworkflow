@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: change:M45-sync-state-reconciliation
+contract_type: change
+title: M45 Sync state reconciliation
+status: accepted
+source_artifacts:
+  - changes/M44-clean-sync-recovery-e2e/CHANGE.yaml
+depends_on:
+  - change:M44-clean-sync-recovery-e2e
+produces:
+  - work_items:M45-sync-state-reconciliation
+summary: >
+  Preserve Agent workflow continuity after clean by teaching sync to reconcile
+  CURRENT_STATE.yaml from preserved artifact indexes when the managed state file
+  had to be recreated.
+problem: >
+  Clean preserves source artifacts and stage indexes, then removes managed
+  CURRENT_STATE.yaml. Sync restores managed files, but recreates CURRENT_STATE
+  as the default workflow entrypoint, which sends the next Agent back to
+  /ow:vision even when preserved indexes identify a later active artifact.
+goals:
+  - Reconcile recreated CURRENT_STATE.yaml from preserved stage index current pointers.
+  - Restore current_* path pointers, active_stage, next_command, and read_this_first when safe.
+  - Do not overwrite an existing non-default CURRENT_STATE.yaml.
+  - Surface reconciliation status and warnings in sync JSON output.
+  - Add clean/sync E2E coverage for workflow continuity after recovery.
+non_goals:
+  - Do not make clean preserve managed CURRENT_STATE.yaml.
+  - Do not infer state from arbitrary filenames when indexes are absent.
+  - Do not mutate source artifacts during reconciliation.
+  - Do not introduce a new CLI command.
+decisions:
+  - "Indexes remain the recovery source of truth because they are source artifacts preserved by clean."
+  - "Reconciliation runs only when sync had to add CURRENT_STATE.yaml, so existing user state is protected."
+  - "When artifact handoff does not provide a next command, sync falls back to the conservative downstream workflow command."
+  - "Normal text sync output stays quiet when there are no recoverable current pointers; JSON still carries state_reconciliation details."
+open_questions:
+  - question: "Should sync fail when preserved artifacts exist but no current pointer is recoverable?"
+    outcome: "No. M45 reports warnings and next_actions, but does not block managed surface repair."
+affected_paths:
+  - packages/core/src/workflow/syncOpenWorkflow.ts
+  - packages/cli/src/commands/sync.ts
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M45-sync-state-reconciliation/
+acceptance:
+  - "After clean removes CURRENT_STATE.yaml, sync restores current_validation/current_prototype from preserved indexes."
+  - "After recovery, CURRENT_STATE.active_stage and next_command match the latest recoverable current artifact."
+  - "Sync JSON includes structured state_reconciliation status and warnings."
+  - "Sync does not overwrite an existing non-default CURRENT_STATE.yaml."
+  - "Clean/sync verification covers the recovered continuity path."
+validation:
+  - npm run build
+  - npm run verify:clean
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

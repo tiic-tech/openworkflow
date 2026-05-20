@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: work_items:M23-production-command-lazy-contracts
+contract_type: work_items
+title: M23 Production command lazy contracts work items
+status: completed
+change_contract: changes/M23-production-command-lazy-contracts/CHANGE.yaml
+items:
+  - task_id: M23-T001
+    title: Define production-stage artifact contracts
+    status: done
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/openworkflow-contract.schema.json
+    acceptance:
+      - Artifact registry includes production_spec, production_change, and team_runtime.
+      - Contracts expose source paths, index paths, required keys, read policy, active pointer, handoff key, and embedded lazy-create template metadata.
+  - task_id: M23-T002
+    title: Deepen /ow:spec /ow:change /ow:team protocols
+    status: done
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/generateCommands.ts
+    acceptance:
+      - Production command skills contain required/optional context, allowed/forbidden outputs, lazy-create rules, quality bars, and readiness gates.
+      - Generated context packets no longer show spec/change/team as shallow placeholders.
+  - task_id: M23-T003
+    title: Preserve minimal init and lazy-create boundary
+    status: done
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - init writes only .openworkflow/config.yaml, workflow index, and audit files under .openworkflow.
+      - No stage directories or _templates are written during init.
+      - Runtime surface verification fails if eager stage templates reappear.
+  - task_id: M23-T004
+    title: Extend validation and regression coverage
+    status: done
+    owned_paths:
+      - packages/core/src/validators/
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - Validators accept the new production artifact types.
+      - Workflow E2E verifies generated production command contracts and skills.
+      - Full project validation commands pass.

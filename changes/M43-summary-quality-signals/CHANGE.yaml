@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M43-summary-quality-signals
+contract_type: change
+title: M43 Summary quality signals
+status: accepted
+source_artifacts:
+  - changes/M42-health-errors-surface/CHANGE.yaml
+depends_on:
+  - change:M42-health-errors-surface
+produces:
+  - work_items:M43-summary-quality-signals
+summary: >
+  Distinguish summary freshness from source artifact quality by adding explicit
+  quality signals to summary health entries and items.
+problem: >
+  A SUMMARY.yaml can be fresh because it was just generated, while the source
+  artifact is still a draft or has empty handoff-critical fields. Agents need to
+  know when a summary is current but thin so they do not treat freshness as a
+  high-quality development handoff.
+goals:
+  - Add quality metadata to summary health items: source_status, empty_key_fields, quality_status, and quality_warnings.
+  - Keep freshness status (`current`, `missing`, `stale_unknown`) stable so M43 does not create a new strict gate.
+  - Surface quality warnings at entry/model level without making freshness-ok summaries fail.
+  - Update help/AGENTS guidance to tell Agents to inspect quality signals before trusting current summaries.
+  - Add runtime coverage for a fresh prototype SUMMARY whose source artifact is still thin.
+non_goals:
+  - Do not make validate schema-check SUMMARY.yaml files.
+  - Do not prevent summarize from generating extractive summaries for draft artifacts.
+  - Do not turn quality warnings into nonzero exits in M43.
+decisions:
+  - "`status` remains the freshness/trust status; `quality_status` communicates source quality."
+  - "`current_but_thin` is a warning signal, not a command failure, until a later strict mode chooses to enforce it."
+open_questions:
+  - question: "Should quality warnings flow into health_errors?"
+    outcome: "No. M43 treats thin source quality as warnings because the summary can still be useful as low-context orientation."
+affected_paths:
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M43-summary-quality-signals/
+acceptance:
+  - "Fresh summaries for draft or thin source artifacts report `quality_status: current_but_thin`."
+  - "Summary health items include `source_status`, `empty_key_fields`, and `quality_warnings`."
+  - "Top-level summary health stays `ok:true` when freshness is current but quality is thin."
+  - "Warnings mention thin quality so Agents can avoid over-trusting the summary."
+  - "Help and AGENTS.md explain freshness versus quality."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+created_at: 2026-05-20
+updated_at: 2026-05-20

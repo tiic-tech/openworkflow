@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: work_items:M37-managed-clean-boundary
+contract_type: work_items
+title: M37 Managed clean boundary work items
+status: completed
+change_contract: changes/M37-managed-clean-boundary/CHANGE.yaml
+items:
+  - task_id: M37-T001
+    title: Define managed OpenWorkflow clean targets
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/cleanOpenWorkflow.ts
+    acceptance:
+      - Clean plans only root config/current-state plus workflow/audit metadata files.
+      - Clean removes empty managed directories after file removal.
+      - Stage artifact directories and unknown files are preserved.
+  - task_id: M37-T002
+    title: Report preserved paths in clean output
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/cleanOpenWorkflow.ts
+      - packages/cli/src/commands/clean.ts
+    acceptance:
+      - JSON effects include preserved paths.
+      - Text output prints preserved paths and counts.
+  - task_id: M37-T003
+    title: Update Agent-facing clean guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help states clean preserves `.openworkflow` source artifacts and user content.
+      - AGENTS.md managed block gives the same non-destructive boundary.
+  - task_id: M37-T004
+    title: Add clean regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyCleanCommand.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Verifier creates source artifacts and confirms they survive clean.
+      - Verifier confirms managed metadata, generated adapters, and AGENTS.md managed block are cleaned.
+      - Repository validation requires M37 change contracts.

@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: work_items:M28-cli-json-report-surface
+contract_type: work_items
+title: M28 CLI JSON report surface work items
+status: accepted
+change_contract: changes/M28-cli-json-report-surface/CHANGE.yaml
+items:
+  - task_id: M28-T001
+    title: Define shared JSON report envelope
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/
+      - packages/cli/src/index.ts
+    acceptance:
+      - Shared helpers produce the same top-level keys for every command.
+      - Effects arrays are present even when empty.
+      - Warnings and errors are captured in JSON mode.
+  - task_id: M28-T002
+    title: Add JSON output to read/report commands
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/doctor.ts
+      - packages/cli/src/commands/validate.ts
+    acceptance:
+      - brief/status read model is returned under data.
+      - doctor JSON includes workflow, AGENTS.md, and adapter health.
+      - validate JSON includes validation errors and ok status.
+  - task_id: M28-T003
+    title: Add JSON output to mutating commands
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/init.ts
+      - packages/cli/src/commands/sync.ts
+      - packages/cli/src/commands/clean.ts
+    acceptance:
+      - init JSON reports workflow, AGENTS.md, and adapter effects.
+      - sync JSON reports workflow, AGENTS.md, platform detection, adapter effects, and migration notes.
+      - clean JSON reports planned, removed, updated, skipped, and warnings.
+  - task_id: M28-T004
+    title: Update Agent-facing command documentation
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - help explains `--json` for Agent consumption.
+      - AGENTS.md managed block tells Agents to prefer JSON for structured command reads.
+  - task_id: M28-T005
+    title: Add JSON regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyCleanCommand.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Tests parse JSON for every CLI command.
+      - Tests assert shared envelope keys.
+      - Tests assert JSON stdout has no human report prefix.

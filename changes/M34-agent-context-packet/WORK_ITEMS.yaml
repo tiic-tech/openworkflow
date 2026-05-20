@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: work_items:M34-agent-context-packet
+contract_type: work_items
+title: M34 Agent context packet command work items
+status: completed
+change_contract: changes/M34-agent-context-packet/CHANGE.yaml
+items:
+  - task_id: M34-T001
+    title: Define context packet read model
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+      - packages/cli/src/commands/inspect.ts
+      - packages/cli/src/commands/check.ts
+    acceptance:
+      - Model includes command, packet_id, budget, included content, missing paths, omitted paths, warnings, blockers, and next actions.
+      - Model reuses existing inspect/check logic rather than duplicating readiness semantics.
+      - Model can be produced for CURRENT_STATE.next_command when `--for` is omitted.
+  - task_id: M34-T002
+    title: Implement budgeted content loading
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+      - packages/core/src/fs/index.ts
+    acceptance:
+      - Required workflow files are included when small enough.
+      - SUMMARY.yaml/current_slice content is preferred before full source artifacts.
+      - Per-file and total truncation are explicit in JSON output.
+  - task_id: M34-T003
+    title: Preserve lazy and read-only boundaries
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - Context command does not write files.
+      - Context command does not create missing stage directories.
+      - Raw evidence and forbidden context are omitted by default.
+  - task_id: M34-T004
+    title: Update Agent-facing command surfaces
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help documents context, default next-command behavior, `--for`, and `--max-bytes`.
+      - AGENTS.md managed block tells Agents when to use context versus inspect/check/summaries.
+      - Help keeps the distinction between CLI maintenance commands and repo-local `/ow:*` workflow commands.
+  - task_id: M34-T005
+    title: Add context packet regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime tests cover fresh init, explicit `--for`, missing summary warnings, stale summary warnings, raw evidence omission, and non-OpenWorkflow root.
+      - Workflow E2E verifies help and AGENTS.md context guidance.
+      - Repository validation includes M34 change contracts and new source files once implemented.

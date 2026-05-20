@@ -20,6 +20,15 @@ openworkflow init . --tools codex
 openworkflow sync --root . --tools codex
 openworkflow doctor --root . --tools codex
 openworkflow validate --root .
+openworkflow clean --root . --tools codex
+```
+
+`openworkflow clean` removes project-local OpenWorkflow files after a dry-run.
+Use `openworkflow clean --root . --tools codex --yes` to remove generated
+project files. To remove the global CLI package itself, use:
+
+```bash
+npm uninstall -g @tiic-tech/openworkflow
 ```
 
 ## Release Checks
@@ -30,6 +39,7 @@ Before publishing, run:
 npm run validate
 npm run verify:runtime-surface
 npm run verify:e2e-workflow
+npm run verify:clean
 npm pack --dry-run
 ```
 

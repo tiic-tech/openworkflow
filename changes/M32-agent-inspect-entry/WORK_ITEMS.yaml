@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: work_items:M32-agent-inspect-entry
+contract_type: work_items
+title: M32 Agent inspect entry work items
+status: completed
+change_contract: changes/M32-agent-inspect-entry/CHANGE.yaml
+items:
+  - task_id: M32-T001
+    title: Define inspect read model
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/inspect.ts
+      - packages/core/src/workflow/
+    acceptance:
+      - Inspect model includes project, workflow, health, summaries, next_command_check, read_order, and recommended_next_actions.
+      - Model reuses existing brief/check/summaries/doctor semantics where practical.
+      - Model is read-only.
+  - task_id: M32-T002
+    title: Implement inspect CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/inspect.ts
+    acceptance:
+      - "`openworkflow inspect --root <folder>` prints a compact human summary."
+      - "`openworkflow inspect --root <folder> --json` emits the shared M28 envelope."
+      - Non-OpenWorkflow roots return explicit not-initialized data.
+  - task_id: M32-T003
+    title: Add structured read order
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/inspect.ts
+      - packages/cli/src/commands/brief.ts
+    acceptance:
+      - Read order includes `must_read`, `read_if_missing_context`, `avoid_by_default`, and `raw_evidence_only_if`.
+      - Current-state and summary artifacts are prioritized over raw evidence.
+      - Read order is stable enough for Agent automation.
+  - task_id: M32-T004
+    title: Update Agent-facing docs
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help presents `inspect` as the recommended Agent entry command.
+      - AGENTS.md managed block tells Agents to run `openworkflow inspect --root . --json` first.
+      - Existing `brief`, `check`, and `summaries` boundaries remain documented.
+  - task_id: M32-T005
+    title: Add inspect regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Tests cover fresh init inspect output.
+      - Tests cover non-OpenWorkflow root behavior.
+      - Tests cover unhealthy summaries affecting inspect health.
+      - Tests verify inspect does not create stage artifacts.
+updated_at: 2026-05-20

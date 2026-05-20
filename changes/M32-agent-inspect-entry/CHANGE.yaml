@@ -1,0 +1,76 @@
+schema_version: 0.1.0
+contract_id: change:M32-agent-inspect-entry
+contract_type: change
+title: M32 Agent inspect entry
+status: accepted
+source_artifacts:
+  - changes/M31-unified-health-semantics/CHANGE.yaml
+depends_on:
+  - change:M31-unified-health-semantics
+produces:
+  - work_items:M32-agent-inspect-entry
+summary: >
+  Add a single Agent-oriented `openworkflow inspect --root <folder> --json`
+  entrypoint that aggregates current workflow state, summary health, next-command
+  readiness, lightweight managed-surface health, and recommended read order.
+problem: >
+  M27-M31 created useful low-context read models, but a first-consumer Agent
+  still has to decide which command to run first and reconcile separate outputs
+  from brief/status, summaries, check, doctor, and validate. This keeps the
+  workflow understandable, but not yet optimal for fast Agent entry. The next
+  step is a single inspection surface that answers "where am I, what should I
+  read, what is unhealthy, and what should I do next" without creating artifacts.
+goals:
+  - Add `openworkflow inspect --root <folder> [--json]` as the recommended Agent entrypoint.
+  - Aggregate brief/status state, summary health, next-command readiness, and lightweight doctor scope into one read-only report.
+  - Include a structured `read_order` with `must_read`, `read_if_missing_context`, `avoid_by_default`, and `raw_evidence_only_if`.
+  - Detect non-OpenWorkflow roots explicitly and avoid misleading healthy output.
+  - Preserve M31 health semantics: summary health affects inspect health, while doctor managed-surface ok remains scoped.
+  - Keep inspect read-only and ensure it does not create stage directories or missing artifacts.
+  - Update `openworkflow --help` and AGENTS.md managed block because a new CLI command is introduced.
+  - Keep JSON output in the shared M28 report envelope.
+non_goals:
+  - Do not generate or refresh SUMMARY.yaml.
+  - Do not mutate CURRENT_STATE.yaml, indexes, or stage artifacts.
+  - Do not replace specialized commands; `brief`, `check`, `summaries`, `doctor`, and `validate` remain available.
+  - Do not add a full post-command audit; that belongs to a future command audit change.
+decisions:
+  - "`inspect` is the default first command for Agent project entry; `brief/status` remain lower-level read models."
+  - "`inspect` should call or share existing read-model builders instead of reimplementing workflow health logic independently."
+  - "`inspect` should report next-command readiness for `CURRENT_STATE.next_command` when available."
+resolved_questions:
+  - "`inspect` human output is compact; JSON is the primary detailed Agent interface."
+  - "`inspect` preserves zero exit for initialized read-model consumption even when JSON ok is false, and returns non-zero only for non-OpenWorkflow roots."
+  - "`inspect` focuses on entry health/readiness and read order; validate remains a separate contract-shape command."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/inspect.ts
+  - packages/cli/src/commands/brief.ts
+  - packages/cli/src/commands/check.ts
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/core/src/workflow/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M32-agent-inspect-entry/
+acceptance:
+  - "`openworkflow inspect --root <folder> --json` emits the shared JSON envelope."
+  - "Inspect includes project, workflow, health, summaries, next_command_check, read_order, and recommended_next_actions."
+  - "Inspect reports non-OpenWorkflow roots explicitly instead of silently falling back to package defaults."
+  - "Inspect is read-only and does not create stage directories or missing artifacts."
+  - "When summary health is missing or stale, inspect exposes false health consistently."
+  - "Inspect includes command readiness for the current `next_command` when one exists."
+  - "`openworkflow --help` and AGENTS.md managed block mention inspect as the recommended Agent entry command."
+  - "Runtime and workflow E2E tests cover fresh init, non-OpenWorkflow root, unhealthy summaries, and no artifact creation."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, inspect, summaries, check, doctor, validate, clean
+created_at: 2026-05-20
+updated_at: 2026-05-20
+completed_at: 2026-05-20

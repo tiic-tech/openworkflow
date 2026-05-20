@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M47-doctor-handoff-quality-split
+contract_type: change
+title: M47 Doctor handoff quality split
+status: accepted
+source_artifacts:
+  - changes/M46-strict-summary-quality/CHANGE.yaml
+depends_on:
+  - change:M46-strict-summary-quality
+produces:
+  - work_items:M47-doctor-handoff-quality-split
+summary: >
+  Split doctor JSON health into managed-surface health and handoff-quality
+  health so Agents do not mistake generated surface readiness for trustworthy
+  development handoff quality.
+problem: >
+  Doctor is primarily a maintenance command for generated workflow, AGENTS.md,
+  and adapter surfaces. Thin summaries currently appear only as warnings while
+  doctor ok remains true, which is correct for maintenance but ambiguous for an
+  Agent deciding whether artifact handoff quality is safe to trust.
+goals:
+  - Add structured doctor booleans for managed_surface_ok, adapter_ok, summary_freshness_ok, and handoff_quality_ok.
+  - Keep top-level doctor ok scoped to managed surfaces and adapters.
+  - Surface handoff quality warnings and next actions that point Agents to `summaries --strict`.
+  - Update help and AGENTS.md to clarify doctor capability boundaries.
+  - Add runtime coverage for thin summary quality under doctor.
+non_goals:
+  - Do not make doctor fail on thin handoff quality in M47.
+  - Do not change `summaries --strict` semantics.
+  - Do not introduce a new CLI command.
+decisions:
+  - "doctor.ok remains a maintenance-health signal, not a handoff-quality gate."
+  - "handoff_quality_ok is derived from strict summary quality without forcing strict doctor exit semantics."
+  - "Agents should use inspect --strict or summaries --strict when they need handoff quality to be a blocking gate."
+open_questions:
+  - question: "Should doctor get a future --strict flag?"
+    outcome: "Not in M47; Agents should use inspect --strict or summaries --strict for strict handoff gates."
+affected_paths:
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M47-doctor-handoff-quality-split/
+acceptance:
+  - "doctor --json includes managed_surface_ok, adapter_ok, summary_freshness_ok, and handoff_quality_ok."
+  - "Thin summary quality keeps doctor ok:true when managed surfaces are healthy."
+  - "Thin summary quality sets handoff_quality_ok:false and points next_actions to summaries --strict."
+  - "Help and AGENTS.md clarify that doctor ok does not prove handoff quality."
+  - "Runtime verification covers doctor handoff-quality split."
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

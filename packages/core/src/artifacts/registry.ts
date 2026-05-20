@@ -3,11 +3,14 @@ export type DiscoveryArtifactType =
   | "validation_target"
   | "prototype_evidence"
   | "decision_record"
-  | "product_design";
+  | "product_design"
+  | "production_spec"
+  | "production_change"
+  | "team_runtime";
 
 export interface DiscoveryArtifactContract {
   artifactType: DiscoveryArtifactType;
-  contractType: "vision" | "validation" | "prototype" | "decision" | "design";
+  contractType: "vision" | "validation" | "prototype" | "decision" | "design" | "spec" | "change" | "runtime";
   command: string;
   title: string;
   sourceOfTruthPath: string;
@@ -22,8 +25,16 @@ export interface DiscoveryArtifactContract {
   activePointer: ActivePointer;
   evidencePolicy: string;
   handoffKey: string;
+  summaryPolicy?: SummaryPolicy;
   template: Record<string, unknown>;
   conditionalPackets?: readonly ConditionalPacketMetadata[];
+}
+
+export interface SummaryPolicy {
+  strategy: "summary_file" | "current_slice";
+  path: string;
+  loadBeforeFull: boolean;
+  refreshWhen: string;
 }
 
 export interface ConditionalPacketMetadata {
@@ -147,6 +158,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference human notes when intent needs explanation; do not embed long brainstorming transcript.",
     handoffKey: "handoff.next_command",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "vision_delta",
+      loadBeforeFull: true,
+      refreshWhen: "Update the current slice when stable_answers or unresolved_questions change.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "vision:<id>",
@@ -208,6 +225,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Rank features and assumptions in YAML; keep rationale compact and defer examples to NOTE.md.",
     handoffKey: "prototype_scope",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "core_question + prototype_scope + acceptance",
+      loadBeforeFull: true,
+      refreshWhen: "Update the current slice when validation scope, acceptance, or decision options change.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "validation:<id>",
@@ -281,6 +304,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     evidencePolicy:
       "Reference visual concepts, reference analyses, runnable artifacts, screenshots, logs, critique, and URLs by path; keep concept evidence distinct from implementation evidence and do not paste bulky evidence into YAML.",
     handoffKey: "handoff.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/prototypes/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after prototype evidence, verification, result, or handoff changes.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "prototype:<id>",
@@ -388,6 +417,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference reviewed evidence and user feedback; summarize rationale without copying full review transcripts.",
     handoffKey: "next_command",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "outcome + rationale + next_command + follow_up_questions",
+      loadBeforeFull: true,
+      refreshWhen: "Update whenever the decision outcome or next command changes.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "decision:<id>",
@@ -449,6 +484,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference accepted prototype evidence and decision records by path; keep product design decisions in PRODUCT_DESIGN.yaml.",
     handoffKey: "spec_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/design/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after product design scope, open questions, or spec readiness changes.",
+    },
     conditionalPackets: [
       {
         artifactType: "tech_spec",
@@ -524,6 +565,258 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
         ready: false,
         blockers: [],
         next_command: null,
+      },
+      updated_at: null,
+    },
+  },
+  {
+    artifactType: "production_spec",
+    contractType: "spec",
+    command: "/ow:spec",
+    title: "Production spec",
+    sourceOfTruthPath: ".openworkflow/specs/<id>/SPEC.yaml",
+    templatePath: ".openworkflow/specs/_templates/SPEC.yaml",
+    indexPath: ".openworkflow/specs/SPEC_INDEX.yaml",
+    indexCollectionKey: "specs",
+    notePath: ".openworkflow/specs/<id>/NOTE.md",
+    reviewPath: null,
+    disclosureLevel: 2,
+    requiredKeys: [
+      "artifact_type",
+      "source_design",
+      "goal",
+      "scope",
+      "requirements",
+      "interfaces",
+      "acceptance",
+      "verification",
+      "risks",
+      "change_readiness",
+    ],
+    readPolicy: {
+      loadByDefault: true,
+      agentReadOrder: 70,
+      maxYamlLines: 220,
+      maxNoteLines: 60,
+      rawEvidence: "only_when_referenced",
+    },
+    activePointer: {
+      indexPath: ".openworkflow/specs/SPEC_INDEX.yaml",
+      pointerKey: "current_spec",
+      collectionKey: "specs",
+      idKey: "spec_id",
+      pathKey: "path",
+    },
+    evidencePolicy: "Reference product design and conditional design packets by path; keep implementation requirements concrete and bounded.",
+    handoffKey: "change_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/specs/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after scope, interfaces, acceptance, verification, risks, or change readiness changes.",
+    },
+    template: {
+      schema_version: "0.1.0",
+      contract_id: "spec:<id>",
+      contract_type: "spec",
+      artifact_type: "production_spec",
+      title: "<short production spec title>",
+      status: "draft",
+      source_design: "",
+      goal: "",
+      scope: {
+        in: [],
+        out: [],
+      },
+      requirements: {
+        user_facing: [],
+        functional: [],
+        non_functional: [],
+      },
+      interfaces: {
+        ui: [],
+        api: [],
+        data: [],
+        integrations: [],
+      },
+      acceptance: [],
+      verification: {
+        commands: [],
+        manual_checks: [],
+      },
+      risks: [],
+      change_readiness: {
+        ready: false,
+        blockers: [],
+        next_command: null,
+      },
+      updated_at: null,
+    },
+  },
+  {
+    artifactType: "production_change",
+    contractType: "change",
+    command: "/ow:change",
+    title: "Production change",
+    sourceOfTruthPath: ".openworkflow/changes/<id>/CHANGE.yaml",
+    templatePath: ".openworkflow/changes/_templates/CHANGE.yaml",
+    indexPath: ".openworkflow/changes/CHANGE_INDEX.yaml",
+    indexCollectionKey: "changes",
+    notePath: ".openworkflow/changes/<id>/NOTE.md",
+    reviewPath: null,
+    disclosureLevel: 2,
+    requiredKeys: [
+      "artifact_type",
+      "source_spec",
+      "problem",
+      "goals",
+      "non_goals",
+      "affected_paths",
+      "acceptance",
+      "validation",
+      "work_items",
+      "risks",
+      "runtime_readiness",
+    ],
+    readPolicy: {
+      loadByDefault: true,
+      agentReadOrder: 80,
+      maxYamlLines: 220,
+      maxNoteLines: 60,
+      rawEvidence: "only_when_referenced",
+    },
+    activePointer: {
+      indexPath: ".openworkflow/changes/CHANGE_INDEX.yaml",
+      pointerKey: "current_change",
+      collectionKey: "changes",
+      idKey: "change_id",
+      pathKey: "path",
+    },
+    evidencePolicy: "Reference the source spec and repo inspection notes; keep implementation planning traceable and scoped.",
+    handoffKey: "runtime_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/changes/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after affected paths, work items, validation, risks, or runtime readiness changes.",
+    },
+    conditionalPackets: [
+      {
+        artifactType: "work_items",
+        path: ".openworkflow/changes/<id>/WORK_ITEMS.yaml",
+        requiredByDefault: true,
+        when: "Use for ordered implementation tasks with owned paths, dependencies, acceptance, and verification.",
+      },
+    ],
+    template: {
+      schema_version: "0.1.0",
+      contract_id: "change:<id>",
+      contract_type: "change",
+      artifact_type: "production_change",
+      title: "<short production change title>",
+      status: "draft",
+      source_spec: "",
+      problem: "",
+      goals: [],
+      non_goals: [],
+      affected_paths: [],
+      acceptance: [],
+      validation: [],
+      work_items: {
+        path: ".openworkflow/changes/<id>/WORK_ITEMS.yaml",
+        summary: [],
+      },
+      risks: [],
+      runtime_readiness: {
+        ready: false,
+        blockers: [],
+        next_command: null,
+      },
+      updated_at: null,
+    },
+  },
+  {
+    artifactType: "team_runtime",
+    contractType: "runtime",
+    command: "/ow:team",
+    title: "Team runtime",
+    sourceOfTruthPath: ".openworkflow/runtime/<id>/STATE.yaml",
+    templatePath: ".openworkflow/runtime/_templates/STATE.yaml",
+    indexPath: ".openworkflow/runtime/RUNTIME_INDEX.yaml",
+    indexCollectionKey: "runs",
+    notePath: ".openworkflow/runtime/<id>/NOTE.md",
+    reviewPath: null,
+    disclosureLevel: 2,
+    requiredKeys: [
+      "artifact_type",
+      "source_change",
+      "active_work_item",
+      "execution_mode",
+      "work_queue",
+      "agents",
+      "verification",
+      "issues",
+      "checkpoints",
+      "handoff",
+    ],
+    readPolicy: {
+      loadByDefault: true,
+      agentReadOrder: 90,
+      maxYamlLines: 220,
+      maxNoteLines: 80,
+      rawEvidence: "only_when_referenced",
+    },
+    activePointer: {
+      indexPath: ".openworkflow/runtime/RUNTIME_INDEX.yaml",
+      pointerKey: "current_run",
+      collectionKey: "runs",
+      idKey: "run_id",
+      pathKey: "path",
+    },
+    evidencePolicy: "Reference change, work items, verification logs, issues, and checkpoints by path; keep current execution state compact.",
+    handoffKey: "handoff.next_action",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/runtime/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after active work item, verification, issues, checkpoints, or handoff changes.",
+    },
+    conditionalPackets: [
+      {
+        artifactType: "runtime_issues",
+        path: ".openworkflow/runtime/<id>/ISSUES.yaml",
+        requiredByDefault: false,
+        when: "Use when implementation or verification finds blockers, regressions, or follow-up issues.",
+      },
+      {
+        artifactType: "runtime_checkpoints",
+        path: ".openworkflow/runtime/<id>/CHECKPOINTS.yaml",
+        requiredByDefault: false,
+        when: "Use when recording commits, verification gates, QA checkpoints, or release readiness.",
+      },
+    ],
+    template: {
+      schema_version: "0.1.0",
+      contract_id: "runtime:<id>",
+      contract_type: "runtime",
+      artifact_type: "team_runtime",
+      title: "<short runtime title>",
+      status: "active",
+      source_change: "",
+      active_work_item: null,
+      execution_mode: "single_agent|agent_team|reconcile|qa_fix",
+      work_queue: [],
+      agents: [],
+      verification: {
+        commands: [],
+        results: [],
+      },
+      issues: [],
+      checkpoints: [],
+      handoff: {
+        status: "in_progress",
+        next_action: null,
+        blockers: [],
       },
       updated_at: null,
     },

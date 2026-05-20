@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: work_items:M22-project-clean-command
+contract_type: work_items
+title: M22 Project clean command work items
+status: completed
+change_contract: changes/M22-project-clean-command/CHANGE.yaml
+items:
+  - task_id: M22-T001
+    title: Define clean command semantics
+    status: completed
+    depends_on: []
+    owned_paths:
+      - changes/M22-project-clean-command/
+      - README.md
+    acceptance:
+      - clean is documented as project cleanup, not npm package uninstall.
+      - clean is selected over remove/delete/uninstall for the user-facing command.
+      - Destructive behavior requires --yes.
+  - task_id: M22-T002
+    title: Implement CLI clean command
+    status: completed
+    depends_on:
+      - M22-T001
+    owned_paths:
+      - package.json
+      - packages/cli/src/
+      - packages/core/src/
+    acceptance:
+      - openworkflow clean is routed from the CLI.
+      - --root, --tools codex, --force, and --yes are supported.
+      - Default execution is dry-run and returns planned removals.
+      - --yes performs deletion.
+  - task_id: M22-T003
+    title: Implement Codex adapter cleanup
+    status: completed
+    depends_on:
+      - M22-T002
+    owned_paths:
+      - packages/adapters/codex/src/
+    acceptance:
+      - Generated .agents/openworkflow-adapter.yaml is removed.
+      - Generated .agents/skills/ow-* skill files and metadata files are removed.
+      - Non-generated .agents files are skipped with warnings.
+      - Empty generated directories are pruned when safe.
+  - task_id: M22-T004
+    title: Add clean validation coverage
+    status: completed
+    depends_on:
+      - M22-T002
+      - M22-T003
+    owned_paths:
+      - packages/cli/src/dev/
+      - packages/core/src/validators/
+    acceptance:
+      - A verifier initializes a temporary project, runs clean dry-run, runs clean --yes, and asserts expected removals.
+      - The verifier confirms non-generated files are preserved.
+      - Repository contract validation includes M22 files.
+  - task_id: M22-T005
+    title: Validate and close M22
+    status: completed
+    depends_on:
+      - M22-T004
+    owned_paths:
+      - changes/M22-project-clean-command/
+    acceptance:
+      - Full validation command list passes.
+      - M22 work items and TODO are marked completed after implementation.
+updated_at: 2026-05-19

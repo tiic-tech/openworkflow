@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: change:M49-single-handoff-entry
+contract_type: change
+title: M49 Single handoff entry
+status: accepted
+source_artifacts:
+  - changes/M48-handoff-quality-summary/CHANGE.yaml
+depends_on:
+  - change:M48-handoff-quality-summary
+produces:
+  - work_items:M49-single-handoff-entry
+summary: >
+  Add one Agent-first handoff command that answers whether the current
+  OpenWorkflow repo state is trustworthy enough for a new Agent to continue.
+problem: >
+  After M48, handoff trust signals are compact but still spread across
+  context, doctor, inspect strict, summaries strict, and check. A first
+  consumer needs one structured command that aggregates managed-surface health,
+  strict artifact summary quality, current-state pointers, next-command
+  readiness, read order, blockers, and next actions.
+goals:
+  - Add `openworkflow handoff --root <folder> [--tools auto|codex] [--json]`.
+  - Output a single handoff model with handoff_ok, blocking_reasons, quality_summary, managed-surface health, next-command readiness, read_order, and next_actions.
+  - Make handoff strict by default for summary quality and next-command readiness.
+  - Keep doctor, context, summaries, and inspect semantics unchanged.
+  - Update help and AGENTS.md managed guidance for the new Agent entrypoint.
+  - Add runtime coverage for pass and thin-summary failure handoff cases.
+non_goals:
+  - Do not replace inspect or context.
+  - Do not add context strict/handoff mode in M49.
+  - Do not mutate workflow state or artifacts.
+decisions:
+  - "`handoff` is a read-only Agent trust gate, not a maintenance command."
+  - "`handoff.ok` should mean a new Agent can trust the low-context handoff path."
+  - "Managed-surface health and handoff quality remain separately visible in the JSON model."
+open_questions:
+  - question: "Should `handoff` eventually materialize a context packet?"
+    outcome: "Not in M49; it should point to `context --json` through read_order and next_actions."
+affected_paths:
+  - packages/cli/src/commands/handoff.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M49-single-handoff-entry/
+acceptance:
+  - "`handoff --json` returns the standard JSON report envelope."
+  - "`handoff --json` includes handoff_ok, blocking_reasons, quality_summary, managed_surface_ok, adapter_ok, summary_freshness_ok, summary_quality_ok, next_command_ready, read_order, and next_actions."
+  - "Fresh init handoff passes with handoff_ok true."
+  - "Current-but-thin summaries make handoff fail with handoff_ok false and strict quality blockers."
+  - "Handoff stays read-only and does not create lazy stage artifacts."
+  - "Help and AGENTS.md present handoff as the recommended trust gate before context loading."
+  - "Runtime verification covers handoff success and failure paths."
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: work_items:M29-command-readiness-check
+contract_type: work_items
+title: M29 Command readiness check work items
+status: accepted
+change_contract: changes/M29-command-readiness-check/CHANGE.yaml
+items:
+  - task_id: M29-T001
+    title: Define readiness read model
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+    acceptance:
+      - Readiness model separates ready, blockers, warnings, context requirements, output boundaries, and next actions.
+      - Command normalization accepts `/ow:*`, `ow:*`, and `ow-*` forms.
+      - The model is read-only and does not inspect full evidence files.
+  - task_id: M29-T002
+    title: Implement check CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/
+    acceptance:
+      - "`openworkflow check <command>` prints concise human-readable readiness."
+      - "`--json` emits the shared M28 envelope."
+      - Exit code is non-zero for blockers and zero for warnings-only readiness.
+  - task_id: M29-T003
+    title: Evaluate context packets and current state
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/core/src/commands/
+      - packages/core/src/artifacts/
+    acceptance:
+      - Required, optional, forbidden, and conditional context are evaluated from generated contracts.
+      - CURRENT_STATE.next_command mismatch is surfaced as a warning.
+      - read_this_first and active pointers are included in output.
+  - task_id: M29-T004
+    title: Update Agent-facing docs for new CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - "Help documents `check` and its Agent planning use case."
+      - "AGENTS.md managed block tells Agents to use `check` before uncertain `/ow:*` work."
+      - JSON usage remains documented.
+  - task_id: M29-T005
+    title: Add readiness regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Tests cover ready command, missing required context, forbidden context, next-command mismatch, JSON envelope, and no side effects.
+      - Repository validation includes M29 change contracts and new source files.

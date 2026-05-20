@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: work_items:M42-health-errors-surface
+contract_type: work_items
+title: M42 Health errors surface work items
+status: completed
+change_contract: changes/M42-health-errors-surface/CHANGE.yaml
+items:
+  - task_id: M42-T001
+    title: Extend JSON report envelope
+    status: completed
+    owned_paths:
+      - packages/cli/src/report.ts
+    acceptance:
+      - All JSON reports include health_errors.
+      - Existing call sites compile without repetitive boilerplate.
+  - task_id: M42-T002
+    title: Populate health errors in read models
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/inspect.ts
+      - packages/cli/src/commands/summaries.ts
+      - packages/cli/src/commands/context.ts
+      - packages/cli/src/commands/check.ts
+    acceptance:
+      - ok:false health/readiness reports carry actionable health_errors.
+      - ok:true reports keep health_errors empty.
+  - task_id: M42-T003
+    title: Update Agent-facing JSON guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help and AGENTS.md describe health_errors as blocking health/readiness failures.
+  - task_id: M42-T004
+    title: Add regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier asserts every report has health_errors.
+      - Runtime verifier checks non-empty health_errors for summary/readiness failures.
+      - Repository validation requires M42 contracts.

@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: work_items:M27-agent-brief-status
+contract_type: work_items
+title: M27 Agent brief and status work items
+status: accepted
+change_contract: changes/M27-agent-brief-status/CHANGE.yaml
+items:
+  - task_id: M27-T001
+    title: Define Agent brief read model
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+    acceptance:
+      - Read model includes project, workflow, active pointers, read_this_first, health, git, and agent_guidance.
+      - Missing data is represented explicitly instead of crashing when possible.
+      - The model does not require loading full evidence files.
+  - task_id: M27-T002
+    title: Implement status and brief CLI commands
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - "`status` and `brief` both call the shared read model."
+      - Default output is concise and scannable.
+      - "`--json` emits parseable structured JSON."
+      - "AGENTS.md managed block and `openworkflow --help` both mention the new commands."
+  - task_id: M27-T003
+    title: Add health and git summaries
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/adapters/src/
+      - packages/cli/src/commands/
+    acceptance:
+      - Health summarizes workflow, adapters, and AGENTS.md state.
+      - Health reports whether sync or doctor is the next maintenance action.
+      - Git summary reports branch, dirty flag, and changed files, with graceful non-git fallback.
+  - task_id: M27-T004
+    title: Update help and repository validation
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M27-agent-brief-status/
+    acceptance:
+      - "`openworkflow --help` documents status/brief and their Agent use case."
+      - Repository validation includes M27 change contracts and new source files.
+  - task_id: M27-T005
+    title: Add regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    acceptance:
+      - Tests cover text and JSON output.
+      - Tests verify no stage artifacts are created.
+      - Tests cover dirty git state and non-git fallback.

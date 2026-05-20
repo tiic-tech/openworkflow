@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: change:M30-artifact-summary-health
+contract_type: change
+title: M30 Artifact summary health
+status: accepted
+source_artifacts:
+  - changes/M29-command-readiness-check/CHANGE.yaml
+depends_on:
+  - change:M29-command-readiness-check
+produces:
+  - work_items:M30-artifact-summary-health
+summary: >
+  Add structured summary health checks for long workflow artifacts so Agents can
+  trust low-context summaries, detect missing or stale summaries, and know when
+  full evidence must be loaded.
+problem: >
+  M24 introduced summary_policy metadata and M27-M29 added brief/status/check
+  read models, but OpenWorkflow still does not verify whether long artifacts
+  actually have a usable SUMMARY.yaml or current_slice. As the workflow creates
+  validation, prototype, design, spec, change, and runtime artifacts, Agents need
+  a fast way to know which summaries are current enough to read by default and
+  which evidence must be inspected directly.
+goals:
+  - Add summary health to Agent-facing read models without creating stage artifacts during init.
+  - Add a read-only `openworkflow summaries --root <folder> [--json]` command for summary coverage and freshness.
+  - Report summary status per artifact contract: not_applicable, missing, present, stale_unknown, or current.
+  - Use existing summary_policy metadata from ARTIFACT_CONTRACTS.yaml.
+  - Include summary health in `brief/status --json` under data.health or a dedicated summary section.
+  - Include summary guidance in `check <command>` output when the target command relies on artifacts with summary_policy.
+  - Keep default behavior read-only; any generation or refresh command must be explicit and future-scoped.
+  - Update `openworkflow --help` and AGENTS.md managed block because a new CLI command is introduced.
+non_goals:
+  - Do not generate or rewrite SUMMARY.yaml in M30.
+  - Do not scan raw evidence directories by default.
+  - Do not require every artifact type to have a summary if its contract uses current_slice instead.
+  - Do not create stage directories or missing artifacts.
+decisions:
+  - Summary health is a diagnostic/read-model feature first, not an artifact generator.
+  - Freshness is conservative: if the tool cannot prove freshness, report stale_unknown rather than current.
+  - Summary health should use the M28 JSON envelope for machine consumption.
+  - The command should tolerate missing stage directories and report no instantiated artifacts rather than failing.
+resolved_questions:
+  - Use the repo-local `.openworkflow/audit/ARTIFACT_CONTRACTS.yaml` as the primary summary policy source, with the package registry as a fallback before managed metadata exists.
+  - Use filesystem mtime comparison for M30 summary_file freshness and report stale_unknown when the summary is older than the artifact.
+  - Keep summary health out of doctor for M30; expose it through summaries and embed it in brief/status and check read models.
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M30-artifact-summary-health/
+acceptance:
+  - "`openworkflow summaries --root <folder>` prints summary health without writing files."
+  - "`openworkflow summaries --root <folder> --json` emits the shared M28 JSON envelope."
+  - "The summary health model reports each summary_policy artifact contract and its status."
+  - "Missing stage directories are handled as no instantiated artifacts, not errors."
+  - "brief/status includes summary health counts or a summary health pointer."
+  - "check includes summary guidance for commands that depend on summary-policy artifacts."
+  - "The command is read-only and does not create stage directories."
+  - "`openworkflow --help` and AGENTS.md managed block mention `summaries` and JSON usage."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+updated_at: 2026-05-20
+completed_at: 2026-05-20

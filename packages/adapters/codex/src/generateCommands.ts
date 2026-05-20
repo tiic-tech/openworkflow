@@ -99,17 +99,20 @@ ${xmlList(protocol.auditCheckpoints.after)}
 </audit_checkpoints>
 
 <working_protocol>
-1. Load only the required context packet first.
-2. Use optional context only when the required packet is insufficient.
-3. Stay inside allowed outputs.
-4. Create conditional outputs only when the current artifact explicitly names them as blockers or the user asks for that packet.
-5. Stop before creating any forbidden output.
-6. Record unresolved questions instead of expanding scope.
+1. Load .openworkflow/CURRENT_STATE.yaml first when present, then load only the required context packet for this command.
+2. Use optional context only when the current state, required packet, or summary/current_slice is insufficient.
+3. When an artifact contract defines summary_policy, load that summary or current_slice before the full source artifact.
+4. Stay inside allowed outputs.
+5. Create conditional outputs only when the current artifact explicitly names them as blockers or the user asks for that packet.
+6. Stop before creating any forbidden output.
+7. Record unresolved questions instead of expanding scope.
 </working_protocol>
 
 <artifact_checkpoint>
 Write durable .openworkflow artifacts only at meaningful checkpoints: stable user answers, explicit save requests, completed evidence changes, or handoff readiness.
 Do not treat artifact writing as the opening move for conversation-first commands.
+When a downstream stage supersedes an older question or draft, update lifecycle status and clear stale current_question values in the affected artifacts.
+Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
 
 ${internalSectionsXml(protocol.internalSections ?? [])}
@@ -166,12 +169,14 @@ ${artifactXmlList(artifacts)}
 </artifact_contracts>
 
 <working_protocol>
-Load only the contract files required for this stage.
-Keep artifacts short, scoped, and traceable through .openworkflow/workflow/WORKFLOW_INDEX.yaml plus .openworkflow/audit/.
+Load .openworkflow/CURRENT_STATE.yaml first when present, then load only the contract files required for this stage.
+When an artifact contract defines summary_policy, load that summary or current_slice before the full source artifact.
+Keep artifacts short, scoped, and traceable through .openworkflow/CURRENT_STATE.yaml, .openworkflow/workflow/WORKFLOW_INDEX.yaml, and .openworkflow/audit/.
 </working_protocol>
 
 <artifact_checkpoint>
 Write durable .openworkflow artifacts only at meaningful checkpoints.
+Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
 
 <handoff>
@@ -195,7 +200,7 @@ function artifactXmlList(artifacts: ReturnType<typeof getDiscoveryArtifactContra
   return artifacts
     .map(
       (artifact) =>
-        `- ${escapeXml(artifact.artifactType)}: template ${escapeXml(artifact.templatePath)}, source ${escapeXml(artifact.sourceOfTruthPath)}, note ${escapeXml(artifact.notePath)}, review ${escapeXml(artifact.reviewPath ?? "none")}, load_by_default ${artifact.readPolicy.loadByDefault}, max_yaml_lines ${artifact.readPolicy.maxYamlLines}`,
+        `- ${escapeXml(artifact.artifactType)}: template ${escapeXml(artifact.templatePath)}, source ${escapeXml(artifact.sourceOfTruthPath)}, note ${escapeXml(artifact.notePath)}, review ${escapeXml(artifact.reviewPath ?? "none")}, load_by_default ${artifact.readPolicy.loadByDefault}, max_yaml_lines ${artifact.readPolicy.maxYamlLines}${artifact.summaryPolicy ? `, summary_policy ${escapeXml(artifact.summaryPolicy.strategy)} at ${escapeXml(artifact.summaryPolicy.path)}` : ""}`,
     )
     .join("\n");
 }

@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M42-health-errors-surface
+contract_type: change
+title: M42 Health errors surface
+status: accepted
+source_artifacts:
+  - changes/M41-compact-command-audit-slice/CHANGE.yaml
+depends_on:
+  - change:M41-compact-command-audit-slice
+produces:
+  - work_items:M42-health-errors-surface
+summary: >
+  Add a machine-readable `health_errors` array to JSON reports so Agents can
+  distinguish blocking health/readiness failures from non-blocking warnings.
+problem: >
+  M38 aligned `ok:false` with nonzero exit codes, but some health commands still
+  return `errors: []` and put the actionable reason only in `warnings`. Agents
+  can parse this, but it forces command-specific branching and weakens the JSON
+  envelope as a reliable machine interface.
+goals:
+  - Add `health_errors` to the JSON report envelope.
+  - Populate `health_errors` when `summaries`, `brief`, `status`, `inspect`, `context`, or `check` reports `ok:false`.
+  - Preserve `warnings` for non-blocking guidance and observations.
+  - Keep existing `errors` semantics for command/runtime failures and explicit blockers.
+  - Update help and AGENTS.md managed block to document the distinction.
+non_goals:
+  - Do not change exit-code semantics from M38.
+  - Do not rename or remove existing `errors` or `warnings` fields.
+  - Do not make warnings-only healthy reports fail.
+decisions:
+  - "`health_errors` is an envelope-level machine field; it is always present and defaults to an empty array."
+  - "`errors` remains for command execution errors and hard blockers; `health_errors` carries health/readiness reasons when `ok:false`."
+open_questions:
+  - question: "Should health failures also be copied into `errors`?"
+    outcome: "No for M42. Keep the existing `errors` contract stable and add `health_errors` for the new machine-readable surface."
+affected_paths:
+  - packages/cli/src/report.ts
+  - packages/cli/src/commands/brief.ts
+  - packages/cli/src/commands/check.ts
+  - packages/cli/src/commands/context.ts
+  - packages/cli/src/commands/inspect.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M42-health-errors-surface/
+acceptance:
+  - "Every JSON report includes `health_errors` as an array."
+  - "`summaries --json` with missing/stale summary health emits `ok:false`, exits nonzero, and has non-empty `health_errors`."
+  - "`brief/status/inspect --json` with failing summary or readiness health has non-empty `health_errors`."
+  - "`check/context --json` with readiness blockers has non-empty `health_errors`."
+  - "Healthy reports keep `health_errors: []`."
+  - "Help and AGENTS.md explain `health_errors` versus `warnings`."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+created_at: 2026-05-20
+updated_at: 2026-05-20

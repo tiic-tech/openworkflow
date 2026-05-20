@@ -1,0 +1,37 @@
+schema_version: 0.1.0
+contract_id: work_items:M48-handoff-quality-summary
+contract_type: work_items
+title: M48 Handoff quality summary work items
+status: completed
+change_contract: changes/M48-handoff-quality-summary/CHANGE.yaml
+items:
+  - task_id: M48-T001
+    title: Add shared compact summary quality model
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    acceptance:
+      - Shared helper returns freshness, strict quality, counts, warning/error counts, and next actions.
+      - Helper is reusable by doctor and context commands.
+  - task_id: M48-T002
+    title: Surface compact handoff fields in Agent entry JSON
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+      - packages/cli/src/commands/doctor.ts
+    acceptance:
+      - context --json data includes handoff_quality_ok and quality_summary.
+      - doctor --json data includes quality_summary.
+      - Existing non-strict exit semantics remain unchanged.
+  - task_id: M48-T003
+    title: Update Agent guidance and runtime tests
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Help and AGENTS.md mention compact handoff quality fields.
+      - Runtime verifier covers quality_summary and handoff_quality_ok behavior.
+      - Repository validation requires M48 contracts.

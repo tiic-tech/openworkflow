@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: change:M23-production-command-lazy-contracts
+contract_type: change
+title: M23 Production command lazy contracts
+status: completed
+source_artifacts:
+  - changes/M22-project-clean-command/CHANGE.yaml
+depends_on:
+  - change:M22-project-clean-command
+produces:
+  - work_items:M23-production-command-lazy-contracts
+summary: >
+  Upgrade /ow:spec, /ow:change, and /ow:team from shallow placeholders into
+  agent-usable production-stage protocols while preserving OpenWorkflow init as
+  a minimal setup that creates only workflow, audit, and config surfaces.
+problem: >
+  npm-published OpenWorkflow now produces useful discovery artifacts for
+  vision, validation, prototype, decision, and design, but the production
+  commands /ow:spec, /ow:change, and /ow:team remain placeholder-level. As a
+  first consumer agent, this is not enough to obtain high-quality development
+  intelligence with small context. At the same time, previous product
+  constraints require init to stay minimal: downstream stage artifacts must be
+  lazy-created only after the user first invokes the corresponding command.
+goals:
+  - Add deep command protocols for /ow:spec, /ow:change, and /ow:team.
+  - Add artifact contracts for production specs, production changes, and team runtime state.
+  - Preserve the minimal init contract: init writes workflow, audit, and config only.
+  - Ensure artifact contracts provide enough lazy-create template data for agents without precreating stage directories.
+  - Update verification so the runtime surface rejects eager stage template creation.
+  - Keep generated Codex skills useful as the first command entrypoint for each production stage.
+non_goals:
+  - Do not implement full automatic execution of /ow:spec, /ow:change, or /ow:team as CLI subcommands.
+  - Do not create specs, changes, runtime files, or stage-local templates during init or sync.
+  - Do not redesign the vision, validation, prototype, tune, decision, or design workflows beyond compatibility updates.
+  - Do not migrate the legacy standalone run-team skill in this change.
+decisions:
+  - Artifact contracts may embed template payloads because they are audit metadata, not stage artifacts.
+  - Stage directories remain absent until the corresponding repo-local agent skill creates them on first command invocation.
+  - Production command skills should be deep protocols even though artifact creation remains agent-driven.
+affected_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/workflow/initOpenWorkflow.ts
+  - packages/core/src/validators/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - schemas/openworkflow-contract.schema.json
+  - changes/M23-production-command-lazy-contracts/
+acceptance:
+  - /ow:spec generated skill includes lazy-create guidance, accepted-design context, spec quality bar, and /ow:change handoff.
+  - /ow:change generated skill includes lazy-create guidance, source-spec context, work item planning, and /ow:team handoff.
+  - /ow:team generated skill includes lazy-create runtime guidance, source-change context, runtime state expectations, and verification checkpoints.
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml includes production_spec, production_change, and team_runtime contracts with templates embedded as metadata.
+  - openworkflow init does not create vision, validation, prototype, decision, design, specs, changes, or runtime stage directories or _templates.
+  - validate, runtime surface verification, workflow E2E verification, clean verification, and smoke init pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - npm run smoke:init
+  - npm run validate:cli
+updated_at: 2026-05-20

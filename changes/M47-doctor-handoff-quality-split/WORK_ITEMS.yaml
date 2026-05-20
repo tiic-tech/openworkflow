@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: work_items:M47-doctor-handoff-quality-split
+contract_type: work_items
+title: M47 Doctor handoff quality split work items
+status: completed
+change_contract: changes/M47-doctor-handoff-quality-split/CHANGE.yaml
+items:
+  - task_id: M47-T001
+    title: Add structured doctor health split
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/doctor.ts
+    acceptance:
+      - Doctor JSON exposes managed_surface_ok, adapter_ok, summary_freshness_ok, and handoff_quality_ok.
+      - Top-level ok remains scoped to managed surfaces and adapters.
+  - task_id: M47-T002
+    title: Clarify Agent guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help clarifies doctor maintenance scope versus handoff quality.
+      - AGENTS.md managed block points Agents to inspect/summaries strict for handoff gates.
+  - task_id: M47-T003
+    title: Add runtime verification
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier covers thin summary doctor ok true and handoff_quality_ok false.
+      - Repository validation requires M47 contracts.

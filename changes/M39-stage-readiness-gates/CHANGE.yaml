@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M39-stage-readiness-gates
+contract_type: change
+title: M39 Stage readiness gates
+status: accepted
+source_artifacts:
+  - changes/M38-json-exit-code-semantics/CHANGE.yaml
+depends_on:
+  - change:M38-json-exit-code-semantics
+produces:
+  - work_items:M39-stage-readiness-gates
+summary: >
+  Add semantic readiness gates for downstream `/ow:*` commands so a current
+  artifact must be usable, not merely present on disk, before Agents treat the
+  next development stage as ready.
+problem: >
+  Source artifacts can exist as draft scaffolds with placeholder text, empty
+  current-slice fields, or missing readiness booleans. Today `check` mostly
+  verifies required files and forbidden context, so a registered draft can make
+  downstream commands appear ready even though it contains too little
+  development intelligence for another Agent to proceed safely.
+goals:
+  - Add reusable current-artifact readiness checks for stage handoffs.
+  - Make `openworkflow check /ow:proto` require a usable current validation target.
+  - Make `openworkflow check /ow:design` require usable accepted prototype evidence or a continue decision.
+  - Make `openworkflow check /ow:spec`, `/ow:change`, and `/ow:team` require the upstream readiness booleans to be true.
+  - Keep draft artifacts creatable; block only when they are used as current downstream input.
+  - Surface readiness blockers in JSON so Agents know exactly which field to repair.
+  - Update help and AGENTS.md because Agent command readiness semantics changed.
+non_goals:
+  - Do not prevent `openworkflow draft --write` from creating placeholder artifacts.
+  - Do not require every historical artifact to be production-quality.
+  - Do not add a destructive migration or rewrite existing artifacts.
+  - Do not make `validate` responsible for summary freshness; `summaries` remains the summary trust command.
+decisions:
+  - "Draft artifacts may exist, but current artifacts used for the next stage must satisfy a semantic gate."
+  - "Readiness gates belong in `check` because Agents call it before choosing a `/ow:*` command."
+  - "Each gate reports field-level blockers rather than a vague unhealthy artifact message."
+open_questions:
+  - question: "Should `validate` fail on every placeholder artifact?"
+    outcome: "No. M39 blocks placeholder artifacts only when they are selected as current stage inputs; historical drafts remain valid project material."
+affected_paths:
+  - packages/core/src/artifacts/readiness.ts
+  - packages/cli/src/commands/check.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M39-stage-readiness-gates/
+acceptance:
+  - "`openworkflow check /ow:proto --json` blocks when CURRENT_STATE.current_validation points to a draft or empty validation artifact."
+  - "A validation artifact with a non-empty core question, prototype scope, and acceptance passes the `/ow:proto` semantic gate."
+  - "`/ow:spec`, `/ow:change`, and `/ow:team` block on missing or false readiness booleans in current design/spec/change artifacts."
+  - "Readiness blockers include specific artifact paths and fields to repair."
+  - "Help and AGENTS.md explain that `check` validates semantic readiness, not just file existence."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+created_at: 2026-05-20
+updated_at: 2026-05-20

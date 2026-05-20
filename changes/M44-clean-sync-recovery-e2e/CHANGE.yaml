@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: change:M44-clean-sync-recovery-e2e
+contract_type: change
+title: M44 Clean sync recovery E2E
+status: accepted
+source_artifacts:
+  - changes/M43-summary-quality-signals/CHANGE.yaml
+depends_on:
+  - change:M43-summary-quality-signals
+produces:
+  - work_items:M44-clean-sync-recovery-e2e
+summary: >
+  Harden the clean command regression suite so it proves a project can recover
+  managed OpenWorkflow runtime surfaces with sync after clean removes them,
+  without mutating source artifacts.
+problem: >
+  Clean correctly preserves source artifacts and removes managed files, but the
+  E2E coverage does not yet prove the intended recovery path: an Agent should be
+  able to run sync and regain AGENTS.md guidance, Codex adapter files, workflow
+  indices, audit indices, and health-oriented commands while the preserved
+  artifacts remain byte-for-byte unchanged.
+goals:
+  - Capture source artifact snapshots before clean and assert they remain unchanged after sync.
+  - Exercise `openworkflow sync --json` after `clean --yes` in the clean verifier.
+  - Assert managed config, workflow, audit, adapter, skill, and AGENTS.md managed block are restored by sync.
+  - Prove an Agent can run JSON health entrypoints after recovery.
+  - Register M44 contracts in repository validation.
+non_goals:
+  - Do not change clean or sync behavior unless the new regression exposes an existing bug.
+  - Do not add a new CLI command.
+  - Do not expand init beyond the established minimal setup.
+decisions:
+  - "M44 is test hardening for the clean/sync boundary, not a new runtime surface."
+  - "The recovery assertion must use byte-for-byte source snapshots so preservation is explicit."
+  - "Sync may return nonzero when it preserves a legacy non-generated command; M44 treats recovered managed surfaces plus explicit skipped reporting as the desired non-destructive behavior."
+open_questions:
+  - question: "Should clean automatically run sync?"
+    outcome: "No. clean remains destructive for managed outputs only; recovery stays explicit through sync."
+affected_paths:
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M44-clean-sync-recovery-e2e/
+acceptance:
+  - "`verify:clean` covers `clean --yes` followed by `sync --json`."
+  - "Sync restores managed `.openworkflow` runtime files, Codex adapter files, and the AGENTS.md managed block."
+  - "Preserved source artifacts remain byte-for-byte unchanged after clean and sync."
+  - "Recovered projects can run JSON Agent entrypoints for doctor and command readiness."
+  - "Repository validation requires M44 contracts."
+validation:
+  - npm run build
+  - npm run verify:clean
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

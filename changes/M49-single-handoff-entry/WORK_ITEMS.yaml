@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: work_items:M49-single-handoff-entry
+contract_type: work_items
+title: M49 Single handoff entry work items
+status: completed
+change_contract: changes/M49-single-handoff-entry/CHANGE.yaml
+items:
+  - task_id: M49-T001
+    title: Add handoff command model
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/handoff.ts
+      - packages/cli/src/index.ts
+    acceptance:
+      - Handoff command is read-only and supports the standard JSON envelope.
+      - Handoff aggregates managed surface, adapter, summary quality, and next-command readiness.
+      - Handoff fails on strict summary quality blockers.
+  - task_id: M49-T002
+    title: Update Agent guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help names handoff as the Agent trust gate.
+      - AGENTS.md managed block points Agents to handoff before context loading.
+  - task_id: M49-T003
+    title: Add runtime verification
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier covers fresh handoff success.
+      - Runtime verifier covers thin summary handoff failure.
+      - Repository validation requires M49 contracts.

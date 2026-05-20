@@ -17,7 +17,15 @@ export const CONTRACT_TYPES = [
 
 export type ContractType = (typeof CONTRACT_TYPES)[number];
 
-export type ContractStatus = "draft" | "active" | "superseded" | "archived";
+export type ContractStatus =
+  | "draft"
+  | "active"
+  | "reviewed"
+  | "accepted"
+  | "revise_requested"
+  | "completed"
+  | "superseded"
+  | "archived";
 
 export interface CommonContract {
   schema_version: string;

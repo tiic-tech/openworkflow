@@ -12,6 +12,7 @@ export interface ValidationResult {
 
 const REQUIRED_OPENWORKFLOW_FILES = [
   ".openworkflow/config.yaml",
+  ".openworkflow/CURRENT_STATE.yaml",
   ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
   ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
   ".openworkflow/audit/CONTEXT_PACKETS.yaml",
@@ -41,11 +42,52 @@ export async function validateOpenWorkflow(root: string): Promise<ValidationResu
     validateContractGraph(root, file, data, errors);
     validateArtifactContracts(root, file, data, errors);
     validateDisclosureLevels(root, file, data, errors);
+    validateConfig(root, file, data, errors);
+    validateCurrentState(root, file, data, errors);
     validateActivePointer(root, file, data, errors);
     validateDiscoveryArtifact(root, file, data, errors);
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+function validateConfig(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("config.yaml") || !isRecord(data)) {
+    return;
+  }
+  const label = relative(root, file);
+  if (!nonEmptyString(data.project_slug) || data.project_slug === "project") {
+    errors.push(`${label} project_slug must be a useful non-empty slug`);
+  }
+  if (!nonEmptyString(data.project_title) || data.project_title === ".") {
+    errors.push(`${label} project_title must be a useful non-empty title`);
+  }
+}
+
+function validateCurrentState(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("CURRENT_STATE.yaml") || !isRecord(data)) {
+    return;
+  }
+  const label = relative(root, file);
+  for (const key of ["active_stage", "next_command", "blocked_by", "read_this_first", "last_decision"]) {
+    if (!(key in data)) {
+      errors.push(`${label} missing current state key ${key}`);
+    }
+  }
+  if (!nonEmptyString(data.active_stage)) {
+    errors.push(`${label} active_stage must be a non-empty string`);
+  }
+  if (typeof data.next_command !== "string" && data.next_command !== null) {
+    errors.push(`${label} next_command must be a string or null`);
+  }
+  for (const key of ["blocked_by", "read_this_first"]) {
+    if (!Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if (!isRecord(data.last_decision)) {
+    errors.push(`${label} last_decision must be a mapping`);
+  }
 }
 
 function validateArtifactContracts(root: string, file: string, data: unknown, errors: string[]): void {
@@ -63,6 +105,9 @@ function validateArtifactContracts(root: string, file: string, data: unknown, er
     "prototype_evidence",
     "decision_record",
     "product_design",
+    "production_spec",
+    "production_change",
+    "team_runtime",
   ]);
   for (const artifact of artifacts) {
     if (!isRecord(artifact)) {
@@ -127,6 +172,18 @@ function validateArtifactContractMetadata(
   } else {
     errors.push(`${label} ${String(artifact.artifact_type)} active_pointer must be a mapping`);
   }
+  const summaryPolicy = artifact.summary_policy;
+  if (summaryPolicy !== null && summaryPolicy !== undefined) {
+    if (!isRecord(summaryPolicy)) {
+      errors.push(`${label} ${String(artifact.artifact_type)} summary_policy must be null or a mapping`);
+    } else {
+      for (const key of ["strategy", "path", "load_before_full", "refresh_when"]) {
+        if (!(key in summaryPolicy)) {
+          errors.push(`${label} ${String(artifact.artifact_type)} summary_policy missing ${key}`);
+        }
+      }
+    }
+  }
 }
 
 function validateActivePointer(root: string, file: string, data: unknown, errors: string[]): void {
@@ -140,6 +197,9 @@ function validateActivePointer(root: string, file: string, data: unknown, errors
     pointerRule("PROTOTYPE_INDEX.yaml", "current_prototype", "prototypes", "prototype_id", "path"),
     pointerRule("DECISION_INDEX.yaml", "current_decision", "decisions", "decision_id", "path"),
     pointerRule("DESIGN_INDEX.yaml", "current_design", "designs", "design_id", "path"),
+    pointerRule("SPEC_INDEX.yaml", "current_spec", "specs", "spec_id", "path"),
+    pointerRule("CHANGE_INDEX.yaml", "current_change", "changes", "change_id", "path"),
+    pointerRule("RUNTIME_INDEX.yaml", "current_run", "runs", "run_id", "path"),
   ];
   const rule = rules.find((item) => file.endsWith(item.fileName));
   if (!rule) {
@@ -224,6 +284,9 @@ function validateDisclosureLevels(root: string, file: string, data: unknown, err
 }
 
 function validateDiscoveryArtifact(root: string, file: string, data: unknown, errors: string[]): void {
+  if (file.endsWith("SUMMARY.yaml")) {
+    return;
+  }
   if (!isRecord(data) || typeof data.artifact_type !== "string") {
     return;
   }
@@ -249,6 +312,15 @@ function validateDiscoveryArtifact(root: string, file: string, data: unknown, er
   }
   if (data.artifact_type === "product_design") {
     validateProductDesign(label, data, errors);
+  }
+  if (data.artifact_type === "production_spec") {
+    validateProductionSpec(label, data, errors);
+  }
+  if (data.artifact_type === "production_change") {
+    validateProductionChange(label, data, errors);
+  }
+  if (data.artifact_type === "team_runtime") {
+    validateTeamRuntime(label, data, errors);
   }
 }
 
@@ -306,6 +378,46 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "open_questions",
       "conditional_packets",
       "spec_readiness",
+    ];
+  }
+  if (artifactType === "production_spec") {
+    return [
+      "source_design",
+      "goal",
+      "scope",
+      "requirements",
+      "interfaces",
+      "acceptance",
+      "verification",
+      "risks",
+      "change_readiness",
+    ];
+  }
+  if (artifactType === "production_change") {
+    return [
+      "source_spec",
+      "problem",
+      "goals",
+      "non_goals",
+      "affected_paths",
+      "acceptance",
+      "validation",
+      "work_items",
+      "risks",
+      "runtime_readiness",
+    ];
+  }
+  if (artifactType === "team_runtime") {
+    return [
+      "source_change",
+      "active_work_item",
+      "execution_mode",
+      "work_queue",
+      "agents",
+      "verification",
+      "issues",
+      "checkpoints",
+      "handoff",
     ];
   }
   return null;
@@ -471,6 +583,55 @@ function validateProductDesign(label: string, data: Record<string, unknown>, err
         errors.push(`${label} spec_readiness missing ${key}`);
       }
     }
+  }
+}
+
+function validateProductionSpec(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["scope", "requirements", "interfaces", "verification", "change_readiness"]) {
+    if (key in data && !isRecord(data[key])) {
+      errors.push(`${label} ${key} must be a mapping`);
+    }
+  }
+  const changeReadiness = data.change_readiness;
+  if (isRecord(changeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in changeReadiness)) {
+        errors.push(`${label} change_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateProductionChange(label: string, data: Record<string, unknown>, errors: string[]): void {
+  for (const key of ["goals", "non_goals", "affected_paths", "acceptance", "validation", "risks"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  const runtimeReadiness = data.runtime_readiness;
+  if (isRecord(runtimeReadiness)) {
+    for (const key of ["ready", "next_command"]) {
+      if (!(key in runtimeReadiness)) {
+        errors.push(`${label} runtime_readiness missing ${key}`);
+      }
+    }
+  }
+}
+
+function validateTeamRuntime(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (typeof data.execution_mode === "string" && !["single_agent", "agent_team", "reconcile", "qa_fix"].includes(data.execution_mode)) {
+    errors.push(`${label} has invalid execution_mode ${data.execution_mode}`);
+  }
+  for (const key of ["work_queue", "agents", "issues", "checkpoints"]) {
+    if (key in data && !Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if ("verification" in data && !isRecord(data.verification)) {
+    errors.push(`${label} verification must be a mapping`);
+  }
+  if ("handoff" in data && !isRecord(data.handoff)) {
+    errors.push(`${label} handoff must be a mapping`);
   }
 }
 

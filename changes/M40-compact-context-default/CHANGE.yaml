@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: change:M40-compact-context-default
+contract_type: change
+title: M40 Compact context default
+status: accepted
+source_artifacts:
+  - changes/M39-stage-readiness-gates/CHANGE.yaml
+depends_on:
+  - change:M39-stage-readiness-gates
+produces:
+  - work_items:M40-compact-context-default
+summary: >
+  Make `openworkflow context` default to a smaller Agent startup packet by
+  returning managed audit knowledge as structured fields and omitting bulky
+  managed audit source files unless the caller explicitly asks for full mode.
+problem: >
+  The context command is intended to satisfy "small context, high-quality
+  development intelligence", but the default packet can include full managed
+  audit files such as ARTIFACT_CONTRACTS.yaml and CONTEXT_PACKETS.yaml even
+  though their actionable meaning is already present in structured JSON. That
+  makes the first Agent read heavier than necessary and encourages reading
+  framework internals instead of the active state and trusted summaries.
+goals:
+  - Add `openworkflow context --mode compact|full`, defaulting to `compact`.
+  - Keep compact mode focused on AGENTS.md, CURRENT_STATE, trusted summaries/current_slice, readiness, and inspect data.
+  - Omit bulky managed audit source files in compact mode with explicit reasons.
+  - Preserve full mode for debugging or deep inspection of managed audit contracts.
+  - Lower compact default budget while keeping `--max-bytes` available.
+  - Update help and AGENTS.md managed block because context consumption semantics changed.
+non_goals:
+  - Do not remove structured readiness, inspect, context_packet, or summary_guidance fields from JSON.
+  - Do not change raw evidence omission policy.
+  - Do not make context write or repair artifacts.
+  - Do not add another command for context depth.
+decisions:
+  - "Compact is the default because it best matches Agent startup needs."
+  - "Full mode is explicit and intended for debugging generated OpenWorkflow metadata."
+  - "Managed audit files omitted in compact mode are represented structurally, so Agents still get their actionable meaning."
+open_questions:
+  - question: "Should compact mode omit AGENTS.md?"
+    outcome: "No. AGENTS.md remains included because it is the repo-local Agent onboarding source."
+affected_paths:
+  - packages/cli/src/commands/context.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M40-compact-context-default/
+acceptance:
+  - "`openworkflow context --root <folder> --json` reports `mode: compact` and uses a compact default budget."
+  - "Compact mode omits `.openworkflow/audit/ARTIFACT_CONTRACTS.yaml` and `.openworkflow/audit/CONTEXT_PACKETS.yaml` content with explicit structured-representation reasons."
+  - "`openworkflow context --root <folder> --mode full --json` may include managed audit source files when budget allows."
+  - "Trusted SUMMARY.yaml/current_slice content remains preferred in compact mode."
+  - "Help and AGENTS.md document `--mode compact|full` and when to use full mode."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+created_at: 2026-05-20
+updated_at: 2026-05-20

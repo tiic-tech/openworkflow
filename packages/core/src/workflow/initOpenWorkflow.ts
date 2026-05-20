@@ -11,22 +11,74 @@ export interface InitResult {
   skipped: string[];
 }
 
+export interface OpenWorkflowManagedFile {
+  relativePath: string;
+  content: string;
+  refreshPolicy: "refresh" | "missing-only";
+}
+
 export async function initOpenWorkflow(options: InitOptions): Promise<InitResult> {
   const root = options.root;
   const written: string[] = [];
   const skipped: string[] = [];
 
-  await writeContract(root, ".openworkflow/workflow/WORKFLOW_INDEX.yaml", workflowIndex(options), options.force, written, skipped);
-  await writeContract(root, ".openworkflow/config.yaml", workflowConfig(options), options.force, written, skipped);
-  await writeContract(root, ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", commandAuditIndex(options), options.force, written, skipped);
-  await writeContract(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets(options), options.force, written, skipped);
-  await writeContract(root, ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", artifactContracts(options), options.force, written, skipped);
-  await writeContract(root, ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", disclosureLevels(options), options.force, written, skipped);
-  for (const artifact of getDiscoveryArtifactContracts()) {
-    await writeContract(root, artifact.templatePath, dumpYaml(artifact.template), options.force, written, skipped);
+  for (const file of renderOpenWorkflowManagedFiles(options)) {
+    await writeContract(root, file.relativePath, file.content, options.force, written, skipped);
   }
 
   return { root, written, skipped };
+}
+
+export function renderOpenWorkflowManagedFiles(options: InitOptions): OpenWorkflowManagedFile[] {
+  return [
+    {
+      relativePath: ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      content: workflowIndex(options),
+      refreshPolicy: "refresh",
+    },
+    {
+      relativePath: ".openworkflow/CURRENT_STATE.yaml",
+      content: currentState(options),
+      refreshPolicy: "missing-only",
+    },
+    {
+      relativePath: ".openworkflow/config.yaml",
+      content: workflowConfig(options),
+      refreshPolicy: "refresh",
+    },
+    {
+      relativePath: ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
+      content: commandAuditIndex(options),
+      refreshPolicy: "refresh",
+    },
+    {
+      relativePath: ".openworkflow/audit/CONTEXT_PACKETS.yaml",
+      content: contextPackets(options),
+      refreshPolicy: "refresh",
+    },
+    {
+      relativePath: ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      content: artifactContracts(options),
+      refreshPolicy: "refresh",
+    },
+    {
+      relativePath: ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
+      content: disclosureLevels(options),
+      refreshPolicy: "refresh",
+    },
+  ];
+}
+
+export function openWorkflowManagedRelativePaths(): string[] {
+  return [
+    ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+    ".openworkflow/CURRENT_STATE.yaml",
+    ".openworkflow/config.yaml",
+    ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
+    ".openworkflow/audit/CONTEXT_PACKETS.yaml",
+    ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+    ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
+  ];
 }
 
 function workflowConfig(options: InitOptions): string {
@@ -99,10 +151,45 @@ function workflowIndex(options: InitOptions): string {
     tools: options.tools,
     contracts: [
       contractEntry(workflowId, "workflow", ".openworkflow/workflow/WORKFLOW_INDEX.yaml", "active"),
+      contractEntry("workflow:current-state", "workflow", ".openworkflow/CURRENT_STATE.yaml", "active"),
       contractEntry("audit:command-index", "workflow", ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", "active"),
       contractEntry("audit:context-packets", "workflow", ".openworkflow/audit/CONTEXT_PACKETS.yaml", "active"),
       contractEntry("audit:artifact-contracts", "workflow", ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml", "active"),
       contractEntry("audit:disclosure-levels", "workflow", ".openworkflow/audit/DISCLOSURE_LEVELS.yaml", "active"),
+    ],
+    updated_at: null,
+  });
+}
+
+function currentState(options: InitOptions): string {
+  return dumpYaml({
+    ...common("workflow:current-state", "workflow", `${options.projectTitle} current state`),
+    project: {
+      slug: options.projectSlug,
+      title: options.projectTitle,
+    },
+    workflow_root: ".openworkflow",
+    active_stage: "workflow",
+    current_vision: null,
+    current_validation: null,
+    current_prototype: null,
+    current_decision: null,
+    current_design: null,
+    current_spec: null,
+    current_change: null,
+    current_run: null,
+    last_decision: {
+      outcome: null,
+      path: null,
+    },
+    next_command: "/ow:vision",
+    blocked_by: [],
+    read_this_first: [
+      ".openworkflow/CURRENT_STATE.yaml",
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
+      ".openworkflow/audit/CONTEXT_PACKETS.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
     ],
     updated_at: null,
   });
@@ -182,6 +269,16 @@ function artifactContracts(options: InitOptions): string {
       },
       evidence_policy: artifact.evidencePolicy,
       handoff_key: artifact.handoffKey,
+      summary_policy: artifact.summaryPolicy
+        ? {
+            strategy: artifact.summaryPolicy.strategy,
+            path: artifact.summaryPolicy.path,
+            load_before_full: artifact.summaryPolicy.loadBeforeFull,
+            refresh_when: artifact.summaryPolicy.refreshWhen,
+          }
+        : null,
+      lazy_create: true,
+      template: artifact.template,
       conditional_packets: artifact.conditionalPackets ?? [],
     })),
     updated_at: null,

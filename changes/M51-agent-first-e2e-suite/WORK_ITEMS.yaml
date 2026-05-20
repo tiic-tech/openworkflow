@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: work_items:M51-agent-first-e2e-suite
+contract_type: work_items
+title: M51 Agent-first E2E suite work items
+status: completed
+change_contract: changes/M51-agent-first-e2e-suite/CHANGE.yaml
+items:
+  - task_id: M51-T001
+    title: Add agent-first E2E verifier
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - package.json
+    acceptance:
+      - "`npm run verify:agent-e2e` runs the verifier against dist CLI output."
+      - Verifier creates and removes only temporary projects.
+  - task_id: M51-T002
+    title: Cover first-consumer workflow assertions
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyAgentE2E.ts
+    acceptance:
+      - Verifier covers init, lazy boundaries, draft/register, summary quality, handoff, context handoff, clean, sync recovery, and source preservation.
+  - task_id: M51-T003
+    title: Register validation coverage
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Repository validation requires M51 contracts.
+      - M51 validation commands pass.
