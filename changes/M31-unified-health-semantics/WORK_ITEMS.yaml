@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: work_items:M31-unified-health-semantics
+contract_type: work_items
+title: M31 Unified health semantics work items
+status: draft
+change_contract: changes/M31-unified-health-semantics/CHANGE.yaml
+items:
+  - task_id: M31-T001
+    title: Unify brief/status health ok semantics
+    status: planned
+    owned_paths:
+      - packages/cli/src/commands/brief.ts
+    acceptance:
+      - "`data.health.ok` includes `data.health.summaries.ok`."
+      - JSON warnings include summary health warnings.
+      - Human output clearly shows when summary health makes the entrypoint unhealthy.
+  - task_id: M31-T002
+    title: Make summaries require an initialized workflow root
+    status: planned
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/commands/summaries.ts
+    acceptance:
+      - Non-OpenWorkflow roots do not report healthy not_instantiated counts.
+      - JSON output makes missing workflow metadata explicit.
+      - Initialized projects with no stage artifacts still report not_instantiated without errors.
+  - task_id: M31-T003
+    title: Clarify validate and doctor summary boundary
+    status: planned
+    owned_paths:
+      - packages/cli/src/commands/doctor.ts
+      - packages/cli/src/commands/validate.ts
+      - packages/core/src/validators/
+      - packages/cli/src/index.ts
+    acceptance:
+      - A deliberate policy exists for SUMMARY.yaml validation.
+      - Help and JSON next_actions tell Agents whether to use `summaries` for artifact summary trust.
+      - "`doctor` and `validate` no longer imply they cover summary health if they do not."
+  - task_id: M31-T004
+    title: Promote command-specific summary issues into check warnings
+    status: planned
+    owned_paths:
+      - packages/cli/src/commands/check.ts
+    acceptance:
+      - "`check <command> --json` warnings include missing or stale relevant summary health."
+      - "`summary_guidance` remains structured for machine consumers."
+      - Required/forbidden context blockers remain separate from advisory summary warnings.
+  - task_id: M31-T005
+    title: Update Agent-facing docs and regression coverage
+    status: planned
+    owned_paths:
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Help and AGENTS.md managed block reflect health command boundaries.
+      - Runtime tests cover missing workflow root, missing current_slice, missing SUMMARY, stale SUMMARY, and brief/status health consistency.
+      - E2E tests verify no stage artifacts are created by health/read-model commands.

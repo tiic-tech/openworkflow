@@ -142,6 +142,8 @@ const REQUIRED_FILES = [
   "changes/M29-command-readiness-check/WORK_ITEMS.yaml",
   "changes/M30-artifact-summary-health/CHANGE.yaml",
   "changes/M30-artifact-summary-health/WORK_ITEMS.yaml",
+  "changes/M31-unified-health-semantics/CHANGE.yaml",
+  "changes/M31-unified-health-semantics/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
