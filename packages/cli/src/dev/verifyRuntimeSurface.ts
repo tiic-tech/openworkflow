@@ -118,6 +118,8 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow --help",
     "ok:false",
     "handoff_quality_ok",
+    "data.quality_summary",
+    "quality_summary.status",
     ".openworkflow/CURRENT_STATE.yaml",
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
@@ -159,6 +161,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Two command surfaces",
     "CLI maintenance commands",
     "Doctor confirms managed surface health, not handoff quality",
+    "data.handoff_quality_ok",
+    "data.quality_summary",
     "Repo-local workflow commands are Agent skills",
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
@@ -171,6 +175,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "fail on current-but-thin summaries",
     "context",
     "Read-only packet materializer",
+    "quality_summary",
     "--max-bytes",
     "--mode full",
     "draft",
@@ -345,6 +350,13 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Number(contextFreshBudget.max_bytes) === 12000, "fresh compact context should use compact default budget");
   assert(contextFreshData.normalized_command === "/ow:vision", "fresh context should default to CURRENT_STATE.next_command");
   assert(contextFreshData.packet_id === "context:vision", "fresh context missing packet_id");
+  assert(contextFreshData.handoff_quality_ok === true, "fresh context should report handoff_quality_ok=true");
+  const contextFreshQuality = record(contextFreshData.quality_summary, "fresh context quality_summary");
+  assert(contextFreshQuality.status === "trusted", "fresh context quality_summary should be trusted");
+  assert(contextFreshQuality.freshness_ok === true, "fresh context quality_summary freshness should be ok");
+  assert(contextFreshQuality.strict_quality_ok === true, "fresh context quality_summary strict quality should be ok");
+  assert(contextFreshQuality.handoff_quality_ok === true, "fresh context quality_summary handoff quality should be ok");
+  assert(Number(contextFreshQuality.health_error_count) === 0, "fresh context quality_summary should have no health errors");
   const contextFreshAudit = record(contextFreshData.command_audit, "fresh context command_audit");
   assert(contextFreshAudit.trigger === "/ow:vision", "fresh context command_audit should describe current command");
   assert(Array.isArray(contextFreshAudit.allowed_outputs) && contextFreshAudit.allowed_outputs.length > 0, "fresh context command_audit missing allowed outputs");
@@ -440,6 +452,14 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(doctorThinData.adapter_ok === true, "doctor should report adapter_ok=true");
   assert(doctorThinData.summary_freshness_ok === true, "doctor should report summary_freshness_ok=true for current summaries");
   assert(doctorThinData.handoff_quality_ok === false, "doctor should report handoff_quality_ok=false for thin summaries");
+  const doctorThinQuality = record(doctorThinData.quality_summary, "doctor quality_summary");
+  assert(doctorThinQuality.status === "current_but_thin", "doctor quality_summary should report current_but_thin");
+  assert(doctorThinQuality.freshness_ok === true, "doctor quality_summary freshness should be ok for current summaries");
+  assert(doctorThinQuality.strict_quality_ok === false, "doctor quality_summary strict quality should fail for thin summaries");
+  assert(doctorThinQuality.handoff_quality_ok === false, "doctor quality_summary handoff quality should fail for thin summaries");
+  assert(Number(doctorThinQuality.current_but_thin_count) > 0, "doctor quality_summary should count thin artifacts");
+  assert(Number(doctorThinQuality.strict_quality_health_error_count) > 0, "doctor quality_summary should count strict quality errors");
+  assert(Array.isArray(doctorThinQuality.next_actions) && doctorThinQuality.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor quality_summary should recommend strict summaries");
   assert(nonEmptyArray(record(doctorThinData.strict_quality, "doctor strict quality").health_errors), "doctor should include strict quality errors");
   assert(Array.isArray(doctorThin.next_actions) && doctorThin.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor should recommend summaries --strict for thin handoff quality");
   const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
@@ -447,6 +467,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const designContext = parseJsonReport(designContextStatus.output, "context");
   const designContextData = record(designContext.data, "design context data");
   assert(designContext.ok === false, "blocked design context should report ok=false");
+  assert(designContextData.handoff_quality_ok === false, "thin design context should expose handoff_quality_ok=false");
+  const designContextQuality = record(designContextData.quality_summary, "design context quality_summary");
+  assert(designContextQuality.status === "current_but_thin", "thin design context quality_summary should report current_but_thin");
+  assert(Number(designContextQuality.health_error_count) > 0, "thin design context quality_summary should count quality errors");
   assert(nonEmptyArray(designContext.health_errors), "blocked context should expose health_errors");
   assert(Array.isArray(designContextData.included) && designContextData.included.some((item) => record(item, "included design context").source === "summary_file" && record(item, "included design context").path === ".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "design context should include trusted prototype SUMMARY.yaml");
 

@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M48-handoff-quality-summary
+contract_type: change
+title: M48 Handoff quality summary
+status: accepted
+source_artifacts:
+  - changes/M47-doctor-handoff-quality-split/CHANGE.yaml
+depends_on:
+  - change:M47-doctor-handoff-quality-split
+produces:
+  - work_items:M48-handoff-quality-summary
+summary: >
+  Surface compact handoff-quality signals in Agent entry JSON so Agents can
+  decide whether repo context is trustworthy without parsing nested summary
+  health entries.
+problem: >
+  M47 separates managed-surface health from handoff quality, but the most
+  useful consumer signals are still nested under doctor strict_quality or
+  inspect summaries. Agents entering a repo need a small top-level read model
+  that states whether handoff quality is trustworthy, why not, and which strict
+  command to run next.
+goals:
+  - Add a compact quality_summary model derived from summary freshness and strict summary quality.
+  - Expose handoff_quality_ok and quality_summary in context --json data.
+  - Expose quality_summary in doctor --json data next to the existing health split.
+  - Keep non-strict context and doctor exit semantics unchanged.
+  - Update help and AGENTS.md managed guidance for the new summary fields.
+  - Add runtime coverage for the new Agent-readable quality summary.
+non_goals:
+  - Do not add a new handoff command in M48.
+  - Do not make context --json fail only because handoff quality is thin.
+  - Do not change summaries --strict or inspect --strict semantics.
+decisions:
+  - "handoff_quality_ok is a trust signal, not a default command exit gate for context or doctor."
+  - "quality_summary should be compact and parseable without walking entries/items."
+  - "Strict commands remain the blocking gates when Agents need handoff approval."
+open_questions:
+  - question: "Should a future command provide a single strict handoff approval entrypoint?"
+    outcome: "Yes; defer to a follow-up change after the shared summary model is in place."
+affected_paths:
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/commands/context.ts
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M48-handoff-quality-summary/
+acceptance:
+  - "context --json data includes handoff_quality_ok and quality_summary."
+  - "doctor --json data includes quality_summary."
+  - "quality_summary includes freshness ok, strict quality ok, status counts, warning counts, health error counts, and next actions."
+  - "Thin current summaries keep context/doctor maintenance exit semantics unchanged while exposing handoff_quality_ok:false."
+  - "Help and AGENTS.md tell Agents where to read the compact handoff-quality signal."
+  - "Runtime verification covers the compact quality summary fields."
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

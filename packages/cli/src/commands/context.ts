@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
-import { evaluateSummaryQualityGate, type SummaryHealthEntry } from "../../../core/src/workflow/summaryHealth.js";
+import { buildSummaryQualitySummary, evaluateSummaryQualityGate, type SummaryHealthEntry, type SummaryQualitySummary } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { buildBriefModel } from "./brief.js";
@@ -76,6 +76,8 @@ interface ContextModel {
   omitted: ContextOmission[];
   truncated: ContextOmission[];
   summary_guidance: ReadinessModel["summary_guidance"];
+  handoff_quality_ok: boolean;
+  quality_summary: SummaryQualitySummary;
   recommended_next_actions: string[];
 }
 
@@ -132,9 +134,10 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
 
   const readiness = await buildReadiness(root, requested);
   const inspect = buildInspectModel(brief, readiness, evaluateSummaryQualityGate(brief.health.summaries, false));
+  const qualitySummary = buildSummaryQualitySummary(brief.health.summaries);
   const packet = findPacket(loaded, readiness.normalized_command ?? requested);
   const commandAudit = findCommandAudit(await loadCommandAudit(root), readiness.normalized_command ?? requested);
-  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, packet, commandAudit);
+  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, qualitySummary, packet, commandAudit);
   const packetErrors = packet ? [] : [`missing context packet for command: ${readiness.normalized_command ?? requested}`];
   const warnings = unique([
     ...readiness.warnings,
@@ -169,6 +172,7 @@ async function buildContextModel(
   maxBytes: number,
   readiness: ReadinessModel,
   inspect: InspectModel,
+  qualitySummary: SummaryQualitySummary,
   contextPacket: ContextPacketMetadata | null,
   commandAudit: CommandAuditMetadata | null,
 ): Promise<ContextModel> {
@@ -231,7 +235,10 @@ async function buildContextModel(
     omitted: uniqueOmissions(omitted),
     truncated: uniqueOmissions(truncated),
     summary_guidance: readiness.summary_guidance,
+    handoff_quality_ok: qualitySummary.handoff_quality_ok,
+    quality_summary: qualitySummary,
     recommended_next_actions: unique([
+      ...qualitySummary.next_actions,
       ...inspect.recommended_next_actions,
       ...readiness.next_actions,
       ...(inspect.summaries.ok ? [] : inspect.summaries.next_actions),

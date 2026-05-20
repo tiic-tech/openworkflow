@@ -3,7 +3,7 @@ import { detectAdapterPlatforms, getAdapterEntry, getSupportedAdapterIds } from 
 import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { doctorOpenWorkflow } from "../../../core/src/workflow/doctorOpenWorkflow.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
-import { evaluateSummaryHealth, evaluateSummaryQualityGate } from "../../../core/src/workflow/summaryHealth.js";
+import { buildSummaryQualitySummary, evaluateSummaryHealth, evaluateSummaryQualityGate } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, slugify } from "./shared.js";
@@ -50,6 +50,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   const agentsGuide = await doctorAgentsGuide(root);
   const summaryHealth = await evaluateSummaryHealth(root);
   const handoffQuality = evaluateSummaryQualityGate(summaryHealth, true);
+  const qualitySummary = buildSummaryQualitySummary(summaryHealth, handoffQuality);
   const adapterResults = [];
   for (const tool of tools) {
     const adapter = getAdapterEntry(tool);
@@ -69,7 +70,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   const managedSurfaceOk = workflow.ok && agentsGuide.ok;
   const adapterOk = adapterResults.every((entry) => entry.result.ok);
   const summaryFreshnessOk = summaryHealth.ok;
-  const handoffQualityOk = handoffQuality.ok;
+  const handoffQualityOk = qualitySummary.handoff_quality_ok;
   const ok = managedSurfaceOk && adapterOk;
   if (json) {
     printJsonReport({
@@ -81,6 +82,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
         agents_md: agentsGuide,
         summary_health: summaryHealth,
         strict_quality: handoffQuality,
+        quality_summary: qualitySummary,
         managed_surface_ok: managedSurfaceOk,
         adapter_ok: adapterOk,
         summary_freshness_ok: summaryFreshnessOk,

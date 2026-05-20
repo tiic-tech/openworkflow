@@ -46,6 +46,24 @@ export interface SummaryQualityGate {
   health_errors: string[];
 }
 
+export type SummaryQualitySummaryStatus = "not_initialized" | "needs_refresh" | "current_but_thin" | "trusted";
+
+export interface SummaryQualitySummary {
+  initialized: boolean;
+  status: SummaryQualitySummaryStatus;
+  freshness_ok: boolean;
+  strict_quality_ok: boolean;
+  handoff_quality_ok: boolean;
+  counts: Record<SummaryHealthStatus, number>;
+  instantiated_count: number;
+  current_but_thin_count: number;
+  freshness_health_error_count: number;
+  strict_quality_health_error_count: number;
+  health_error_count: number;
+  warning_count: number;
+  next_actions: string[];
+}
+
 interface SummaryArtifactContract {
   artifactType: string;
   command: string;
@@ -109,6 +127,57 @@ export function summaryQualityHealthErrors(health: SummaryHealthModel): string[]
       return details.map((detail) => `summary quality ${entry.artifact_type}: ${detail}`);
     })
   ));
+}
+
+export function buildSummaryQualitySummary(
+  health: SummaryHealthModel,
+  strictQuality: SummaryQualityGate = evaluateSummaryQualityGate(health, true),
+): SummaryQualitySummary {
+  const currentButThinCount = health.entries.reduce(
+    (count, entry) => count + entry.items.filter((item) => item.quality_status === "current_but_thin").length,
+    0,
+  );
+  const freshnessHealthErrorCount = health.ok ? 0 : health.warnings.length;
+  const strictQualityHealthErrorCount = strictQuality.health_errors.length;
+  const handoffQualityOk = health.ok && strictQuality.ok;
+  return {
+    initialized: health.initialized,
+    status: summaryQualitySummaryStatus(health, strictQuality),
+    freshness_ok: health.ok,
+    strict_quality_ok: strictQuality.ok,
+    handoff_quality_ok: handoffQualityOk,
+    counts: health.counts,
+    instantiated_count: health.entries.reduce((count, entry) => count + entry.instantiated_count, 0),
+    current_but_thin_count: currentButThinCount,
+    freshness_health_error_count: freshnessHealthErrorCount,
+    strict_quality_health_error_count: strictQualityHealthErrorCount,
+    health_error_count: freshnessHealthErrorCount + strictQualityHealthErrorCount,
+    warning_count: health.warnings.length,
+    next_actions: summaryQualityNextActions(health, strictQuality),
+  };
+}
+
+function summaryQualitySummaryStatus(health: SummaryHealthModel, strictQuality: SummaryQualityGate): SummaryQualitySummaryStatus {
+  if (!health.initialized) {
+    return "not_initialized";
+  }
+  if (!health.ok) {
+    return "needs_refresh";
+  }
+  if (!strictQuality.ok) {
+    return "current_but_thin";
+  }
+  return "trusted";
+}
+
+function summaryQualityNextActions(health: SummaryHealthModel, strictQuality: SummaryQualityGate): string[] {
+  if (!health.initialized) {
+    return ["run openworkflow init <folder> --tools codex, or run openworkflow sync on an initialized project"];
+  }
+  return unique([
+    ...(!health.ok ? health.next_actions : []),
+    ...(!strictQuality.ok ? ["run openworkflow summaries --root . --strict --json before trusting artifact handoff quality"] : []),
+  ]);
 }
 
 async function loadArtifactContracts(contractsPath: string): Promise<SummaryArtifactContract[] | null> {

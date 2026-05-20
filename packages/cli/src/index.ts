@@ -120,8 +120,10 @@ Agent quick start:
   full evidence. Doctor confirms managed surface health, not handoff quality.
   Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
   but check summary quality fields before treating a current summary
-  as a complete handoff. Add --strict to summaries or inspect when thin source
-  quality should block the Agent handoff. Use --json when an Agent needs structured command output.
+  as a complete handoff. In context --json and doctor --json, read
+  data.handoff_quality_ok and data.quality_summary for compact trust signals.
+  Add --strict to summaries or inspect when thin source quality should block the Agent handoff.
+  Use --json when an Agent needs structured command output.
   Use openworkflow context --root . --json when you want OpenWorkflow to package
   the next command's compact startup context instead of reading files one by one.
 
@@ -132,7 +134,7 @@ Two command surfaces:
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and separately report summary freshness and handoff quality.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
-    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice; use --for /ow:<command>, --max-bytes, and --mode full when needed.
+    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
