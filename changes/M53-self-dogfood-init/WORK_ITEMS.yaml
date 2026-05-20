@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: work_items:M53-self-dogfood-init
+contract_type: work_items
+title: M53 Self dogfood OpenWorkflow init work items
+status: draft
+change_contract: changes/M53-self-dogfood-init/CHANGE.yaml
+items:
+  - task_id: M53-T001
+    title: Prepare self-dogfood branch and local build
+    status: pending
+    owned_paths:
+      - changes/M53-self-dogfood-init/
+      - dist/
+    acceptance:
+      - The branch starts from merged `main`.
+      - The local TypeScript build succeeds before init is executed.
+  - task_id: M53-T002
+    title: Initialize OpenWorkflow with Codex platform
+    status: pending
+    owned_paths:
+      - .openworkflow/
+      - .agents/
+      - AGENTS.md
+    acceptance:
+      - Local CLI init runs with `--tools codex --json`.
+      - Init creates only the minimal managed setup plus Codex adapter surfaces.
+      - Existing user-authored repository files are preserved.
+  - task_id: M53-T003
+    title: Classify committed versus runtime self-dogfood artifacts
+    status: pending
+    owned_paths:
+      - .gitignore
+      - .openworkflow/
+      - .agents/
+      - AGENTS.md
+    acceptance:
+      - Source-level managed surfaces intended for future Agents are committed.
+      - Runtime/cache or large evidence surfaces are ignored or explicitly left out.
+      - The policy is visible enough for future Agents to avoid artifact bloat.
+  - task_id: M53-T004
+    title: Verify Agent-first self-dogfood entry points
+    status: pending
+    owned_paths:
+      - .openworkflow/
+      - .agents/
+      - AGENTS.md
+    acceptance:
+      - `doctor --json` reports a coherent Codex-managed repository.
+      - `handoff --json` provides a low-context entry point.
+      - `context --handoff --json` provides a bounded default packet.

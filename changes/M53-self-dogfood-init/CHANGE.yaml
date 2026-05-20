@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: change:M53-self-dogfood-init
+contract_type: change
+title: M53 Self dogfood OpenWorkflow init
+status: draft
+source_artifacts:
+  - docs/OW_DEVELOP_PLAN.md
+depends_on:
+  - change:M52-default-sync-adapter-recovery
+produces:
+  - work_items:M53-self-dogfood-init
+summary: >
+  Initialize the OpenWorkflow repository with OpenWorkflow itself so future OW
+  development can be guided by the same Agent-first artifacts, Codex adapter
+  surface, and low-context handoff path that OW provides to consumer projects.
+problem: >
+  OpenWorkflow is now mature enough to dogfood its own workflow surface, but
+  the repository currently has no `.openworkflow/`, `.agents/`, or AGENTS.md
+  managed block. Continuing development without self-initialization delays
+  first-consumer feedback on init, AGENTS.md guidance, help quality, handoff,
+  context, clean, sync, and future change/archive/review behavior.
+goals:
+  - Initialize this repository with the local development build of OpenWorkflow and Codex as the first platform.
+  - Commit the minimal managed workflow surface needed for OW to manage itself.
+  - Preserve the minimal-init rule: do not precreate optional stage artifacts beyond init-owned files.
+  - Define which self-dogfood files are source artifacts versus runtime/cache evidence.
+  - Verify the initialized repository through Agent-first JSON entry points.
+  - Keep this change focused on bootstrap; do not redesign workflow semantics here.
+non_goals:
+  - Do not run product workflow commands such as `/ow:proto`, `/ow:build`, or `/ow:change` in M53.
+  - Do not migrate existing historical `changes/M22-M52` into `.openworkflow/archive`.
+  - Do not add codegraph integration in this change.
+  - Do not use a stale globally installed npm package when the local development build is available.
+decisions:
+  - "The OpenWorkflow repository should dogfood OpenWorkflow from the latest local build."
+  - "Codex is the first self-dogfood platform for init because it is the current priority adapter."
+  - "Generated managed onboarding surfaces are source artifacts when they define how Agents should enter this repository."
+  - "Runtime evidence and large generated artifacts should not become default startup context."
+open_questions:
+  - question: "Should self-dogfood runtime evidence be committed, ignored, or archived per milestone?"
+    outcome: "M53 should classify the first set and leave durable policy refinement to a later change."
+  - question: "Should historical `changes/` be indexed into OW artifacts immediately?"
+    outcome: "Defer; M53 only bootstraps the managed surface."
+affected_paths:
+  - changes/M53-self-dogfood-init/
+  - .openworkflow/
+  - .agents/
+  - AGENTS.md
+  - .gitignore
+acceptance:
+  - "The repository is on a fresh M53 branch based on merged `main`."
+  - "`npm run build` succeeds before running local init."
+  - "Local CLI init creates `.openworkflow/`, `.agents/skills`, Codex adapter metadata, and AGENTS.md managed guidance."
+  - "Init output respects minimal setup and does not create optional stage artifacts such as proto/spec/change/team outputs."
+  - "Committed self-dogfood files are limited to source-level managed surfaces; runtime/cache policy is explicit."
+  - "`doctor --json`, `handoff --json`, and `context --handoff --json` produce usable Agent-first entry reports after init."
+  - "The final diff is reviewable as a bootstrap change, not mixed with unrelated feature work."
+validation:
+  - npm run build
+  - node dist/cli/src/index.js init . --tools codex --json
+  - node dist/cli/src/index.js doctor --json
+  - node dist/cli/src/index.js handoff --json
+  - node dist/cli/src/index.js context --handoff --json
+created_at: 2026-05-20
+updated_at: 2026-05-20
