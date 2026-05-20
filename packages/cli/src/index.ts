@@ -96,7 +96,7 @@ Usage:
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--strict] [--json]
-  openworkflow context --root <folder> [--for <ow-command>] [--mode compact|full] [--max-bytes <n>] [--json]
+  openworkflow context --root <folder> [--for <ow-command>] [--mode compact|full] [--max-bytes <n>] [--handoff] [--json]
   openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--force] [--json]
   openworkflow register --root <folder> --artifact <path> [--current] [--next-command <ow-command>] [--write] [--json]
   openworkflow check <ow-command> --root <folder> [--json]
@@ -123,8 +123,9 @@ Commands:
 
 Agent quick start:
   Read AGENTS.md, then run openworkflow handoff --root . --json. Handoff is
-  the strict Agent trust gate before context loading. If it passes, run
-  openworkflow context --root . --json. Inspect starts
+  the strict Agent trust gate before context loading. If you need the packet
+  and the trust gate in one call, run openworkflow context --root . --handoff --json.
+  Otherwise, run openworkflow context --root . --json after handoff passes. Inspect starts
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
   full evidence. Doctor confirms managed surface health, not handoff quality.
   Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
@@ -144,7 +145,7 @@ Two command surfaces:
     doctor     Report missing or stale generated surfaces, and separately report summary freshness and handoff quality.
     handoff    Strict read-only Agent trust gate; aggregates doctor-style surface health, inspect --strict quality, summaries --strict quality, and next-command readiness.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
-    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; use --for /ow:<command>, --max-bytes, and --mode full when needed.
+    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; add --handoff to fail on strict handoff-quality blockers, or use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
@@ -165,6 +166,8 @@ Two command surfaces:
     Use summaries --json before loading raw evidence when summary/current-slice
     health or source quality is unknown. Use summaries --strict --json, or
     inspect --strict --json at repo entry, when draft/thin sources must block trust.
+    Use context --handoff --json when an Agent needs a bounded context packet and
+    strict handoff-quality blocking in the same command.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

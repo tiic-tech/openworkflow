@@ -128,6 +128,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow inspect --root . --json",
     "--strict",
     "openworkflow context --root . --json",
+    "openworkflow context --root . --handoff --json",
     "--for /ow:<command>",
     "--max-bytes <n>",
     "openworkflow draft --root . --artifact <type> --id <id> --json",
@@ -165,6 +166,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Doctor confirms managed surface health, not handoff quality",
     "data.handoff_quality_ok",
     "data.quality_summary",
+    "context --root . --handoff --json",
     "Repo-local workflow commands are Agent skills",
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
@@ -180,6 +182,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "context",
     "Read-only packet materializer",
     "quality_summary",
+    "--handoff",
     "--max-bytes",
     "--mode full",
     "draft",
@@ -365,6 +368,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const contextFreshBudget = record(contextFreshData.budget, "context budget");
   assert(contextFresh.ok === true, "fresh context should be ok");
   assert(contextFreshData.mode === "compact", "fresh context should default to compact mode");
+  assert(contextFreshData.handoff_mode === false, "fresh context should default handoff_mode=false");
   assert(contextFreshBudget.mode === "compact", "fresh context budget should report compact mode");
   assert(Number(contextFreshBudget.max_bytes) === 12000, "fresh compact context should use compact default budget");
   assert(contextFreshData.normalized_command === "/ow:vision", "fresh context should default to CURRENT_STATE.next_command");
@@ -386,6 +390,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => record(item, "omitted context").path === ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml" && String(record(item, "omitted context").reason).includes("represented structurally")), "compact context should explain omitted command audit");
   assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => record(item, "omitted context").path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml" && String(record(item, "omitted context").reason).includes("represented structurally")), "compact context should explain omitted artifact contracts");
   assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => String(record(item, "omitted context").path).includes(".openworkflow/changes/**")), "fresh context should omit forbidden context");
+  const handoffContextFresh = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--handoff", "--json"], env), "context");
+  const handoffContextFreshData = record(handoffContextFresh.data, "fresh handoff context data");
+  assert(handoffContextFresh.ok === true, "fresh context --handoff should pass");
+  assert(handoffContextFreshData.handoff_mode === true, "fresh context --handoff should report handoff_mode=true");
+  assert(handoffContextFreshData.handoff_quality_ok === true, "fresh context --handoff should report handoff_quality_ok=true");
   const fullContext = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--mode", "full", "--json"], env), "context");
   const fullContextData = record(fullContext.data, "full context data");
   const fullContextBudget = record(fullContextData.budget, "full context budget");
@@ -481,6 +490,19 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(doctorThinQuality.next_actions) && doctorThinQuality.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor quality_summary should recommend strict summaries");
   assert(nonEmptyArray(record(doctorThinData.strict_quality, "doctor strict quality").health_errors), "doctor should include strict quality errors");
   assert(Array.isArray(doctorThin.next_actions) && doctorThin.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor should recommend summaries --strict for thin handoff quality");
+  const defaultThinContext = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
+  const defaultThinContextData = record(defaultThinContext.data, "default thin context data");
+  assert(defaultThinContext.ok === true, "default context should stay non-strict for thin handoff quality");
+  assert(defaultThinContextData.handoff_mode === false, "default thin context should report handoff_mode=false");
+  assert(defaultThinContextData.handoff_quality_ok === false, "default thin context should expose handoff_quality_ok=false");
+  const handoffThinContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--handoff", "--json"], env);
+  assert(handoffThinContextStatus.code !== 0, "context --handoff should fail for current_but_thin quality");
+  const handoffThinContext = parseJsonReport(handoffThinContextStatus.output, "context");
+  const handoffThinContextData = record(handoffThinContext.data, "thin handoff context data");
+  assert(handoffThinContext.ok === false, "thin context --handoff should report ok=false");
+  assert(handoffThinContextData.handoff_mode === true, "thin context --handoff should report handoff_mode=true");
+  assert(handoffThinContextData.handoff_quality_ok === false, "thin context --handoff should report handoff_quality_ok=false");
+  assert(Array.isArray(handoffThinContext.health_errors) && handoffThinContext.health_errors.some((item) => String(item).includes("summary quality prototype_evidence")), "thin context --handoff should expose strict summary health errors");
   const handoffThinStatus = await runCaptureStatus(["node", CLI, "handoff", "--root", root, "--tools", "codex", "--json"], env);
   assert(handoffThinStatus.code !== 0, "handoff should fail for current_but_thin quality");
   const handoffThin = parseJsonReport(handoffThinStatus.output, "handoff");

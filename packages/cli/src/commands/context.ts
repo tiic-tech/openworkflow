@@ -63,6 +63,7 @@ interface ContextBudget {
 
 interface ContextModel {
   mode: ContextMode;
+  handoff_mode: boolean;
   command: string | null;
   normalized_command: string | null;
   packet_id: string | null;
@@ -108,6 +109,7 @@ interface AddContentInput {
 export async function contextCommand(flags: Map<string, string | boolean>): Promise<number> {
   const root = resolve(stringFlag(flags, "root", ".") ?? ".");
   const json = booleanFlag(flags, "json");
+  const handoffMode = booleanFlag(flags, "handoff");
   const mode = parseMode(stringFlag(flags, "mode"));
   if (!mode) {
     return finishError(root, json, "invalid --mode; expected compact or full", ["rerun with --mode compact or --mode full"]);
@@ -133,18 +135,20 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
   }
 
   const readiness = await buildReadiness(root, requested);
-  const inspect = buildInspectModel(brief, readiness, evaluateSummaryQualityGate(brief.health.summaries, false));
-  const qualitySummary = buildSummaryQualitySummary(brief.health.summaries);
+  const strictQuality = evaluateSummaryQualityGate(brief.health.summaries, true);
+  const inspect = buildInspectModel(brief, readiness, evaluateSummaryQualityGate(brief.health.summaries, handoffMode));
+  const qualitySummary = buildSummaryQualitySummary(brief.health.summaries, strictQuality);
   const packet = findPacket(loaded, readiness.normalized_command ?? requested);
   const commandAudit = findCommandAudit(await loadCommandAudit(root), readiness.normalized_command ?? requested);
-  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, qualitySummary, packet, commandAudit);
+  const model = await buildContextModel(root, mode, handoffMode, maxBytes, readiness, inspect, qualitySummary, packet, commandAudit);
   const packetErrors = packet ? [] : [`missing context packet for command: ${readiness.normalized_command ?? requested}`];
+  const handoffErrors = handoffMode ? contextHandoffErrors(brief.health.summaries.warnings, strictQuality.health_errors) : [];
   const warnings = unique([
     ...readiness.warnings,
     ...inspect.summaries.warnings,
     ...model.omitted.filter((item) => item.reason.includes("summary")).map((item) => `${item.path}: ${item.reason}`),
   ]);
-  const errors = unique([...readiness.blockers, ...packetErrors]);
+  const errors = unique([...readiness.blockers, ...packetErrors, ...handoffErrors]);
   const ok = packet !== null && readiness.ready && errors.length === 0;
   const healthErrors = ok ? [] : unique(errors.length > 0 ? errors : warnings);
 
@@ -169,6 +173,7 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
 async function buildContextModel(
   root: string,
   mode: ContextMode,
+  handoffMode: boolean,
   maxBytes: number,
   readiness: ReadinessModel,
   inspect: InspectModel,
@@ -222,6 +227,7 @@ async function buildContextModel(
 
   return {
     mode,
+    handoff_mode: handoffMode,
     command: readiness.command,
     normalized_command: readiness.normalized_command,
     packet_id: contextPacket?.packet_id ?? null,
@@ -244,6 +250,13 @@ async function buildContextModel(
       ...(inspect.summaries.ok ? [] : inspect.summaries.next_actions),
     ]),
   };
+}
+
+function contextHandoffErrors(summaryWarnings: string[], strictQualityErrors: string[]): string[] {
+  return unique([
+    ...summaryWarnings.map((warning) => `summary freshness: ${warning}`),
+    ...strictQualityErrors,
+  ]);
 }
 
 async function includeContextPath(

@@ -186,6 +186,8 @@ const REQUIRED_FILES = [
   "changes/M48-handoff-quality-summary/WORK_ITEMS.yaml",
   "changes/M49-single-handoff-entry/CHANGE.yaml",
   "changes/M49-single-handoff-entry/WORK_ITEMS.yaml",
+  "changes/M50-context-handoff-mode/CHANGE.yaml",
+  "changes/M50-context-handoff-mode/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
