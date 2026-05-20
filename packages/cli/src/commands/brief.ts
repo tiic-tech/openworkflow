@@ -8,6 +8,7 @@ import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { doctorOpenWorkflow } from "../../../core/src/workflow/doctorOpenWorkflow.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
 import { booleanFlag, stringFlag } from "../args.js";
+import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, slugify } from "./shared.js";
 
 const execFileAsync = promisify(execFile);
@@ -55,12 +56,27 @@ interface HealthSection {
   errors: string[];
 }
 
-export async function briefCommand(flags: Map<string, string | boolean>): Promise<number> {
+export async function briefCommand(command: "brief" | "status", flags: Map<string, string | boolean>): Promise<number> {
   const root = resolve(stringFlag(flags, "root", ".") ?? ".");
   const json = booleanFlag(flags, "json");
   const model = await buildBriefModel(root, parseTools(stringFlag(flags, "tools")));
   if (json) {
-    console.log(JSON.stringify(model, null, 2));
+    printJsonReport({
+      command,
+      ok: true,
+      root,
+      data: model,
+      warnings: model.health.workflow.warnings.concat(
+        model.health.agents_md.warnings,
+        Object.values(model.health.adapters).flatMap((section) => section.warnings),
+      ),
+      errors: model.health.workflow.errors.concat(
+        model.health.agents_md.errors,
+        Object.values(model.health.adapters).flatMap((section) => section.errors),
+      ),
+      effects: emptyEffects(),
+      next_actions: [model.agent_guidance.recommended_next_action],
+    });
   } else {
     printBrief(model);
   }

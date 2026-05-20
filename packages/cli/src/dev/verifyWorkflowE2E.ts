@@ -368,7 +368,10 @@ async function verifyDisplayLabels(runtime: Runtime): Promise<void> {
 
 async function verifyBriefReadModel(runtime: Runtime): Promise<void> {
   const phase = "brief-read-model";
-  const json = JSON.parse(await runCapture(["node", CLI, "brief", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  const report = JSON.parse(await runCapture(["node", CLI, "brief", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  assertPhase(phase, report.command === "brief", "brief report command mismatch");
+  assertPhase(phase, report.ok === true, "brief report should be ok");
+  const json = recordField(report, "data", phase);
   for (const key of ["project", "workflow", "read_this_first", "active_pointers", "health", "git", "agent_guidance"]) {
     assertPhase(phase, key in json, `brief missing key ${key}`);
   }
@@ -386,6 +389,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   const phase = "agent-onboarding";
   const guide = await read(join(target, "AGENTS.md"));
   assertIncludes(phase, guide, "openworkflow --help", "AGENTS.md does not point agents to CLI help");
+  assertIncludes(phase, guide, "Prefer `--json`", "AGENTS.md does not mention JSON report mode");
   assertIncludes(phase, guide, ".openworkflow/CURRENT_STATE.yaml", "AGENTS.md does not point agents to current state");
   assertIncludes(phase, guide, "CLI commands maintain and summarize the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
   assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
@@ -397,6 +401,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "Two command surfaces", "help missing command surface distinction");
   assertIncludes(phase, help, "Repo-local workflow commands are Agent skills", "help missing workflow skill explanation");
   assertIncludes(phase, help, "Lazy creation boundary", "help missing lazy creation boundary");
+  assertIncludes(phase, help, "Every command supports --json", "help missing JSON report mode");
 }
 
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {

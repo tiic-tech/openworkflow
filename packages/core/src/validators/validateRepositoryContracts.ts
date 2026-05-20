@@ -36,6 +36,7 @@ const REQUIRED_FILES = [
   "package.json",
   "tsconfig.json",
   "packages/cli/src/index.ts",
+  "packages/cli/src/report.ts",
   "packages/cli/src/commands/brief.ts",
   "packages/cli/src/commands/clean.ts",
   "packages/cli/src/commands/init.ts",
@@ -132,6 +133,8 @@ const REQUIRED_FILES = [
   "changes/M26-non-destructive-multi-platform-sync/WORK_ITEMS.yaml",
   "changes/M27-agent-brief-status/CHANGE.yaml",
   "changes/M27-agent-brief-status/WORK_ITEMS.yaml",
+  "changes/M28-cli-json-report-surface/CHANGE.yaml",
+  "changes/M28-cli-json-report-surface/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

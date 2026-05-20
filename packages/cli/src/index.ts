@@ -36,7 +36,7 @@ async function main(): Promise<number> {
   }
 
   if (parsed.command === "status" || parsed.command === "brief") {
-    return briefCommand(parsed.flags);
+    return briefCommand(parsed.command, parsed.flags);
   }
 
   console.error(`Unknown command: ${parsed.command}`);
@@ -68,7 +68,7 @@ Commands:
 Agent quick start:
   Read AGENTS.md, then .openworkflow/CURRENT_STATE.yaml. Follow read_this_first
   before loading full evidence. Prefer SUMMARY.yaml/current_slice guidance when a
-  long artifact offers it.
+  long artifact offers it. Use --json when an Agent needs structured command output.
 
 Two command surfaces:
   CLI maintenance commands keep OpenWorkflow installed and current:
@@ -79,6 +79,11 @@ Two command surfaces:
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
+
+  Agent-readable JSON:
+    Every command supports --json. In JSON mode stdout is a single report object
+    with schema_version, command, ok, root, data, warnings, errors, effects, and
+    next_actions.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

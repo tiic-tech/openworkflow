@@ -4,6 +4,7 @@ import { syncAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
 import { syncOpenWorkflow } from "../../../core/src/workflow/syncOpenWorkflow.js";
 import { booleanFlag, stringFlag } from "../args.js";
+import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, printWarnings, slugify } from "./shared.js";
 
 export async function syncCommand(flags: Map<string, string | boolean>): Promise<number> {
@@ -15,6 +16,7 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   const tools = resolveSyncTools(explicitTools, detection.detected);
   const workflowTools = autoTools ? uniqueTools([...tools, ...detection.unknownConfigured]) : tools;
   const force = booleanFlag(flags, "force");
+  const json = booleanFlag(flags, "json");
   const config = await readWorkflowConfig(root);
   const projectTitle = stringFlag(flags, "project-title") ?? config?.projectTitle ?? basenameForTitle(root);
   const projectSlug = slugify(stringFlag(flags, "project-slug") ?? config?.projectSlug ?? projectTitle);
@@ -22,6 +24,19 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   const unsupportedRequested = tools.filter((tool) => !supported.has(tool));
 
   if (unsupportedRequested.length > 0) {
+    if (json) {
+      printJsonReport({
+        command: "sync",
+        ok: false,
+        root,
+        data: { requested_tools: tools, supported_tools: getSupportedAdapterIds() },
+        warnings: [],
+        errors: [`Unsupported tools selected: ${unsupportedRequested.join(", ")}.`],
+        effects: emptyEffects(),
+        next_actions: [`use --tools ${getSupportedAdapterIds().join(",") || "auto"}`],
+      });
+      return 1;
+    }
     console.error(`Unsupported tools selected: ${unsupportedRequested.join(", ")}. Supported tools: ${getSupportedAdapterIds().join(", ")}.`);
     return 1;
   }
@@ -51,11 +66,45 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
     adapterResults.push({ tool, result });
   }
 
-  printWarnings([
+  const warnings = [
     ...workflow.warnings,
     ...detection.unknownConfigured.map((tool) => `Configured tool is not supported by this OpenWorkflow version and was not synced: ${tool}`),
     ...adapterResults.flatMap((entry) => entry.result.warnings),
-  ]);
+  ];
+  const ok = !adapterResults.some((entry) => entry.result.skipped.length > 0);
+  if (json) {
+    printJsonReport({
+      command: "sync",
+      ok,
+      root,
+      data: {
+        workflow,
+        agents_md: agentsGuide,
+        detection,
+        tools,
+        adapters: Object.fromEntries(adapterResults.map((entry) => [entry.tool, entry.result])),
+      },
+      warnings,
+      errors: [],
+      effects: {
+        ...emptyEffects(),
+        written: [...workflow.added, ...(adapterResults.flatMap((entry) => entry.result.written))],
+        updated: [
+          ...workflow.updated,
+          ...(agentsGuide.action === "updated" || agentsGuide.action === "appended" || agentsGuide.action === "created" ? [agentsGuide.path] : []),
+        ],
+        removed: adapterResults.flatMap((entry) => entry.result.removed),
+        skipped: adapterResults.flatMap((entry) => entry.result.skipped),
+        unchanged: [...workflow.unchanged, ...adapterResults.flatMap((entry) => entry.result.unchanged)],
+        preserved: workflow.preserved,
+        migration_notes: workflow.migrationNotes,
+      },
+      next_actions: ok ? ["run openworkflow brief --root . --json"] : ["inspect skipped files, then rerun openworkflow sync"],
+    });
+    return ok ? 0 : 1;
+  }
+
+  printWarnings(warnings);
   console.log(`Synced OpenWorkflow at ${root}`);
   console.log(`Workflow files added: ${workflow.added.length}, updated: ${workflow.updated.length}, unchanged: ${workflow.unchanged.length}, preserved: ${workflow.preserved.length}`);
   console.log(`AGENTS.md: ${agentsGuide.action}`);
@@ -70,7 +119,7 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   for (const note of workflow.migrationNotes) {
     console.log(`migration: ${note}`);
   }
-  return adapterResults.some((entry) => entry.result.skipped.length > 0) ? 1 : 0;
+  return ok ? 0 : 1;
 }
 
 function resolveSyncTools(explicitTools: string[], detectedTools: string[]): string[] {

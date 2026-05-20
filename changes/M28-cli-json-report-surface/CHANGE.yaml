@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: change:M28-cli-json-report-surface
+contract_type: change
+title: M28 Unified CLI JSON report surface
+status: accepted
+source_artifacts:
+  - changes/M27-agent-brief-status/CHANGE.yaml
+depends_on:
+  - change:M27-agent-brief-status
+produces:
+  - work_items:M28-cli-json-report-surface
+summary: >
+  Add a consistent `--json` report mode across all OpenWorkflow CLI commands so
+  Agents can consume command results, context, warnings, errors, and file
+  effects without parsing human text.
+problem: >
+  M27 introduced structured JSON for brief/status, but the rest of the CLI still
+  reports through human-oriented stdout/stderr. Agents need a predictable JSON
+  envelope for both read/report commands and mutating commands such as init,
+  sync, and clean. Without this, Agents must parse text to understand what
+  changed, what failed, and what next action is recommended.
+goals:
+  - Add a shared CLI JSON report envelope for every command.
+  - Support `--json` for `init`, `sync`, `doctor`, `validate`, `clean`, `brief`, and `status`.
+  - Ensure `--json` stdout is pure JSON with no human log lines.
+  - Preserve exit-code semantics while also placing warnings and errors in the JSON payload.
+  - Include command effects for mutating commands: written, updated, removed, skipped, unchanged, preserved, and migration notes where relevant.
+  - Align `brief/status --json` with the same envelope while keeping the read model under `data`.
+  - Keep default human-readable output unchanged except where small report cleanup is needed.
+  - Update `openworkflow --help` and AGENTS.md managed block to describe JSON mode for Agents.
+non_goals:
+  - Do not add a new `capabilities` command in M28.
+  - Do not change command behavior based on `--json`; only report format should change.
+  - Do not make JSON schemas externally versioned files yet.
+  - Do not require shelling out to parse human text in tests.
+decisions:
+  - "Use one top-level envelope for all commands: { schema_version, command, ok, root, data, warnings, errors, effects, next_actions }."
+  - "In JSON mode, warnings/errors are serialized into the envelope; human stderr is avoided except for unexpected process-level crashes."
+  - "`brief/status` keep their rich read model as `data` instead of returning the model as the top-level object."
+  - "Mutating commands report file effects in `effects`; read-only commands may leave effect arrays empty."
+open_questions: []
+resolved_questions:
+  - M28 does not add diagnostics codes; a future change can add them without changing the current envelope.
+  - M28 does not include command duration or package version; schema_version is enough for the first stable report surface.
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/
+  - packages/cli/src/args.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - changes/M28-cli-json-report-surface/
+acceptance:
+  - "Every CLI command supports `--json`: init, sync, doctor, validate, clean, brief, and status."
+  - "`--json` stdout is parseable JSON and contains no human report text."
+  - "Every JSON response uses the shared top-level envelope keys: schema_version, command, ok, root, data, warnings, errors, effects, next_actions."
+  - "Mutating commands report file effects under effects."
+  - "Read/report commands place their primary read model or validation result under data."
+  - "Exit codes remain meaningful and match command success or failure."
+  - "openworkflow --help and AGENTS.md managed block mention `--json` as the Agent-consumable mode."
+  - "Regression tests cover JSON output for every command."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+updated_at: 2026-05-20

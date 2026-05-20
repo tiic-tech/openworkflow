@@ -27,6 +27,7 @@ async function main(): Promise<number> {
     await verifyAgentsGuide(target);
     await verifyHelpSurface(env);
     await verifyBriefStatus(target, tempRoot, env);
+    await verifyJsonReports(target, tempRoot, env);
     await verifyConfig(target);
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
@@ -149,6 +150,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Sync safety",
     "status",
     "brief",
+    "Every command supports --json",
+    "schema_version, command, ok, root, data, warnings, errors, effects",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
   }
@@ -171,14 +174,15 @@ async function verifyBriefStatus(root: string, tempRoot: string, env: NodeJS.Pro
     assert(status.includes(required), `status output missing ${required}`);
   }
 
-  const json = JSON.parse(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env)) as Record<string, unknown>;
+  const json = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
+  const data = record(json.data, "brief data");
   for (const key of ["project", "workflow", "read_this_first", "active_pointers", "health", "git", "agent_guidance"]) {
-    assert(key in json, `brief json missing top-level key ${key}`);
+    assert(key in data, `brief json missing data key ${key}`);
   }
-  const workflow = record(json.workflow, "workflow");
+  const workflow = record(data.workflow, "workflow");
   assert(workflow.active_stage === "workflow", "brief json active_stage mismatch");
   assert(workflow.next_command === "/ow:vision", "brief json next_command mismatch");
-  const git = record(json.git, "git");
+  const git = record(data.git, "git");
   assert(git.available === false, "brief json should report non-git target as unavailable");
 
   for (const forbiddenPath of [
@@ -194,11 +198,23 @@ async function verifyBriefStatus(root: string, tempRoot: string, env: NodeJS.Pro
   const gitTarget = join(tempRoot, "git-target");
   await run(["git", "init", gitTarget], env);
   await run(["node", CLI, "init", gitTarget, "--tools", "codex", "--force"], env);
-  const gitJson = JSON.parse(await runCapture(["node", CLI, "brief", "--root", gitTarget, "--json"], env)) as Record<string, unknown>;
-  const gitState = record(gitJson.git, "git");
+  const gitJson = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", gitTarget, "--json"], env), "brief");
+  const gitData = record(gitJson.data, "brief data");
+  const gitState = record(gitData.git, "git");
   assert(gitState.available === true, "brief json should detect git worktree");
   assert(gitState.dirty === true, "brief json should report dirty git worktree");
   assert(Array.isArray(gitState.changed_files) && gitState.changed_files.length > 0, "brief json missing changed files");
+}
+
+async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const initTarget = join(tempRoot, "json-init");
+  parseJsonReport(await runCapture(["node", CLI, "init", initTarget, "--tools", "codex", "--json"], env), "init");
+  parseJsonReport(await runCapture(["node", CLI, "sync", "--root", root, "--json"], env), "sync");
+  parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", root, "--json"], env), "doctor");
+  parseJsonReport(await runCapture(["node", CLI, "validate", "--root", root, "--json"], env), "validate");
+  parseJsonReport(await runCapture(["node", CLI, "clean", "--root", root, "--tools", "codex", "--json"], env), "clean");
+  parseJsonReport(await runCapture(["node", CLI, "status", "--root", root, "--json"], env), "status");
+  parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
 }
 
 async function verifyNonDestructiveSyncMigration(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -600,6 +616,23 @@ function assertSetEqual(actual: Set<string>, expected: Set<string>, label: strin
 function record(value: unknown, label: string): Record<string, unknown> {
   assert(typeof value === "object" && value !== null && !Array.isArray(value), `${label} must be a record`);
   return value as Record<string, unknown>;
+}
+
+function parseJsonReport(output: string, command: string): Record<string, unknown> {
+  const report = JSON.parse(output) as Record<string, unknown>;
+  for (const key of ["schema_version", "command", "ok", "root", "data", "warnings", "errors", "effects", "next_actions"]) {
+    assert(key in report, `${command} json missing envelope key ${key}`);
+  }
+  assert(report.command === command, `${command} json command mismatch`);
+  assert(typeof report.ok === "boolean", `${command} json ok must be boolean`);
+  assert(Array.isArray(report.warnings), `${command} json warnings must be array`);
+  assert(Array.isArray(report.errors), `${command} json errors must be array`);
+  assert(Array.isArray(report.next_actions), `${command} json next_actions must be array`);
+  const effects = record(report.effects, `${command} effects`);
+  for (const key of ["planned", "written", "updated", "removed", "skipped", "unchanged", "preserved", "migration_notes"]) {
+    assert(Array.isArray(effects[key]), `${command} effects.${key} must be array`);
+  }
+  return report;
 }
 
 function assert(condition: boolean, message: string): asserts condition {

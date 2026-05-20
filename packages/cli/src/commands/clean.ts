@@ -3,6 +3,7 @@ import { cleanCodexAdapter } from "../../../adapters/codex/src/cleanCodexAdapter
 import { cleanAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { cleanOpenWorkflow, type CleanResult, type CleanTarget } from "../../../core/src/workflow/cleanOpenWorkflow.js";
 import { booleanFlag, stringFlag } from "../args.js";
+import { emptyEffects, printJsonReport } from "../report.js";
 import { parseTools, printWarnings } from "./shared.js";
 
 export async function cleanCommand(flags: Map<string, string | boolean>): Promise<number> {
@@ -10,9 +11,23 @@ export async function cleanCommand(flags: Map<string, string | boolean>): Promis
   const tools = parseTools(stringFlag(flags, "tools", "codex"));
   const yes = booleanFlag(flags, "yes");
   const force = booleanFlag(flags, "force");
+  const json = booleanFlag(flags, "json");
   const results: CleanResult[] = [];
 
   if (tools.length > 0 && !tools.includes("codex")) {
+    if (json) {
+      printJsonReport({
+        command: "clean",
+        ok: false,
+        root,
+        data: { tools },
+        warnings: [],
+        errors: ["No supported tools selected. M28 supports --tools codex."],
+        effects: emptyEffects(),
+        next_actions: ["use --tools codex or omit --tools"],
+      });
+      return 1;
+    }
     console.error("No supported tools selected. M22 supports --tools codex.");
     return 1;
   }
@@ -25,6 +40,25 @@ export async function cleanCommand(flags: Map<string, string | boolean>): Promis
   }
 
   const merged = mergeResults(results);
+  if (json) {
+    printJsonReport({
+      command: "clean",
+      ok: true,
+      root,
+      data: { dry_run: merged.dryRun, tools },
+      warnings: merged.warnings,
+      errors: [],
+      effects: {
+        ...emptyEffects(),
+        planned: merged.planned.map((target) => target.path),
+        removed: merged.removed,
+        updated: merged.updated,
+        skipped: merged.skipped,
+      },
+      next_actions: yes ? [] : ["rerun with --yes to remove planned targets"],
+    });
+    return 0;
+  }
   printCleanSummary(root, merged);
   printWarnings(merged.warnings);
   if (!yes) {
