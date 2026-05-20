@@ -8,7 +8,7 @@ import { evaluateSummaryHealth, type SummaryHealthEntry } from "../../../core/sr
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 
-interface ReadinessModel {
+export interface ReadinessModel {
   command: string | null;
   normalized_command: string | null;
   ready: boolean;
@@ -28,18 +28,18 @@ interface ReadinessModel {
   next_actions: string[];
 }
 
-interface ContextStatus {
+export interface ContextStatus {
   path: string;
   exists: boolean;
 }
 
-interface ArtifactSummary {
+export interface ArtifactSummary {
   artifact_type: string;
   source_of_truth_path: string;
   summary_policy: string | null;
 }
 
-interface SummaryGuidance {
+export interface SummaryGuidance {
   artifact_type: string;
   status: string;
   next_actions: string[];
@@ -92,7 +92,7 @@ async function finish(root: string, json: boolean, data: ReadinessModel, error: 
   return 1;
 }
 
-async function buildReadiness(root: string, requested: string): Promise<ReadinessModel> {
+export async function buildReadiness(root: string, requested: string): Promise<ReadinessModel> {
   const normalized = normalizeCommand(requested);
   const command = findCommand(normalized);
   const currentState = await readCurrentState(root);

@@ -14,7 +14,7 @@ import { basenameForTitle, parseTools, slugify } from "./shared.js";
 
 const execFileAsync = promisify(execFile);
 
-interface BriefModel {
+export interface BriefModel {
   project: {
     title: string;
     slug: string;
@@ -52,7 +52,7 @@ interface BriefModel {
   };
 }
 
-interface HealthSection {
+export interface HealthSection {
   ok: boolean;
   warnings: string[];
   errors: string[];
@@ -86,7 +86,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
   return 0;
 }
 
-async function buildBriefModel(root: string, explicitTools: string[]): Promise<BriefModel> {
+export async function buildBriefModel(root: string, explicitTools: string[]): Promise<BriefModel> {
   const config = await readWorkflowConfig(root);
   const detection = await detectAdapterPlatforms(root);
   const autoTools = explicitTools.length === 0 || explicitTools.includes("auto");

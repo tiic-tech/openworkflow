@@ -41,6 +41,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/commands/check.ts",
   "packages/cli/src/commands/clean.ts",
   "packages/cli/src/commands/init.ts",
+  "packages/cli/src/commands/inspect.ts",
   "packages/cli/src/commands/summaries.ts",
   "packages/cli/src/commands/validate.ts",
   "packages/cli/src/commands/sync.ts",

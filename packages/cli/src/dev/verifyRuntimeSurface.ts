@@ -119,6 +119,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
+    "openworkflow inspect --root . --json",
     "openworkflow brief --root .",
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
@@ -155,6 +156,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Sync safety",
     "status",
     "brief",
+    "inspect",
     "check",
     "summaries",
     "SUMMARY.yaml freshness is checked by summaries",
@@ -227,6 +229,7 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "clean", "--root", root, "--tools", "codex", "--json"], env), "clean");
   parseJsonReport(await runCapture(["node", CLI, "status", "--root", root, "--json"], env), "status");
   parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
+  parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
   parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
 }
@@ -241,6 +244,14 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(uninitializedReport.ok === false, "uninitialized summaries report should not be ok");
   assert(uninitializedData.initialized === false, "uninitialized summaries data should be initialized=false");
   assert(Array.isArray(uninitializedReport.errors) && uninitializedReport.errors.some((item) => String(item).includes("missing OpenWorkflow artifact contracts")), "uninitialized summaries missing explicit error");
+
+  const inspectUninitialized = await runCaptureStatus(["node", CLI, "inspect", "--root", missingRoot, "--json"], env);
+  assert(inspectUninitialized.code !== 0, "inspect should fail clearly outside an initialized OpenWorkflow root");
+  const inspectUninitializedReport = parseJsonReport(inspectUninitialized.output, "inspect");
+  const inspectUninitializedData = record(inspectUninitializedReport.data, "uninitialized inspect data");
+  const inspectUninitializedSummaries = record(inspectUninitializedData.summaries, "uninitialized inspect summaries");
+  assert(inspectUninitializedReport.ok === false, "uninitialized inspect should not be ok");
+  assert(inspectUninitializedSummaries.initialized === false, "uninitialized inspect should expose summary initialized=false");
 
   const summaryBoundaryRoot = join(tempRoot, "summary-validate-boundary");
   await run(["node", CLI, "init", summaryBoundaryRoot, "--tools", "codex", "--force"], env);
@@ -257,6 +268,13 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const freshCounts = record(freshData.counts, "summary health counts");
   assert(freshData.initialized === true, "fresh summary health should report initialized=true");
   assert(Number(freshCounts.not_instantiated) > 0, "fresh summary health should report not_instantiated artifacts");
+  const inspectFresh = parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
+  const inspectFreshData = record(inspectFresh.data, "inspect data");
+  const inspectReadOrder = record(inspectFreshData.read_order, "inspect read_order");
+  const inspectNextCheck = record(inspectFreshData.next_command_check, "inspect next_command_check");
+  assert(inspectFresh.ok === true, "fresh inspect should be ok");
+  assert(Array.isArray(inspectReadOrder.must_read) && inspectReadOrder.must_read.includes(".openworkflow/CURRENT_STATE.yaml"), "inspect read_order missing current state");
+  assert(inspectNextCheck.ready === true, "inspect next_command_check should report ready vision");
   await assertNoStageArtifacts(root);
 
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
@@ -291,6 +309,12 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert("summaries" in briefHealth, "brief health missing summaries");
   assert(brief.ok === false, "brief top-level ok should include failing summary health");
   assert(briefHealth.ok === false, "brief health.ok should include failing summary health");
+
+  const inspect = parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
+  const inspectData = record(inspect.data, "inspect data");
+  const inspectHealth = record(inspectData.health, "inspect health");
+  assert(inspect.ok === false, "inspect top-level ok should include failing summary health");
+  assert(inspectHealth.ok === false, "inspect health.ok should include failing summary health");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
   assert(checkStatus.code !== 0, "proto check should fail without required validation context");

@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M32-agent-inspect-entry
 contract_type: work_items
 title: M32 Agent inspect entry work items
-status: draft
+status: completed
 change_contract: changes/M32-agent-inspect-entry/CHANGE.yaml
 items:
   - task_id: M32-T001
     title: Define inspect read model
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/commands/inspect.ts
       - packages/core/src/workflow/
@@ -17,7 +17,7 @@ items:
       - Model is read-only.
   - task_id: M32-T002
     title: Implement inspect CLI command
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/index.ts
       - packages/cli/src/commands/inspect.ts
@@ -27,7 +27,7 @@ items:
       - Non-OpenWorkflow roots return explicit not-initialized data.
   - task_id: M32-T003
     title: Add structured read order
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/commands/inspect.ts
       - packages/cli/src/commands/brief.ts
@@ -37,7 +37,7 @@ items:
       - Read order is stable enough for Agent automation.
   - task_id: M32-T004
     title: Update Agent-facing docs
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/index.ts
       - packages/core/src/onboarding/agentsGuide.ts
@@ -47,7 +47,7 @@ items:
       - Existing `brief`, `check`, and `summaries` boundaries remain documented.
   - task_id: M32-T005
     title: Add inspect regression coverage
-    status: planned
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -57,3 +57,4 @@ items:
       - Tests cover non-OpenWorkflow root behavior.
       - Tests cover unhealthy summaries affecting inspect health.
       - Tests verify inspect does not create stage artifacts.
+updated_at: 2026-05-20
