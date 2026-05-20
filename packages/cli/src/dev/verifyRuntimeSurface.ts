@@ -117,6 +117,8 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "template-id: openworkflow.agents-guide.v1",
     "openworkflow --help",
     "ok:false",
+    "openworkflow handoff --root . --json",
+    "strict Agent trust gate",
     "handoff_quality_ok",
     "data.quality_summary",
     "quality_summary.status",
@@ -171,6 +173,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Sync safety",
     "status",
     "brief",
+    "handoff",
+    "Strict Agent trust gate",
     "inspect",
     "fail on current-but-thin summaries",
     "context",
@@ -253,6 +257,7 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "init", initTarget, "--tools", "codex", "--json"], env), "init");
   parseJsonReport(await runCapture(["node", CLI, "sync", "--root", root, "--json"], env), "sync");
   parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", root, "--json"], env), "doctor");
+  parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
   const validateReport = parseJsonReport(await runCapture(["node", CLI, "validate", "--root", root, "--json"], env), "validate");
   const validateData = record(validateReport.data, "validate data");
   const validateScope = record(validateData.scope, "validate scope");
@@ -341,6 +346,20 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(inspectFresh.ok === true, "fresh inspect should be ok");
   assert(Array.isArray(inspectReadOrder.must_read) && inspectReadOrder.must_read.includes(".openworkflow/CURRENT_STATE.yaml"), "inspect read_order missing current state");
   assert(inspectNextCheck.ready === true, "inspect next_command_check should report ready vision");
+  const handoffFresh = parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
+  const handoffFreshData = record(handoffFresh.data, "fresh handoff data");
+  assert(handoffFresh.ok === true, "fresh handoff should pass");
+  assert(handoffFreshData.handoff_ok === true, "fresh handoff should report handoff_ok=true");
+  assert(handoffFreshData.managed_surface_ok === true, "fresh handoff should report managed_surface_ok=true");
+  assert(handoffFreshData.adapter_ok === true, "fresh handoff should report adapter_ok=true");
+  assert(handoffFreshData.summary_freshness_ok === true, "fresh handoff should report summary_freshness_ok=true");
+  assert(handoffFreshData.summary_quality_ok === true, "fresh handoff should report summary_quality_ok=true");
+  assert(handoffFreshData.next_command_ready === true, "fresh handoff should report next_command_ready=true");
+  assert(Array.isArray(handoffFreshData.blocking_reasons) && handoffFreshData.blocking_reasons.length === 0, "fresh handoff should have no blockers");
+  const handoffFreshQuality = record(handoffFreshData.quality_summary, "fresh handoff quality_summary");
+  assert(handoffFreshQuality.status === "trusted", "fresh handoff quality_summary should be trusted");
+  const handoffFreshReadOrder = record(handoffFreshData.read_order, "fresh handoff read_order");
+  assert(Array.isArray(handoffFreshReadOrder.must_read) && handoffFreshReadOrder.must_read.includes(".openworkflow/CURRENT_STATE.yaml"), "fresh handoff read_order missing current state");
   const contextFresh = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
   const contextFreshData = record(contextFresh.data, "context data");
   const contextFreshBudget = record(contextFreshData.budget, "context budget");
@@ -462,6 +481,19 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(doctorThinQuality.next_actions) && doctorThinQuality.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor quality_summary should recommend strict summaries");
   assert(nonEmptyArray(record(doctorThinData.strict_quality, "doctor strict quality").health_errors), "doctor should include strict quality errors");
   assert(Array.isArray(doctorThin.next_actions) && doctorThin.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor should recommend summaries --strict for thin handoff quality");
+  const handoffThinStatus = await runCaptureStatus(["node", CLI, "handoff", "--root", root, "--tools", "codex", "--json"], env);
+  assert(handoffThinStatus.code !== 0, "handoff should fail for current_but_thin quality");
+  const handoffThin = parseJsonReport(handoffThinStatus.output, "handoff");
+  const handoffThinData = record(handoffThin.data, "thin handoff data");
+  assert(handoffThin.ok === false, "thin handoff should report ok=false");
+  assert(handoffThinData.handoff_ok === false, "thin handoff should report handoff_ok=false");
+  assert(handoffThinData.summary_freshness_ok === true, "thin handoff should keep summary_freshness_ok=true");
+  assert(handoffThinData.summary_quality_ok === false, "thin handoff should report summary_quality_ok=false");
+  assert(handoffThinData.next_command_ready === true, "thin handoff should keep next_command_ready=true");
+  const handoffThinQuality = record(handoffThinData.quality_summary, "thin handoff quality_summary");
+  assert(handoffThinQuality.status === "current_but_thin", "thin handoff quality_summary should report current_but_thin");
+  assert(nonEmptyArray(handoffThinData.blocking_reasons), "thin handoff should expose blocking_reasons");
+  assert(Array.isArray(handoffThin.health_errors) && handoffThin.health_errors.some((item) => String(item).includes("summary quality prototype_evidence")), "thin handoff should expose strict summary health errors");
   const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
   assert(designContextStatus.code !== 0, "design context should return nonzero while readiness blockers exist");
   const designContext = parseJsonReport(designContextStatus.output, "context");

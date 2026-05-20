@@ -6,6 +6,7 @@ import { cleanCommand } from "./commands/clean.js";
 import { contextCommand } from "./commands/context.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { draftCommand } from "./commands/draft.js";
+import { handoffCommand } from "./commands/handoff.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
 import { registerCommand } from "./commands/register.js";
@@ -36,6 +37,10 @@ async function main(): Promise<number> {
 
   if (parsed.command === "doctor") {
     return doctorCommand(parsed.flags);
+  }
+
+  if (parsed.command === "handoff") {
+    return handoffCommand(parsed.flags);
   }
 
   if (parsed.command === "clean") {
@@ -87,6 +92,7 @@ Usage:
   openworkflow validate --root <folder>
   openworkflow sync --root <folder> [--tools auto|codex] [--force]
   openworkflow doctor --root <folder> [--tools auto|codex]
+  openworkflow handoff --root <folder> [--tools auto|codex] [--json]
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--strict] [--json]
@@ -103,6 +109,7 @@ Commands:
   validate   Validate .openworkflow contract files and source artifact shape.
   sync       Non-destructively refresh workflow contracts and detected adapters.
   doctor     Check managed workflow and adapter files for missing or stale templates.
+  handoff    Strict Agent trust gate for deciding whether current repo context is safe to continue.
   status     Print a low-context Agent read model for current workflow state.
   brief      Alias for status, named for Agent entry and handoff.
   inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
@@ -115,7 +122,9 @@ Commands:
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
-  Read AGENTS.md, then run openworkflow inspect --root . --json. Inspect starts
+  Read AGENTS.md, then run openworkflow handoff --root . --json. Handoff is
+  the strict Agent trust gate before context loading. If it passes, run
+  openworkflow context --root . --json. Inspect starts
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
   full evidence. Doctor confirms managed surface health, not handoff quality.
   Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
@@ -133,12 +142,14 @@ Two command surfaces:
     sync       Detect current platforms, refresh managed workflow files, and sync adapters.
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and separately report summary freshness and handoff quality.
+    handoff    Strict read-only Agent trust gate; aggregates doctor-style surface health, inspect --strict quality, summaries --strict quality, and next-command readiness.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
+    handoff    Use before context loading when you need one boolean for Agent continuation trust.
     check      Verify required/forbidden context, output boundaries, and current artifact usability before starting a /ow:* command.
     summaries  Check summary freshness and source quality before raw evidence; requires an initialized .openworkflow root. Add --strict to fail on current-but-thin source quality.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.

@@ -184,6 +184,8 @@ const REQUIRED_FILES = [
   "changes/M47-doctor-handoff-quality-split/WORK_ITEMS.yaml",
   "changes/M48-handoff-quality-summary/CHANGE.yaml",
   "changes/M48-handoff-quality-summary/WORK_ITEMS.yaml",
+  "changes/M49-single-handoff-entry/CHANGE.yaml",
+  "changes/M49-single-handoff-entry/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
