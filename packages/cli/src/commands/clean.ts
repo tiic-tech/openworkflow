@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import { cleanCodexAdapter } from "../../../adapters/codex/src/cleanCodexAdapter.js";
+import { cleanAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { cleanOpenWorkflow, type CleanResult, type CleanTarget } from "../../../core/src/workflow/cleanOpenWorkflow.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { parseTools, printWarnings } from "./shared.js";
@@ -17,6 +18,7 @@ export async function cleanCommand(flags: Map<string, string | boolean>): Promis
   }
 
   results.push(await cleanOpenWorkflow({ root, yes }));
+  results.push(await cleanAgentsGuide({ root, yes }));
 
   if (tools.includes("codex")) {
     results.push(await cleanCodexAdapter({ root, yes, force }));
@@ -36,6 +38,7 @@ function mergeResults(results: CleanResult[]): CleanResult {
     dryRun: results.every((result) => result.dryRun),
     planned: results.flatMap((result) => result.planned),
     removed: results.flatMap((result) => result.removed),
+    updated: results.flatMap((result) => result.updated),
     skipped: results.flatMap((result) => result.skipped),
     warnings: results.flatMap((result) => result.warnings),
   };
@@ -47,10 +50,13 @@ function printCleanSummary(root: string, result: CleanResult): void {
   for (const path of result.removed) {
     console.log(`removed: ${path}`);
   }
+  for (const path of result.updated) {
+    console.log(`updated: ${path}`);
+  }
   for (const path of result.skipped) {
     console.log(`skipped: ${path}`);
   }
-  console.log(`planned: ${result.planned.length}, removed: ${result.removed.length}, skipped: ${result.skipped.length}, warnings: ${result.warnings.length}`);
+  console.log(`planned: ${result.planned.length}, removed: ${result.removed.length}, updated: ${result.updated.length}, skipped: ${result.skipped.length}, warnings: ${result.warnings.length}`);
 }
 
 function printTargets(label: string, targets: CleanTarget[]): void {

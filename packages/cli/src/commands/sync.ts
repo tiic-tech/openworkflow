@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import { generateCodexAdapter } from "../../../adapters/codex/src/generateCodexAdapter.js";
+import { syncAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { basenameForTitle, parseTools, printWarnings, slugify } from "./shared.js";
 
@@ -22,9 +23,11 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
     tools,
     force,
   });
+  const agentsGuide = await syncAgentsGuide(root);
 
   printWarnings(adapter.warnings);
   console.log(`Synced Codex adapter at ${root}`);
+  console.log(`AGENTS.md: ${agentsGuide.action}`);
   console.log(`written: ${adapter.written.length}, skipped: ${adapter.skipped.length}, unchanged: ${adapter.unchanged.length}, removed: ${adapter.removed.length}`);
   return adapter.skipped.length > 0 ? 1 : 0;
 }

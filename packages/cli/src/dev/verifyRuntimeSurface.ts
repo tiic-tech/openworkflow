@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdtemp, readdir, readFile, rm, stat } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,11 +18,14 @@ async function main(): Promise<number> {
     const env = { ...process.env, CODEX_HOME: codexHome };
 
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
+    await writeStaleAgentsGuide(target);
     await run(["node", CLI, "sync", "--root", target, "--tools", "codex"], env);
     await run(["node", CLI, "doctor", "--root", target, "--tools", "codex"], env);
     await run(["node", CLI, "validate", "--root", target], env);
 
     await verifyMinimalOpenWorkflow(target);
+    await verifyAgentsGuide(target);
+    await verifyHelpSurface(env);
     await verifyConfig(target);
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
@@ -53,6 +56,74 @@ async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {
       }
     });
   });
+}
+
+async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<string> {
+  return new Promise<string>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd: REPO_ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise(output);
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}\n${output}`));
+      }
+    });
+  });
+}
+
+async function verifyAgentsGuide(root: string): Promise<void> {
+  const guide = await read(join(root, "AGENTS.md"));
+  for (const required of [
+    "BEGIN OPENWORKFLOW AGENT GUIDE",
+    "generated-by: openworkflow",
+    "template-id: openworkflow.agents-guide.v1",
+    "openworkflow --help",
+    ".openworkflow/CURRENT_STATE.yaml",
+    "read_this_first",
+    ".agents/skills/ow-*/SKILL.md",
+    "/ow:vision",
+    "/ow:spec",
+    "/ow:team",
+    "Respect lazy creation",
+  ]) {
+    assert(guide.includes(required), `AGENTS.md missing onboarding guidance: ${required}`);
+  }
+  assert(!guide.includes("Old lazy creation wording"), "sync did not refresh stale AGENTS.md managed block");
+  assert(guide.indexOf("BEGIN OPENWORKFLOW AGENT GUIDE") === guide.lastIndexOf("BEGIN OPENWORKFLOW AGENT GUIDE"), "sync duplicated AGENTS.md managed block");
+}
+
+async function writeStaleAgentsGuide(root: string): Promise<void> {
+  const path = join(root, "AGENTS.md");
+  const guide = await read(path);
+  await writeFile(path, guide.replace("Respect lazy creation", "Old lazy creation wording"), "utf8");
+}
+
+async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
+  const help = await runCapture(["node", CLI, "--help"], env);
+  for (const required of [
+    "Agent quick start",
+    "Two command surfaces",
+    "CLI maintenance commands",
+    "Repo-local workflow commands are Agent skills",
+    ".openworkflow/CURRENT_STATE.yaml",
+    "/ow:vision",
+    "/ow:team",
+    "Lazy creation boundary",
+  ]) {
+    assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
+  }
 }
 
 async function verifyMinimalOpenWorkflow(root: string): Promise<void> {

@@ -33,6 +33,7 @@ async function main(): Promise<number> {
     await run(["node", CLI, "sync", "--root", target, "--tools", "codex"], env);
     await run(["node", CLI, "doctor", "--root", target, "--tools", "codex"], env);
     await run(["node", CLI, "validate", "--root", target], env);
+    await verifyAgentOnboarding(target, env);
 
     const runtime = await loadRuntime(target);
     await verifyCurrentState(runtime);
@@ -364,6 +365,21 @@ async function verifyDisplayLabels(runtime: Runtime): Promise<void> {
   }
 }
 
+async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const phase = "agent-onboarding";
+  const guide = await read(join(target, "AGENTS.md"));
+  assertIncludes(phase, guide, "openworkflow --help", "AGENTS.md does not point agents to CLI help");
+  assertIncludes(phase, guide, ".openworkflow/CURRENT_STATE.yaml", "AGENTS.md does not point agents to current state");
+  assertIncludes(phase, guide, "CLI commands maintain the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
+  assertIncludes(phase, guide, "Repo-local workflow commands are delivered as Agent skills", "AGENTS.md does not distinguish workflow skill commands");
+  assertIncludes(phase, guide, "Respect lazy creation", "AGENTS.md does not preserve lazy artifact creation boundary");
+  const help = await runCapture(["node", CLI, "--help"], env);
+  assertIncludes(phase, help, "Agent quick start", "help missing Agent quick start");
+  assertIncludes(phase, help, "Two command surfaces", "help missing command surface distinction");
+  assertIncludes(phase, help, "Repo-local workflow commands are Agent skills", "help missing workflow skill explanation");
+  assertIncludes(phase, help, "Lazy creation boundary", "help missing lazy creation boundary");
+}
+
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolvePromise, reject) => {
     const child = spawn(command[0] ?? "", command.slice(1), {
@@ -377,6 +393,31 @@ async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {
         resolvePromise();
       } else {
         reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}`));
+      }
+    });
+  });
+}
+
+async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<string> {
+  return new Promise<string>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd: REPO_ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise(output);
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}\n${output}`));
       }
     });
   });

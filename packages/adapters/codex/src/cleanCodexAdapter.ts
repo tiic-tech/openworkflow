@@ -18,6 +18,7 @@ export async function cleanCodexAdapter(options: CleanCodexOptions): Promise<Cle
   const dryRun = !options.yes;
   const planned: CleanTarget[] = [];
   const removed: string[] = [];
+  const updated: string[] = [];
   const skipped: string[] = [];
   const warnings: string[] = [];
 
@@ -43,7 +44,7 @@ export async function cleanCodexAdapter(options: CleanCodexOptions): Promise<Cle
     await pruneCodexDirs(options.root);
   }
 
-  return { planned, removed, skipped, warnings, dryRun };
+  return { planned, removed, updated, skipped, warnings, dryRun };
 }
 
 function cleanCandidatePaths(): string[] {

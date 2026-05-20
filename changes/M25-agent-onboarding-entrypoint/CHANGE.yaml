@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:M25-agent-onboarding-entrypoint
 contract_type: change
 title: M25 Agent onboarding entrypoint
-status: draft
+status: accepted
 source_artifacts:
   - changes/M24-agent-context-state-and-summaries/CHANGE.yaml
 depends_on:
@@ -41,10 +41,11 @@ decisions:
   - The generated block should be bounded by stable markers so init, sync, doctor, and clean can reason about it safely.
   - Existing AGENTS.md files are preserved; OpenWorkflow appends the managed block if missing and replaces only that block when refreshing.
   - openworkflow --help must explain both CLI maintenance commands and repo-local /ow:* workflow skills because agents commonly discover capabilities through help text.
-open_questions:
-  - Should the maintained template live under templates/openworkflow/AGENTS.md, packages/core/src/onboarding/, or both source plus packaged template output?
-  - Should doctor report stale AGENTS.md template versions as warnings or failures?
-  - Should sync refresh AGENTS.md by default, or require --force when the existing managed block was locally edited?
+open_questions: []
+resolved_questions:
+  - The maintained template lives in packages/core/src/onboarding/agentsGuide.ts so init, sync, doctor, and clean share one versioned source of truth.
+  - doctor reports missing or stale AGENTS.md managed blocks as warnings, because sync can repair them non-destructively.
+  - sync refreshes the managed AGENTS.md block by default because stable markers constrain the write to OpenWorkflow-owned content.
 affected_paths:
   - packages/cli/src/commands/init.ts
   - packages/cli/src/commands/sync.ts

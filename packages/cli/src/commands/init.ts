@@ -1,6 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { generateCodexAdapter } from "../../../adapters/codex/src/generateCodexAdapter.js";
+import { syncAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { initOpenWorkflow } from "../../../core/src/workflow/initOpenWorkflow.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { basenameForTitle, parseTools, printWarnings, slugify } from "./shared.js";
@@ -28,6 +29,7 @@ export async function initCommand(positional: string[], flags: Map<string, strin
     tools,
     force,
   });
+  const agentsGuide = await syncAgentsGuide(root);
 
   let adapterWritten = 0;
   let adapterSkipped = 0;
@@ -50,6 +52,7 @@ export async function initCommand(positional: string[], flags: Map<string, strin
 
   console.log(`Initialized OpenWorkflow at ${root}`);
   console.log(`.openworkflow written: ${result.written.length}, skipped: ${result.skipped.length}`);
+  console.log(`AGENTS.md: ${agentsGuide.action}`);
   if (tools.includes("codex")) {
     console.log(`Codex adapter written: ${adapterWritten}, skipped: ${adapterSkipped}, unchanged: ${adapterUnchanged}, removed: ${adapterRemoved}`);
   }

@@ -55,6 +55,33 @@ Commands:
   sync       Regenerate project-local tool adapters from packaged templates.
   doctor     Check generated adapter files for missing or stale templates.
   clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
+
+Agent quick start:
+  Read AGENTS.md, then .openworkflow/CURRENT_STATE.yaml. Follow read_this_first
+  before loading full evidence. Prefer SUMMARY.yaml/current_slice guidance when a
+  long artifact offers it.
+
+Two command surfaces:
+  CLI maintenance commands keep OpenWorkflow installed and current:
+    init       Create the minimal workflow root, AGENTS.md guide, and tool adapters.
+    sync       Refresh generated adapters and managed onboarding blocks.
+    validate   Check .openworkflow contract shape.
+    doctor     Report missing or stale generated surfaces.
+    clean      Remove generated OpenWorkflow surfaces without touching user content.
+
+  Repo-local workflow commands are Agent skills, not CLI subcommands:
+    /ow:vision      clarify product vision through conversation-first discovery
+    /ow:validation  define and assess the highest-risk validation target
+    /ow:proto       create evidence-producing prototypes
+    /ow:tune        revise the current prototype/design target
+    /ow:design      turn accepted evidence into product design contracts
+    /ow:spec        write production-ready implementation specs
+    /ow:change      plan a concrete implementation change
+    /ow:team        execute an approved change with runtime tracking
+
+Lazy creation boundary:
+  openworkflow init creates only the minimal .openworkflow setup. Stage artifacts
+  are created by the first matching /ow:* workflow command, not by init.
 `);
 }
 

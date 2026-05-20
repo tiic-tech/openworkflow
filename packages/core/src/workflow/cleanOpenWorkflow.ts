@@ -10,6 +10,7 @@ export interface CleanTarget {
 export interface CleanResult {
   planned: CleanTarget[];
   removed: string[];
+  updated: string[];
   skipped: string[];
   warnings: string[];
   dryRun: boolean;
@@ -25,22 +26,23 @@ export async function cleanOpenWorkflow(options: CleanOptions): Promise<CleanRes
   const target = join(options.root, ".openworkflow");
   const planned: CleanTarget[] = [];
   const removed: string[] = [];
+  const updated: string[] = [];
   const skipped: string[] = [];
   const warnings: string[] = [];
 
   if (!(await exists(target))) {
     skipped.push(target);
-    return { planned, removed, skipped, warnings, dryRun };
+    return { planned, removed, updated, skipped, warnings, dryRun };
   }
 
   planned.push({ path: target, reason: "OpenWorkflow project state" });
   if (dryRun) {
-    return { planned, removed, skipped, warnings, dryRun };
+    return { planned, removed, updated, skipped, warnings, dryRun };
   }
 
   await rm(target, { recursive: true, force: true });
   removed.push(target);
-  return { planned, removed, skipped, warnings, dryRun };
+  return { planned, removed, updated, skipped, warnings, dryRun };
 }
 
 async function exists(path: string): Promise<boolean> {

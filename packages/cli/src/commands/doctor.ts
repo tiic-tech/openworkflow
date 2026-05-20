@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import { doctorCodexAdapter } from "../../../adapters/codex/src/doctorCodexAdapter.js";
+import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { stringFlag } from "../args.js";
 import { parseTools } from "./shared.js";
 
@@ -13,16 +14,19 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   }
 
   const adapter = await doctorCodexAdapter(root);
-  for (const warning of adapter.warnings) {
+  const agentsGuide = await doctorAgentsGuide(root);
+  const warnings = [...agentsGuide.warnings, ...adapter.warnings];
+  const errors = [...agentsGuide.errors, ...adapter.errors];
+  for (const warning of warnings) {
     console.warn(`Warning: ${warning}`);
   }
-  if (!adapter.ok) {
+  if (!adapter.ok || !agentsGuide.ok) {
     console.error("OpenWorkflow doctor found adapter issues:");
-    for (const error of adapter.errors) {
+    for (const error of errors) {
       console.error(`- ${error}`);
     }
     return 1;
   }
-  console.log(adapter.warnings.length > 0 ? "OpenWorkflow doctor passed with warnings." : "OpenWorkflow doctor passed.");
+  console.log(warnings.length > 0 ? "OpenWorkflow doctor passed with warnings." : "OpenWorkflow doctor passed.");
   return 0;
 }

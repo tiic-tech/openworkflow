@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { mkdir, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,7 +17,12 @@ async function main(): Promise<number> {
     const codexHome = join(tempRoot, "codex-home");
     const env = { ...process.env, CODEX_HOME: codexHome };
 
+    await mkdir(target, { recursive: true });
+    await writeFile(join(target, "AGENTS.md"), "# Project Agents\n\nUser rules stay.\n", "utf8");
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
+    let agentsGuide = await read(join(target, "AGENTS.md"));
+    assert(agentsGuide.includes("User rules stay."), "init did not preserve existing AGENTS.md content");
+    assert(agentsGuide.includes("BEGIN OPENWORKFLOW AGENT GUIDE"), "init did not append AGENTS.md managed block");
     await writeNonGeneratedFixtures(target);
 
     const dryRun = await runCapture(["node", CLI, "clean", "--root", target, "--tools", "codex"], env);
@@ -38,11 +43,21 @@ async function main(): Promise<number> {
     await assertFile(join(target, ".agents", "custom.md"));
     await assertFile(join(target, ".agents", "skills", "ow-vision", "custom.md"));
     await assertFile(join(target, ".codex", "commands", "ow", "vision.md"));
+    agentsGuide = await read(join(target, "AGENTS.md"));
+    assert(agentsGuide.includes("User rules stay."), "clean removed user AGENTS.md content");
+    assert(!agentsGuide.includes("BEGIN OPENWORKFLOW AGENT GUIDE"), "clean did not remove AGENTS.md managed block");
 
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
     const forceClean = await runCapture(["node", CLI, "clean", "--root", target, "--tools", "codex", "--yes", "--force"], env);
     assert(forceClean.includes("OpenWorkflow clean completed"), "clean --force did not complete");
     assert(!(await exists(join(target, ".codex", "commands", "ow", "vision.md"))), "force clean did not remove expected legacy target");
+
+    const generatedOnlyTarget = join(tempRoot, "generated-only");
+    await run(["node", CLI, "init", generatedOnlyTarget, "--tools", "codex", "--force"], env);
+    await run(["node", CLI, "clean", "--root", generatedOnlyTarget, "--tools", "codex", "--yes"], env);
+    await assertFile(join(generatedOnlyTarget, "AGENTS.md"));
+    const generatedOnlyAgents = await read(join(generatedOnlyTarget, "AGENTS.md"));
+    assert(generatedOnlyAgents === "", "clean should clear only the managed block and leave AGENTS.md in place");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -110,6 +125,10 @@ async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<st
 async function assertFile(path: string): Promise<void> {
   const info = await stat(path);
   assert(info.isFile(), `missing file: ${path}`);
+}
+
+async function read(path: string): Promise<string> {
+  return readFile(path, "utf8");
 }
 
 async function exists(path: string): Promise<boolean> {

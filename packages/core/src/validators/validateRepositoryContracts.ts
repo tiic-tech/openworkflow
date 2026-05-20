@@ -50,6 +50,7 @@ const REQUIRED_FILES = [
   "packages/core/src/contracts/yaml.ts",
   "packages/core/src/commands/registry.ts",
   "packages/core/src/fs/index.ts",
+  "packages/core/src/onboarding/agentsGuide.ts",
   "packages/core/src/workflow/initOpenWorkflow.ts",
   "packages/core/src/workflow/cleanOpenWorkflow.ts",
   "packages/core/src/validators/validateOpenWorkflow.ts",
@@ -120,6 +121,10 @@ const REQUIRED_FILES = [
   "changes/M23-production-command-lazy-contracts/WORK_ITEMS.yaml",
   "changes/M24-agent-context-state-and-summaries/CHANGE.yaml",
   "changes/M24-agent-context-state-and-summaries/WORK_ITEMS.yaml",
+  "changes/M25-agent-onboarding-entrypoint/CHANGE.yaml",
+  "changes/M25-agent-onboarding-entrypoint/WORK_ITEMS.yaml",
+  "changes/M26-non-destructive-multi-platform-sync/CHANGE.yaml",
+  "changes/M26-non-destructive-multi-platform-sync/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
