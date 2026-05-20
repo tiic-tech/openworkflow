@@ -63,6 +63,7 @@ async function verifyMinimalOpenWorkflow(root: string): Promise<void> {
     actualFiles,
     new Set([
       ".openworkflow/config.yaml",
+      ".openworkflow/CURRENT_STATE.yaml",
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
       ".openworkflow/audit/CONTEXT_PACKETS.yaml",
@@ -91,6 +92,13 @@ async function verifyConfig(root: string): Promise<void> {
   assert(config.includes("default_command_delivery: codex-repo-skills"), "config missing Codex skill delivery");
   assert(config.includes(".agents/skills"), "config missing Codex skill surface");
   assert(config.includes("explicit_invocation: $ow-<id>"), "config missing explicit skill invocation policy");
+  assert(!config.includes("project_title: ."), "config kept unusable project title");
+  assert(!config.includes("project_slug: project"), "config kept generic project slug");
+
+  const currentState = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  assert(currentState.includes("active_stage: workflow"), "current state missing workflow active stage");
+  assert(currentState.includes("next_command: /ow:vision"), "current state missing initial next command");
+  assert(currentState.includes("read_this_first:"), "current state missing read_this_first");
 }
 
 async function verifyNoDefaultPrompts(codexHome: string): Promise<void> {
@@ -116,6 +124,8 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.includes("<inner_thinking>"), `${name} missing inner thinking block`);
     assert(skillContent.includes("<artifact_checkpoint>"), `${name} missing artifact checkpoint block`);
     assert(skillContent.includes("<handoff>"), `${name} missing handoff block`);
+    assert(skillContent.includes(".openworkflow/CURRENT_STATE.yaml"), `${name} missing current state guidance`);
+    assert(skillContent.includes("summary_policy"), `${name} missing summary policy guidance`);
     if (name === "ow-vision") {
       verifyVisionSkill(skillContent);
     }
@@ -296,6 +306,8 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("artifact_type: production_change"), "artifact contracts missing production_change");
   assert(artifacts.includes("artifact_type: team_runtime"), "artifact contracts missing team_runtime");
   assert(artifacts.includes("lazy_create: true"), "artifact contracts missing lazy_create markers");
+  assert(artifacts.includes("summary_policy:"), "artifact contracts missing summary policy metadata");
+  assert(artifacts.includes("SUMMARY.yaml"), "artifact contracts missing summary file paths");
   assert(artifacts.includes("template:"), "artifact contracts missing embedded templates");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
 }

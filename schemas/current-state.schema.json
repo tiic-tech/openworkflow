@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/current-state.schema.json",
+  "title": "OpenWorkflow Current State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "title",
+    "status",
+    "active_stage",
+    "last_decision",
+    "next_command",
+    "blocked_by",
+    "read_this_first"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "const": "workflow:current-state"
+    },
+    "contract_type": {
+      "const": "workflow"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "active_stage": {
+      "type": "string"
+    },
+    "current_vision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_validation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_prototype": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_decision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_design": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_spec": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_change": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_run": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_decision": {
+      "type": "object",
+      "required": [
+        "outcome",
+        "path"
+      ],
+      "additionalProperties": true
+    },
+    "next_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "blocked_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "read_this_first": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

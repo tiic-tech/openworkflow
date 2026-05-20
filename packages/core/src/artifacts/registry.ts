@@ -25,8 +25,16 @@ export interface DiscoveryArtifactContract {
   activePointer: ActivePointer;
   evidencePolicy: string;
   handoffKey: string;
+  summaryPolicy?: SummaryPolicy;
   template: Record<string, unknown>;
   conditionalPackets?: readonly ConditionalPacketMetadata[];
+}
+
+export interface SummaryPolicy {
+  strategy: "summary_file" | "current_slice";
+  path: string;
+  loadBeforeFull: boolean;
+  refreshWhen: string;
 }
 
 export interface ConditionalPacketMetadata {
@@ -150,6 +158,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference human notes when intent needs explanation; do not embed long brainstorming transcript.",
     handoffKey: "handoff.next_command",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "vision_delta",
+      loadBeforeFull: true,
+      refreshWhen: "Update the current slice when stable_answers or unresolved_questions change.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "vision:<id>",
@@ -211,6 +225,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Rank features and assumptions in YAML; keep rationale compact and defer examples to NOTE.md.",
     handoffKey: "prototype_scope",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "core_question + prototype_scope + acceptance",
+      loadBeforeFull: true,
+      refreshWhen: "Update the current slice when validation scope, acceptance, or decision options change.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "validation:<id>",
@@ -284,6 +304,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     evidencePolicy:
       "Reference visual concepts, reference analyses, runnable artifacts, screenshots, logs, critique, and URLs by path; keep concept evidence distinct from implementation evidence and do not paste bulky evidence into YAML.",
     handoffKey: "handoff.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/prototypes/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after prototype evidence, verification, result, or handoff changes.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "prototype:<id>",
@@ -391,6 +417,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference reviewed evidence and user feedback; summarize rationale without copying full review transcripts.",
     handoffKey: "next_command",
+    summaryPolicy: {
+      strategy: "current_slice",
+      path: "outcome + rationale + next_command + follow_up_questions",
+      loadBeforeFull: true,
+      refreshWhen: "Update whenever the decision outcome or next command changes.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "decision:<id>",
@@ -452,6 +484,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference accepted prototype evidence and decision records by path; keep product design decisions in PRODUCT_DESIGN.yaml.",
     handoffKey: "spec_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/design/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after product design scope, open questions, or spec readiness changes.",
+    },
     conditionalPackets: [
       {
         artifactType: "tech_spec",
@@ -571,6 +609,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference product design and conditional design packets by path; keep implementation requirements concrete and bounded.",
     handoffKey: "change_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/specs/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after scope, interfaces, acceptance, verification, risks, or change readiness changes.",
+    },
     template: {
       schema_version: "0.1.0",
       contract_id: "spec:<id>",
@@ -650,6 +694,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference the source spec and repo inspection notes; keep implementation planning traceable and scoped.",
     handoffKey: "runtime_readiness.next_command",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/changes/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after affected paths, work items, validation, risks, or runtime readiness changes.",
+    },
     conditionalPackets: [
       {
         artifactType: "work_items",
@@ -725,6 +775,12 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     },
     evidencePolicy: "Reference change, work items, verification logs, issues, and checkpoints by path; keep current execution state compact.",
     handoffKey: "handoff.next_action",
+    summaryPolicy: {
+      strategy: "summary_file",
+      path: ".openworkflow/runtime/<id>/SUMMARY.yaml",
+      loadBeforeFull: true,
+      refreshWhen: "Refresh after active work item, verification, issues, checkpoints, or handoff changes.",
+    },
     conditionalPackets: [
       {
         artifactType: "runtime_issues",

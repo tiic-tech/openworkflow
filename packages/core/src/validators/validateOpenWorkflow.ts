@@ -12,6 +12,7 @@ export interface ValidationResult {
 
 const REQUIRED_OPENWORKFLOW_FILES = [
   ".openworkflow/config.yaml",
+  ".openworkflow/CURRENT_STATE.yaml",
   ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
   ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
   ".openworkflow/audit/CONTEXT_PACKETS.yaml",
@@ -41,11 +42,52 @@ export async function validateOpenWorkflow(root: string): Promise<ValidationResu
     validateContractGraph(root, file, data, errors);
     validateArtifactContracts(root, file, data, errors);
     validateDisclosureLevels(root, file, data, errors);
+    validateConfig(root, file, data, errors);
+    validateCurrentState(root, file, data, errors);
     validateActivePointer(root, file, data, errors);
     validateDiscoveryArtifact(root, file, data, errors);
   }
 
   return { ok: errors.length === 0, errors };
+}
+
+function validateConfig(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("config.yaml") || !isRecord(data)) {
+    return;
+  }
+  const label = relative(root, file);
+  if (!nonEmptyString(data.project_slug) || data.project_slug === "project") {
+    errors.push(`${label} project_slug must be a useful non-empty slug`);
+  }
+  if (!nonEmptyString(data.project_title) || data.project_title === ".") {
+    errors.push(`${label} project_title must be a useful non-empty title`);
+  }
+}
+
+function validateCurrentState(root: string, file: string, data: unknown, errors: string[]): void {
+  if (!file.endsWith("CURRENT_STATE.yaml") || !isRecord(data)) {
+    return;
+  }
+  const label = relative(root, file);
+  for (const key of ["active_stage", "next_command", "blocked_by", "read_this_first", "last_decision"]) {
+    if (!(key in data)) {
+      errors.push(`${label} missing current state key ${key}`);
+    }
+  }
+  if (!nonEmptyString(data.active_stage)) {
+    errors.push(`${label} active_stage must be a non-empty string`);
+  }
+  if (typeof data.next_command !== "string" && data.next_command !== null) {
+    errors.push(`${label} next_command must be a string or null`);
+  }
+  for (const key of ["blocked_by", "read_this_first"]) {
+    if (!Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if (!isRecord(data.last_decision)) {
+    errors.push(`${label} last_decision must be a mapping`);
+  }
 }
 
 function validateArtifactContracts(root: string, file: string, data: unknown, errors: string[]): void {
@@ -129,6 +171,18 @@ function validateArtifactContractMetadata(
     }
   } else {
     errors.push(`${label} ${String(artifact.artifact_type)} active_pointer must be a mapping`);
+  }
+  const summaryPolicy = artifact.summary_policy;
+  if (summaryPolicy !== null && summaryPolicy !== undefined) {
+    if (!isRecord(summaryPolicy)) {
+      errors.push(`${label} ${String(artifact.artifact_type)} summary_policy must be null or a mapping`);
+    } else {
+      for (const key of ["strategy", "path", "load_before_full", "refresh_when"]) {
+        if (!(key in summaryPolicy)) {
+          errors.push(`${label} ${String(artifact.artifact_type)} summary_policy missing ${key}`);
+        }
+      }
+    }
   }
 }
 

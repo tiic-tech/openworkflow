@@ -58,6 +58,10 @@
       "enum": [
         "draft",
         "active",
+        "reviewed",
+        "accepted",
+        "revise_requested",
+        "completed",
         "superseded",
         "archived"
       ]

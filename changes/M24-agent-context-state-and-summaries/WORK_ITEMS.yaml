@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: work_items:M24-agent-context-state-and-summaries
+contract_type: work_items
+title: M24 Agent context state and summaries work items
+status: completed
+change_contract: changes/M24-agent-context-state-and-summaries/CHANGE.yaml
+items:
+  - task_id: M24-T001
+    title: Add current state contract
+    status: done
+    owned_paths:
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/core/src/validators/
+      - schemas/
+    acceptance:
+      - .openworkflow/CURRENT_STATE.yaml is generated during init as workflow-level metadata.
+      - The contract includes active_stage, current pointers, last_decision, next_command, blocked_by, and read_this_first.
+      - Validation rejects malformed current-state pointers.
+  - task_id: M24-T002
+    title: Define lifecycle status transitions
+    status: done
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/commands/registry.ts
+      - schemas/openworkflow-contract.schema.json
+    acceptance:
+      - Artifact statuses support machine-readable post-draft states.
+      - Command protocols tell agents when to mark old questions or artifacts superseded, reviewed, accepted, or revise_requested.
+      - Generated skills avoid leaving stale current_question values after handoff.
+  - task_id: M24-T003
+    title: Add summary or current-slice metadata
+    status: done
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/adapters/codex/src/generateCommands.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    acceptance:
+      - Long artifacts expose summary/current_slice metadata in artifact contracts.
+      - Generated skills prefer summaries before full artifact reads.
+      - Read policies preserve raw evidence as opt-in.
+  - task_id: M24-T004
+    title: Improve project identity metadata
+    status: done
+    owned_paths:
+      - packages/cli/src/commands/init.ts
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - init derives useful project_slug and project_title from the target directory when the user does not provide better metadata.
+      - Project title "." is rejected or normalized.
+      - Any root OpenWorkflow entrypoint decision preserves the minimal init contract.
+  - task_id: M24-T005
+    title: Extend regression coverage
+    status: done
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime surface verification covers current-state and metadata quality.
+      - Workflow E2E covers summary loading guidance and lifecycle updates.
+      - Repository validation includes M24 change contracts.

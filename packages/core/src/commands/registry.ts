@@ -180,6 +180,7 @@ function visionProtocol(): CommandProtocol {
     auditCheckpoints: {
       before: [
         "Confirm workflow and context indexes exist.",
+        "Load CURRENT_STATE.yaml when present to avoid stale stage routing.",
         "Start in conversation mode and ask the next useful vision question before writing artifacts.",
       ],
       during: [
@@ -190,6 +191,7 @@ function visionProtocol(): CommandProtocol {
       after: [
         "Persist artifacts only after stable answers, explicit save request, or readiness checkpoint.",
         "Handoff to validation only after mandatory coverage, unresolved blockers are named, and the user confirms readiness.",
+        "When handing off, mark the vision session active or reviewed, clear stale current_question when answered, and update CURRENT_STATE.yaml.",
         "Confirm no validation, prototype, spec, change, or runtime artifacts were created.",
       ],
     },
@@ -271,9 +273,14 @@ function validationProtocol(): CommandProtocol {
       ".openworkflow/runtime/**",
     ],
     auditCheckpoints: {
-      before: ["Confirm a vision contract exists.", "Load only vision and validation index context."],
+      before: ["Confirm a vision contract exists.", "Load CURRENT_STATE.yaml when present.", "Load only vision and validation index context."],
       during: ["Classify features as existential, supporting, later, or out of scope.", "Name the single highest-risk validation question."],
-      after: ["Record the validation target and prototype brief.", "Confirm no prototype, spec, change, or runtime artifacts were created."],
+      after: [
+        "Record the validation target and prototype brief.",
+        "Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next command.",
+        "Mark superseded validation targets accordingly when a new validation target replaces them.",
+        "Confirm no prototype, spec, change, or runtime artifacts were created.",
+      ],
     },
     antiPatterns: [
       "Do not turn feature ranking into a production task list.",
@@ -328,6 +335,7 @@ function prototypeProtocol(): CommandProtocol {
         "Record reference analysis, static concept evidence, runnable implementation evidence, verification, self-critique, and known limits separately.",
         "Write a decision audit record internally after prototype evidence changes.",
         "Write evidence and result artifacts.",
+        "Refresh prototype SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_prototype, last_decision, and next_command.",
         "Confirm no design, spec, change, team, persistence, or production hardening was created.",
       ],
     },
@@ -458,6 +466,7 @@ function tuneProtocol(): CommandProtocol {
       after: [
         "Write updated prototype evidence and review artifacts.",
         "Write or update the internal decision audit record.",
+        "Refresh prototype SUMMARY.yaml and CURRENT_STATE.yaml after the revision outcome is known.",
         "Show the user only the tuning result, unresolved question if any, and the next user-facing command.",
       ],
     },
@@ -531,7 +540,13 @@ function decisionProtocol(): CommandProtocol {
     auditCheckpoints: {
       before: ["Confirm prototype evidence exists.", "Load only prototype evidence, user feedback summary, and decision index context."],
       during: ["Record audit outcome as continue, revise, pivot, stop, or needs_more_evidence.", "Keep only decision-rich evidence."],
-      after: ["Write the decision record.", "Authorize /ow:design only when outcome is continue.", "Return control to the user-facing proto or tune command."],
+      after: [
+        "Write the decision record.",
+        "Update CURRENT_STATE.yaml last_decision and next_command.",
+        "Set prototype status to accepted only when outcome is continue, revise_requested when outcome is revise, or superseded when pivoted.",
+        "Authorize /ow:design only when outcome is continue.",
+        "Return control to the user-facing proto or tune command.",
+      ],
     },
     antiPatterns: [
       "Do not infer acceptance without user review or explicit evidence.",
@@ -596,6 +611,7 @@ function designProtocol(): CommandProtocol {
       ],
       after: [
         "Write PRODUCT_DESIGN.yaml only after enough design meaning is stable.",
+        "Refresh design SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_design and spec readiness.",
         "Hand off to /ow:spec only when spec readiness is true and blockers are explicit.",
       ],
     },
@@ -688,6 +704,7 @@ function specProtocol(): CommandProtocol {
       ],
       after: [
         "Write the spec artifact and update SPEC_INDEX.yaml.",
+        "Refresh spec SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_spec and change readiness.",
         "Hand off to /ow:change only when the spec has bounded scope, acceptance, and verification.",
         "Confirm no change or runtime artifacts were created.",
       ],
@@ -764,6 +781,7 @@ function changeProtocol(): CommandProtocol {
       ],
       after: [
         "Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.",
+        "Refresh change SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_change and runtime readiness.",
         "Hand off to /ow:team only when work items are implementable and verification is explicit.",
         "Confirm no runtime artifacts were created.",
       ],
@@ -842,6 +860,7 @@ function teamProtocol(): CommandProtocol {
       ],
       after: [
         "Update runtime state, issues, and checkpoints.",
+        "Refresh runtime SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_run, blockers, and next action.",
         "Run the verification named by the change plan when practical.",
         "Report changed artifacts, verification result, and remaining blockers.",
       ],

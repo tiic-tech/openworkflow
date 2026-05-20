@@ -15,6 +15,7 @@ const USER_FACING_DISCOVERY_HANDOFFS = ["/ow:tune", "/ow:design", "/ow:validatio
 
 interface Runtime {
   target: string;
+  currentState: Record<string, unknown>;
   commands: Record<string, unknown>[];
   packets: Record<string, unknown>[];
   artifacts: Record<string, unknown>[];
@@ -34,6 +35,7 @@ async function main(): Promise<number> {
     await run(["node", CLI, "validate", "--root", target], env);
 
     const runtime = await loadRuntime(target);
+    await verifyCurrentState(runtime);
     await verifyVisionPhase(runtime);
     await verifyValidationPhase(runtime);
     await verifyPrototypePhase(runtime);
@@ -51,14 +53,26 @@ async function main(): Promise<number> {
 
 async function loadRuntime(target: string): Promise<Runtime> {
   const commandIndex = await readYaml(join(target, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"));
+  const currentState = await readYaml(join(target, ".openworkflow", "CURRENT_STATE.yaml"));
   const contextPackets = await readYaml(join(target, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
   const artifactContracts = await readYaml(join(target, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
   return {
     target,
+    currentState,
     commands: records(commandIndex, "commands", "runtime"),
     packets: records(contextPackets, "packets", "runtime"),
     artifacts: records(artifactContracts, "artifacts", "runtime"),
   };
+}
+
+async function verifyCurrentState(runtime: Runtime): Promise<void> {
+  const phase = "current-state";
+  assertPhase(phase, runtime.currentState.contract_id === "workflow:current-state", "current state contract id mismatch");
+  assertPhase(phase, runtime.currentState.active_stage === "workflow", "initial active stage should be workflow");
+  assertPhase(phase, runtime.currentState.next_command === "/ow:vision", "initial next command should be /ow:vision");
+  assertListIncludes(phase, stringList(runtime.currentState, "read_this_first", phase), ".openworkflow/CURRENT_STATE.yaml", "current state does not point to itself");
+  const lastDecision = recordField(runtime.currentState, "last_decision", phase);
+  assertPhase(phase, "outcome" in lastDecision, "current state last_decision missing outcome");
 }
 
 async function verifyVisionPhase(runtime: Runtime): Promise<void> {
@@ -84,6 +98,9 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "user confirms readiness", "context packet lost readiness gate");
 
   const skill = await readSkill(runtime, "ow-vision");
+  assertIncludes(phase, skill, ".openworkflow/CURRENT_STATE.yaml", "skill missing current state loading guidance");
+  assertIncludes(phase, skill, "clear stale current_question", "skill missing stale question closure guidance");
+  assertIncludes(phase, skill, "summary_policy", "skill missing summary policy guidance");
   assertIncludes(phase, skill, "<conversation_first>", "skill missing conversation_first block");
   assertIncludes(phase, skill, "Ask exactly one question", "skill no longer limits vision to one focused question");
   assertIncludes(phase, skill, "<mandatory_coverage>", "skill missing mandatory coverage block");
@@ -268,6 +285,7 @@ async function verifySpecPhase(runtime: Runtime): Promise<void> {
   const artifact = artifactRecord(runtime, "production_spec", phase);
   assertPhase(phase, artifact.command === "/ow:spec", "production_spec command mismatch");
   assertPhase(phase, artifact.lazy_create === true, "production_spec is not marked lazy_create");
+  assertPhase(phase, "summary_policy" in artifact, "production_spec missing summary policy");
   const template = recordField(artifact, "template", phase);
   assertPhase(phase, "change_readiness" in template, "production_spec template missing change_readiness");
 }
@@ -297,6 +315,7 @@ async function verifyChangePhase(runtime: Runtime): Promise<void> {
   const artifact = artifactRecord(runtime, "production_change", phase);
   assertPhase(phase, artifact.command === "/ow:change", "production_change command mismatch");
   assertPhase(phase, artifact.lazy_create === true, "production_change is not marked lazy_create");
+  assertPhase(phase, "summary_policy" in artifact, "production_change missing summary policy");
   const template = recordField(artifact, "template", phase);
   assertPhase(phase, "runtime_readiness" in template, "production_change template missing runtime_readiness");
 }
@@ -325,6 +344,7 @@ async function verifyTeamPhase(runtime: Runtime): Promise<void> {
   const artifact = artifactRecord(runtime, "team_runtime", phase);
   assertPhase(phase, artifact.command === "/ow:team", "team_runtime command mismatch");
   assertPhase(phase, artifact.lazy_create === true, "team_runtime is not marked lazy_create");
+  assertPhase(phase, "summary_policy" in artifact, "team_runtime missing summary policy");
   const template = recordField(artifact, "template", phase);
   assertPhase(phase, "handoff" in template, "team_runtime template missing handoff");
 }

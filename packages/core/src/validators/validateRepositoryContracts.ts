@@ -19,6 +19,7 @@ const REQUIRED_FILES = [
   "references/artifact-authoring-templates.md",
   "references/runtime-command-surface.md",
   "schemas/openworkflow-contract.schema.json",
+  "schemas/current-state.schema.json",
   "schemas/workflow-index.schema.json",
   "schemas/contract-graph.schema.json",
   "schemas/artifact-contracts.schema.json",
@@ -117,6 +118,8 @@ const REQUIRED_FILES = [
   "changes/M22-project-clean-command/WORK_ITEMS.yaml",
   "changes/M23-production-command-lazy-contracts/CHANGE.yaml",
   "changes/M23-production-command-lazy-contracts/WORK_ITEMS.yaml",
+  "changes/M24-agent-context-state-and-summaries/CHANGE.yaml",
+  "changes/M24-agent-context-state-and-summaries/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
@@ -178,11 +181,52 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validatePrototype(root, path, data, errors);
       validateArtifactContracts(root, path, data, errors);
       validateDisclosureLevels(root, path, data, errors);
+      validateConfig(root, path, data, errors);
+      validateCurrentState(root, path, data, errors);
       validateActivePointer(root, path, data, errors);
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
     }
+  }
+}
+
+function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "config.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  if (!nonEmptyString(data.project_slug) || data.project_slug === "project") {
+    errors.push(`${label} project_slug must be a useful non-empty slug`);
+  }
+  if (!nonEmptyString(data.project_title) || data.project_title === ".") {
+    errors.push(`${label} project_title must be a useful non-empty title`);
+  }
+}
+
+function validateCurrentState(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "CURRENT_STATE.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  for (const key of ["active_stage", "next_command", "blocked_by", "read_this_first", "last_decision"]) {
+    if (!(key in data)) {
+      errors.push(`${label} missing current state key ${key}`);
+    }
+  }
+  if (!nonEmptyString(data.active_stage)) {
+    errors.push(`${label} active_stage must be a non-empty string`);
+  }
+  if (typeof data.next_command !== "string" && data.next_command !== null) {
+    errors.push(`${label} next_command must be a string or null`);
+  }
+  for (const key of ["blocked_by", "read_this_first"]) {
+    if (!Array.isArray(data[key])) {
+      errors.push(`${label} ${key} must be an array`);
+    }
+  }
+  if (!isRecord(data.last_decision)) {
+    errors.push(`${label} last_decision must be a mapping`);
   }
 }
 
@@ -406,6 +450,18 @@ function validateArtifactContractMetadata(
     }
   } else {
     errors.push(`${label} artifact ${index} active_pointer must be a mapping`);
+  }
+  const summaryPolicy = artifact.summary_policy;
+  if (summaryPolicy !== null && summaryPolicy !== undefined) {
+    if (!isRecord(summaryPolicy)) {
+      errors.push(`${label} artifact ${index} summary_policy must be null or a mapping`);
+    } else {
+      for (const key of ["strategy", "path", "load_before_full", "refresh_when"]) {
+        if (!(key in summaryPolicy)) {
+          errors.push(`${label} artifact ${index} summary_policy missing ${key}`);
+        }
+      }
+    }
   }
 }
 

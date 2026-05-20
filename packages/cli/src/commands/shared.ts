@@ -1,3 +1,5 @@
+import { basename, resolve } from "node:path";
+
 export function parseTools(raw: string | undefined): string[] {
   if (!raw) {
     return [];
@@ -6,8 +8,11 @@ export function parseTools(raw: string | undefined): string[] {
 }
 
 export function basenameForTitle(path: string): string {
-  const parts = path.split(/[\\/]/).filter(Boolean);
-  return parts.at(-1) ?? "OpenWorkflow Project";
+  const name = basename(resolve(path));
+  if (!name || name === "." || name === "..") {
+    return "OpenWorkflow Project";
+  }
+  return name;
 }
 
 export function slugify(value: string): string {
