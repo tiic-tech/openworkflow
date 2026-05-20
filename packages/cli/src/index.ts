@@ -117,8 +117,9 @@ Commands:
 Agent quick start:
   Read AGENTS.md, then run openworkflow inspect --root . --json. Inspect starts
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
-  full evidence. Prefer SUMMARY.yaml/current_slice guidance when a long artifact
-  offers it, but check summary quality fields before treating a current summary
+  full evidence. Doctor confirms managed surface health, not handoff quality.
+  Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
+  but check summary quality fields before treating a current summary
   as a complete handoff. Add --strict to summaries or inspect when thin source
   quality should block the Agent handoff. Use --json when an Agent needs structured command output.
   Use openworkflow context --root . --json when you want OpenWorkflow to package
@@ -129,7 +130,7 @@ Two command surfaces:
     init       Create the minimal workflow root, AGENTS.md guide, and tool adapters.
     sync       Detect current platforms, refresh managed workflow files, and sync adapters.
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
-    doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
+    doctor     Report missing or stale generated surfaces, and separately report summary freshness and handoff quality.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.

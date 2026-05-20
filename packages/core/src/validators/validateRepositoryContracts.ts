@@ -180,6 +180,8 @@ const REQUIRED_FILES = [
   "changes/M45-sync-state-reconciliation/WORK_ITEMS.yaml",
   "changes/M46-strict-summary-quality/CHANGE.yaml",
   "changes/M46-strict-summary-quality/WORK_ITEMS.yaml",
+  "changes/M47-doctor-handoff-quality-split/CHANGE.yaml",
+  "changes/M47-doctor-handoff-quality-split/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

@@ -117,6 +117,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "template-id: openworkflow.agents-guide.v1",
     "openworkflow --help",
     "ok:false",
+    "handoff_quality_ok",
     ".openworkflow/CURRENT_STATE.yaml",
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
@@ -157,6 +158,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Agent quick start",
     "Two command surfaces",
     "CLI maintenance commands",
+    "Doctor confirms managed surface health, not handoff quality",
     "Repo-local workflow commands are Agent skills",
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
@@ -431,6 +433,15 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(strictInspect.ok === false, "inspect --strict should report ok=false");
   assert(inspectStrictQuality.strict === true, "inspect --strict should report strict quality enabled");
   assert(nonEmptyArray(strictInspect.health_errors), "inspect --strict should expose quality health_errors");
+  const doctorThin = parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", root, "--tools", "codex", "--json"], env), "doctor");
+  const doctorThinData = record(doctorThin.data, "doctor thin data");
+  assert(doctorThin.ok === true, "doctor should keep ok=true for thin quality when managed surfaces are healthy");
+  assert(doctorThinData.managed_surface_ok === true, "doctor should report managed_surface_ok=true");
+  assert(doctorThinData.adapter_ok === true, "doctor should report adapter_ok=true");
+  assert(doctorThinData.summary_freshness_ok === true, "doctor should report summary_freshness_ok=true for current summaries");
+  assert(doctorThinData.handoff_quality_ok === false, "doctor should report handoff_quality_ok=false for thin summaries");
+  assert(nonEmptyArray(record(doctorThinData.strict_quality, "doctor strict quality").health_errors), "doctor should include strict quality errors");
+  assert(Array.isArray(doctorThin.next_actions) && doctorThin.next_actions.some((item) => String(item).includes("summaries --root . --strict --json")), "doctor should recommend summaries --strict for thin handoff quality");
   const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
   assert(designContextStatus.code !== 0, "design context should return nonzero while readiness blockers exist");
   const designContext = parseJsonReport(designContextStatus.output, "context");

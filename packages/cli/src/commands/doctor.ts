@@ -3,7 +3,7 @@ import { detectAdapterPlatforms, getAdapterEntry, getSupportedAdapterIds } from 
 import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { doctorOpenWorkflow } from "../../../core/src/workflow/doctorOpenWorkflow.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
-import { evaluateSummaryHealth } from "../../../core/src/workflow/summaryHealth.js";
+import { evaluateSummaryHealth, evaluateSummaryQualityGate } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, slugify } from "./shared.js";
@@ -49,6 +49,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   });
   const agentsGuide = await doctorAgentsGuide(root);
   const summaryHealth = await evaluateSummaryHealth(root);
+  const handoffQuality = evaluateSummaryQualityGate(summaryHealth, true);
   const adapterResults = [];
   for (const tool of tools) {
     const adapter = getAdapterEntry(tool);
@@ -65,7 +66,11 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
     ...adapterResults.flatMap((entry) => entry.result.warnings),
   ];
   const errors = [...workflow.errors, ...agentsGuide.errors, ...adapterResults.flatMap((entry) => entry.result.errors)];
-  const ok = workflow.ok && agentsGuide.ok && adapterResults.every((entry) => entry.result.ok);
+  const managedSurfaceOk = workflow.ok && agentsGuide.ok;
+  const adapterOk = adapterResults.every((entry) => entry.result.ok);
+  const summaryFreshnessOk = summaryHealth.ok;
+  const handoffQualityOk = handoffQuality.ok;
+  const ok = managedSurfaceOk && adapterOk;
   if (json) {
     printJsonReport({
       command: "doctor",
@@ -75,9 +80,14 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
         workflow,
         agents_md: agentsGuide,
         summary_health: summaryHealth,
+        strict_quality: handoffQuality,
+        managed_surface_ok: managedSurfaceOk,
+        adapter_ok: adapterOk,
+        summary_freshness_ok: summaryFreshnessOk,
+        handoff_quality_ok: handoffQualityOk,
         scope: {
           managed_surfaces: "doctor ok covers generated workflow files, AGENTS.md managed block, and selected adapters",
-          artifact_summaries: "summary health is reported as warnings; use openworkflow summaries --json for artifact summary trust",
+          artifact_summaries: "summary freshness and handoff quality are reported separately; use openworkflow summaries --strict --json for artifact summary trust",
         },
         detection,
         tools,
@@ -86,7 +96,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
       warnings,
       errors,
       effects: emptyEffects(),
-      next_actions: doctorNextActions(ok, summaryHealth.ok),
+      next_actions: doctorNextActions(ok, summaryHealth.ok, handoffQuality.ok),
     });
     return ok ? 0 : 1;
   }
@@ -101,15 +111,21 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
     return 1;
   }
   console.log(warnings.length > 0 ? "OpenWorkflow doctor passed with warnings." : "OpenWorkflow doctor passed.");
+  if (!handoffQuality.ok) {
+    console.log("handoff_quality: warnings; run openworkflow summaries --root . --strict --json");
+  }
   return 0;
 }
 
-function doctorNextActions(ok: boolean, summariesOk: boolean): string[] {
+function doctorNextActions(ok: boolean, summariesOk: boolean, handoffQualityOk: boolean): string[] {
   if (!ok) {
     return ["run openworkflow sync, then openworkflow doctor"];
   }
   if (!summariesOk) {
     return ["run openworkflow summaries --json before relying on low-context artifact reads"];
+  }
+  if (!handoffQualityOk) {
+    return ["run openworkflow summaries --root . --strict --json before trusting artifact handoff quality"];
   }
   return [];
 }
