@@ -44,6 +44,7 @@ async function main(): Promise<number> {
     await verifyInternalDecisionPhase(runtime);
     await verifyProductionCommandPhases(runtime);
     await verifyDisplayLabels(runtime);
+    await verifyBriefReadModel(runtime);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -365,12 +366,30 @@ async function verifyDisplayLabels(runtime: Runtime): Promise<void> {
   }
 }
 
+async function verifyBriefReadModel(runtime: Runtime): Promise<void> {
+  const phase = "brief-read-model";
+  const json = JSON.parse(await runCapture(["node", CLI, "brief", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  for (const key of ["project", "workflow", "read_this_first", "active_pointers", "health", "git", "agent_guidance"]) {
+    assertPhase(phase, key in json, `brief missing key ${key}`);
+  }
+  const workflow = recordField(json, "workflow", phase);
+  assertPhase(phase, workflow.active_stage === "workflow", "brief active_stage mismatch");
+  assertPhase(phase, workflow.next_command === "/ow:vision", "brief next_command mismatch");
+  const readThisFirst = json.read_this_first;
+  assertPhase(phase, Array.isArray(readThisFirst), "brief read_this_first must be a list");
+  assertPhase(phase, readThisFirst.includes(".openworkflow/CURRENT_STATE.yaml"), "brief does not include current state read pointer");
+  const guidance = recordField(json, "agent_guidance", phase);
+  assertPhase(phase, String(guidance.recommended_next_action).includes("/ow:vision"), "brief guidance does not point to next command");
+}
+
 async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Promise<void> {
   const phase = "agent-onboarding";
   const guide = await read(join(target, "AGENTS.md"));
   assertIncludes(phase, guide, "openworkflow --help", "AGENTS.md does not point agents to CLI help");
   assertIncludes(phase, guide, ".openworkflow/CURRENT_STATE.yaml", "AGENTS.md does not point agents to current state");
-  assertIncludes(phase, guide, "CLI commands maintain the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
+  assertIncludes(phase, guide, "CLI commands maintain and summarize the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
+  assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
+  assertIncludes(phase, guide, "openworkflow status --root .", "AGENTS.md does not mention status command");
   assertIncludes(phase, guide, "Repo-local workflow commands are delivered as Agent skills", "AGENTS.md does not distinguish workflow skill commands");
   assertIncludes(phase, guide, "Respect lazy creation", "AGENTS.md does not preserve lazy artifact creation boundary");
   const help = await runCapture(["node", CLI, "--help"], env);

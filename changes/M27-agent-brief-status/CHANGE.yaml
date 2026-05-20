@@ -1,0 +1,73 @@
+schema_version: 0.1.0
+contract_id: change:M27-agent-brief-status
+contract_type: change
+title: M27 Agent brief and status read model
+status: accepted
+source_artifacts:
+  - changes/M26-non-destructive-multi-platform-sync/CHANGE.yaml
+depends_on:
+  - change:M26-non-destructive-multi-platform-sync
+produces:
+  - work_items:M27-agent-brief-status
+summary: >
+  Add an Agent-oriented `openworkflow status` / `openworkflow brief` read model
+  so a new development Agent can enter a repository with minimal context and get
+  high-quality workflow, health, reading-order, and git-state intelligence.
+problem: >
+  M24-M26 established CURRENT_STATE.yaml, AGENTS.md, and non-destructive sync,
+  but an Agent still has to manually inspect several files and run multiple
+  commands to answer the first-consumer questions: what stage is active, which
+  files should be read first, which artifacts are current, whether workflow or
+  adapter surfaces are stale, and whether the git worktree is safe to edit. We
+  need a single low-context read model that composes existing state without
+  creating new workflow artifacts.
+goals:
+  - Add `openworkflow status --root <folder>` for concise human-readable workflow status.
+  - Add `openworkflow brief --root <folder>` as an alias focused on Agent entry.
+  - Add `--json` output for machine-consumable Agent read model.
+  - Compose CURRENT_STATE.yaml, config, platform detection, doctor-style health, AGENTS.md state, and git state.
+  - Preserve minimal init and lazy-create constraints by printing the read model by default instead of writing artifacts.
+  - Report active pointers, read_this_first order, next command, blockers, last decision, and safe next action.
+  - Report health at a useful level: workflow contracts, adapters, AGENTS.md, and sync-fixable drift.
+  - Report git branch, dirty flag, and changed files when the repository is a git worktree.
+  - Update both `openworkflow --help` and the AGENTS.md managed block when introducing the new commands.
+non_goals:
+  - Do not generate or rewrite workflow artifacts.
+  - Do not replace `doctor`; brief/status should summarize health while doctor remains the deeper diagnostic command.
+  - Do not infer product decisions that are not represented in CURRENT_STATE or existing contracts.
+  - Do not scan full evidence files by default.
+decisions:
+  - "`brief` and `status` share the same read model; `brief` is the Agent-friendly name."
+  - "Default output is concise text for humans and Agents; `--json` returns stable structured data."
+  - "The command may call existing doctor helpers in-process, but it should not exit non-zero for ordinary drift because the purpose is orientation."
+  - Git state is best-effort and should degrade gracefully outside a git repository.
+  - "Every new CLI command must be reflected in both `openworkflow --help` and the maintained AGENTS.md managed block."
+open_questions: []
+resolved_questions:
+  - M27 remains print-only; any persisted BRIEF.yaml snapshot should be a future explicit change.
+  - Default text output shows concise health counts and recommended maintenance; `--json` carries the structured details.
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/core/src/workflow/
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M27-agent-brief-status/
+acceptance:
+  - "`openworkflow status --root <folder>` prints a concise status with project, active stage, next command, read order, active pointers, health, and git state."
+  - "`openworkflow brief --root <folder>` produces the same read model."
+  - "`--json` produces parseable JSON with stable top-level keys for project, workflow, read_this_first, active_pointers, health, git, and agent_guidance."
+  - The command does not create or modify `.openworkflow` stage artifacts.
+  - The command reports missing/stale workflow or adapter surfaces as health issues and points to sync/doctor when useful.
+  - The command works outside git repositories by returning `git.available: false`.
+  - "`openworkflow --help` and generated AGENTS.md both mention `status` and `brief`."
+  - Regression tests cover text output, JSON output, dirty git state, and no-artifact side effects.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+updated_at: 2026-05-20

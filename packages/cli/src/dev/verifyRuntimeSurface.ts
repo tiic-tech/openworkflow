@@ -26,6 +26,7 @@ async function main(): Promise<number> {
     await verifyMinimalOpenWorkflow(target);
     await verifyAgentsGuide(target);
     await verifyHelpSurface(env);
+    await verifyBriefStatus(target, tempRoot, env);
     await verifyConfig(target);
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
@@ -115,6 +116,8 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
+    "openworkflow brief --root .",
+    "openworkflow status --root .",
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
@@ -144,9 +147,58 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "/ow:team",
     "Lazy creation boundary",
     "Sync safety",
+    "status",
+    "brief",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
   }
+}
+
+async function verifyBriefStatus(root: string, tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const status = await runCapture(["node", CLI, "status", "--root", root], env);
+  for (const required of [
+    "OpenWorkflow brief for",
+    "Workflow:",
+    "active_stage: workflow",
+    "next_command: /ow:vision",
+    "Read this first:",
+    ".openworkflow/CURRENT_STATE.yaml",
+    "Active pointers:",
+    "Health:",
+    "Git:",
+    "Agent guidance:",
+  ]) {
+    assert(status.includes(required), `status output missing ${required}`);
+  }
+
+  const json = JSON.parse(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env)) as Record<string, unknown>;
+  for (const key of ["project", "workflow", "read_this_first", "active_pointers", "health", "git", "agent_guidance"]) {
+    assert(key in json, `brief json missing top-level key ${key}`);
+  }
+  const workflow = record(json.workflow, "workflow");
+  assert(workflow.active_stage === "workflow", "brief json active_stage mismatch");
+  assert(workflow.next_command === "/ow:vision", "brief json next_command mismatch");
+  const git = record(json.git, "git");
+  assert(git.available === false, "brief json should report non-git target as unavailable");
+
+  for (const forbiddenPath of [
+    ".openworkflow/vision",
+    ".openworkflow/validation",
+    ".openworkflow/prototypes",
+    ".openworkflow/changes",
+    ".openworkflow/runtime",
+  ]) {
+    assert(!(await exists(join(root, forbiddenPath))), `brief/status created stage path: ${forbiddenPath}`);
+  }
+
+  const gitTarget = join(tempRoot, "git-target");
+  await run(["git", "init", gitTarget], env);
+  await run(["node", CLI, "init", gitTarget, "--tools", "codex", "--force"], env);
+  const gitJson = JSON.parse(await runCapture(["node", CLI, "brief", "--root", gitTarget, "--json"], env)) as Record<string, unknown>;
+  const gitState = record(gitJson.git, "git");
+  assert(gitState.available === true, "brief json should detect git worktree");
+  assert(gitState.dirty === true, "brief json should report dirty git worktree");
+  assert(Array.isArray(gitState.changed_files) && gitState.changed_files.length > 0, "brief json missing changed files");
 }
 
 async function verifyNonDestructiveSyncMigration(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -543,6 +595,11 @@ function assertSetEqual(actual: Set<string>, expected: Set<string>, label: strin
   const actualList = [...actual].sort();
   const expectedList = [...expected].sort();
   assert(JSON.stringify(actualList) === JSON.stringify(expectedList), `${label}: ${actualList.join(", ")}`);
+}
+
+function record(value: unknown, label: string): Record<string, unknown> {
+  assert(typeof value === "object" && value !== null && !Array.isArray(value), `${label} must be a record`);
+  return value as Record<string, unknown>;
 }
 
 function assert(condition: boolean, message: string): asserts condition {
