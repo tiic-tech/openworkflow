@@ -38,6 +38,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/index.ts",
   "packages/cli/src/report.ts",
   "packages/cli/src/commands/brief.ts",
+  "packages/cli/src/commands/check.ts",
   "packages/cli/src/commands/clean.ts",
   "packages/cli/src/commands/init.ts",
   "packages/cli/src/commands/validate.ts",
@@ -135,6 +136,8 @@ const REQUIRED_FILES = [
   "changes/M27-agent-brief-status/WORK_ITEMS.yaml",
   "changes/M28-cli-json-report-surface/CHANGE.yaml",
   "changes/M28-cli-json-report-surface/WORK_ITEMS.yaml",
+  "changes/M29-command-readiness-check/CHANGE.yaml",
+  "changes/M29-command-readiness-check/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

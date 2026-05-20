@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: change:M29-command-readiness-check
+contract_type: change
+title: M29 Command readiness check
+status: accepted
+source_artifacts:
+  - changes/M28-cli-json-report-surface/CHANGE.yaml
+depends_on:
+  - change:M28-cli-json-report-surface
+produces:
+  - work_items:M29-command-readiness-check
+summary: >
+  Add an Agent-consumable readiness check for repo-local `/ow:*` workflow
+  commands so an Agent can validate required context, forbidden context,
+  lazy-create boundaries, and likely next actions before starting a command.
+problem: >
+  M27 and M28 give Agents a low-context project brief and structured CLI output,
+  but an Agent still has to manually interpret COMMAND_AUDIT_INDEX,
+  CONTEXT_PACKETS, ARTIFACT_CONTRACTS, and CURRENT_STATE to decide whether a
+  requested `/ow:*` command is safe to run. This is exactly the kind of
+  structured workflow intelligence OpenWorkflow should provide directly.
+goals:
+  - Add `openworkflow check <command> --root <folder>` for workflow command readiness.
+  - Support semantic commands such as `/ow:spec`, `ow:spec`, and skill names such as `ow-spec`.
+  - Return the M28 JSON envelope with a readiness model under `data` when `--json` is used.
+  - Evaluate required, optional, forbidden, and conditional context from context packets.
+  - Evaluate command allowed outputs, forbidden outputs, handoff commands, and lazy-create implications.
+  - Include active CURRENT_STATE pointers and read_this_first guidance in the readiness output.
+  - Recommend concrete next actions when required context is missing, forbidden context exists, or the command is not the current next command.
+  - Update `openworkflow --help` and the AGENTS.md managed block because a new CLI command is being introduced.
+non_goals:
+  - Do not execute `/ow:*` workflow commands.
+  - Do not create missing stage artifacts.
+  - Do not infer readiness from full evidence content beyond declared contracts in M29.
+  - Do not require a clean git worktree unless the checked command contract explicitly says so in a future version.
+decisions:
+  - "Readiness check is read-only and must not mutate `.openworkflow` or adapter surfaces."
+  - "`check` is a CLI command for Agent planning; `/ow:*` commands remain repo-local Agent skills."
+  - "A command can be not recommended yet without being a hard failure; JSON should separate `ready`, `warnings`, and `blockers`."
+  - Missing required context should produce blockers and a non-zero exit code, while next-command mismatch should be a warning unless required context is also missing.
+open_questions: []
+resolved_questions:
+  - "`check` returns non-zero only for blockers such as missing required context, forbidden context, unknown command, or missing command argument."
+  - "CURRENT_STATE.next_command mismatch is warning-only unless another blocker exists."
+  - "Default text output includes a compact artifact boundary summary; `--json` includes the full readiness model."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/
+  - packages/core/src/workflow/
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M29-command-readiness-check/
+acceptance:
+  - "`openworkflow check /ow:vision --root <folder>` reports readiness for the vision command without writing files."
+  - "`openworkflow check ow-spec --root <folder> --json` emits the shared M28 JSON envelope."
+  - "The readiness model includes command, ready, blockers, warnings, required_context, optional_context, forbidden_context, allowed_outputs, forbidden_outputs, handoff_commands, read_this_first, and next_actions."
+  - "Missing required context is reported as blockers with non-zero exit status."
+  - "Forbidden context is reported as blockers with non-zero exit status."
+  - "A command that differs from CURRENT_STATE.next_command is reported as a warning with a suggested next action."
+  - "The command is read-only and does not create stage directories."
+  - "`openworkflow --help` and AGENTS.md managed block mention `check` and JSON usage."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+updated_at: 2026-05-20

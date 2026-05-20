@@ -28,6 +28,7 @@ export function renderAgentsGuide(): string {
 - Start every workflow turn by reading \`.openworkflow/CURRENT_STATE.yaml\`, then follow its \`read_this_first\` pointers before loading full evidence.
 - CLI commands maintain and summarize the repo-local workflow surface: \`init\`, \`sync\`, \`validate\`, \`doctor\`, \`status\`, \`brief\`, and \`clean\`.
 - Use \`openworkflow brief --root .\` or \`openworkflow status --root .\` for a low-context Agent read model before deciding what to inspect next; use \`--json\` when another tool needs structured data.
+- Use \`openworkflow check /ow:<command> --root . --json\` before uncertain workflow work to verify required context, forbidden context, output boundaries, and next actions.
 - Repo-local workflow commands are delivered as Agent skills under \`.agents/skills/ow-*/SKILL.md\` and map to semantic commands: \`/ow:vision\`, \`/ow:validation\`, \`/ow:proto\`, \`/ow:tune\`, \`/ow:design\`, \`/ow:spec\`, \`/ow:change\`, and \`/ow:team\`.
 - Respect lazy creation: \`openworkflow init\` only creates the minimal workflow root; stage artifacts must be created only by the first matching \`/ow:*\` command.
 - Prefer summary/current-state files for orientation, and load raw evidence only when the current task requires it.

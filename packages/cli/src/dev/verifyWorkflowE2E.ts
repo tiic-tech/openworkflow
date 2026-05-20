@@ -45,6 +45,7 @@ async function main(): Promise<number> {
     await verifyProductionCommandPhases(runtime);
     await verifyDisplayLabels(runtime);
     await verifyBriefReadModel(runtime);
+    await verifyCommandReadiness(runtime);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -385,6 +386,46 @@ async function verifyBriefReadModel(runtime: Runtime): Promise<void> {
   assertPhase(phase, String(guidance.recommended_next_action).includes("/ow:vision"), "brief guidance does not point to next command");
 }
 
+async function verifyCommandReadiness(runtime: Runtime): Promise<void> {
+  const phase = "command-readiness";
+  const report = JSON.parse(await runCapture(["node", CLI, "check", "/ow:vision", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  assertPhase(phase, report.command === "check", "check report command mismatch");
+  assertPhase(phase, report.ok === true, "vision check should be ok");
+  const data = recordField(report, "data", phase);
+  assertPhase(phase, data.ready === true, "vision should be ready");
+  assertPhase(phase, Array.isArray(data.required_context), "check missing required_context");
+  assertPhase(phase, Array.isArray(data.forbidden_context), "check missing forbidden_context");
+  assertPhase(phase, Array.isArray(data.allowed_outputs), "check missing allowed_outputs");
+  assertPhase(phase, Array.isArray(data.handoff_commands), "check missing handoff_commands");
+
+  const spec = await runCaptureStatus(["node", CLI, "check", "ow-spec", "--root", runtime.target, "--json"], { ...process.env });
+  assertPhase(phase, spec.code !== 0, "spec check should fail without product design");
+  const specReport = JSON.parse(spec.output) as Record<string, unknown>;
+  const specData = recordField(specReport, "data", phase);
+  assertPhase(phase, Array.isArray(specData.blockers), "spec check missing blockers");
+}
+
+async function runCaptureStatus(command: string[], env: NodeJS.ProcessEnv): Promise<{ code: number | null; output: string }> {
+  return new Promise<{ code: number | null; output: string }>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd: REPO_ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      resolvePromise({ code, output });
+    });
+  });
+}
+
 async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Promise<void> {
   const phase = "agent-onboarding";
   const guide = await read(join(target, "AGENTS.md"));
@@ -394,6 +435,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "CLI commands maintain and summarize the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
   assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
   assertIncludes(phase, guide, "openworkflow status --root .", "AGENTS.md does not mention status command");
+  assertIncludes(phase, guide, "openworkflow check /ow:<command> --root . --json", "AGENTS.md does not mention check command");
   assertIncludes(phase, guide, "Repo-local workflow commands are delivered as Agent skills", "AGENTS.md does not distinguish workflow skill commands");
   assertIncludes(phase, guide, "Respect lazy creation", "AGENTS.md does not preserve lazy artifact creation boundary");
   const help = await runCapture(["node", CLI, "--help"], env);
@@ -402,6 +444,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "Repo-local workflow commands are Agent skills", "help missing workflow skill explanation");
   assertIncludes(phase, help, "Lazy creation boundary", "help missing lazy creation boundary");
   assertIncludes(phase, help, "Every command supports --json", "help missing JSON report mode");
+  assertIncludes(phase, help, "check", "help missing check command");
 }
 
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {

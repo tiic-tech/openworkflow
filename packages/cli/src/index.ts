@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { booleanFlag, parseArgs } from "./args.js";
 import { briefCommand } from "./commands/brief.js";
+import { checkCommand } from "./commands/check.js";
 import { cleanCommand } from "./commands/clean.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { initCommand } from "./commands/init.js";
@@ -39,6 +40,10 @@ async function main(): Promise<number> {
     return briefCommand(parsed.command, parsed.flags);
   }
 
+  if (parsed.command === "check") {
+    return checkCommand(parsed.positional, parsed.flags);
+  }
+
   console.error(`Unknown command: ${parsed.command}`);
   printHelp();
   return 1;
@@ -54,6 +59,7 @@ Usage:
   openworkflow doctor --root <folder> [--tools auto|codex]
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
+  openworkflow check <ow-command> --root <folder> [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -63,6 +69,7 @@ Commands:
   doctor     Check managed workflow and adapter files for missing or stale templates.
   status     Print a low-context Agent read model for current workflow state.
   brief      Alias for status, named for Agent entry and handoff.
+  check      Check readiness for a repo-local /ow:* workflow command.
   clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -78,6 +85,7 @@ Two command surfaces:
     doctor     Report missing or stale generated surfaces.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
+    check      Verify required/forbidden context before starting a /ow:* command.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
 
   Agent-readable JSON:

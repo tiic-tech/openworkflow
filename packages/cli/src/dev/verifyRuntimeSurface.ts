@@ -28,6 +28,7 @@ async function main(): Promise<number> {
     await verifyHelpSurface(env);
     await verifyBriefStatus(target, tempRoot, env);
     await verifyJsonReports(target, tempRoot, env);
+    await verifyCommandCheck(target, env);
     await verifyConfig(target);
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
@@ -119,6 +120,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     ".agents/skills/ow-*/SKILL.md",
     "openworkflow brief --root .",
     "openworkflow status --root .",
+    "openworkflow check /ow:<command> --root . --json",
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
@@ -150,6 +152,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "Sync safety",
     "status",
     "brief",
+    "check",
     "Every command supports --json",
     "schema_version, command, ok, root, data, warnings, errors, effects",
   ]) {
@@ -215,6 +218,44 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "clean", "--root", root, "--tools", "codex", "--json"], env), "clean");
   parseJsonReport(await runCapture(["node", CLI, "status", "--root", root, "--json"], env), "status");
   parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
+  parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
+}
+
+async function verifyCommandCheck(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const vision = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
+  const visionData = record(vision.data, "vision check data");
+  assert(visionData.ready === true, "vision check should be ready in fresh init");
+  assert(Array.isArray(visionData.required_context), "check missing required_context");
+  assert(Array.isArray(visionData.allowed_outputs), "check missing allowed_outputs");
+  assert(Array.isArray(visionData.handoff_commands), "check missing handoff_commands");
+
+  const spec = await runCaptureStatus(["node", CLI, "check", "ow-spec", "--root", root, "--json"], env);
+  assert(spec.code !== 0, "spec check should fail without required design context");
+  const specReport = parseJsonReport(spec.output, "check");
+  const specData = record(specReport.data, "spec check data");
+  assert(specData.ready === false, "spec check should not be ready");
+  assert(Array.isArray(specData.blockers) && specData.blockers.some((item) => String(item).includes("missing required context")), "spec check missing required context blocker");
+
+  const validation = await runCaptureStatus(["node", CLI, "check", "ow-validation", "--root", root, "--json"], env);
+  assert(validation.code !== 0, "validation check should fail without vision contract");
+  const validationReport = parseJsonReport(validation.output, "check");
+  const validationData = record(validationReport.data, "validation check data");
+  assert(validationData.ready === false, "validation check should not be ready without vision contract");
+  assert(Array.isArray(validationData.warnings) && validationData.warnings.some((item) => String(item).includes("CURRENT_STATE next_command")), "validation check missing next-command warning");
+
+  await assertNoStageArtifacts(root);
+}
+
+async function assertNoStageArtifacts(root: string): Promise<void> {
+  for (const forbiddenPath of [
+    ".openworkflow/vision",
+    ".openworkflow/validation",
+    ".openworkflow/prototypes",
+    ".openworkflow/changes",
+    ".openworkflow/runtime",
+  ]) {
+    assert(!(await exists(join(root, forbiddenPath))), `check created stage path: ${forbiddenPath}`);
+  }
 }
 
 async function verifyNonDestructiveSyncMigration(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
