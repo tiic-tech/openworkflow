@@ -27,9 +27,10 @@ export function renderAgentsGuide(): string {
 - Prefer \`--json\` for structured command output; every OpenWorkflow CLI command supports a JSON report envelope for Agent consumption.
 - Start with \`openworkflow inspect --root . --json\` for the aggregated Agent entry read model, health, next-command readiness, and read order.
 - Start every workflow turn by reading \`.openworkflow/CURRENT_STATE.yaml\`, then follow its \`read_this_first\` pointers before loading full evidence.
-- CLI commands maintain and summarize the repo-local workflow surface: \`init\`, \`sync\`, \`validate\`, \`doctor\`, \`inspect\`, \`context\`, \`draft\`, \`status\`, \`brief\`, \`check\`, \`summaries\`, and \`clean\`.
+- CLI commands maintain and summarize the repo-local workflow surface: \`init\`, \`sync\`, \`validate\`, \`doctor\`, \`inspect\`, \`context\`, \`draft\`, \`register\`, \`status\`, \`brief\`, \`check\`, \`summaries\`, and \`clean\`.
 - Use \`openworkflow context --root . --json\` to materialize a bounded startup packet for \`CURRENT_STATE.next_command\`; add \`--for /ow:<command>\` and \`--max-bytes <n>\` when you need a specific workflow command or tighter context budget.
 - Use \`openworkflow draft --root . --artifact <type> --id <id> --json\` to preview a contract-shaped source artifact; add \`--write\` only when the active \`/ow:*\` workflow step should create that artifact.
+- Use \`openworkflow register --root . --artifact <path> --json\` after a source artifact exists to preview index registration; add \`--write\` to make it visible to read models, and \`--current\` only when it should become the active pointer.
 - Use \`openworkflow brief --root .\` or \`openworkflow status --root .\` for a low-context Agent read model before deciding what to inspect next; use \`--json\` when another tool needs structured data.
 - Use \`openworkflow check /ow:<command> --root . --json\` before uncertain workflow work to verify required context, forbidden context, output boundaries, and next actions.
 - Use \`openworkflow summaries --root . --json\` before loading raw evidence when artifact summaries or current slices may be missing or stale.

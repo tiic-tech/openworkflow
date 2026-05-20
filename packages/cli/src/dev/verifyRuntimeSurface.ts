@@ -124,6 +124,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "--for /ow:<command>",
     "--max-bytes <n>",
     "openworkflow draft --root . --artifact <type> --id <id> --json",
+    "openworkflow register --root . --artifact <path> --json",
     "openworkflow brief --root .",
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
@@ -167,6 +168,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "--max-bytes",
     "draft",
     "contract-shaped source artifact",
+    "register",
+    "index registration",
     "check",
     "summaries",
     "summarize",
@@ -244,6 +247,9 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
   parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
   parseJsonReport(await runCapture(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "json-val", "--json"], env), "draft");
+  const registerStatus = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", ".openworkflow/validation/json-val/VALIDATION.yaml", "--json"], env);
+  assert(registerStatus.code !== 0, "register should fail clearly when artifact path is missing");
+  parseJsonReport(registerStatus.output, "register");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
   parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
@@ -287,6 +293,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(draftUninitializedReport.ok === false, "uninitialized draft should not be ok");
   assert(Array.isArray(draftUninitializedReport.errors) && draftUninitializedReport.errors.some((item) => String(item).includes("missing OpenWorkflow artifact contracts")), "uninitialized draft missing explicit error");
 
+  const registerUninitialized = await runCaptureStatus(["node", CLI, "register", "--root", missingRoot, "--artifact", ".openworkflow/validation/val-1/VALIDATION.yaml", "--json"], env);
+  assert(registerUninitialized.code !== 0, "register should fail clearly outside an initialized OpenWorkflow root");
+  const registerUninitializedReport = parseJsonReport(registerUninitialized.output, "register");
+  assert(registerUninitializedReport.ok === false, "uninitialized register should not be ok");
+
   const summaryBoundaryRoot = join(tempRoot, "summary-validate-boundary");
   await run(["node", CLI, "init", summaryBoundaryRoot, "--tools", "codex", "--force"], env);
   const summaryOnlyDir = join(summaryBoundaryRoot, ".openworkflow", "prototypes", "proto-summary-only");
@@ -298,6 +309,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const draftRoot = join(tempRoot, "draft-command");
   await run(["node", CLI, "init", draftRoot, "--tools", "codex", "--force"], env);
   await verifyDraftCommand(draftRoot, env);
+  await verifyRegisterCommand(draftRoot, env);
 
   const root = join(tempRoot, "summary-health");
   await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
@@ -474,6 +486,63 @@ async function verifyDraftCommand(root: string, env: NodeJS.ProcessEnv): Promise
   const forceEffects = record(force.effects, "draft force effects");
   assert(force.ok === true, "draft force write should be ok");
   assert(Array.isArray(forceEffects.updated) && forceEffects.updated.includes(".openworkflow/validation/val-draft/VALIDATION.yaml"), "draft force write missing updated effect");
+}
+
+async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const currentStateBefore = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  const artifactPath = ".openworkflow/validation/val-draft/VALIDATION.yaml";
+  const dryRun = parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--json"], env), "register");
+  const dryData = record(dryRun.data, "register dry-run data");
+  const dryEffects = record(dryRun.effects, "register dry-run effects");
+  assert(dryRun.ok === true, "register dry-run should be ok");
+  assert(dryData.index_path === ".openworkflow/validation/VALIDATION_INDEX.yaml", "register dry-run index path mismatch");
+  assert(Array.isArray(dryEffects.planned) && dryEffects.planned.includes(".openworkflow/validation/VALIDATION_INDEX.yaml"), "register dry-run missing planned index");
+  assert(!(await exists(join(root, ".openworkflow", "validation", "VALIDATION_INDEX.yaml"))), "register dry-run wrote index");
+
+  const writeRun = parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--write", "--json"], env), "register");
+  const writeEffects = record(writeRun.effects, "register write effects");
+  assert(writeRun.ok === true, "register write should be ok");
+  assert(Array.isArray(writeEffects.written) && writeEffects.written.includes(".openworkflow/validation/VALIDATION_INDEX.yaml"), "register write missing written index");
+  const indexPath = join(root, ".openworkflow", "validation", "VALIDATION_INDEX.yaml");
+  await assertFile(indexPath);
+  const index = await read(indexPath);
+  assert(index.includes("validation_id: val-draft"), "register index missing validation entry");
+  assert(index.includes(`path: ${artifactPath}`), "register index missing artifact path");
+  assert((await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"))) === currentStateBefore, "register without --current modified CURRENT_STATE.yaml");
+
+  const duplicate = parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--write", "--json"], env), "register");
+  const duplicateEffects = record(duplicate.effects, "register duplicate effects");
+  assert(Array.isArray(duplicateEffects.updated) && duplicateEffects.updated.includes(".openworkflow/validation/VALIDATION_INDEX.yaml"), "register duplicate should update index");
+  const duplicateIndex = await read(indexPath);
+  assert(duplicateIndex.indexOf("validation_id: val-draft") === duplicateIndex.lastIndexOf("validation_id: val-draft"), "register duplicate appended duplicate entry");
+
+  const currentRun = parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--current", "--next-command", "/ow:proto", "--write", "--json"], env), "register");
+  const currentEffects = record(currentRun.effects, "register current effects");
+  assert(Array.isArray(currentEffects.updated) && currentEffects.updated.includes(".openworkflow/CURRENT_STATE.yaml"), "register current missing current state update");
+  const currentState = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  assert(currentState.includes("active_stage: validation"), "register current did not update active_stage");
+  assert(currentState.includes(`current_validation: ${artifactPath}`), "register current did not update current pointer");
+  assert(currentState.includes("next_command: /ow:proto"), "register current did not update next command");
+  const currentIndex = await read(indexPath);
+  assert(currentIndex.includes("current_validation: val-draft"), "register current did not update index pointer");
+
+  const nextWithoutCurrent = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--next-command", "/ow:proto", "--json"], env);
+  assert(nextWithoutCurrent.code !== 0, "register should reject --next-command without --current");
+  const nextWithoutCurrentReport = parseJsonReport(nextWithoutCurrent.output, "register");
+  assert(nextWithoutCurrentReport.ok === false, "register --next-command without current should report ok=false");
+
+  const invalidPath = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", ".openworkflow/validation/val-draft/NOTE.md", "--json"], env);
+  assert(invalidPath.code !== 0, "register should reject non-source artifact paths");
+  const invalidPathReport = parseJsonReport(invalidPath.output, "register");
+  assert(invalidPathReport.ok === false, "register invalid path should report ok=false");
+
+  const mismatchPath = join(root, ".openworkflow", "validation", "val-mismatch", "VALIDATION.yaml");
+  await mkdir(dirname(mismatchPath), { recursive: true });
+  await writeFile(mismatchPath, "schema_version: 0.1.0\ncontract_id: validation:val-mismatch\ncontract_type: validation\nartifact_type: prototype_evidence\ntitle: mismatch\nstatus: draft\n", "utf8");
+  const mismatch = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", ".openworkflow/validation/val-mismatch/VALIDATION.yaml", "--json"], env);
+  assert(mismatch.code !== 0, "register should reject artifact_type mismatches");
+  const mismatchReport = parseJsonReport(mismatch.output, "register");
+  assert(mismatchReport.ok === false, "register mismatch should report ok=false");
 }
 
 async function assertNoStageArtifacts(root: string): Promise<void> {

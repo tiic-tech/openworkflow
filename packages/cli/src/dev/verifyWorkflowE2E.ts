@@ -479,6 +479,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "openworkflow context --root . --json", "AGENTS.md does not mention context command");
   assertIncludes(phase, guide, "--max-bytes <n>", "AGENTS.md does not mention context budget");
   assertIncludes(phase, guide, "openworkflow draft --root . --artifact <type> --id <id> --json", "AGENTS.md does not mention draft command");
+  assertIncludes(phase, guide, "openworkflow register --root . --artifact <path> --json", "AGENTS.md does not mention register command");
   assertIncludes(phase, guide, ".openworkflow/CURRENT_STATE.yaml", "AGENTS.md does not point agents to current state");
   assertIncludes(phase, guide, "CLI commands maintain and summarize the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
   assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
@@ -500,6 +501,8 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "--max-bytes", "help missing context budget");
   assertIncludes(phase, help, "draft", "help missing draft command");
   assertIncludes(phase, help, "contract-shaped source artifact", "help missing draft boundary");
+  assertIncludes(phase, help, "register", "help missing register command");
+  assertIncludes(phase, help, "index registration", "help missing register boundary");
   assertIncludes(phase, help, "check", "help missing check command");
   assertIncludes(phase, help, "summaries", "help missing summaries command");
   assertIncludes(phase, help, "summarize", "help missing summarize command");

@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: work_items:M36-artifact-register-command
+contract_type: work_items
+title: M36 Artifact register command work items
+status: completed
+change_contract: changes/M36-artifact-register-command/CHANGE.yaml
+items:
+  - task_id: M36-T001
+    title: Define register model
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/register.ts
+      - packages/core/src/artifacts/registry.ts
+    acceptance:
+      - Model resolves artifact path, artifact id, contract, index path, index entry, and optional current-state patch.
+      - Model rejects source paths that do not match a known source-of-truth contract.
+      - Model rejects mismatched artifact_type values.
+  - task_id: M36-T002
+    title: Implement register CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/register.ts
+    acceptance:
+      - Dry-run reports planned changes.
+      - "`--write` creates or updates the configured index file."
+      - Duplicate registration updates an existing collection entry instead of appending a duplicate.
+  - task_id: M36-T003
+    title: Implement explicit current pointer updates
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/register.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - "`--current --write` updates index current pointer and CURRENT_STATE matching current_* pointer."
+      - "`--next-command` only changes CURRENT_STATE.next_command when `--current` is present."
+      - active_stage is set to the artifact contract stage only when `--current` is present.
+  - task_id: M36-T004
+    title: Update Agent-facing command surfaces
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help documents register, dry-run default, `--write`, `--current`, and `--next-command`.
+      - AGENTS.md tells Agents to use register after draft when an artifact should become workflow-visible.
+      - Existing draft/context guidance remains consistent.
+  - task_id: M36-T005
+    title: Add register regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime tests cover dry-run, write, duplicate update, current pointer update, next-command update, invalid path, mismatched type, and non-OpenWorkflow root.
+      - Workflow E2E verifies help and AGENTS.md register guidance.
+      - Repository validation includes M36 change contracts and new source files.

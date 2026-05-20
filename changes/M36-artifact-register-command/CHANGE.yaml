@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: change:M36-artifact-register-command
+contract_type: change
+title: M36 Artifact register command
+status: accepted
+source_artifacts:
+  - changes/M35-artifact-draft-command/CHANGE.yaml
+depends_on:
+  - change:M35-artifact-draft-command
+produces:
+  - work_items:M36-artifact-register-command
+summary: >
+  Add a contract-aware register command that indexes an existing source artifact
+  and optionally updates the active pointer so drafted artifacts become visible
+  to low-context Agent read models without hand-editing indexes.
+problem: >
+  M35 can create a contract-shaped source artifact, but it deliberately does
+  not update indexes or CURRENT_STATE. That preserves safety, but leaves Agents
+  with a manual and error-prone follow-up: creating the right index file,
+  adding the right collection entry, setting current pointers, and preserving
+  next-command intent. Without a governed register step, valid artifacts can
+  remain invisible to brief, inspect, and context entrypoints.
+goals:
+  - Add `openworkflow register --root <folder> --artifact <path> [--current] [--next-command <ow-command>] [--write] [--json]`.
+  - Resolve artifact contract by source path and artifact_type.
+  - Default to dry-run with planned index and CURRENT_STATE changes.
+  - Create or update only the artifact's configured index file when `--write` is present.
+  - Update index current pointer and CURRENT_STATE current pointer only when `--current` is present.
+  - Preserve source artifact content, SUMMARY.yaml, NOTE.md, raw evidence, and unrelated stage directories.
+  - Use the M28 JSON envelope and report planned/written/updated/skipped effects.
+  - Update `openworkflow --help` and AGENTS.md managed block because a new CLI command is introduced.
+non_goals:
+  - Do not create source artifacts; use `draft` for that.
+  - Do not author summary files; use `summarize` for that.
+  - Do not infer user acceptance, decisions, or next-command transitions without explicit flags.
+  - Do not register raw evidence files, notes, review assets, or conditional packets.
+decisions:
+  - "`register` is the state visibility companion to `draft`: draft writes the source artifact, register links it into workflow indexes."
+  - "Dry-run should show the resolved index path, entry, and current-state patch before writes."
+  - "`--current` is explicit because setting active pointers changes Agent routing."
+open_questions:
+  - question: "Should register set active_stage automatically when `--current` is used?"
+    outcome: "`--current --write` sets CURRENT_STATE.active_stage to the artifact contract stage because active pointer routing and active stage must agree."
+  - question: "Should register update CURRENT_STATE.next_command automatically from artifact handoff fields?"
+    outcome: "No automatic handoff inference; CURRENT_STATE.next_command changes only when the caller passes explicit `--next-command` together with `--current`."
+  - question: "How should duplicate index entries be handled?"
+    outcome: "Duplicate registration replaces the existing entry with the same artifact id, preventing duplicate collection entries."
+affected_paths:
+  - packages/cli/src/index.ts
+  - packages/cli/src/commands/register.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M36-artifact-register-command/
+acceptance:
+  - "`openworkflow register --root <folder> --artifact .openworkflow/validation/val-1/VALIDATION.yaml --json` reports the planned index entry without writing."
+  - "`openworkflow register --root <folder> --artifact <path> --write --json` creates or updates only the configured index file."
+  - "`--current --write` sets the index pointer and the matching CURRENT_STATE current_* pointer."
+  - "`--next-command <ow-command> --current --write` updates CURRENT_STATE.next_command explicitly."
+  - "Duplicate registration updates the existing entry rather than adding duplicates."
+  - "Invalid artifact paths, mismatched artifact_type, and non-OpenWorkflow roots return explicit JSON errors."
+  - "`openworkflow --help` and AGENTS.md managed block mention register, dry-run/write behavior, and `--current`."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - manual tmp e2e: init, draft --write, register dry-run, register --write, register --current --next-command, validate
+created_at: 2026-05-20
+updated_at: 2026-05-20
