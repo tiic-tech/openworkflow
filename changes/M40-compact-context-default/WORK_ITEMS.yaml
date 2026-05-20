@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: work_items:M40-compact-context-default
+contract_type: work_items
+title: M40 Compact context default work items
+status: completed
+change_contract: changes/M40-compact-context-default/CHANGE.yaml
+items:
+  - task_id: M40-T001
+    title: Add context mode and compact budget
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+    acceptance:
+      - Context accepts `--mode compact|full`.
+      - Compact mode is default.
+      - Invalid modes return a JSON error.
+  - task_id: M40-T002
+    title: Omit bulky managed audit files in compact mode
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+    acceptance:
+      - Compact mode reports managed audit files as omitted because they are represented structurally.
+      - Full mode can include those files when budget allows.
+  - task_id: M40-T003
+    title: Update Agent-facing context guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help and AGENTS.md explain compact default and full mode.
+  - task_id: M40-T004
+    title: Add regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier checks compact omission and full inclusion behavior.
+      - Workflow E2E checks help and AGENTS.md mention context mode.
+      - Repository validation requires M40 contracts.

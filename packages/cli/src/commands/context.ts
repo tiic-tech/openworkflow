@@ -10,8 +10,11 @@ import { buildReadiness, type ContextStatus, type ReadinessModel } from "./check
 import { buildInspectModel, type InspectModel } from "./inspect.js";
 import { parseTools } from "./shared.js";
 
-const DEFAULT_MAX_BYTES = 24000;
-const DEFAULT_MAX_ITEM_BYTES = 6000;
+const COMPACT_DEFAULT_MAX_BYTES = 12000;
+const FULL_DEFAULT_MAX_BYTES = 24000;
+const COMPACT_MAX_ITEM_BYTES = 3000;
+const FULL_MAX_ITEM_BYTES = 6000;
+type ContextMode = "compact" | "full";
 
 interface ContextPacketFile {
   path: string;
@@ -38,6 +41,7 @@ interface ContextPacketMetadata {
 }
 
 interface ContextBudget {
+  mode: ContextMode;
   max_bytes: number;
   max_item_bytes: number;
   used_bytes: number;
@@ -45,6 +49,7 @@ interface ContextBudget {
 }
 
 interface ContextModel {
+  mode: ContextMode;
   command: string | null;
   normalized_command: string | null;
   packet_id: string | null;
@@ -66,6 +71,7 @@ interface LoadedPacket {
 }
 
 interface BudgetState {
+  mode: ContextMode;
   maxBytes: number;
   maxItemBytes: number;
   usedBytes: number;
@@ -81,9 +87,13 @@ interface AddContentInput {
 export async function contextCommand(flags: Map<string, string | boolean>): Promise<number> {
   const root = resolve(stringFlag(flags, "root", ".") ?? ".");
   const json = booleanFlag(flags, "json");
-  const maxBytes = parseMaxBytes(stringFlag(flags, "max-bytes"));
+  const mode = parseMode(stringFlag(flags, "mode"));
+  if (!mode) {
+    return finishError(root, json, "invalid --mode; expected compact or full", ["rerun with --mode compact or --mode full"]);
+  }
+  const maxBytes = parseMaxBytes(stringFlag(flags, "max-bytes"), mode);
   if (maxBytes === null) {
-    return finishError(root, json, "invalid --max-bytes; expected a positive integer", ["rerun with --max-bytes 24000"]);
+    return finishError(root, json, `invalid --max-bytes; expected a positive integer`, [`rerun with --max-bytes ${defaultMaxBytes(mode)}`]);
   }
 
   const loaded = await loadContextPacketMetadata(root);
@@ -104,7 +114,7 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
   const readiness = await buildReadiness(root, requested);
   const inspect = buildInspectModel(brief, readiness);
   const packet = findPacket(loaded, readiness.normalized_command ?? requested);
-  const model = await buildContextModel(root, maxBytes, readiness, inspect, packet);
+  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, packet);
   const packetErrors = packet ? [] : [`missing context packet for command: ${readiness.normalized_command ?? requested}`];
   const warnings = unique([
     ...readiness.warnings,
@@ -133,14 +143,16 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
 
 async function buildContextModel(
   root: string,
+  mode: ContextMode,
   maxBytes: number,
   readiness: ReadinessModel,
   inspect: InspectModel,
   contextPacket: ContextPacketMetadata | null,
 ): Promise<ContextModel> {
   const budget: BudgetState = {
+    mode,
     maxBytes,
-    maxItemBytes: Math.min(DEFAULT_MAX_ITEM_BYTES, maxBytes),
+    maxItemBytes: Math.min(defaultMaxItemBytes(mode), maxBytes),
     usedBytes: 0,
   };
   const included: ContextPacketFile[] = [];
@@ -161,7 +173,6 @@ async function buildContextModel(
   const startupPaths = unique([
     "AGENTS.md",
     ".openworkflow/CURRENT_STATE.yaml",
-    ".openworkflow/audit/CONTEXT_PACKETS.yaml",
   ]);
   for (const path of startupPaths) {
     await includePath(root, path, "workflow", "startup workflow context", budget, included, omitted, truncated, seen);
@@ -183,6 +194,7 @@ async function buildContextModel(
   }
 
   return {
+    mode,
     command: readiness.command,
     normalized_command: readiness.normalized_command,
     packet_id: contextPacket?.packet_id ?? null,
@@ -282,6 +294,11 @@ async function includePath(
   if (seen.has(path) || isPattern(path)) {
     return;
   }
+  if (budget.mode === "compact" && isBulkyManagedAuditPath(path)) {
+    omitted.push({ path, reason: "represented structurally in context_packet/readiness; use --mode full to include managed audit source" });
+    seen.add(path);
+    return;
+  }
   if (isRawEvidencePath(path)) {
     omitted.push({ path, reason: "raw evidence or review asset omitted by default" });
     return;
@@ -377,9 +394,19 @@ function findPacket(loaded: LoadedPacket, command: string): ContextPacketMetadat
   return null;
 }
 
-function parseMaxBytes(value: string | undefined): number | null {
+function parseMode(value: string | undefined): ContextMode | null {
   if (!value) {
-    return DEFAULT_MAX_BYTES;
+    return "compact";
+  }
+  if (value === "compact" || value === "full") {
+    return value;
+  }
+  return null;
+}
+
+function parseMaxBytes(value: string | undefined, mode: ContextMode): number | null {
+  if (!value) {
+    return defaultMaxBytes(mode);
   }
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
@@ -387,6 +414,7 @@ function parseMaxBytes(value: string | undefined): number | null {
 
 function budgetModel(budget: BudgetState): ContextBudget {
   return {
+    mode: budget.mode,
     max_bytes: budget.maxBytes,
     max_item_bytes: budget.maxItemBytes,
     used_bytes: budget.usedBytes,
@@ -458,6 +486,18 @@ function isPattern(path: string): boolean {
 
 function isRawEvidencePath(path: string): boolean {
   return path.includes("/evidence/") || path.endsWith("/evidence/**") || path.endsWith("/review.html") || path.includes("/review.");
+}
+
+function isBulkyManagedAuditPath(path: string): boolean {
+  return path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml" || path === ".openworkflow/audit/CONTEXT_PACKETS.yaml" || path === ".openworkflow/audit/DISCLOSURE_LEVELS.yaml";
+}
+
+function defaultMaxBytes(mode: ContextMode): number {
+  return mode === "compact" ? COMPACT_DEFAULT_MAX_BYTES : FULL_DEFAULT_MAX_BYTES;
+}
+
+function defaultMaxItemBytes(mode: ContextMode): number {
+  return mode === "compact" ? COMPACT_MAX_ITEM_BYTES : FULL_MAX_ITEM_BYTES;
 }
 
 function truncateToBytes(value: string, maxBytes: number): string {

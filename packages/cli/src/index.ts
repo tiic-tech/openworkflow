@@ -90,7 +90,7 @@ Usage:
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--json]
-  openworkflow context --root <folder> [--for <ow-command>] [--max-bytes <n>] [--json]
+  openworkflow context --root <folder> [--for <ow-command>] [--mode compact|full] [--max-bytes <n>] [--json]
   openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--force] [--json]
   openworkflow register --root <folder> --artifact <path> [--current] [--next-command <ow-command>] [--write] [--json]
   openworkflow check <ow-command> --root <folder> [--json]
@@ -120,7 +120,7 @@ Agent quick start:
   full evidence. Prefer SUMMARY.yaml/current_slice guidance when a long artifact
   offers it. Use --json when an Agent needs structured command output.
   Use openworkflow context --root . --json when you want OpenWorkflow to package
-  the next command's bounded startup context instead of reading files one by one.
+  the next command's compact startup context instead of reading files one by one.
 
 Two command surfaces:
   CLI maintenance commands keep OpenWorkflow installed and current:
@@ -129,7 +129,7 @@ Two command surfaces:
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order.
-    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command; use --for /ow:<command> and --max-bytes to bound included content.
+    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
