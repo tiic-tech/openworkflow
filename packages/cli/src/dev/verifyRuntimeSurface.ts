@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, mkdtemp, readdir, readFile, rm, stat, unlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, stat, unlink, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -29,6 +29,7 @@ async function main(): Promise<number> {
     await verifyBriefStatus(target, tempRoot, env);
     await verifyJsonReports(target, tempRoot, env);
     await verifyCommandCheck(target, env);
+    await verifySummaryHealth(tempRoot, env);
     await verifyConfig(target);
     await verifySkills(target);
     await verifyNoDefaultPrompts(codexHome);
@@ -121,6 +122,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow brief --root .",
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
+    "openworkflow summaries --root . --json",
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
@@ -153,6 +155,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "status",
     "brief",
     "check",
+    "summaries",
     "Every command supports --json",
     "schema_version, command, ok, root, data, warnings, errors, effects",
   ]) {
@@ -219,6 +222,54 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "status", "--root", root, "--json"], env), "status");
   parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
+  parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+}
+
+async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const root = join(tempRoot, "summary-health");
+  await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
+  const fresh = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const freshData = record(fresh.data, "summary health data");
+  const freshCounts = record(freshData.counts, "summary health counts");
+  assert(Number(freshCounts.not_instantiated) > 0, "fresh summary health should report not_instantiated artifacts");
+  await assertNoStageArtifacts(root);
+
+  const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
+  await mkdir(artifactDir, { recursive: true });
+  await writeFile(join(artifactDir, "EVIDENCE.yaml"), "artifact_type: prototype_evidence\ncore_question: Test\n", "utf8");
+  const missing = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const missingData = record(missing.data, "summary health data");
+  const entries = missingData.entries;
+  assert(Array.isArray(entries), "summary health entries must be array");
+  assert(entries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "missing"), "summary health did not report missing prototype summary");
+
+  const validationDir = join(root, ".openworkflow", "validation", "val-1");
+  await mkdir(validationDir, { recursive: true });
+  await writeFile(join(validationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Test\n", "utf8");
+  const missingSlice = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const missingSliceEntries = record(missingSlice.data, "summary health data").entries;
+  assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
+  assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "missing"), "summary health did not report missing validation current_slice");
+
+  const summaryPath = join(artifactDir, "SUMMARY.yaml");
+  await writeFile(summaryPath, "artifact_type: prototype_summary\n", "utf8");
+  const old = new Date(0);
+  await utimes(summaryPath, old, old);
+  const stale = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const staleEntries = record(stale.data, "summary health data").entries;
+  assert(Array.isArray(staleEntries), "summary health entries must be array");
+  assert(staleEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "stale_unknown"), "summary health did not report stale prototype summary");
+
+  const brief = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
+  const briefData = record(brief.data, "brief data");
+  const briefHealth = record(briefData.health, "brief health");
+  assert("summaries" in briefHealth, "brief health missing summaries");
+
+  const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(checkStatus.code !== 0, "proto check should fail without required validation context");
+  const check = parseJsonReport(checkStatus.output, "check");
+  const checkData = record(check.data, "check data");
+  assert("summary_guidance" in checkData, "check output missing summary_guidance");
 }
 
 async function verifyCommandCheck(root: string, env: NodeJS.ProcessEnv): Promise<void> {

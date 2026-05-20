@@ -4,6 +4,7 @@ import { getDiscoveryArtifactContractsForCommand } from "../../../core/src/artif
 import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
+import { evaluateSummaryHealth, type SummaryHealthEntry } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 
@@ -21,6 +22,7 @@ interface ReadinessModel {
   forbidden_outputs: string[];
   handoff_commands: string[];
   artifact_contracts: ArtifactSummary[];
+  summary_guidance: SummaryGuidance[];
   read_this_first: string[];
   active_pointers: Record<string, string | null>;
   next_actions: string[];
@@ -35,6 +37,12 @@ interface ArtifactSummary {
   artifact_type: string;
   source_of_truth_path: string;
   summary_policy: string | null;
+}
+
+interface SummaryGuidance {
+  artifact_type: string;
+  status: string;
+  next_actions: string[];
 }
 
 export async function checkCommand(positional: string[], flags: Map<string, string | boolean>): Promise<number> {
@@ -97,6 +105,7 @@ async function buildReadiness(root: string, requested: string): Promise<Readines
   }
 
   const protocol = command.protocol;
+  const summaryHealth = await evaluateSummaryHealth(root);
   const required = await contextStatuses(root, protocol?.requiredContext ?? [".openworkflow/workflow/WORKFLOW_INDEX.yaml"]);
   const optional = await contextStatuses(root, protocol?.optionalContext ?? []);
   const forbidden = await contextStatuses(root, protocol?.forbiddenContext ?? []);
@@ -131,6 +140,7 @@ async function buildReadiness(root: string, requested: string): Promise<Readines
       source_of_truth_path: artifact.sourceOfTruthPath,
       summary_policy: artifact.summaryPolicy?.strategy ?? null,
     })),
+    summary_guidance: summaryGuidanceFor(command.trigger, summaryHealth.entries),
     next_actions: nextActions,
   };
 }
@@ -145,6 +155,7 @@ function printReadiness(model: ReadinessModel): void {
   printList("allowed_outputs", model.allowed_outputs);
   printList("forbidden_outputs", model.forbidden_outputs);
   printList("handoff_commands", model.handoff_commands);
+  printList("summary_guidance", model.summary_guidance.map((item) => `${item.artifact_type}: ${item.status}`));
   printList("read_this_first", model.read_this_first);
   printList("next_actions", model.next_actions);
 }
@@ -178,6 +189,7 @@ function missingCommandModel(): ReadinessModel {
     forbidden_outputs: [],
     handoff_commands: [],
     artifact_contracts: [],
+    summary_guidance: [],
     read_this_first: [],
     active_pointers: {},
     next_actions: ["run openworkflow check /ow:vision --root ."],
@@ -199,10 +211,22 @@ function baseModel(requested: string, normalized: string, currentState: Record<s
     forbidden_outputs: [],
     handoff_commands: [],
     artifact_contracts: [],
+    summary_guidance: [],
     read_this_first: stringList(currentState?.read_this_first),
     active_pointers: activePointers(currentState),
     next_actions: [],
   };
+}
+
+function summaryGuidanceFor(command: string, entries: SummaryHealthEntry[]): SummaryGuidance[] {
+  const artifactTypes = new Set<string>(getDiscoveryArtifactContractsForCommand(command).map((artifact) => artifact.artifactType));
+  return entries
+    .filter((entry) => artifactTypes.has(entry.artifact_type) && entry.strategy !== "none")
+    .map((entry) => ({
+      artifact_type: entry.artifact_type,
+      status: entry.status,
+      next_actions: entry.next_actions,
+    }));
 }
 
 function nextActionsFor(

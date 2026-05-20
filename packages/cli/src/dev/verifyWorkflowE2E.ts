@@ -46,6 +46,7 @@ async function main(): Promise<number> {
     await verifyDisplayLabels(runtime);
     await verifyBriefReadModel(runtime);
     await verifyCommandReadiness(runtime);
+    await verifySummaryReadModel(runtime);
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -405,6 +406,26 @@ async function verifyCommandReadiness(runtime: Runtime): Promise<void> {
   assertPhase(phase, Array.isArray(specData.blockers), "spec check missing blockers");
 }
 
+async function verifySummaryReadModel(runtime: Runtime): Promise<void> {
+  const phase = "summary-read-model";
+  const report = JSON.parse(await runCapture(["node", CLI, "summaries", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  assertPhase(phase, report.command === "summaries", "summaries report command mismatch");
+  assertPhase(phase, report.ok === true, "fresh summaries report should be ok");
+  const data = recordField(report, "data", phase);
+  const counts = recordField(data, "counts", phase);
+  assertPhase(phase, Number(counts.not_instantiated) > 0, "fresh summaries should report not_instantiated artifacts");
+  assertPhase(phase, Array.isArray(data.entries), "summaries missing entries");
+
+  const brief = JSON.parse(await runCapture(["node", CLI, "brief", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  const briefData = recordField(brief, "data", phase);
+  const health = recordField(briefData, "health", phase);
+  assertPhase(phase, "summaries" in health, "brief health missing summaries");
+
+  const check = JSON.parse(await runCapture(["node", CLI, "check", "/ow:vision", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  const checkData = recordField(check, "data", phase);
+  assertPhase(phase, Array.isArray(checkData.summary_guidance), "check missing summary_guidance");
+}
+
 async function runCaptureStatus(command: string[], env: NodeJS.ProcessEnv): Promise<{ code: number | null; output: string }> {
   return new Promise<{ code: number | null; output: string }>((resolvePromise, reject) => {
     let output = "";
@@ -436,6 +457,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
   assertIncludes(phase, guide, "openworkflow status --root .", "AGENTS.md does not mention status command");
   assertIncludes(phase, guide, "openworkflow check /ow:<command> --root . --json", "AGENTS.md does not mention check command");
+  assertIncludes(phase, guide, "openworkflow summaries --root . --json", "AGENTS.md does not mention summaries command");
   assertIncludes(phase, guide, "Repo-local workflow commands are delivered as Agent skills", "AGENTS.md does not distinguish workflow skill commands");
   assertIncludes(phase, guide, "Respect lazy creation", "AGENTS.md does not preserve lazy artifact creation boundary");
   const help = await runCapture(["node", CLI, "--help"], env);
@@ -445,6 +467,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "Lazy creation boundary", "help missing lazy creation boundary");
   assertIncludes(phase, help, "Every command supports --json", "help missing JSON report mode");
   assertIncludes(phase, help, "check", "help missing check command");
+  assertIncludes(phase, help, "summaries", "help missing summaries command");
 }
 
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {

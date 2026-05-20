@@ -41,6 +41,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/commands/check.ts",
   "packages/cli/src/commands/clean.ts",
   "packages/cli/src/commands/init.ts",
+  "packages/cli/src/commands/summaries.ts",
   "packages/cli/src/commands/validate.ts",
   "packages/cli/src/commands/sync.ts",
   "packages/cli/src/commands/doctor.ts",
@@ -59,6 +60,7 @@ const REQUIRED_FILES = [
   "packages/core/src/workflow/initOpenWorkflow.ts",
   "packages/core/src/workflow/readWorkflowConfig.ts",
   "packages/core/src/workflow/cleanOpenWorkflow.ts",
+  "packages/core/src/workflow/summaryHealth.ts",
   "packages/core/src/workflow/syncOpenWorkflow.ts",
   "packages/core/src/validators/validateOpenWorkflow.ts",
   "packages/core/src/validators/validateRepositoryContracts.ts",
@@ -138,6 +140,8 @@ const REQUIRED_FILES = [
   "changes/M28-cli-json-report-surface/WORK_ITEMS.yaml",
   "changes/M29-command-readiness-check/CHANGE.yaml",
   "changes/M29-command-readiness-check/WORK_ITEMS.yaml",
+  "changes/M30-artifact-summary-health/CHANGE.yaml",
+  "changes/M30-artifact-summary-health/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

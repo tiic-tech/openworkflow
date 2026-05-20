@@ -5,6 +5,7 @@ import { checkCommand } from "./commands/check.js";
 import { cleanCommand } from "./commands/clean.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { initCommand } from "./commands/init.js";
+import { summariesCommand } from "./commands/summaries.js";
 import { syncCommand } from "./commands/sync.js";
 import { validateCommand } from "./commands/validate.js";
 
@@ -44,6 +45,10 @@ async function main(): Promise<number> {
     return checkCommand(parsed.positional, parsed.flags);
   }
 
+  if (parsed.command === "summaries") {
+    return summariesCommand(parsed.flags);
+  }
+
   console.error(`Unknown command: ${parsed.command}`);
   printHelp();
   return 1;
@@ -60,6 +65,7 @@ Usage:
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow check <ow-command> --root <folder> [--json]
+  openworkflow summaries --root <folder> [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -70,6 +76,7 @@ Commands:
   status     Print a low-context Agent read model for current workflow state.
   brief      Alias for status, named for Agent entry and handoff.
   check      Check readiness for a repo-local /ow:* workflow command.
+  summaries  Inspect summary/current-slice health for workflow artifacts.
   clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -86,12 +93,15 @@ Two command surfaces:
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context before starting a /ow:* command.
+    summaries  Check whether low-context summaries can be trusted before raw evidence.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
 
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
     with schema_version, command, ok, root, data, warnings, errors, effects, and
     next_actions.
+    Use summaries --json before loading raw evidence when summary/current-slice
+    health is unknown.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

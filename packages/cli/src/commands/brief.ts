@@ -7,6 +7,7 @@ import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
 import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { doctorOpenWorkflow } from "../../../core/src/workflow/doctorOpenWorkflow.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
+import { evaluateSummaryHealth, type SummaryHealthModel } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, slugify } from "./shared.js";
@@ -35,6 +36,7 @@ interface BriefModel {
     workflow: HealthSection;
     adapters: Record<string, HealthSection>;
     agents_md: HealthSection;
+    summaries: SummaryHealthModel;
     recommended_maintenance: string | null;
   };
   git: {
@@ -69,6 +71,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
       warnings: model.health.workflow.warnings.concat(
         model.health.agents_md.warnings,
         Object.values(model.health.adapters).flatMap((section) => section.warnings),
+        model.health.summaries.warnings,
       ),
       errors: model.health.workflow.errors.concat(
         model.health.agents_md.errors,
@@ -100,6 +103,7 @@ async function buildBriefModel(root: string, explicitTools: string[]): Promise<B
     force: false,
   });
   const agentsGuideHealth = await doctorAgentsGuide(root);
+  const summaryHealth = await evaluateSummaryHealth(root);
   const adapterHealth: Record<string, HealthSection> = {};
   for (const tool of tools) {
     const adapter = getAdapterEntry(tool);
@@ -126,7 +130,8 @@ async function buildBriefModel(root: string, explicitTools: string[]): Promise<B
     workflow: workflowHealth,
     adapters: adapterHealth,
     agents_md: agentsGuideHealth,
-    recommended_maintenance: maintenanceAction(workflowHealth, agentsGuideHealth, adapterHealth),
+    summaries: summaryHealth,
+    recommended_maintenance: maintenanceAction(workflowHealth, agentsGuideHealth, adapterHealth, summaryHealth),
   };
 
   return {
@@ -196,6 +201,7 @@ function printBrief(model: BriefModel): void {
   console.log(`  ok: ${model.health.ok}`);
   console.log(`  workflow: ${healthLabel(model.health.workflow)}`);
   console.log(`  agents_md: ${healthLabel(model.health.agents_md)}`);
+  console.log(`  summaries: current=${model.health.summaries.counts.current}, missing=${model.health.summaries.counts.missing}, stale_unknown=${model.health.summaries.counts.stale_unknown}, not_instantiated=${model.health.summaries.counts.not_instantiated}`);
   for (const [tool, section] of Object.entries(model.health.adapters)) {
     console.log(`  adapter:${tool}: ${healthLabel(section)}`);
   }
@@ -225,12 +231,19 @@ function maintenanceAction(
   workflow: HealthSection,
   agentsGuide: HealthSection,
   adapters: Record<string, HealthSection>,
+  summaries: SummaryHealthModel,
 ): string | null {
   const hasSyncFixableDrift = workflow.errors.length > 0
     || workflow.warnings.length > 0
     || agentsGuide.warnings.length > 0
     || Object.values(adapters).some((section) => section.errors.length > 0 || section.warnings.length > 0);
-  return hasSyncFixableDrift ? "run openworkflow sync, then openworkflow doctor" : null;
+  if (hasSyncFixableDrift) {
+    return "run openworkflow sync, then openworkflow doctor";
+  }
+  if (!summaries.ok) {
+    return "run openworkflow summaries --json before relying on low-context artifact reads";
+  }
+  return null;
 }
 
 function recommendedNextAction(currentState: Record<string, unknown> | null, health: BriefModel["health"]): string {

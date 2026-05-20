@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: work_items:M30-artifact-summary-health
+contract_type: work_items
+title: M30 Artifact summary health work items
+status: completed
+change_contract: changes/M30-artifact-summary-health/CHANGE.yaml
+items:
+  - task_id: M30-T001
+    title: Define summary health model
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/core/src/artifacts/registry.ts
+    acceptance:
+      - Model represents summary policy, summary path/current_slice, instantiated artifact presence, status, warnings, and next actions.
+      - Model tolerates missing stage directories.
+      - Model is read-only.
+  - task_id: M30-T002
+    title: Implement summaries CLI command
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/
+    acceptance:
+      - "`openworkflow summaries --root <folder>` prints concise text."
+      - "`--json` emits the shared M28 envelope."
+      - Exit code remains zero unless the command cannot read managed workflow metadata.
+  - task_id: M30-T003
+    title: Integrate summary health into brief and check
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/check.ts
+    acceptance:
+      - brief/status JSON includes summary health counts or entries.
+      - check output includes summary guidance for relevant required/optional artifacts.
+      - Human output stays compact.
+  - task_id: M30-T004
+    title: Update Agent-facing docs
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help documents `summaries`.
+      - AGENTS.md managed block tells Agents to consult summaries before loading raw evidence.
+      - JSON usage remains documented.
+  - task_id: M30-T005
+    title: Add summary health regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Tests cover fresh init with no instantiated stage artifacts.
+      - Tests cover a staged artifact with missing summary/current_slice.
+      - Tests verify no stage directories are created by summaries/brief/check.
+      - Repository validation includes M30 change contracts and new source files.
+updated_at: 2026-05-20
