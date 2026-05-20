@@ -41,6 +41,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/commands/check.ts",
   "packages/cli/src/commands/clean.ts",
   "packages/cli/src/commands/context.ts",
+  "packages/cli/src/commands/draft.ts",
   "packages/cli/src/commands/init.ts",
   "packages/cli/src/commands/inspect.ts",
   "packages/cli/src/commands/summaries.ts",
@@ -153,6 +154,8 @@ const REQUIRED_FILES = [
   "changes/M33-summary-refresh-command/WORK_ITEMS.yaml",
   "changes/M34-agent-context-packet/CHANGE.yaml",
   "changes/M34-agent-context-packet/WORK_ITEMS.yaml",
+  "changes/M35-artifact-draft-command/CHANGE.yaml",
+  "changes/M35-artifact-draft-command/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

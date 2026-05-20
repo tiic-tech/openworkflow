@@ -123,6 +123,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow context --root . --json",
     "--for /ow:<command>",
     "--max-bytes <n>",
+    "openworkflow draft --root . --artifact <type> --id <id> --json",
     "openworkflow brief --root .",
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
@@ -164,6 +165,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "context",
     "Read-only packet materializer",
     "--max-bytes",
+    "draft",
+    "contract-shaped source artifact",
     "check",
     "summaries",
     "summarize",
@@ -240,6 +243,7 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
   parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
   parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
+  parseJsonReport(await runCapture(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "json-val", "--json"], env), "draft");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
   parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
@@ -277,6 +281,12 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(contextUninitializedReport.ok === false, "uninitialized context should not be ok");
   assert(Array.isArray(contextUninitializedReport.errors) && contextUninitializedReport.errors.some((item) => String(item).includes("missing OpenWorkflow context packets")), "uninitialized context missing explicit error");
 
+  const draftUninitialized = await runCaptureStatus(["node", CLI, "draft", "--root", missingRoot, "--artifact", "validation_target", "--id", "val-1", "--json"], env);
+  assert(draftUninitialized.code !== 0, "draft should fail clearly outside an initialized OpenWorkflow root");
+  const draftUninitializedReport = parseJsonReport(draftUninitialized.output, "draft");
+  assert(draftUninitializedReport.ok === false, "uninitialized draft should not be ok");
+  assert(Array.isArray(draftUninitializedReport.errors) && draftUninitializedReport.errors.some((item) => String(item).includes("missing OpenWorkflow artifact contracts")), "uninitialized draft missing explicit error");
+
   const summaryBoundaryRoot = join(tempRoot, "summary-validate-boundary");
   await run(["node", CLI, "init", summaryBoundaryRoot, "--tools", "codex", "--force"], env);
   const summaryOnlyDir = join(summaryBoundaryRoot, ".openworkflow", "prototypes", "proto-summary-only");
@@ -284,6 +294,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   await writeFile(join(summaryOnlyDir, "SUMMARY.yaml"), "artifact_type: prototype_summary\nsummary: Validate should not schema-check summary files.\n", "utf8");
   const validateBoundary = parseJsonReport(await runCapture(["node", CLI, "validate", "--root", summaryBoundaryRoot, "--json"], env), "validate");
   assert(validateBoundary.ok === true, "validate should not reject SUMMARY.yaml as an unknown source artifact");
+
+  const draftRoot = join(tempRoot, "draft-command");
+  await run(["node", CLI, "init", draftRoot, "--tools", "codex", "--force"], env);
+  await verifyDraftCommand(draftRoot, env);
 
   const root = join(tempRoot, "summary-health");
   await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
@@ -418,6 +432,48 @@ async function verifyCommandCheck(root: string, env: NodeJS.ProcessEnv): Promise
   assert(Array.isArray(validationData.warnings) && validationData.warnings.some((item) => String(item).includes("CURRENT_STATE next_command")), "validation check missing next-command warning");
 
   await assertNoStageArtifacts(root);
+}
+
+async function verifyDraftCommand(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const currentStateBefore = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  const dryRun = parseJsonReport(await runCapture(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "val-draft", "--json"], env), "draft");
+  const dryData = record(dryRun.data, "draft dry-run data");
+  const dryEffects = record(dryRun.effects, "draft dry-run effects");
+  assert(dryRun.ok === true, "draft dry-run should be ok");
+  assert(dryData.path === ".openworkflow/validation/val-draft/VALIDATION.yaml", "draft dry-run path mismatch");
+  assert(String(dryData.content).includes("contract_id: validation:val-draft"), "draft dry-run content did not replace id");
+  assert(Array.isArray(dryEffects.planned) && dryEffects.planned.includes(".openworkflow/validation/val-draft/VALIDATION.yaml"), "draft dry-run missing planned effect");
+  assert(!(await exists(join(root, ".openworkflow", "validation"))), "draft dry-run created validation directory");
+
+  const invalidId = await runCaptureStatus(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "../bad", "--json"], env);
+  assert(invalidId.code !== 0, "draft should reject unsafe ids");
+  const invalidIdReport = parseJsonReport(invalidId.output, "draft");
+  assert(invalidIdReport.ok === false, "draft invalid id should report ok=false");
+
+  const invalidArtifact = await runCaptureStatus(["node", CLI, "draft", "--root", root, "--artifact", "unknown_artifact", "--id", "x1", "--json"], env);
+  assert(invalidArtifact.code !== 0, "draft should reject unknown artifact types");
+  const invalidArtifactReport = parseJsonReport(invalidArtifact.output, "draft");
+  assert(invalidArtifactReport.ok === false, "draft unknown artifact should report ok=false");
+
+  const writeRun = parseJsonReport(await runCapture(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "val-draft", "--write", "--json"], env), "draft");
+  const writeEffects = record(writeRun.effects, "draft write effects");
+  assert(writeRun.ok === true, "draft write should be ok");
+  assert(Array.isArray(writeEffects.written) && writeEffects.written.includes(".openworkflow/validation/val-draft/VALIDATION.yaml"), "draft write missing written effect");
+  await assertFile(join(root, ".openworkflow", "validation", "val-draft", "VALIDATION.yaml"));
+  assert(!(await exists(join(root, ".openworkflow", "validation", "VALIDATION_INDEX.yaml"))), "draft created validation index unexpectedly");
+  assert(!(await exists(join(root, ".openworkflow", "validation", "val-draft", "NOTE.md"))), "draft created note unexpectedly");
+  assert((await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"))) === currentStateBefore, "draft modified CURRENT_STATE.yaml");
+
+  const duplicate = await runCaptureStatus(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "val-draft", "--write", "--json"], env);
+  assert(duplicate.code !== 0, "draft duplicate write should fail without force");
+  const duplicateReport = parseJsonReport(duplicate.output, "draft");
+  assert(duplicateReport.ok === false, "draft duplicate write should report ok=false");
+  assert(Array.isArray(duplicateReport.errors) && duplicateReport.errors.some((item) => String(item).includes("artifact already exists")), "draft duplicate missing explicit error");
+
+  const force = parseJsonReport(await runCapture(["node", CLI, "draft", "--root", root, "--artifact", "validation_target", "--id", "val-draft", "--write", "--force", "--json"], env), "draft");
+  const forceEffects = record(force.effects, "draft force effects");
+  assert(force.ok === true, "draft force write should be ok");
+  assert(Array.isArray(forceEffects.updated) && forceEffects.updated.includes(".openworkflow/validation/val-draft/VALIDATION.yaml"), "draft force write missing updated effect");
 }
 
 async function assertNoStageArtifacts(root: string): Promise<void> {

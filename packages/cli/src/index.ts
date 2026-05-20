@@ -5,6 +5,7 @@ import { checkCommand } from "./commands/check.js";
 import { cleanCommand } from "./commands/clean.js";
 import { contextCommand } from "./commands/context.js";
 import { doctorCommand } from "./commands/doctor.js";
+import { draftCommand } from "./commands/draft.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
 import { summariesCommand } from "./commands/summaries.js";
@@ -52,6 +53,10 @@ async function main(): Promise<number> {
     return contextCommand(parsed.flags);
   }
 
+  if (parsed.command === "draft") {
+    return draftCommand(parsed.flags);
+  }
+
   if (parsed.command === "inspect") {
     return inspectCommand(parsed.flags);
   }
@@ -81,6 +86,7 @@ Usage:
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--json]
   openworkflow context --root <folder> [--for <ow-command>] [--max-bytes <n>] [--json]
+  openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--force] [--json]
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
@@ -95,6 +101,7 @@ Commands:
   brief      Alias for status, named for Agent entry and handoff.
   inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
   context    Materialize a bounded Agent context packet for a /ow:* workflow command.
+  draft      Preview or create a contract-shaped source artifact draft.
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
   summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
@@ -116,6 +123,7 @@ Two command surfaces:
     doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command; use --for /ow:<command> and --max-bytes to bound included content.
+    draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context before starting a /ow:* command.
