@@ -174,6 +174,8 @@ const REQUIRED_FILES = [
   "changes/M42-health-errors-surface/WORK_ITEMS.yaml",
   "changes/M43-summary-quality-signals/CHANGE.yaml",
   "changes/M43-summary-quality-signals/WORK_ITEMS.yaml",
+  "changes/M44-clean-sync-recovery-e2e/CHANGE.yaml",
+  "changes/M44-clean-sync-recovery-e2e/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

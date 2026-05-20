@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: work_items:M44-clean-sync-recovery-e2e
+contract_type: work_items
+title: M44 Clean sync recovery E2E work items
+status: completed
+change_contract: changes/M44-clean-sync-recovery-e2e/CHANGE.yaml
+items:
+  - task_id: M44-T001
+    title: Snapshot preserved source artifacts across clean and sync
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyCleanCommand.ts
+    acceptance:
+      - Clean verifier records source artifact contents before clean.
+      - Source artifacts compare byte-for-byte unchanged after sync.
+  - task_id: M44-T002
+    title: Verify sync recovery after clean
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyCleanCommand.ts
+    acceptance:
+      - Clean verifier runs sync after clean --yes.
+      - Managed OpenWorkflow files, Codex adapter files, generated skills, and AGENTS.md managed block are restored.
+      - Doctor and readiness JSON entrypoints run after recovery.
+  - task_id: M44-T003
+    title: Register M44 validation contracts
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Repository validation requires M44 CHANGE and WORK_ITEMS files.

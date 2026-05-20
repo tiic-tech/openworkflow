@@ -33,6 +33,7 @@ async function main(): Promise<number> {
     await assertFile(join(target, ".agents", "custom.md"));
     await assertFile(join(target, ".codex", "commands", "ow", "vision.md"));
     await writeOpenWorkflowSourceArtifacts(target);
+    const sourceSnapshots = await readSourceSnapshots(target);
 
     const jsonDryRun = JSON.parse(await runCapture(["node", CLI, "clean", "--root", target, "--tools", "codex", "--json"], env)) as {
       effects?: { preserved?: string[] };
@@ -58,6 +59,29 @@ async function main(): Promise<number> {
     agentsGuide = await read(join(target, "AGENTS.md"));
     assert(agentsGuide.includes("User rules stay."), "clean removed user AGENTS.md content");
     assert(!agentsGuide.includes("BEGIN OPENWORKFLOW AGENT GUIDE"), "clean did not remove AGENTS.md managed block");
+
+    const sync = await runCaptureStatus(["node", CLI, "sync", "--root", target, "--tools", "codex", "--json"], env);
+    assert(sync.code === 0 || sync.code === 1, "sync --json returned an unexpected exit code after clean recovery");
+    const syncReport = parseJsonReport(sync.output, "sync");
+    assert(isRecord(syncReport.effects), "sync --json did not include effects after clean recovery");
+    assert(arrayIncludesPath(syncReport.effects.written, ".openworkflow/workflow/WORKFLOW_INDEX.yaml"), "sync --json did not report restored workflow index");
+    assert(arrayIncludesPath(syncReport.effects.written, ".agents/openworkflow-adapter.yaml"), "sync --json did not report restored Codex adapter manifest");
+    assert(arrayIncludesPath(syncReport.effects.skipped, ".codex/commands/ow/vision.md"), "sync --json did not report preserved legacy non-generated command");
+    await assertFile(join(target, ".openworkflow", "config.yaml"));
+    await assertFile(join(target, ".openworkflow", "CURRENT_STATE.yaml"));
+    await assertFile(join(target, ".openworkflow", "workflow", "WORKFLOW_INDEX.yaml"));
+    await assertFile(join(target, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"));
+    await assertFile(join(target, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
+    await assertFile(join(target, ".agents", "openworkflow-adapter.yaml"));
+    await assertFile(join(target, ".agents", "skills", "ow-vision", "SKILL.md"));
+    await assertSourceSnapshots(target, sourceSnapshots);
+    agentsGuide = await read(join(target, "AGENTS.md"));
+    assert(agentsGuide.includes("User rules stay."), "sync recovery did not preserve user AGENTS.md content");
+    assert(agentsGuide.includes("BEGIN OPENWORKFLOW AGENT GUIDE"), "sync recovery did not restore AGENTS.md managed block");
+    const doctorReport = parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", target, "--tools", "codex", "--json"], env), "doctor");
+    assert(doctorReport.ok === true, "doctor --json did not report ok after sync recovery");
+    const checkReport = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", target, "--json"], env), "check");
+    assert(checkReport.ok === true, "check /ow:vision --json did not report ready after sync recovery");
 
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
     const forceClean = await runCapture(["node", CLI, "clean", "--root", target, "--tools", "codex", "--yes", "--force"], env);
@@ -120,6 +144,28 @@ async function writeOpenWorkflowSourceArtifacts(target: string): Promise<void> {
   await writeFile(join(target, ".openworkflow", "notes", "handoff.md"), "Preserve user notes.\n", "utf8");
 }
 
+const SOURCE_ARTIFACT_PATHS = [
+  ".openworkflow/validation/val-1/VALIDATION.yaml",
+  ".openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+  ".openworkflow/prototypes/proto-1/SUMMARY.yaml",
+  ".openworkflow/notes/handoff.md",
+];
+
+async function readSourceSnapshots(target: string): Promise<Map<string, string>> {
+  const snapshots = new Map<string, string>();
+  for (const relativePath of SOURCE_ARTIFACT_PATHS) {
+    snapshots.set(relativePath, await read(join(target, relativePath)));
+  }
+  return snapshots;
+}
+
+async function assertSourceSnapshots(target: string, snapshots: Map<string, string>): Promise<void> {
+  for (const [relativePath, before] of snapshots) {
+    const after = await read(join(target, relativePath));
+    assert(after === before, `source artifact changed during clean/sync recovery: ${relativePath}`);
+  }
+}
+
 async function run(command: string[], env: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolvePromise, reject) => {
     const child = spawn(command[0] ?? "", command.slice(1), {
@@ -163,6 +209,27 @@ async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<st
   });
 }
 
+async function runCaptureStatus(command: string[], env: NodeJS.ProcessEnv): Promise<{ code: number | null; output: string }> {
+  return new Promise<{ code: number | null; output: string }>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd: REPO_ROOT,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      resolvePromise({ code, output });
+    });
+  });
+}
+
 async function assertFile(path: string): Promise<void> {
   const info = await stat(path);
   assert(info.isFile(), `missing file: ${path}`);
@@ -185,6 +252,21 @@ function assert(condition: boolean, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function parseJsonReport(output: string, expectedCommand: string): Record<string, unknown> {
+  const parsed = JSON.parse(output) as unknown;
+  assert(isRecord(parsed), `${expectedCommand} --json did not return an object`);
+  assert(parsed.command === expectedCommand, `${expectedCommand} --json returned unexpected command`);
+  return parsed;
+}
+
+function arrayIncludesPath(value: unknown, suffix: string): boolean {
+  return Array.isArray(value) && value.some((item) => typeof item === "string" && item.endsWith(suffix));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 main()
