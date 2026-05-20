@@ -63,6 +63,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
   const json = booleanFlag(flags, "json");
   const model = await buildBriefModel(root, parseTools(stringFlag(flags, "tools")));
   if (json) {
+    const healthErrors = healthErrorsForBrief(model);
     printJsonReport({
       command,
       ok: model.health.ok,
@@ -77,6 +78,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
         model.health.agents_md.errors,
         Object.values(model.health.adapters).flatMap((section) => section.errors),
       ),
+      health_errors: healthErrors,
       effects: emptyEffects(),
       next_actions: [model.agent_guidance.recommended_next_action],
     });
@@ -84,6 +86,26 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
     printBrief(model);
   }
   return model.health.ok ? 0 : 1;
+}
+
+export function healthErrorsForBrief(model: BriefModel): string[] {
+  if (model.health.ok) {
+    return [];
+  }
+  return unique([
+    ...healthSectionErrors("workflow", model.health.workflow),
+    ...healthSectionErrors("agents_md", model.health.agents_md),
+    ...Object.entries(model.health.adapters).flatMap(([tool, section]) => healthSectionErrors(`adapter:${tool}`, section)),
+    ...(!model.health.summaries.ok ? model.health.summaries.warnings : []),
+  ]);
+}
+
+function healthSectionErrors(label: string, section: HealthSection): string[] {
+  if (section.ok) {
+    return [];
+  }
+  const items = section.errors.length > 0 ? section.errors : section.warnings;
+  return items.map((item) => `${label}: ${item}`);
 }
 
 export async function buildBriefModel(root: string, explicitTools: string[]): Promise<BriefModel> {
@@ -328,6 +350,10 @@ function stringOrNull(value: unknown): string | null {
 
 function uniqueTools(tools: string[]): string[] {
   return [...new Set(tools)];
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values.filter((value) => value.trim().length > 0))];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

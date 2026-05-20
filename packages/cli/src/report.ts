@@ -19,6 +19,7 @@ export interface CliJsonReport<TData = unknown> {
   data: TData;
   warnings: string[];
   errors: string[];
+  health_errors: string[];
   effects: CliEffects;
   next_actions: string[];
 }
@@ -36,6 +37,8 @@ export function emptyEffects(): CliEffects {
   };
 }
 
-export function printJsonReport<TData>(report: Omit<CliJsonReport<TData>, "schema_version">): void {
-  console.log(JSON.stringify({ schema_version: SCHEMA_VERSION, ...report }, null, 2));
+export function printJsonReport<TData>(
+  report: Omit<CliJsonReport<TData>, "schema_version" | "health_errors"> & { health_errors?: string[] },
+): void {
+  console.log(JSON.stringify({ schema_version: SCHEMA_VERSION, health_errors: report.health_errors ?? (report.ok ? [] : report.errors), ...report }, null, 2));
 }

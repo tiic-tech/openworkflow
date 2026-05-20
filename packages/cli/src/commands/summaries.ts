@@ -8,6 +8,7 @@ export async function summariesCommand(flags: Map<string, string | boolean>): Pr
   const json = booleanFlag(flags, "json");
   const health = await evaluateSummaryHealth(root);
   if (json) {
+    const healthErrors = healthErrorsForSummaries(health);
     printJsonReport({
       command: "summaries",
       ok: health.ok,
@@ -15,6 +16,7 @@ export async function summariesCommand(flags: Map<string, string | boolean>): Pr
       data: health,
       warnings: health.warnings,
       errors: health.initialized ? [] : health.warnings,
+      health_errors: healthErrors,
       effects: emptyEffects(),
       next_actions: health.next_actions,
     });
@@ -22,6 +24,16 @@ export async function summariesCommand(flags: Map<string, string | boolean>): Pr
     printSummaries(health);
   }
   return health.ok ? 0 : 1;
+}
+
+function healthErrorsForSummaries(health: SummaryHealthModel): string[] {
+  if (health.ok) {
+    return [];
+  }
+  if (health.warnings.length > 0) {
+    return health.warnings;
+  }
+  return ["summary health is not ok"];
 }
 
 function printSummaries(health: SummaryHealthModel): void {

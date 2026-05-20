@@ -25,7 +25,7 @@ export function renderAgentsGuide(): string {
 
 - Run \`openworkflow --help\` first when you need current CLI capabilities, workflow command boundaries, or maintenance commands.
 - Prefer \`--json\` for structured command output; every OpenWorkflow CLI command supports a JSON report envelope for Agent consumption.
-- Treat JSON \`ok:false\` as a failed command: OpenWorkflow exits nonzero but still writes the parseable JSON report to stdout for warnings, errors, and next_actions.
+- Treat JSON \`ok:false\` as a failed command: OpenWorkflow exits nonzero but still writes the parseable JSON report to stdout. Read \`health_errors\` for blocking health/readiness failures, \`errors\` for command/runtime failures, and \`warnings\` for non-blocking guidance.
 - Start with \`openworkflow inspect --root . --json\` for the aggregated Agent entry read model, health, next-command readiness, and read order.
 - Start every workflow turn by reading \`.openworkflow/CURRENT_STATE.yaml\`, then follow its \`read_this_first\` pointers before loading full evidence.
 - CLI commands maintain and summarize the repo-local workflow surface: \`init\`, \`sync\`, \`validate\`, \`doctor\`, \`inspect\`, \`context\`, \`draft\`, \`register\`, \`status\`, \`brief\`, \`check\`, \`summaries\`, and \`clean\`.

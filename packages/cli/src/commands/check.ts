@@ -66,6 +66,7 @@ export async function checkCommand(positional: string[], flags: Map<string, stri
       data: model,
       warnings: model.warnings,
       errors: model.blockers,
+      health_errors: ok ? [] : model.blockers,
       effects: emptyEffects(),
       next_actions: model.next_actions,
     });
@@ -84,6 +85,7 @@ async function finish(root: string, json: boolean, data: ReadinessModel, error: 
       data,
       warnings: [],
       errors: [error],
+      health_errors: [error],
       effects: emptyEffects(),
       next_actions: nextActions,
     });

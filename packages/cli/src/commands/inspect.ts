@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
-import { buildBriefModel, type BriefModel } from "./brief.js";
+import { buildBriefModel, healthErrorsForBrief, type BriefModel } from "./brief.js";
 import { buildReadiness, type ReadinessModel } from "./check.js";
 import { parseTools } from "./shared.js";
 
@@ -33,6 +33,7 @@ export async function inspectCommand(flags: Map<string, string | boolean>): Prom
   const model = buildInspectModel(brief, nextCommandCheck);
   const warnings = warningsFor(brief, nextCommandCheck);
   const errors = errorsFor(brief, nextCommandCheck);
+  const healthErrors = healthErrorsForInspect(brief, nextCommandCheck);
 
   if (json) {
     printJsonReport({
@@ -42,6 +43,7 @@ export async function inspectCommand(flags: Map<string, string | boolean>): Prom
       data: model,
       warnings,
       errors,
+      health_errors: healthErrors,
       effects: emptyEffects(),
       next_actions: model.recommended_next_actions,
     });
@@ -49,6 +51,16 @@ export async function inspectCommand(flags: Map<string, string | boolean>): Prom
     printInspect(model);
   }
   return model.health.ok ? 0 : 1;
+}
+
+function healthErrorsForInspect(brief: BriefModel, nextCommandCheck: ReadinessModel | null): string[] {
+  if (brief.health.ok && (nextCommandCheck?.ready ?? true)) {
+    return [];
+  }
+  return unique([
+    ...healthErrorsForBrief({ ...brief, health: brief.health }),
+    ...(nextCommandCheck && !nextCommandCheck.ready ? nextCommandCheck.blockers : []),
+  ]);
 }
 
 export function buildInspectModel(brief: BriefModel, nextCommandCheck: ReadinessModel | null): InspectModel {

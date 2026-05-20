@@ -179,7 +179,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
-    "schema_version, command, ok, root, data, warnings, errors, effects",
+    "schema_version, command, ok, root, data, warnings, errors",
+    "health_errors",
     "When ok is false",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
@@ -368,6 +369,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(missingStatus.code !== 0, "summaries should exit nonzero when initialized summary health is not ok");
   const missing = parseJsonReport(missingStatus.output, "summaries");
   assert(missing.ok === false, "missing summary health should emit ok=false");
+  assert(nonEmptyArray(missing.health_errors), "missing summary health should expose health_errors");
   const missingData = record(missing.data, "summary health data");
   const entries = missingData.entries;
   assert(Array.isArray(entries), "summary health entries must be array");
@@ -376,6 +378,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(missingCheckStatus.code !== 0, "proto check should fail without required validation context");
   const missingCheck = parseJsonReport(missingCheckStatus.output, "check");
   assert(Array.isArray(missingCheck.warnings) && missingCheck.warnings.some((item) => String(item).includes("summary health for prototype_evidence")), "check warnings missing summary health promotion");
+  assert(nonEmptyArray(missingCheck.health_errors), "blocked check should expose health_errors");
 
   const dryRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--json"], env), "summarize");
   const dryEffects = record(dryRun.effects, "summarize dry-run effects");
@@ -399,6 +402,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const designContext = parseJsonReport(designContextStatus.output, "context");
   const designContextData = record(designContext.data, "design context data");
   assert(designContext.ok === false, "blocked design context should report ok=false");
+  assert(nonEmptyArray(designContext.health_errors), "blocked context should expose health_errors");
   assert(Array.isArray(designContextData.included) && designContextData.included.some((item) => record(item, "included design context").source === "summary_file" && record(item, "included design context").path === ".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "design context should include trusted prototype SUMMARY.yaml");
 
   const validationDir = join(root, ".openworkflow", "validation", "val-1");
@@ -421,6 +425,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(staleStatus.code !== 0, "summaries should exit nonzero for stale summaries");
   const stale = parseJsonReport(staleStatus.output, "summaries");
   assert(stale.ok === false, "stale summaries should emit ok=false");
+  assert(nonEmptyArray(stale.health_errors), "stale summary health should expose health_errors");
   const staleEntries = record(stale.data, "summary health data").entries;
   assert(Array.isArray(staleEntries), "summary health entries must be array");
   assert(staleEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "stale_unknown"), "summary health did not report stale prototype summary");
@@ -439,11 +444,13 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert("summaries" in briefHealth, "brief health missing summaries");
   assert(brief.ok === false, "brief top-level ok should include failing summary health");
   assert(briefHealth.ok === false, "brief health.ok should include failing summary health");
+  assert(nonEmptyArray(brief.health_errors), "brief should expose health_errors when health fails");
 
   const statusStatus = await runCaptureStatus(["node", CLI, "status", "--root", root, "--json"], env);
   assert(statusStatus.code !== 0, "status should exit nonzero when top-level ok=false");
   const statusReport = parseJsonReport(statusStatus.output, "status");
   assert(statusReport.ok === false, "status top-level ok should include failing summary health");
+  assert(nonEmptyArray(statusReport.health_errors), "status should expose health_errors when health fails");
 
   const inspectStatus = await runCaptureStatus(["node", CLI, "inspect", "--root", root, "--json"], env);
   assert(inspectStatus.code !== 0, "inspect should exit nonzero when top-level ok=false");
@@ -452,6 +459,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const inspectHealth = record(inspectData.health, "inspect health");
   assert(inspect.ok === false, "inspect top-level ok should include failing summary health");
   assert(inspectHealth.ok === false, "inspect health.ok should include failing summary health");
+  assert(nonEmptyArray(inspect.health_errors), "inspect should expose health_errors when health fails");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
   assert(checkStatus.code !== 0, "proto check should fail without required validation context");
@@ -1043,19 +1051,24 @@ function record(value: unknown, label: string): Record<string, unknown> {
 
 function parseJsonReport(output: string, command: string): Record<string, unknown> {
   const report = JSON.parse(output) as Record<string, unknown>;
-  for (const key of ["schema_version", "command", "ok", "root", "data", "warnings", "errors", "effects", "next_actions"]) {
+  for (const key of ["schema_version", "command", "ok", "root", "data", "warnings", "errors", "health_errors", "effects", "next_actions"]) {
     assert(key in report, `${command} json missing envelope key ${key}`);
   }
   assert(report.command === command, `${command} json command mismatch`);
   assert(typeof report.ok === "boolean", `${command} json ok must be boolean`);
   assert(Array.isArray(report.warnings), `${command} json warnings must be array`);
   assert(Array.isArray(report.errors), `${command} json errors must be array`);
+  assert(Array.isArray(report.health_errors), `${command} json health_errors must be array`);
   assert(Array.isArray(report.next_actions), `${command} json next_actions must be array`);
   const effects = record(report.effects, `${command} effects`);
   for (const key of ["planned", "written", "updated", "removed", "skipped", "unchanged", "preserved", "migration_notes"]) {
     assert(Array.isArray(effects[key]), `${command} effects.${key} must be array`);
   }
   return report;
+}
+
+function nonEmptyArray(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
 }
 
 function assert(condition: boolean, message: string): asserts condition {

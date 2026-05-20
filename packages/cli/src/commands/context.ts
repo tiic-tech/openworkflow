@@ -143,6 +143,7 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
   ]);
   const errors = unique([...readiness.blockers, ...packetErrors]);
   const ok = packet !== null && readiness.ready && errors.length === 0;
+  const healthErrors = ok ? [] : unique(errors.length > 0 ? errors : warnings);
 
   if (json) {
     printJsonReport({
@@ -152,6 +153,7 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
       data: model,
       warnings,
       errors,
+      health_errors: healthErrors,
       effects: emptyEffects(),
       next_actions: model.recommended_next_actions,
     });
@@ -518,6 +520,7 @@ function finishError(root: string, json: boolean, error: string, nextActions: st
       data: { ok: false },
       warnings: [],
       errors: [error],
+      health_errors: [error],
       effects: emptyEffects(),
       next_actions: nextActions,
     });
