@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M37-managed-clean-boundary
+contract_type: change
+title: M37 Managed clean boundary
+status: accepted
+source_artifacts:
+  - changes/M36-artifact-register-command/CHANGE.yaml
+depends_on:
+  - change:M36-artifact-register-command
+produces:
+  - work_items:M37-managed-clean-boundary
+summary: >
+  Make `openworkflow clean` safe for real project use by removing only
+  OpenWorkflow-managed metadata and generated adapter surfaces while preserving
+  source artifacts, summaries, evidence, and user-authored project knowledge.
+problem: >
+  The current clean implementation deletes the entire `.openworkflow` directory.
+  That is too destructive for a workflow system where stage artifacts, SUMMARY
+  files, evidence, and notes are project source material. An Agent or developer
+  running clean to remove generated surfaces can accidentally destroy the exact
+  artifacts needed to resume development.
+goals:
+  - Change `cleanOpenWorkflow` to plan and remove only managed workflow metadata files and empty managed directories.
+  - Preserve `.openworkflow` source artifact directories and user-authored files by default.
+  - Surface preserved paths in text and JSON output so Agents can see what was intentionally left in place.
+  - Update clean verification to prove source artifacts, SUMMARY.yaml, and evidence survive `clean --yes`.
+  - Update `openworkflow --help` and AGENTS.md managed block to document the non-destructive clean boundary.
+  - Keep AGENTS.md behavior aligned with M25: remove only the managed block and leave the file.
+non_goals:
+  - Do not add a destructive "delete all workflow state" mode in M37.
+  - Do not rewrite or migrate preserved stage artifacts during clean.
+  - Do not change adapter force-clean behavior except where needed for shared result reporting.
+  - Do not weaken init's minimal/lazy artifact creation boundary.
+decisions:
+  - "`clean` is a generated-surface cleanup command, not a project artifact deletion command."
+  - "Managed `.openworkflow` cleanup targets are limited to root config/state and audit/workflow metadata created by init/sync/runtime maintenance."
+  - "Stage artifact directories are treated as source-of-truth project material even when originally scaffolded by OpenWorkflow."
+open_questions:
+  - question: "Should a future command support deleting all OpenWorkflow project state?"
+    outcome: "Out of scope for M37; if needed, it must be a separate explicitly dangerous command or flag with its own contract."
+affected_paths:
+  - packages/core/src/workflow/cleanOpenWorkflow.ts
+  - packages/cli/src/commands/clean.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M37-managed-clean-boundary/
+acceptance:
+  - "`openworkflow clean --root <folder> --tools codex --yes` removes managed `.openworkflow` metadata files but preserves source artifact directories."
+  - "VALIDATION.yaml, PROTOTYPE.yaml/EVIDENCE.yaml, SUMMARY.yaml, and user notes under `.openworkflow` survive clean."
+  - "Text and JSON clean output report preserved `.openworkflow` paths."
+  - "Generated Codex adapter files and the AGENTS.md managed block are still cleaned."
+  - "`openworkflow --help` and AGENTS.md managed block explain that clean preserves source artifacts and user content."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:clean
+  - npm run verify:runtime-surface
+created_at: 2026-05-20
+updated_at: 2026-05-20

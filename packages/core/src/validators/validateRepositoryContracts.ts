@@ -159,6 +159,8 @@ const REQUIRED_FILES = [
   "changes/M35-artifact-draft-command/WORK_ITEMS.yaml",
   "changes/M36-artifact-register-command/CHANGE.yaml",
   "changes/M36-artifact-register-command/WORK_ITEMS.yaml",
+  "changes/M37-managed-clean-boundary/CHANGE.yaml",
+  "changes/M37-managed-clean-boundary/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

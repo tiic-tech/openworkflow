@@ -112,7 +112,7 @@ Commands:
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
   summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
-  clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
+  clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
   Read AGENTS.md, then run openworkflow inspect --root . --json. Inspect starts
@@ -137,7 +137,7 @@ Two command surfaces:
     check      Verify required/forbidden context before starting a /ow:* command.
     summaries  Check whether low-context summaries can be trusted before raw evidence; requires an initialized .openworkflow root.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
-    clean      Remove generated OpenWorkflow surfaces without touching user content.
+    clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
@@ -159,6 +159,11 @@ Two command surfaces:
 Lazy creation boundary:
   openworkflow init creates only the minimal .openworkflow setup. Stage artifacts
   are created by the first matching /ow:* workflow command, not by init.
+
+Clean safety:
+  clean removes managed .openworkflow metadata and generated tool adapters, but
+  preserves source artifacts, SUMMARY.yaml, evidence, notes, and user AGENTS.md
+  content. Use --json to inspect planned, removed, skipped, and preserved paths.
 
 Sync safety:
   sync may add missing managed workflow files and refresh audit/index metadata,

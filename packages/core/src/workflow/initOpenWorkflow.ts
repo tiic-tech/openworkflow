@@ -69,6 +69,18 @@ export function renderOpenWorkflowManagedFiles(options: InitOptions): OpenWorkfl
   ];
 }
 
+export function openWorkflowManagedRelativePaths(): string[] {
+  return [
+    ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+    ".openworkflow/CURRENT_STATE.yaml",
+    ".openworkflow/config.yaml",
+    ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml",
+    ".openworkflow/audit/CONTEXT_PACKETS.yaml",
+    ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+    ".openworkflow/audit/DISCLOSURE_LEVELS.yaml",
+  ];
+}
+
 function workflowConfig(options: InitOptions): string {
   return dumpYaml({
     project_slug: options.projectSlug,

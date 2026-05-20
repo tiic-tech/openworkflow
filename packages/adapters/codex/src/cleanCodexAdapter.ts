@@ -20,6 +20,7 @@ export async function cleanCodexAdapter(options: CleanCodexOptions): Promise<Cle
   const removed: string[] = [];
   const updated: string[] = [];
   const skipped: string[] = [];
+  const preserved: string[] = [];
   const warnings: string[] = [];
 
   for (const relativePath of cleanCandidatePaths()) {
@@ -30,6 +31,7 @@ export async function cleanCodexAdapter(options: CleanCodexOptions): Promise<Cle
     }
     if (!options.force && !hasGeneratedMarker(content)) {
       skipped.push(path);
+      preserved.push(path);
       warnings.push(`Skipped non-generated file: ${path}`);
       continue;
     }
@@ -44,7 +46,7 @@ export async function cleanCodexAdapter(options: CleanCodexOptions): Promise<Cle
     await pruneCodexDirs(options.root);
   }
 
-  return { planned, removed, updated, skipped, warnings, dryRun };
+  return { planned, removed, updated, skipped, preserved, warnings, dryRun };
 }
 
 function cleanCandidatePaths(): string[] {

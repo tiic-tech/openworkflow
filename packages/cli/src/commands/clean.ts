@@ -54,6 +54,7 @@ export async function cleanCommand(flags: Map<string, string | boolean>): Promis
         removed: merged.removed,
         updated: merged.updated,
         skipped: merged.skipped,
+        preserved: merged.preserved,
       },
       next_actions: yes ? [] : ["rerun with --yes to remove planned targets"],
     });
@@ -74,6 +75,7 @@ function mergeResults(results: CleanResult[]): CleanResult {
     removed: results.flatMap((result) => result.removed),
     updated: results.flatMap((result) => result.updated),
     skipped: results.flatMap((result) => result.skipped),
+    preserved: results.flatMap((result) => result.preserved),
     warnings: results.flatMap((result) => result.warnings),
   };
 }
@@ -90,7 +92,10 @@ function printCleanSummary(root: string, result: CleanResult): void {
   for (const path of result.skipped) {
     console.log(`skipped: ${path}`);
   }
-  console.log(`planned: ${result.planned.length}, removed: ${result.removed.length}, updated: ${result.updated.length}, skipped: ${result.skipped.length}, warnings: ${result.warnings.length}`);
+  for (const path of result.preserved) {
+    console.log(`preserved: ${path}`);
+  }
+  console.log(`planned: ${result.planned.length}, removed: ${result.removed.length}, updated: ${result.updated.length}, skipped: ${result.skipped.length}, preserved: ${result.preserved.length}, warnings: ${result.warnings.length}`);
 }
 
 function printTargets(label: string, targets: CleanTarget[]): void {
