@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: audit:disclosure-levels
+contract_type: workflow
+title: OpenWorkflow disclosure levels
+status: active
+levels:
+  - level: 0
+    name: workflow indexes
+    default_for_agents: true
+    purpose: Find the active workflow state without recursively reading stage folders.
+    examples:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - level: 1
+    name: command and artifact packets
+    default_for_agents: true
+    purpose: Know required, optional, and forbidden context before doing command work.
+    examples:
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - level: 2
+    name: current YAML artifact
+    default_for_agents: true
+    purpose: Load the one source-of-truth artifact named by the current index.
+    examples:
+      - .openworkflow/validation/<id>/VALIDATION.yaml
+      - .openworkflow/prototypes/<id>/EVIDENCE.yaml
+  - level: 3
+    name: short human note
+    default_for_agents: false
+    purpose: Explain intent or user feedback when the YAML state is not enough.
+    examples:
+      - .openworkflow/validation/<id>/NOTE.md
+      - .openworkflow/decisions/<id>/NOTE.md
+  - level: 4
+    name: review UI and raw evidence
+    default_for_agents: false
+    purpose: Inspect screenshots, logs, prototype URLs, generated HTML, or recordings when evidence must
+      be reviewed directly.
+    examples:
+      - .openworkflow/prototypes/<id>/review.html
+      - .openworkflow/prototypes/<id>/evidence/
+updated_at: null

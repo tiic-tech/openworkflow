@@ -1,0 +1,140 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.manifest
+adapter: codex
+adapter_version: 0.1.0
+generated_by: openworkflow
+delivery: repo-local-skills
+source_of_truth: .openworkflow
+command_namespace: ow
+skill_surface:
+  directory: .agents/skills
+  path_pattern: .agents/skills/ow-<id>/SKILL.md
+  interface_metadata: agents/openai.yaml
+  frontmatter:
+    - name
+    - description
+commands:
+  - id: workflow
+    trigger: /ow:workflow
+    visibility: user
+    skill_name: ow-workflow
+    explicit_invocation: $ow-workflow
+    skill_path: .agents/skills/ow-workflow/SKILL.md
+    interface_path: .agents/skills/ow-workflow/agents/openai.yaml
+    legacy_triggers:
+      - /build-workflow
+  - id: context
+    trigger: /ow:context
+    visibility: user
+    skill_name: ow-context
+    explicit_invocation: $ow-context
+    skill_path: .agents/skills/ow-context/SKILL.md
+    interface_path: .agents/skills/ow-context/agents/openai.yaml
+    legacy_triggers:
+      - /build-context
+  - id: vision
+    trigger: /ow:vision
+    visibility: user
+    skill_name: ow-vision
+    explicit_invocation: $ow-vision
+    skill_path: .agents/skills/ow-vision/SKILL.md
+    interface_path: .agents/skills/ow-vision/agents/openai.yaml
+    legacy_triggers:
+      - /build-vision
+  - id: validation
+    trigger: /ow:validation
+    visibility: user
+    skill_name: ow-validation
+    explicit_invocation: $ow-validation
+    skill_path: .agents/skills/ow-validation/SKILL.md
+    interface_path: .agents/skills/ow-validation/agents/openai.yaml
+    legacy_triggers:
+      - /build-validation
+  - id: proto
+    trigger: /ow:proto
+    visibility: user
+    skill_name: ow-proto
+    explicit_invocation: $ow-proto
+    skill_path: .agents/skills/ow-proto/SKILL.md
+    interface_path: .agents/skills/ow-proto/agents/openai.yaml
+    legacy_triggers:
+      - /build-prototype
+      - /ow:prototype
+  - id: tune
+    trigger: /ow:tune
+    visibility: user
+    skill_name: ow-tune
+    explicit_invocation: $ow-tune
+    skill_path: .agents/skills/ow-tune/SKILL.md
+    interface_path: .agents/skills/ow-tune/agents/openai.yaml
+    legacy_triggers:
+      - /ow:tune:proto
+  - id: decision
+    trigger: /ow:decision
+    visibility: internal
+    skill_name: ow-decision
+    explicit_invocation: $ow-decision
+    skill_path: .agents/skills/ow-decision/SKILL.md
+    interface_path: .agents/skills/ow-decision/agents/openai.yaml
+    legacy_triggers:
+      - /build-decision
+  - id: design
+    trigger: /ow:design
+    visibility: user
+    skill_name: ow-design
+    explicit_invocation: $ow-design
+    skill_path: .agents/skills/ow-design/SKILL.md
+    interface_path: .agents/skills/ow-design/agents/openai.yaml
+    legacy_triggers:
+      - /build-design
+  - id: spec
+    trigger: /ow:spec
+    visibility: user
+    skill_name: ow-spec
+    explicit_invocation: $ow-spec
+    skill_path: .agents/skills/ow-spec/SKILL.md
+    interface_path: .agents/skills/ow-spec/agents/openai.yaml
+    legacy_triggers:
+      - /build-spec
+  - id: change
+    trigger: /ow:change
+    visibility: user
+    skill_name: ow-change
+    explicit_invocation: $ow-change
+    skill_path: .agents/skills/ow-change/SKILL.md
+    interface_path: .agents/skills/ow-change/agents/openai.yaml
+    legacy_triggers:
+      - /build-change
+  - id: team
+    trigger: /ow:team
+    visibility: user
+    skill_name: ow-team
+    explicit_invocation: $ow-team
+    skill_path: .agents/skills/ow-team/SKILL.md
+    interface_path: .agents/skills/ow-team/agents/openai.yaml
+    legacy_triggers:
+      - /run-team
+      - /build-team
+generated_files:
+  - .agents/skills/ow-workflow/SKILL.md
+  - .agents/skills/ow-workflow/agents/openai.yaml
+  - .agents/skills/ow-context/SKILL.md
+  - .agents/skills/ow-context/agents/openai.yaml
+  - .agents/skills/ow-vision/SKILL.md
+  - .agents/skills/ow-vision/agents/openai.yaml
+  - .agents/skills/ow-validation/SKILL.md
+  - .agents/skills/ow-validation/agents/openai.yaml
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/skills/ow-proto/agents/openai.yaml
+  - .agents/skills/ow-tune/SKILL.md
+  - .agents/skills/ow-tune/agents/openai.yaml
+  - .agents/skills/ow-decision/SKILL.md
+  - .agents/skills/ow-decision/agents/openai.yaml
+  - .agents/skills/ow-design/SKILL.md
+  - .agents/skills/ow-design/agents/openai.yaml
+  - .agents/skills/ow-spec/SKILL.md
+  - .agents/skills/ow-spec/agents/openai.yaml
+  - .agents/skills/ow-change/SKILL.md
+  - .agents/skills/ow-change/agents/openai.yaml
+  - .agents/skills/ow-team/SKILL.md
+  - .agents/skills/ow-team/agents/openai.yaml
+sync_command: openworkflow sync --tools codex

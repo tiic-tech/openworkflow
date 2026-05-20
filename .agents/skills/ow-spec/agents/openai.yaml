@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.spec
+interface:
+  display_name: "ow:spec"
+  short_description: "Create one focused production spec from accepted product design."
+  default_prompt: "Use /ow:spec for this OpenWorkflow repository."

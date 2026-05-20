@@ -1,0 +1,234 @@
+schema_version: 0.1.0
+contract_id: audit:command-index
+contract_type: workflow
+title: OpenWorkflow command audit index
+status: active
+source_of_truth: .openworkflow
+commands:
+  - id: workflow
+    trigger: /ow:workflow
+    stage: workflow
+    visibility: user
+    depth: shallow
+    context_packet: context:workflow
+    allowed_outputs:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      []
+    handoff_commands:
+      []
+  - id: context
+    trigger: /ow:context
+    stage: context
+    visibility: user
+    depth: shallow
+    context_packet: context:context
+    allowed_outputs:
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      []
+    handoff_commands:
+      []
+  - id: vision
+    trigger: /ow:vision
+    stage: vision
+    visibility: user
+    depth: deep
+    context_packet: context:vision
+    allowed_outputs:
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/sessions/<id>/VISION_SESSION.yaml
+      - .openworkflow/vision/sessions/<id>/NOTE.md
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/validation/**
+      - .openworkflow/prototypes/**
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:validation
+  - id: validation
+    trigger: /ow:validation
+    stage: validation
+    visibility: user
+    depth: deep
+    context_packet: context:validation
+    allowed_outputs:
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/<id>/VALIDATION.yaml
+      - .openworkflow/validation/<id>/NOTE.md
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/prototypes/**
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:proto
+      - /ow:vision
+  - id: proto
+    trigger: /ow:proto
+    stage: prototype
+    visibility: user
+    depth: deep
+    context_packet: context:proto
+    allowed_outputs:
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/<id>/EVIDENCE.yaml
+      - .openworkflow/prototypes/<id>/NOTE.md
+      - .openworkflow/prototypes/<id>/review.html
+      - .openworkflow/prototypes/<id>/evidence/**
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+      - .openworkflow/decisions/<id>/DECISION.yaml
+      - .openworkflow/decisions/<id>/NOTE.md
+      - .openworkflow/decisions/<id>/review.html
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:tune
+      - /ow:design
+      - /ow:validation
+  - id: tune
+    trigger: /ow:tune
+    stage: prototype
+    visibility: user
+    depth: deep
+    context_packet: context:tune
+    allowed_outputs:
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/<id>/EVIDENCE.yaml
+      - .openworkflow/prototypes/<id>/NOTE.md
+      - .openworkflow/prototypes/<id>/review.html
+      - .openworkflow/prototypes/<id>/evidence/**
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+      - .openworkflow/decisions/<id>/DECISION.yaml
+      - .openworkflow/decisions/<id>/NOTE.md
+      - .openworkflow/decisions/<id>/review.html
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:tune
+      - /ow:design
+      - /ow:validation
+  - id: decision
+    trigger: /ow:decision
+    stage: decision
+    visibility: internal
+    depth: deep
+    context_packet: context:decision
+    allowed_outputs:
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+      - .openworkflow/decisions/<id>/DECISION.yaml
+      - .openworkflow/decisions/<id>/NOTE.md
+      - .openworkflow/decisions/<id>/review.html
+      - .openworkflow/prototypes/<id>/EVIDENCE.yaml
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:design
+      - /ow:tune
+      - /ow:validation
+      - /ow:vision
+  - id: design
+    trigger: /ow:design
+    stage: design
+    visibility: user
+    depth: deep
+    context_packet: context:design
+    allowed_outputs:
+      - .openworkflow/design/DESIGN_INDEX.yaml
+      - .openworkflow/design/<id>/PRODUCT_DESIGN.yaml
+      - .openworkflow/design/<id>/NOTE.md
+    conditional_outputs:
+      - .openworkflow/design/<id>/TECH_SPEC.yaml
+      - .openworkflow/design/<id>/FRONTEND_SPEC.yaml
+      - .openworkflow/design/<id>/BACKEND_SPEC.yaml
+      - .openworkflow/design/<id>/API_CONTRACT.yaml
+      - .openworkflow/design/<id>/DB_SCHEMA_MODEL.yaml
+    forbidden_outputs:
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:spec
+      - /ow:tune
+      - /ow:validation
+  - id: spec
+    trigger: /ow:spec
+    stage: spec
+    visibility: user
+    depth: deep
+    context_packet: context:spec
+    allowed_outputs:
+      - .openworkflow/specs/SPEC_INDEX.yaml
+      - .openworkflow/specs/<id>/SPEC.yaml
+      - .openworkflow/specs/<id>/NOTE.md
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:change
+      - /ow:design
+  - id: change
+    trigger: /ow:change
+    stage: change
+    visibility: user
+    depth: deep
+    context_packet: context:change
+    allowed_outputs:
+      - .openworkflow/changes/CHANGE_INDEX.yaml
+      - .openworkflow/changes/<id>/CHANGE.yaml
+      - .openworkflow/changes/<id>/NOTE.md
+      - .openworkflow/changes/<id>/WORK_ITEMS.yaml
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:team
+      - /ow:spec
+  - id: team
+    trigger: /ow:team
+    stage: runtime
+    visibility: user
+    depth: deep
+    context_packet: context:team
+    allowed_outputs:
+      - .openworkflow/runtime/RUNTIME_INDEX.yaml
+      - .openworkflow/runtime/<id>/STATE.yaml
+      - .openworkflow/runtime/<id>/NOTE.md
+      - .openworkflow/runtime/<id>/ISSUES.yaml
+      - .openworkflow/runtime/<id>/CHECKPOINTS.yaml
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      []
+    handoff_commands:
+      - /ow:change
+updated_at: null

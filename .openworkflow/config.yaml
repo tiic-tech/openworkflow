@@ -1,0 +1,17 @@
+project_slug: openworkflow
+project_title: OpenWorkflow
+workflow_root: .openworkflow
+tools:
+  - codex
+adapter_policy:
+  source_of_truth: .openworkflow
+  default_command_delivery: codex-repo-skills
+  generated_surfaces:
+    - .openworkflow
+    - .agents/skills
+    - .agents/openworkflow-adapter.yaml
+  codex_skill_surface:
+    directory: .agents/skills
+    path_pattern: .agents/skills/ow-<id>/SKILL.md
+    interface_metadata: agents/openai.yaml
+    explicit_invocation: $ow-<id>

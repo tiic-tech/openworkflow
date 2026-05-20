@@ -4,3 +4,12 @@ node_modules/
 dist/
 .DS_Store
 
+# OpenWorkflow self-dogfood: keep .openworkflow control files and .agents
+# adapter surfaces tracked, but do not commit bulky runtime evidence by default.
+.openworkflow/**/evidence/
+.openworkflow/**/raw/
+.openworkflow/**/screenshots/
+.openworkflow/**/logs/
+.openworkflow/**/traces/
+.openworkflow/**/recordings/
+.openworkflow/**/.cache/

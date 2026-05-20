@@ -12,7 +12,7 @@ items:
       - changes/M53-self-dogfood-init/
       - dist/
     acceptance:
-      - The branch starts from merged `main`.
+      - "The branch starts from merged `main`."
       - The local TypeScript build succeeds before init is executed.
   - task_id: M53-T002
     title: Initialize OpenWorkflow with Codex platform
@@ -22,7 +22,7 @@ items:
       - .agents/
       - AGENTS.md
     acceptance:
-      - Local CLI init runs with `--tools codex --json`.
+      - "Local CLI init runs with `--tools codex --json`."
       - Init creates only the minimal managed setup plus Codex adapter surfaces.
       - Existing user-authored repository files are preserved.
   - task_id: M53-T003
@@ -45,6 +45,6 @@ items:
       - .agents/
       - AGENTS.md
     acceptance:
-      - `doctor --json` reports a coherent Codex-managed repository.
-      - `handoff --json` provides a low-context entry point.
-      - `context --handoff --json` provides a bounded default packet.
+      - "`doctor --json` reports a coherent Codex-managed repository."
+      - "`handoff --json` provides a low-context entry point."
+      - "`context --handoff --json` provides a bounded default packet."

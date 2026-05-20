@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.proto
+interface:
+  display_name: "ow:proto"
+  short_description: "Build the smallest prototype needed to validate the current core feature."
+  default_prompt: "Use /ow:proto for this OpenWorkflow repository."

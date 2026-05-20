@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.change
+interface:
+  display_name: "ow:change"
+  short_description: "Create one focused production change for the current core feature."
+  default_prompt: "Use /ow:change for this OpenWorkflow repository."
