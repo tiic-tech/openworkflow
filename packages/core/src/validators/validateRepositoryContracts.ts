@@ -56,6 +56,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/dev/verifyCleanCommand.ts",
   "packages/adapters/src/registry.ts",
   "packages/core/src/artifacts/registry.ts",
+  "packages/core/src/artifacts/readiness.ts",
   "packages/core/src/contracts/index.ts",
   "packages/core/src/contracts/yaml.ts",
   "packages/core/src/commands/registry.ts",
@@ -163,6 +164,8 @@ const REQUIRED_FILES = [
   "changes/M37-managed-clean-boundary/WORK_ITEMS.yaml",
   "changes/M38-json-exit-code-semantics/CHANGE.yaml",
   "changes/M38-json-exit-code-semantics/WORK_ITEMS.yaml",
+  "changes/M39-stage-readiness-gates/CHANGE.yaml",
+  "changes/M39-stage-readiness-gates/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

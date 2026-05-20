@@ -543,6 +543,49 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   const currentIndex = await read(indexPath);
   assert(currentIndex.includes("current_validation: val-draft"), "register current did not update index pointer");
 
+  const draftProtoCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(draftProtoCheck.code !== 0, "proto check should block when current validation is still a draft scaffold");
+  const draftProtoReport = parseJsonReport(draftProtoCheck.output, "check");
+  const draftProtoData = record(draftProtoReport.data, "draft proto check data");
+  assert(draftProtoReport.ok === false, "draft current validation should make proto check ok=false");
+  assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("status must be beyond draft")), "proto check missing draft status blocker");
+  assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("core_question must be non-empty")), "proto check missing core_question readiness blocker");
+
+  await writeFile(join(root, artifactPath), [
+    "schema_version: 0.1.0",
+    "contract_id: validation:val-draft",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Filled validation target",
+    "status: active",
+    "core_question: Does the first prototype answer the core workflow risk?",
+    "feature_classification:",
+    "  existential:",
+    "    - agent readiness",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - Agents need a concrete validation scope.",
+    "prototype_scope:",
+    "  include:",
+    "    - Build the smallest checkable readiness flow.",
+    "  exclude: []",
+    "acceptance:",
+    "  - Agent can start /ow:proto without guessing the validation target.",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "",
+  ].join("\n"), "utf8");
+  const filledProtoCheck = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env), "check");
+  const filledProtoData = record(filledProtoCheck.data, "filled proto check data");
+  assert(filledProtoCheck.ok === true, "filled current validation should make proto check ok=true");
+  assert(Array.isArray(filledProtoData.blockers) && filledProtoData.blockers.length === 0, "filled proto check should have no blockers");
+
   const nextWithoutCurrent = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--next-command", "/ow:proto", "--json"], env);
   assert(nextWithoutCurrent.code !== 0, "register should reject --next-command without --current");
   const nextWithoutCurrentReport = parseJsonReport(nextWithoutCurrent.output, "register");

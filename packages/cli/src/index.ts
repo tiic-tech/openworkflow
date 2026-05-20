@@ -134,7 +134,7 @@ Two command surfaces:
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
-    check      Verify required/forbidden context before starting a /ow:* command.
+    check      Verify required/forbidden context, output boundaries, and current artifact usability before starting a /ow:* command.
     summaries  Check whether low-context summaries can be trusted before raw evidence; requires an initialized .openworkflow root.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.

@@ -1,6 +1,7 @@
 import { readdir, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { getDiscoveryArtifactContractsForCommand } from "../../../core/src/artifacts/registry.js";
+import { assessStageReadiness } from "../../../core/src/artifacts/readiness.js";
 import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
@@ -109,9 +110,11 @@ export async function buildReadiness(root: string, requested: string): Promise<R
   const required = await contextStatuses(root, protocol?.requiredContext ?? [".openworkflow/workflow/WORKFLOW_INDEX.yaml"]);
   const optional = await contextStatuses(root, protocol?.optionalContext ?? []);
   const forbidden = await contextStatuses(root, protocol?.forbiddenContext ?? []);
+  const semanticReadiness = await assessStageReadiness(root, command.trigger, currentState);
   const blockers = [
     ...required.filter((item) => !item.exists).map((item) => `missing required context: ${item.path}`),
     ...forbidden.filter((item) => item.exists).map((item) => `forbidden context exists: ${item.path}`),
+    ...semanticReadiness.blockers,
   ];
   const warnings: string[] = [];
   const nextCommand = stringOrNull(currentState?.next_command);
@@ -126,6 +129,7 @@ export async function buildReadiness(root: string, requested: string): Promise<R
   if (!summaryHealth.initialized) {
     warnings.push("summary health unavailable because OpenWorkflow artifact contracts are missing");
   }
+  warnings.push(...semanticReadiness.warnings);
 
   const nextActions = nextActionsFor(command, blockers, warnings, currentState);
   return {
