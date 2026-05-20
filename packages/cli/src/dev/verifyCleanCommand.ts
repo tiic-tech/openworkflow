@@ -64,8 +64,17 @@ async function main(): Promise<number> {
     assert(sync.code === 0 || sync.code === 1, "sync --json returned an unexpected exit code after clean recovery");
     const syncReport = parseJsonReport(sync.output, "sync");
     assert(isRecord(syncReport.effects), "sync --json did not include effects after clean recovery");
+    const syncData = record(syncReport.data, "sync data");
+    const stateReconciliation = record(syncData.state_reconciliation, "sync state_reconciliation");
+    const restoredPointers = record(stateReconciliation.restored_pointers, "sync restored_pointers");
+    assert(stateReconciliation.reconciled === true, "sync did not reconcile CURRENT_STATE from preserved indexes");
+    assert(stateReconciliation.active_stage === "prototype", "sync did not restore prototype active_stage");
+    assert(stateReconciliation.next_command === "/ow:tune", "sync did not restore prototype next_command");
+    assert(restoredPointers.current_validation === ".openworkflow/validation/val-1/VALIDATION.yaml", "sync did not restore current_validation");
+    assert(restoredPointers.current_prototype === ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "sync did not restore current_prototype");
     assert(arrayIncludesPath(syncReport.effects.written, ".openworkflow/workflow/WORKFLOW_INDEX.yaml"), "sync --json did not report restored workflow index");
     assert(arrayIncludesPath(syncReport.effects.written, ".agents/openworkflow-adapter.yaml"), "sync --json did not report restored Codex adapter manifest");
+    assert(arrayIncludesPath(syncReport.effects.updated, ".openworkflow/CURRENT_STATE.yaml"), "sync --json did not report reconciled CURRENT_STATE update");
     assert(arrayIncludesPath(syncReport.effects.skipped, ".codex/commands/ow/vision.md"), "sync --json did not report preserved legacy non-generated command");
     await assertFile(join(target, ".openworkflow", "config.yaml"));
     await assertFile(join(target, ".openworkflow", "CURRENT_STATE.yaml"));
@@ -74,6 +83,11 @@ async function main(): Promise<number> {
     await assertFile(join(target, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml"));
     await assertFile(join(target, ".agents", "openworkflow-adapter.yaml"));
     await assertFile(join(target, ".agents", "skills", "ow-vision", "SKILL.md"));
+    const recoveredState = await read(join(target, ".openworkflow", "CURRENT_STATE.yaml"));
+    assert(recoveredState.includes("active_stage: prototype"), "recovered CURRENT_STATE missing prototype active_stage");
+    assert(recoveredState.includes("current_validation: .openworkflow/validation/val-1/VALIDATION.yaml"), "recovered CURRENT_STATE missing current_validation");
+    assert(recoveredState.includes("current_prototype: .openworkflow/prototypes/proto-1/EVIDENCE.yaml"), "recovered CURRENT_STATE missing current_prototype");
+    assert(recoveredState.includes("next_command: /ow:tune"), "recovered CURRENT_STATE missing next_command");
     await assertSourceSnapshots(target, sourceSnapshots);
     agentsGuide = await read(join(target, "AGENTS.md"));
     assert(agentsGuide.includes("User rules stay."), "sync recovery did not preserve user AGENTS.md content");
@@ -82,6 +96,14 @@ async function main(): Promise<number> {
     assert(doctorReport.ok === true, "doctor --json did not report ok after sync recovery");
     const checkReport = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", target, "--json"], env), "check");
     assert(checkReport.ok === true, "check /ow:vision --json did not report ready after sync recovery");
+    const recoveredStateBeforeResync = await read(join(target, ".openworkflow", "CURRENT_STATE.yaml"));
+    const resync = await runCaptureStatus(["node", CLI, "sync", "--root", target, "--tools", "codex", "--json"], env);
+    assert(resync.code === 0 || resync.code === 1, "resync --json returned an unexpected exit code");
+    const resyncReport = parseJsonReport(resync.output, "sync");
+    const resyncData = record(resyncReport.data, "resync data");
+    const resyncReconciliation = record(resyncData.state_reconciliation, "resync state_reconciliation");
+    assert(resyncReconciliation.attempted === false, "sync attempted to reconcile an existing non-default CURRENT_STATE");
+    assert((await read(join(target, ".openworkflow", "CURRENT_STATE.yaml"))) === recoveredStateBeforeResync, "sync overwrote existing non-default CURRENT_STATE");
 
     await run(["node", CLI, "init", target, "--tools", "codex", "--force"], env);
     const forceClean = await runCapture(["node", CLI, "clean", "--root", target, "--tools", "codex", "--yes", "--force"], env);
@@ -124,16 +146,63 @@ async function writeOpenWorkflowSourceArtifacts(target: string): Promise<void> {
     "schema_version: 0.1.0",
     "contract_id: validation:val-1",
     "contract_type: validation",
+    "artifact_type: validation_target",
     "title: Validation fixture",
     "status: active",
+    "core_question: Can sync recover current state?",
+    "prototype_scope:",
+    "  include:",
+    "    - state recovery",
+    "acceptance:",
+    "  - CURRENT_STATE points to prototype after clean/sync",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(target, ".openworkflow", "validation", "VALIDATION_INDEX.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: index:validation",
+    "contract_type: validation",
+    "title: Validation index",
+    "status: active",
+    "current_validation: val-1",
+    "validations:",
+    "  - validation_id: val-1",
+    "    path: .openworkflow/validation/val-1/VALIDATION.yaml",
+    "    artifact_type: validation_target",
+    "    title: Validation fixture",
+    "    status: active",
     "",
   ].join("\n"), "utf8");
   await writeFile(join(target, ".openworkflow", "prototypes", "proto-1", "EVIDENCE.yaml"), [
     "schema_version: 0.1.0",
     "contract_id: prototype:proto-1",
     "contract_type: prototype",
+    "artifact_type: prototype_evidence",
     "title: Prototype fixture",
     "status: active",
+    "core_question: Can sync recover next command?",
+    "prototype_artifact:",
+    "  path: .openworkflow/prototypes/proto-1/review.html",
+    "verification:",
+    "  browser_checks:",
+    "    - recovered",
+    "result: not_reviewed",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(target, ".openworkflow", "prototypes", "PROTOTYPE_INDEX.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: index:prototype",
+    "contract_type: prototype",
+    "title: Prototype index",
+    "status: active",
+    "current_prototype: proto-1",
+    "prototypes:",
+    "  - prototype_id: proto-1",
+    "    path: .openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+    "    artifact_type: prototype_evidence",
+    "    title: Prototype fixture",
+    "    status: active",
     "",
   ].join("\n"), "utf8");
   await writeFile(join(target, ".openworkflow", "prototypes", "proto-1", "SUMMARY.yaml"), [
@@ -145,7 +214,9 @@ async function writeOpenWorkflowSourceArtifacts(target: string): Promise<void> {
 }
 
 const SOURCE_ARTIFACT_PATHS = [
+  ".openworkflow/validation/VALIDATION_INDEX.yaml",
   ".openworkflow/validation/val-1/VALIDATION.yaml",
+  ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
   ".openworkflow/prototypes/proto-1/EVIDENCE.yaml",
   ".openworkflow/prototypes/proto-1/SUMMARY.yaml",
   ".openworkflow/notes/handoff.md",
@@ -263,6 +334,11 @@ function parseJsonReport(output: string, expectedCommand: string): Record<string
 
 function arrayIncludesPath(value: unknown, suffix: string): boolean {
   return Array.isArray(value) && value.some((item) => typeof item === "string" && item.endsWith(suffix));
+}
+
+function record(value: unknown, label: string): Record<string, unknown> {
+  assert(isRecord(value), `${label} must be an object`);
+  return value;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

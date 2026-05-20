@@ -79,6 +79,7 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
       root,
       data: {
         workflow,
+        state_reconciliation: workflow.stateReconciliation,
         agents_md: agentsGuide,
         detection,
         tools,
@@ -107,6 +108,9 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   printWarnings(warnings);
   console.log(`Synced OpenWorkflow at ${root}`);
   console.log(`Workflow files added: ${workflow.added.length}, updated: ${workflow.updated.length}, unchanged: ${workflow.unchanged.length}, preserved: ${workflow.preserved.length}`);
+  if (workflow.stateReconciliation.reconciled || workflow.stateReconciliation.warnings.length > 0) {
+    console.log(`CURRENT_STATE reconciliation: ${workflow.stateReconciliation.reconciled ? "reconciled" : workflow.stateReconciliation.reason}`);
+  }
   console.log(`AGENTS.md: ${agentsGuide.action}`);
   if (detection.evidence.length > 0 && autoTools) {
     console.log(`Detected tools: ${tools.length > 0 ? tools.join(", ") : "none"} (${detection.evidence.join("; ")})`);
