@@ -477,6 +477,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "Prefer `--json`", "AGENTS.md does not mention JSON report mode");
   assertIncludes(phase, guide, "openworkflow inspect --root . --json", "AGENTS.md does not mention inspect command");
   assertIncludes(phase, guide, "openworkflow context --root . --json", "AGENTS.md does not mention context command");
+  assertIncludes(phase, guide, "command_audit", "AGENTS.md does not mention compact command audit slice");
   assertIncludes(phase, guide, "--max-bytes <n>", "AGENTS.md does not mention context budget");
   assertIncludes(phase, guide, "--mode full", "AGENTS.md does not mention full context mode");
   assertIncludes(phase, guide, "openworkflow draft --root . --artifact <type> --id <id> --json", "AGENTS.md does not mention draft command");
@@ -499,6 +500,7 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "Every command supports --json", "help missing JSON report mode");
   assertIncludes(phase, help, "inspect", "help missing inspect command");
   assertIncludes(phase, help, "context", "help missing context command");
+  assertIncludes(phase, help, "command_audit", "help missing compact command audit slice");
   assertIncludes(phase, help, "--max-bytes", "help missing context budget");
   assertIncludes(phase, help, "--mode full", "help missing full context mode");
   assertIncludes(phase, help, "draft", "help missing draft command");

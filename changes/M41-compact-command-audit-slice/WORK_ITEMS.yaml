@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: work_items:M41-compact-command-audit-slice
+contract_type: work_items
+title: M41 Compact command audit slice work items
+status: completed
+change_contract: changes/M41-compact-command-audit-slice/CHANGE.yaml
+items:
+  - task_id: M41-T001
+    title: Load command audit slice
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+    acceptance:
+      - Context loads the selected command entry from COMMAND_AUDIT_INDEX.yaml.
+      - JSON output includes a command_audit object or null when unavailable.
+  - task_id: M41-T002
+    title: Omit command audit source in compact mode
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/context.ts
+    acceptance:
+      - Compact mode does not include COMMAND_AUDIT_INDEX.yaml content.
+      - Omitted output explains that command_audit represents it structurally.
+      - Full mode can still include the source file.
+  - task_id: M41-T003
+    title: Update Agent-facing guidance
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help and AGENTS.md mention compact command_audit slices.
+  - task_id: M41-T004
+    title: Add regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime verifier checks compact omission and command_audit content.
+      - Workflow E2E checks help and AGENTS.md mention command_audit.
+      - Repository validation requires M41 contracts.

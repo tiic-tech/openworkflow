@@ -337,9 +337,14 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Number(contextFreshBudget.max_bytes) === 12000, "fresh compact context should use compact default budget");
   assert(contextFreshData.normalized_command === "/ow:vision", "fresh context should default to CURRENT_STATE.next_command");
   assert(contextFreshData.packet_id === "context:vision", "fresh context missing packet_id");
+  const contextFreshAudit = record(contextFreshData.command_audit, "fresh context command_audit");
+  assert(contextFreshAudit.trigger === "/ow:vision", "fresh context command_audit should describe current command");
+  assert(Array.isArray(contextFreshAudit.allowed_outputs) && contextFreshAudit.allowed_outputs.length > 0, "fresh context command_audit missing allowed outputs");
   assert(Number(contextFreshBudget.used_bytes) > 0, "fresh context should include content");
   assert(Array.isArray(contextFreshData.included) && contextFreshData.included.some((item) => record(item, "included context").path === ".openworkflow/CURRENT_STATE.yaml"), "fresh context missing CURRENT_STATE content");
+  assert(Array.isArray(contextFreshData.included) && !contextFreshData.included.some((item) => record(item, "included context").path === ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml"), "compact context should not include full command audit source");
   assert(Array.isArray(contextFreshData.included) && !contextFreshData.included.some((item) => record(item, "included context").path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml"), "compact context should not include full artifact contracts source");
+  assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => record(item, "omitted context").path === ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml" && String(record(item, "omitted context").reason).includes("represented structurally")), "compact context should explain omitted command audit");
   assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => record(item, "omitted context").path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml" && String(record(item, "omitted context").reason).includes("represented structurally")), "compact context should explain omitted artifact contracts");
   assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => String(record(item, "omitted context").path).includes(".openworkflow/changes/**")), "fresh context should omit forbidden context");
   const fullContext = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--mode", "full", "--json"], env), "context");
@@ -348,6 +353,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(fullContextData.mode === "full", "full context should report full mode");
   assert(fullContextBudget.mode === "full", "full context budget should report full mode");
   assert(Number(fullContextBudget.max_bytes) === 24000, "full context should use full default budget");
+  assert(Array.isArray(fullContextData.included) && fullContextData.included.some((item) => record(item, "included full context").path === ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml"), "full context should include command audit when budget allows");
   assert(Array.isArray(fullContextData.included) && fullContextData.included.some((item) => record(item, "included full context").path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml"), "full context should include artifact contracts when budget allows");
   const invalidMode = await runCaptureStatus(["node", CLI, "context", "--root", root, "--mode", "verbose", "--json"], env);
   assert(invalidMode.code !== 0, "context should reject invalid mode");

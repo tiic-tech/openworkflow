@@ -168,6 +168,8 @@ const REQUIRED_FILES = [
   "changes/M39-stage-readiness-gates/WORK_ITEMS.yaml",
   "changes/M40-compact-context-default/CHANGE.yaml",
   "changes/M40-compact-context-default/WORK_ITEMS.yaml",
+  "changes/M41-compact-command-audit-slice/CHANGE.yaml",
+  "changes/M41-compact-command-audit-slice/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

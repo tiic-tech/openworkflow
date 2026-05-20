@@ -129,7 +129,7 @@ Two command surfaces:
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order.
-    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode; use --for /ow:<command>, --max-bytes, and --mode full when needed.
+    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.

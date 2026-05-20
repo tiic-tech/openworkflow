@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: change:M41-compact-command-audit-slice
+contract_type: change
+title: M41 Compact command audit slice
+status: accepted
+source_artifacts:
+  - changes/M40-compact-context-default/CHANGE.yaml
+depends_on:
+  - change:M40-compact-context-default
+produces:
+  - work_items:M41-compact-command-audit-slice
+summary: >
+  Complete the compact context default by representing COMMAND_AUDIT_INDEX.yaml
+  as the current command's structured audit slice instead of including the full
+  managed audit source file.
+problem: >
+  M40 made context compact by default and omitted the largest managed audit
+  sources, but compact mode still includes COMMAND_AUDIT_INDEX.yaml. That keeps
+  unnecessary managed metadata in the low-context startup packet even though
+  Agents only need the active command's audit checkpoints, allowed outputs, and
+  handoff boundaries.
+goals:
+  - Add a structured `command_audit` slice to `openworkflow context --json`.
+  - Omit `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml` in compact mode with an explicit structural-representation reason.
+  - Preserve full mode behavior so full context can include COMMAND_AUDIT_INDEX.yaml when budget allows.
+  - Keep readiness, context_packet, and summary/current_slice behavior unchanged.
+  - Update Agent-facing help and AGENTS.md guidance for compact command audit slices.
+non_goals:
+  - Do not change the managed COMMAND_AUDIT_INDEX.yaml file format.
+  - Do not remove command audit metadata from init/sync.
+  - Do not change raw evidence or summary trust semantics.
+decisions:
+  - "Compact mode should expose exactly the current command's audit intelligence, not the whole command audit registry."
+  - "Full mode remains the escape hatch for debugging generated OpenWorkflow metadata."
+open_questions:
+  - question: "Should command_audit be loaded from COMMAND_AUDIT_INDEX.yaml or assembled from registry code?"
+    outcome: "Load from the generated audit file so context reflects the repo-local managed surface that sync maintains."
+affected_paths:
+  - packages/cli/src/commands/context.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M41-compact-command-audit-slice/
+acceptance:
+  - "`openworkflow context --root <folder> --json` returns `command_audit` for the selected command."
+  - "Compact mode omits `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml` with a structured-representation reason."
+  - "`openworkflow context --root <folder> --mode full --json` includes COMMAND_AUDIT_INDEX.yaml when budget allows."
+  - "Help and AGENTS.md describe compact command audit slices."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+created_at: 2026-05-20
+updated_at: 2026-05-20

@@ -40,6 +40,19 @@ interface ContextPacketMetadata {
   audit_checkpoints: unknown;
 }
 
+interface CommandAuditMetadata {
+  id: string | null;
+  trigger: string;
+  stage: string | null;
+  visibility: string | null;
+  depth: string | null;
+  allowed_outputs: string[];
+  conditional_outputs: string[];
+  forbidden_outputs: string[];
+  handoff_commands: string[];
+  audit_checkpoints: unknown;
+}
+
 interface ContextBudget {
   mode: ContextMode;
   max_bytes: number;
@@ -57,6 +70,7 @@ interface ContextModel {
   readiness: ReadinessModel;
   inspect: InspectModel;
   context_packet: ContextPacketMetadata | null;
+  command_audit: CommandAuditMetadata | null;
   included: ContextPacketFile[];
   missing: ContextStatus[];
   omitted: ContextOmission[];
@@ -68,6 +82,11 @@ interface ContextModel {
 interface LoadedPacket {
   packetsPath: string;
   packets: unknown[];
+}
+
+interface LoadedCommandAudit {
+  path: string;
+  commands: unknown[];
 }
 
 interface BudgetState {
@@ -114,7 +133,8 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
   const readiness = await buildReadiness(root, requested);
   const inspect = buildInspectModel(brief, readiness);
   const packet = findPacket(loaded, readiness.normalized_command ?? requested);
-  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, packet);
+  const commandAudit = findCommandAudit(await loadCommandAudit(root), readiness.normalized_command ?? requested);
+  const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, packet, commandAudit);
   const packetErrors = packet ? [] : [`missing context packet for command: ${readiness.normalized_command ?? requested}`];
   const warnings = unique([
     ...readiness.warnings,
@@ -148,6 +168,7 @@ async function buildContextModel(
   readiness: ReadinessModel,
   inspect: InspectModel,
   contextPacket: ContextPacketMetadata | null,
+  commandAudit: CommandAuditMetadata | null,
 ): Promise<ContextModel> {
   const budget: BudgetState = {
     mode,
@@ -202,6 +223,7 @@ async function buildContextModel(
     readiness,
     inspect,
     context_packet: contextPacket,
+    command_audit: commandAudit,
     included,
     missing,
     omitted: uniqueOmissions(omitted),
@@ -376,6 +398,22 @@ async function loadContextPacketMetadata(root: string): Promise<LoadedPacket | n
   }
 }
 
+async function loadCommandAudit(root: string): Promise<LoadedCommandAudit | null> {
+  const path = ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml";
+  try {
+    const parsed = parseYaml(await readTextFile(join(root, path)));
+    if (!isRecord(parsed) || !Array.isArray(parsed.commands)) {
+      return { path, commands: [] };
+    }
+    return { path, commands: parsed.commands };
+  } catch (error) {
+    if (isNotFound(error)) {
+      return null;
+    }
+    throw error;
+  }
+}
+
 function findPacket(loaded: LoadedPacket, command: string): ContextPacketMetadata | null {
   for (const packet of loaded.packets) {
     if (!isRecord(packet) || stringValue(packet.command) !== command) {
@@ -389,6 +427,30 @@ function findPacket(loaded: LoadedPacket, command: string): ContextPacketMetadat
       optional: stringList(packet.optional),
       forbidden: stringList(packet.forbidden),
       audit_checkpoints: packet.audit_checkpoints ?? null,
+    };
+  }
+  return null;
+}
+
+function findCommandAudit(loaded: LoadedCommandAudit | null, command: string): CommandAuditMetadata | null {
+  if (!loaded) {
+    return null;
+  }
+  for (const entry of loaded.commands) {
+    if (!isRecord(entry) || stringValue(entry.trigger) !== command) {
+      continue;
+    }
+    return {
+      id: stringValue(entry.id),
+      trigger: command,
+      stage: stringValue(entry.stage),
+      visibility: stringValue(entry.visibility),
+      depth: stringValue(entry.depth),
+      allowed_outputs: stringList(entry.allowed_outputs),
+      conditional_outputs: stringList(entry.conditional_outputs),
+      forbidden_outputs: stringList(entry.forbidden_outputs),
+      handoff_commands: stringList(entry.handoff_commands),
+      audit_checkpoints: entry.audit_checkpoints ?? null,
     };
   }
   return null;
@@ -489,7 +551,7 @@ function isRawEvidencePath(path: string): boolean {
 }
 
 function isBulkyManagedAuditPath(path: string): boolean {
-  return path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml" || path === ".openworkflow/audit/CONTEXT_PACKETS.yaml" || path === ".openworkflow/audit/DISCLOSURE_LEVELS.yaml";
+  return path === ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml" || path === ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml" || path === ".openworkflow/audit/CONTEXT_PACKETS.yaml" || path === ".openworkflow/audit/DISCLOSURE_LEVELS.yaml";
 }
 
 function defaultMaxBytes(mode: ContextMode): number {
