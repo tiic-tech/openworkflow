@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: work_items:M52-default-sync-adapter-recovery
+contract_type: work_items
+title: M52 Default sync adapter recovery work items
+status: completed
+change_contract: changes/M52-default-sync-adapter-recovery/CHANGE.yaml
+items:
+  - task_id: M52-T001
+    title: Fix default sync tool fallback
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/sync.ts
+    acceptance:
+      - Default auto sync selects Codex when no configured or detected tools remain.
+      - Explicit --tools behavior is unchanged.
+      - Sync JSON exposes fallback evidence.
+  - task_id: M52-T002
+    title: Cover default recovery in Agent E2E
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyAgentE2E.ts
+    acceptance:
+      - Agent E2E uses default `sync --json` after clean.
+      - Agent E2E asserts Codex adapter restoration and doctor tool health.
+  - task_id: M52-T003
+    title: Register M52 validation
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Repository validation requires M52 contracts.

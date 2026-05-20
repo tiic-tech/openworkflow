@@ -53,6 +53,7 @@ const REQUIRED_FILES = [
   "packages/cli/src/dev/validateRepositoryContractsCli.ts",
   "packages/cli/src/dev/verifyRuntimeSurface.ts",
   "packages/cli/src/dev/verifyWorkflowE2E.ts",
+  "packages/cli/src/dev/verifyAgentE2E.ts",
   "packages/cli/src/dev/verifyCleanCommand.ts",
   "packages/adapters/src/registry.ts",
   "packages/core/src/artifacts/registry.ts",
@@ -188,6 +189,10 @@ const REQUIRED_FILES = [
   "changes/M49-single-handoff-entry/WORK_ITEMS.yaml",
   "changes/M50-context-handoff-mode/CHANGE.yaml",
   "changes/M50-context-handoff-mode/WORK_ITEMS.yaml",
+  "changes/M51-agent-first-e2e-suite/CHANGE.yaml",
+  "changes/M51-agent-first-e2e-suite/WORK_ITEMS.yaml",
+  "changes/M52-default-sync-adapter-recovery/CHANGE.yaml",
+  "changes/M52-default-sync-adapter-recovery/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

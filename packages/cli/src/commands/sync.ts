@@ -13,7 +13,8 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   const explicitTools = parseTools(rawTools);
   const autoTools = isAutoTools(explicitTools);
   const detection = await detectAdapterPlatforms(root);
-  const tools = resolveSyncTools(explicitTools, detection.detected);
+  const fallbackTools = autoTools && detection.detected.length === 0 && detection.configured.length === 0 ? ["codex"] : [];
+  const tools = resolveSyncTools(explicitTools, detection.detected, fallbackTools);
   const workflowTools = autoTools ? uniqueTools([...tools, ...detection.unknownConfigured]) : tools;
   const force = booleanFlag(flags, "force");
   const json = booleanFlag(flags, "json");
@@ -81,7 +82,7 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
         workflow,
         state_reconciliation: workflow.stateReconciliation,
         agents_md: agentsGuide,
-        detection,
+        detection: detectionWithFallback(detection, fallbackTools),
         tools,
         adapters: Object.fromEntries(adapterResults.map((entry) => [entry.tool, entry.result])),
       },
@@ -112,8 +113,9 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
     console.log(`CURRENT_STATE reconciliation: ${workflow.stateReconciliation.reconciled ? "reconciled" : workflow.stateReconciliation.reason}`);
   }
   console.log(`AGENTS.md: ${agentsGuide.action}`);
-  if (detection.evidence.length > 0 && autoTools) {
-    console.log(`Detected tools: ${tools.length > 0 ? tools.join(", ") : "none"} (${detection.evidence.join("; ")})`);
+  const displayedDetection = detectionWithFallback(detection, fallbackTools);
+  if (displayedDetection.evidence.length > 0 && autoTools) {
+    console.log(`Detected tools: ${tools.length > 0 ? tools.join(", ") : "none"} (${displayedDetection.evidence.join("; ")})`);
   } else if (autoTools) {
     console.log("Detected tools: none");
   }
@@ -126,11 +128,28 @@ export async function syncCommand(flags: Map<string, string | boolean>): Promise
   return ok ? 0 : 1;
 }
 
-function resolveSyncTools(explicitTools: string[], detectedTools: string[]): string[] {
+function resolveSyncTools(explicitTools: string[], detectedTools: string[], fallbackTools: string[]): string[] {
   if (isAutoTools(explicitTools)) {
-    return detectedTools;
+    return detectedTools.length > 0 ? detectedTools : fallbackTools;
   }
   return explicitTools;
+}
+
+function detectionWithFallback(
+  detection: Awaited<ReturnType<typeof detectAdapterPlatforms>>,
+  fallbackTools: string[],
+): Awaited<ReturnType<typeof detectAdapterPlatforms>> {
+  if (fallbackTools.length === 0) {
+    return detection;
+  }
+  return {
+    ...detection,
+    detected: uniqueTools([...detection.detected, ...fallbackTools]),
+    evidence: [
+      ...detection.evidence,
+      `default auto sync fallback tool: ${fallbackTools.join(", ")}; no configured or detected adapter surface remained`,
+    ],
+  };
 }
 
 function isAutoTools(tools: string[]): boolean {

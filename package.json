@@ -37,6 +37,7 @@
     "validate": "npm run build && node dist/cli/src/dev/validateRepositoryContractsCli.js --root .",
     "verify:runtime-surface": "npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js",
     "verify:e2e-workflow": "npm run build && node dist/cli/src/dev/verifyWorkflowE2E.js",
+    "verify:agent-e2e": "npm run build && node dist/cli/src/dev/verifyAgentE2E.js",
     "verify:clean": "npm run build && node dist/cli/src/dev/verifyCleanCommand.js",
     "prepack": "npm run build",
     "prepublishOnly": "npm run validate && npm run verify:runtime-surface && npm run verify:e2e-workflow && npm run verify:clean",

@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: change:M52-default-sync-adapter-recovery
+contract_type: change
+title: M52 Default sync adapter recovery
+status: accepted
+source_artifacts:
+  - changes/M51-agent-first-e2e-suite/CHANGE.yaml
+depends_on:
+  - change:M51-agent-first-e2e-suite
+produces:
+  - work_items:M52-default-sync-adapter-recovery
+summary: >
+  Fix default sync recovery after clean so OpenWorkflow restores the Codex
+  adapter surface instead of silently rebuilding a workflow with no tools.
+problem: >
+  After `clean --yes --json`, default `sync --json` has no config or adapter
+  evidence to detect. It currently resolves auto tools to an empty list,
+  restores `.openworkflow` and AGENTS.md, but does not restore the Codex
+  adapter. `doctor --json` then reports ok with `tools: []`, creating false
+  readiness for Agents.
+goals:
+  - Make default sync recover Codex when auto detection finds no configured or detected tools.
+  - Keep explicit `--tools` behavior unchanged.
+  - Expose the fallback in sync detection/evidence so Agents can see why Codex was selected.
+  - Update Agent-first E2E to cover default `sync --json` after clean.
+  - Register M52 contracts in repository validation.
+non_goals:
+  - Do not add multi-platform detection beyond Codex in M52.
+  - Do not change clean preservation boundaries.
+  - Do not make doctor infer missing adapters independently of sync state.
+decisions:
+  - "Codex is the fallback platform for auto sync when no tool evidence remains after clean."
+  - "Explicit --tools remains authoritative and should not be overridden."
+  - "The regression must be covered in verify:agent-e2e, not only in ad hoc audits."
+open_questions:
+  - question: "How should future multi-platform sync choose a fallback when no tool evidence remains?"
+    outcome: "Defer; M52 documents Codex as the current first-priority fallback."
+affected_paths:
+  - packages/cli/src/commands/sync.ts
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M52-default-sync-adapter-recovery/
+acceptance:
+  - "After clean, default `sync --json` restores `.agents/openworkflow-adapter.yaml`."
+  - "Default sync JSON explains Codex fallback evidence when no tools are detected."
+  - "After default sync recovery, default `doctor --json` reports tools including codex and adapter_ok true."
+  - "`verify:agent-e2e` covers default sync recovery, not explicit `--tools codex` only."
+  - "Repository validation requires M52 contracts."
+validation:
+  - npm run build
+  - npm run verify:agent-e2e
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20
