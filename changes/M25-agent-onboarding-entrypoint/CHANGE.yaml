@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: change:M25-agent-onboarding-entrypoint
+contract_type: change
+title: M25 Agent onboarding entrypoint
+status: draft
+source_artifacts:
+  - changes/M24-agent-context-state-and-summaries/CHANGE.yaml
+depends_on:
+  - change:M24-agent-context-state-and-summaries
+produces:
+  - work_items:M25-agent-onboarding-entrypoint
+summary: >
+  Add a root AGENTS.md onboarding entrypoint and improve openworkflow --help so
+  first-consumer agents can quickly understand OpenWorkflow usage, command
+  boundaries, and low-context reading order.
+problem: >
+  M24 added CURRENT_STATE.yaml as the low-context workflow entrypoint, but a new
+  agent entering a repository may not know OpenWorkflow is installed or that it
+  should start from CURRENT_STATE.yaml and repo-local ow skills. The CLI help is
+  currently focused on human package operation and does not explain the
+  workflow command surface, lazy-create rule, or agent consumption path. We need
+  a durable root-level onboarding guide and a maintainable template mechanism so
+  OpenWorkflow can improve that guide and the --help text across versions.
+goals:
+  - Add a maintained AGENTS.md prompt template to the OpenWorkflow source.
+  - During openworkflow init, create AGENTS.md from the template when the file does not exist.
+  - When AGENTS.md already exists, append or update only an OpenWorkflow-managed block instead of overwriting user content.
+  - Make the AGENTS.md insertion idempotent with explicit generated markers and a template version.
+  - Update sync to refresh the OpenWorkflow-managed AGENTS.md block when the packaged template changes.
+  - Update clean to remove only the OpenWorkflow-managed AGENTS.md block, and remove AGENTS.md only if it becomes empty and was fully generated.
+  - Improve openworkflow --help with Agent-facing usage guidance, /ow:* workflow command boundaries, lazy-create behavior, and first-read files.
+  - Add regression coverage for AGENTS.md creation, append/update behavior, clean behavior, and help text quality.
+non_goals:
+  - Do not overwrite arbitrary user-authored AGENTS.md content.
+  - Do not require every downstream agent platform to use the same root filename beyond AGENTS.md in this change.
+  - Do not implement full command execution for /ow:* commands as CLI subcommands.
+  - Do not create stage artifacts during init.
+decisions:
+  - AGENTS.md becomes part of the init surface because the user explicitly wants a root-level Agent entrypoint.
+  - The source of truth for the OpenWorkflow section is a versioned template in the package source, not hand-written string literals scattered through CLI code.
+  - The generated block should be bounded by stable markers so init, sync, doctor, and clean can reason about it safely.
+  - Existing AGENTS.md files are preserved; OpenWorkflow appends the managed block if missing and replaces only that block when refreshing.
+  - openworkflow --help must explain both CLI maintenance commands and repo-local /ow:* workflow skills because agents commonly discover capabilities through help text.
+open_questions:
+  - Should the maintained template live under templates/openworkflow/AGENTS.md, packages/core/src/onboarding/, or both source plus packaged template output?
+  - Should doctor report stale AGENTS.md template versions as warnings or failures?
+  - Should sync refresh AGENTS.md by default, or require --force when the existing managed block was locally edited?
+affected_paths:
+  - packages/cli/src/commands/init.ts
+  - packages/cli/src/commands/sync.ts
+  - packages/cli/src/commands/clean.ts
+  - packages/cli/src/commands/doctor.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/
+  - packages/adapters/codex/src/
+  - templates/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyCleanCommand.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M25-agent-onboarding-entrypoint/
+acceptance:
+  - openworkflow init creates AGENTS.md with a concise OpenWorkflow-managed section when no AGENTS.md exists.
+  - If AGENTS.md exists, init preserves user content and appends the OpenWorkflow-managed section exactly once.
+  - Re-running init or sync does not duplicate the OpenWorkflow section.
+  - sync refreshes the managed section from the packaged template when the template version changes.
+  - clean removes the managed section without deleting unrelated AGENTS.md content.
+  - openworkflow --help includes an Agent quick start, first-read files, /ow:* workflow command summary, lazy-create warning, and CLI maintenance command summary.
+  - Runtime surface, clean, and workflow E2E verification cover the AGENTS.md and help behavior.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+  - npm run smoke:init
+  - npm run validate:cli
+updated_at: 2026-05-20
