@@ -1,44 +1,60 @@
 import { resolve } from "node:path";
-import { evaluateSummaryHealth, type SummaryHealthModel } from "../../../core/src/workflow/summaryHealth.js";
+import {
+  evaluateSummaryHealth,
+  evaluateSummaryQualityGate,
+  type SummaryHealthModel,
+  type SummaryQualityGate,
+} from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 
 export async function summariesCommand(flags: Map<string, string | boolean>): Promise<number> {
   const root = resolve(stringFlag(flags, "root", ".") ?? ".");
   const json = booleanFlag(flags, "json");
+  const strict = booleanFlag(flags, "strict");
   const health = await evaluateSummaryHealth(root);
+  const qualityGate = evaluateSummaryQualityGate(health, strict);
+  const ok = health.ok && qualityGate.ok;
   if (json) {
-    const healthErrors = healthErrorsForSummaries(health);
+    const healthErrors = healthErrorsForSummaries(health, qualityGate);
     printJsonReport({
       command: "summaries",
-      ok: health.ok,
+      ok,
       root,
-      data: health,
+      data: {
+        ...health,
+        strict_quality: qualityGate,
+      },
       warnings: health.warnings,
       errors: health.initialized ? [] : health.warnings,
       health_errors: healthErrors,
       effects: emptyEffects(),
-      next_actions: health.next_actions,
+      next_actions: nextActionsFor(health, qualityGate),
     });
   } else {
-    printSummaries(health);
+    printSummaries(health, qualityGate);
   }
-  return health.ok ? 0 : 1;
+  return ok ? 0 : 1;
 }
 
-function healthErrorsForSummaries(health: SummaryHealthModel): string[] {
-  if (health.ok) {
-    return [];
-  }
-  if (health.warnings.length > 0) {
-    return health.warnings;
-  }
-  return ["summary health is not ok"];
+function healthErrorsForSummaries(health: SummaryHealthModel, qualityGate: SummaryQualityGate): string[] {
+  const freshnessErrors = health.ok
+    ? []
+    : health.warnings.length > 0 ? health.warnings : ["summary health is not ok"];
+  return unique([...freshnessErrors, ...qualityGate.health_errors]);
 }
 
-function printSummaries(health: SummaryHealthModel): void {
+function nextActionsFor(health: SummaryHealthModel, qualityGate: SummaryQualityGate): string[] {
+  const strictActions = qualityGate.health_errors.length > 0
+    ? ["repair thin source artifacts or inspect raw evidence before trusting summaries"]
+    : [];
+  return unique([...health.next_actions, ...strictActions]);
+}
+
+function printSummaries(health: SummaryHealthModel, qualityGate: SummaryQualityGate): void {
   console.log("OpenWorkflow summary health");
-  console.log(`ok: ${health.ok}`);
+  console.log(`ok: ${health.ok && qualityGate.ok}`);
+  console.log(`strict_quality: ${qualityGate.strict}`);
   console.log(`initialized: ${health.initialized}`);
   if (!health.initialized) {
     for (const warning of health.warnings) {
@@ -57,10 +73,15 @@ function printSummaries(health: SummaryHealthModel): void {
       console.log(`  quality: ${item.quality_status} (${item.artifact_path})`);
     }
   }
-  if (health.next_actions.length > 0) {
+  const nextActions = nextActionsFor(health, qualityGate);
+  if (nextActions.length > 0) {
     console.log("next_actions:");
-    for (const action of health.next_actions) {
+    for (const action of nextActions) {
       console.log(`  - ${action}`);
     }
   }
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values.filter((value) => value.trim().length > 0))];
 }

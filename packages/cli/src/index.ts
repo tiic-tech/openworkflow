@@ -89,12 +89,12 @@ Usage:
   openworkflow doctor --root <folder> [--tools auto|codex]
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
-  openworkflow inspect --root <folder> [--json]
+  openworkflow inspect --root <folder> [--strict] [--json]
   openworkflow context --root <folder> [--for <ow-command>] [--mode compact|full] [--max-bytes <n>] [--json]
   openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--force] [--json]
   openworkflow register --root <folder> --artifact <path> [--current] [--next-command <ow-command>] [--write] [--json]
   openworkflow check <ow-command> --root <folder> [--json]
-  openworkflow summaries --root <folder> [--json]
+  openworkflow summaries --root <folder> [--strict] [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
@@ -119,7 +119,8 @@ Agent quick start:
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
   full evidence. Prefer SUMMARY.yaml/current_slice guidance when a long artifact
   offers it, but check summary quality fields before treating a current summary
-  as a complete handoff. Use --json when an Agent needs structured command output.
+  as a complete handoff. Add --strict to summaries or inspect when thin source
+  quality should block the Agent handoff. Use --json when an Agent needs structured command output.
   Use openworkflow context --root . --json when you want OpenWorkflow to package
   the next command's compact startup context instead of reading files one by one.
 
@@ -129,14 +130,14 @@ Two command surfaces:
     sync       Detect current platforms, refresh managed workflow files, and sync adapters.
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
-    inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order.
+    inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice; use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
     register   Preview index registration for an existing source artifact; pass --write to update the index, and --current to update active pointers.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context, output boundaries, and current artifact usability before starting a /ow:* command.
-    summaries  Check summary freshness and source quality before raw evidence; requires an initialized .openworkflow root.
+    summaries  Check summary freshness and source quality before raw evidence; requires an initialized .openworkflow root. Add --strict to fail on current-but-thin source quality.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
@@ -148,7 +149,8 @@ Two command surfaces:
     for blocking health/readiness failures, errors for command/runtime failures,
     and warnings for non-blocking guidance.
     Use summaries --json before loading raw evidence when summary/current-slice
-    health or source quality is unknown.
+    health or source quality is unknown. Use summaries --strict --json, or
+    inspect --strict --json at repo entry, when draft/thin sources must block trust.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

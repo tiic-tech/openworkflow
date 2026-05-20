@@ -26,7 +26,7 @@ export function renderAgentsGuide(): string {
 - Run \`openworkflow --help\` first when you need current CLI capabilities, workflow command boundaries, or maintenance commands.
 - Prefer \`--json\` for structured command output; every OpenWorkflow CLI command supports a JSON report envelope for Agent consumption.
 - Treat JSON \`ok:false\` as a failed command: OpenWorkflow exits nonzero but still writes the parseable JSON report to stdout. Read \`health_errors\` for blocking health/readiness failures, \`errors\` for command/runtime failures, and \`warnings\` for non-blocking guidance.
-- Start with \`openworkflow inspect --root . --json\` for the aggregated Agent entry read model, health, next-command readiness, and read order.
+- Start with \`openworkflow inspect --root . --json\` for the aggregated Agent entry read model, health, next-command readiness, and read order; add \`--strict\` when current-but-thin summary quality should block handoff trust.
 - Start every workflow turn by reading \`.openworkflow/CURRENT_STATE.yaml\`, then follow its \`read_this_first\` pointers before loading full evidence.
 - CLI commands maintain and summarize the repo-local workflow surface: \`init\`, \`sync\`, \`validate\`, \`doctor\`, \`inspect\`, \`context\`, \`draft\`, \`register\`, \`status\`, \`brief\`, \`check\`, \`summaries\`, and \`clean\`.
 - Use \`openworkflow context --root . --json\` to materialize a compact startup packet for \`CURRENT_STATE.next_command\`; compact mode returns a structured \`command_audit\` slice instead of full audit source. Add \`--for /ow:<command>\`, \`--max-bytes <n>\`, or \`--mode full\` when you need a specific workflow command, tighter budget, or full managed audit source.
@@ -34,7 +34,7 @@ export function renderAgentsGuide(): string {
 - Use \`openworkflow register --root . --artifact <path> --json\` after a source artifact exists to preview index registration; add \`--write\` to make it visible to read models, and \`--current\` only when it should become the active pointer.
 - Use \`openworkflow brief --root .\` or \`openworkflow status --root .\` for a low-context Agent read model before deciding what to inspect next; use \`--json\` when another tool needs structured data.
 - Use \`openworkflow check /ow:<command> --root . --json\` before uncertain workflow work to verify required context, forbidden context, output boundaries, current artifact usability, and next actions.
-- Use \`openworkflow summaries --root . --json\` before loading raw evidence when artifact summaries or current slices may be missing, stale, or current-but-thin; freshness and source artifact quality are separate signals.
+- Use \`openworkflow summaries --root . --json\` before loading raw evidence when artifact summaries or current slices may be missing, stale, or current-but-thin; add \`--strict\` to make draft/thin source quality return \`ok:false\`. Freshness and source artifact quality are separate signals.
 - Use \`openworkflow summarize --root . --artifact <path> --json\` to preview SUMMARY.yaml refreshes; add \`--write\` only when you intend to update summary files without changing source artifacts.
 - Use \`openworkflow validate --root . --json\` for contract shape; SUMMARY.yaml trust is checked by \`summaries\`, not by \`validate\`.
 - Use \`openworkflow clean --root . --tools codex --json\` to preview managed/generated cleanup; \`--yes\` removes OpenWorkflow managed metadata and generated adapter files while preserving source artifacts, SUMMARY.yaml, evidence, notes, and user AGENTS.md content.

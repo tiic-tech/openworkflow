@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: work_items:M46-strict-summary-quality
+contract_type: work_items
+title: M46 Strict summary quality work items
+status: completed
+change_contract: changes/M46-strict-summary-quality/CHANGE.yaml
+items:
+  - task_id: M46-T001
+    title: Add strict summary quality helper
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    acceptance:
+      - Core can derive quality health errors from current_but_thin items.
+      - Freshness health remains unchanged.
+  - task_id: M46-T002
+    title: Add strict CLI gates
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/summaries.ts
+      - packages/cli/src/commands/inspect.ts
+    acceptance:
+      - summaries --strict returns nonzero for thin quality.
+      - inspect --strict returns nonzero for thin quality.
+  - task_id: M46-T003
+    title: Update Agent guidance and tests
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Help and AGENTS.md mention strict summary quality.
+      - Runtime verifier covers strict and non-strict behavior.
+      - Repository validation requires M46 contracts.

@@ -40,6 +40,12 @@ export interface SummaryHealthModel {
   next_actions: string[];
 }
 
+export interface SummaryQualityGate {
+  strict: boolean;
+  ok: boolean;
+  health_errors: string[];
+}
+
 interface SummaryArtifactContract {
   artifactType: string;
   command: string;
@@ -80,6 +86,29 @@ export async function evaluateSummaryHealth(root: string): Promise<SummaryHealth
     warnings,
     next_actions: nextActions,
   };
+}
+
+export function evaluateSummaryQualityGate(health: SummaryHealthModel, strict: boolean): SummaryQualityGate {
+  const healthErrors = strict ? summaryQualityHealthErrors(health) : [];
+  return {
+    strict,
+    ok: healthErrors.length === 0,
+    health_errors: healthErrors,
+  };
+}
+
+export function summaryQualityHealthErrors(health: SummaryHealthModel): string[] {
+  return unique(health.entries.flatMap((entry) =>
+    entry.items.flatMap((item) => {
+      if (item.quality_status !== "current_but_thin") {
+        return [];
+      }
+      const details = item.quality_warnings.length > 0
+        ? item.quality_warnings
+        : [`summary source quality is current_but_thin: ${item.artifact_path}`];
+      return details.map((detail) => `summary quality ${entry.artifact_type}: ${detail}`);
+    })
+  ));
 }
 
 async function loadArtifactContracts(contractsPath: string): Promise<SummaryArtifactContract[] | null> {
@@ -435,6 +464,10 @@ function hasNonEmptyValue(value: unknown): boolean {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)];
 }
 
 function stringValue(value: unknown): string | null {

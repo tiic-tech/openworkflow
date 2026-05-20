@@ -2,7 +2,7 @@ import { stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { isNotFound, readTextFile } from "../../../core/src/fs/index.js";
-import { type SummaryHealthEntry } from "../../../core/src/workflow/summaryHealth.js";
+import { evaluateSummaryQualityGate, type SummaryHealthEntry } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { buildBriefModel } from "./brief.js";
@@ -131,7 +131,7 @@ export async function contextCommand(flags: Map<string, string | boolean>): Prom
   }
 
   const readiness = await buildReadiness(root, requested);
-  const inspect = buildInspectModel(brief, readiness);
+  const inspect = buildInspectModel(brief, readiness, evaluateSummaryQualityGate(brief.health.summaries, false));
   const packet = findPacket(loaded, readiness.normalized_command ?? requested);
   const commandAudit = findCommandAudit(await loadCommandAudit(root), readiness.normalized_command ?? requested);
   const model = await buildContextModel(root, mode, maxBytes, readiness, inspect, packet, commandAudit);

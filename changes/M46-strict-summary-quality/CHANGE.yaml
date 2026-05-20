@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: change:M46-strict-summary-quality
+contract_type: change
+title: M46 Strict summary quality
+status: accepted
+source_artifacts:
+  - changes/M45-sync-state-reconciliation/CHANGE.yaml
+depends_on:
+  - change:M45-sync-state-reconciliation
+produces:
+  - work_items:M46-strict-summary-quality
+summary: >
+  Add an opt-in strict summary quality gate so Agents can treat current-but-thin
+  summaries, draft sources, and empty handoff-critical fields as blocking
+  health failures.
+problem: >
+  M43 distinguishes freshness from source quality, but default summary health
+  intentionally keeps fresh-but-thin artifacts as ok:true with warnings. That is
+  useful for compatibility, but Agents need a strict mode when they are deciding
+  whether a handoff is safe enough to trust without reading full evidence.
+goals:
+  - Add `summaries --strict` to turn current_but_thin quality into ok:false and nonzero exit.
+  - Add `inspect --strict` so the Agent entrypoint can enforce the same quality gate.
+  - Preserve default non-strict behavior for compatibility.
+  - Surface strict quality failures in `health_errors` and structured JSON data.
+  - Update help and AGENTS.md guidance for strict quality usage.
+non_goals:
+  - Do not change summary freshness semantics.
+  - Do not make `validate` schema-check SUMMARY.yaml files.
+  - Do not make `doctor` fail on handoff quality in M46.
+decisions:
+  - "`status` remains freshness; strict mode gates on `quality_status`."
+  - "Strict mode is opt-in for M46 to avoid breaking existing automation that treats freshness current as ok."
+  - "`inspect --strict` gives Agents a single entry command that can fail on thin handoff quality without making `doctor` a handoff gate."
+open_questions:
+  - question: "Should strict quality become the default later?"
+    outcome: "Not in M46; collect E2E evidence first."
+affected_paths:
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/commands/inspect.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M46-strict-summary-quality/
+acceptance:
+  - "Default `summaries --json` stays ok:true for fresh current_but_thin summaries."
+  - "`summaries --strict --json` returns ok:false, nonzero exit, and health_errors for current_but_thin summaries."
+  - "`inspect --strict --json` returns ok:false when summary quality is thin."
+  - "Help and AGENTS.md explain when Agents should use strict quality mode."
+  - "Runtime verification covers default and strict quality behavior."
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+created_at: 2026-05-20
+updated_at: 2026-05-20

@@ -178,6 +178,8 @@ const REQUIRED_FILES = [
   "changes/M44-clean-sync-recovery-e2e/WORK_ITEMS.yaml",
   "changes/M45-sync-state-reconciliation/CHANGE.yaml",
   "changes/M45-sync-state-reconciliation/WORK_ITEMS.yaml",
+  "changes/M46-strict-summary-quality/CHANGE.yaml",
+  "changes/M46-strict-summary-quality/WORK_ITEMS.yaml",
 ];
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);

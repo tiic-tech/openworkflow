@@ -121,6 +121,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
     "openworkflow inspect --root . --json",
+    "--strict",
     "openworkflow context --root . --json",
     "--for /ow:<command>",
     "--max-bytes <n>",
@@ -130,6 +131,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
     "openworkflow summaries --root . --json",
+    "draft/thin source quality return `ok:false`",
     "openworkflow summarize --root . --artifact <path> --json",
     "SUMMARY.yaml trust is checked by `summaries`, not by `validate`",
     "/ow:vision",
@@ -164,6 +166,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "status",
     "brief",
     "inspect",
+    "fail on current-but-thin summaries",
     "context",
     "Read-only packet materializer",
     "--max-bytes",
@@ -174,6 +177,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "index registration",
     "check",
     "summaries",
+    "--strict",
     "summarize",
     "pass --write to update summary files",
     "SUMMARY.yaml freshness is checked by summaries",
@@ -182,6 +186,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "schema_version, command, ok, root, data, warnings, errors",
     "health_errors",
     "When ok is false",
+    "inspect --strict --json",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
   }
@@ -408,6 +413,24 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prototype_artifact"), "thin prototype summary should report empty key fields");
   assert(Array.isArray(currentPrototypeRecord.quality_warnings) && currentPrototypeRecord.quality_warnings.some((item) => String(item).includes("empty handoff fields")), "thin prototype summary should report quality warnings");
   assert(currentAfterWrite.ok === true, "current but thin summary should not fail freshness health");
+  const strictSummaryStatus = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--strict", "--json"], env);
+  assert(strictSummaryStatus.code !== 0, "summaries --strict should fail for current_but_thin quality");
+  const strictSummary = parseJsonReport(strictSummaryStatus.output, "summaries");
+  const strictSummaryData = record(strictSummary.data, "strict summary data");
+  const strictQuality = record(strictSummaryData.strict_quality, "strict quality");
+  assert(strictSummary.ok === false, "summaries --strict should report ok=false");
+  assert(strictQuality.strict === true, "summaries --strict should report strict quality enabled");
+  assert(strictQuality.ok === false, "summaries --strict should report strict quality failure");
+  assert(nonEmptyArray(strictSummary.health_errors), "summaries --strict should expose quality health_errors");
+  assert(Array.isArray(strictSummary.health_errors) && strictSummary.health_errors.some((item) => String(item).includes("summary quality prototype_evidence")), "summaries --strict health_errors should name prototype quality");
+  const strictInspectStatus = await runCaptureStatus(["node", CLI, "inspect", "--root", root, "--strict", "--json"], env);
+  assert(strictInspectStatus.code !== 0, "inspect --strict should fail for current_but_thin quality");
+  const strictInspect = parseJsonReport(strictInspectStatus.output, "inspect");
+  const strictInspectData = record(strictInspect.data, "strict inspect data");
+  const inspectStrictQuality = record(strictInspectData.strict_quality, "inspect strict quality");
+  assert(strictInspect.ok === false, "inspect --strict should report ok=false");
+  assert(inspectStrictQuality.strict === true, "inspect --strict should report strict quality enabled");
+  assert(nonEmptyArray(strictInspect.health_errors), "inspect --strict should expose quality health_errors");
   const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
   assert(designContextStatus.code !== 0, "design context should return nonzero while readiness blockers exist");
   const designContext = parseJsonReport(designContextStatus.output, "context");
