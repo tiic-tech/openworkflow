@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: work_items:M26-non-destructive-multi-platform-sync
+contract_type: work_items
+title: M26 Non-destructive multi-platform sync work items
+status: draft
+change_contract: changes/M26-non-destructive-multi-platform-sync/CHANGE.yaml
+items:
+  - task_id: M26-T001
+    title: Define adapter registry and platform detection
+    status: planned
+    owned_paths:
+      - packages/adapters/
+      - packages/adapters/codex/src/
+      - packages/cli/src/commands/sync.ts
+    acceptance:
+      - Codex adapter is exposed through a registry entry rather than direct sync-only wiring.
+      - Detection reads .openworkflow/config.yaml tools first and then managed adapter surfaces.
+      - Unknown or future platforms are reported clearly without being created.
+  - task_id: M26-T002
+    title: Implement workflow-level sync migration
+    status: planned
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/sync.ts
+    acceptance:
+      - Missing managed workflow-level files can be added to older projects.
+      - Audit contracts can be refreshed from the current package safely.
+      - Existing stage artifacts are not overwritten or created by workflow sync.
+  - task_id: M26-T003
+    title: Update sync reporting and CLI semantics
+    status: planned
+    owned_paths:
+      - packages/cli/src/commands/sync.ts
+      - packages/cli/src/index.ts
+    acceptance:
+      - Omitted --tools and --tools auto detect existing platforms.
+      - Explicit --tools only syncs requested platforms.
+      - Output separates workflow results from each adapter result.
+  - task_id: M26-T004
+    title: Extend doctor for workflow and adapter drift
+    status: planned
+    owned_paths:
+      - packages/cli/src/commands/doctor.ts
+      - packages/adapters/codex/src/doctorCodexAdapter.ts
+      - packages/core/src/workflow/
+    acceptance:
+      - doctor reports missing CURRENT_STATE.yaml or stale audit contracts.
+      - doctor reports stale/missing platform adapters through registry entries.
+      - Messages identify whether sync can safely fix the issue.
+  - task_id: M26-T005
+    title: Add non-destructive sync regression tests
+    status: planned
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyCleanCommand.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Tests simulate an older project missing newer managed workflow files.
+      - Tests verify sync adds managed files and updates adapters without touching user artifacts.
+      - Tests verify auto-detection and explicit --tools behavior.
+      - Repository validation includes M26 change contracts.
