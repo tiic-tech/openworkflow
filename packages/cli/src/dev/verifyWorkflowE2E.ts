@@ -435,6 +435,18 @@ async function verifySummaryReadModel(runtime: Runtime): Promise<void> {
   const readOrder = recordField(inspectData, "read_order", phase);
   assertPhase(phase, Array.isArray(readOrder.must_read), "inspect read_order missing must_read");
   assertPhase(phase, readOrder.must_read.includes(".openworkflow/CURRENT_STATE.yaml"), "inspect must_read missing current state");
+
+  const context = JSON.parse(await runCapture(["node", CLI, "context", "--root", runtime.target, "--json"], { ...process.env })) as Record<string, unknown>;
+  assertPhase(phase, context.command === "context", "context report command mismatch");
+  assertPhase(phase, context.ok === true, "fresh context report should be ok");
+  const contextData = recordField(context, "data", phase);
+  for (const key of ["normalized_command", "packet_id", "budget", "readiness", "inspect", "context_packet", "included", "omitted", "recommended_next_actions"]) {
+    assertPhase(phase, key in contextData, `context missing key ${key}`);
+  }
+  assertPhase(phase, contextData.normalized_command === "/ow:vision", "context should default to CURRENT_STATE.next_command");
+  assertPhase(phase, contextData.packet_id === "context:vision", "context missing packet id");
+  assertPhase(phase, Array.isArray(contextData.included), "context included must be array");
+  assertPhase(phase, Array.isArray(contextData.omitted), "context omitted must be array");
 }
 
 async function runCaptureStatus(command: string[], env: NodeJS.ProcessEnv): Promise<{ code: number | null; output: string }> {
@@ -464,6 +476,8 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, guide, "openworkflow --help", "AGENTS.md does not point agents to CLI help");
   assertIncludes(phase, guide, "Prefer `--json`", "AGENTS.md does not mention JSON report mode");
   assertIncludes(phase, guide, "openworkflow inspect --root . --json", "AGENTS.md does not mention inspect command");
+  assertIncludes(phase, guide, "openworkflow context --root . --json", "AGENTS.md does not mention context command");
+  assertIncludes(phase, guide, "--max-bytes <n>", "AGENTS.md does not mention context budget");
   assertIncludes(phase, guide, ".openworkflow/CURRENT_STATE.yaml", "AGENTS.md does not point agents to current state");
   assertIncludes(phase, guide, "CLI commands maintain and summarize the repo-local workflow surface", "AGENTS.md does not distinguish CLI maintenance commands");
   assertIncludes(phase, guide, "openworkflow brief --root .", "AGENTS.md does not mention brief command");
@@ -481,6 +495,8 @@ async function verifyAgentOnboarding(target: string, env: NodeJS.ProcessEnv): Pr
   assertIncludes(phase, help, "Lazy creation boundary", "help missing lazy creation boundary");
   assertIncludes(phase, help, "Every command supports --json", "help missing JSON report mode");
   assertIncludes(phase, help, "inspect", "help missing inspect command");
+  assertIncludes(phase, help, "context", "help missing context command");
+  assertIncludes(phase, help, "--max-bytes", "help missing context budget");
   assertIncludes(phase, help, "check", "help missing check command");
   assertIncludes(phase, help, "summaries", "help missing summaries command");
   assertIncludes(phase, help, "summarize", "help missing summarize command");

@@ -120,6 +120,9 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
     "openworkflow inspect --root . --json",
+    "openworkflow context --root . --json",
+    "--for /ow:<command>",
+    "--max-bytes <n>",
     "openworkflow brief --root .",
     "openworkflow status --root .",
     "openworkflow check /ow:<command> --root . --json",
@@ -158,6 +161,9 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "status",
     "brief",
     "inspect",
+    "context",
+    "Read-only packet materializer",
+    "--max-bytes",
     "check",
     "summaries",
     "summarize",
@@ -233,6 +239,7 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "status", "--root", root, "--json"], env), "status");
   parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
   parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
+  parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
   parseJsonReport(await runCapture(["node", CLI, "check", "/ow:vision", "--root", root, "--json"], env), "check");
   parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
@@ -264,6 +271,12 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const summarizeUninitializedReport = parseJsonReport(summarizeUninitialized.output, "summarize");
   assert(summarizeUninitializedReport.ok === false, "uninitialized summarize should not be ok");
 
+  const contextUninitialized = await runCaptureStatus(["node", CLI, "context", "--root", missingRoot, "--json"], env);
+  assert(contextUninitialized.code !== 0, "context should fail clearly outside an initialized OpenWorkflow root");
+  const contextUninitializedReport = parseJsonReport(contextUninitialized.output, "context");
+  assert(contextUninitializedReport.ok === false, "uninitialized context should not be ok");
+  assert(Array.isArray(contextUninitializedReport.errors) && contextUninitializedReport.errors.some((item) => String(item).includes("missing OpenWorkflow context packets")), "uninitialized context missing explicit error");
+
   const summaryBoundaryRoot = join(tempRoot, "summary-validate-boundary");
   await run(["node", CLI, "init", summaryBoundaryRoot, "--tools", "codex", "--force"], env);
   const summaryOnlyDir = join(summaryBoundaryRoot, ".openworkflow", "prototypes", "proto-summary-only");
@@ -286,6 +299,15 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(inspectFresh.ok === true, "fresh inspect should be ok");
   assert(Array.isArray(inspectReadOrder.must_read) && inspectReadOrder.must_read.includes(".openworkflow/CURRENT_STATE.yaml"), "inspect read_order missing current state");
   assert(inspectNextCheck.ready === true, "inspect next_command_check should report ready vision");
+  const contextFresh = parseJsonReport(await runCapture(["node", CLI, "context", "--root", root, "--json"], env), "context");
+  const contextFreshData = record(contextFresh.data, "context data");
+  const contextFreshBudget = record(contextFreshData.budget, "context budget");
+  assert(contextFresh.ok === true, "fresh context should be ok");
+  assert(contextFreshData.normalized_command === "/ow:vision", "fresh context should default to CURRENT_STATE.next_command");
+  assert(contextFreshData.packet_id === "context:vision", "fresh context missing packet_id");
+  assert(Number(contextFreshBudget.used_bytes) > 0, "fresh context should include content");
+  assert(Array.isArray(contextFreshData.included) && contextFreshData.included.some((item) => record(item, "included context").path === ".openworkflow/CURRENT_STATE.yaml"), "fresh context missing CURRENT_STATE content");
+  assert(Array.isArray(contextFreshData.omitted) && contextFreshData.omitted.some((item) => String(record(item, "omitted context").path).includes(".openworkflow/changes/**")), "fresh context should omit forbidden context");
   await assertNoStageArtifacts(root);
 
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
@@ -318,14 +340,25 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const currentEntries = record(currentAfterWrite.data, "summary health data").entries;
   assert(Array.isArray(currentEntries), "summary health entries must be array");
   assert(currentEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "current"), "summary health did not report current prototype after summarize write");
+  const designContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:design", "--max-bytes", "12000", "--json"], env);
+  assert(designContextStatus.code !== 0, "design context should return nonzero while readiness blockers exist");
+  const designContext = parseJsonReport(designContextStatus.output, "context");
+  const designContextData = record(designContext.data, "design context data");
+  assert(designContext.ok === false, "blocked design context should report ok=false");
+  assert(Array.isArray(designContextData.included) && designContextData.included.some((item) => record(item, "included design context").source === "summary_file" && record(item, "included design context").path === ".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "design context should include trusted prototype SUMMARY.yaml");
 
   const validationDir = join(root, ".openworkflow", "validation", "val-1");
   await mkdir(validationDir, { recursive: true });
-  await writeFile(join(validationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Test\n", "utf8");
+  await writeFile(join(validationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Test\nprototype_scope:\n  include:\n    - demo\nacceptance:\n  - works\n", "utf8");
   const missingSlice = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const missingSliceEntries = record(missingSlice.data, "summary health data").entries;
   assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
-  assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "missing"), "summary health did not report missing validation current_slice");
+  assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "current"), "summary health did not report current validation current_slice");
+  const protoContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:proto", "--json"], env);
+  assert(protoContextStatus.code !== 0, "proto context should return nonzero while readiness blockers exist");
+  const protoContext = parseJsonReport(protoContextStatus.output, "context");
+  const protoContextData = record(protoContext.data, "proto context data");
+  assert(Array.isArray(protoContextData.included) && protoContextData.included.some((item) => record(item, "included proto context").source === "current_slice" && record(item, "included proto context").path === ".openworkflow/validation/val-1/VALIDATION.yaml"), "proto context should include validation current_slice");
 
   const summaryPath = join(artifactDir, "SUMMARY.yaml");
   const old = new Date(0);
@@ -337,6 +370,9 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const allWrite = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--all", "--write", "--json"], env), "summarize");
   const allEffects = record(allWrite.effects, "summarize all effects");
   assert(Array.isArray(allEffects.written) && allEffects.written.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize --all --write did not refresh stale summary");
+  const incompleteValidationDir = join(root, ".openworkflow", "validation", "val-missing");
+  await mkdir(incompleteValidationDir, { recursive: true });
+  await writeFile(join(incompleteValidationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Incomplete\n", "utf8");
 
   const brief = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
   const briefData = record(brief.data, "brief data");

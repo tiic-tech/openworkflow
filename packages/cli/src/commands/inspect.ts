@@ -5,7 +5,7 @@ import { buildBriefModel, type BriefModel } from "./brief.js";
 import { buildReadiness, type ReadinessModel } from "./check.js";
 import { parseTools } from "./shared.js";
 
-interface InspectModel {
+export interface InspectModel {
   project: BriefModel["project"];
   workflow: BriefModel["workflow"];
   health: BriefModel["health"] & {
@@ -17,7 +17,7 @@ interface InspectModel {
   recommended_next_actions: string[];
 }
 
-interface ReadOrder {
+export interface ReadOrder {
   must_read: string[];
   read_if_missing_context: string[];
   avoid_by_default: string[];
@@ -51,7 +51,7 @@ export async function inspectCommand(flags: Map<string, string | boolean>): Prom
   return model.summaries.initialized ? 0 : 1;
 }
 
-function buildInspectModel(brief: BriefModel, nextCommandCheck: ReadinessModel | null): InspectModel {
+export function buildInspectModel(brief: BriefModel, nextCommandCheck: ReadinessModel | null): InspectModel {
   const nextCommandReady = nextCommandCheck ? nextCommandCheck.ready : null;
   const health = {
     ...brief.health,

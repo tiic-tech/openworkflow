@@ -3,6 +3,7 @@ import { booleanFlag, parseArgs } from "./args.js";
 import { briefCommand } from "./commands/brief.js";
 import { checkCommand } from "./commands/check.js";
 import { cleanCommand } from "./commands/clean.js";
+import { contextCommand } from "./commands/context.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
@@ -47,6 +48,10 @@ async function main(): Promise<number> {
     return checkCommand(parsed.positional, parsed.flags);
   }
 
+  if (parsed.command === "context") {
+    return contextCommand(parsed.flags);
+  }
+
   if (parsed.command === "inspect") {
     return inspectCommand(parsed.flags);
   }
@@ -75,6 +80,7 @@ Usage:
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--json]
+  openworkflow context --root <folder> [--for <ow-command>] [--max-bytes <n>] [--json]
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
@@ -88,6 +94,7 @@ Commands:
   status     Print a low-context Agent read model for current workflow state.
   brief      Alias for status, named for Agent entry and handoff.
   inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
+  context    Materialize a bounded Agent context packet for a /ow:* workflow command.
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
   summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
@@ -98,6 +105,8 @@ Agent quick start:
   from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
   full evidence. Prefer SUMMARY.yaml/current_slice guidance when a long artifact
   offers it. Use --json when an Agent needs structured command output.
+  Use openworkflow context --root . --json when you want OpenWorkflow to package
+  the next command's bounded startup context instead of reading files one by one.
 
 Two command surfaces:
   CLI maintenance commands keep OpenWorkflow installed and current:
@@ -106,6 +115,7 @@ Two command surfaces:
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order.
+    context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command; use --for /ow:<command> and --max-bytes to bound included content.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context before starting a /ow:* command.
