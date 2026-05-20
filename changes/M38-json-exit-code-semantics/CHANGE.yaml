@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M38-json-exit-code-semantics
+contract_type: change
+title: M38 JSON exit code semantics
+status: accepted
+source_artifacts:
+  - changes/M37-managed-clean-boundary/CHANGE.yaml
+depends_on:
+  - change:M37-managed-clean-boundary
+produces:
+  - work_items:M38-json-exit-code-semantics
+summary: >
+  Align Agent-readable JSON reports with process exit codes so a top-level
+  `ok: false` report is never returned with a success exit status.
+problem: >
+  Agent consumers often branch on process exit code before parsing stdout.
+  Several read-model commands can emit structured JSON with `ok: false` while
+  still exiting 0 when the repository is initialized but not healthy. That
+  creates false positives for automation and weakens the promise that `--json`
+  is a reliable machine interface.
+goals:
+  - Make `brief`, `status`, `inspect`, and `summaries` return nonzero when their top-level JSON/text health model is not ok.
+  - Preserve structured JSON bodies so Agents can still parse warnings, errors, data, and next_actions after a nonzero exit.
+  - Add runtime tests for initialized-but-unhealthy projects where `ok:false` must match a nonzero exit code.
+  - Document the exit-code invariant in `openworkflow --help` and AGENTS.md managed block.
+non_goals:
+  - Do not treat warnings-only healthy reports as failures.
+  - Do not change `doctor`'s current boundary where artifact summary health is reported as warning scope.
+  - Do not change command-specific readiness semantics beyond aligning exit codes with the top-level `ok` value.
+decisions:
+  - "For Agent automation, top-level `ok` is the success contract and exit code must agree with it."
+  - "Read-model commands may still print full JSON on failure; callers should parse stdout after nonzero exits."
+open_questions:
+  - question: "Should text mode follow the same exit-code rule?"
+    outcome: "Yes; M38 uses the same health-derived exit code for text and JSON modes so shell behavior stays predictable."
+affected_paths:
+  - packages/cli/src/commands/brief.ts
+  - packages/cli/src/commands/inspect.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/index.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M38-json-exit-code-semantics/
+acceptance:
+  - "`openworkflow summaries --root <initialized-unhealthy> --json` emits `ok:false` and exits nonzero."
+  - "`openworkflow inspect --root <initialized-unhealthy> --json` emits `ok:false` and exits nonzero."
+  - "`openworkflow brief --root <initialized-unhealthy> --json` and `status --json` emit `ok:false` and exit nonzero."
+  - "Healthy read-model commands continue to exit 0."
+  - "Help and AGENTS.md explain that JSON `ok:false` means a nonzero exit and stdout should still be parsed."
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+created_at: 2026-05-20
+updated_at: 2026-05-20

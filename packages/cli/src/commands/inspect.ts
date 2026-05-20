@@ -48,7 +48,7 @@ export async function inspectCommand(flags: Map<string, string | boolean>): Prom
   } else {
     printInspect(model);
   }
-  return model.summaries.initialized ? 0 : 1;
+  return model.health.ok ? 0 : 1;
 }
 
 export function buildInspectModel(brief: BriefModel, nextCommandCheck: ReadinessModel | null): InspectModel {

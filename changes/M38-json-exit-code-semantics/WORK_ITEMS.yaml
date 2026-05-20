@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: work_items:M38-json-exit-code-semantics
+contract_type: work_items
+title: M38 JSON exit code semantics work items
+status: completed
+change_contract: changes/M38-json-exit-code-semantics/CHANGE.yaml
+items:
+  - task_id: M38-T001
+    title: Align read-model command exit codes
+    status: completed
+    owned_paths:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/inspect.ts
+      - packages/cli/src/commands/summaries.ts
+    acceptance:
+      - Commands return 1 whenever the top-level ok value is false.
+      - Healthy initialized read models still return 0.
+  - task_id: M38-T002
+    title: Document Agent JSON exit semantics
+    status: completed
+    owned_paths:
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+    acceptance:
+      - Help documents that `ok:false` exits nonzero.
+      - AGENTS.md managed block tells Agents to parse JSON stdout after nonzero exits.
+  - task_id: M38-T003
+    title: Add runtime regression coverage
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Runtime surface verifier checks summaries, inspect, brief, and status on an initialized unhealthy project.
+      - Repository validation requires M38 change contracts.

@@ -116,6 +116,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "generated-by: openworkflow",
     "template-id: openworkflow.agents-guide.v1",
     "openworkflow --help",
+    "ok:false",
     ".openworkflow/CURRENT_STATE.yaml",
     "read_this_first",
     ".agents/skills/ow-*/SKILL.md",
@@ -178,6 +179,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "requires an initialized .openworkflow root",
     "Every command supports --json",
     "schema_version, command, ok, root, data, warnings, errors, effects",
+    "When ok is false",
   ]) {
     assert(help.includes(required), `openworkflow --help missing agent guidance: ${required}`);
   }
@@ -339,7 +341,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
   await mkdir(artifactDir, { recursive: true });
   await writeFile(join(artifactDir, "EVIDENCE.yaml"), "artifact_type: prototype_evidence\ncore_question: Test\nresult: promising\nhandoff:\n  next_command: /ow:design\n", "utf8");
-  const missing = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const missingStatus = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--json"], env);
+  assert(missingStatus.code !== 0, "summaries should exit nonzero when initialized summary health is not ok");
+  const missing = parseJsonReport(missingStatus.output, "summaries");
+  assert(missing.ok === false, "missing summary health should emit ok=false");
   const missingData = record(missing.data, "summary health data");
   const entries = missingData.entries;
   assert(Array.isArray(entries), "summary health entries must be array");
@@ -389,7 +394,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const summaryPath = join(artifactDir, "SUMMARY.yaml");
   const old = new Date(0);
   await utimes(summaryPath, old, old);
-  const stale = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  const staleStatus = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--json"], env);
+  assert(staleStatus.code !== 0, "summaries should exit nonzero for stale summaries");
+  const stale = parseJsonReport(staleStatus.output, "summaries");
+  assert(stale.ok === false, "stale summaries should emit ok=false");
   const staleEntries = record(stale.data, "summary health data").entries;
   assert(Array.isArray(staleEntries), "summary health entries must be array");
   assert(staleEntries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "stale_unknown"), "summary health did not report stale prototype summary");
@@ -400,14 +408,23 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   await mkdir(incompleteValidationDir, { recursive: true });
   await writeFile(join(incompleteValidationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Incomplete\n", "utf8");
 
-  const brief = parseJsonReport(await runCapture(["node", CLI, "brief", "--root", root, "--json"], env), "brief");
+  const briefStatus = await runCaptureStatus(["node", CLI, "brief", "--root", root, "--json"], env);
+  assert(briefStatus.code !== 0, "brief should exit nonzero when top-level ok=false");
+  const brief = parseJsonReport(briefStatus.output, "brief");
   const briefData = record(brief.data, "brief data");
   const briefHealth = record(briefData.health, "brief health");
   assert("summaries" in briefHealth, "brief health missing summaries");
   assert(brief.ok === false, "brief top-level ok should include failing summary health");
   assert(briefHealth.ok === false, "brief health.ok should include failing summary health");
 
-  const inspect = parseJsonReport(await runCapture(["node", CLI, "inspect", "--root", root, "--json"], env), "inspect");
+  const statusStatus = await runCaptureStatus(["node", CLI, "status", "--root", root, "--json"], env);
+  assert(statusStatus.code !== 0, "status should exit nonzero when top-level ok=false");
+  const statusReport = parseJsonReport(statusStatus.output, "status");
+  assert(statusReport.ok === false, "status top-level ok should include failing summary health");
+
+  const inspectStatus = await runCaptureStatus(["node", CLI, "inspect", "--root", root, "--json"], env);
+  assert(inspectStatus.code !== 0, "inspect should exit nonzero when top-level ok=false");
+  const inspect = parseJsonReport(inspectStatus.output, "inspect");
   const inspectData = record(inspect.data, "inspect data");
   const inspectHealth = record(inspectData.health, "inspect health");
   assert(inspect.ok === false, "inspect top-level ok should include failing summary health");

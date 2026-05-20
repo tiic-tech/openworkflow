@@ -142,7 +142,8 @@ Two command surfaces:
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
     with schema_version, command, ok, root, data, warnings, errors, effects, and
-    next_actions.
+    next_actions. When ok is false, the command exits nonzero but still prints
+    the JSON report to stdout so Agents can parse errors and next_actions.
     Use summaries --json before loading raw evidence when summary/current-slice
     health is unknown.
 

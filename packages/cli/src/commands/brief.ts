@@ -83,7 +83,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
   } else {
     printBrief(model);
   }
-  return 0;
+  return model.health.ok ? 0 : 1;
 }
 
 export async function buildBriefModel(root: string, explicitTools: string[]): Promise<BriefModel> {

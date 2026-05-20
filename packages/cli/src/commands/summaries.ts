@@ -21,7 +21,7 @@ export async function summariesCommand(flags: Map<string, string | boolean>): Pr
   } else {
     printSummaries(health);
   }
-  return health.initialized ? 0 : 1;
+  return health.ok ? 0 : 1;
 }
 
 function printSummaries(health: SummaryHealthModel): void {
