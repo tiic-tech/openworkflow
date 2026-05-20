@@ -284,6 +284,9 @@ function validateDisclosureLevels(root: string, file: string, data: unknown, err
 }
 
 function validateDiscoveryArtifact(root: string, file: string, data: unknown, errors: string[]): void {
+  if (file.endsWith("SUMMARY.yaml")) {
+    return;
+  }
   if (!isRecord(data) || typeof data.artifact_type !== "string") {
     return;
   }

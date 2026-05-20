@@ -70,7 +70,7 @@ Usage:
 
 Commands:
   init       Initialize .openworkflow contracts and optional tool adapters.
-  validate   Validate .openworkflow contract files.
+  validate   Validate .openworkflow contract files and source artifact shape.
   sync       Non-destructively refresh workflow contracts and detected adapters.
   doctor     Check managed workflow and adapter files for missing or stale templates.
   status     Print a low-context Agent read model for current workflow state.
@@ -88,12 +88,12 @@ Two command surfaces:
   CLI maintenance commands keep OpenWorkflow installed and current:
     init       Create the minimal workflow root, AGENTS.md guide, and tool adapters.
     sync       Detect current platforms, refresh managed workflow files, and sync adapters.
-    validate   Check .openworkflow contract shape.
-    doctor     Report missing or stale generated surfaces.
+    validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
+    doctor     Report missing or stale generated surfaces, and surface summary-health warnings.
     status     Summarize current state, health, read order, and git state.
     brief      Same read model as status; use when entering a repo as an Agent.
     check      Verify required/forbidden context before starting a /ow:* command.
-    summaries  Check whether low-context summaries can be trusted before raw evidence.
+    summaries  Check whether low-context summaries can be trusted before raw evidence; requires an initialized .openworkflow root.
     clean      Remove generated OpenWorkflow surfaces without touching user content.
 
   Agent-readable JSON:

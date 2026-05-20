@@ -65,7 +65,7 @@ export async function briefCommand(command: "brief" | "status", flags: Map<strin
   if (json) {
     printJsonReport({
       command,
-      ok: true,
+      ok: model.health.ok,
       root,
       data: model,
       warnings: model.health.workflow.warnings.concat(
@@ -126,7 +126,7 @@ async function buildBriefModel(root: string, explicitTools: string[]): Promise<B
   }
 
   const health = {
-    ok: workflowHealth.ok && agentsGuideHealth.ok && Object.values(adapterHealth).every((item) => item.ok),
+    ok: workflowHealth.ok && agentsGuideHealth.ok && summaryHealth.ok && Object.values(adapterHealth).every((item) => item.ok),
     workflow: workflowHealth,
     adapters: adapterHealth,
     agents_md: agentsGuideHealth,
@@ -241,7 +241,9 @@ function maintenanceAction(
     return "run openworkflow sync, then openworkflow doctor";
   }
   if (!summaries.ok) {
-    return "run openworkflow summaries --json before relying on low-context artifact reads";
+    return summaries.initialized
+      ? "run openworkflow summaries --json before relying on low-context artifact reads"
+      : "run openworkflow init or sync before relying on OpenWorkflow read models";
   }
   return null;
 }

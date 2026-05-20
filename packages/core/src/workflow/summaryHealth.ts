@@ -1,6 +1,5 @@
 import { readdir, stat } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
-import { getDiscoveryArtifactContracts, type DiscoveryArtifactContract } from "../artifacts/registry.js";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound, readTextFile } from "../fs/index.js";
 
@@ -28,6 +27,8 @@ export interface SummaryHealthEntry {
 
 export interface SummaryHealthModel {
   ok: boolean;
+  initialized: boolean;
+  contracts_path: string;
   counts: Record<SummaryHealthStatus, number>;
   entries: SummaryHealthEntry[];
   warnings: string[];
@@ -49,12 +50,26 @@ interface SummaryPolicy {
 }
 
 export async function evaluateSummaryHealth(root: string): Promise<SummaryHealthModel> {
-  const contracts = await loadArtifactContracts(root);
+  const contractsPath = join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml");
+  const contracts = await loadArtifactContracts(contractsPath);
+  if (!contracts) {
+    return {
+      ok: false,
+      initialized: false,
+      contracts_path: ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      counts: emptyCounts(),
+      entries: [],
+      warnings: ["missing OpenWorkflow artifact contracts: .openworkflow/audit/ARTIFACT_CONTRACTS.yaml"],
+      next_actions: ["run openworkflow init <folder> --tools codex, or run openworkflow sync on an initialized project"],
+    };
+  }
   const entries = await Promise.all(contracts.map((contract) => evaluateContract(root, contract)));
   const warnings = entries.flatMap((entry) => entry.warnings);
   const nextActions = [...new Set(entries.flatMap((entry) => entry.next_actions))];
   return {
     ok: !entries.some((entry) => ["missing", "stale_unknown"].includes(entry.status)),
+    initialized: true,
+    contracts_path: ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
     counts: countStatuses(entries),
     entries,
     warnings,
@@ -62,8 +77,7 @@ export async function evaluateSummaryHealth(root: string): Promise<SummaryHealth
   };
 }
 
-async function loadArtifactContracts(root: string): Promise<SummaryArtifactContract[]> {
-  const contractsPath = join(root, ".openworkflow", "audit", "ARTIFACT_CONTRACTS.yaml");
+async function loadArtifactContracts(contractsPath: string): Promise<SummaryArtifactContract[] | null> {
   try {
     const parsed = parseYaml(await readTextFile(contractsPath));
     if (isRecord(parsed) && Array.isArray(parsed.artifacts)) {
@@ -72,21 +86,13 @@ async function loadArtifactContracts(root: string): Promise<SummaryArtifactContr
         return mapped ? [mapped] : [];
       });
     }
+    return [];
   } catch (error) {
     if (!isNotFound(error)) {
       throw error;
     }
+    return null;
   }
-  return getDiscoveryArtifactContracts().map(artifactContractFromRegistry);
-}
-
-function artifactContractFromRegistry(contract: DiscoveryArtifactContract): SummaryArtifactContract {
-  return {
-    artifactType: contract.artifactType,
-    command: contract.command,
-    sourceOfTruthPath: contract.sourceOfTruthPath,
-    summaryPolicy: contract.summaryPolicy,
-  };
 }
 
 function artifactContractFromRecord(value: unknown): SummaryArtifactContract | null {
@@ -315,13 +321,21 @@ function aggregateStatus(statuses: SummaryHealthStatus[]): SummaryHealthStatus {
 }
 
 function countStatuses(entries: SummaryHealthEntry[]): Record<SummaryHealthStatus, number> {
+  const counts = emptyCounts();
+  for (const entry of entries) {
+    counts[entry.status] += 1;
+  }
+  return counts;
+}
+
+function emptyCounts(): Record<SummaryHealthStatus, number> {
   return {
-    not_applicable: entries.filter((entry) => entry.status === "not_applicable").length,
-    not_instantiated: entries.filter((entry) => entry.status === "not_instantiated").length,
-    missing: entries.filter((entry) => entry.status === "missing").length,
-    present: entries.filter((entry) => entry.status === "present").length,
-    stale_unknown: entries.filter((entry) => entry.status === "stale_unknown").length,
-    current: entries.filter((entry) => entry.status === "current").length,
+    not_applicable: 0,
+    not_instantiated: 0,
+    missing: 0,
+    present: 0,
+    stale_unknown: 0,
+    current: 0,
   };
 }
 

@@ -3,6 +3,7 @@ import { detectAdapterPlatforms, getAdapterEntry, getSupportedAdapterIds } from 
 import { doctorAgentsGuide } from "../../../core/src/onboarding/agentsGuide.js";
 import { doctorOpenWorkflow } from "../../../core/src/workflow/doctorOpenWorkflow.js";
 import { readWorkflowConfig } from "../../../core/src/workflow/readWorkflowConfig.js";
+import { evaluateSummaryHealth } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 import { basenameForTitle, parseTools, slugify } from "./shared.js";
@@ -47,6 +48,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
     force: false,
   });
   const agentsGuide = await doctorAgentsGuide(root);
+  const summaryHealth = await evaluateSummaryHealth(root);
   const adapterResults = [];
   for (const tool of tools) {
     const adapter = getAdapterEntry(tool);
@@ -58,6 +60,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   const warnings = [
     ...workflow.warnings,
     ...agentsGuide.warnings,
+    ...summaryHealth.warnings.map((warning) => `summary health: ${warning}`),
     ...detection.unknownConfigured.map((tool) => `Configured tool is not supported by this OpenWorkflow version and was not checked: ${tool}`),
     ...adapterResults.flatMap((entry) => entry.result.warnings),
   ];
@@ -71,6 +74,11 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
       data: {
         workflow,
         agents_md: agentsGuide,
+        summary_health: summaryHealth,
+        scope: {
+          managed_surfaces: "doctor ok covers generated workflow files, AGENTS.md managed block, and selected adapters",
+          artifact_summaries: "summary health is reported as warnings; use openworkflow summaries --json for artifact summary trust",
+        },
         detection,
         tools,
         adapters: Object.fromEntries(adapterResults.map((entry) => [entry.tool, entry.result])),
@@ -78,7 +86,7 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
       warnings,
       errors,
       effects: emptyEffects(),
-      next_actions: ok ? [] : ["run openworkflow sync, then openworkflow doctor"],
+      next_actions: doctorNextActions(ok, summaryHealth.ok),
     });
     return ok ? 0 : 1;
   }
@@ -94,6 +102,16 @@ export async function doctorCommand(flags: Map<string, string | boolean>): Promi
   }
   console.log(warnings.length > 0 ? "OpenWorkflow doctor passed with warnings." : "OpenWorkflow doctor passed.");
   return 0;
+}
+
+function doctorNextActions(ok: boolean, summariesOk: boolean): string[] {
+  if (!ok) {
+    return ["run openworkflow sync, then openworkflow doctor"];
+  }
+  if (!summariesOk) {
+    return ["run openworkflow summaries --json before relying on low-context artifact reads"];
+  }
+  return [];
 }
 
 function isAutoTools(tools: string[]): boolean {

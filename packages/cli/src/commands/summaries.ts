@@ -14,19 +14,25 @@ export async function summariesCommand(flags: Map<string, string | boolean>): Pr
       root,
       data: health,
       warnings: health.warnings,
-      errors: [],
+      errors: health.initialized ? [] : health.warnings,
       effects: emptyEffects(),
       next_actions: health.next_actions,
     });
   } else {
     printSummaries(health);
   }
-  return 0;
+  return health.initialized ? 0 : 1;
 }
 
 function printSummaries(health: SummaryHealthModel): void {
   console.log("OpenWorkflow summary health");
   console.log(`ok: ${health.ok}`);
+  console.log(`initialized: ${health.initialized}`);
+  if (!health.initialized) {
+    for (const warning of health.warnings) {
+      console.log(`warning: ${warning}`);
+    }
+  }
   console.log(
     `counts: current=${health.counts.current}, missing=${health.counts.missing}, stale_unknown=${health.counts.stale_unknown}, not_instantiated=${health.counts.not_instantiated}, not_applicable=${health.counts.not_applicable}`,
   );

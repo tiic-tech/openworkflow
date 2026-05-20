@@ -121,6 +121,11 @@ async function buildReadiness(root: string, requested: string): Promise<Readines
   if (command.visibility === "internal") {
     warnings.push(`${command.trigger} is an internal command and is not a normal user-facing step`);
   }
+  const summaryGuidance = summaryGuidanceFor(command.trigger, summaryHealth.entries);
+  warnings.push(...summaryWarnings(summaryGuidance));
+  if (!summaryHealth.initialized) {
+    warnings.push("summary health unavailable because OpenWorkflow artifact contracts are missing");
+  }
 
   const nextActions = nextActionsFor(command, blockers, warnings, currentState);
   return {
@@ -140,7 +145,7 @@ async function buildReadiness(root: string, requested: string): Promise<Readines
       source_of_truth_path: artifact.sourceOfTruthPath,
       summary_policy: artifact.summaryPolicy?.strategy ?? null,
     })),
-    summary_guidance: summaryGuidanceFor(command.trigger, summaryHealth.entries),
+    summary_guidance: summaryGuidance,
     next_actions: nextActions,
   };
 }
@@ -227,6 +232,12 @@ function summaryGuidanceFor(command: string, entries: SummaryHealthEntry[]): Sum
       status: entry.status,
       next_actions: entry.next_actions,
     }));
+}
+
+function summaryWarnings(guidance: SummaryGuidance[]): string[] {
+  return guidance
+    .filter((entry) => entry.status === "missing" || entry.status === "stale_unknown")
+    .map((entry) => `summary health for ${entry.artifact_type} is ${entry.status}; inspect summaries before relying on low-context reads`);
 }
 
 function nextActionsFor(
