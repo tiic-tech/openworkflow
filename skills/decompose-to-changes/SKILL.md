@@ -23,6 +23,21 @@ product theme, or broad planning source. When the current queue still owns the
 work, maintain that queue and let `select-change` create candidate-specific
 selection artifacts inside the existing feat folder.
 
+## Branch Boundary
+
+When creating a new feat queue, capture the current branch from
+`git status --short --branch` and decide the intended feat branch. Record it in
+`queue_policy.branch_boundary` and in `SUMMARY.yaml`.
+
+Do not automatically create or switch branches from this skill. If the agent or
+user already created the branch, record it. If the queue is being planned before
+branch creation, record the proposed branch name and note that the branch still
+needs to be created before implementation begins.
+
+For queue maintenance, preserve the existing branch boundary. If the current
+branch differs, record the observation in the operation reason or summary notes
+instead of silently changing the boundary.
+
 ## Read First
 
 Read these only as needed:
@@ -46,20 +61,23 @@ Read these only as needed:
 4. Choose a `plan_id` and output location. Default to
    `changes/<plan_id>/CANDIDATE_CHANGES.yaml`; this folder is the feat root for
    all candidate commits in the queue.
-5. If updating an existing queue, preserve existing candidate ids and history.
+5. In decomposition mode, choose or confirm the feat branch boundary and record
+   it as `queue_policy.branch_boundary`.
+6. If updating an existing queue, preserve existing candidate ids, branch
+   boundary, and history.
    Add new ids only for genuinely new candidates.
-6. Decompose the source into candidates with focused owned paths, explicit
+7. Decompose the source into candidates with focused owned paths, explicit
    includes and excludes, dependencies, validation, and acceptance.
-7. For queue maintenance, write an `operations` entry for every targeted
+8. For queue maintenance, write an `operations` entry for every targeted
    change. Include the operation type, target id, reason, and evidence.
-8. If the current queue reaches one or more `risk: high` candidates that need
+9. If the current queue reaches one or more `risk: high` candidates that need
    user confirmation, create or update `HIGH_RISK_DECISION_REPORT.md` in the
    owning queue folder before implementation continues.
-9. Write `CANDIDATE_CHANGES.yaml` first. Then write
+10. Write `CANDIDATE_CHANGES.yaml` first. Then write
    `CANDIDATE_CHANGES.md` as a non-authoritative readable view.
-10. Write `SUMMARY.yaml` with source refs, candidate count, key dependencies,
-   risks, and the optional next recommended candidate.
-11. Run repository validation when available, usually `npm run validate`.
+11. Write `SUMMARY.yaml` with source refs, candidate count, branch boundary,
+    key dependencies, risks, and the optional next recommended candidate.
+12. Run repository validation when available, usually `npm run validate`.
 
 ## Candidate Rules
 

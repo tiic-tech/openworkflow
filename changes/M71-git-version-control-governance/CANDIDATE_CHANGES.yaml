@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G002
+next_recommended_candidate_id: G003
 changes:
   - id: G001
     status: done
@@ -110,7 +110,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G002
-    status: ready
+    status: done
     title: Add branch boundary fields to decompose-to-changes outputs
     purpose: >
       Teach decompose-to-changes to record branch ownership when it creates a
@@ -147,6 +147,24 @@ changes:
       - decompose-to-changes distinguishes new feat queue creation from queue maintenance on an existing branch.
       - decompose-to-changes records dirty-tree observations without widening into implementation.
       - Markdown and SUMMARY expectations include the branch boundary.
+    selection:
+      selected_change_id: G002-dtc-branch-boundary-fields
+      reason: >
+        G002 is the next recommended candidate after G010 and teaches
+        decompose-to-changes to record branch boundaries before select-change
+        enforces them.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G002-dtc-branch-boundary-fields
+      completed_at: 2026-05-21
+      evidence:
+        - skills/decompose-to-changes/SKILL.md
+        - skills/decompose-to-changes/references/decomposition-protocol.md
+        - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/decompose-to-changes"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G003
     status: ready
     title: Add branch and dirty-tree guards to select-change
@@ -623,5 +641,35 @@ operations:
       - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
       - "validation: quick_validate.py skills/analyze-changes"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: Select G002 because DTC must record branch boundaries before select-change can enforce branch fit.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: Complete G002 after adding branch-boundary guidance to decompose-to-changes and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/decompose-to-changes"
       - "validation: npm run validate"
       - "validation: git diff --check"

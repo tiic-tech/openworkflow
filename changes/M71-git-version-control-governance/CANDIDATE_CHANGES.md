@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G002`.
+- Next recommended candidate: `G003`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -47,7 +47,7 @@ Completion evidence:
 
 ## G002 - Add Branch Boundary Fields To Decompose-To-Changes Outputs
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -67,6 +67,15 @@ Validation:
 - `python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes`
 - `npm run validate`
 - `git diff --check`
+
+Selection: `G002-dtc-branch-boundary-fields`
+
+Completion evidence:
+
+- `skills/decompose-to-changes/SKILL.md`
+- `skills/decompose-to-changes/references/decomposition-protocol.md`
+- `changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml`
 
 ## G003 - Add Branch And Dirty-Tree Guards To Select-Change
 

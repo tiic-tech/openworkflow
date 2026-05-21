@@ -58,6 +58,26 @@ Open a new top-level feat folder only when a new decomposition queue is needed.
 Otherwise, update the existing queue by candidate id and let each completed
 candidate land as a normal git commit.
 
+## Branch Boundary
+
+When creating a new queue, capture the branch context from
+`git status --short --branch`.
+
+Record the intended feat branch under:
+
+```yaml
+queue_policy:
+  branch_boundary: codex/<feat-branch>
+```
+
+Use the current branch when it already matches the new feat. If branch creation
+has not happened yet, record the proposed branch name and note the gap in
+`SUMMARY.yaml`. Do not create or switch branches as part of this skill.
+
+When maintaining an existing queue, preserve `queue_policy.branch_boundary`.
+If the current branch differs from the recorded boundary, add an operation or
+summary note explaining why maintenance is still valid.
+
 ## Status Guidance
 
 Use these statuses:
@@ -173,6 +193,7 @@ report unless the new high-risk stop concerns a materially different decision.
 - `source`
 - `queue_policy`
 - `selection_policy`
+- `queue_policy.branch_boundary` for new branch-governed queues
 - `next_recommended_candidate_id` when appropriate
 - `changes`
 - `operations` when the queue has been maintained after initial creation
@@ -181,6 +202,7 @@ report unless the new high-risk stop concerns a materially different decision.
 
 - source-of-truth notice
 - selection policy summary
+- branch boundary when present
 - next recommended candidate when present
 - one compact section per candidate
 
@@ -188,6 +210,7 @@ report unless the new high-risk stop concerns a materially different decision.
 
 - source summary
 - output paths
+- branch boundary when present
 - candidate count
 - next recommended candidate
 - unresolved questions

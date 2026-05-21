@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:G002-dtc-branch-boundary-fields
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G002-dtc-branch-boundary-fields
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G002
+title: Add branch boundary fields to decompose-to-changes outputs
+status: done
+selection_reason: >
+  G002 is the next recommended candidate after G010. It teaches
+  decompose-to-changes to record feat branch ownership in new candidate queues
+  while keeping branch creation and switching outside the skill's own behavior.
+rejected_alternatives:
+  - candidate_ref: G003
+    reason: select-change branch enforcement should consume branch fields created by decompose-to-changes.
+  - candidate_ref: G005
+    reason: PR-ready summaries should follow the branch boundary contract.
+  - candidate_ref: G009
+    reason: gh risk boundaries can wait until local branch governance is reflected in DTC.
+scope:
+  includes:
+    - branch naming guidance for new candidate queues
+    - queue_policy.branch_boundary guidance
+    - summary output for the owning branch
+    - dirty-tree note behavior before creating a new queue
+    - non-automatic branch creation guidance unless already performed by the agent
+  excludes:
+    - select-change branch enforcement
+    - automatic git checkout or branch creation inside skill instructions
+    - PR creation behavior
+owned_paths:
+  - skills/decompose-to-changes/SKILL.md
+  - skills/decompose-to-changes/references/decomposition-protocol.md
+  - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/
+forbidden_paths:
+  - skills/select-change/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - decompose-to-changes tells agents to capture the feat branch in queue policy.
+  - decompose-to-changes distinguishes new feat queue creation from queue maintenance on an existing branch.
+  - decompose-to-changes records dirty-tree observations without widening into implementation.
+  - Markdown and SUMMARY expectations include the branch boundary.
+validation:
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - skills/decompose-to-changes/SKILL.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+    - "validation: quick_validate.py skills/decompose-to-changes"
+    - "validation: npm run validate"
+    - "validation: git diff --check"
