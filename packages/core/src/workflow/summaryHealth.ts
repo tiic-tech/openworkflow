@@ -410,7 +410,22 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
     ];
   }
   if (artifactType === "prototype_evidence") {
-    return ["core_question", "prompt_pack_type", "review_plan", "result"];
+    return [
+      "core_question",
+      "prompt_pack_type",
+      "preflight_quality_gate.can_proceed",
+      "direction_count_policy.resolved_count",
+      "normalized_input.primary_user",
+      "normalized_input.desired_behavior_change",
+      "normalized_input.strongest_success_signal",
+      "strategic_core.central_uncertainty",
+      "directions",
+      "build_recommendation.first_direction_id",
+      "prompt_text_manifest.status",
+      "image_generation.status",
+      "review_plan",
+      "result",
+    ];
   }
   if (artifactType === "decision_record") {
     return ["outcome", "rationale", "next_command"];

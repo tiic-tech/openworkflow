@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:M86-proto-strategy-prompt-compiler:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C002
+change_id: C002-strategic-prompt-pack-artifacts
+title: Strengthen strategic prototype prompt-pack artifacts
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  C002 is the next dependency after C001 and turns the native source behavior
+  into artifact schema, template, validator, and summary quality checks.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+dependencies:
+  - C001
+acceptance:
+  - Artifacts can record whether vision and validation quality are sufficient for high-quality prototype prompts.
+  - Artifacts can represent askUserQuestion for missing strategic direction count and default to 3 when the user delegates to the agent.
+  - Prompt-pack artifacts cannot declare ephemeral vision_only validation.
+  - Prompt-pack artifacts separate prompt text readiness from image generation and collection status.
+  - Templates expose normalized input, strategic core, directions, build recommendation, constraints, and review plan.
+  - Validators catch thin strategic prompt packs.
+  - Summary health reports missing strategy and direction fields.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rollback:
+  - Revert C002 schema, validator, template, verification, and generated contract updates if validation fails.
+high_risk:
+  approval_required: false
+  reason: >
+    This is a medium-risk artifact contract tightening. It does not expose new
+    runtime commands or implement downstream generation.

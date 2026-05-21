@@ -2115,6 +2115,10 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("summary_policy:"), "artifact contracts missing summary policy metadata");
   assert(artifacts.includes("SUMMARY.yaml"), "artifact contracts missing summary file paths");
   assert(artifacts.includes("template:"), "artifact contracts missing embedded templates");
+  assert(artifacts.includes("preflight_quality_gate:"), "artifact contracts missing proto preflight quality gate");
+  assert(artifacts.includes("direction_count_policy:"), "artifact contracts missing proto direction count policy");
+  assert(artifacts.includes("prompt_text_manifest:"), "artifact contracts missing proto prompt text manifest");
+  assert(artifacts.includes("image_generation:"), "artifact contracts missing proto image generation state");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
 }
 

@@ -290,6 +290,14 @@ artifacts:
       - prompt_pack_type
       - validation_input
       - source
+      - preflight_quality_gate
+      - direction_count_policy
+      - normalized_input
+      - strategic_core
+      - directions
+      - build_recommendation
+      - prompt_text_manifest
+      - image_generation
       - negative_constraints
       - review_plan
       - result
@@ -328,7 +336,7 @@ artifacts:
       prototype_mode: image_prompt_pack
       prompt_pack_type: strategic_proto_prompt_pack
       validation_input:
-        mode: vision_only|validation_present|internally_derived
+        mode: validation_present|agent_auto_generated
         refs:
           []
         notes:
@@ -338,14 +346,68 @@ artifacts:
           []
         target_tool: image_generation
         output_language: ""
+      preflight_quality_gate:
+        vision_status: missing|thin|ready
+        validation_status: missing|thin|ready
+        can_proceed: false
+        blockers:
+          []
+        next_command_when_blocked: /ow:vision
+        required_followup_questions:
+          []
+      direction_count_policy:
+        requested_count: null
+        resolved_count: 3
+        source: user_input|agent_default_after_user_delegation
+        ask_user_question_required: true
+        ask_user_question: How many strategically different prototype directions should /ow:proto generate?
       normalized_input:
-        {}
+        product_domain: ""
+        primary_user: ""
+        usage_context: ""
+        current_alternative: ""
+        core_pain: ""
+        desired_behavior_change: ""
+        strongest_success_signal: ""
+        core_differentiator: ""
+        emotional_value: ""
+        functional_value: ""
+        trust_requirements:
+          []
+        privacy_requirements:
+          []
+        non_goals:
+          []
+        future_opportunities:
+          []
+        validation_target: ""
       strategic_core:
-        {}
+        target_user: ""
+        behavior_change: ""
+        mechanism: ""
+        differentiator: ""
+        boundary_conditions:
+          []
+        central_uncertainty: ""
       directions:
-        []
+        - direction_id: ""
+          name: ""
+          strategic_hypothesis: ""
+          validates: ""
+          main_risk: ""
+          distinctness_rationale: ""
+          prototype_prompt: ""
+          screen_prompts:
+            []
+          pm_judgment: ""
       build_recommendation:
-        {}
+        first_direction_id: ""
+        why_first: ""
+        success_signals:
+          []
+        failure_signals:
+          []
+        next_test_if_it_works: ""
       baseline_audit:
         []
       product_system:
@@ -363,7 +425,26 @@ artifacts:
         []
       global_design_prompt: ""
       screen_prompts:
-        []
+        - prompt_id: ""
+          screen_name: ""
+          image_role: ""
+          prompt: ""
+          acceptance_criteria:
+            []
+      prompt_text_manifest:
+        status: draft
+        directions_ready: false
+        direction_count: 0
+        prompt_text_refs:
+          []
+      image_generation:
+        status: not_started
+        batch_strategy: Generate each selected direction as a coherent multi-image screen group after
+          prompt_text_manifest.status is ready_for_image_generation.
+        generated_images:
+          []
+        collection_notes:
+          []
       negative_constraints:
         []
       review_plan:

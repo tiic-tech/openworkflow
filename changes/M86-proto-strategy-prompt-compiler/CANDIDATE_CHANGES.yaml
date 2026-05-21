@@ -127,18 +127,21 @@ changes:
       evidence:
         - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: candidate
+    status: selected
     title: Strengthen strategic prototype prompt-pack artifacts
     purpose: >
       Make the prototype evidence and prompt-pack schemas/templates enforce the
       fields /ow:proto needs for agent-grade prompt generation.
     scope:
       includes:
+        - preflight quality gate for vision and validation artifact existence and quality
+        - direction count policy with askUserQuestion and default 3 behavior
         - validation_input mode values aligned to durable validation
         - normalized_input required strategic fields
         - strategic_core required fields
         - directions with distinction rationale and screen prompt requirements
         - build_recommendation signals
+        - prompt text manifest and image generation collection fields
       excludes:
         - /ow:tune refined prompt pack schema work
         - generated /ow:proto protocol wording
@@ -169,10 +172,20 @@ changes:
       - node dist/cli/src/index.js validate --root . --json
       - git diff --check
     acceptance:
+      - Artifacts can record whether vision and validation quality are sufficient for high-quality prototype prompts.
+      - Artifacts can represent askUserQuestion for missing strategic direction count and default to 3 when the user delegates to the agent.
       - Prompt-pack artifacts cannot declare ephemeral vision_only validation.
+      - Prompt-pack artifacts separate prompt text readiness from image generation and collection status.
       - Templates expose normalized input, strategic core, directions, build recommendation, constraints, and review plan.
       - Validators catch thin strategic prompt packs.
       - Summary health reports missing strategy and direction fields.
+    selection:
+      selected_change_id: C002-strategic-prompt-pack-artifacts
+      reason: >
+        Select C002 directly within M86 because C001 is complete and C002
+        encodes the source behavior requirements into artifact schema,
+        templates, validators, and summary quality.
+      selected_at: 2026-05-22
   - id: C003
     status: candidate
     title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
@@ -186,6 +199,8 @@ changes:
         - generated ow-proto skill guidance through sync
         - context packet drift checks
         - verification for validation consumption and strategic directions
+        - askUserQuestion behavior for missing strategic direction count
+        - batch image generation and evidence collection after prompt text is ready
       excludes:
         - artifact schema changes
         - tune behavior
@@ -214,6 +229,10 @@ changes:
       - git diff --check
     acceptance:
       - Generated /ow:proto says it compiles validated strategy into prompt packs.
+      - Generated /ow:proto checks vision and validation quality and routes back to /ow:vision when either is insufficient.
+      - Generated /ow:proto asks for strategic direction count when absent and uses 3 only when the user delegates that decision.
+      - Generated /ow:proto writes multi-direction prompt text before starting image generation.
+      - Generated /ow:proto batch-generates prototype images and records collected outputs.
       - Generated /ow:proto preserves M85 durable validation behavior.
       - Context packets include the strategic prompt-pack quality gates.
       - Verification catches generated-surface drift.
@@ -308,3 +327,18 @@ operations:
       - skills/build-prototype/SKILL.md
       - skills/build-prototype/references/strategic-prompt-pack-protocol.md
       - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 directly inside the current M86 queue after C001 completed;
+      no high-risk approval is required.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/IMPLEMENTATION_BRIEF.md

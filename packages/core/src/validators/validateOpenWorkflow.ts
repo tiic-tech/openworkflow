@@ -534,6 +534,8 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   validateEvidenceRefs(root, label, data, errors);
   if ("validation_input" in data && !isRecord(data.validation_input)) {
     errors.push(`${label} validation_input must be a mapping`);
+  } else {
+    validatePrototypeValidationInput(label, data.validation_input, errors);
   }
   if ("source" in data && !isRecord(data.source)) {
     errors.push(`${label} source must be a mapping`);
@@ -556,9 +558,210 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   if ("prompt_pack_type" in data && !["strategic_proto_prompt_pack", "refined_proto_prompt_pack", "proto_review_evidence"].includes(String(data.prompt_pack_type))) {
     errors.push(`${label} has invalid prompt_pack_type ${String(data.prompt_pack_type)}`);
   }
+  if (data.prompt_pack_type === "strategic_proto_prompt_pack") {
+    validateStrategicPrototypePromptPack(label, data, errors);
+  }
   if (typeof data.result === "string" && !["pass", "fail", "unclear", "not_reviewed"].includes(data.result)) {
     errors.push(`${label} has invalid result ${data.result}`);
   }
+}
+
+const STRATEGIC_NORMALIZED_FIELDS = [
+  "product_domain",
+  "primary_user",
+  "usage_context",
+  "current_alternative",
+  "core_pain",
+  "desired_behavior_change",
+  "strongest_success_signal",
+  "core_differentiator",
+  "emotional_value",
+  "functional_value",
+  "trust_requirements",
+  "privacy_requirements",
+  "non_goals",
+  "future_opportunities",
+  "validation_target",
+];
+
+const STRATEGIC_CORE_FIELDS = [
+  "target_user",
+  "behavior_change",
+  "mechanism",
+  "differentiator",
+  "boundary_conditions",
+  "central_uncertainty",
+];
+
+const STRATEGIC_DIRECTION_FIELDS = [
+  "direction_id",
+  "name",
+  "strategic_hypothesis",
+  "validates",
+  "main_risk",
+  "distinctness_rationale",
+  "prototype_prompt",
+  "screen_prompts",
+  "pm_judgment",
+];
+
+function validatePrototypeValidationInput(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  const mode = String(value.mode ?? "");
+  if (mode && !["validation_present", "agent_auto_generated"].includes(mode)) {
+    errors.push(`${label} validation_input.mode has invalid value ${mode}`);
+  }
+  if (mode === "vision_only" || mode === "internally_derived") {
+    errors.push(`${label} validation_input.mode must reference durable validation, not ${mode}`);
+  }
+  if (!Array.isArray(value.refs)) {
+    errors.push(`${label} validation_input.refs must be an array`);
+  } else if (mode && value.refs.length === 0) {
+    errors.push(`${label} validation_input.refs must include durable validation artifact refs`);
+  }
+}
+
+function validateStrategicPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validatePreflightQualityGate(label, data.preflight_quality_gate, errors);
+  validateDirectionCountPolicy(label, data.direction_count_policy, errors);
+  validateRequiredObjectFields(label, "normalized_input", data.normalized_input, STRATEGIC_NORMALIZED_FIELDS, errors);
+  validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
+  validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
+  validateBuildRecommendation(label, data.build_recommendation, errors);
+  validatePromptTextManifest(label, data.prompt_text_manifest, errors);
+  validateImageGeneration(label, data.image_generation, errors);
+}
+
+function validatePreflightQualityGate(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} preflight_quality_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["vision_status", "validation_status", "can_proceed", "blockers", "next_command_when_blocked"]) {
+    if (!(key in value)) {
+      errors.push(`${label} preflight_quality_gate missing ${key}`);
+    }
+  }
+  for (const key of ["vision_status", "validation_status"]) {
+    const status = String(value[key] ?? "");
+    if (status && !["missing", "thin", "ready"].includes(status)) {
+      errors.push(`${label} preflight_quality_gate.${key} has invalid value ${status}`);
+    }
+  }
+  if (value.can_proceed !== true && value.next_command_when_blocked !== "/ow:vision") {
+    errors.push(`${label} preflight_quality_gate must route blocked prototype work back to /ow:vision`);
+  }
+}
+
+function validateDirectionCountPolicy(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} direction_count_policy must be a mapping`);
+    return;
+  }
+  const source = String(value.source ?? "");
+  if (source && !["user_input", "agent_default_after_user_delegation"].includes(source)) {
+    errors.push(`${label} direction_count_policy.source has invalid value ${source}`);
+  }
+  if (typeof value.resolved_count !== "number" || value.resolved_count < 1) {
+    errors.push(`${label} direction_count_policy.resolved_count must be a positive number`);
+  }
+  if (source === "agent_default_after_user_delegation" && value.resolved_count !== 3) {
+    errors.push(`${label} direction_count_policy delegated default must resolve to 3`);
+  }
+  if (value.ask_user_question_required === true && !nonEmptyString(value.ask_user_question)) {
+    errors.push(`${label} direction_count_policy.ask_user_question must be set when askUserQuestion is required`);
+  }
+}
+
+function validateRequiredObjectFields(label: string, field: string, value: unknown, keys: string[], errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} ${field} must be a mapping`);
+    return;
+  }
+  for (const key of keys) {
+    if (!hasUsefulValue(value[key])) {
+      errors.push(`${label} ${field}.${key} must be non-empty`);
+    }
+  }
+}
+
+function validateStrategicDirections(label: string, value: unknown, countPolicy: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} directions must contain strategic prompt directions`);
+    return;
+  }
+  const resolvedCount = isRecord(countPolicy) && typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  if (resolvedCount !== null && value.length < resolvedCount) {
+    errors.push(`${label} directions must include at least direction_count_policy.resolved_count items`);
+  }
+  value.forEach((item, index) => {
+    if (!isRecord(item)) {
+      errors.push(`${label} directions[${index}] must be a mapping`);
+      return;
+    }
+    for (const key of STRATEGIC_DIRECTION_FIELDS) {
+      if (!hasUsefulValue(item[key])) {
+        errors.push(`${label} directions[${index}].${key} must be non-empty`);
+      }
+    }
+    const screenPrompts = item.screen_prompts;
+    if (Array.isArray(screenPrompts) && screenPrompts.length < 2) {
+      errors.push(`${label} directions[${index}].screen_prompts must include multi-image prompt text`);
+    }
+  });
+}
+
+function validateBuildRecommendation(label: string, value: unknown, errors: string[]): void {
+  validateRequiredObjectFields(label, "build_recommendation", value, ["first_direction_id", "why_first", "success_signals", "failure_signals", "next_test_if_it_works"], errors);
+}
+
+function validatePromptTextManifest(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} prompt_text_manifest must be a mapping`);
+    return;
+  }
+  const status = String(value.status ?? "");
+  if (status && !["draft", "ready_for_image_generation", "generated"].includes(status)) {
+    errors.push(`${label} prompt_text_manifest.status has invalid value ${status}`);
+  }
+  if (status !== "draft" && value.directions_ready !== true) {
+    errors.push(`${label} prompt_text_manifest.directions_ready must be true before image generation`);
+  }
+  if (!Array.isArray(value.prompt_text_refs)) {
+    errors.push(`${label} prompt_text_manifest.prompt_text_refs must be an array`);
+  }
+}
+
+function validateImageGeneration(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} image_generation must be a mapping`);
+    return;
+  }
+  const status = String(value.status ?? "");
+  if (status && !["not_started", "queued", "in_progress", "complete", "blocked"].includes(status)) {
+    errors.push(`${label} image_generation.status has invalid value ${status}`);
+  }
+  if (!nonEmptyString(value.batch_strategy)) {
+    errors.push(`${label} image_generation.batch_strategy must be non-empty`);
+  }
+  if (!Array.isArray(value.generated_images)) {
+    errors.push(`${label} image_generation.generated_images must be an array`);
+  }
+  if (!Array.isArray(value.collection_notes)) {
+    errors.push(`${label} image_generation.collection_notes must be an array`);
+  }
+}
+
+function hasUsefulValue(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (isRecord(value)) {
+    return Object.keys(value).length > 0;
+  }
+  return nonEmptyString(value);
 }
 
 function validateVisualConceptPolicy(label: string, data: Record<string, unknown>, errors: string[]): void {
