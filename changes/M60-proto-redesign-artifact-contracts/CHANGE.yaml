@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:M60-proto-redesign-artifact-contracts
 contract_type: change
 title: M60 Proto redesign artifact contracts
-status: draft
+status: completed
 source_artifacts:
   - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
   - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip

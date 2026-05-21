@@ -2,12 +2,12 @@ schema_version: 0.1.0
 contract_id: work_items:M60-proto-redesign-artifact-contracts
 contract_type: work_items
 title: M60 Proto redesign artifact contract work items
-status: draft
+status: completed
 change_contract: changes/M60-proto-redesign-artifact-contracts/CHANGE.yaml
 items:
   - task_id: M60-T001
     title: Read prototype prompt source material
-    status: planned
+    status: completed
     owned_paths:
       - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
       - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
@@ -18,7 +18,7 @@ items:
       - Validation input questions are listed without implementing policy changes.
   - task_id: M60-T002
     title: Define proto redesign artifact reference
-    status: planned
+    status: completed
     owned_paths:
       - references/proto-redesign-artifact-contracts.md
     acceptance:
@@ -28,7 +28,7 @@ items:
       - Reference defines review evidence and decision handoff.
   - task_id: M60-T003
     title: Add proto prompt pack schema
-    status: planned
+    status: completed
     owned_paths:
       - schemas/proto-prompt-pack.schema.json
     acceptance:
@@ -36,7 +36,7 @@ items:
       - Schema stays compatible with common contract validation.
   - task_id: M60-T004
     title: Validate contracts
-    status: planned
+    status: completed
     owned_paths:
       - references/proto-redesign-artifact-contracts.md
       - schemas/proto-prompt-pack.schema.json

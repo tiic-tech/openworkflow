@@ -6,7 +6,7 @@ selected_change_id: M60-proto-redesign-artifact-contracts
 source_plan_id: M59-proto-redesign-planning-dogfood
 source_candidate_id: P001
 title: Define proto redesign artifact contracts
-status: active
+status: completed
 selection_reason:
   - P001 is dependency-free and selected by the M59 queue.
   - It unlocks source proto behavior, tune behavior, and validation policy.

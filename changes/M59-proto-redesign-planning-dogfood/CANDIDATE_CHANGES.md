@@ -15,11 +15,11 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Selected candidate: `P001`
+Next recommended candidate: `P004`
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
-Status: `selected`
+Status: `done`
 
 Purpose: define artifact vocabulary for image-first `/ow:proto`: strategic
 prototype prompt packs, screen-bound tune prompt packs, validation input policy,
@@ -36,6 +36,13 @@ Validation:
 - `npm run validate`
 
 Selection: `M60-proto-redesign-artifact-contracts`
+
+Completion evidence:
+
+- `references/proto-redesign-artifact-contracts.md`
+- `schemas/proto-prompt-pack.schema.json`
+- `changes/M60-proto-redesign-artifact-contracts/CHANGE.yaml`
+- `npm run validate`
 
 ## P002 - Implement Vision-To-Strategic Prototype Source Behavior
 
@@ -57,7 +64,7 @@ Depends on: `P001`, `P002`
 
 ## P004 - Clarify Validation Consumption For Proto
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: decide and encode how `/ow:proto` should behave when validation
 artifacts are present, missing, or internally derived after vision creation.

@@ -4,11 +4,11 @@ contract_type: planning
 planning_artifact_type: atom_tasks
 selected_change_id: M60-proto-redesign-artifact-contracts
 title: M60 Proto redesign artifact contract atom tasks
-status: active
+status: completed
 tasks:
   - task_id: M60-A001
     title: Read prototype prompt source material
-    status: planned
+    status: completed
     type: read
     owned_paths:
       - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
@@ -20,7 +20,7 @@ tasks:
       - Validation input questions are listed without implementing policy changes.
   - task_id: M60-A002
     title: Define proto redesign artifact reference
-    status: planned
+    status: completed
     type: document
     owned_paths:
       - references/proto-redesign-artifact-contracts.md
@@ -31,7 +31,7 @@ tasks:
       - Reference defines review evidence and decision handoff.
   - task_id: M60-A003
     title: Add proto prompt pack schema
-    status: planned
+    status: completed
     type: edit
     owned_paths:
       - schemas/proto-prompt-pack.schema.json
@@ -40,7 +40,7 @@ tasks:
       - Schema stays compatible with common contract validation.
   - task_id: M60-A004
     title: Validate contracts
-    status: planned
+    status: completed
     type: verify
     owned_paths:
       - references/proto-redesign-artifact-contracts.md
