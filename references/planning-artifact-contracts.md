@@ -31,6 +31,14 @@ Do not create a new top-level `changes/<id>/` folder for every candidate. Open a
 new top-level folder only when `decompose-to-changes` creates a new queue for a
 new feat, product theme, or broad planning source.
 
+## Skill Lifecycle Link
+
+When a selected planning change touches runtime skill generation, adapter
+delivery, generated `.agents/**` files, or `.openworkflow/audit/**`, read
+`references/skill-system-lifecycle.md` before implementation. That reference
+defines OpenWorkflow's native skill file shape, XML-like protocol block
+semantics, generated-surface ownership, and drift expectations.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.

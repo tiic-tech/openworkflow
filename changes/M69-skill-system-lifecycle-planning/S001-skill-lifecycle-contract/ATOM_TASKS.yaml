@@ -4,11 +4,11 @@ contract_type: planning
 planning_artifact_type: atom_tasks
 selected_change_id: S001-skill-lifecycle-contract
 title: Atom tasks for native skill lifecycle contract
-status: ready
+status: done
 tasks:
   - task_id: T001
     title: Inspect current generated skill and registry sources
-    status: pending
+    status: done
     type: read
     owned_paths:
       - packages/adapters/codex/src/generateSkills.ts
@@ -21,7 +21,7 @@ tasks:
       - OpenSpec comparison facts needed by the reference are identified without copying external code.
   - task_id: T002
     title: Write native skill lifecycle reference
-    status: pending
+    status: done
     type: document
     owned_paths:
       - references/skill-system-lifecycle.md
@@ -30,7 +30,7 @@ tasks:
       - Reference explicitly distinguishes OW's static runtime skill contract from OpenSpec's dynamic artifact instruction envelopes.
   - task_id: T003
     title: Link planning contracts to skill lifecycle rules
-    status: pending
+    status: done
     type: document
     owned_paths:
       - references/planning-artifact-contracts.md
@@ -39,7 +39,7 @@ tasks:
       - No generated surfaces are edited.
   - task_id: T004
     title: Verify repository contracts
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - references/skill-system-lifecycle.md

@@ -6,7 +6,7 @@ selected_change_id: S001-skill-lifecycle-contract
 source_plan_id: M69-skill-system-lifecycle-planning
 source_candidate_id: S001
 title: Document native skill format and lifecycle contract
-status: selected
+status: done
 selection_reason: >
   Select M69/S001 before M68/H003. H003 is a high-risk runtime/generated
   surface change, while S001 is a focused contract change that clarifies the
