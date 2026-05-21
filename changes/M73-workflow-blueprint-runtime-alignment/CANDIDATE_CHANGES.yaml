@@ -51,43 +51,48 @@ scope_control:
     build-agent, build-skill, lifecycle transactions, or expanded read models
     as current candidates in this queue.
   deferred_features:
+    - title: Reassess front-chain command quality
+      reason: >
+        The expanded workflow depends on the quality of vision, validation,
+        proto, and tune; these commands should be re-reviewed before proto2html
+        or downstream implementation contracts are decomposed.
+      suggested_plan_id: M74-front-chain-command-quality-review
     - title: Define proto2html runtime contract
       reason: Separate command surface; should receive its own DTC pass after taxonomy.
-      suggested_plan_id: M74-proto2html-runtime-contract
+      suggested_plan_id: M75-proto2html-runtime-contract
     - title: Define html2spec artifact contract
       reason: Separate artifact family; depends on proto2html and should not be bundled into taxonomy.
-      suggested_plan_id: M75-html2spec-artifact-contract
+      suggested_plan_id: M76-html2spec-artifact-contract
     - title: Define build command team and milestone planning contract
       reason: Separate command surface with agent/team implications and high-risk runtime exposure.
-      suggested_plan_id: M76-build-command-contract
+      suggested_plan_id: M77-build-command-contract
     - title: Align /ow:change with DTC AC SC loop
       reason: Separate orchestration feature; depends on build/milestone boundaries.
-      suggested_plan_id: M77-change-planning-loop
+      suggested_plan_id: M78-change-planning-loop
     - title: Design async review command pipeline
       reason: Separate async/internal pipeline with review findings and monitoring behavior.
-      suggested_plan_id: M78-review-async-pipeline
+      suggested_plan_id: M79-review-async-pipeline
     - title: Design archive completion transaction
       reason: Separate completion transaction; depends on review and change-loop boundaries.
-      suggested_plan_id: M79-archive-completion-transaction
+      suggested_plan_id: M80-archive-completion-transaction
     - title: Define build-agent and build-skill registry semantics
       reason: Separate advanced command and registry feature with generated-surface risk.
-      suggested_plan_id: M80-build-agent-skill-registry
+      suggested_plan_id: M81-build-agent-skill-registry
     - title: Design workflow lifecycle transaction map
       reason: Cross-surface transaction map should follow individual command contract queues.
-      suggested_plan_id: M81-workflow-lifecycle-transactions
+      suggested_plan_id: M82-workflow-lifecycle-transactions
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
-      suggested_plan_id: M82-expanded-workflow-read-model
-next_recommended_candidate_id: C001
+      suggested_plan_id: M83-expanded-workflow-read-model
+next_recommended_candidate_id: C011
 changes:
   - id: C001
-    status: selected
+    status: superseded
     title: Define workflow command taxonomy and stage graph
     purpose: >
-      Convert the OW_DEVELOP_PLAN blueprint into a compact command taxonomy and
-      stage graph that places DTC, AC, and SC inside /ow:change while preserving
-      proto2html, html2spec, build, review, archive, build-agent, and build-skill
-      as separate future workflow surfaces.
+      Historical selected candidate for the M73 taxonomy slice. It was split by
+      DTC into narrower C011-C014 candidates so each implementation pass has a
+      clearer outcome.
     scope:
       includes:
         - full workflow stage graph
@@ -104,24 +109,159 @@ changes:
       - changes/M73-workflow-blueprint-runtime-alignment/C001-workflow-command-taxonomy/
       - changes/M73-workflow-blueprint-runtime-alignment/
     dependencies: []
-    unlocks: []
+    unlocks:
+      - C011
+      - C012
+      - C013
+      - C014
     risk: medium
     size: medium
     validation:
       - npm run validate
       - git diff --check
     acceptance:
-      - Workflow graph matches the user-approved blueprint.
-      - DTC, AC, and SC are explicitly scoped to the /ow:change loop.
-      - Remaining command surfaces are recorded as deferred feature refs, not current candidates.
-      - No generated or runtime source surfaces are changed.
+      - Superseded by C011-C014 with stable operation evidence.
+      - Original selection evidence remains historical and should not be used for new implementation.
     selection:
       selected_change_id: C001-workflow-command-taxonomy
       reason: >
-        analyze-changes recommends the non-high-risk taxonomy change first
-        because it prevents local planning-command work from drifting away from
-        the full OW workflow blueprint while keeping this queue bounded.
+        analyze-changes originally recommended the non-high-risk taxonomy change
+        first. DTC later split it into narrower current candidates.
       selected_at: 2026-05-21
+  - id: C011
+    status: ready
+    title: Define command family taxonomy
+    purpose: >
+      Define the command families used by the full workflow blueprint without
+      implementing or registering new runtime commands.
+    scope:
+      includes:
+        - primary workflow commands
+        - internal planning and decision commands
+        - advanced creation commands
+        - asynchronous support commands
+        - explicit command-family boundary language
+      excludes:
+        - stage graph sequencing details
+        - DTC/AC/SC orchestration internals
+        - runtime registry or adapter changes
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    dependencies: []
+    unlocks:
+      - C012
+      - C013
+      - C014
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Command families are named and described.
+      - Existing DTC, AC, and SC are classified as planning intelligence, not primary workflow stages.
+      - No runtime command registry or generated adapter surface changes are made.
+  - id: C012
+    status: candidate
+    title: Define workflow stage graph
+    purpose: >
+      Define the main stage graph from vision through archive and show where
+      optional tune loops and supporting surfaces attach.
+    scope:
+      includes:
+        - main workflow stage order
+        - tune loop placement
+        - proto2html and html2spec as future stage surfaces
+        - build, change, review, and archive attachment points
+      excludes:
+        - detailed artifact contracts for each future stage
+        - lifecycle transaction implementation
+        - runtime adapter changes
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    dependencies:
+      - C011
+    unlocks:
+      - C013
+      - C014
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Stage graph matches the user-approved blueprint.
+      - Optional tune behavior is represented without breaking the main chain.
+      - Future runtime stages remain deferred feature refs.
+  - id: C013
+    status: candidate
+    title: Define /ow:change planning intelligence boundary
+    purpose: >
+      Place DTC, AC, and SC inside the /ow:change loop as planning
+      intelligence while preserving /ow:change as the implementation
+      orchestration boundary.
+    scope:
+      includes:
+        - /ow:change relationship to DTC, AC, and SC
+        - inputs and outputs at the planning-loop level
+        - high-risk stop and approval handoff expectations
+        - boundary against full /ow:change runtime implementation
+      excludes:
+        - implementing /ow:change orchestration
+        - changing DTC, AC, or SC source skills
+        - async review or archive transactions
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    dependencies:
+      - C011
+      - C012
+    unlocks:
+      - C014
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - DTC, AC, and SC are explicitly subordinate to /ow:change.
+      - High-risk report behavior remains a planning-loop stop, not approval.
+      - /ow:change implementation remains a deferred feature ref.
+  - id: C014
+    status: candidate
+    title: Define deferred feature handoff map
+    purpose: >
+      Turn the out-of-scope runtime surfaces into a concise future-queue handoff
+      map so later DTC passes start from explicit feature boundaries.
+    scope:
+      includes:
+        - future queue hints for vision, validation, proto, tune, proto2html, html2spec, build, change, review, archive, build-agent, build-skill, lifecycle, and read model work
+        - risk notes for future high-risk surfaces
+        - evidence links back to OW_DEVELOP_PLAN and M73
+      excludes:
+        - creating the future queues
+        - selecting or approving high-risk candidates
+        - implementing any runtime surface
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    dependencies:
+      - C011
+      - C012
+      - C013
+    unlocks: []
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Deferred features are listed as future queue boundaries, not active candidates.
+      - Front-chain quality review appears before proto2html and downstream implementation work.
+      - High-risk future surfaces remain explicitly approval-gated.
+      - Later DTC passes can cite M73 without inheriting an oversized queue.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -188,3 +328,38 @@ operations:
     evidence:
       - skills/decompose-to-changes/references/decomposition-protocol.md
       - references/planning-artifact-contracts.md
+  - operation_id: OP004
+    operation_type: split
+    target_candidate_ids:
+      - C001
+      - C011
+      - C012
+      - C013
+      - C014
+    actor: agent
+    reason: >
+      DTC decomposed the selected C001 taxonomy slice into smaller candidates
+      after confirming that M73 should remain one workflow-slice queue but C001
+      itself was still too broad for a single focused implementation pass.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: superseded
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+  - operation_id: OP005
+    operation_type: update
+    target_candidate_ids:
+      - C014
+    actor: agent
+    reason: >
+      User clarified that the downstream workflow should restart review from
+      vision because the quality of vision, validation, proto, and tune affects
+      every later implementation stage. DTC updated the deferred feature handoff
+      map so front-chain command quality review precedes proto2html.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+      - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
