@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G019-remote-readonly-pr-plan
+contract_type: planning
+planning_artifact_type: atom_tasks
+title: Atom tasks for G019 remote read-only PR-ready planning
+status: done
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G019
+selected_change_id: G019-remote-readonly-pr-plan
+tasks:
+  - id: T001
+    status: done
+    title: Add remote read-only planner core
+    output:
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+    acceptance:
+      - The planner reads local queue evidence, remote refs, and optional PR metadata without mutation.
+  - id: T002
+    status: done
+    title: Add CLI action
+    output:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+    acceptance:
+      - The openworkflow git-automation remote-plan command returns structured JSON and reports mutation_performed false.
+  - id: T003
+    status: done
+    title: Update generated skill guidance
+    output:
+      - packages/core/src/commands/registry.ts
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    acceptance:
+      - The generated surface documents `remote-plan` as read-only.
+  - id: T004
+    status: done
+    title: Add runtime coverage
+    output:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - A local bare remote fixture proves the command reads refs and does not mutate.
+  - id: T005
+    status: done
+    title: Validate
+    output:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Repository validation, whitespace checks, and runtime surface verification pass.

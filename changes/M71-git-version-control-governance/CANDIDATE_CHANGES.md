@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G019`.
+- Next recommended candidate: `G020`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -538,7 +538,7 @@ Completion evidence:
 
 ## G019 - Implement Remote Read-Only PR-Ready Planning
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -561,6 +561,21 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G019-remote-readonly-pr-plan`
+
+Completion evidence:
+
+- `packages/core/src/git/remoteReadonlyPlanner.ts`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/core/src/commands/registry.ts`
+- `references/git-automation-governance.md`
+- `.agents/skills/ow-git-automation/SKILL.md`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml`
 
 ## G020 - Pilot Draft PR Remote Mutation
 

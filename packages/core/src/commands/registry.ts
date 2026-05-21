@@ -174,6 +174,7 @@ function gitAutomationProtocol(): CommandProtocol {
       "local selected-change commit through openworkflow git-automation commit",
       "local PR_READY_SUMMARY.md through openworkflow git-automation summary",
       "remote operation plan through openworkflow git-automation remote",
+      "remote read-only PR-ready plan through openworkflow git-automation remote-plan",
       "local evidence artifacts under changes/<plan_id>/",
     ],
     conditionalOutputs: [
@@ -214,6 +215,7 @@ function gitAutomationProtocol(): CommandProtocol {
       "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --json",
       "openworkflow git-automation summary --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
       "openworkflow git-automation simulate --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --json",
+      "openworkflow git-automation remote-plan --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base <branch> --json",
     ],
     internalSections: [
       {
@@ -221,6 +223,7 @@ function gitAutomationProtocol(): CommandProtocol {
         items: [
           "managed mode may perform approved local branch, commit, and summary operations with previews and evidence.",
           "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
+          "remote-plan mode may read remote refs and PR metadata, but must not push, create PRs, edit PRs, merge, or mutate Issues.",
           "autonomous mode is a future high-risk path and is not implemented by the G015 command shell.",
         ],
       },

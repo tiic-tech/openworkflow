@@ -1236,6 +1236,7 @@ async function verifyPrReadySummaryGeneration(): Promise<void> {
 
 async function verifyGitAutomationManagedShell(): Promise<void> {
   const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-git-automation-shell-"));
+  const remoteRoot = `${tempRoot}-remote.git`;
   try {
     await runInCwd(tempRoot, ["git", "init"]);
     await runInCwd(tempRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
@@ -1245,6 +1246,10 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     await writeFile(join(tempRoot, "change.txt"), "change\n", "utf8");
     await runInCwd(tempRoot, ["git", "add", "change.txt"]);
     await runInCwd(tempRoot, ["git", "commit", "-m", "M71/G015 shell fixture"]);
+    await runInCwd(tempRoot, ["git", "init", "--bare", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "remote", "add", "origin", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "master"]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "codex/m71-shell-fixture"]);
     await mkdir(join(tempRoot, "changes", "M71-shell"), { recursive: true });
     await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
       "schema_version: 0.1.0",
@@ -1317,8 +1322,70 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert(Array.isArray(simulateResult.rollbackPlan), "simulator missing rollback plan");
     assert(Array.isArray(simulateResult.blockers), "simulator missing blockers");
     assert(simulate.output.includes("validation evidence is missing"), "simulator should report missing validation blocker");
+
+    await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-shell",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-shell",
+      "title: Candidate changes for shell fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-shell-fixture",
+      "changes:",
+      "  - id: G017",
+      "    status: done",
+      "    title: Build read-only autonomous git simulator",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: feed017'",
+      "        - 'validation: npm run verify:runtime-surface'",
+      "  - id: G019",
+      "    status: done",
+      "    title: Remote readonly plan fixture",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "        - 'validation: npm run validate'",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(tempRoot, ["git", "add", "changes/M71-shell/CANDIDATE_CHANGES.yaml", "changes/M71-shell/PR_READY_SUMMARY.md"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "M71/G019 remote plan fixture evidence"]);
+    const remotePlan = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "remote-plan",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(remotePlan.code === 0, `remote-plan should succeed with read-only fixture evidence: ${remotePlan.output}`);
+    const remotePlanReport = parseJsonReport(remotePlan.output, "git-automation remote-plan");
+    const remotePlanData = record(remotePlanReport.data, "git-automation remote-plan data");
+    const remotePlanResult = record(remotePlanData.result, "git-automation remote-plan result");
+    assert(remotePlanResult.mutation_performed === false, "remote-plan must report no mutation");
+    const targetIdentity = record(remotePlanResult.targetIdentity, "remote-plan target identity");
+    assert(targetIdentity.remote === "origin", "remote-plan should record target remote");
+    const remoteState = record(remotePlanResult.remoteState, "remote-plan remote state");
+    assert(typeof remoteState.baseHead === "string", "remote-plan should read remote base head");
+    assert(typeof remoteState.branchHead === "string", "remote-plan should read remote branch head");
+    assert(Array.isArray(remotePlanResult.readOnlyPlan), "remote-plan missing read-only plan");
+    assert(remotePlan.output.includes("did not push"), "remote-plan should state non-mutation boundary");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
+    await rm(remoteRoot, { recursive: true, force: true });
   }
 }
 
@@ -1373,6 +1440,7 @@ function verifyGitAutomationSkill(content: string): void {
     "openworkflow git-automation commit",
     "openworkflow git-automation summary",
     "openworkflow git-automation simulate",
+    "openworkflow git-automation remote-plan",
   ]) {
     assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
   }

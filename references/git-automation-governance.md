@@ -266,3 +266,34 @@ The simulator is successful only when it can produce a complete plan without
 missing branch, commit, validation, PR-summary, or rollback evidence. Unknown
 remote metadata is a warning when local evidence is otherwise complete; stale
 or conflicting remote metadata is a blocker for later execution candidates.
+
+## Remote Read-Only PR-Ready Plan
+
+`openworkflow git-automation remote-plan` is the approved B step after the
+simulator. It reads remote state and emits a local JSON plan. It must not push,
+create PRs, edit PRs, close PRs, merge, mutate Issues, or alter refs.
+
+Remote-plan input:
+
+- source `CANDIDATE_CHANGES.yaml`
+- target remote
+- target base
+- optional target branch
+- optional base ref for ordered local commits
+- optional `PR_READY_SUMMARY.md` path
+
+Remote-plan output:
+
+- target identity: remote URL, target branch, target base, current branch, and
+  queue branch boundary
+- local state: local HEAD, dirty paths, ordered local commits, queue commit
+  evidence, validation evidence, and PR-ready summary status
+- remote state: target branch head and base head when readable
+- optional PR metadata from `gh pr list` when available
+- blockers, warnings, read-only operation plan, and rollback guidance
+
+Remote-plan is successful only when the target remote and base are readable,
+the working tree is clean, the branch boundary matches, validation evidence is
+present, and `PR_READY_SUMMARY.md` exists. Missing branch head is a warning
+because a later approved push or draft PR pilot may create it; missing base head
+is a blocker.
