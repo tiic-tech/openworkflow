@@ -83,6 +83,7 @@ const REQUIRED_FILES = [
   "packages/adapters/codex/src/templates.ts",
   "templates/openworkflow/README.md",
   "templates/codex/README.md",
+  "skills/build-vision/SKILL.md",
   "skills/build-validation/SKILL.md",
   "skills/build-validation/scripts/init_validation.py",
   "skills/build-prototype/SKILL.md",
