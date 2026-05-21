@@ -11,6 +11,22 @@ Choose one candidate change and turn it into implementation-ready planning
 artifacts. This skill prepares the next change; it does not execute the
 implementation.
 
+## Feat Boundary
+
+The source `CANDIDATE_CHANGES.yaml` is the feat boundary. A selected candidate
+is a commit-sized slice inside that feat, not a new top-level feat. By default,
+write selection artifacts under the existing queue folder:
+
+```text
+changes/<plan_id>/<candidate-id>-<slug>/
+  SELECTED_CHANGE.yaml
+  ATOM_TASKS.yaml
+  IMPLEMENTATION_BRIEF.md
+```
+
+Create a new top-level `changes/<id>/` only when the user explicitly starts a
+new decomposition queue or the existing queue is no longer the owning feat.
+
 ## Read First
 
 Read these only as needed:
@@ -33,7 +49,8 @@ Read these only as needed:
 6. Otherwise choose the candidate that best matches the queue's
    `selection_policy`, unlocks downstream work, has focused owned paths, and
    has realistic validation.
-7. Create a new change folder, usually `changes/<selected_change_id>/`.
+7. Create a candidate-specific folder inside the current feat folder, usually
+   `changes/<plan_id>/<candidate-id>-<slug>/`.
 8. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
 9. Update the candidate queue:

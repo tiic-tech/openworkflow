@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: work_items:H001-proto2html-artifact-contracts
+contract_type: work_items
+title: H001 Proto2html artifact contracts work items
+status: selected
+change_contract: changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
+items:
+  - task_id: H001-T001
+    title: Reference contract
+    status: pending
+    owned_paths:
+      - references/proto2html-artifact-contracts.md
+    acceptance:
+      - Input, output, fidelity, and non-goal rules are clear.
+  - task_id: H001-T002
+    title: Schema contract
+    status: pending
+    owned_paths:
+      - schemas/html-prototype.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Schema is valid JSON and listed in repository required files.
+  - task_id: H001-T003
+    title: Queue completion
+    status: pending
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/
+      - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/
+    acceptance:
+      - H001 is complete and validation evidence is attached.

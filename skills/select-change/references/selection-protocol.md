@@ -20,6 +20,25 @@ If the user names a candidate id, verify that its dependencies are satisfied
 before selecting it. If the id is blocked or not ready, report why and stop
 unless the user explicitly overrides the risk.
 
+## Feat And Commit Cadence
+
+The source `CANDIDATE_CHANGES.yaml` is the feature-level queue. Selection does
+not normally create a new top-level `changes/<id>/` folder. Instead, place
+candidate-specific planning artifacts inside the existing feat folder:
+
+```text
+changes/<plan_id>/
+  CANDIDATE_CHANGES.yaml
+  <candidate-id>-<slug>/
+    SELECTED_CHANGE.yaml
+    ATOM_TASKS.yaml
+    IMPLEMENTATION_BRIEF.md
+```
+
+Each selected candidate should be small enough to complete as one coherent git
+commit. When the candidate completes, update the queue with completion evidence
+and include the commit id when available.
+
 ## Targeted Candidate Review
 
 For point-to-point review, inspect only the requested candidate plus the

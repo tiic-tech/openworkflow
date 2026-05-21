@@ -16,6 +16,21 @@ Queues may also carry a top-level `operations` list. Use it to audit targeted
 maintenance such as adding a candidate, updating a scope, changing priority,
 selecting a candidate, or marking completion.
 
+## Feat And Commit Cadence
+
+Each `CANDIDATE_CHANGES.yaml` queue is a feat boundary. The top-level
+`changes/<plan_id>/` folder owns the feature-sized planning source, readable
+view, summary, operation log, and candidate-specific selection artifacts.
+
+Each candidate inside that queue is a commit-sized change. A selected candidate
+should normally write its `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+`IMPLEMENTATION_BRIEF.md` under `changes/<plan_id>/<candidate-id>-<slug>/` and
+complete with one coherent git commit.
+
+Do not create a new top-level `changes/<id>/` folder for every candidate. Open a
+new top-level folder only when `decompose-to-changes` creates a new queue for a
+new feat, product theme, or broad planning source.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.

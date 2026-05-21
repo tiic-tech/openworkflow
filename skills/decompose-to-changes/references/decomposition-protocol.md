@@ -32,6 +32,32 @@ candidate is too broad when it owns multiple unrelated modules, mixes source
 skill authoring with runtime command exposure, or requires both product design
 and production implementation.
 
+## Feat And Commit Cadence
+
+The queue is the feat. `changes/<plan_id>/CANDIDATE_CHANGES.yaml` defines the
+feature-sized planning boundary and should remain the durable source of truth
+until that feature is complete or superseded.
+
+Individual candidates are commit-sized changes inside the current feat. Do not
+create sibling top-level folders such as `changes/<new-id>/` for every
+candidate. Selection artifacts should live under the current feat folder, for
+example:
+
+```text
+changes/<plan_id>/
+  CANDIDATE_CHANGES.yaml
+  CANDIDATE_CHANGES.md
+  SUMMARY.yaml
+  <candidate-id>-<slug>/
+    SELECTED_CHANGE.yaml
+    ATOM_TASKS.yaml
+    IMPLEMENTATION_BRIEF.md
+```
+
+Open a new top-level feat folder only when a new decomposition queue is needed.
+Otherwise, update the existing queue by candidate id and let each completed
+candidate land as a normal git commit.
+
 ## Status Guidance
 
 Use these statuses:

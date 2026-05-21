@@ -11,6 +11,18 @@ Turn ambiguous planning input into a durable candidate change queue. This skill
 plans change boundaries; it does not select one change for implementation and
 does not implement code.
 
+## Feat Boundary
+
+Treat each `CANDIDATE_CHANGES.yaml` produced by this skill as one complete feat
+boundary. The top-level folder `changes/<plan_id>/` owns the feat-level queue,
+summary, and audit history. Candidate changes inside that queue are
+commit-sized slices of the feat, not separate top-level feats.
+
+Create a new top-level `changes/<plan_id>/` only for a new decomposition queue,
+product theme, or broad planning source. When the current queue still owns the
+work, maintain that queue and let `select-change` create candidate-specific
+selection artifacts inside the existing feat folder.
+
 ## Read First
 
 Read these only as needed:
@@ -32,7 +44,8 @@ Read these only as needed:
    - latest session discussion when the user refers to "current discussion"
    - repo vision, roadmap, or existing OpenWorkflow artifacts only when needed
 4. Choose a `plan_id` and output location. Default to
-   `changes/<plan_id>/CANDIDATE_CHANGES.yaml`.
+   `changes/<plan_id>/CANDIDATE_CHANGES.yaml`; this folder is the feat root for
+   all candidate commits in the queue.
 5. If updating an existing queue, preserve existing candidate ids and history.
    Add new ids only for genuinely new candidates.
 6. Decompose the source into candidates with focused owned paths, explicit
