@@ -1,0 +1,127 @@
+schema_version: 0.1.0
+contract_id: change_analysis:M72-remaining-change-priority-analysis
+contract_type: planning
+planning_artifact_type: change_analysis
+analysis_id: M72-remaining-change-priority-analysis
+title: Remaining change priority analysis
+status: complete
+source:
+  queues:
+    - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+    - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+    - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+    - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+    - changes/M70-high-risk-governance-planning/CANDIDATE_CHANGES.yaml
+    - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+git_state:
+  branch: codex/m71-git-version-governance
+  dirty: false
+  note: >
+    Analysis began from a clean tree. The analyzed legacy queues do not record
+    branch_boundary, so implementation should add or confirm a feat branch
+    boundary before selecting a candidate under the current git governance.
+queues:
+  - plan_id: M54-decompose-select-change-planning
+    next_recommended_candidate_id: C007
+    ready_candidates:
+      - C007
+      - C004
+    blocker_notes:
+      - C004 is marked ready but depends on C007, so C007 must precede C004.
+  - plan_id: M59-proto-redesign-planning-dogfood
+    next_recommended_candidate_id: null
+    ready_candidates: []
+    blocker_notes:
+      - Queue is complete.
+  - plan_id: M68-post-proto-workflow-planning
+    next_recommended_candidate_id: H003
+    ready_candidates:
+      - H003
+    blocker_notes:
+      - H003 is high risk and has no local HIGH_RISK_DECISION_REPORT.md.
+  - plan_id: M69-skill-system-lifecycle-planning
+    next_recommended_candidate_id: null
+    ready_candidates: []
+    blocker_notes:
+      - Remaining S003 and S007 entries are candidate-status and should flow through M70 mitigation first.
+  - plan_id: M70-high-risk-governance-planning
+    next_recommended_candidate_id: G005
+    ready_candidates:
+      - G005
+    blocker_notes:
+      - G005 is medium risk and design-only.
+  - plan_id: M71-git-version-control-governance
+    next_recommended_candidate_id: null
+    ready_candidates: []
+    blocker_notes:
+      - Queue is complete.
+recommendation:
+  target_plan_id: M54-decompose-select-change-planning
+  target_candidate_id: C007
+  action: handoff_to_select_change
+  priority_rank: 1
+  reason: >
+    C007 is ready, medium risk, dependency-satisfied, and directly improves
+    cross-queue selection arbitration, which is the exact capability being used
+    for this remaining-work analysis. It also unlocks C004 runtime exposure for
+    planning skills.
+priority_order:
+  - rank: 1
+    plan_id: M54-decompose-select-change-planning
+    candidate_id: C007
+    action: select_next_after_branch_boundary_confirmation
+    reason: >
+      Highest leverage and non-high-risk; improves select-change's ability to
+      consume cross-queue recommendations.
+  - rank: 2
+    plan_id: M70-high-risk-governance-planning
+    candidate_id: G005
+    action: select_after_C007_or_if_skill-lifecycle_work_is_prioritized
+    reason: >
+      Medium-risk design-only mitigation for M69 S003; good next step for skill
+      delivery architecture but less directly tied to current selection flow.
+  - rank: 3
+    plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    action: high_risk_report_before_selection
+    reason: >
+      Valuable runtime exposure for proto2html, but high risk and missing a
+      local high-risk decision report.
+  - rank: 4
+    plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    action: wait_for_C007_then_high_risk_report
+    reason: >
+      Runtime exposure for planning skills is useful, but it depends on C007 and
+      is high risk.
+  - rank: 5
+    plan_id: M68-post-proto-workflow-planning
+    candidate_id: H007
+    action: queue_maintenance_before_selection
+    reason: >
+      Lifecycle transactions are strategically useful, but the candidate is not
+      ready and should be promoted intentionally if this becomes the focus.
+rejected_alternatives:
+  - plan_id: M70-high-risk-governance-planning
+    candidate_id: G005
+    reason: Medium-risk and useful, but C007 better addresses the immediate cross-queue selection gap.
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: High-risk runtime exposure with no high-risk report in the queue.
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    reason: Depends on C007 and is high risk.
+high_risk_stop:
+  required: false
+  reason: Recommended candidate C007 is medium risk. High-risk stop applies if choosing H003 or C004 instead.
+handoff:
+  next_skill: select-change
+  instruction: >
+    Select M54-decompose-select-change-planning/C007 only after confirming or
+    adding an owning branch boundary for the M54 queue under current git
+    governance.
+validation:
+  commands_run:
+    - git status --short --branch
+    - find changes -name CANDIDATE_CHANGES.yaml -maxdepth 3 -print
+    - node script to summarize queue statuses and dependencies
