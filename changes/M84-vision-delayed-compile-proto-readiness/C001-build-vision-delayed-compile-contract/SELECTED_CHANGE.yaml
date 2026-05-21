@@ -6,7 +6,7 @@ selected_change_id: C001-build-vision-delayed-compile-contract
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C001
 title: Define /ow:vision delayed-compile contract and native build-vision skill
-status: selected
+status: done
 selection_reason: >
   C001 is the dependency-free first step for the vision reconstruction. It
   defines the interaction contract before schema and generated adapter changes,
@@ -59,3 +59,8 @@ risk:
 commit_boundary: >
   Complete as one coherent local commit unless the build-vision source skill
   reveals a need to split source behavior from planning artifacts.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml

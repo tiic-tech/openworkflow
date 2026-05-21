@@ -26,9 +26,9 @@ Deferred features:
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Selected candidate: `C001`
+Completed candidate: `C001`
 
-Next recommended candidate: none until `C001` is completed or superseded.
+Next recommended candidate: `C002`
 
 ## Selection Policy
 
@@ -42,7 +42,7 @@ Avoid changes that rebuild vision, validation, proto, and tune together.
 
 ### C001 - Define /ow:vision delayed-compile contract and native build-vision skill
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -52,9 +52,14 @@ has the same source-skill foundation as validation, proto, and tune.
 
 Selection: `C001-build-vision-delayed-compile-contract`
 
+Completion evidence:
+
+- `changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml`
+- `0140a0109ff9da718952a37a422cfcf527264b51`
+
 ### C002 - Extend vision artifacts with proto-readiness and coverage matrix
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

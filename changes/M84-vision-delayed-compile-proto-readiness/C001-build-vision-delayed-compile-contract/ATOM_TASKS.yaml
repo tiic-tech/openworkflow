@@ -6,7 +6,7 @@ selected_change_id: C001-build-vision-delayed-compile-contract
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C001
 title: Atom tasks for build-vision delayed compile contract
-status: ready
+status: completed
 tasks:
   - task_id: T001
     title: Update discovery-loop plan and M84 queue
@@ -47,3 +47,7 @@ validation:
   - npm run validate
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml

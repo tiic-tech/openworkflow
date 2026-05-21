@@ -84,10 +84,10 @@ scope_control:
         through benchmark prototype selection after component commands are
         upgraded.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Define /ow:vision delayed-compile contract and native build-vision skill
     purpose: >
       Replace eager per-answer persistence with an explicit interview,
@@ -139,8 +139,15 @@ changes:
         contract and fills the missing native build-vision source skill before
         schema, generated adapter, or downstream command changes.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-build-vision-delayed-compile-contract
+      completed_at: 2026-05-22
+      primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
+        - skills/build-vision/SKILL.md
   - id: C002
-    status: candidate
+    status: ready
     title: Extend vision artifacts with proto-readiness and coverage matrix
     purpose: >
       Add structured vision fields that let /ow:proto evaluate whether it can
@@ -317,3 +324,30 @@ operations:
       - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/SELECTED_CHANGE.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/ATOM_TASKS.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete the delayed-compile contract and native build-vision source skill
+      change with local commit evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
+      - 0140a0109ff9da718952a37a422cfcf527264b51
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 becomes ready after C001 established the delayed-compile contract and
+      native build-vision source skill foundation.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
