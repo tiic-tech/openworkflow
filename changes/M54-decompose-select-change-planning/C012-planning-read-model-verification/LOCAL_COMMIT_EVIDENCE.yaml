@@ -1,0 +1,19 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C012-planning-read-model-verification
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C012-planning-read-model-verification
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C012
+selected_change_id: C012-planning-read-model-verification
+primary_commit: 81a86fab2b75c73c115ee755d1db519090174692
+validation_evidence:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
