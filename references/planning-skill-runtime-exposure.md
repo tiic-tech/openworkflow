@@ -74,6 +74,31 @@ explicit, validated source contracts.
 - High-risk candidates still require a decision report and explicit approved
   option before implementation.
 
+## Approved Command Semantics
+
+The accepted C010 direction is to promote the planning source skills to formal
+OpenWorkflow semantic command ids:
+
+- `/ow:decompose-to-changes`: creates, queries, and maintains one
+  `CANDIDATE_CHANGES.yaml` queue under `changes/<plan_id>/`. It owns planning
+  decomposition and queue maintenance, but it must not select a candidate or
+  implement code.
+- `/ow:analyze-changes`: reads one or more candidate queues and writes advisory
+  `CHANGE_ANALYSIS.yaml` evidence. It recommends the next plan id and candidate
+  id, including high-risk stop recommendations, but it must not mutate queues,
+  select candidates, or authorize high-risk implementation.
+- `/ow:select-change`: consumes a queue or explicit analysis recommendation and
+  writes `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+  `IMPLEMENTATION_BRIEF.md` for one commit-sized candidate. It must re-check
+  branch, dirty-tree, dependency, and high-risk gates before selection.
+
+These command ids are core semantic decisions, not adapter delivery decisions.
+Core owns the command names, source-of-truth behavior boundaries, required and
+forbidden context, output contracts, and high-risk gates. Source skills remain
+the behavior references until runtime registry code and adapter generation are
+implemented. Codex `.agents/skills/ow-*` delivery belongs to a later generated
+surface candidate.
+
 ## Read-Model Expectations
 
 Planning runtime exposure must not load full planning history by default.

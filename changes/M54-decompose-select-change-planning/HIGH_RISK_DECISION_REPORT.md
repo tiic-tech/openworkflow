@@ -109,6 +109,22 @@ After Option B, split implementation into smaller candidates such as:
 - `C004d`: Codex adapter generation for accepted planning surfaces.
 - `C004e`: runtime-surface and agent e2e verification fixtures.
 
+Approved on 2026-05-21: proceed with the **C010 Narrow Core Command
+Semantics** follow-up.
+
+The approved semantic direction is that the planning source skills become
+formal OpenWorkflow command ids:
+
+- `/ow:decompose-to-changes`
+- `/ow:analyze-changes`
+- `/ow:select-change`
+
+The approved C010 scope is limited to recording the core command semantics,
+authority boundaries, and source-of-truth ownership for these command ids. C010
+does not authorize Codex adapter generation, generated `.agents/**` surfaces,
+or broad runtime delivery. Those remain gated by the C011 high-risk candidate
+after the C010 semantics are complete.
+
 ## Guardrails
 
 - Do not hand-edit generated `.agents/**`, `.openworkflow/**`, or `AGENTS.md`
@@ -132,6 +148,7 @@ option:
 - `Approve Option B`
 - `Approve Option C`
 - `Approve Option D`
+- `Approve C010 Narrow Core Command Semantics`
 
 Ambiguous instructions such as "continue" are not enough to select or implement
 runtime exposure.

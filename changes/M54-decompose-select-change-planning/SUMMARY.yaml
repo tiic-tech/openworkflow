@@ -3,14 +3,15 @@ contract_id: summary:M54-decompose-select-change-planning
 contract_type: planning
 planning_artifact_type: summary
 plan_id: M54-decompose-select-change-planning
-title: Summary for decompose-to-changes and select-change planning
+title: Summary for decompose-to-changes, analyze-changes, and select-change planning
 status: active
 source:
   kind: planning_discussion
   summary: >
-    Tracks the source planning work for decompose-to-changes and select-change:
-    durable candidate queues, selected-change artifacts, queue maintenance, and
-    cross-queue selection arbitration.
+    Tracks the source planning work for decompose-to-changes, analyze-changes,
+    and select-change: durable candidate queues, change analysis artifacts,
+    selected-change artifacts, queue maintenance, and cross-queue selection
+    arbitration.
   refs:
     - docs/OW_DEVELOP_PLAN.md
     - docs/OW_DEVELOP_PLAN_Phase2.md
@@ -22,11 +23,11 @@ outputs:
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
 candidate_count: 13
-completed_candidate_id: C012
-completed_change_id: C012-planning-read-model-verification
-previous_completed_candidate_id: C009
-previous_completed_change_id: C009-planning-artifact-registration
-next_recommended_candidate_id: C010
+completed_candidate_id: C010
+completed_change_id: C010-planning-registry-semantics
+previous_completed_candidate_id: C012
+previous_completed_change_id: C012-planning-read-model-verification
+next_recommended_candidate_id: C011
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -43,6 +44,8 @@ key_dependencies:
   - C010, C011, and C013 are high-risk or high-risk-dependent and require approval before selection.
   - C012 is the next non-high-risk candidate because it adds verification fixtures without generated surface changes.
   - C012 is complete and the next remaining ready candidate is C010, which is high risk.
+  - User approved C010 Narrow Core Command Semantics: DTC, AC, and SC should be formal /ow:* command ids.
+  - C010 is complete and C011 is the next generated-surface follow-up; C011 remains high risk.
 risks:
   - id: R001
     level: medium
@@ -78,4 +81,6 @@ validation:
     - OP015 added C010, C011, C012, and C013 follow-up candidates.
     - OP016 selected C012.
     - OP017 completed C012 planning artifact read-model verification fixtures.
+    - OP018 selected C010 after explicit high-risk approval.
+    - OP019 completed C010 planning registry semantics for DTC, AC, and SC.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

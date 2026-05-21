@@ -3,7 +3,7 @@ contract_id: candidate_changes:M54-decompose-select-change-planning
 contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M54-decompose-select-change-planning
-title: Candidate changes for decompose-to-changes and select-change skills
+title: Candidate changes for decompose-to-changes, analyze-changes, and select-change skills
 status: active
 source:
   kind: planning_discussion
@@ -37,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C010
+next_recommended_candidate_id: C011
 changes:
   - id: C001
     status: done
@@ -506,7 +506,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: C010
-    status: ready
+    status: done
     title: Define planning command or capability registry semantics
     purpose: >
       Decide whether planning skills should become semantic commands,
@@ -515,6 +515,9 @@ changes:
     scope:
       includes:
         - command versus capability registry decision
+        - formal /ow:decompose-to-changes command semantics
+        - formal /ow:analyze-changes command semantics
+        - formal /ow:select-change command semantics
         - source-of-truth ownership for planning skill semantics
         - migration and compatibility constraints
       excludes:
@@ -539,8 +542,25 @@ changes:
       - Registry semantic decision is explicit and approval-backed.
       - Adapter generation remains out of scope.
       - Generated surfaces remain untouched.
+    selection:
+      selected_change_id: C010-planning-registry-semantics
+      reason: >
+        User approved C010 Narrow Core Command Semantics from the high-risk
+        report and requested DTC, AC, and SC as formal /ow:* command ids.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C010-planning-registry-semantics
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-skill-runtime-exposure.md
+        - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+        - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: C011
-    status: candidate
+    status: ready
     title: Add Codex adapter generation for accepted planning surfaces
     purpose: >
       Generate accepted planning runtime surfaces through the Codex adapter only
@@ -914,4 +934,41 @@ operations:
       - "validation: npm run validate"
       - "validation: npm run verify:runtime-surface"
       - "validation: npm run verify:agent-e2e"
+      - "validation: git diff --check"
+  - operation_id: OP018
+    operation_type: select
+    target_candidate_ids:
+      - C010
+    actor: agent
+    reason: >
+      User approved C010 Narrow Core Command Semantics from the high-risk
+      report and requested decompose-to-changes, analyze-changes, and
+      select-change as formal /ow:* command ids.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP019
+    operation_type: complete
+    target_candidate_ids:
+      - C010
+    actor: agent
+    reason: >
+      The planning runtime exposure boundary now records accepted command
+      semantics for /ow:decompose-to-changes, /ow:analyze-changes, and
+      /ow:select-change while keeping generated adapter delivery gated by C011.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md
+      - "validation: npm run validate"
       - "validation: git diff --check"

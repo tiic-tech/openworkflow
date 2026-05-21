@@ -1,4 +1,4 @@
-# Candidate Changes: Decompose and Select Change Skills
+# Candidate Changes: Decompose, Analyze, and Select Change Skills
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
@@ -14,11 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C010` after high-risk approval.
+Next recommended candidate: `C011` after high-risk approval.
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
-Latest completed candidate: `C007`
+Latest completed candidate: `C010`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -334,18 +334,34 @@ Completion evidence:
 
 ## C010 - Define Planning Command Or Capability Registry Semantics
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
 Purpose: decide whether planning skills should become semantic commands,
 capability registry entries, or remain source skills before adapter generation.
 
-Stop condition: requires explicit approval before selection.
+Approved command semantics:
+
+- `/ow:decompose-to-changes`
+- `/ow:analyze-changes`
+- `/ow:select-change`
+
+Completion evidence:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md`
+- `npm run validate`
+- `git diff --check`
+
+Generated adapter delivery remains gated by `C011`.
 
 ## C011 - Add Codex Adapter Generation For Accepted Planning Surfaces
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `high`
 
@@ -419,3 +435,5 @@ verification boundaries have been proven or blocked.
 - `OP015`: add `C010`, `C011`, `C012`, and `C013`
 - `OP016`: select `C012`
 - `OP017`: complete `C012`
+- `OP018`: select `C010`
+- `OP019`: complete `C010`

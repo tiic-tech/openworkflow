@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C010-planning-registry-semantics
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C010-planning-registry-semantics
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C010
+title: Define planning command registry semantics
+status: completed
+selection_reason:
+  - User approved C010 Narrow Core Command Semantics from the high-risk report.
+  - The approved semantic direction is formal /ow:* command ids for decompose-to-changes, analyze-changes, and select-change.
+  - C010 stays limited to command semantics and explicitly defers Codex adapter generation and generated surfaces to C011.
+rejected_alternatives:
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C011
+    reason: Codex adapter generation remains a separate high-risk generated-surface candidate.
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C013
+    reason: Full runtime exposure reassessment depends on accepted command semantics and generated delivery evidence.
+scope:
+  includes:
+    - approved command ids for decompose-to-changes, analyze-changes, and select-change
+    - source-of-truth ownership for planning command behavior
+    - high-risk report approval record for the C010 semantic decision
+    - queue and summary evidence for the selected high-risk change
+  excludes:
+    - Codex adapter generation
+    - generated .agents or .openworkflow changes
+    - implementation of generated planning skill delivery
+    - remote git or GitHub operations
+owned_paths:
+  - references/planning-skill-runtime-exposure.md
+  - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+  - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+forbidden_paths:
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - DTC, AC, and SC are named as formal /ow:* semantic command ids.
+  - analyze-changes is represented as a first-class planning command, not folded into decompose-to-changes or select-change.
+  - Generated adapter delivery remains explicitly gated by C011.
+  - The high-risk report records the concrete C010 approval.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21
