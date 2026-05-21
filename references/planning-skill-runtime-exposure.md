@@ -87,12 +87,17 @@ Default read models should prefer:
 5. Full `CANDIDATE_CHANGES.yaml` only when selection, queue maintenance, or
    audit requires source truth.
 
+`references/planning-artifact-contracts.md` defines the planning artifact
+registration roles and minimum summary fields. Runtime exposure work must
+depend on that registration contract before adding command, adapter, or
+generated-surface behavior.
+
 ## Follow-Up Candidate Split
 
 Future runtime exposure should be split into smaller candidates:
 
 - `C009`: define planning artifact registration and summary/read-model
-  contract. Medium risk if limited to contract/reference/validator design.
+  contract. Complete when limited to contract/reference design.
 - `C010`: add command or capability registry semantics without adapter
   generation. High risk until a specific registry boundary is approved.
 - `C011`: add Codex adapter generation for accepted planning surfaces. High

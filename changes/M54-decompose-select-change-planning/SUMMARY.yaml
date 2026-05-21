@@ -21,12 +21,12 @@ outputs:
   summary: changes/M54-decompose-select-change-planning/SUMMARY.yaml
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
-candidate_count: 9
-completed_candidate_id: C008
-completed_change_id: C008-runtime-exposure-design
-previous_completed_candidate_id: C007
-previous_completed_change_id: C007-cross-queue-selection
-next_recommended_candidate_id: C009
+candidate_count: 13
+completed_candidate_id: C009
+completed_change_id: C009-planning-artifact-registration
+previous_completed_candidate_id: C008
+previous_completed_change_id: C008-runtime-exposure-design
+next_recommended_candidate_id: C012
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -39,6 +39,9 @@ key_dependencies:
   - User approved C004 Option B; C008 is the medium-risk design-only boundary candidate that implements that approved path.
   - C008 is complete and splits follow-up work into smaller candidates.
   - C009 is the next non-high-risk candidate for planning artifact registration and summary contracts.
+  - C009 is complete and makes C012 ready.
+  - C010, C011, and C013 are high-risk or high-risk-dependent and require approval before selection.
+  - C012 is the next non-high-risk candidate because it adds verification fixtures without generated surface changes.
 risks:
   - id: R001
     level: medium
@@ -69,4 +72,7 @@ validation:
     - OP010 selected C008.
     - OP011 completed C008 design-only runtime exposure boundary.
     - OP012 added C009 as the next non-high-risk follow-up.
+    - OP013 selected C009.
+    - OP014 completed C009 planning artifact registration and summary contract.
+    - OP015 added C010, C011, C012, and C013 follow-up candidates.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

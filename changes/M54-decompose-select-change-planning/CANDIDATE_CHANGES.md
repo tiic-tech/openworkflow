@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C009`
+Next recommended candidate: `C012`
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
@@ -297,7 +297,7 @@ Completion evidence:
 
 ## C009 - Define Planning Artifact Registration And Summary Contract
 
-Status: `ready`
+Status: `done`
 
 Purpose: define the contract and validator expectations for registering
 planning artifacts in read models without exposing runtime command or adapter
@@ -324,6 +324,72 @@ Acceptance:
 - Runtime command and adapter generation remain out of scope.
 - Future C010/C012 work can use the contract without loading full planning history by default.
 
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `git diff --check`
+
+## C010 - Define Planning Command Or Capability Registry Semantics
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: decide whether planning skills should become semantic commands,
+capability registry entries, or remain source skills before adapter generation.
+
+Stop condition: requires explicit approval before selection.
+
+## C011 - Add Codex Adapter Generation For Accepted Planning Surfaces
+
+Status: `candidate`
+
+Risk: `high`
+
+Purpose: generate accepted planning runtime surfaces through the Codex adapter
+only after the semantic registry boundary is approved.
+
+## C012 - Add Planning Artifact Read-Model Verification Fixtures
+
+Status: `ready`
+
+Purpose: add verification fixtures for the planning artifact registration
+contract without changing runtime command semantics or adapter generation.
+
+Owned paths:
+
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/cli/src/dev/verifyAgentE2E.ts`
+- `references/planning-artifact-contracts.md`
+- `changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/`
+
+Depends on: `C009`
+
+Validation:
+
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
+
+Acceptance:
+
+- Verification covers planning artifact summary-first expectations.
+- Verification does not add generated surfaces or adapter behavior.
+- Full candidate queues are not required for default low-context read models.
+
+## C013 - Reassess Full Planning Skill Runtime Exposure
+
+Status: `candidate`
+
+Risk: `high`
+
+Purpose: reassess C004 after registration, semantic registry, adapter, and
+verification boundaries have been proven or blocked.
+
 ## Operation Audit
 
 - `OP001`: add `C006`
@@ -338,3 +404,6 @@ Acceptance:
 - `OP010`: select `C008`
 - `OP011`: complete `C008`
 - `OP012`: add `C009`
+- `OP013`: select `C009`
+- `OP014`: complete `C009`
+- `OP015`: add `C010`, `C011`, `C012`, and `C013`

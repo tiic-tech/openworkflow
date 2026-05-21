@@ -70,6 +70,62 @@ delivery, generated `.agents/**` files, or `.openworkflow/audit/**`, read
 defines OpenWorkflow's native skill file shape, XML-like protocol block
 semantics, generated-surface ownership, and drift expectations.
 
+## Planning Artifact Registration
+
+Planning artifacts can appear in Agent read models only through summary-first
+registration. Runtime or adapter exposure must not load full planning history
+by default.
+
+Registration roles:
+
+- `CANDIDATE_CHANGES.yaml`: source of truth for one feat queue. Load only when
+  selecting, maintaining, completing, or auditing that queue.
+- `SUMMARY.yaml`: default queue handoff and read-model artifact. It should name
+  source refs, branch boundary, candidate count, completed candidate, next
+  recommended candidate, high-risk report paths, validation, and unresolved
+  questions.
+- `CHANGE_ANALYSIS.yaml`: advisory cross-queue recommendation evidence. It may
+  recommend a `target_plan_id` and `target_candidate_id`, but it must not
+  mutate queues or authorize high-risk implementation.
+- `SELECTED_CHANGE.yaml`: implementation boundary for one selected candidate.
+  It should be loaded before `ATOM_TASKS.yaml` when executing or reviewing the
+  selected change.
+- `ATOM_TASKS.yaml`: task breakdown for the selected candidate. It is not a
+  source of product scope beyond the selected change.
+- `LOCAL_COMMIT_EVIDENCE.yaml`: local implementation evidence for a selected
+  change. It records commit hashes and validation evidence, but does not imply
+  remote push, PR creation, merge, or Issue mutation.
+- `HIGH_RISK_DECISION_REPORT.md`: stop packet for high-risk candidates. It is
+  evidence, not approval.
+
+Minimum summary fields for planning queues:
+
+- `plan_id`
+- `branch_boundary`
+- `candidate_count`
+- `completed_candidate_id`
+- `completed_change_id`
+- `next_recommended_candidate_id`
+- `outputs`
+- `key_dependencies`
+- `risks`
+- `unresolved_questions`
+- `validation`
+
+Read-model order for planning work:
+
+1. `SUMMARY.yaml`
+2. `HIGH_RISK_DECISION_REPORT.md` only when the next candidate is high risk
+3. `CHANGE_ANALYSIS.yaml` only when consuming a cross-queue recommendation
+4. `SELECTED_CHANGE.yaml`
+5. `ATOM_TASKS.yaml`
+6. `CANDIDATE_CHANGES.yaml` only when source truth is needed
+
+Validators should reject malformed source artifacts, but summary freshness and
+quality are separate trust signals. Use `openworkflow summaries --json` or
+handoff/inspect quality fields for summary trust rather than treating
+`validate` alone as proof that a summary is sufficient.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.
