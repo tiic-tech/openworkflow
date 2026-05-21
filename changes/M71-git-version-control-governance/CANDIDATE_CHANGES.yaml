@@ -48,10 +48,10 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G001
+next_recommended_candidate_id: G008
 changes:
   - id: G001
-    status: ready
+    status: done
     title: Formalize git governance hierarchy in planning contracts
     purpose: >
       Define the canonical relationship between atom tasks, selected changes,
@@ -92,8 +92,25 @@ changes:
       - The contracts state that a feat should have an owning branch.
       - The contracts state that PRs summarize feat branches, not individual atom tasks.
       - The contracts prohibit destructive git operations unless the user explicitly requests them.
+    selection:
+      selected_change_id: G001-git-governance-contract
+      reason: >
+        G001 is the next recommended candidate and creates the shared
+        version-control contract needed before source skills, Issue governance,
+        gh boundaries, or validation can enforce git behavior.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G001-git-governance-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G002
-    status: candidate
+    status: ready
     title: Add branch boundary fields to decompose-to-changes outputs
     purpose: >
       Teach decompose-to-changes to record branch ownership when it creates a
@@ -131,7 +148,7 @@ changes:
       - decompose-to-changes records dirty-tree observations without widening into implementation.
       - Markdown and SUMMARY expectations include the branch boundary.
   - id: G003
-    status: candidate
+    status: ready
     title: Add branch and dirty-tree guards to select-change
     purpose: >
       Teach select-change to verify the current branch and working tree before
@@ -207,7 +224,7 @@ changes:
       - Runtime-surface verification includes at least one negative case for git governance metadata.
       - Historical queues remain valid unless they opt into the new fields incorrectly.
   - id: G005
-    status: candidate
+    status: ready
     title: Define feat completion and PR-ready summary artifact
     purpose: >
       Create a lightweight artifact contract for completing a candidate queue as
@@ -317,7 +334,7 @@ changes:
       - The report defines explicit user approval conditions and stop criteria.
       - No automated git or gh mutation implementation is performed by this candidate.
   - id: G008
-    status: candidate
+    status: ready
     title: Formalize Issue governance and source-of-truth rules
     purpose: >
       Define how OW relates external Issues to local planning queues, including
@@ -481,3 +498,32 @@ operations:
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
       - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: Select G001 because it is ready, dependency-free, and defines the version-control contract required by downstream governance changes.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: Complete G001 after adding the git governance reference, linking planning contracts, and validating the repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"

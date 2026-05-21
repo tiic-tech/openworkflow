@@ -14,11 +14,11 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G001`.
+- Next recommended candidate: `G008`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
-Status: `ready`
+Status: `done`
 
 Risk: `low`
 
@@ -36,9 +36,18 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G001-git-governance-contract`
+
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `references/git-version-control-governance.md`
+- `changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml`
+
 ## G002 - Add Branch Boundary Fields To Decompose-To-Changes Outputs
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
@@ -61,7 +70,7 @@ Validation:
 
 ## G003 - Add Branch And Dirty-Tree Guards To Select-Change
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
@@ -107,7 +116,7 @@ Validation:
 
 ## G005 - Define Feat Completion And PR-Ready Summary Artifact
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `low`
 

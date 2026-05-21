@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G001-git-governance-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G001-git-governance-contract
+title: Atom tasks for git governance hierarchy contract
+status: done
+tasks:
+  - task_id: T001
+    title: Define git governance reference
+    status: done
+    type: edit
+    owned_paths:
+      - references/git-version-control-governance.md
+    done_when:
+      - The reference defines atom task, selected change, feat queue, branch, PR, and merge boundaries.
+      - The reference includes naming and commit message expectations.
+      - The reference states non-destructive git operation rules.
+  - task_id: T002
+    title: Link planning contracts to git governance
+    status: done
+    type: edit
+    owned_paths:
+      - references/planning-artifact-contracts.md
+    done_when:
+      - Planning contracts reference the git governance document.
+      - Feat and commit cadence includes branch and PR expectations.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G001 selection and completion evidence are recorded.
+      - Downstream candidates unlocked by G001 are made ready when their dependencies are satisfied.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - references/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

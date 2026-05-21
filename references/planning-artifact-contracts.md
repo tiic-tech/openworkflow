@@ -31,6 +31,22 @@ Do not create a new top-level `changes/<id>/` folder for every candidate. Open a
 new top-level folder only when `decompose-to-changes` creates a new queue for a
 new feat, product theme, or broad planning source.
 
+## Git Governance Link
+
+Use `references/git-version-control-governance.md` as the source contract for
+git and version-control boundaries. In that model:
+
+- atom tasks are implementation checklist items
+- selected changes are commit-sized units
+- `CANDIDATE_CHANGES.yaml` queues are feat boundaries
+- feat queues should have owning branches when they opt into branch governance
+- pull requests summarize feat branches, not individual atom tasks
+- merge or release is the integration boundary after review
+
+Skills may inspect git state for planning and audit, but they must not perform
+destructive or remote-impacting git operations unless the user explicitly asks
+for that specific operation. Remote gh operations require separate governance.
+
 ## Skill Lifecycle Link
 
 When a selected planning change touches runtime skill generation, adapter
