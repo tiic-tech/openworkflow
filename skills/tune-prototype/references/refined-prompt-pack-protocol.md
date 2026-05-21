@@ -1,8 +1,7 @@
 # Refined Prompt Pack Protocol
 
-Use this reference when `/ow:proto` or tune-oriented prototype work should
-convert accepted baseline screens and user feedback into a screen-bound refined
-prompt pack.
+Use this reference when `/ow:tune` should convert accepted baseline screens and
+user feedback into a screen-bound refined prompt pack.
 
 ## Input Normalization
 

@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: change:M65-proto-tune-skill-boundary
+contract_type: change
+title: M65 Proto tune skill boundary
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - changes/M64-proto-tune-refined-prompt-source/CHANGE.yaml
+  - skills/build-prototype/SKILL.md
+depends_on:
+  - change:M64-proto-tune-refined-prompt-source
+produces:
+  - selected_change:M65-proto-tune-skill-boundary
+  - atom_tasks:M65-proto-tune-skill-boundary
+summary: >
+  Split prototype refinement source behavior out of build-prototype and into a
+  dedicated tune-prototype skill before P005 dogfood.
+problem: >
+  Combining first-pass strategic prototype generation and tune/refinement in
+  one skill makes `/ow:proto` and `/ow:tune` share a fuzzy execution boundary.
+  Dogfood should validate two explicit source skills: build-prototype for
+  strategic exploration and tune-prototype for baseline-preserving refinement.
+goals:
+  - Narrow build-prototype back to strategic prototype prompt packs from vision
+    or validation context.
+  - Add tune-prototype as the source skill for baseline screen audit, delta
+    rules, and refined prompt packs.
+  - Preserve refined prompt pack behavior while moving ownership to the clearer
+    skill boundary.
+  - Record the temporary queue insertion as auditable operations.
+non_goals:
+  - Do not expose runtime command surfaces.
+  - Do not edit generated Codex adapter surfaces.
+  - Do not change the proto prompt pack schema.
+  - Do not add HTML conversion.
+affected_paths:
+  - skills/build-prototype/
+  - skills/tune-prototype/
+  - changes/M59-proto-redesign-planning-dogfood/
+  - changes/M65-proto-tune-skill-boundary/
+acceptance:
+  - build-prototype no longer owns tune/refinement source behavior.
+  - tune-prototype owns baseline audit, product-system extraction, delta rules,
+    screen manifests, and refined prompt packs.
+  - P005 dogfood depends on P007 and remains next after P007 completion.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/tune-prototype
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -104,6 +104,7 @@ Purpose: exercise the redesigned source-level proto flow on OpenWorkflow's own
 product vision and record evidence for acceptance, tuning, or pivot.
 
 Depends on: `P002`, `P003`, `P004`
+Also waits for temporary boundary change: `P007`
 
 ## P006 - Expose Proven Proto Redesign Through Runtime Surfaces
 
@@ -114,6 +115,27 @@ and generated Codex adapter surfaces after dogfood evidence is accepted.
 
 Depends on: `P005`
 
+## P007 - Split Prototype Tuning Into Dedicated Tune-Prototype Skill
+
+Status: `done`
+
+Purpose: separate first-pass strategic prototype generation from
+refinement/tuning so `/ow:proto` maps to `build-prototype` and `/ow:tune` maps
+to a focused `tune-prototype` source skill before dogfood validates the full
+flow.
+
+Depends on: `P003`
+
+Completion evidence:
+
+- `skills/build-prototype/SKILL.md`
+- `skills/tune-prototype/SKILL.md`
+- `skills/tune-prototype/references/refined-prompt-pack-protocol.md`
+- `changes/M65-proto-tune-skill-boundary/CHANGE.yaml`
+- `quick_validate.py skills/build-prototype`
+- `quick_validate.py skills/tune-prototype`
+- `npm run validate`
+
 ## Operation Audit
 
 - `OP001`: select `P002`
@@ -122,3 +144,8 @@ Depends on: `P005`
 - `OP004`: select `P003`
 - `OP005`: complete `P003`
 - `OP006`: mark `P005` ready and make it next recommended
+- `OP007`: add temporary boundary change `P007`
+- `OP008`: prioritize `P007` ahead of `P005`
+- `OP009`: select `P007`
+- `OP010`: complete `P007`
+- `OP011`: restore `P005` as next recommended

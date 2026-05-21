@@ -254,6 +254,7 @@ changes:
       - P002
       - P003
       - P004
+      - P007
     unlocks:
       - P006
     risk: low
@@ -301,6 +302,58 @@ changes:
       - Runtime surfaces expose the accepted proto redesign behavior.
       - Generated adapter output is produced through generation paths.
       - Existing init, sync, handoff, and context behavior remains healthy.
+  - id: P007
+    status: done
+    title: Split prototype tuning into dedicated tune-prototype skill
+    purpose: >
+      Separate first-pass strategic prototype generation from refinement/tuning
+      so `/ow:proto` maps to build-prototype and `/ow:tune` maps to a focused
+      tune-prototype source skill before dogfood validates the full flow.
+    scope:
+      includes:
+        - tune-prototype skill source guidance
+        - refined prompt pack protocol relocation
+        - build-prototype boundary cleanup
+        - queue maintenance evidence for temporary change insertion
+      excludes:
+        - runtime command exposure
+        - generated adapter surfaces
+        - HTML conversion
+        - changing proto prompt pack schema
+    owned_paths:
+      - skills/build-prototype/
+      - skills/tune-prototype/
+      - changes/M65-proto-tune-skill-boundary/
+      - changes/M59-proto-redesign-planning-dogfood/
+    dependencies:
+      - P003
+    unlocks:
+      - P005
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/tune-prototype
+    acceptance:
+      - build-prototype no longer owns tune/refinement source behavior.
+      - tune-prototype owns baseline audit, delta rules, and refined prompt packs.
+      - P005 dogfood depends on the split boundary before proceeding.
+    selection:
+      selected_change_id: M65-proto-tune-skill-boundary
+      reason: User approved a temporary inserted change to clarify skill boundaries before P005 dogfood.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M65-proto-tune-skill-boundary
+      completed_at: 2026-05-21
+      evidence:
+        - skills/build-prototype/SKILL.md
+        - skills/tune-prototype/SKILL.md
+        - skills/tune-prototype/references/refined-prompt-pack-protocol.md
+        - changes/M65-proto-tune-skill-boundary/CHANGE.yaml
+        - "validation: quick_validate.py skills/build-prototype"
+        - "validation: quick_validate.py skills/tune-prototype"
+        - "validation: npm run validate"
 operations:
   - operation_id: OP001
     operation_type: select
@@ -374,5 +427,66 @@ operations:
     changed_at: 2026-05-21
     before_status: candidate
     after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: add
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: User approved inserting a temporary boundary clarification change before P005 dogfood.
+    changed_at: 2026-05-21
+    before_status: none
+    after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: priority_change
+    target_candidate_ids:
+      - P007
+      - P005
+    actor: agent
+    reason: P007 should run before P005 so dogfood validates separate proto and tune source skills.
+    changed_at: 2026-05-21
+    before_status: P005 ready
+    after_status: P007 ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: P007 is ready, has focused source-skill owned paths, and directly addresses the approved boundary concern.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M65-proto-tune-skill-boundary/SELECTED_CHANGE.yaml
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: tune-prototype was created, build-prototype was narrowed, and both skills plus repository contracts validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/tune-prototype/SKILL.md
+      - changes/M65-proto-tune-skill-boundary/CHANGE.yaml
+      - "validation: quick_validate.py skills/build-prototype"
+      - "validation: quick_validate.py skills/tune-prototype"
+      - "validation: npm run validate"
+  - operation_id: OP011
+    operation_type: priority_change
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: P005 becomes the next ready dogfood step after the temporary P007 boundary change is complete.
+    changed_at: 2026-05-21
+    before_status: P007 done
+    after_status: P005 ready
     evidence:
       - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
