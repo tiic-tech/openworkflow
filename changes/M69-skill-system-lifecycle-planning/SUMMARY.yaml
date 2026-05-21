@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: planning_summary:M69-skill-system-lifecycle-planning
+contract_type: planning
+title: M69 Skill system lifecycle planning summary
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    Decomposes the OpenSpec built-in skill lifecycle research into focused
+    OpenWorkflow changes for native skill format, generated metadata, adapter
+    lifecycle, validation, drift detection, and dynamic instruction envelopes.
+  refs:
+    - "session: 2026-05-21 OpenSpec built-in skill lifecycle research"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/shared/skill-generation.ts"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/command-generation/registry.ts"
+    - packages/adapters/codex/src/generateSkills.ts
+    - packages/adapters/codex/src/generateCommands.ts
+    - packages/core/src/commands/registry.ts
+outputs:
+  candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
+candidate_count: 7
+next_recommended_candidate_id: S001
+unresolved_questions:
+  - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
+  - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
+  - Whether generated metadata belongs only in frontmatter or also in `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`.
+validation_commands:
+  - npm run validate
+notes:
+  - S001 is recommended first because later generator, validator, and adapter work needs a stable native skill format contract.
+  - S003 and S007 are high risk because they touch delivery architecture and multi-adapter boundaries.
+  - The queue intentionally keeps proto2html runtime exposure in M68 and does not mix it into skill-system lifecycle work.
