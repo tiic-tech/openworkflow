@@ -15,6 +15,7 @@ Optional:
 - upstream source artifacts named by the queue
 - user constraints such as "choose C004" or "avoid runtime changes"
 - top-level queue `operations` for audit history
+- current branch and dirty-tree state from `git status --short --branch`
 
 If the user names a candidate id, verify that its dependencies are satisfied
 before selecting it. If the id is blocked, not ready, or `risk: high`, report
@@ -40,6 +41,30 @@ Each selected candidate should be small enough to complete as one coherent git
 commit. When the candidate completes, update the queue with completion evidence
 and include the commit id when available.
 
+## Branch And Dirty-Tree Guards
+
+Before selecting, compare current git state with the queue boundary:
+
+- current branch from `git status --short --branch`
+- dirty paths from `git status --short --branch`
+- `queue_policy.branch_boundary` when present
+
+If the current branch differs from `queue_policy.branch_boundary`, stop before
+selection unless the user explicitly approves a planning-only exception or
+asks to continue on the current branch. Report the recorded branch, current
+branch, and exact resume condition. Do not run checkout or branch commands.
+
+If the tree is dirty, decide whether the paths are part of the current
+selection operation. A clean selection can create selection artifacts and update
+the queue. A dirty tree containing previous selected-change implementation,
+unrelated source edits, or generated surfaces should stop selection until that
+work is committed, stashed, or otherwise resolved by the user. Do not perform
+those git operations from this skill.
+
+Selection artifacts should state the expected commit boundary: the selected
+candidate should complete as one coherent commit unless it is split or
+superseded before implementation continues.
+
 ## Targeted Candidate Review
 
 For point-to-point review, inspect only the requested candidate plus the
@@ -63,14 +88,16 @@ the recommended operation to be applied.
 
 ## Decision Order
 
-1. Exclude `done`, `blocked`, `deferred`, and `superseded` candidates.
-2. Prefer `ready` candidates over plain `candidate` entries.
-3. Honor `next_recommended_candidate_id` when it is ready and coherent.
-4. Prefer candidates that unlock other candidates.
-5. Prefer focused owned paths over cross-module changes.
-6. Prefer clear validation over unclear or manual-only acceptance.
-7. Prefer lower-risk dogfood or source behavior before runtime exposure.
-8. Stop on `risk: high` unless explicit user approval names a concrete decision
+1. Stop on branch mismatch unless an explicit planning-only exception exists.
+2. Stop on unrelated dirty-tree work that would blur the commit boundary.
+3. Exclude `done`, `blocked`, `deferred`, and `superseded` candidates.
+4. Prefer `ready` candidates over plain `candidate` entries.
+5. Honor `next_recommended_candidate_id` when it is ready and coherent.
+6. Prefer candidates that unlock other candidates.
+7. Prefer focused owned paths over cross-module changes.
+8. Prefer clear validation over unclear or manual-only acceptance.
+9. Prefer lower-risk dogfood or source behavior before runtime exposure.
+10. Stop on `risk: high` unless explicit user approval names a concrete decision
    option.
 
 When two candidates are close, pick the one that produces better evidence for

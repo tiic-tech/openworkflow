@@ -27,6 +27,21 @@ changes/<plan_id>/<candidate-id>-<slug>/
 Create a new top-level `changes/<id>/` only when the user explicitly starts a
 new decomposition queue or the existing queue is no longer the owning feat.
 
+## Git Boundary
+
+Use `git status --short --branch` as a read-only guard before selection.
+
+If the queue has `queue_policy.branch_boundary`, compare it with the current
+branch. When they differ, stop before creating selection artifacts unless the
+user explicitly says this is a planning-only exception or asks to proceed on the
+current branch. Do not switch branches from this skill.
+
+If the working tree is dirty, inspect whether the changes are only the current
+selection operation. If the dirty tree appears to contain an uncommitted
+previous selected change or unrelated implementation work, stop and recommend
+committing, stashing, or resolving that work before selecting another
+candidate. Do not commit, stash, reset, restore, or clean from this skill.
+
 ## Read First
 
 Read these only as needed:
@@ -38,32 +53,36 @@ Read these only as needed:
 
 ## Workflow
 
-1. Run `git status --short --branch` and note whether the tree is dirty.
+1. Run `git status --short --branch` and note current branch and dirty paths.
 2. Read `CANDIDATE_CHANGES.yaml` as the source of truth.
-3. If the user names a candidate id, perform targeted readiness review for
+3. Check `queue_policy.branch_boundary` when present. Stop on branch mismatch
+   unless the user has approved a planning-only exception.
+4. Check dirty-tree state. Stop if uncommitted work would contaminate a new
+   selected change or blur the one-change-one-commit boundary.
+5. If the user names a candidate id, perform targeted readiness review for
    that id before considering the rest of the queue.
-4. Filter candidates to `ready` first. If none are ready, inspect `candidate`
+6. Filter candidates to `ready` first. If none are ready, inspect `candidate`
    entries and report the blockers instead of forcing a selection.
-5. Prefer `next_recommended_candidate_id` when it points to a ready candidate
+7. Prefer `next_recommended_candidate_id` when it points to a ready candidate
    and the dependencies still hold.
-6. Otherwise choose the candidate that best matches the queue's
+8. Otherwise choose the candidate that best matches the queue's
    `selection_policy`, unlocks downstream work, has focused owned paths, and
    has realistic validation.
-7. If the candidate is `risk: high`, stop before selection unless the user has
+9. If the candidate is `risk: high`, stop before selection unless the user has
    explicitly approved a concrete decision option from a high-risk decision
    report.
-8. Create a candidate-specific folder inside the current feat folder, usually
+10. Create a candidate-specific folder inside the current feat folder, usually
    `changes/<plan_id>/<candidate-id>-<slug>/`.
-9. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+11. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
-10. Update the candidate queue:
+12. Update the candidate queue:
    - set the selected candidate to `selected`
    - add `selection.selected_change_id`
    - add concise `selection.reason`
    - append an `operations` entry for the selection
    - leave all other candidates in place
-11. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
-12. Stop before implementation unless the user explicitly asks to continue.
+13. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
+14. Stop before implementation unless the user explicitly asks to continue.
 
 ## Targeted Review
 
@@ -116,7 +135,10 @@ narrow enough to match that approved option.
 - Do not delete or renumber candidate ids.
 - Do not silently select a blocked candidate.
 - Do not silently select a `risk: high` candidate.
+- Do not select on the wrong branch without explicit planning-only approval.
+- Do not select when unrelated dirty-tree work would contaminate the commit boundary.
 - Do not implement the selected change.
+- Do not create commits, switch branches, stash, reset, restore, or clean.
 - Do not mark the candidate `done`; implementation completion owns that update.
 - Do not widen scope beyond the selected candidate.
 - Do not hand-edit generated `.agents/` or `.openworkflow/` surfaces unless the

@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:G003-select-branch-dirty-guards
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G003-select-branch-dirty-guards
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G003
+title: Add branch and dirty-tree guards to select-change
+status: done
+selection_reason: >
+  G003 is ready after G001 and should follow G002 because select-change can now
+  consume branch boundaries that decompose-to-changes records.
+rejected_alternatives:
+  - candidate_ref: G004
+    reason: validation should follow source skill behavior changes.
+  - candidate_ref: G005
+    reason: PR-ready summary behavior should follow branch selection guards.
+  - candidate_ref: G009
+    reason: gh operation boundaries are less urgent than local selection hygiene.
+scope:
+  includes:
+    - current branch check against queue_policy.branch_boundary
+    - dirty-tree guard for uncommitted previous selected change work
+    - explicit allowed exceptions for planning-only queue maintenance
+    - completion expectation that the selected candidate lands as one commit
+  excludes:
+    - automatic commit creation
+    - branch switching
+    - PR creation
+    - validator implementation
+owned_paths:
+  - skills/select-change/SKILL.md
+  - skills/select-change/references/selection-protocol.md
+  - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/
+forbidden_paths:
+  - skills/decompose-to-changes/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - select-change checks whether the current branch matches the queue branch boundary.
+  - select-change stops or reports when an unrelated dirty tree would contaminate a new selected change.
+  - select-change does not perform git mutations itself.
+  - selection artifacts describe the expected commit boundary.
+validation:
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - skills/select-change/SKILL.md
+    - skills/select-change/references/selection-protocol.md
+    - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+    - "validation: quick_validate.py skills/select-change"
+    - "validation: npm run validate"
+    - "validation: git diff --check"

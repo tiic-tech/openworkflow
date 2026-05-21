@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G003
+next_recommended_candidate_id: G004
 changes:
   - id: G001
     status: done
@@ -166,7 +166,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G003
-    status: ready
+    status: done
     title: Add branch and dirty-tree guards to select-change
     purpose: >
       Teach select-change to verify the current branch and working tree before
@@ -203,8 +203,25 @@ changes:
       - select-change stops or reports when an unrelated dirty tree would contaminate a new selected change.
       - select-change does not perform git mutations itself.
       - selection artifacts describe the expected commit boundary.
+    selection:
+      selected_change_id: G003-select-branch-dirty-guards
+      reason: >
+        G003 is ready after G001 and follows G002 because select-change can now
+        enforce branch boundaries that decompose-to-changes records.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G003-select-branch-dirty-guards
+      completed_at: 2026-05-21
+      evidence:
+        - skills/select-change/SKILL.md
+        - skills/select-change/references/selection-protocol.md
+        - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/select-change"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G004
-    status: candidate
+    status: ready
     title: Validate git governance fields and completion evidence
     purpose: >
       Extend repository validation so planning queues can enforce required git
@@ -671,5 +688,35 @@ operations:
       - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
       - "validation: quick_validate.py skills/decompose-to-changes"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: Select G003 because select-change must enforce branch and dirty-tree guards after DTC starts recording branch boundaries.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: Complete G003 after adding branch and dirty-tree guards to select-change and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/select-change"
       - "validation: npm run validate"
       - "validation: git diff --check"

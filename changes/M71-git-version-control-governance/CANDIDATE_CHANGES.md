@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G003`.
+- Next recommended candidate: `G004`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -79,7 +79,7 @@ Completion evidence:
 
 ## G003 - Add Branch And Dirty-Tree Guards To Select-Change
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -100,9 +100,18 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G003-select-branch-dirty-guards`
+
+Completion evidence:
+
+- `skills/select-change/SKILL.md`
+- `skills/select-change/references/selection-protocol.md`
+- `changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml`
+
 ## G004 - Validate Git Governance Fields And Completion Evidence
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
