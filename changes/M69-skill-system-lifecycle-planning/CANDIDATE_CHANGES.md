@@ -19,7 +19,7 @@ moving Codex command exposure to global prompts, editing generated `.agents` or
 proto2html runtime exposure, and broad multi-platform adapter work before the
 format contract is stable.
 
-Next recommended candidate: `S005`.
+Next recommended candidate: `S006`.
 
 Feat boundary: this queue owns the top-level
 `changes/M69-skill-system-lifecycle-planning/` folder. Each `S###` candidate is
@@ -109,6 +109,9 @@ Risk: `high`
 - `OP007`: select `S004`
 - `OP008`: complete `S004`
 - `OP009`: mark `S005` ready and make it next recommended
+- `OP010`: select `S005`
+- `OP011`: complete `S005`
+- `OP012`: mark `S006` ready and make it next recommended
 
 ## S004 - Validate Generated Skill Format And Protocol Blocks
 
@@ -132,7 +135,7 @@ Completion evidence:
 
 ## S005 - Add Generated-Surface Drift And Parity Tests
 
-Status: `ready`
+Status: `done`
 
 Depends on: `S002`, `S004`
 
@@ -140,9 +143,19 @@ Purpose: detect when command registry, artifact contracts, generated skill
 files, audit indexes, and adapter manifests drift apart, using an OpenSpec-style
 generatedBy and parity testing approach adapted to OW.
 
+Selection: `S005-generated-surface-drift-tests`
+
+Completion evidence:
+
+- `packages/core/src/validators/validateRepositoryContracts.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `git diff --check`
+
 ## S006 - Design Dynamic Instruction Envelope Model
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `S001`
 

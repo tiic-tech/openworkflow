@@ -938,8 +938,12 @@ async function verifySkills(root: string): Promise<void> {
 
 async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const skill = join(REPO_ROOT, ".agents", "skills", "ow-proto", "SKILL.md");
+  const manifest = join(REPO_ROOT, ".agents", "openworkflow-adapter.yaml");
+  const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
+  const originalManifest = await read(manifest);
+  const originalCommandAudit = await read(commandAudit);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -950,8 +954,20 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const malformedWrapper = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(malformedWrapper.code !== 0, "validate passed after generated skill was wrapped in <skill>");
     assert(malformedWrapper.output.includes("must not use a top-level <skill> XML wrapper"), "malformed wrapper validation did not explain skill wrapper failure");
+
+    await writeFile(manifest, originalManifest.replace("  - .agents/skills/ow-proto/SKILL.md\n", ""), "utf8");
+    const missingGeneratedFile = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingGeneratedFile.code !== 0, "validate passed after Codex manifest generated_files drifted");
+    assert(missingGeneratedFile.output.includes("generated_files missing .agents/skills/ow-proto/SKILL.md"), "generated_files drift validation did not explain missing generated file");
+
+    await writeFile(commandAudit, originalCommandAudit.replace("    trigger: /ow:proto\n", "    trigger: /ow:proto-drift\n"), "utf8");
+    const commandAuditDrift = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(commandAuditDrift.code !== 0, "validate passed after command audit trigger drifted");
+    assert(commandAuditDrift.output.includes("COMMAND_AUDIT_INDEX.yaml proto trigger must be /ow:proto"), "command audit drift validation did not explain trigger mismatch");
   } finally {
     await writeFile(skill, original, "utf8");
+    await writeFile(manifest, originalManifest, "utf8");
+    await writeFile(commandAudit, originalCommandAudit, "utf8");
   }
 }
 

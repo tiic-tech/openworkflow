@@ -26,7 +26,9 @@ completed_contract_candidate_id: S001
 completed_contract_change_id: S001-skill-lifecycle-contract
 completed_metadata_candidate_id: S002
 completed_metadata_change_id: S002-generated-skill-metadata
-next_recommended_candidate_id: S005
+completed_drift_candidate_id: S005
+completed_drift_change_id: S005-generated-surface-drift-tests
+next_recommended_candidate_id: S006
 unresolved_questions:
   - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
   - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
@@ -43,4 +45,5 @@ notes:
   - S001 completed the native skill lifecycle contract and unblocked generated metadata work in S002.
   - S002 completed generated Codex skill metadata and runtime-surface metadata verification.
   - S004 completed generated skill format validation with negative runtime-surface coverage.
-  - S005 is now ready because its generated metadata and skill format validation dependencies are complete.
+  - S005 completed generated-surface drift and parity checks.
+  - S006 is now ready as the remaining non-high-risk design item.

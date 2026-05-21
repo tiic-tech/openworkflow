@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
+import { getWorkflowCommands, type WorkflowCommand } from "../commands/registry.js";
 import { SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound } from "../fs/index.js";
@@ -223,6 +224,7 @@ export async function validateRepositoryContracts(rootInput: string): Promise<Va
   await validateJsonSchemas(root, errors);
   await validateYamlContracts(root, errors);
   await validateGeneratedCodexSkills(root, errors);
+  await validateGeneratedSurfaceParity(root, errors);
   return { ok: errors.length === 0, errors };
 }
 
@@ -515,6 +517,261 @@ function countOccurrences(content: string, needle: string): number {
 function stringField(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+async function validateGeneratedSurfaceParity(root: string, errors: string[]): Promise<void> {
+  const commands = [...getWorkflowCommands()];
+  const commandAudit = await readYamlRecordForParity(root, ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", errors);
+  if (commandAudit) {
+    validateCommandAuditParity(".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", commandAudit.commands, commands, errors);
+  }
+  const contextPackets = await readYamlRecordForParity(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", errors);
+  if (contextPackets) {
+    validateContextPacketParity(".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets.packets, commands, errors);
+  }
+  const codexManifest = await readYamlRecordForParity(root, ".agents/openworkflow-adapter.yaml", errors);
+  if (codexManifest) {
+    await validateCodexManifestParity(root, ".agents/openworkflow-adapter.yaml", codexManifest, commands, errors);
+  }
+}
+
+async function readYamlRecordForParity(
+  root: string,
+  relativePath: string,
+  errors: string[],
+): Promise<Record<string, unknown> | null> {
+  const path = join(root, relativePath);
+  if (!(await exists(path))) {
+    return null;
+  }
+  try {
+    const data = parseYaml(await readFile(path, "utf8"));
+    if (isRecord(data)) {
+      return data;
+    }
+    errors.push(`${relativePath} must be a mapping for generated-surface parity validation`);
+  } catch (error) {
+    errors.push(`${relativePath} is not valid YAML for generated-surface parity validation: ${messageFor(error)}`);
+  }
+  return null;
+}
+
+function validateCommandAuditParity(
+  label: string,
+  value: unknown,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  const records = recordsById(label, "commands", value, "id", errors);
+  if (!records) {
+    return;
+  }
+  assertCommandIds(label, records, commands, errors);
+  for (const command of commands) {
+    const actual = records.get(command.id);
+    if (!actual) {
+      continue;
+    }
+    assertField(label, command.id, actual, "trigger", command.trigger, errors);
+    assertField(label, command.id, actual, "stage", command.stage, errors);
+    assertField(label, command.id, actual, "visibility", command.visibility, errors);
+    assertField(label, command.id, actual, "depth", command.protocol?.depth ?? "shallow", errors);
+    assertField(label, command.id, actual, "context_packet", `context:${command.id}`, errors);
+    assertStringArray(label, command.id, actual, "allowed_outputs", command.protocol?.allowedOutputs ?? command.targetArtifacts, errors);
+    assertStringArray(label, command.id, actual, "conditional_outputs", command.protocol?.conditionalOutputs ?? [], errors);
+    assertStringArray(label, command.id, actual, "forbidden_outputs", command.protocol?.forbiddenOutputs ?? [], errors);
+    assertStringArray(label, command.id, actual, "handoff_commands", command.protocol?.handoffCommands ?? [], errors);
+  }
+}
+
+function validateContextPacketParity(
+  label: string,
+  value: unknown,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  const records = recordsById(label, "packets", value, "packet_id", errors);
+  if (!records) {
+    return;
+  }
+  const expectedIds = new Set(commands.map((command) => `context:${command.id}`));
+  assertIdSet(label, "packets", records, expectedIds, errors);
+  for (const command of commands) {
+    const packetId = `context:${command.id}`;
+    const actual = records.get(packetId);
+    if (!actual) {
+      continue;
+    }
+    assertField(label, packetId, actual, "command", command.trigger, errors);
+    assertField(label, packetId, actual, "visibility", command.visibility, errors);
+    assertStringArray(label, packetId, actual, "required", command.protocol?.requiredContext ?? [".openworkflow/workflow/WORKFLOW_INDEX.yaml"], errors);
+    assertStringArray(label, packetId, actual, "optional", command.protocol?.optionalContext ?? [], errors);
+    assertStringArray(label, packetId, actual, "forbidden", command.protocol?.forbiddenContext ?? [], errors);
+    assertStringArray(label, packetId, actual, "conditional_outputs", command.protocol?.conditionalOutputs ?? [], errors);
+  }
+}
+
+async function validateCodexManifestParity(
+  root: string,
+  label: string,
+  manifest: Record<string, unknown>,
+  commands: WorkflowCommand[],
+  errors: string[],
+): Promise<void> {
+  const records = recordsById(label, "commands", manifest.commands, "id", errors);
+  if (!records) {
+    return;
+  }
+  assertCommandIds(label, records, commands, errors);
+  const expectedGeneratedFiles = new Set<string>();
+  for (const command of commands) {
+    const actual = records.get(command.id);
+    if (!actual) {
+      continue;
+    }
+    const skillName = `ow-${command.id}`;
+    const skillPath = `.agents/skills/${skillName}/SKILL.md`;
+    const interfacePath = `.agents/skills/${skillName}/agents/openai.yaml`;
+    expectedGeneratedFiles.add(skillPath);
+    expectedGeneratedFiles.add(interfacePath);
+    assertField(label, command.id, actual, "trigger", command.trigger, errors);
+    assertField(label, command.id, actual, "visibility", command.visibility, errors);
+    assertField(label, command.id, actual, "skill_name", skillName, errors);
+    assertField(label, command.id, actual, "explicit_invocation", `$${skillName}`, errors);
+    assertField(label, command.id, actual, "skill_path", skillPath, errors);
+    assertField(label, command.id, actual, "interface_path", interfacePath, errors);
+    assertStringArray(label, command.id, actual, "legacy_triggers", command.legacyTriggers, errors);
+  }
+  await validateManifestGeneratedFiles(root, label, manifest.generated_files, expectedGeneratedFiles, errors);
+}
+
+async function validateManifestGeneratedFiles(
+  root: string,
+  label: string,
+  value: unknown,
+  expectedGeneratedFiles: Set<string>,
+  errors: string[],
+): Promise<void> {
+  if (!Array.isArray(value)) {
+    errors.push(`${label} generated_files must be a list; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+  const actual = new Set<string>();
+  for (const item of value) {
+    if (typeof item !== "string") {
+      errors.push(`${label} generated_files contains a non-string path`);
+      continue;
+    }
+    actual.add(item);
+    const path = join(root, item);
+    if (!existsSyncSafe(path)) {
+      errors.push(`${label} generated_files references missing ${item}; update adapter source and run openworkflow sync --tools codex`);
+      continue;
+    }
+    const content = await readFile(path, "utf8");
+    if (!content.includes("generated-by: openworkflow")) {
+      errors.push(`${label} generated_files ${item} is missing generated marker; update adapter source and run openworkflow sync --tools codex`);
+    }
+  }
+  for (const expected of expectedGeneratedFiles) {
+    if (!actual.has(expected)) {
+      errors.push(`${label} generated_files missing ${expected}; update adapter source and run openworkflow sync --tools codex`);
+    }
+  }
+}
+
+function recordsById(
+  label: string,
+  collectionName: string,
+  value: unknown,
+  idKey: string,
+  errors: string[],
+): Map<string, Record<string, unknown>> | null {
+  if (!Array.isArray(value)) {
+    errors.push(`${label} ${collectionName} must be a list for generated-surface parity validation`);
+    return null;
+  }
+  const records = new Map<string, Record<string, unknown>>();
+  value.forEach((item, index) => {
+    if (!isRecord(item)) {
+      errors.push(`${label} ${collectionName}[${index}] must be a mapping`);
+      return;
+    }
+    const id = item[idKey];
+    if (typeof id !== "string" || id.length === 0) {
+      errors.push(`${label} ${collectionName}[${index}] missing ${idKey}`);
+      return;
+    }
+    if (records.has(id)) {
+      errors.push(`${label} ${collectionName} duplicate ${idKey} ${id}`);
+      return;
+    }
+    records.set(id, item);
+  });
+  return records;
+}
+
+function assertCommandIds(
+  label: string,
+  records: Map<string, Record<string, unknown>>,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  assertIdSet(label, "commands", records, new Set(commands.map((command) => command.id)), errors);
+}
+
+function assertIdSet(
+  label: string,
+  collectionName: string,
+  records: Map<string, Record<string, unknown>>,
+  expectedIds: Set<string>,
+  errors: string[],
+): void {
+  for (const expected of expectedIds) {
+    if (!records.has(expected)) {
+      errors.push(`${label} ${collectionName} missing ${expected}; update source registry and run openworkflow sync --tools codex`);
+    }
+  }
+  for (const actual of records.keys()) {
+    if (!expectedIds.has(actual)) {
+      errors.push(`${label} ${collectionName} has unexpected ${actual}; update source registry and run openworkflow sync --tools codex`);
+    }
+  }
+}
+
+function assertField(
+  label: string,
+  id: string,
+  record: Record<string, unknown>,
+  field: string,
+  expected: string,
+  errors: string[],
+): void {
+  if (record[field] !== expected) {
+    errors.push(`${label} ${id} ${field} must be ${expected}; update source registry and run openworkflow sync --tools codex`);
+  }
+}
+
+function assertStringArray(
+  label: string,
+  id: string,
+  record: Record<string, unknown>,
+  field: string,
+  expected: readonly string[],
+  errors: string[],
+): void {
+  const actual = record[field];
+  if (!Array.isArray(actual) || !actual.every((item) => typeof item === "string")) {
+    errors.push(`${label} ${id} ${field} must be a string list; update source registry and run openworkflow sync --tools codex`);
+    return;
+  }
+  if (!stringArraysEqual(actual, expected)) {
+    errors.push(`${label} ${id} ${field} drifted from source registry; update source registry and run openworkflow sync --tools codex`);
+  }
+}
+
+function stringArraysEqual(actual: string[], expected: readonly string[]): boolean {
+  return actual.length === expected.length && actual.every((item, index) => item === expected[index]);
 }
 
 function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {

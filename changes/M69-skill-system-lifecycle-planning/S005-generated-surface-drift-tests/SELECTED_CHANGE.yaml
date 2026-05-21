@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:S005-generated-surface-drift-tests
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: S005-generated-surface-drift-tests
+source_plan_id: M69-skill-system-lifecycle-planning
+source_candidate_id: S005
+title: Add generated-surface drift and parity tests
+status: done
+selection_reason: >
+  Generated metadata and skill format validation are now in place, so the next
+  useful hardening is parity across command registry, audit indexes, Codex
+  manifest entries, and generated file lists.
+rejected_alternatives:
+  - candidate_ref: S003
+    reason: Adapter delivery model changes are high risk and should wait until parity checks protect the current surface.
+  - candidate_ref: S006
+    reason: Dynamic instruction envelope design is useful, but generated-surface drift checks directly protect ongoing dogfood development.
+scope:
+  includes:
+    - generated skill parity checks
+    - audit index parity checks
+    - stale generated-surface diagnostics
+    - clean sync verification coverage
+  excludes:
+    - adding new workflow commands
+    - changing skill protocol contents
+    - multi-platform adapter expansion
+owned_paths:
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/generateSkills.ts
+  - skills/**
+acceptance:
+  - Verification catches stale generated skill metadata or missing generated skill files.
+  - Verification catches registry entries missing from adapter manifest or audit indexes.
+  - The checks tell agents to update source and run sync, not hand-edit generated files.
+  - Current generated surfaces pass after regeneration.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - "validation: npm run validate"
+    - "validation: npm run verify:runtime-surface"
+    - "validation: git diff --check"

@@ -46,7 +46,7 @@ selection_policy:
     - editing generated .agents or .openworkflow surfaces directly
     - mixing skill lifecycle architecture with proto2html runtime exposure
     - broad multi-platform adapter work before the format contract is stable
-next_recommended_candidate_id: S005
+next_recommended_candidate_id: S006
 changes:
   - id: S001
     status: done
@@ -264,7 +264,7 @@ changes:
         - "validation: npm run verify:runtime-surface"
         - "validation: git diff --check"
   - id: S005
-    status: ready
+    status: done
     title: Add generated-surface drift and parity tests
     purpose: >
       Detect when command registry, artifact contracts, generated skill files,
@@ -281,6 +281,7 @@ changes:
         - changing skill protocol contents
         - multi-platform adapter expansion
     owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyAgentE2E.ts
       - packages/adapters/codex/src/manifest.ts
@@ -304,8 +305,26 @@ changes:
       - Verification catches registry entries missing from adapter manifest or audit indexes.
       - The checks tell agents to update source and run sync, not hand-edit generated files.
       - Current generated surfaces pass after regeneration.
+    selection:
+      selected_change_id: S005-generated-surface-drift-tests
+      reason: >
+        S004 made generated skill shape a repository contract; S005 should now
+        enforce parity across registry, audit indexes, Codex manifest, and
+        generated file lists before higher-risk delivery model work.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S005-generated-surface-drift-tests
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
   - id: S006
-    status: candidate
+    status: ready
     title: Design dynamic instruction envelope model
     purpose: >
       Decide whether OW should add an OpenSpec-like dynamic instruction output
@@ -494,6 +513,45 @@ operations:
       - S005
     actor: agent
     reason: S002 and S004 are complete, satisfying generated-surface drift and parity test dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: S005 is ready after S002 and S004 and is the next non-high-risk generated-surface hardening change.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: Repository validation now checks generated surface parity across registry, audit indexes, Codex manifest, and generated_files.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP012
+    operation_type: status_change
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: S006 depends only on S001, which is complete, and is the remaining non-high-risk queue item.
     changed_at: 2026-05-21
     before_status: candidate
     after_status: ready
