@@ -9,6 +9,7 @@ source:
   kind: planning_discussion
   refs:
     - "user_request: use decompose-to-changes to create a candidate queue for commit, feat, branch, and PR governance"
+    - "user_request: consider whether Issues should be included in git governance, whether authorized gh operations should be covered, and whether an analyze-changes skill is needed for cross-queue priority analysis"
     - "discussion: atom task -> implementation checklist; selected change -> commit; CANDIDATE_CHANGES -> feat; feat -> branch; branch -> PR; PR -> merge/release boundary"
     - references/planning-artifact-contracts.md
     - skills/decompose-to-changes/SKILL.md
@@ -36,7 +37,9 @@ queue_policy:
 selection_policy:
   prefer:
     - artifact contracts before source skill behavior changes
+    - issue source-of-truth rules before gh mutation behavior
     - branch and dirty-tree guards before PR handoff automation
+    - cross-queue analysis before selecting across multiple active candidate queues
     - validation before relying on git governance in dogfood mode
     - design-only or report-only treatment for high-risk git automation
   avoid:
@@ -44,6 +47,7 @@ selection_policy:
     - mixing multiple feat queues on one branch without an explicit exception
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
+    - treating remote GitHub Issues as local files when gh is configured as the source of truth
 next_recommended_candidate_id: G001
 changes:
   - id: G001
@@ -75,6 +79,8 @@ changes:
       - G003
       - G004
       - G005
+      - G008
+      - G010
     risk: low
     size: small
     validation:
@@ -274,21 +280,23 @@ changes:
       - The fixture scope remains planning-only and does not mutate git history.
   - id: G007
     status: candidate
-    title: Decide whether OW should automate branch, commit, push, and PR operations
+    title: Decide whether OW should automate git and gh mutation operations
     purpose: >
       Produce a high-risk decision packet for any future move from planning
-      guidance into automated git mutations, including branch creation, commits,
-      pushes, and PR creation.
+      guidance into automated git or GitHub mutations, including branch
+      creation, commits, pushes, issue edits, issue closure, and PR creation.
     scope:
       includes:
-        - trust and safety risks for automated git mutations
-        - user approval models for branch creation, commit, push, and PR
+        - trust and safety risks for automated local git mutations
+        - trust and safety risks for authenticated gh remote mutations
+        - user approval models for branch creation, commit, push, issue edits, issue closure, and PR creation
         - recommended default of report-first or explicit-approval-only behavior
         - guardrails for destructive or remote operations
       excludes:
-        - implementing git automation
+        - implementing git or gh automation
         - invoking GitHub APIs
         - pushing branches
+        - editing or closing GitHub Issues
         - opening PRs
     owned_paths:
       - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
@@ -296,6 +304,7 @@ changes:
     dependencies:
       - G001
       - G005
+      - G009
     unlocks: []
     risk: high
     size: medium
@@ -303,10 +312,127 @@ changes:
       - npm run validate
       - git diff --check
     acceptance:
-      - A high-risk decision report exists before any git mutation automation is selected.
-      - The report separates branch creation, local commit, push, and PR creation decisions.
+      - A high-risk decision report exists before any git or gh mutation automation is selected.
+      - The report separates branch creation, local commit, push, issue mutation, and PR creation decisions.
       - The report defines explicit user approval conditions and stop criteria.
-      - No automated git mutation implementation is performed by this candidate.
+      - No automated git or gh mutation implementation is performed by this candidate.
+  - id: G008
+    status: candidate
+    title: Formalize Issue governance and source-of-truth rules
+    purpose: >
+      Define how OW relates external Issues to local planning queues, including
+      when local issue artifacts are git-tracked and when GitHub Issues should
+      remain the remote source of truth.
+    scope:
+      includes:
+        - Issue to CANDIDATE_CHANGES relationship model
+        - local issue backlog policy when gh is absent or unauthorized
+        - GitHub Issue source-of-truth policy when gh is configured
+        - linkage fields from issues to plan ids, candidate ids, commits, branches, and PRs
+        - drift prevention rules for remote issue bodies and local audit artifacts
+      excludes:
+        - implementing gh commands
+        - creating or editing issues
+        - changing select-change behavior
+        - changing validator implementation
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/
+    dependencies:
+      - G001
+    unlocks:
+      - G009
+      - G010
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Issue is defined as an intent or problem source, not as a direct selected change.
+      - The contract defines when local issue artifacts are tracked in git.
+      - The contract defines GitHub Issues as the source of truth when gh is authorized and configured.
+      - The contract defines local linkage artifacts that can audit decomposition without duplicating remote issue bodies.
+  - id: G009
+    status: candidate
+    title: Define gh issue and PR operation risk boundaries
+    purpose: >
+      Define which gh operations OW may treat as read-only, evidence-writing,
+      or high-risk mutation so future GitHub integration can be governed before
+      implementation.
+    scope:
+      includes:
+        - read-only gh operations for issues and PRs
+        - medium-risk evidence operations such as comments, labels, or PR body suggestions
+        - high-risk mutation operations such as issue creation, body edits, closure, push, PR creation, and merge
+        - explicit authorization and configuration prerequisites
+        - local audit expectations for every remote mutation
+      excludes:
+        - implementing gh commands
+        - opening PRs
+        - creating, editing, or closing issues
+        - replacing the high-risk report gate for mutation automation
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - references/gh-operation-governance.md
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/
+    dependencies:
+      - G001
+      - G008
+    unlocks:
+      - G007
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - gh operations are classified into read-only, evidence-writing, and mutation tiers.
+      - The contract requires user authorization and configured gh before any gh-dependent workflow.
+      - High-risk remote mutations remain behind HIGH_RISK_DECISION_REPORT.md and explicit approval.
+      - Local audit artifacts remain the OW-owned record even when GitHub is the remote source of truth.
+  - id: G010
+    status: candidate
+    title: Create analyze-changes skill for cross-queue priority analysis
+    purpose: >
+      Add a read-only planning skill that compares multiple active
+      CANDIDATE_CHANGES queues and recommends the next plan id and candidate id
+      without selecting or implementing it.
+    scope:
+      includes:
+        - skill boundary between decompose-to-changes, analyze-changes, and select-change
+        - cross-queue readiness, dependency, risk, branch, dirty-tree, and unlock analysis
+        - CHANGE_ANALYSIS.yaml and CHANGE_ANALYSIS.md artifact expectations
+        - handoff shape that select-change can consume
+        - high-risk stop reporting when the best next candidate is high risk
+      excludes:
+        - implementing selected changes
+        - mutating candidate queues except for optional analysis evidence links
+        - performing git or gh mutations
+        - replacing select-change selection artifacts
+    owned_paths:
+      - skills/analyze-changes/SKILL.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/
+    dependencies:
+      - G001
+      - G008
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/analyze-changes
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - analyze-changes is defined as read-only priority analysis across one or more candidate queues.
+      - The skill outputs a recommended target_plan_id and target_candidate_id with rejected alternatives.
+      - The skill reports branch and dirty-tree constraints before recommending implementation.
+      - The skill hands off to select-change without creating SELECTED_CHANGE.yaml itself.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -323,6 +449,34 @@ operations:
     changed_at: 2026-05-21
     before_status: null
     after_status: active
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: Expand the high-risk automation decision from local git mutations to include authenticated gh remote mutations.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP003
+    operation_type: add
+    target_candidate_ids:
+      - G008
+      - G009
+      - G010
+    actor: agent
+    reason: Add Issue governance, gh operation risk boundaries, and cross-queue analyze-changes planning after user review of git governance scope.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
     evidence:
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md

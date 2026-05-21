@@ -10,6 +10,10 @@ view only.
 - Commit boundary: one selected candidate should complete as one coherent commit.
 - PR boundary: one PR should summarize the feat branch, not individual atom
   tasks.
+- Issue boundary: Issues are intent/problem sources; local OW artifacts own
+  decomposition and audit linkage.
+- gh boundary: read-only and evidence-writing operations may be governed
+  separately from high-risk remote mutations.
 - Next recommended candidate: `G001`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
@@ -146,16 +150,16 @@ Validation:
 - `git diff --check`
 - `npm run verify:runtime-surface`
 
-## G007 - Decide Whether OW Should Automate Branch, Commit, Push, And PR Operations
+## G007 - Decide Whether OW Should Automate Git And Gh Mutation Operations
 
 Status: `candidate`
 
 Risk: `high`
 
 Purpose: produce a high-risk decision packet before any future move from
-planning guidance into automated git mutations.
+planning guidance into automated local git or authenticated GitHub mutations.
 
-Dependencies: `G001`, `G005`
+Dependencies: `G001`, `G005`, `G009`
 
 Owned paths:
 
@@ -167,5 +171,77 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
-Stop condition: do not select or implement automated git mutation behavior
+Stop condition: do not select or implement automated git or gh mutation behavior
 without explicit approval of a concrete high-risk decision option.
+
+## G008 - Formalize Issue Governance And Source-Of-Truth Rules
+
+Status: `candidate`
+
+Risk: `low`
+
+Purpose: define how OW relates external Issues to local planning queues,
+including when local issue artifacts are git-tracked and when GitHub Issues
+remain the remote source of truth.
+
+Dependencies: `G001`
+
+Owned paths:
+
+- `references/planning-artifact-contracts.md`
+- `references/git-version-control-governance.md`
+- `references/issue-governance.md`
+- `changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+## G009 - Define Gh Issue And PR Operation Risk Boundaries
+
+Status: `candidate`
+
+Risk: `medium`
+
+Purpose: classify gh operations as read-only, evidence-writing, or high-risk
+mutation before any GitHub integration is implemented.
+
+Dependencies: `G001`, `G008`
+
+Owned paths:
+
+- `references/git-version-control-governance.md`
+- `references/issue-governance.md`
+- `references/gh-operation-governance.md`
+- `changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+## G010 - Create Analyze-Changes Skill For Cross-Queue Priority Analysis
+
+Status: `candidate`
+
+Risk: `medium`
+
+Purpose: add a read-only planning skill that compares multiple active
+`CANDIDATE_CHANGES` queues and recommends the next `plan_id` and `candidate_id`
+without selecting or implementing it.
+
+Dependencies: `G001`, `G008`
+
+Owned paths:
+
+- `skills/analyze-changes/SKILL.md`
+- `skills/analyze-changes/references/analysis-protocol.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M71-git-version-control-governance/G010-analyze-changes-skill/`
+
+Validation:
+
+- `python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/analyze-changes`
+- `npm run validate`
+- `git diff --check`

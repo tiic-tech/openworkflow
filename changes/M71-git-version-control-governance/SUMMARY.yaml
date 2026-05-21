@@ -12,18 +12,22 @@ source:
     discussion into a decompose-to-changes candidate queue. The governing model
     is atom task as implementation checklist, selected change as commit,
     CANDIDATE_CHANGES as feat, feat as branch, branch as PR, and PR as
-    merge/release boundary.
+    merge/release boundary. A follow-up queue maintenance pass added Issues,
+    gh operation boundaries, and a read-only analyze-changes skill for
+    cross-queue priority analysis.
 outputs:
   candidate_changes_yaml: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
 branch_boundary: codex/m71-git-version-governance
-candidate_count: 7
+candidate_count: 10
 next_recommended_candidate_id: G001
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G002 and G003 must complete before G004 can validate the new behavior.
   - G005 should complete before any PR-ready handoff fixture work.
+  - G008 defines Issue source-of-truth rules before gh operation boundaries or cross-queue analysis depend on Issues.
+  - G009 classifies gh issue and PR operation risk before G007 decides mutation automation.
   - G007 is high risk and must stop for a decision report before implementation.
 risks:
   - id: R001
@@ -32,11 +36,21 @@ risks:
     mitigation: Define planning-only and explicit-user-override exceptions in the contracts and skills.
   - id: R002
     level: high
-    description: Automated git mutation could create unwanted commits, pushes, or PRs.
+    description: Automated git or gh mutation could create unwanted commits, pushes, issue edits, issue closures, or PRs.
     mitigation: Keep automation as a high-risk decision packet until the user explicitly approves a concrete option.
+  - id: R003
+    level: medium
+    description: Local issue artifacts can drift from GitHub Issues when gh is configured as the remote source of truth.
+    mitigation: Store linkage and audit metadata locally, but avoid duplicating remote issue bodies as authoritative content.
+  - id: R004
+    level: medium
+    description: Cross-queue analysis could silently become selection if its boundary is not explicit.
+    mitigation: Keep analyze-changes read-only and hand off recommended plan and candidate ids to select-change.
 unresolved_questions:
   - Should OW require a new branch for every new CANDIDATE_CHANGES immediately, or allow a documented exception when retrofitting legacy queues?
   - Should commit hashes become mandatory completion evidence for all future done candidates, or only for queues that opt into branch governance?
+  - Should local issue backlog artifacts exist only when gh is absent, or also as an optional cache when gh is available?
+  - Should analyze-changes produce one global analysis artifact or one artifact per cross-queue decision episode?
 validation:
   commands_run:
     - npm run validate
@@ -44,3 +58,5 @@ validation:
   notes:
     - Initial DTC output created without selecting or implementing any candidate.
     - Repository validation passed after queue creation.
+    - Queue maintenance added G008, G009, and G010, and expanded G007 to include gh mutation automation.
+    - Repository validation passed after queue maintenance.
