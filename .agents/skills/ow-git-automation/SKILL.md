@@ -57,6 +57,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - local PR_READY_SUMMARY.md through openworkflow git-automation summary
 - remote operation plan through openworkflow git-automation remote
 - remote read-only PR-ready plan through openworkflow git-automation remote-plan
+- draft PR pilot preview or explicitly gated mutation through openworkflow git-automation draft-pr
 - local evidence artifacts under changes/&lt;plan_id&gt;/
 </allowed_outputs>
 
@@ -115,6 +116,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - managed mode may perform approved local branch, commit, and summary operations with previews and evidence.
 - managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.
 - remote-plan mode may read remote refs and PR metadata, but must not push, create PRs, edit PRs, merge, or mutate Issues.
+- draft-pr mode is disabled by default; mutation requires --write, --allow-draft-pr, current remote-plan evidence, and rollback guidance.
 - autonomous mode is a future high-risk path and is not implemented by the G015 command shell.
 </mode_policy>
 
@@ -143,6 +145,7 @@ When readiness is not satisfied, keep asking one focused question or record unre
 - openworkflow git-automation summary --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --json
 - openworkflow git-automation simulate --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --base &lt;base-ref&gt; --json
 - openworkflow git-automation remote-plan --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --base &lt;base-ref&gt; --remote &lt;remote&gt; --target-base &lt;branch&gt; --json
+- openworkflow git-automation draft-pr --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --base &lt;base-ref&gt; --remote &lt;remote&gt; --target-base &lt;branch&gt; --json
 </handoff_commands>
 </agent_protocol>
 

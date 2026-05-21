@@ -1383,6 +1383,54 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert(typeof remoteState.branchHead === "string", "remote-plan should read remote branch head");
     assert(Array.isArray(remotePlanResult.readOnlyPlan), "remote-plan missing read-only plan");
     assert(remotePlan.output.includes("did not push"), "remote-plan should state non-mutation boundary");
+
+    const draftPreview = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(draftPreview.code === 0, `draft-pr preview should succeed without mutation: ${draftPreview.output}`);
+    const draftPreviewReport = parseJsonReport(draftPreview.output, "git-automation draft-pr");
+    const draftPreviewData = record(draftPreviewReport.data, "git-automation draft-pr data");
+    const draftPreviewResult = record(draftPreviewData.result, "git-automation draft-pr result");
+    assert(draftPreviewResult.mutation_performed === false, "draft-pr preview must not mutate");
+    assert(typeof draftPreviewResult.bodyDigest === "string", "draft-pr preview should include body digest");
+    const draftPreviewCommand = record(draftPreviewResult.preview, "draft-pr preview command");
+    assert(Array.isArray(draftPreviewCommand.args), "draft-pr preview missing command args");
+    assert((draftPreviewCommand.args as unknown[]).includes("--draft"), "draft-pr preview should create a draft PR");
+
+    const draftWriteBlocked = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(draftWriteBlocked.code !== 0, "draft-pr write should be blocked without --allow-draft-pr");
+    assert(draftWriteBlocked.output.includes("requires --allow-draft-pr"), "draft-pr write blocker should name allow flag");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
     await rm(remoteRoot, { recursive: true, force: true });
@@ -1441,6 +1489,7 @@ function verifyGitAutomationSkill(content: string): void {
     "openworkflow git-automation summary",
     "openworkflow git-automation simulate",
     "openworkflow git-automation remote-plan",
+    "openworkflow git-automation draft-pr",
   ]) {
     assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
   }

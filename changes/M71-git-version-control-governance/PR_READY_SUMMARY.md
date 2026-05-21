@@ -30,10 +30,11 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G017` Build read-only autonomous git simulator (selected: `G017-autonomous-git-simulator`; commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282)
 - `G018` Plan narrow autonomous remote pilot (selected: `G018-narrow-autonomous-remote-pilot`; commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c)
 - `G019` Implement remote read-only PR-ready planning (selected: `G019-remote-readonly-pr-plan`; commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e)
+- `G020` Pilot draft PR remote mutation (selected: `G020-draft-pr-remote-pilot`; commit: not recorded)
 
 ## Deferred Or Blocked Changes
 
-- `G020` status `ready`: Pilot draft PR remote mutation
+- None.
 
 ## High-Risk Decisions
 
@@ -43,7 +44,7 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G017` status `done`: Build read-only autonomous git simulator
 - `G018` status `done`: Plan narrow autonomous remote pilot
 - `G019` status `done`: Implement remote read-only PR-ready planning
-- `G020` status `ready`: Pilot draft PR remote mutation
+- `G020` status `done`: Pilot draft PR remote mutation
 
 ## Validation
 
@@ -58,4 +59,3 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 
 - This artifact is local evidence only.
 - Remote PR creation or mutation requires separate gh operation governance and explicit user approval.
-- Warning: candidate queue is not fully complete; PR-ready summary is a review packet, not a merge signal

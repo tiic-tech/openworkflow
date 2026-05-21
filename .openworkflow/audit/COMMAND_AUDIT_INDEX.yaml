@@ -247,6 +247,8 @@ commands:
       - local PR_READY_SUMMARY.md through openworkflow git-automation summary
       - remote operation plan through openworkflow git-automation remote
       - remote read-only PR-ready plan through openworkflow git-automation remote-plan
+      - draft PR pilot preview or explicitly gated mutation through openworkflow git-automation
+        draft-pr
       - local evidence artifacts under changes/<plan_id>/
     conditional_outputs:
       - high-risk decision report when remote mutation or autonomous mode is requested
@@ -266,6 +268,9 @@ commands:
       - openworkflow git-automation simulate --root . --queue
         changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --json
       - openworkflow git-automation remote-plan --root . --queue
+        changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base
+        <branch> --json
+      - openworkflow git-automation draft-pr --root . --queue
         changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base
         <branch> --json
 updated_at: null

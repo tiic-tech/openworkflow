@@ -22,10 +22,10 @@ outputs:
   high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 20
-completed_candidate_id: G019
-completed_change_id: G019-remote-readonly-pr-plan
-previous_completed_candidate_id: G018
-previous_completed_change_id: G018-narrow-autonomous-remote-pilot
+completed_candidate_id: G020
+completed_change_id: G020-draft-pr-remote-pilot
+previous_completed_candidate_id: G019
+previous_completed_change_id: G019-remote-readonly-pr-plan
 fixture_completed_candidate_id: G006
 fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
 pr_completed_candidate_id: G005
@@ -42,7 +42,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G020
+next_recommended_candidate_id: null
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -67,7 +67,8 @@ key_dependencies:
   - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation; primary commit 5a5d2e21008b9e31456a9b8b9810cf1014dca282 records the implementation.
   - G018 is complete and records the approved B -> C path: remote read-only planning first, then a narrow draft PR mutation pilot; primary commit a853ae5581e3a21d8f0ff7e865fb480b92df433c records the planning decision.
   - G019 is complete and implements remote read-only PR-ready planning without mutation; primary commit 55e62cd3615b047b44705b0dd81be540dc3a1e2e records the implementation.
-  - G020 is next and pilots draft PR mutation only, with merge and Issue mutation still excluded.
+  - G020 is complete and pilots draft PR mutation only, disabled by default with dry-run preview and explicit --allow-draft-pr gating.
+  - No next candidate is currently recommended in this queue; merge, Issue mutation, force-push, and full autonomous lifecycle remain outside scope.
 risks:
   - id: R001
     level: medium
@@ -138,3 +139,4 @@ validation:
     - G018 primary implementation commit is a853ae5581e3a21d8f0ff7e865fb480b92df433c; commit evidence is recorded in a follow-up evidence commit.
     - G019 completed the remote read-only PR-ready planner and made G020 the next draft PR mutation pilot.
     - G019 primary implementation commit is 55e62cd3615b047b44705b0dd81be540dc3a1e2e; commit evidence is recorded in a follow-up evidence commit.
+    - G020 completed the disabled-by-default draft PR pilot with preview, allow gate, managed body digest, and rollback guidance.

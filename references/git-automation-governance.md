@@ -297,3 +297,28 @@ the working tree is clean, the branch boundary matches, validation evidence is
 present, and `PR_READY_SUMMARY.md` exists. Missing branch head is a warning
 because a later approved push or draft PR pilot may create it; missing base head
 is a blocker.
+
+## Draft PR Pilot
+
+`openworkflow git-automation draft-pr` is the approved C pilot after remote
+read-only planning. It is disabled by default: without `--write` it only emits a
+payload preview, and with `--write` it still refuses unless `--allow-draft-pr`
+is present.
+
+Draft-pr input:
+
+- the same target identity inputs as `remote-plan`
+- `PR_READY_SUMMARY.md` as the managed PR body source
+- optional PR title
+- explicit `--write --allow-draft-pr` for mutation
+
+Draft-pr guarantees:
+
+- dry-run returns `mutation_performed: false`
+- mutation is limited to `gh pr create --draft` or a managed draft PR body edit
+- remote branch and target base must already be readable
+- the PR body is wrapped in an OpenWorkflow managed section and digest
+- rollback guidance is included before mutation
+
+Draft-pr must not push, merge, mark ready for review, mutate Issues, force-push,
+reset, rebase, or destructively delete branches.

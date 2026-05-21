@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G020`.
+- Next recommended candidate: none.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -581,7 +581,7 @@ Completion evidence:
 
 ## G020 - Pilot Draft PR Remote Mutation
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -604,6 +604,22 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G020-draft-pr-remote-pilot`
+
+Completion evidence:
+
+- `packages/core/src/git/draftPrPilot.ts`
+- `packages/core/src/git/remoteReadonlyPlanner.ts`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/core/src/commands/registry.ts`
+- `references/git-automation-governance.md`
+- `.agents/skills/ow-git-automation/SKILL.md`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

@@ -3,13 +3,14 @@ import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { simulateAutonomousGit } from "../../../core/src/git/autonomousSimulator.js";
+import { pilotDraftPr } from "../../../core/src/git/draftPrPilot.js";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 import { planRemoteReadonly } from "../../../core/src/git/remoteReadonlyPlanner.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 
-type GitAutomationAction = "branch" | "commit" | "summary" | "remote" | "simulate" | "remote-plan";
+type GitAutomationAction = "branch" | "commit" | "summary" | "remote" | "simulate" | "remote-plan" | "draft-pr";
 const execFileAsync = promisify(execFile);
 
 export async function gitAutomationCommand(positional: string[], flags: Map<string, string | boolean>): Promise<number> {
@@ -19,7 +20,7 @@ export async function gitAutomationCommand(positional: string[], flags: Map<stri
   const write = booleanFlag(flags, "write");
   const automation = stringFlag(flags, "automation", "managed") ?? "managed";
 
-  if (!action || !["branch", "commit", "summary", "remote", "simulate", "remote-plan"].includes(action)) {
+  if (!action || !["branch", "commit", "summary", "remote", "simulate", "remote-plan", "draft-pr"].includes(action)) {
     return finishGitAutomationUsage(root, json);
   }
   if (automation === "autonomous") {
@@ -42,6 +43,9 @@ export async function gitAutomationCommand(positional: string[], flags: Map<stri
   }
   if (action === "remote-plan") {
     return gitAutomationRemotePlan(root, flags, json);
+  }
+  if (action === "draft-pr") {
+    return gitAutomationDraftPr(root, flags, write, json);
   }
   return gitAutomationRemote(root, flags, json);
 }
@@ -196,6 +200,30 @@ async function gitAutomationRemotePlan(root: string, flags: Map<string, string |
   }, result.ok ? ["review remote read-only plan before any draft PR pilot"] : ["resolve remote-plan blockers before any remote mutation pilot"]);
 }
 
+async function gitAutomationDraftPr(root: string, flags: Map<string, string | boolean>, write: boolean, json: boolean): Promise<number> {
+  const queuePath = stringFlag(flags, "queue");
+  if (!queuePath) {
+    return finishGitAutomationError(root, json, "draft-pr mode requires --queue <CANDIDATE_CHANGES.yaml>", []);
+  }
+  const result = await pilotDraftPr({
+    root,
+    queuePath,
+    baseRef: stringFlag(flags, "base"),
+    targetRemote: stringFlag(flags, "remote"),
+    targetBase: stringFlag(flags, "target-base"),
+    targetBranch: stringFlag(flags, "target-branch"),
+    prSummaryPath: stringFlag(flags, "pr-summary"),
+    title: stringFlag(flags, "title"),
+    allowDraftPr: booleanFlag(flags, "allow-draft-pr"),
+    dryRun: !write,
+  });
+  return finishGitAutomationResult(root, json, "git-automation draft-pr", result.ok, {
+    mode: "draft-pr-pilot",
+    action: "draft-pr",
+    result,
+  }, result.ok ? [write ? "record draft PR URL and rollback evidence" : "rerun with --write --allow-draft-pr only after reviewing the payload preview"] : ["resolve draft-pr blockers before mutation"]);
+}
+
 async function loadQueue(root: string, queuePath: string): Promise<Record<string, unknown>> {
   const { readFile } = await import("node:fs/promises");
   return record(parseYaml(await readFile(join(root, queuePath), "utf8")));
@@ -206,7 +234,7 @@ function findCandidate(queue: Record<string, unknown>, candidateId: string): Rec
 }
 
 function finishGitAutomationUsage(root: string, json: boolean): number {
-  const usage = "usage: openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]";
+  const usage = "usage: openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan|draft-pr> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]";
   if (json) {
     printJsonReport({
       command: "git-automation",

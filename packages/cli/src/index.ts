@@ -107,7 +107,7 @@ Usage:
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--strict] [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
-  openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
+  openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan|draft-pr> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -165,8 +165,8 @@ Two command surfaces:
                branch, commit, and summary actions are local-only; remote push,
                PR creation, Issue mutation, and merge require explicit approval
                and are refused by this command shell. Use remote-plan for
-               remote read-only PR-ready planning and simulate for read-only
-               autonomous push/PR/merge planning.
+               remote read-only PR-ready planning, draft-pr for the disabled-by-default
+               draft PR pilot, and simulate for read-only autonomous push/PR/merge planning.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
   Agent-readable JSON:
