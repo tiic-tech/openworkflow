@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: selected_change:H002-proto2html-source-behavior
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: H002-proto2html-source-behavior
+source_plan_id: M68-post-proto-workflow-planning
+source_candidate_id: H002
+title: Implement proto2html source skill behavior
+status: completed
+selection_reason:
+  - H002 is next recommended and depends only on completed H001 contracts.
+  - It defines source behavior before dogfood and runtime exposure.
+  - Owned paths are limited to the new source skill and M68 audit artifacts.
+rejected_alternatives:
+  - id: H003
+    reason: Runtime exposure depends on source behavior and dogfood evidence.
+  - id: H004
+    reason: Dogfood requires source behavior to exist first.
+scope:
+  includes:
+    - proto2html source skill guidance
+    - benchmark input resolution
+    - single-file HTML reconstruction rules
+    - screenshot and fidelity-report evidence rules
+  excludes:
+    - runtime command exposure
+    - html2spec extraction
+    - production application implementation
+owned_paths:
+  - skills/proto2html/
+  - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Source guidance requires accepted benchmark prototype input.
+  - HTML reconstruction is single-file and fidelity-oriented.
+  - Evidence captures screenshots, fidelity gaps, and known limits.
+validation:
+  - quick_validate.py skills/proto2html
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: work_items:H002-proto2html-source-behavior
+contract_type: work_items
+title: H002 Proto2html source behavior work items
+status: completed
+change_contract: changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/CHANGE.yaml
+items:
+  - task_id: H002-T001
+    title: Source skill
+    status: completed
+    owned_paths:
+      - skills/proto2html/SKILL.md
+      - skills/proto2html/agents/openai.yaml
+    acceptance:
+      - Accepted benchmark input is required.
+      - Runtime exposure is explicitly forbidden.
+  - task_id: H002-T002
+    title: Protocol reference
+    status: completed
+    owned_paths:
+      - skills/proto2html/references/proto2html-protocol.md
+    acceptance:
+      - Fidelity reconstruction workflow and evidence fields are explicit.
+  - task_id: H002-T003
+    title: Queue and validation
+    status: completed
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/
+    acceptance:
+      - H002 is complete.
+      - H004 is ready.
+      - Required validation passes.

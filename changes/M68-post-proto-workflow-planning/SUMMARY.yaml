@@ -17,18 +17,21 @@ outputs:
   atom_tasks: changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/ATOM_TASKS.yaml
   implementation_brief: changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/IMPLEMENTATION_BRIEF.md
 candidate_count: 7
-selected_candidate_id: H001
-selected_change_id: H001-proto2html-artifact-contracts
-completed_candidate_id: H001
-completed_change_id: H001-proto2html-artifact-contracts
-next_recommended_candidate_id: H002
+selected_candidate_id: H002
+selected_change_id: H002-proto2html-source-behavior
+completed_candidate_id: H002
+completed_change_id: H002-proto2html-source-behavior
+completed_contract_candidate_id: H001
+next_recommended_candidate_id: H004
 unresolved_questions:
   - Whether proto2html should eventually be user-facing or hidden behind accepted benchmark handoff.
   - Whether html2spec replaces `/ow:spec` or coexists as a stricter source path.
 validation_commands:
   - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/proto2html
 notes:
   - This queue starts after M59 completed the image-first proto/tune runtime exposure.
   - H001 is selected first because proto2html needs artifact contracts before source or runtime behavior.
   - M68 is the feat boundary; each H-prefixed candidate should complete as a focused commit inside this folder.
   - H001 completed the proto2html reference and schema contract; H002 is the next source-skill behavior change.
+  - H002 completed proto2html source skill behavior; H004 dogfood is ready before runtime exposure.

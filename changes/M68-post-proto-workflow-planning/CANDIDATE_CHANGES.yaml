@@ -39,7 +39,7 @@ selection_policy:
     - adding user-facing commands before contracts exist
     - turning proto or tune back into HTML implementation loops
     - broad autonomous runtime changes before production-stage contracts are clear
-next_recommended_candidate_id: H002
+next_recommended_candidate_id: H004
 changes:
   - id: H001
     status: done
@@ -91,7 +91,7 @@ changes:
         - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
         - "validation: npm run validate"
   - id: H002
-    status: ready
+    status: done
     title: Implement proto2html source skill behavior
     purpose: >
       Add source guidance for reconstructing an accepted benchmark image into a
@@ -123,6 +123,20 @@ changes:
       - Source guidance requires accepted benchmark prototype input.
       - HTML reconstruction is single-file and fidelity-oriented.
       - Evidence captures screenshots, fidelity gaps, and known limits.
+    selection:
+      selected_change_id: H002-proto2html-source-behavior
+      reason: H002 is ready after H001 and defines source behavior before dogfood or runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H002-proto2html-source-behavior
+      completed_at: 2026-05-21
+      evidence:
+        - skills/proto2html/SKILL.md
+        - skills/proto2html/references/proto2html-protocol.md
+        - skills/proto2html/agents/openai.yaml
+        - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/CHANGE.yaml
+        - "validation: quick_validate.py skills/proto2html"
+        - "validation: npm run validate"
   - id: H003
     status: candidate
     title: Expose proto2html runtime command surface
@@ -164,7 +178,7 @@ changes:
       - Generated adapter surfaces are produced through sync.
       - Existing proto and tune image-only boundaries remain intact.
   - id: H004
-    status: candidate
+    status: ready
     title: Dogfood proto2html reconstruction contract
     purpose: >
       Exercise proto2html source behavior on an accepted benchmark-style
@@ -322,6 +336,43 @@ operations:
       - H002
     actor: agent
     reason: H002 becomes ready after H001 defines the proto2html artifact contract.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: H002 is next recommended, ready, and bounded to source skill behavior.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/SELECTED_CHANGE.yaml
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: Proto2html source skill guidance, protocol reference, and interface metadata were added and validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/proto2html/SKILL.md
+      - skills/proto2html/references/proto2html-protocol.md
+      - skills/proto2html/agents/openai.yaml
+      - "validation: quick_validate.py skills/proto2html"
+      - "validation: npm run validate"
+  - operation_id: OP006
+    operation_type: priority_change
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: H004 becomes ready after H001 and H002; dogfood evidence is required before H003 runtime exposure.
     changed_at: 2026-05-21
     before_status: candidate
     after_status: ready
