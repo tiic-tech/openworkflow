@@ -116,6 +116,19 @@ remote state checks, ordered commit handling, conflict policy, validation gates,
 and rollback evidence. Designing those contracts first prevents a broad command
 implementation from becoming the policy by accident.
 
+## Approved Decision
+
+Approved on 2026-05-21: proceed with **Option B - Design-Only Autonomous
+Contract**.
+
+The approved work may define autonomous-mode contracts, configuration,
+operation matrices, evidence, rollback, conflict handling, and merge-readiness
+rules. It must not implement autonomous push, PR creation or update, merge,
+Issue mutation, force-push, reset, rebase, or destructive branch deletion.
+
+The next recommended follow-up after Option B is **Option C - Read-Only
+Autonomous Simulator**.
+
 ## Required Autonomous Contract
 
 If Option B is approved, the contract should define:

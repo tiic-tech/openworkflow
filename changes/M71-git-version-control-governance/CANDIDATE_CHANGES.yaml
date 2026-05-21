@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G016
+next_recommended_candidate_id: G017
 changes:
   - id: G001
     status: done
@@ -903,7 +903,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G016
-    status: ready
+    status: done
     title: Define autonomous git automation lifecycle
     purpose: >
       Plan the fully autonomous git automation mode that can push, create or
@@ -925,7 +925,8 @@ changes:
       - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/
     dependencies:
       - G015
-    unlocks: []
+    unlocks:
+      - G017
     risk: high
     size: large
     validation:
@@ -936,6 +937,61 @@ changes:
       - Every remote mutation class has evidence and rollback requirements.
       - Merge-readiness and conflict-resolution rules are documented.
       - Implementation remains blocked until a separate high-risk approval is granted.
+    selection:
+      selected_change_id: G016-autonomous-git-automation-lifecycle
+      reason: >
+        The user approved G016 Option B from the high-risk decision report:
+        define autonomous mode contracts without implementing remote mutation.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G016-autonomous-git-automation-lifecycle
+      completed_at: 2026-05-21
+      evidence:
+        - references/git-automation-governance.md
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G017
+    status: ready
+    title: Build read-only autonomous git simulator
+    purpose: >
+      Simulate autonomous git automation from local and remote-readable state,
+      producing the push, PR, conflict, merge, evidence, and rollback plan
+      without performing remote mutation.
+    scope:
+      includes:
+        - read-only local git state inspection
+        - read-only remote metadata inspection when available
+        - ordered commit and base-ref analysis
+        - simulated push, PR, checks, conflict, merge, and rollback plan
+        - evidence artifact for autonomous dry runs
+      excludes:
+        - pushing branches
+        - creating or updating PRs
+        - merging PRs
+        - mutating GitHub Issues
+        - resolving conflicts automatically
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/
+    dependencies:
+      - G016
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Simulator produces a complete autonomous operation plan without mutation.
+      - Simulator handles large local commit ranges through ordered commit evidence.
+      - Simulator reports merge blockers, conflict risk, missing validation, and rollback plan gaps.
+      - Remote mutation remains impossible from simulator mode.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -1483,3 +1539,44 @@ operations:
     after_status: ready
     evidence:
       - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP037
+    operation_type: select
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Select G016 after user approved Option B, design-only autonomous contract.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP038
+    operation_type: complete
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Complete G016 after defining autonomous mode enablement, operation matrix, evidence, merge-readiness, conflict, rollback, and implementation path.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP039
+    operation_type: add
+    target_candidate_ids:
+      - G017
+    actor: agent
+    reason: Add the recommended Option C follow-up as a read-only autonomous simulator before any full autonomous remote mutation implementation.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - references/git-automation-governance.md

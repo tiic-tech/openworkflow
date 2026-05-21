@@ -21,11 +21,11 @@ outputs:
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
   high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
-candidate_count: 16
-completed_candidate_id: G015
-completed_change_id: G015-ow-git-automation-command-shell
-previous_completed_candidate_id: G014
-previous_completed_change_id: G014-pr-ready-summary-generation
+candidate_count: 17
+completed_candidate_id: G016
+completed_change_id: G016-autonomous-git-automation-lifecycle
+previous_completed_candidate_id: G015
+previous_completed_change_id: G015-ow-git-automation-command-shell
 fixture_completed_candidate_id: G006
 fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
 pr_completed_candidate_id: G005
@@ -42,7 +42,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G016
+next_recommended_candidate_id: G017
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -63,7 +63,8 @@ key_dependencies:
   - G013 is complete and implements selected-change local commit automation with allowed-path and validation-evidence guards.
   - G014 is complete and generates local PR-ready summaries without remote mutation.
   - G015 is complete and introduces the managed git-automation command shell with remote operation planning.
-  - G016 is ready but high risk because it defines fully autonomous push, PR, and merge automation.
+  - G016 is complete and defines the design-only autonomous git automation lifecycle contract.
+  - G017 is ready but high risk because it builds the read-only autonomous simulator that precedes full autonomous remote mutation.
 risks:
   - id: R001
     level: medium
@@ -120,3 +121,6 @@ validation:
     - G015 completed the managed git-automation command shell and added G016 as the autonomous-mode high-risk follow-up.
     - G015 primary implementation commit is 47b708131bc87a1175c3603f0a9643c6f21b0e2e; commit evidence is recorded in a follow-up evidence commit.
     - G016 high-risk decision report was created; implementation requires explicit approval of a concrete option.
+    - User approved G016 Option B: design-only autonomous contract now, then read-only simulator before full autonomous mode.
+    - G016 completed autonomous enablement, operation matrix, evidence, merge-readiness, conflict, rollback, and implementation-path contracts.
+    - G017 read-only autonomous simulator was added as the next recommended candidate.

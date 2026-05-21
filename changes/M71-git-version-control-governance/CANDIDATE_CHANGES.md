@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G016`.
+- Next recommended candidate: `G017`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -421,7 +421,7 @@ Completion evidence:
 
 ## G016 - Define Autonomous Git Automation Lifecycle
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -444,6 +444,40 @@ Validation:
 High-risk report:
 
 - `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md`
+
+Selection: `G016-autonomous-git-automation-lifecycle`
+
+Completion evidence:
+
+- `references/git-automation-governance.md`
+- `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml`
+
+## G017 - Build Read-Only Autonomous Git Simulator
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: simulate autonomous git automation from local and remote-readable
+state, producing the push, PR, conflict, merge, evidence, and rollback plan
+without performing remote mutation.
+
+Dependencies: `G016`
+
+Owned paths:
+
+- `packages/core/src/git/`
+- `packages/cli/src/`
+- `references/git-automation-governance.md`
+- `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

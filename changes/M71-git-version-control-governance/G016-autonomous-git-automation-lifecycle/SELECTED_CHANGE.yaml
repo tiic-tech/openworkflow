@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: selected_change:G016-autonomous-git-automation-lifecycle
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G016-autonomous-git-automation-lifecycle
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G016
+title: Define autonomous git automation lifecycle
+status: done
+selection_reason: >
+  The user approved G016 Option B from the high-risk decision report. This
+  selected change defines the autonomous git automation contract without
+  implementing remote mutation.
+approved_option:
+  decided_at: 2026-05-21
+  option: G016 Option B - Design-Only Autonomous Contract
+  follow_up: G016 Option C should become a read-only autonomous simulator candidate.
+scope:
+  includes:
+    - autonomous mode enablement contract
+    - allowed and denied operation matrix
+    - preflight and completion evidence requirements
+    - merge-readiness gates
+    - conflict policy
+    - rollback and recovery requirements
+    - implementation path toward simulator and narrow pilot
+  excludes:
+    - implementing autonomous push
+    - creating or updating remote PRs
+    - merging PRs
+    - mutating GitHub Issues
+    - force-push, reset, rebase, or destructive branch deletion
+owned_paths:
+  - references/git-automation-governance.md
+  - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/
+forbidden_paths:
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Autonomous mode has an explicit enablement contract.
+  - Every remote mutation class has evidence and rollback requirements.
+  - Merge-readiness and conflict-resolution rules are documented.
+  - Implementation remains blocked until a separate high-risk approval is granted.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/git-automation-governance.md
+    - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+    - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
