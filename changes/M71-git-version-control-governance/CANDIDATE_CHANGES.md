@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G010`.
+- Next recommended candidate: `G002`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -242,7 +242,7 @@ Validation:
 
 ## G010 - Create Analyze-Changes Skill For Cross-Queue Priority Analysis
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -264,3 +264,13 @@ Validation:
 - `python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/analyze-changes`
 - `npm run validate`
 - `git diff --check`
+
+Selection: `G010-analyze-changes-skill`
+
+Completion evidence:
+
+- `skills/analyze-changes/SKILL.md`
+- `skills/analyze-changes/references/analysis-protocol.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml`

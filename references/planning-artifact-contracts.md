@@ -263,6 +263,42 @@ Queue linkage:
 - Do not create `SELECTED_CHANGE.yaml` for a high-risk candidate solely because
   the report exists.
 
+## CHANGE_ANALYSIS.yaml
+
+Purpose: compare one or more candidate queues and recommend the next `plan_id`
+and `candidate_id` for `select-change` without selecting or implementing the
+candidate.
+
+Required top-level fields:
+
+- `schema_version`
+- `contract_id`
+- `contract_type: planning`
+- `planning_artifact_type: change_analysis`
+- `analysis_id`
+- `status`
+- `source`
+- `git_state`
+- `recommendation`
+- `rejected_alternatives`
+- `high_risk_stop`
+- `validation`
+
+`recommendation` should include:
+
+- `target_plan_id`
+- `target_candidate_id`
+- `action`
+- `reason`
+
+Allowed actions include `handoff_to_select_change`, `queue_maintenance`,
+`high_risk_report`, and `commit_current_work`.
+
+The analysis artifact is advisory. It must not create
+`SELECTED_CHANGE.yaml`, mutate candidate status, or authorize high-risk
+implementation. `select-change` owns selection artifacts after consuming a
+recommended target.
+
 ## Status Update Rules
 
 When select-change chooses a candidate:

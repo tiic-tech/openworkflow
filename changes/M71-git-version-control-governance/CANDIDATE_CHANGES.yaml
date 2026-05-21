@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G010
+next_recommended_candidate_id: G002
 changes:
   - id: G001
     status: done
@@ -430,7 +430,7 @@ changes:
       - High-risk remote mutations remain behind HIGH_RISK_DECISION_REPORT.md and explicit approval.
       - Local audit artifacts remain the OW-owned record even when GitHub is the remote source of truth.
   - id: G010
-    status: ready
+    status: done
     title: Create analyze-changes skill for cross-queue priority analysis
     purpose: >
       Add a read-only planning skill that compares multiple active
@@ -468,6 +468,25 @@ changes:
       - The skill outputs a recommended target_plan_id and target_candidate_id with rejected alternatives.
       - The skill reports branch and dirty-tree constraints before recommending implementation.
       - The skill hands off to select-change without creating SELECTED_CHANGE.yaml itself.
+    selection:
+      selected_change_id: G010-analyze-changes-skill
+      reason: >
+        G010 is ready after G001 and G008. It directly improves dogfood
+        scheduling by adding a read-only cross-queue priority step before
+        select-change consumes a concrete target.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G010-analyze-changes-skill
+      completed_at: 2026-05-21
+      evidence:
+        - skills/analyze-changes/SKILL.md
+        - skills/analyze-changes/references/analysis-protocol.md
+        - references/planning-artifact-contracts.md
+        - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/analyze-changes"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
 operations:
   - operation_id: OP001
     operation_type: add
@@ -573,5 +592,36 @@ operations:
       - references/issue-governance.md
       - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - G010
+    actor: agent
+    reason: Select G010 because it is ready after G001 and G008 and closes the cross-queue priority analysis gap discovered during dogfood use.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - G010
+    actor: agent
+    reason: Complete G010 after adding analyze-changes, defining CHANGE_ANALYSIS artifacts, and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/analyze-changes/SKILL.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/analyze-changes"
       - "validation: npm run validate"
       - "validation: git diff --check"
