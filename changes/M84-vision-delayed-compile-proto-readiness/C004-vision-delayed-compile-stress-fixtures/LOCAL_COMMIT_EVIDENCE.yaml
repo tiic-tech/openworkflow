@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C004-vision-delayed-compile-stress-fixtures
+contract_type: evidence
+planning_artifact_type: local_commit_evidence
+selected_change_id: C004-vision-delayed-compile-stress-fixtures
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C004
+title: Local commit evidence for vision delayed-compile stress fixtures
+status: completed
+completed_at: 2026-05-22
+primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+summary: >
+  Added runtime-surface stress fixtures for thin, blocked, and ready vision
+  sessions. The fixtures verify that non-ready proto_readiness.status remains
+  current_but_thin while a complete ready vision is usable, and they strengthen
+  generated /ow:vision drift checks for no eager durable writes.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/SELECTED_CHANGE.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/ATOM_TASKS.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/IMPLEMENTATION_BRIEF.md
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+known_issue_recorded:
+  id: KI001
+  command: /ow:analyze-changes
+  note: >
+    The AC runtime-surface wording drift was recorded in the M84 summary. C004
+    aligned the immediate verifier expectation to current generated wording so
+    full runtime-surface verification can complete; deeper AC review remains
+    deferred as M90.
+risk:
+  level: medium
+  high_risk_report: not_applicable
+  notes:
+    - This change only adds verification fixtures and planning evidence inside the M84 vision boundary.

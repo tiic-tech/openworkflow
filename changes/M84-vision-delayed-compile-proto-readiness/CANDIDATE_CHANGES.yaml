@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M84-vision-delayed-compile-proto-readiness
 title: Candidate changes for vision delayed compile and proto readiness
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -93,7 +93,7 @@ scope_control:
         immediate verifier wording to the current generated skill so vision
         stress fixtures can run, but deeper AC command-quality review remains
         outside the M84 vision boundary.
-      suggested_plan_id: M90-analyze-changes-runtime-surface-alignment
+      suggested_plan_id: M90-analyze-changes-command-quality-review
 next_recommended_candidate_id: null
 changes:
   - id: C001
@@ -276,7 +276,7 @@ changes:
         - .agents/skills/ow-vision/SKILL.md
         - .openworkflow/audit/CONTEXT_PACKETS.yaml
   - id: C004
-    status: selected
+    status: done
     title: Add /ow:vision delayed-compile stress tests and fixtures
     purpose: >
       Verify that /ow:vision remains low-latency for humans while still
@@ -324,6 +324,13 @@ changes:
         protocol guidance and C004 is the final M84 candidate needed to
         pressure-test thin, blocked, and ready vision states.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-vision-delayed-compile-stress-fixtures
+      completed_at: 2026-05-22
+      primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
 operations:
   - operation_id: OP001
     operation_type: add
@@ -487,7 +494,7 @@ operations:
   - operation_id: OP012
     operation_type: defer
     target_candidate_ids:
-      - M90-analyze-changes-runtime-surface-alignment
+      - M90-analyze-changes-command-quality-review
     actor: agent
     reason: >
       Record the unrelated AC runtime-surface failure exposed during C003:
@@ -515,3 +522,31 @@ operations:
       - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/SELECTED_CHANGE.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/ATOM_TASKS.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Complete delayed-compile stress fixtures for thin, blocked, and ready
+      vision sessions with full runtime-surface verification.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+      - 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - M84-vision-delayed-compile-proto-readiness
+    actor: agent
+    reason: >
+      Complete the bounded M84 queue after C001-C004 all reached done status;
+      downstream validation/proto/tune changes remain deferred as separate
+      bounded queues.
+    changed_at: 2026-05-22
+    before_status: active
+    after_status: completed
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml

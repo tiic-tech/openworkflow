@@ -6,7 +6,7 @@ selected_change_id: C004-vision-delayed-compile-stress-fixtures
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C004
 title: Add /ow:vision delayed-compile stress tests and fixtures
-status: selected
+status: completed
 selection_reason: >
   C004 is the final M84 dependency. It pressure-tests the delayed-compile vision
   contract after C001-C003 established source behavior, artifact structure, and
@@ -53,3 +53,8 @@ risk:
 commit_boundary: >
   Complete as one coherent local commit unless the unrelated analyze-changes
   runtime-surface drift blocks the full runtime verification command.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

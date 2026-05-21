@@ -6,11 +6,11 @@ selected_change_id: C004-vision-delayed-compile-stress-fixtures
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C004
 title: Atom tasks for vision delayed-compile stress fixtures
-status: ready
+status: completed
 tasks:
   - task_id: T001
     title: Add vision summary quality fixtures
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
@@ -20,7 +20,7 @@ tasks:
       artifacts and asserts their summary quality status.
   - task_id: T002
     title: Strengthen generated-surface drift checks
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -30,7 +30,7 @@ tasks:
       delayed compile, or proto-readiness guidance.
   - task_id: T003
     title: Validate C004 boundary
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - changes/M84-vision-delayed-compile-proto-readiness/
@@ -44,3 +44,6 @@ validation:
   - npm run verify:runtime-surface
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d

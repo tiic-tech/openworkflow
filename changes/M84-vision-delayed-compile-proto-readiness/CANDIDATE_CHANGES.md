@@ -29,11 +29,11 @@ Deferred features:
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Completed candidates: `C001`, `C002`, `C003`
+Completed candidates: `C001`, `C002`, `C003`, `C004`
 
-Selected candidate: `C004`
+Selected candidate: none
 
-Next recommended candidate: none until `C004` is completed or superseded.
+Next recommended candidate: none; M84 is complete.
 
 ## Selection Policy
 
@@ -97,7 +97,7 @@ Completion evidence:
 
 ### C004 - Add /ow:vision delayed-compile stress tests and fixtures
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -105,3 +105,8 @@ Adds verification coverage for thin, blocked, and compile-ready vision states,
 plus generated-surface drift protection for the delayed-compile contract.
 
 Selection: `C004-vision-delayed-compile-stress-fixtures`
+
+Completion evidence:
+
+- `changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml`
+- `7c6d30157f0deb2ee73bb651865f3ffc9d96993d`
