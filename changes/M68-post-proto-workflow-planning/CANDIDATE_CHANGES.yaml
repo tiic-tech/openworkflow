@@ -39,10 +39,10 @@ selection_policy:
     - adding user-facing commands before contracts exist
     - turning proto or tune back into HTML implementation loops
     - broad autonomous runtime changes before production-stage contracts are clear
-next_recommended_candidate_id: H001
+next_recommended_candidate_id: H002
 changes:
   - id: H001
-    status: selected
+    status: done
     title: Define proto2html artifact contracts
     purpose: >
       Define the durable artifact vocabulary for converting an accepted
@@ -81,8 +81,17 @@ changes:
       selected_change_id: H001-proto2html-artifact-contracts
       reason: H001 is the root unblocker for the post-proto workflow and keeps runtime exposure out of scope.
       selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H001-proto2html-artifact-contracts
+      completed_at: 2026-05-21
+      evidence:
+        - references/proto2html-artifact-contracts.md
+        - schemas/html-prototype.schema.json
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
+        - "validation: npm run validate"
   - id: H002
-    status: candidate
+    status: ready
     title: Implement proto2html source skill behavior
     purpose: >
       Add source guidance for reconstructing an accepted benchmark image into a
@@ -293,3 +302,28 @@ operations:
     after_status: selected
     evidence:
       - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/SELECTED_CHANGE.yaml
+  - operation_id: OP002
+    operation_type: complete
+    target_candidate_ids:
+      - H001
+    actor: agent
+    reason: Proto2html reference and HTML prototype schema were added and repository validation passed.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/proto2html-artifact-contracts.md
+      - schemas/html-prototype.schema.json
+      - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
+      - "validation: npm run validate"
+  - operation_id: OP003
+    operation_type: priority_change
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: H002 becomes ready after H001 defines the proto2html artifact contract.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml

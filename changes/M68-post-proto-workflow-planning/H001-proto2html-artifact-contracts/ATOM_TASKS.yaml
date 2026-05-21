@@ -4,11 +4,11 @@ contract_type: planning
 planning_artifact_type: atom_tasks
 selected_change_id: H001-proto2html-artifact-contracts
 title: H001 Proto2html artifact contracts atom tasks
-status: selected
+status: completed
 tasks:
   - task_id: H001-A001
     title: Define proto2html reference contract
-    status: pending
+    status: completed
     type: document
     owned_paths:
       - references/proto2html-artifact-contracts.md
@@ -17,7 +17,7 @@ tasks:
       - The contract clearly separates proto2html from proto/tune and html2spec.
   - task_id: H001-A002
     title: Add HTML prototype schema
-    status: pending
+    status: completed
     type: edit
     owned_paths:
       - schemas/html-prototype.schema.json
@@ -27,7 +27,7 @@ tasks:
       - Repository contract validation treats the schema as a required project file.
   - task_id: H001-A003
     title: Complete queue and validate
-    status: pending
+    status: completed
     type: verify
     owned_paths:
       - changes/M68-post-proto-workflow-planning/

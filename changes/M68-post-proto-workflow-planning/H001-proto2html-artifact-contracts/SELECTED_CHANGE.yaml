@@ -6,7 +6,7 @@ selected_change_id: H001-proto2html-artifact-contracts
 source_plan_id: M68-post-proto-workflow-planning
 source_candidate_id: H001
 title: Define proto2html artifact contracts
-status: selected
+status: completed
 selection_reason:
   - H001 has no dependencies and unlocks proto2html source, dogfood, and runtime exposure.
   - It keeps the change focused on contracts and avoids premature command exposure.

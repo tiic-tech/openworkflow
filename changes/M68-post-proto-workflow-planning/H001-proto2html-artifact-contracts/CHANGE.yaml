@@ -2,7 +2,7 @@ schema_version: 0.1.0
 contract_id: change:H001-proto2html-artifact-contracts
 contract_type: change
 title: H001 Proto2html artifact contracts
-status: selected
+status: completed
 source_artifacts:
   - docs/OW_DEVELOP_PLAN.md
   - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml

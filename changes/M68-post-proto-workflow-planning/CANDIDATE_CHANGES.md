@@ -16,7 +16,7 @@ Avoid mixing proto2html with html2spec or build planning, adding commands before
 contracts exist, turning proto/tune back into HTML loops, and broad autonomous
 runtime changes before production-stage contracts are clear.
 
-Next recommended candidate: `H001`
+Next recommended candidate: `H002`
 
 Feat boundary: this queue owns the top-level `changes/M68-post-proto-workflow-planning/`
 folder. Each `H###` candidate is expected to land as a focused commit with
@@ -24,7 +24,7 @@ selection artifacts under this feat folder.
 
 ## H001 - Define Proto2html Artifact Contracts
 
-Status: `selected`
+Status: `done`
 
 Purpose: define the durable artifact vocabulary for converting an accepted
 benchmark prototype image into a single HTML reconstruction with fidelity
@@ -43,9 +43,17 @@ Validation:
 
 Selection: `H001-proto2html-artifact-contracts`
 
+Completion evidence:
+
+- `references/proto2html-artifact-contracts.md`
+- `schemas/html-prototype.schema.json`
+- `packages/core/src/validators/validateRepositoryContracts.ts`
+- `changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml`
+- `npm run validate`
+
 ## H002 - Implement Proto2html Source Skill Behavior
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `H001`
 
@@ -100,3 +108,5 @@ without forgetting register, pointer, summary, and handoff maintenance.
 ## Operation Audit
 
 - `OP001`: select `H001`
+- `OP002`: complete `H001`
+- `OP003`: mark `H002` ready and make it next recommended
