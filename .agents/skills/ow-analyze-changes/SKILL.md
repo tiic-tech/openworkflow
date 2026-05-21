@@ -1,6 +1,6 @@
 ---
 name: "ow-analyze-changes"
-description: "Analyze one or more candidate change queues and recommend the next candidate without selecting it. Use this skill for /ow:analyze-changes in OpenWorkflow repositories."
+description: "Analyze multiple candidate change queues and recommend the next queue and candidate without selecting it. Use this skill for /ow:analyze-changes in OpenWorkflow repositories."
 metadata:
   generated_by: "openworkflow"
   adapter: "codex"
@@ -13,7 +13,7 @@ metadata:
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.analyze-changes -->
 # /ow:analyze-changes
 
-Analyze one or more candidate change queues and recommend the next candidate without selecting it.
+Analyze multiple candidate change queues and recommend the next queue and candidate without selecting it.
 
 <user_behavior>
 Keep visible responses concise and outcome-focused.
@@ -56,8 +56,6 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <allowed_outputs>
 - changes/&lt;analysis_id&gt;/CHANGE_ANALYSIS.yaml
 - changes/&lt;analysis_id&gt;/CHANGE_ANALYSIS.md
-- changes/&lt;plan_id&gt;/CHANGE_ANALYSIS.yaml for single-queue analysis
-- changes/&lt;plan_id&gt;/CHANGE_ANALYSIS.md for single-queue analysis
 </allowed_outputs>
 
 <conditional_outputs>
@@ -81,6 +79,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <audit_checkpoints>
 <before>
 - Run git status --short --branch and record branch and dirty-tree state.
+- Confirm this is a cross-queue decision; when only one queue is active, hand off to select-change.
 - Discover only user-provided queues, or obvious changes/*/CANDIDATE_CHANGES.yaml files when global analysis is requested.
 - Read YAML queues as source truth and Markdown views only as aids.
 </before>
@@ -120,6 +119,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not implement candidates from analyze-changes.
 - Do not treat CHANGE_ANALYSIS.yaml as approval for high-risk implementation.
 - Do not discover every queue unless the user requests global comparison.
+- Do not use analyze-changes as a mandatory pre-step for single-queue selection.
 </anti_patterns>
 
 <handoff>

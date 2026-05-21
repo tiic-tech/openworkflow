@@ -1,13 +1,18 @@
 # Analysis Protocol
 
-Use this protocol to produce `CHANGE_ANALYSIS.yaml` and `CHANGE_ANALYSIS.md`.
+Use this protocol to produce cross-queue `CHANGE_ANALYSIS.yaml` and
+`CHANGE_ANALYSIS.md`.
+
+`analyze-changes` is for cross-queue priority arbitration. If the current work
+state has one active `CANDIDATE_CHANGES.yaml`, do not create a
+`CHANGE_ANALYSIS.yaml` just to choose the next candidate. Hand off to
+`select-change`; SC owns prioritization inside one queue.
 
 ## Inputs
 
 Accepted inputs:
 
-- explicit `CANDIDATE_CHANGES.yaml` paths
-- a `changes/<plan_id>/` folder
+- explicit `CANDIDATE_CHANGES.yaml` paths, plural
 - a request to analyze all obvious queues under `changes/`
 - Issue references only when they are already linked from candidate queues or
   supplied by the user
@@ -16,6 +21,10 @@ Do not load generated runtime surfaces or unrelated source code unless a queue's
 candidate explicitly needs that context for readiness analysis.
 
 ## Candidate Evaluation
+
+First confirm that at least two active queues are being compared, or that the
+user explicitly requests cross-queue arbitration. If not, return a handoff to
+`select-change` instead of writing analysis artifacts.
 
 For each candidate considered, capture:
 

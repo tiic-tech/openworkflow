@@ -1,15 +1,19 @@
 ---
 name: analyze-changes
-description: Analyze one or more OpenWorkflow CANDIDATE_CHANGES queues and recommend the next plan id and candidate id without selecting or implementing it. Use when multiple candidate queues exist, when cross-queue priority is unclear, when branch or dirty-tree constraints may affect what to do next, or before select-change should consume a cross-queue recommendation.
+description: Analyze multiple OpenWorkflow CANDIDATE_CHANGES queues and recommend the next plan id and candidate id without selecting or implementing it. Use when multiple candidate queues exist, when cross-queue priority is unclear, or before select-change should consume a cross-queue recommendation.
 ---
 
 # Analyze Changes
 
 ## Purpose
 
-Compare candidate queues and produce a read-only priority analysis. This skill
+Compare multiple candidate queues and produce a read-only priority analysis. This skill
 does not decompose new queues, does not select a candidate, and does not
 implement code.
+
+Do not use this skill as a mandatory pre-step for a single active queue. When
+the current work state has one owning `CANDIDATE_CHANGES.yaml`, use
+`select-change` directly; SC owns single-queue prioritization and selection.
 
 ## Read First
 
@@ -19,29 +23,32 @@ Read only what is needed:
 - `references/git-version-control-governance.md`
 - `references/issue-governance.md` when Issues affect priority
 - `skills/analyze-changes/references/analysis-protocol.md`
-- The target `CANDIDATE_CHANGES.yaml` files
+- The target `CANDIDATE_CHANGES.yaml` files, plural
 
 ## Workflow
 
 1. Run `git status --short --branch` and record the current branch and dirty
    tree state.
-2. Discover candidate queues only from user-provided paths or obvious
+2. Confirm the request is a cross-queue decision. If there is only one active
+   queue and no explicit cross-queue comparison request, stop and hand off to
+   `select-change` without writing `CHANGE_ANALYSIS.yaml`.
+3. Discover candidate queues only from user-provided paths or obvious
    `changes/*/CANDIDATE_CHANGES.yaml` files when the user asks for a global
    analysis.
-3. Read YAML as the source of truth. Use Markdown views only as readable aids.
-4. For each queue, record branch boundary, next recommended candidate, ready
+4. Read YAML as the source of truth. Use Markdown views only as readable aids.
+5. For each queue, record branch boundary, next recommended candidate, ready
    candidates, blocked candidates, high-risk candidates, and dependency gaps.
-5. Score candidates with the queue policy first, then cross-queue signals:
+6. Score candidates with the queue policy first, then cross-queue signals:
    readiness, dependency unlock value, risk, branch fit, dirty-tree fit,
    Issue linkage, validation realism, and user recency.
-6. If the best next candidate is `risk: high`, stop with a high-risk analysis
+7. If the best next candidate is `risk: high`, stop with a high-risk analysis
    recommendation and point to the needed `HIGH_RISK_DECISION_REPORT.md`.
-7. Write `CHANGE_ANALYSIS.yaml` first, then `CHANGE_ANALYSIS.md` as a readable
+8. Write `CHANGE_ANALYSIS.yaml` first, then `CHANGE_ANALYSIS.md` as a readable
    view.
-8. Recommend exactly one `target_plan_id` and `target_candidate_id` when the
+9. Recommend exactly one `target_plan_id` and `target_candidate_id` when the
    evidence supports it. Otherwise recommend the queue maintenance needed before
    selection.
-9. Hand off to `select-change`; do not create `SELECTED_CHANGE.yaml`,
+10. Hand off to `select-change`; do not create `SELECTED_CHANGE.yaml`,
    `ATOM_TASKS.yaml`, or `IMPLEMENTATION_BRIEF.md`.
 
 ## Output Location
@@ -52,14 +59,6 @@ Default to an analysis folder when comparing multiple queues:
 changes/<analysis-id>/
   CHANGE_ANALYSIS.yaml
   CHANGE_ANALYSIS.md
-```
-
-When analyzing one owning feat queue only, the analysis may live under that
-queue folder if it is clearly scoped to that queue:
-
-```text
-changes/<plan_id>/CHANGE_ANALYSIS.yaml
-changes/<plan_id>/CHANGE_ANALYSIS.md
 ```
 
 Use an `analysis-id` that describes the decision episode, not a selected
@@ -85,6 +84,8 @@ candidate.
   evidence link when the user requests that maintenance.
 - Do not select candidates.
 - Do not implement candidates.
+- Do not produce a same-queue priority analysis when `select-change` can rank
+  candidates inside the only active queue.
 - Do not run destructive git operations.
 - Do not run gh mutation operations.
 - Do not treat local Issue snapshots as authoritative when GitHub Issues are

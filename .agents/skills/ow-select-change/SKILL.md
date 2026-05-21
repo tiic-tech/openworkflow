@@ -43,7 +43,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <optional_context>
 - changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.md
-- changes/&lt;analysis_id&gt;/CHANGE_ANALYSIS.yaml
+- changes/&lt;analysis_id&gt;/CHANGE_ANALYSIS.yaml only for cross-queue recommendations
 - changes/&lt;plan_id&gt;/SUMMARY.yaml
 - changes/&lt;plan_id&gt;/HIGH_RISK_DECISION_REPORT.md
 </optional_context>
@@ -80,9 +80,11 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run git status --short --branch and compare current branch with queue_policy.branch_boundary.
 - Check dirty-tree state and stop if unrelated work would contaminate the selected change.
+- For a single active queue, rank candidates directly without requiring analyze-changes.
 - Confirm candidate dependencies, readiness, risk, owned paths, validation, and acceptance.
 </before>
 <during>
+- Use next_recommended_candidate_id, dependency satisfaction, unlock value, selection_policy, risk, owned paths, and validation realism to choose inside one queue.
 - Select exactly one candidate inside the owning queue folder.
 - Re-check high-risk approval before writing selection artifacts for risk: high candidates.
 - Keep atom tasks small enough for one focused implementation pass.

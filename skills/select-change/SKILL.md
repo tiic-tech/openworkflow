@@ -11,9 +11,13 @@ Choose one candidate change and turn it into implementation-ready planning
 artifacts. This skill prepares the next change; it does not execute the
 implementation.
 
-By default, operate on one active queue. Use cross-queue arbitration only when
-the user provides multiple queues, points to a `CHANGE_ANALYSIS.yaml`, or asks
-which queue and candidate should go next.
+By default, operate on one active queue and rank candidates inside that queue.
+Use cross-queue arbitration only when the user provides multiple queues, points
+to a cross-queue `CHANGE_ANALYSIS.yaml`, or asks which queue and candidate
+should go next.
+
+SC is not only a "mark selected" command. In a single queue it owns
+prioritization, readiness review, risk gating, selection, and atomization.
 
 ## Feat Boundary
 
@@ -54,7 +58,7 @@ Read these only as needed:
 - `skills/select-change/references/selection-protocol.md`
 - The target `CANDIDATE_CHANGES.yaml`
 - The matching `CANDIDATE_CHANGES.md` only as a readable aid
-- `CHANGE_ANALYSIS.yaml` when consuming a cross-queue recommendation
+- `CHANGE_ANALYSIS.yaml` only when consuming a cross-queue recommendation
 
 ## Workflow
 
@@ -66,15 +70,18 @@ Read these only as needed:
    selected change or blur the one-change-one-commit boundary.
 5. If the user names a candidate id, perform targeted readiness review for
    that id before considering the rest of the queue.
-6. If the user provides multiple queues or a `CHANGE_ANALYSIS.yaml`, run the
-   cross-queue arbitration path before choosing a target queue.
+6. If the user provides multiple queues or a cross-queue `CHANGE_ANALYSIS.yaml`,
+   run the cross-queue arbitration path before choosing a target queue.
 7. Filter candidates to `ready` first. If none are ready, inspect `candidate`
    entries and report the blockers instead of forcing a selection.
-8. Prefer `next_recommended_candidate_id` when it points to a ready candidate
-   and the dependencies still hold.
-9. Otherwise choose the candidate that best matches the queue's
-   `selection_policy`, unlocks downstream work, has focused owned paths, and
-   has realistic validation.
+8. Rank the current queue directly:
+   - prefer `next_recommended_candidate_id` when it points to a ready candidate
+     and dependencies still hold
+   - otherwise prefer dependency-satisfied candidates that best match
+     `selection_policy`
+   - then prefer unlock value, focused owned paths, realistic validation,
+     lower risk, and user recency
+9. Choose exactly one candidate from the owning queue.
 10. If the candidate is `risk: high`, stop before selection unless the user has
    explicitly approved a concrete decision option from a high-risk decision
    report.
@@ -93,9 +100,13 @@ Read these only as needed:
 
 ## Cross-Queue Arbitration
 
-Cross-queue arbitration is explicit. Do not discover every queue in the repo
-unless the user asks for a global comparison or provides an existing
-`CHANGE_ANALYSIS.yaml`.
+Cross-queue arbitration is explicit and exceptional. Do not discover every
+queue in the repo unless the user asks for a global comparison or provides an
+existing cross-queue `CHANGE_ANALYSIS.yaml`.
+
+Do not invoke `analyze-changes` for a normal single-queue selection. The
+single-queue path above is the default and should be sufficient for
+prioritizing candidates inside one `CANDIDATE_CHANGES.yaml`.
 
 When arbitration is active:
 

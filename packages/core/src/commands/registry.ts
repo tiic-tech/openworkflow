@@ -133,7 +133,7 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
   command(
     "analyze-changes",
     [],
-    "Analyze one or more candidate change queues and recommend the next candidate without selecting it.",
+    "Analyze multiple candidate change queues and recommend the next queue and candidate without selecting it.",
     "planning",
     ["changes/<analysis_id>/CHANGE_ANALYSIS.yaml", "changes/<analysis_id>/CHANGE_ANALYSIS.md"],
     analyzeChangesProtocol(),
@@ -270,8 +270,6 @@ function analyzeChangesProtocol(): CommandProtocol {
     allowedOutputs: [
       "changes/<analysis_id>/CHANGE_ANALYSIS.yaml",
       "changes/<analysis_id>/CHANGE_ANALYSIS.md",
-      "changes/<plan_id>/CHANGE_ANALYSIS.yaml for single-queue analysis",
-      "changes/<plan_id>/CHANGE_ANALYSIS.md for single-queue analysis",
     ],
     conditionalOutputs: [
       "high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md",
@@ -288,6 +286,7 @@ function analyzeChangesProtocol(): CommandProtocol {
     auditCheckpoints: {
       before: [
         "Run git status --short --branch and record branch and dirty-tree state.",
+        "Confirm this is a cross-queue decision; when only one queue is active, hand off to select-change.",
         "Discover only user-provided queues, or obvious changes/*/CANDIDATE_CHANGES.yaml files when global analysis is requested.",
         "Read YAML queues as source truth and Markdown views only as aids.",
       ],
@@ -307,6 +306,7 @@ function analyzeChangesProtocol(): CommandProtocol {
       "Do not implement candidates from analyze-changes.",
       "Do not treat CHANGE_ANALYSIS.yaml as approval for high-risk implementation.",
       "Do not discover every queue unless the user requests global comparison.",
+      "Do not use analyze-changes as a mandatory pre-step for single-queue selection.",
     ],
     handoffCommands: ["/ow:select-change", "/ow:decompose-to-changes"],
   };
@@ -323,7 +323,7 @@ function selectChangeProtocol(): CommandProtocol {
     ],
     optionalContext: [
       "changes/<plan_id>/CANDIDATE_CHANGES.md",
-      "changes/<analysis_id>/CHANGE_ANALYSIS.yaml",
+      "changes/<analysis_id>/CHANGE_ANALYSIS.yaml only for cross-queue recommendations",
       "changes/<plan_id>/SUMMARY.yaml",
       "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
     ],
@@ -349,9 +349,11 @@ function selectChangeProtocol(): CommandProtocol {
       before: [
         "Run git status --short --branch and compare current branch with queue_policy.branch_boundary.",
         "Check dirty-tree state and stop if unrelated work would contaminate the selected change.",
+        "For a single active queue, rank candidates directly without requiring analyze-changes.",
         "Confirm candidate dependencies, readiness, risk, owned paths, validation, and acceptance.",
       ],
       during: [
+        "Use next_recommended_candidate_id, dependency satisfaction, unlock value, selection_policy, risk, owned paths, and validation realism to choose inside one queue.",
         "Select exactly one candidate inside the owning queue folder.",
         "Re-check high-risk approval before writing selection artifacts for risk: high candidates.",
         "Keep atom tasks small enough for one focused implementation pass.",

@@ -268,8 +268,6 @@ commands:
     allowed_outputs:
       - changes/<analysis_id>/CHANGE_ANALYSIS.yaml
       - changes/<analysis_id>/CHANGE_ANALYSIS.md
-      - changes/<plan_id>/CHANGE_ANALYSIS.yaml for single-queue analysis
-      - changes/<plan_id>/CHANGE_ANALYSIS.md for single-queue analysis
     conditional_outputs:
       - high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md
       - queue maintenance recommendation when no candidate is safe to select

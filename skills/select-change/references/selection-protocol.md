@@ -28,6 +28,11 @@ read-only comparison or an actual selection. Read-only comparison belongs to
 `analyze-changes`. Selection may consume a prior `CHANGE_ANALYSIS.yaml`, but it
 must still write artifacts inside one target queue.
 
+If there is only one active queue, do not require `analyze-changes`.
+`select-change` owns ranking within that queue: it should inspect candidate
+status, dependencies, risk, unlock value, selection policy, owned paths, and
+validation realism before selecting one candidate.
+
 ## Feat And Commit Cadence
 
 The source `CANDIDATE_CHANGES.yaml` is the feature-level queue. Selection does
@@ -145,14 +150,18 @@ the recommended operation to be applied.
 2. Stop on unrelated dirty-tree work that would blur the commit boundary.
 3. Exclude `done`, `blocked`, `deferred`, and `superseded` candidates.
 4. Prefer `ready` candidates over plain `candidate` entries.
-5. Honor a current `CHANGE_ANALYSIS.yaml` recommendation when it points to a
-   ready, dependency-satisfied, non-high-risk candidate in the target queue.
-6. Honor `next_recommended_candidate_id` when it is ready and coherent.
+5. When cross-queue arbitration is active, honor a current
+   `CHANGE_ANALYSIS.yaml` recommendation only after verifying it against the
+   target queue.
+6. In the normal single-queue path, honor `next_recommended_candidate_id` when
+   it is ready and coherent.
 7. Prefer candidates that unlock other candidates.
 8. Prefer focused owned paths over cross-module changes.
 9. Prefer clear validation over unclear or manual-only acceptance.
 10. Prefer lower-risk dogfood or source behavior before runtime exposure.
-11. Stop on `risk: high` unless explicit user approval names a concrete decision
+11. Prefer the user's latest explicit sequencing when it does not violate risk
+   or dependency gates.
+12. Stop on `risk: high` unless explicit user approval names a concrete decision
    option.
 
 When two candidates are close, pick the one that produces better evidence for
