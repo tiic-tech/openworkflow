@@ -113,3 +113,4 @@ validation:
     - G013 completed selected-change local commit automation and made G014 ready.
     - G013 primary implementation commit is fb003d7346ce027e08a9f149718caadf82755ad6; commit evidence is recorded in a follow-up evidence commit.
     - G014 completed local PR-ready summary generation and made G015 the next high-risk stop.
+    - G014 primary implementation commit is c8d48b1dc387f40d1aae27193155e5fc3847f912; commit evidence is recorded in a follow-up evidence commit.

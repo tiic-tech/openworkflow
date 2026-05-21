@@ -368,8 +368,10 @@ Completion evidence:
 - `packages/core/src/git/prReadySummary.ts`
 - `packages/cli/src/dev/verifyRuntimeSurface.ts`
 - `changes/M71-git-version-control-governance/PR_READY_SUMMARY.md`
+- `changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/LOCAL_COMMIT_EVIDENCE.yaml`
 - `changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml`
+- `commit: c8d48b1dc387f40d1aae27193155e5fc3847f912`
 
 ## G015 - Add Ow:Git-Automation Command Shell With Remote Approval Gates
 
