@@ -351,9 +351,11 @@ function qualityForArtifact(
   }
   const sourceStatus = stringValue(source.status);
   const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(valueAtPath(source, field)));
+  const readinessWarnings = readinessWarningsForArtifact(artifactPath, artifactType, source);
   const qualityWarnings = [
     ...(sourceStatus === "draft" ? [`source artifact is draft: ${artifactPath}`] : []),
     ...(emptyKeyFields.length > 0 ? [`source artifact has empty handoff fields in ${artifactPath}: ${emptyKeyFields.join(", ")}`] : []),
+    ...readinessWarnings,
   ];
   return {
     source_status: sourceStatus,
@@ -375,6 +377,20 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
       "vision_delta.ai_native_role",
       "vision_delta.success_signals",
       "vision_delta.failure_signals",
+      "strategic_core.target_user",
+      "strategic_core.current_alternative",
+      "strategic_core.desired_behavior_change",
+      "strategic_core.core_mechanism",
+      "strategic_core.core_differentiator",
+      "strategic_core.strongest_success_signal",
+      "product_system_seed.product_thesis",
+      "product_system_seed.primary_loop",
+      "product_system_seed.trust_boundary",
+      "product_system_seed.anti_goals",
+      "proto_readiness.prototype_direction_seeds",
+      "proto_readiness.prompt_constraints",
+      "proto_readiness.validation_target",
+      "proto_readiness.status",
     ];
   }
   if (artifactType === "validation_target") {
@@ -397,6 +413,17 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
   }
   if (artifactType === "team_runtime") {
     return ["active_work_item", "work_queue", "verification", "handoff"];
+  }
+  return [];
+}
+
+function readinessWarningsForArtifact(artifactPath: string, artifactType: string, source: Record<string, unknown>): string[] {
+  if (artifactType !== "vision_session") {
+    return [];
+  }
+  const protoReadinessStatus = stringValue(valueAtPath(source, "proto_readiness.status"));
+  if (protoReadinessStatus !== "ready") {
+    return [`vision proto_readiness.status is not ready in ${artifactPath}: ${protoReadinessStatus || "missing"}`];
   }
   return [];
 }

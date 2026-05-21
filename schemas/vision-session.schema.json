@@ -54,6 +54,157 @@
       "type": "object",
       "additionalProperties": true
     },
+    "strategic_core": {
+      "type": "object",
+      "properties": {
+        "target_user": {
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "current_alternative": {
+          "type": "string"
+        },
+        "pain": {
+          "type": "string"
+        },
+        "desired_behavior_change": {
+          "type": "string"
+        },
+        "core_mechanism": {
+          "type": "string"
+        },
+        "core_differentiator": {
+          "type": "string"
+        },
+        "strongest_success_signal": {
+          "type": "string"
+        },
+        "failure_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "product_system_seed": {
+      "type": "object",
+      "properties": {
+        "product_thesis": {
+          "type": "string"
+        },
+        "primary_loop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "interaction_model": {
+          "type": "string"
+        },
+        "feature_system": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "emotional_value": {
+          "type": "string"
+        },
+        "functional_value": {
+          "type": "string"
+        },
+        "trust_boundary": {
+          "type": "string"
+        },
+        "privacy_boundary": {
+          "type": "string"
+        },
+        "anti_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "future_opportunities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "proto_readiness": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "missing",
+            "thin",
+            "ready",
+            "blocked"
+          ]
+        },
+        "missing_for_proto": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prototype_direction_seeds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prompt_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation_target": {
+          "type": "string"
+        },
+        "downstream_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "missing",
+              "thin",
+              "solid",
+              "conflicted"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "follow_up_question": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
     "handoff": {
       "type": "object",
       "required": [

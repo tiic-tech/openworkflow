@@ -28,7 +28,9 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidate: `C001`
 
-Next recommended candidate: `C002`
+Selected candidate: `C002`
+
+Next recommended candidate: none until `C002` is completed or superseded.
 
 ## Selection Policy
 
@@ -59,13 +61,15 @@ Completion evidence:
 
 ### C002 - Extend vision artifacts with proto-readiness and coverage matrix
 
-Status: `ready`
+Status: `selected`
 
 Risk: `medium`
 
 Adds strategic core, product system seed, proto-readiness, and coverage
 structures so a downstream Agent can tell whether `/ow:proto` can generate
 strong prototype prompt packs without inventing strategy.
+
+Selection: `C002-vision-proto-readiness-artifacts`
 
 ### C003 - Upgrade /ow:vision skill protocol for product partner interrogation
 

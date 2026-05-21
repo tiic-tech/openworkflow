@@ -72,6 +72,69 @@ artifacts:
           []
         failure_signals:
           []
+      strategic_core:
+        target_user: ""
+        context: ""
+        current_alternative: ""
+        pain: ""
+        desired_behavior_change: ""
+        core_mechanism: ""
+        core_differentiator: ""
+        strongest_success_signal: ""
+        failure_signals:
+          []
+      product_system_seed:
+        product_thesis: ""
+        primary_loop:
+          []
+        interaction_model: ""
+        feature_system:
+          []
+        emotional_value: ""
+        functional_value: ""
+        trust_boundary: ""
+        privacy_boundary: ""
+        anti_goals:
+          []
+        future_opportunities:
+          []
+      proto_readiness:
+        status: missing
+        missing_for_proto:
+          []
+        prototype_direction_seeds:
+          []
+        prompt_constraints:
+          []
+        validation_target: ""
+        downstream_notes:
+          []
+      coverage:
+        target_user:
+          status: missing
+          evidence:
+            []
+          follow_up_question: ""
+        differentiator:
+          status: missing
+          evidence:
+            []
+          follow_up_question: ""
+        success_signal:
+          status: missing
+          evidence:
+            []
+          follow_up_question: ""
+        trust_boundary:
+          status: missing
+          evidence:
+            []
+          follow_up_question: ""
+        proto_readiness:
+          status: missing
+          evidence:
+            []
+          follow_up_question: ""
       handoff:
         ready: false
         next_command: null

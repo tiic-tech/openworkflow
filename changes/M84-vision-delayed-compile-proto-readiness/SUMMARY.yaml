@@ -44,9 +44,9 @@ candidate_count: 4
 active_candidate_count: 3
 completed_candidate_id: C001
 completed_change_id: C001-build-vision-delayed-compile-contract
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C002
+selected_candidate_id: C002
+selected_change_id: C002-vision-proto-readiness-artifacts
+next_recommended_candidate_id: null
 key_dependencies:
   - M74/C001 improved /ow:vision as an Agent-first artifact producer, but did not solve eager persistence or deep interview quality.
   - The attached prompt-generation reference skills show that VISION.md must provide enough strategy for /ow:proto to generate high-quality prompts.
@@ -95,4 +95,5 @@ validation:
     - OP003 selected C001 directly with SC because M84 is the single active queue.
     - OP004 completed C001 with local commit evidence.
     - OP005 marked C002 ready after C001 completed the source skill foundation.
-    - No high-risk candidate is next recommended; C002 is medium risk and can proceed through SC under the user's standing rule.
+    - OP006 selected C002 directly with SC because M84 is the single active queue.
+    - No high-risk candidate is currently selected; C002 is medium risk and remains inside vision artifact contract boundaries.

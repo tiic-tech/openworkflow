@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-vision-proto-readiness-artifacts
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-vision-proto-readiness-artifacts
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C002
+title: Extend vision artifacts with proto-readiness and coverage matrix
+status: selected
+selection_reason: >
+  C002 is the next dependency after C001. It turns the delayed-compile concept
+  into artifact structure so /ow:vision can distinguish interview drafts from
+  proto-ready compiled vision and downstream /ow:proto can consume explicit
+  strategic inputs.
+scope:
+  includes:
+    - strategic core fields
+    - product system seed fields
+    - proto_readiness status and missing_for_proto
+    - coverage dimension status with follow-up questions
+    - summary quality checks for nested readiness fields
+  excludes:
+    - changing /ow:proto prompt generation
+    - changing /ow:validation artifact shape
+    - broad discovery-loop read model
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - schemas/vision-session.schema.json
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+forbidden_paths:
+  - skills/build-validation/**
+  - skills/build-prototype/**
+  - skills/tune-prototype/**
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+  - .openworkflow/specs/**
+  - .openworkflow/changes/**
+  - .openworkflow/runtime/**
+acceptance:
+  - Vision templates expose strategic_core, product_system_seed, proto_readiness, and coverage structures.
+  - Summary quality reports thin or missing proto-readiness fields.
+  - A low-context Agent can tell what is missing before /ow:proto can generate strong prompts.
+  - Generated artifact contracts refresh from source through sync.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one coherent local commit unless schema or summary quality
+  updates reveal a need for a separate compatibility migration.

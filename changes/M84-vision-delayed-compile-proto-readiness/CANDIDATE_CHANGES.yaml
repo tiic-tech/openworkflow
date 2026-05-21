@@ -84,7 +84,7 @@ scope_control:
         through benchmark prototype selection after component commands are
         upgraded.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -147,7 +147,7 @@ changes:
         - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
         - skills/build-vision/SKILL.md
   - id: C002
-    status: ready
+    status: selected
     title: Extend vision artifacts with proto-readiness and coverage matrix
     purpose: >
       Add structured vision fields that let /ow:proto evaluate whether it can
@@ -190,6 +190,13 @@ changes:
       - Summary quality reports thin or missing proto-readiness fields.
       - A low-context Agent can tell what is missing before /ow:proto can generate strong prompts.
       - Generated artifact contracts refresh from source through sync.
+    selection:
+      selected_change_id: C002-vision-proto-readiness-artifacts
+      reason: >
+        Single-queue SC selected C002 because C001 established the build-vision
+        source contract and C002 is the next required step before the generated
+        /ow:vision protocol can use proto-readiness as a compile gate.
+      selected_at: 2026-05-22
   - id: C003
     status: candidate
     title: Upgrade /ow:vision skill protocol for product partner interrogation
@@ -351,3 +358,18 @@ operations:
     after_status: ready
     evidence:
       - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 directly with SC because C001 is complete and C002 is the next
+      ready candidate in the single active M84 queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/IMPLEMENTATION_BRIEF.md
