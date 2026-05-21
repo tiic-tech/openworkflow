@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: change:M61-proto-validation-consumption-policy
+contract_type: change
+title: M61 Proto validation consumption policy
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - references/proto-redesign-artifact-contracts.md
+depends_on:
+  - change:M60-proto-redesign-artifact-contracts
+produces:
+  - selected_change:M61-proto-validation-consumption-policy
+  - atom_tasks:M61-proto-validation-consumption-policy
+  - planning:M61-proto-validation-consumption-policy
+summary: >
+  Clarify how image-first `/ow:proto` consumes validation artifacts when
+  present, proceeds from vision-only input when absent, and leaves automatic
+  validation as a separate future change.
+problem: >
+  The proto redesign needs an explicit validation policy before source behavior
+  changes. Without it, future work could accidentally make validation mandatory,
+  remove `ow:validation`, or silently auto-generate validation without a clear
+  contract.
+goals:
+  - Define VISION-only proto fallback behavior.
+  - Define proto behavior when VALIDATION and PROTOTYPE_BRIEF artifacts exist.
+  - Record that automatic validation is a future selected change, not implicit behavior.
+  - Keep runtime command surfaces unchanged.
+non_goals:
+  - Do not remove `ow:validation`.
+  - Do not implement automatic validation triggers.
+  - Do not implement source proto prompt generation changes.
+  - Do not edit generated `.agents` or `.openworkflow` surfaces.
+affected_paths:
+  - references/proto-redesign-artifact-contracts.md
+  - changes/M61-proto-validation-consumption-policy/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+acceptance:
+  - Proto behavior is defined for VISION-only input.
+  - Proto behavior is defined when validation artifacts exist.
+  - Automatic validation remains a separate follow-up, not an implicit change.
+  - "`ow:validation` command visibility is unchanged."
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

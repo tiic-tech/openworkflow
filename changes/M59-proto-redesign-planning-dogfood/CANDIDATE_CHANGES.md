@@ -15,7 +15,7 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Next recommended candidate: `P004`
+Next recommended candidate: `P002`
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
@@ -46,7 +46,7 @@ Completion evidence:
 
 ## P002 - Implement Vision-To-Strategic Prototype Source Behavior
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: update source prototype guidance so `/ow:proto` can consume a vision
 and produce multiple strategic high-fidelity prototype prompt directions.
@@ -64,12 +64,19 @@ Depends on: `P001`, `P002`
 
 ## P004 - Clarify Validation Consumption For Proto
 
-Status: `ready`
+Status: `done`
 
 Purpose: decide and encode how `/ow:proto` should behave when validation
 artifacts are present, missing, or internally derived after vision creation.
 
 Depends on: `P001`
+
+Completion evidence:
+
+- `references/proto-redesign-artifact-contracts.md`
+- `changes/M61-proto-validation-consumption-policy/VALIDATION_CONSUMPTION_POLICY.yaml`
+- `changes/M61-proto-validation-consumption-policy/CHANGE.yaml`
+- `npm run validate`
 
 ## P005 - Dogfood Image-First Proto Flow On OpenWorkflow
 

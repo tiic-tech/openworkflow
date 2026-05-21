@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:M61-proto-validation-consumption-policy
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M61-proto-validation-consumption-policy
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P004
+title: Clarify validation consumption for proto
+status: completed
+selection_reason:
+  - P004 is the only ready candidate after P001 completed.
+  - It unlocks P002 source proto behavior by defining VISION-only and validation-present inputs.
+  - It avoids making validation removal or automatic validation an implicit side effect.
+rejected_alternatives:
+  - id: P002
+    reason: Depends on P004 validation consumption policy.
+  - id: P003
+    reason: Depends on P002 first-pass source behavior.
+  - id: P006
+    reason: Runtime exposure should wait for source behavior and dogfood evidence.
+scope:
+  includes:
+    - validation consumption decision record
+    - VISION-only fallback behavior
+    - rules for consuming VALIDATION and PROTOTYPE_BRIEF when present
+    - follow-up notes for possible automatic validation
+  excludes:
+    - removing ow:validation command surfaces
+    - implementing automatic validation triggers
+    - source proto prompt generation changes
+owned_paths:
+  - references/proto-redesign-artifact-contracts.md
+  - changes/M61-proto-validation-consumption-policy/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - skills/build-prototype/
+acceptance:
+  - Proto behavior is defined for VISION-only input.
+  - Proto behavior is defined when validation artifacts exist.
+  - Automatic validation remains a separate follow-up, not an implicit change.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -44,6 +44,59 @@ Automatic validation after vision creation is a separate future change. This
 contract only defines how proto consumes validation when it exists and how proto
 falls back when it does not.
 
+## Validation Consumption Policy
+
+`/ow:proto` treats validation as decision context, not as a mandatory gate.
+The active policy is `optional_explicit_validation`:
+
+- If `VISION.md` or a vision contract exists and validation artifacts are
+  absent, proto may proceed in `vision_only` mode.
+- If validation artifacts exist, proto must consume them and preserve their
+  boundaries.
+- If the user explicitly asks to skip validation, proto may proceed in
+  `vision_only` mode and record that validation was skipped.
+- If the vision is too vague to identify a product uncertainty, proto should
+  stop and ask for vision clarification instead of manufacturing validation.
+- Automatic validation derivation after vision creation is allowed only as a
+  future feature behind a separate selected change.
+
+### Input Priority
+
+When inputs disagree, apply this priority:
+
+1. Latest explicit user instruction.
+2. Accepted validation decision or prototype brief.
+3. Vision contract and non-goals.
+4. Current session constraints.
+5. Conservative product inference.
+
+Validation artifacts should narrow prototype scope. They should not silently add
+features that the vision excludes.
+
+### Required Policy Fields
+
+Every proto prompt pack should record:
+
+- `validation_input.mode`: `vision_only`, `validation_present`, or
+  `internally_derived`
+- `validation_input.refs`: source validation artifact refs, if any
+- `validation_input.notes`: concise explanation of missing, skipped, or
+  consumed validation context
+
+Use `internally_derived` only after a future feature explicitly implements that
+behavior. Until then, the value is reserved for compatibility.
+
+### Behavior Matrix
+
+| Situation | Proto behavior | Required note |
+|---|---|---|
+| Vision exists, validation missing | Proceed from vision | `validation_input.mode: vision_only` |
+| Vision exists, user skips validation | Proceed from vision | Note explicit skip |
+| Validation and prototype brief exist | Consume validation | `validation_input.mode: validation_present` |
+| Validation conflicts with vision | Stop for decision | Name the conflict |
+| Vision too vague | Stop for clarification | Name missing vision facts |
+| User asks to auto-validate | Create follow-up change | Do not silently auto-trigger |
+
 ## Strategic Proto Prompt Pack
 
 Purpose: convert a product vision into multiple high-fidelity prototype prompt
