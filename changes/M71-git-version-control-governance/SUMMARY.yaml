@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: summary:M71-git-version-control-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M71-git-version-control-governance
+title: Summary for git version control governance planning
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    The user asked to turn the commit, feat, branch, and PR governance
+    discussion into a decompose-to-changes candidate queue. The governing model
+    is atom task as implementation checklist, selected change as commit,
+    CANDIDATE_CHANGES as feat, feat as branch, branch as PR, and PR as
+    merge/release boundary.
+outputs:
+  candidate_changes_yaml: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+  summary: changes/M71-git-version-control-governance/SUMMARY.yaml
+branch_boundary: codex/m71-git-version-governance
+candidate_count: 7
+next_recommended_candidate_id: G001
+key_dependencies:
+  - G001 unlocks the source skill and validation changes.
+  - G002 and G003 must complete before G004 can validate the new behavior.
+  - G005 should complete before any PR-ready handoff fixture work.
+  - G007 is high risk and must stop for a decision report before implementation.
+risks:
+  - id: R001
+    level: medium
+    description: Branch governance could overconstrain legitimate queue maintenance if exceptions are not documented.
+    mitigation: Define planning-only and explicit-user-override exceptions in the contracts and skills.
+  - id: R002
+    level: high
+    description: Automated git mutation could create unwanted commits, pushes, or PRs.
+    mitigation: Keep automation as a high-risk decision packet until the user explicitly approves a concrete option.
+unresolved_questions:
+  - Should OW require a new branch for every new CANDIDATE_CHANGES immediately, or allow a documented exception when retrofitting legacy queues?
+  - Should commit hashes become mandatory completion evidence for all future done candidates, or only for queues that opt into branch governance?
+validation:
+  commands_run:
+    - npm run validate
+    - git diff --check
+  notes:
+    - Initial DTC output created without selecting or implementing any candidate.
+    - Repository validation passed after queue creation.

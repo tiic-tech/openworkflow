@@ -1,0 +1,329 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M71-git-version-control-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M71-git-version-control-governance
+title: Candidate changes for OpenWorkflow git version control governance
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - "user_request: use decompose-to-changes to create a candidate queue for commit, feat, branch, and PR governance"
+    - "discussion: atom task -> implementation checklist; selected change -> commit; CANDIDATE_CHANGES -> feat; feat -> branch; branch -> PR; PR -> merge/release boundary"
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/SKILL.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - skills/select-change/SKILL.md
+    - skills/select-change/references/selection-protocol.md
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable G-prefixed ids are assigned once and referenced by select-change, completion records, commits, and PR summaries.
+  feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat for git version control governance.
+  branch_boundary: The owning branch for this feat is codex/m71-git-version-governance.
+  selected_artifact_location: changes/M71-git-version-control-governance/<candidate-id>-<slug>/
+  commit_policy: Each selected candidate should complete with one coherent git commit whose message references the plan id and candidate id.
+  pr_policy: A PR should represent the feat branch, summarize all completed and deferred candidates, and link validation evidence.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - artifact contracts before source skill behavior changes
+    - branch and dirty-tree guards before PR handoff automation
+    - validation before relying on git governance in dogfood mode
+    - design-only or report-only treatment for high-risk git automation
+  avoid:
+    - selecting candidates while a previous selected change has uncommitted implementation work
+    - mixing multiple feat queues on one branch without an explicit exception
+    - adding destructive git operations to skills
+    - creating PR or remote-push automation before branch and commit invariants are validated
+next_recommended_candidate_id: G001
+changes:
+  - id: G001
+    status: ready
+    title: Formalize git governance hierarchy in planning contracts
+    purpose: >
+      Define the canonical relationship between atom tasks, selected changes,
+      commits, candidate queues, feats, branches, PRs, and merge boundaries so
+      later skill behavior has one shared contract.
+    scope:
+      includes:
+        - version control hierarchy and naming conventions
+        - commit message expectations for selected candidates
+        - branch ownership expectations for each candidate queue
+        - PR scope and summary expectations for completed feat queues
+        - explicit non-destructive git operation policy
+      excludes:
+        - changing decompose-to-changes behavior
+        - changing select-change behavior
+        - adding runtime git automation
+        - creating PRs
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/
+    dependencies: []
+    unlocks:
+      - G002
+      - G003
+      - G004
+      - G005
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A durable reference defines selected change as commit-sized work.
+      - The planning contracts define CANDIDATE_CHANGES as a feat boundary.
+      - The contracts state that a feat should have an owning branch.
+      - The contracts state that PRs summarize feat branches, not individual atom tasks.
+      - The contracts prohibit destructive git operations unless the user explicitly requests them.
+  - id: G002
+    status: candidate
+    title: Add branch boundary fields to decompose-to-changes outputs
+    purpose: >
+      Teach decompose-to-changes to record branch ownership when it creates a
+      new feat queue, making the branch boundary explicit in YAML, Markdown,
+      and summary artifacts.
+    scope:
+      includes:
+        - branch naming guidance for new candidate queues
+        - queue_policy.branch_boundary guidance
+        - summary output for the owning branch
+        - dirty-tree note behavior before creating a new queue
+        - non-automatic branch creation guidance unless already performed by the agent
+      excludes:
+        - select-change branch enforcement
+        - automatic git checkout or branch creation inside skill instructions
+        - PR creation behavior
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - decompose-to-changes tells agents to capture the feat branch in queue policy.
+      - decompose-to-changes distinguishes new feat queue creation from queue maintenance on an existing branch.
+      - decompose-to-changes records dirty-tree observations without widening into implementation.
+      - Markdown and SUMMARY expectations include the branch boundary.
+  - id: G003
+    status: candidate
+    title: Add branch and dirty-tree guards to select-change
+    purpose: >
+      Teach select-change to verify the current branch and working tree before
+      selecting a candidate so one selected change does not blur into another
+      uncommitted change or the wrong feat branch.
+    scope:
+      includes:
+        - current branch check against queue_policy.branch_boundary
+        - dirty-tree guard for uncommitted previous selected change work
+        - explicit allowed exceptions for planning-only queue maintenance
+        - completion expectation that the selected candidate lands as one commit
+      excludes:
+        - automatic commit creation
+        - branch switching
+        - PR creation
+        - validator implementation
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - select-change checks whether the current branch matches the queue branch boundary.
+      - select-change stops or reports when an unrelated dirty tree would contaminate a new selected change.
+      - select-change does not perform git mutations itself.
+      - selection artifacts describe the expected commit boundary.
+  - id: G004
+    status: candidate
+    title: Validate git governance fields and completion evidence
+    purpose: >
+      Extend repository validation so planning queues can enforce required git
+      governance fields and completed candidates can carry commit evidence in a
+      consistent shape.
+    scope:
+      includes:
+        - validation for queue_policy.branch_boundary when present
+        - validation for selected candidate completion commit evidence when done
+        - negative runtime-surface coverage for malformed git governance fields
+        - compatibility with existing queues that predate branch governance
+      excludes:
+        - forcing every historical queue to add branch fields immediately
+        - git command execution
+        - PR creation
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/
+    dependencies:
+      - G001
+      - G002
+      - G003
+    unlocks:
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Repository validation accepts the new M71 queue shape.
+      - Repository validation catches malformed branch boundary fields in generated fixtures.
+      - Runtime-surface verification includes at least one negative case for git governance metadata.
+      - Historical queues remain valid unless they opt into the new fields incorrectly.
+  - id: G005
+    status: candidate
+    title: Define feat completion and PR-ready summary artifact
+    purpose: >
+      Create a lightweight artifact contract for completing a candidate queue as
+      a feat branch and preparing a PR summary without requiring the agent to
+      open a PR automatically.
+    scope:
+      includes:
+        - FEATURE_SUMMARY.md or PR_READY_SUMMARY.md contract
+        - completed, deferred, blocked, and high-risk candidate summary fields
+        - validation command evidence expectations
+        - branch and commit list expectations
+      excludes:
+        - GitHub API usage
+        - automatic PR creation
+        - release automation
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/
+    dependencies:
+      - G001
+    unlocks:
+      - G006
+      - G007
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A PR-ready summary contract exists and is linked from planning contracts.
+      - The contract explains how to summarize candidate completion status.
+      - The contract records branch name, commit evidence, validation evidence, and unresolved risks.
+      - The contract does not require automatic PR creation.
+  - id: G006
+    status: candidate
+    title: Add dogfood fixtures for branch-per-feat workflow
+    purpose: >
+      Add focused dogfood fixtures and examples that show a clean feat branch,
+      selected change commit, completion evidence, and PR-ready summary flow.
+    scope:
+      includes:
+        - example queue metadata with branch boundary
+        - example completed candidate with commit evidence
+        - example PR-ready summary or summary linkage
+        - validation fixtures that protect against stale or contradictory metadata
+      excludes:
+        - changing actual git history
+        - opening PRs
+        - broad generated-surface regeneration
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/
+    dependencies:
+      - G002
+      - G003
+      - G004
+      - G005
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Runtime-surface verification exercises branch-per-feat metadata.
+      - Fixtures prove a completed selected change can be audited back to a commit.
+      - Fixtures prove a feat summary can be audited back to the candidate queue.
+      - The fixture scope remains planning-only and does not mutate git history.
+  - id: G007
+    status: candidate
+    title: Decide whether OW should automate branch, commit, push, and PR operations
+    purpose: >
+      Produce a high-risk decision packet for any future move from planning
+      guidance into automated git mutations, including branch creation, commits,
+      pushes, and PR creation.
+    scope:
+      includes:
+        - trust and safety risks for automated git mutations
+        - user approval models for branch creation, commit, push, and PR
+        - recommended default of report-first or explicit-approval-only behavior
+        - guardrails for destructive or remote operations
+      excludes:
+        - implementing git automation
+        - invoking GitHub APIs
+        - pushing branches
+        - opening PRs
+    owned_paths:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G007-git-automation-high-risk-decision/
+    dependencies:
+      - G001
+      - G005
+    unlocks: []
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A high-risk decision report exists before any git mutation automation is selected.
+      - The report separates branch creation, local commit, push, and PR creation decisions.
+      - The report defines explicit user approval conditions and stop criteria.
+      - No automated git mutation implementation is performed by this candidate.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - G001
+      - G002
+      - G003
+      - G004
+      - G005
+      - G006
+      - G007
+    actor: agent
+    reason: Initial decomposition of commit, feat, branch, and PR governance into commit-sized candidates.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
