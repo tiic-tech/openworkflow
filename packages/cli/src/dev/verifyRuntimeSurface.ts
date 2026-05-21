@@ -5,6 +5,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
+import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 
 const CURRENT_FILE = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(CURRENT_FILE), "../../../..");
@@ -59,6 +60,7 @@ async function main(): Promise<number> {
   await verifyGitGovernanceDogfoodFixtures();
   await verifyLocalFeatBranchAutomation();
   await verifySelectedChangeCommitAutomation();
+  await verifyPrReadySummaryGeneration();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -1161,6 +1163,63 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
     const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
     assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifyPrReadySummaryGeneration(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-pr-ready-summary-"));
+  try {
+    const queuePath = "changes/M71-fixture/CANDIDATE_CHANGES.yaml";
+    await mkdir(join(tempRoot, "changes", "M71-fixture"), { recursive: true });
+    await writeFile(join(tempRoot, queuePath), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-fixture",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-fixture",
+      "title: Candidate changes for fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-fixture",
+      "validation:",
+      "  commands_run:",
+      "    - npm run validate",
+      "changes:",
+      "  - id: G001",
+      "    status: done",
+      "    title: Completed fixture change",
+      "    risk: low",
+      "    selection:",
+      "      selected_change_id: G001-fixture",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "        - 'validation: git diff --check'",
+      "  - id: G002",
+      "    status: blocked",
+      "    title: Blocked fixture change",
+      "    risk: medium",
+      "  - id: G003",
+      "    status: ready",
+      "    title: High-risk fixture command",
+      "    risk: high",
+      "",
+    ].join("\n"), "utf8");
+
+    const preview = await generatePrReadySummary({ root: tempRoot, queuePath, dryRun: true });
+    assert(preview.ok, `PR-ready summary preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.content.includes("This is a local review handoff artifact"), "PR-ready preview must state local-only boundary");
+    assert(preview.content.includes("commit: abcdef1"), "PR-ready preview missing commit evidence");
+    assert(preview.content.includes("G002"), "PR-ready preview missing blocked candidate");
+    assert(preview.content.includes("G003"), "PR-ready preview missing high-risk candidate");
+    assert(preview.warnings.length > 0, "PR-ready preview should warn when queue is not fully complete");
+
+    const written = await generatePrReadySummary({ root: tempRoot, queuePath, dryRun: false });
+    assert(written.ok, `PR-ready summary write failed: ${written.errors.join(", ")}`);
+    const output = await read(join(tempRoot, "changes", "M71-fixture", "PR_READY_SUMMARY.md"));
+    assert(output.includes("Remote PR creation or mutation requires separate gh operation governance"), "PR-ready summary missing remote approval boundary");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }

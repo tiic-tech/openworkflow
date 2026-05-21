@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G014
+next_recommended_candidate_id: G015
 changes:
   - id: G001
     status: done
@@ -775,7 +775,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G014
-    status: ready
+    status: done
     title: Implement local PR-ready summary generation for completed queues
     purpose: >
       Add local-only automation that creates `PR_READY_SUMMARY.md` for a fully
@@ -810,8 +810,26 @@ changes:
       - The summary states no remote PR was opened.
       - Missing validation or incomplete candidates are reported clearly.
       - No remote mutation occurs.
+    selection:
+      selected_change_id: G014-pr-ready-summary-generation
+      reason: >
+        G014 is ready after G013 and produces a local PR-ready review packet
+        before any high-risk command shell or remote operation is considered.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G014-pr-ready-summary-generation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/prReadySummary.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+        - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
   - id: G015
-    status: candidate
+    status: ready
     title: Add ow:git-automation command shell with remote approval gates
     purpose: >
       Introduce the command surface for approved local git automation while
@@ -1298,6 +1316,37 @@ operations:
       - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
       - "commit: fb003d7346ce027e08a9f149718caadf82755ad6"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP031
+    operation_type: select
+    target_candidate_ids:
+      - G014
+    actor: agent
+    reason: Select G014 because selected-change commit evidence is available and local PR-ready summaries can now be generated without remote mutation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP032
+    operation_type: complete
+    target_candidate_ids:
+      - G014
+    actor: agent
+    reason: Complete G014 after adding local PR-ready summary generation and runtime coverage for preview, local write, warnings, and remote non-creation wording.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
       - "validation: npm run verify:runtime-surface"

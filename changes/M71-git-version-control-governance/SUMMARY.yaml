@@ -22,10 +22,10 @@ outputs:
   high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 15
-completed_candidate_id: G013
-completed_change_id: G013-selected-change-commit-automation
-previous_completed_candidate_id: G012
-previous_completed_change_id: G012-local-feat-branch-automation
+completed_candidate_id: G014
+completed_change_id: G014-pr-ready-summary-generation
+previous_completed_candidate_id: G013
+previous_completed_change_id: G013-selected-change-commit-automation
 fixture_completed_candidate_id: G006
 fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
 pr_completed_candidate_id: G005
@@ -42,7 +42,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G014
+next_recommended_candidate_id: G015
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -61,8 +61,8 @@ key_dependencies:
   - G011 is complete and defines the command contract before local git automation implementation.
   - G012 is complete and implements local-only feat branch automation with dirty-tree refusal.
   - G013 is complete and implements selected-change local commit automation with allowed-path and validation-evidence guards.
-  - G014 is ready because local commit evidence can now feed PR-ready summaries.
-  - G015 remains high risk because it introduces the eventual command surface and remote approval gates.
+  - G014 is complete and generates local PR-ready summaries without remote mutation.
+  - G015 is ready but remains high risk because it introduces the eventual command surface and remote approval gates.
 risks:
   - id: R001
     level: medium
@@ -112,3 +112,4 @@ validation:
     - User clarified selected changes must have at least one commit, but may have multiple commits when the final selected-change HEAD preserves traceability.
     - G013 completed selected-change local commit automation and made G014 ready.
     - G013 primary implementation commit is fb003d7346ce027e08a9f149718caadf82755ad6; commit evidence is recorded in a follow-up evidence commit.
+    - G014 completed local PR-ready summary generation and made G015 the next high-risk stop.
