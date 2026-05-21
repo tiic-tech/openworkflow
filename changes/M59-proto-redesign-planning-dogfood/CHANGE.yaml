@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: change:M59-proto-redesign-planning-dogfood
+contract_type: change
+title: M59 Proto redesign planning dogfood
+status: draft
+source_artifacts:
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - skills/decompose-to-changes/SKILL.md
+  - skills/select-change/SKILL.md
+  - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+  - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+depends_on:
+  - change:M56-decompose-to-changes-skill
+  - change:M57-select-change-skill
+produces:
+  - candidate_changes:M59-proto-redesign-planning-dogfood
+  - selected_change:M60-proto-redesign-artifact-contracts
+  - atom_tasks:M60-proto-redesign-artifact-contracts
+summary: >
+  Use the new decompose-to-changes and select-change source skills to create
+  the formal /ow:proto redesign implementation queue and select the first
+  bounded change without implementing it.
+problem: >
+  The proto redesign has enough strategic material to proceed, but it needs a
+  durable candidate queue and one selected implementation entry so future work
+  stays focused and does not mix image-first prompt contracts, validation
+  semantics, source skill behavior, tuning behavior, and runtime exposure.
+goals:
+  - Generate a formal `/ow:proto` redesign candidate queue.
+  - Select the first proto redesign implementation change.
+  - Create atom tasks and an implementation brief for the selected change.
+  - Keep the work as planning dogfood, not implementation.
+non_goals:
+  - Do not implement the proto redesign.
+  - Do not add `/ow:proto2html`.
+  - Do not remove or internalize validation command behavior.
+  - Do not expose runtime command or adapter surfaces.
+affected_paths:
+  - changes/M59-proto-redesign-planning-dogfood/
+  - changes/M60-proto-redesign-artifact-contracts/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+acceptance:
+  - The proto redesign candidate queue is created by the new decomposition skill.
+  - The selected first proto redesign change is chosen by the new selection skill.
+  - The resulting atom tasks keep implementation focused on one module or feature slice.
+  - The selected change does not begin implementation.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js handoff --root . --json
+created_at: 2026-05-21
+updated_at: 2026-05-21

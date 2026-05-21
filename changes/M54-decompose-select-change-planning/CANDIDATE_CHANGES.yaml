@@ -36,7 +36,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -229,7 +229,7 @@ changes:
       - Planning artifacts appear in low-context read models without loading full history by default.
       - Existing init, sync, handoff, and context behavior remains healthy.
   - id: C005
-    status: ready
+    status: done
     title: Dogfood planning skills on the /ow:proto redesign roadmap
     purpose: >
       Use the new decompose-to-changes and select-change flow to create the
@@ -259,3 +259,18 @@ changes:
       - The proto redesign candidate queue is created by the new decomposition skill.
       - The selected first proto redesign change is chosen by the new selection skill.
       - The resulting atom tasks keep implementation focused on one module or feature slice.
+    selection:
+      selected_change_id: M59-proto-redesign-planning-dogfood
+      reason: C002 and C003 are complete, enabling real dogfood planning on the proto redesign roadmap.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M59-proto-redesign-planning-dogfood
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+        - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+        - changes/M60-proto-redesign-artifact-contracts/SELECTED_CHANGE.yaml
+        - changes/M60-proto-redesign-artifact-contracts/ATOM_TASKS.yaml
+        - changes/M60-proto-redesign-artifact-contracts/IMPLEMENTATION_BRIEF.md
+        - "validation: npm run validate"
+        - "validation: node dist/cli/src/index.js handoff --root . --json"

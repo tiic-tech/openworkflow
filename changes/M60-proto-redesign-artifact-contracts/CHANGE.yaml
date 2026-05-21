@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: change:M60-proto-redesign-artifact-contracts
+contract_type: change
+title: M60 Proto redesign artifact contracts
+status: draft
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+  - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+depends_on:
+  - change:M59-proto-redesign-planning-dogfood
+produces:
+  - selected_change:M60-proto-redesign-artifact-contracts
+  - atom_tasks:M60-proto-redesign-artifact-contracts
+summary: >
+  Define image-first proto artifact contracts before changing source prototype
+  or tune behavior.
+problem: >
+  `/ow:proto` redesign needs stable contracts for strategic prototype prompt
+  packs, tune/refined prompt packs, optional validation inputs, and review
+  evidence before source skills or runtime surfaces can change safely.
+goals:
+  - Define proto prompt pack and tune prompt pack artifact shapes.
+  - Define validation input behavior when validation artifacts are present or absent.
+  - Define review evidence and decision handoff rules.
+  - Keep HTML conversion and runtime exposure out of scope.
+non_goals:
+  - Do not implement source proto behavior.
+  - Do not implement tune behavior.
+  - Do not remove `ow:validation`.
+  - Do not expose runtime command or adapter surfaces.
+affected_paths:
+  - references/proto-redesign-artifact-contracts.md
+  - schemas/proto-prompt-pack.schema.json
+  - changes/M60-proto-redesign-artifact-contracts/
+acceptance:
+  - Image-first proto artifacts define required and optional inputs.
+  - Validation artifact consumption is explicit when present or absent.
+  - Tune/refinement prompt packs preserve baseline prototype intent.
+  - HTML conversion and runtime exposure are excluded.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C005`
+Next recommended candidate: `C004`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -146,7 +146,7 @@ Validation:
 
 ## C005 - Dogfood Planning Skills On /ow:proto Redesign
 
-Status: `ready`
+Status: `done`
 
 Purpose: use the new planning skills to create and select the implementation
 queue for `/ow:proto` image-only redesign.
@@ -161,3 +161,13 @@ Validation:
 
 - `npm run validate`
 - `openworkflow handoff --root . --json`
+
+Completion evidence:
+
+- `changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml`
+- `changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml`
+- `changes/M60-proto-redesign-artifact-contracts/SELECTED_CHANGE.yaml`
+- `changes/M60-proto-redesign-artifact-contracts/ATOM_TASKS.yaml`
+- `changes/M60-proto-redesign-artifact-contracts/IMPLEMENTATION_BRIEF.md`
+- `npm run validate`
+- `node dist/cli/src/index.js handoff --root . --json`

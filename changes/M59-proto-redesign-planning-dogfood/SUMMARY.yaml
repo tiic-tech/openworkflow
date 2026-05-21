@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: planning_summary:M59-proto-redesign-planning-dogfood
+contract_type: planning
+title: M59 Proto redesign planning dogfood summary
+status: completed
+source:
+  kind: mixed
+  refs:
+    - current user discussion about validation, ow:proto, and prototype prompt skills
+    - skills/decompose-to-changes/SKILL.md
+    - skills/select-change/SKILL.md
+    - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+outputs:
+  candidate_queue: changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  readable_view: changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+  selected_change: changes/M60-proto-redesign-artifact-contracts/SELECTED_CHANGE.yaml
+  atom_tasks: changes/M60-proto-redesign-artifact-contracts/ATOM_TASKS.yaml
+  implementation_brief: changes/M60-proto-redesign-artifact-contracts/IMPLEMENTATION_BRIEF.md
+candidate_count: 6
+selected_candidate_id: P001
+selected_change_id: M60-proto-redesign-artifact-contracts
+unresolved_questions:
+  - Whether automatic validation should be implemented after the proto input policy is defined.
+  - Whether `/ow:tune` should become its own command surface or remain part of prototype refinement.
+validation_commands:
+  - npm run validate
+  - node dist/cli/src/index.js handoff --root . --json
+notes:
+  - C005 is planning dogfood only; it intentionally does not implement P001.
+  - P001 was selected because it unlocks source behavior and validation policy without runtime changes.
