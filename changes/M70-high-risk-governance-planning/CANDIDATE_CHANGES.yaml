@@ -1,0 +1,303 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M70-high-risk-governance-planning
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M70-high-risk-governance-planning
+title: Candidate changes for high-risk governance and skill hardening
+status: active
+source:
+  kind: mixed
+  refs:
+    - "user_request: use decompose-to-changes on high-risk findings and consider solidifying high-risk-report into skills"
+    - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/SKILL.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - skills/select-change/SKILL.md
+    - skills/select-change/references/selection-protocol.md
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable G-prefixed ids are assigned once and referenced by select-change.
+  feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat for high-risk governance; each candidate is a commit-sized change inside this folder.
+  selected_artifact_location: changes/M70-high-risk-governance-planning/<candidate-id>-<slug>/
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - artifact contract before skill behavior changes
+    - source skill updates before generated runtime surfaces
+    - stop-gate behavior before broad adapter architecture work
+    - validation and dogfood fixtures before relying on the behavior
+    - design-only mitigation before runtime or multi-adapter implementation
+  avoid:
+    - implementing high-risk adapter delivery before explicit user decision
+    - changing generated .agents surfaces directly
+    - treating high-risk reports as informal chat-only guidance
+    - letting select-change silently select risk: high candidates
+    - committing experimental non-Codex generated surfaces
+next_recommended_candidate_id: G001
+changes:
+  - id: G001
+    status: ready
+    title: Formalize high-risk decision report contract
+    purpose: >
+      Define HIGH_RISK_DECISION_REPORT.md as a first-class planning artifact so
+      high-risk stops have a stable structure, output path, required sections,
+      and queue audit expectations.
+    scope:
+      includes:
+        - high-risk report purpose and required sections
+        - output location policy under the owning candidate queue
+        - queue operation expectations when report generation stops implementation
+        - explicit resume condition requiring user decision
+      excludes:
+        - changing source skill behavior
+        - implementing validation code
+        - selecting S003 or S007
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/
+    dependencies: []
+    unlocks:
+      - G002
+      - G003
+      - G004
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Planning contracts define HIGH_RISK_DECISION_REPORT.md and its required sections.
+      - The contract states that implementation resumes only after explicit user approval of an option.
+      - The contract explains how the report is referenced from SUMMARY.yaml and operation logs.
+      - Existing planning artifacts remain valid.
+  - id: G002
+    status: candidate
+    title: Add high-risk report behavior to decompose-to-changes
+    purpose: >
+      Teach decompose-to-changes to plan high-risk governance explicitly,
+      including creating or updating a high-risk decision report when a queue
+      reaches risk: high candidates that require user confirmation.
+    scope:
+      includes:
+        - high-risk detection guidance for candidate queues
+        - report creation and maintenance mode behavior
+        - operation log expectations for high-risk query/report actions
+        - readable-view and summary linkage guidance
+      excludes:
+        - select-change selection gate behavior
+        - runtime command generation
+        - schema or validator implementation
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - decompose-to-changes says when to create HIGH_RISK_DECISION_REPORT.md.
+      - decompose-to-changes preserves candidate ids and statuses while adding high-risk report evidence.
+      - decompose-to-changes can update an existing report instead of creating duplicate reports.
+      - The skill keeps implementation out of scope.
+  - id: G003
+    status: candidate
+    title: Add high-risk stop gate to select-change
+    purpose: >
+      Teach select-change to stop before selecting or implementing risk: high
+      candidates unless the user explicitly approves a concrete decision option.
+    scope:
+      includes:
+        - high-risk readiness review behavior
+        - refusal to silently select risk: high candidates
+        - instructions to produce or reference HIGH_RISK_DECISION_REPORT.md
+        - explicit override and resume criteria
+      excludes:
+        - decompose-to-changes queue creation behavior
+        - implementation of high-risk candidates
+        - runtime adapter changes
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - select-change reports blockers and decision options for risk: high candidates.
+      - select-change does not create SELECTED_CHANGE.yaml for risk: high candidates without explicit user approval.
+      - select-change names the required high-risk report path and resume criteria.
+      - Targeted candidate review includes high-risk decision report status.
+  - id: G004
+    status: candidate
+    title: Add high-risk report validation and dogfood fixtures
+    purpose: >
+      Make high-risk governance testable by adding lightweight validation or
+      dogfood fixtures that prove queues can link a high-risk report and skills
+      can be quick-validated after the behavior changes.
+    scope:
+      includes:
+        - fixture or example queue containing a high-risk stop
+        - validation expectations for required report sections
+        - regression evidence for decompose-to-changes and select-change docs
+        - summary of manual dogfood behavior if code validation is too broad
+      excludes:
+        - full schema enforcement for all Markdown reports if too heavy
+        - changing risk classification semantics
+        - implementing S003 or S007
+    owned_paths:
+      - schemas/
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/
+    dependencies:
+      - G002
+      - G003
+    unlocks:
+      - G005
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+      - git diff --check
+    acceptance:
+      - There is reproducible evidence that required report sections are checked or manually verified.
+      - Skill validation passes for both planning skills after the new behavior.
+      - A high-risk report linked from a queue is treated as evidence, not implementation approval.
+      - Diagnostics or fixture notes tell agents not to bypass user approval.
+  - id: G005
+    status: candidate
+    title: Convert M69 S003 into design-only delivery boundary change
+    purpose: >
+      Apply the high-risk report recommendation by creating a lower-risk
+      design-only path for skill registry and adapter delivery boundaries,
+      without moving code or changing generated surfaces.
+    scope:
+      includes:
+        - architecture note for semantic workflow registry versus adapter delivery
+        - invariants for repo-local delivery and platform-specific adapter rules
+        - explicit non-goals for global prompt installation and non-Codex output
+        - decision record linking back to M69 high-risk report
+      excludes:
+        - code refactor of init, sync, or adapter generation
+        - new registry implementation
+        - non-Codex generated surfaces
+    owned_paths:
+      - references/skill-system-lifecycle.md
+      - references/adapter-delivery-boundary.md
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+      - changes/M70-high-risk-governance-planning/G005-s003-design-only-delivery-boundary/
+    dependencies:
+      - G001
+    unlocks:
+      - G006
+      - G007
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The delivery boundary design separates semantic commands from platform path rules.
+      - The design preserves repo-local delivery as the default trust model.
+      - The design states what an eventual S003 implementation may and may not change.
+      - No runtime behavior or generated files change.
+  - id: G006
+    status: candidate
+    title: Create research-only compatibility report for second adapter target
+    purpose: >
+      Prepare S007 safely by researching one possible second local skill target
+      and documenting compatibility constraints without writing adapter code or
+      generated platform files.
+    scope:
+      includes:
+        - target platform skill discovery model
+        - path, frontmatter, invocation, and lifecycle differences
+        - dry-run feasibility assessment
+        - recommendation for whether a later spike should proceed
+      excludes:
+        - adapter implementation
+        - generated output for the second platform
+        - Codex behavior changes
+    owned_paths:
+      - references/adapter-delivery-boundary.md
+      - references/second-adapter-compatibility-report.md
+      - changes/M70-high-risk-governance-planning/G006-second-adapter-research-report/
+    dependencies:
+      - G005
+    unlocks:
+      - G007
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The report identifies whether dry-run adapter work is justified.
+      - The report explicitly forbids committing second-platform generated files.
+      - The report lists validation gaps before any future implementation.
+      - Codex output remains untouched.
+  - id: G007
+    status: candidate
+    title: Design dry-run multi-adapter spike without durable generated output
+    purpose: >
+      If the design and research reports justify it, define the narrowest
+      dry-run adapter spike that can test multi-adapter boundaries without
+      committing second-platform generated surfaces.
+    scope:
+      includes:
+        - dry-run output location and cleanup policy
+        - adapter capability checklist
+        - validation-only success criteria
+        - explicit user approval requirement before any durable generated output
+      excludes:
+        - full second adapter implementation
+        - default generation of non-Codex surfaces
+        - changing `/ow:*` command semantics
+    owned_paths:
+      - references/adapter-delivery-boundary.md
+      - references/second-adapter-dry-run-spike.md
+      - changes/M70-high-risk-governance-planning/G007-dry-run-multi-adapter-spike-design/
+    dependencies:
+      - G005
+      - G006
+    unlocks: []
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The spike design cannot write durable generated second-platform surfaces by default.
+      - The design names the exact user approval required to proceed beyond dry-run.
+      - The design keeps Codex output semantics unchanged.
+      - Remaining high-risk implementation questions are explicit.
