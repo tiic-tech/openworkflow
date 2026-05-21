@@ -18,14 +18,13 @@ prototype images, full discovery-loop read models, or E2E dogfood.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Align native build-prototype strategy compiler contract | none |
 | C002 | done | medium | Strengthen strategic prototype prompt-pack artifacts | C001 |
-| C003 | selected | medium | Upgrade generated `/ow:proto` protocol for strategy-to-prompt compilation | C001, C002 |
+| C003 | done | medium | Upgrade generated `/ow:proto` protocol for strategy-to-prompt compilation | C001, C002 |
 | C004 | candidate | medium | Add strategic prompt-pack stress fixtures | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C003` is selected. It upgrades the generated `/ow:proto` protocol so agents
-actually execute the preflight, askUserQuestion, prompt-text, and
-image-generation flow encoded by the artifacts.
+`C003` is complete. Next selection should move to `C004`, which pressure-tests
+weak, style-only, and high-quality prompt-pack outputs.
 
 ## Deferred
 

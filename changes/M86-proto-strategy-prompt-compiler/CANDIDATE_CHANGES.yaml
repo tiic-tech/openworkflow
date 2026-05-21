@@ -193,7 +193,7 @@ changes:
       evidence:
         - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: selected
+    status: done
     title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
     purpose: >
       Make generated /ow:proto guidance and context packets consume the
@@ -250,6 +250,12 @@ changes:
         the generated /ow:proto protocol now needs to execute the artifact
         behavior encoded by C002.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-proto-generated-protocol
+      completed_at: 2026-05-22
+      commit: d67d05a
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
     status: candidate
     title: Add strategic prompt-pack stress fixtures
@@ -386,3 +392,17 @@ operations:
       - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/SELECTED_CHANGE.yaml
       - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/ATOM_TASKS.yaml
       - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 upgraded generated /ow:proto protocol with source quality preflight,
+      direction-count askUserQuestion/default delegation, prompt text readiness,
+      batch image generation, and evidence collection guidance.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
