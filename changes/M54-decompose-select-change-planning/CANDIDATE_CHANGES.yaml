@@ -1,0 +1,217 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M54-decompose-select-change-planning
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M54-decompose-select-change-planning
+title: Candidate changes for decompose-to-changes and select-change skills
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - AGENTS.md
+    - changes/M54-decompose-select-change-planning/CHANGE.yaml
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - unlocks downstream implementation
+    - focused owned paths
+    - clear artifact outputs
+    - clear validation commands
+    - low cross-module coupling
+  avoid:
+    - broad workflow rewrites
+    - unclear acceptance
+    - mixed planning and implementation
+    - manual edits to generated .agents or .openworkflow surfaces
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define planning artifact contracts for candidate and selected changes
+    purpose: >
+      Establish the artifact shapes, lifecycle states, and update rules that
+      decompose-to-changes and select-change will read and write.
+    scope:
+      includes:
+        - CANDIDATE_CHANGES.yaml source-of-truth contract
+        - CANDIDATE_CHANGES.md readable-view contract
+        - SELECTED_CHANGE.yaml contract
+        - ATOM_TASKS.yaml contract
+        - IMPLEMENTATION_BRIEF.md contract
+        - status transition rules for candidate selection and completion
+      excludes:
+        - source skill implementation
+        - command registry exposure
+        - generated Codex adapter surfaces
+        - /ow:proto redesign
+    owned_paths:
+      - schemas/
+      - references/
+      - changes/M55-planning-artifact-contracts/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Candidate and selected change artifacts have stable required fields.
+      - Candidate status updates are specified without deleting historical entries.
+      - select-change can query candidates by id and status.
+      - Markdown readable views are explicitly non-authoritative.
+    selection_notes: >
+      This should be selected first because both skills depend on the same
+      durable artifact vocabulary.
+  - id: C002
+    status: candidate
+    title: Implement decompose-to-changes source skill
+    purpose: >
+      Add a repo-local source skill that turns user input, current discussion,
+      or explicit planning source text into a complete candidate change queue.
+    scope:
+      includes:
+        - skills/decompose-to-changes/SKILL.md
+        - references for input normalization, decomposition heuristics, candidate sizing, and output format
+        - guidance for writing CANDIDATE_CHANGES.yaml, CANDIDATE_CHANGES.md, and SUMMARY.yaml
+      excludes:
+        - select-change behavior
+        - generated /ow:* command exposure
+        - automatic implementation
+    owned_paths:
+      - skills/decompose-to-changes/
+      - changes/M56-decompose-to-changes-skill/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - manual dogfood run against the current /ow:proto redesign discussion
+    acceptance:
+      - Skill produces candidate changes with stable ids and focused owned paths.
+      - Skill separates includes, excludes, dependencies, risks, validation, and acceptance.
+      - Skill avoids ranking as a primary responsibility but may set a next recommended candidate.
+      - Skill does not write broad implementation plans that cross unrelated modules.
+  - id: C003
+    status: candidate
+    title: Implement select-change source skill
+    purpose: >
+      Add a repo-local source skill that reads CANDIDATE_CHANGES.yaml, selects
+      the best next change, and emits implementation-ready active change artifacts.
+    scope:
+      includes:
+        - skills/select-change/SKILL.md
+        - references for selection policy, status updates, atom task decomposition, and implementation brief format
+        - SELECTED_CHANGE.yaml output behavior
+        - ATOM_TASKS.yaml output behavior
+        - IMPLEMENTATION_BRIEF.md output behavior
+      excludes:
+        - executing the implementation itself
+        - archive completion behavior
+        - autonomous loop runtime
+    owned_paths:
+      - skills/select-change/
+      - changes/M57-select-change-skill/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - manual dogfood selection from a sample CANDIDATE_CHANGES.yaml
+    acceptance:
+      - Skill selects one candidate by stable id with explicit rationale.
+      - Skill marks selection state without deleting other candidates.
+      - Skill emits atom tasks with owned paths and done_when criteria.
+      - Skill creates an implementation brief that lets an Agent start with low context.
+  - id: C004
+    status: candidate
+    title: Expose planning skills through OpenWorkflow runtime surfaces
+    purpose: >
+      Promote proven source skills into OpenWorkflow command and adapter
+      surfaces so future repositories can invoke them consistently.
+    scope:
+      includes:
+        - command registry entries or equivalent skill registry entries
+        - artifact contract registration for planning artifacts
+        - generated Codex adapter skill surface
+        - runtime-surface and agent-e2e verification updates
+      excludes:
+        - changing /ow:proto or /ow:tune semantics
+        - autonomous loop behavior
+        - archive completion behavior
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - changes/M58-planning-skill-runtime-surface/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - C005
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:agent-e2e
+    acceptance:
+      - Runtime surfaces expose the planning skills without hand-editing generated .agents output.
+      - Planning artifacts appear in low-context read models without loading full history by default.
+      - Existing init, sync, handoff, and context behavior remains healthy.
+  - id: C005
+    status: candidate
+    title: Dogfood planning skills on the /ow:proto redesign roadmap
+    purpose: >
+      Use the new decompose-to-changes and select-change flow to create the
+      implementation queue for /ow:proto image-only redesign and select the
+      first proto redesign change.
+    scope:
+      includes:
+        - candidate changes for /ow:proto image-only redesign
+        - selection of the first proto redesign implementation change
+        - atom tasks and implementation brief for the selected proto redesign change
+      excludes:
+        - implementing the proto redesign itself
+        - adding /ow:proto2html
+        - changing validation behavior beyond planning notes
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/
+    dependencies:
+      - C002
+      - C003
+    unlocks: []
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - openworkflow handoff --root . --json
+    acceptance:
+      - The proto redesign candidate queue is created by the new decomposition skill.
+      - The selected first proto redesign change is chosen by the new selection skill.
+      - The resulting atom tasks keep implementation focused on one module or feature slice.

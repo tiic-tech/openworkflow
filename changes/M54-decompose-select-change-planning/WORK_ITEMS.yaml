@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: work_items:M54-decompose-select-change-planning
+contract_type: work_items
+title: M54 Decompose and select change planning work items
+status: draft
+change_contract: changes/M54-decompose-select-change-planning/CHANGE.yaml
+items:
+  - task_id: M54-T001
+    title: Define candidate change queue structure
+    status: completed
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+    acceptance:
+      - Candidate changes have stable ids.
+      - YAML is the source of truth.
+      - Markdown is a readable view.
+  - task_id: M54-T002
+    title: Split implementation into bounded changes
+    status: completed
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+    acceptance:
+      - Each candidate has focused owned paths.
+      - Each candidate names dependencies and excluded scope.
+      - The first recommended change is clear.
+  - task_id: M54-T003
+    title: Validate planning artifacts
+    status: pending
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/
+    acceptance:
+      - "`npm run validate` passes."

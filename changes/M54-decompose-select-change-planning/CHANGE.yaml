@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: change:M54-decompose-select-change-planning
+contract_type: change
+title: M54 Decompose and select change planning
+status: draft
+source_artifacts:
+  - docs/OW_DEVELOP_PLAN.md
+  - AGENTS.md
+produces:
+  - work_items:M54-decompose-select-change-planning
+  - candidate_changes:M54-decompose-select-change-planning
+summary: >
+  Plan the implementation sequence for two repo-local planning skills:
+  decompose-to-changes and select-change. The plan defines a stable candidate
+  change queue before implementation begins so future work can proceed one
+  bounded change at a time.
+problem: >
+  OpenWorkflow needs a reliable bridge from broad product discussion to focused
+  implementation changes. Without a structured decomposition and selection
+  layer, Agents can turn one discussion into broad cross-module edits, lose
+  status across repeated selection cycles, or re-read long conversations
+  instead of consuming durable planning artifacts.
+goals:
+  - Define the implementation changes needed for decompose-to-changes and select-change.
+  - Keep candidate changes small enough for focused Agent implementation.
+  - Treat CANDIDATE_CHANGES.yaml as the machine-readable source of truth.
+  - Preserve a generated or synchronized CANDIDATE_CHANGES.md human view.
+  - Make candidate ids stable so select-change can query and update one item at a time.
+  - Keep this change as planning only; implementation happens in later selected changes.
+non_goals:
+  - Do not implement the two skills in this planning change.
+  - Do not add new OpenWorkflow CLI commands in this planning change.
+  - Do not modify generated .agents skill surfaces by hand.
+  - Do not change /ow:proto, /ow:tune, or validation behavior in this planning change.
+decisions:
+  - "Candidate changes need stable ids and a YAML source of truth."
+  - "Markdown is useful as a human-readable view, but select-change should consume YAML."
+  - "The first implementation change should define artifact contracts before writing skill behavior."
+  - "The skills should start as source-level repo skills before being promoted to generated /ow:* runtime surfaces."
+open_questions:
+  - question: "Should decompose-to-changes and select-change become user-facing /ow:* commands after source skills prove useful?"
+    outcome: "Plan a later exposure change; do not make command exposure part of the first skill implementation."
+  - question: "Should selected change artifacts live under changes/ or .openworkflow/changes/ first?"
+    outcome: "Use existing changes/ convention during early dogfood, then design .openworkflow integration separately."
+affected_paths:
+  - changes/M54-decompose-select-change-planning/
+acceptance:
+  - "CANDIDATE_CHANGES.yaml contains stable candidate ids, statuses, owned paths, dependencies, validation, and acceptance."
+  - "CANDIDATE_CHANGES.md provides a readable view of the same queue."
+  - "The planned changes are scoped so each one can be implemented without broad cross-module drift."
+  - "The first recommended selected change is clear."
+  - "`npm run validate` passes after adding the planning artifacts."
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21
