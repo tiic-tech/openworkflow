@@ -1,0 +1,276 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M85-validation-proto-target-contract
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M85-validation-proto-target-contract
+title: Candidate changes for validation prototype target contract
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+    - user_direction:2026-05-22-validation-discussion
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes /ow:validation a prototype validation target compiler
+    - preserves vision as source truth and proto as downstream consumer
+    - gives /ow:proto a clear experiment brief and observable evidence criteria
+    - blocks weak or conflicted vision instead of forcing a validation target
+    - keeps one selected change implementation-sized
+  avoid:
+    - rebuilding /ow:proto prompt generation in this queue
+    - treating validation as a generic feature ranking or backlog planner
+    - creating prototype artifacts during validation
+    - expanding into full discovery-loop E2E dogfood
+scope_control:
+  current_boundary: >
+    Upgrade /ow:validation to compile proto-ready vision into one prototype
+    validation target: the central uncertainty, experiment boundary, observable
+    evidence criteria, and handoff contract required by /ow:proto.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include only candidates needed to define, encode, generate, and verify the
+    /ow:validation command and validation_target artifact as the bridge between
+    /ow:vision and /ow:proto.
+  out_of_scope_rule: >
+    Record proto prompt generation, tune inheritance, discovery-loop read model,
+    and full E2E dogfood as deferred queues. Do not include them in M85.
+  deferred_features:
+    - title: Align /ow:proto as strategy-to-prompt compiler
+      reason: >
+        Proto should consume the upgraded validation target after M85 stabilizes.
+      suggested_plan_id: M86-proto-strategy-prompt-compiler
+    - title: Align /ow:tune with product-system inheritance
+      reason: >
+        Tune depends on prototype prompt and benchmark screen evidence contracts.
+      suggested_plan_id: M87-tune-product-system-inheritance
+    - title: Define discovery-loop read model
+      reason: >
+        A compact cross-command read model should wait until vision, validation,
+        proto, and tune command contracts are stable.
+      suggested_plan_id: M88-discovery-loop-read-model
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        End-to-end pressure testing belongs after command-specific contracts land.
+      suggested_plan_id: M89-discovery-loop-e2e-dogfood
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: selected
+    title: Define native build-validation prototype-target compiler contract
+    purpose: >
+      Reposition skills/build-validation from feature prioritization into a
+      source behavior contract for compiling proto-ready vision into a single
+      prototype validation target.
+    scope:
+      includes:
+        - build-validation role model and purpose
+        - vision readiness and return-to-vision gate
+        - central uncertainty and experiment brief requirements
+        - observable evidence and decision rule requirements
+        - no-prototype and no-production boundary
+      excludes:
+        - changing validation artifact schema
+        - changing generated /ow:validation skill
+        - changing /ow:proto behavior
+    owned_paths:
+      - skills/build-validation/SKILL.md
+      - skills/build-validation/references/
+      - changes/M85-validation-proto-target-contract/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - build-validation defines validation as prototype validation target compilation.
+      - The skill says validation must return to /ow:vision when vision is not proto-ready.
+      - The skill names central uncertainty, prototype experiment boundary, observable evidence, and decision rules.
+      - The skill forbids prototype prompt generation and production planning during validation.
+    selection:
+      selected_change_id: C001-build-validation-prototype-target-contract
+      reason: >
+        Single-queue SC selected C001 because it establishes the native
+        build-validation source behavior before artifact shape or generated
+        /ow:validation protocol changes.
+      selected_at: 2026-05-22
+  - id: C002
+    status: candidate
+    title: Extend validation_target artifact with experiment brief fields
+    purpose: >
+      Add structured validation fields that let /ow:proto consume the target as
+      an experiment brief instead of a loose feature ranking.
+    scope:
+      includes:
+        - central_uncertainty
+        - hypothesis
+        - target_behavior
+        - prototype_experiment
+        - observable_signals
+        - decision_rules
+        - vision_gaps
+      excludes:
+        - generated /ow:validation protocol
+        - /ow:proto prompt pack schema
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/validation-target.schema.json
+      - schemas/validation.schema.json
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/artifacts/readiness.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - validation templates expose experiment brief structures for /ow:proto.
+      - Summary quality reports thin or missing experiment fields.
+      - Readiness blocks /ow:proto when central experiment fields are missing.
+  - id: C003
+    status: candidate
+    title: Upgrade /ow:validation generated protocol for experiment compilation
+    purpose: >
+      Make generated /ow:validation guidance consume build-validation and the
+      expanded validation_target artifact shape.
+    scope:
+      includes:
+        - command registry protocol updates
+        - generated ow-validation skill guidance through sync
+        - context packet drift checks
+        - return-to-vision and no-prototype anti-patterns
+      excludes:
+        - /ow:proto prompt generation
+        - downstream tune behavior
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-validation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:validation generated skill names prototype validation target compiler behavior.
+      - The generated skill requires central uncertainty, experiment boundary, evidence, and decision rules.
+      - The generated skill returns to /ow:vision when vision gaps block a valid target.
+      - Verification catches generated-surface drift.
+  - id: C004
+    status: candidate
+    title: Add validation target stress fixtures
+    purpose: >
+      Verify thin, vision-blocked, and proto-ready validation target states
+      before handing M85 to /ow:proto work.
+    scope:
+      includes:
+        - thin validation fixture
+        - vision-gap blocked fixture
+        - proto-ready validation target fixture
+        - strict summary/readiness assertions
+      excludes:
+        - full proto prompt generation
+        - image generation or browser tests
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M85-validation-proto-target-contract/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M86-proto-strategy-prompt-compiler
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests cover a validation target that is too thin for /ow:proto.
+      - Tests cover a validation target blocked by vision gaps.
+      - Tests cover a validation target that is usable by /ow:proto.
+      - Runtime verification fails clearly if experiment fields are dropped.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for upgrading /ow:validation as the
+      prototype-validation target compiler between vision and proto.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.yaml
+      - changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.md
+      - changes/M85-validation-proto-target-contract/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 directly with SC because M85 is the single active queue and
+      C001 is dependency-free.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/SELECTED_CHANGE.yaml
+      - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/ATOM_TASKS.yaml
+      - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/IMPLEMENTATION_BRIEF.md

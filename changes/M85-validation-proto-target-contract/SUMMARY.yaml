@@ -1,0 +1,66 @@
+schema_version: 0.1.0
+contract_id: summary:M85-validation-proto-target-contract
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M85-validation-proto-target-contract
+title: Summary for validation prototype target contract
+status: active
+source:
+  kind: mixed
+  summary: >
+    Tracks the bounded /ow:validation upgrade after M84. Validation should
+    become the prototype validation target compiler between proto-ready vision
+    and /ow:proto, not a generic feature ranking step.
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+scope_boundary:
+  current_boundary: >
+    /ow:validation prototype target contract only.
+  boundary_type: command_surface
+  note: >
+    This queue handles the bridge from vision to proto: central uncertainty,
+    experiment boundary, observable evidence, decision rules, and return-to-
+    vision gates.
+deferred_feature_refs:
+  - M86-proto-strategy-prompt-compiler
+  - M87-tune-product-system-inheritance
+  - M88-discovery-loop-read-model
+  - M89-discovery-loop-e2e-dogfood
+outputs:
+  candidate_changes_yaml: changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.md
+  summary: changes/M85-validation-proto-target-contract/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: C001
+selected_change_id: C001-build-validation-prototype-target-contract
+next_recommended_candidate_id: null
+key_dependencies:
+  - M84 completed proto-ready vision structures and generated /ow:vision guidance.
+  - /ow:proto should not invent the experiment target when validation is present.
+  - Current build-validation skill still uses older .codex paths and feature-ranking framing.
+risks:
+  - id: R001
+    level: medium
+    description: Validation can regress into backlog ranking instead of experiment compilation.
+    mitigation: Define central uncertainty, experiment boundary, observable evidence, and decision rules in C001-C002.
+  - id: R002
+    level: medium
+    description: Validation could block too aggressively when vision is useful but incomplete.
+    mitigation: Distinguish return-to-vision blockers from explicit partial validation targets.
+  - id: R003
+    level: medium
+    description: Expanded validation artifacts could become too verbose for /ow:proto.
+    mitigation: Keep the fields structured and summary-first.
+validation:
+  commands_run:
+    - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
+    - node dist/cli/src/index.js sync --root . --json
+    - git status --short --branch
+  notes:
+    - OP001 created the M85 queue with scope limited to /ow:validation.
+    - OP002 selected C001 directly with SC because M85 is the single active queue.
