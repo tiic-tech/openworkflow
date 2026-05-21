@@ -34,6 +34,7 @@ deferred_feature_refs:
   - M87 absorbs prototype_tune_to_refined_prompt into native /ow:tune behavior
   - M88-discovery-loop-read-model
   - M89-discovery-loop-e2e-dogfood
+  - M90-analyze-changes-command-quality-review
 outputs:
   plan: docs/DISCOVER_LOOP_UPGRATE_PLAN.md
   candidate_changes_yaml: changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
@@ -44,15 +45,16 @@ candidate_count: 4
 active_candidate_count: 1
 completed_candidate_id: C003
 completed_change_id: C003-vision-generated-protocol
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C004
+selected_candidate_id: C004
+selected_change_id: C004-vision-delayed-compile-stress-fixtures
+next_recommended_candidate_id: null
 key_dependencies:
   - M74/C001 improved /ow:vision as an Agent-first artifact producer, but did not solve eager persistence or deep interview quality.
   - The attached prompt-generation reference skills show that VISION.md must provide enough strategy for /ow:proto to generate high-quality prompts.
   - The attached reference skills should be absorbed into native /ow:proto and /ow:tune behavior through later bounded DTC queues.
   - Native skills/build-vision is missing and should be added in C001 as the source behavior for /ow:vision.
   - DTC scope control requires the full vision-validation-proto-tune upgrade to be split into bounded queues.
+  - C003 verification exposed an unrelated AC runtime-surface drift where verify:runtime-surface expected legacy analyze-changes wording.
 risks:
   - id: R001
     level: medium
@@ -100,6 +102,19 @@ completed:
 unresolved_questions:
   - Should the typo-preserving plan filename later be aliased by a correctly spelled DISCOVERY_LOOP_UPGRADE_PLAN.md?
   - Should M74 C002-C004 be superseded after M84 lands, or should they remain as command-quality follow-ups?
+known_issues:
+  - id: KI001
+    command: /ow:analyze-changes
+    source: npm run verify:runtime-surface
+    status: recorded_with_immediate_verifier_alignment
+    suggested_plan_id: M90-analyze-changes-command-quality-review
+    description: >
+      Runtime-surface verification currently expects the exact legacy guidance
+      "Analyze one or more candidate change queues and recommend the next
+      candidate without selecting it." The generated analyze-changes skill uses
+      different wording. C004 aligns the immediate verifier expectation so
+      vision stress fixtures can run; deeper AC command-quality review remains
+      outside M84's /ow:vision boundary.
 validation:
   commands_run:
     - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
@@ -117,4 +132,6 @@ validation:
     - OP009 selected C003 directly with SC because M84 is the single active queue.
     - OP010 completed C003 with local commit evidence.
     - OP011 marked C004 ready as the next candidate.
+    - OP012 recorded the unrelated AC runtime-surface wording drift as a deferred M90 issue.
+    - OP013 selected C004 directly with SC because M84 is the single active queue.
     - No high-risk candidate is currently selected; C004 is medium risk and remains inside stress fixture and verification boundaries.

@@ -487,6 +487,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const invalidModeReport = parseJsonReport(invalidMode.output, "context");
   assert(invalidModeReport.ok === false, "invalid context mode should return ok=false");
   await assertNoStageArtifacts(root);
+  await verifyVisionSummaryQualityFixtures(root, env);
 
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
   await mkdir(artifactDir, { recursive: true });
@@ -671,6 +672,186 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(check.ok === true, "proto check should report ok=true without current validation blockers");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
 
+}
+
+async function verifyVisionSummaryQualityFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const sessionsRoot = join(root, ".openworkflow", "vision", "sessions");
+  const thinDir = join(sessionsRoot, "vision-thin");
+  const blockedDir = join(sessionsRoot, "vision-blocked");
+  const readyDir = join(sessionsRoot, "vision-ready");
+  await mkdir(thinDir, { recursive: true });
+  await mkdir(blockedDir, { recursive: true });
+  await mkdir(readyDir, { recursive: true });
+
+  await writeFile(join(thinDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-thin",
+    status: "draft",
+    oneSentence: "A thin interview snapshot that should not be compiled.",
+    protoStatus: "missing",
+    full: false,
+  }), "utf8");
+  await writeFile(join(blockedDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-blocked",
+    status: "active",
+    oneSentence: "A blocked vision with explicit proto-readiness blockers.",
+    protoStatus: "blocked",
+    full: true,
+  }), "utf8");
+  await writeFile(join(readyDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-ready",
+    status: "active",
+    oneSentence: "A proto-ready vision with enough strategy for prompt generation.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+
+  const report = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  assert(report.ok === true, "vision current_slice summary health should stay freshness-ok");
+  const entries = record(report.data, "vision summaries data").entries;
+  assert(Array.isArray(entries), "vision summaries entries must be array");
+  const visionEntry = entries.find((entry) => record(entry, "summary entry").artifact_type === "vision_session");
+  assert(visionEntry !== undefined, "summary health missing vision_session entry");
+  const visionItems = record(visionEntry, "vision summary entry").items;
+  assert(Array.isArray(visionItems), "vision summary entry items must be array");
+
+  const thin = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-thin/VISION_SESSION.yaml");
+  assert(thin.status === "current", "thin vision fixture should keep current_slice current");
+  assert(thin.quality_status === "current_but_thin", "thin vision fixture should be current_but_thin");
+  assert(Array.isArray(thin.empty_key_fields) && thin.empty_key_fields.includes("strategic_core.target_user"), "thin vision fixture should report missing strategic_core fields");
+  assert(Array.isArray(thin.quality_warnings) && thin.quality_warnings.some((item) => String(item).includes("proto_readiness.status is not ready") && String(item).includes("missing")), "thin vision fixture should warn about missing proto-readiness");
+
+  const blocked = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-blocked/VISION_SESSION.yaml");
+  assert(blocked.status === "current", "blocked vision fixture should keep current_slice current");
+  assert(blocked.quality_status === "current_but_thin", "blocked vision fixture should be current_but_thin");
+  assert(Array.isArray(blocked.empty_key_fields) && blocked.empty_key_fields.length === 0, "blocked vision fixture should be blocked by readiness, not empty fields");
+  assert(Array.isArray(blocked.quality_warnings) && blocked.quality_warnings.some((item) => String(item).includes("proto_readiness.status is not ready") && String(item).includes("blocked")), "blocked vision fixture should warn about blocked proto-readiness");
+
+  const ready = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-ready/VISION_SESSION.yaml");
+  assert(ready.status === "current", "ready vision fixture should keep current_slice current");
+  assert(ready.quality_status === "usable", "ready vision fixture should be usable");
+  assert(Array.isArray(ready.empty_key_fields) && ready.empty_key_fields.length === 0, "ready vision fixture should not have empty key fields");
+  assert(Array.isArray(ready.quality_warnings) && ready.quality_warnings.length === 0, "ready vision fixture should not report quality warnings");
+
+  const strict = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--strict", "--json"], env);
+  assert(strict.code !== 0, "summaries --strict should fail when vision has thin or blocked proto-readiness");
+  const strictReport = parseJsonReport(strict.output, "summaries");
+  assert(Array.isArray(strictReport.health_errors) && strictReport.health_errors.some((item) => String(item).includes("summary quality vision_session")), "strict summaries should name vision_session quality errors");
+}
+
+function summaryItemFor(items: unknown[], artifactPath: string): Record<string, unknown> {
+  const item = items.find((candidate) => record(candidate, "summary item").artifact_path === artifactPath);
+  assert(item !== undefined, `missing summary item for ${artifactPath}`);
+  return record(item, "summary item");
+}
+
+function visionSessionYaml(input: {
+  id: string;
+  status: string;
+  oneSentence: string;
+  protoStatus: "missing" | "blocked" | "ready";
+  full: boolean;
+}): string {
+  const strategicCore = input.full
+    ? `strategic_core:
+  target_user: "Time-constrained product founders"
+  context: "They are shaping an AI-native workflow before implementation"
+  current_alternative: "Unstructured chat prompts and scattered notes"
+  pain: "Weak product intent creates expensive downstream implementation churn"
+  desired_behavior_change: "Slow down just enough to clarify product truth before generation"
+  core_mechanism: "Conversation-first interrogation followed by structured compile"
+  core_differentiator: "Proto-readiness is treated as a vision acceptance gate"
+  strongest_success_signal: "A low-context Agent can generate strong prototype directions without inventing strategy"
+  failure_signals:
+    - "The Agent has to invent the target user"
+`
+    : "";
+  const productSystemSeed = input.full
+    ? `product_system_seed:
+  product_thesis: "Vision quality determines downstream generation quality"
+  primary_loop:
+    - "interview"
+    - "checkpoint"
+    - "compile"
+  interaction_model: "One focused question at a time"
+  feature_system:
+    - "coverage tracking"
+    - "proto-readiness gate"
+  emotional_value: "The human feels deeply understood without file-write interruptions"
+  functional_value: "The Agent receives structured strategy before prototype prompt generation"
+  trust_boundary: "Do not write durable artifacts after every answer"
+  privacy_boundary: "Keep raw brainstorming out of stable truth until checkpoint"
+  anti_goals:
+    - "fixed small question count"
+  future_opportunities:
+    - "discovery-loop E2E fixture"
+`
+    : "";
+  const protoReadiness = input.full
+    ? `proto_readiness:
+  status: ${input.protoStatus}
+  missing_for_proto:
+    - ${input.protoStatus === "blocked" ? "\"benchmark audience is conflicted\"" : "\"none\""}
+  prototype_direction_seeds:
+    - "conversation-first interview workspace"
+    - "proto-readiness dashboard"
+  prompt_constraints:
+    - "Do not invent product strategy"
+    - "Show trust and checkpoint controls"
+  validation_target: "Can the compiled vision drive distinct prototype prompts?"
+  downstream_notes:
+    - "Hand off to /ow:proto only when ready"
+`
+    : `proto_readiness:
+  status: ${input.protoStatus}
+  missing_for_proto:
+    - "strategic core"
+  prototype_direction_seeds: []
+  prompt_constraints: []
+  validation_target: ""
+  downstream_notes: []
+`;
+  return `schema_version: 0.1.0
+contract_id: vision:${input.id}
+contract_type: vision
+artifact_type: vision_session
+title: "${input.id}"
+status: ${input.status}
+current_question: ""
+stable_answers:
+  - "Vision should remain conversational until compile readiness."
+unresolved_questions:
+  - "What prototype directions are strongest?"
+vision_delta:
+  one_sentence: "${input.oneSentence}"
+  problem: "Current vision discovery can compile too early."
+  goals:
+    - "Protect delayed compile"
+  non_goals:
+    - "Generate prototype prompts inside vision"
+  users:
+    - "AI Agents consuming OpenWorkflow artifacts"
+  quality_bar:
+    - "Proto can consume the output without inventing strategy"
+  ai_native_role: "Product partner and intent compiler"
+  success_signals:
+    - "Low-context handoff is usable"
+  failure_signals:
+    - "The Agent invents core strategy"
+${strategicCore}${productSystemSeed}${protoReadiness}coverage:
+  proto_readiness:
+    status: ${input.protoStatus === "ready" ? "solid" : "thin"}
+    evidence:
+      - "runtime fixture"
+    follow_up_question: ""
+handoff:
+  ready: ${input.protoStatus === "ready" ? "true" : "false"}
+  next_command: ${input.protoStatus === "ready" ? "/ow:validation" : "null"}
+  blockers:
+    - ${input.protoStatus === "ready" ? "\"\"" : "\"proto-readiness is not ready\""}
+  readiness_notes:
+    - "runtime fixture"
+updated_at: null
+`;
 }
 
 async function verifyCommandCheck(root: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -1531,7 +1712,7 @@ function verifyDecomposeToChangesSkill(content: string): void {
 
 function verifyAnalyzeChangesSkill(content: string): void {
   for (const required of [
-    "Analyze one or more candidate change queues and recommend the next candidate without selecting it.",
+    "Analyze multiple candidate change queues and recommend the next queue and candidate without selecting it.",
     "read-only-cross-queue-priority-analysis",
     "skills/analyze-changes/references/analysis-protocol.md",
     "CHANGE_ANALYSIS.yaml",
@@ -1573,6 +1754,7 @@ function verifyVisionSkill(content: string): void {
     "Interview mode is the default",
     "Checkpoint mode writes",
     "Compile mode writes",
+    "Do not write durable vision artifacts after every user answer.",
     "<agent_first_consumer>",
     "Treat the next implementing Agent as the first consumer of vision artifacts.",
     "The vision_delta must preserve enough handoff intelligence",
@@ -1592,6 +1774,7 @@ function verifyVisionSkill(content: string): void {
     "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness",
     "Vision readiness is based on strategic depth, proto-readiness, and user confirmation",
     "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers",
+    "auditability is preserved through checkpoints and compile, not per-answer file churn",
   ]) {
     assert(content.includes(required), `ow-vision missing delayed-compile guidance: ${required}`);
   }

@@ -84,7 +84,17 @@ scope_control:
         through benchmark prototype selection after component commands are
         upgraded.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C004
+    - title: Review /ow:analyze-changes command quality and runtime-surface coverage
+      reason: >
+        During C003 verification, npm run verify:runtime-surface failed because
+        the analyze-changes generated skill no longer contains the legacy
+        expected wording: "Analyze one or more candidate change queues and
+        recommend the next candidate without selecting it." C004 can align the
+        immediate verifier wording to the current generated skill so vision
+        stress fixtures can run, but deeper AC command-quality review remains
+        outside the M84 vision boundary.
+      suggested_plan_id: M90-analyze-changes-runtime-surface-alignment
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -266,7 +276,7 @@ changes:
         - .agents/skills/ow-vision/SKILL.md
         - .openworkflow/audit/CONTEXT_PACKETS.yaml
   - id: C004
-    status: ready
+    status: selected
     title: Add /ow:vision delayed-compile stress tests and fixtures
     purpose: >
       Verify that /ow:vision remains low-latency for humans while still
@@ -307,6 +317,13 @@ changes:
       - Tests cover a compile-ready vision artifact with proto-readiness fields.
       - Tests protect the no eager durable write rule at the protocol or generated skill level.
       - Verification fails clearly if generated vision guidance drops the delayed-compile contract.
+    selection:
+      selected_change_id: C004-vision-delayed-compile-stress-fixtures
+      reason: >
+        Single-queue SC selected C004 because C003 completed generated /ow:vision
+        protocol guidance and C004 is the final M84 candidate needed to
+        pressure-test thin, blocked, and ready vision states.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -467,3 +484,34 @@ operations:
     after_status: ready
     evidence:
       - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP012
+    operation_type: defer
+    target_candidate_ids:
+      - M90-analyze-changes-runtime-surface-alignment
+    actor: agent
+    reason: >
+      Record the unrelated AC runtime-surface failure exposed during C003:
+      verify:runtime-surface expected legacy analyze-changes wording that is not
+      present in the generated skill. C004 may align the immediate verifier
+      wording, while deeper AC review stays in a separate queue.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: deferred
+    evidence:
+      - npm run verify:runtime-surface
+      - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 directly with SC because M84 is a single active queue and C004
+      is the next ready medium-risk candidate.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/IMPLEMENTATION_BRIEF.md

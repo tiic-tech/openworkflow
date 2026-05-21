@@ -23,14 +23,17 @@ Deferred features:
   `prototype_tune_to_refined_prompt` reference skill
 - `M88-discovery-loop-read-model`
 - `M89-discovery-loop-e2e-dogfood`
+- `M90-analyze-changes-command-quality-review` for deeper `/ow:analyze-changes`
+  command-quality review. C004 only aligns the immediate runtime-surface wording
+  expectation so vision stress fixtures can run.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: `C001`, `C002`, `C003`
 
-Selected candidate: none
+Selected candidate: `C004`
 
-Next recommended candidate: `C004`
+Next recommended candidate: none until `C004` is completed or superseded.
 
 ## Selection Policy
 
@@ -94,9 +97,11 @@ Completion evidence:
 
 ### C004 - Add /ow:vision delayed-compile stress tests and fixtures
 
-Status: `ready`
+Status: `selected`
 
 Risk: `medium`
 
 Adds verification coverage for thin, blocked, and compile-ready vision states,
 plus generated-surface drift protection for the delayed-compile contract.
+
+Selection: `C004-vision-delayed-compile-stress-fixtures`
