@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G013-selected-change-commit-automation
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G013-selected-change-commit-automation
+title: Atom tasks for selected-change local commit automation
+status: done
+tasks:
+  - task_id: T001
+    title: Implement commit primitive
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+    done_when:
+      - The primitive refuses unrelated dirty paths.
+      - The primitive requires validation evidence.
+      - The primitive requires commit messages to include plan id and candidate id.
+      - The primitive can create a primary local commit and optional evidence commit.
+  - task_id: T002
+    title: Cover commit automation in runtime verification
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers unrelated dirty-path refusal.
+      - Runtime verification covers commit preview.
+      - Runtime verification covers primary commit creation.
+      - Runtime verification covers follow-up evidence commit and clean final status.
+  - task_id: T003
+    title: Update governance contract
+    status: done
+    type: document
+    owned_paths:
+      - references/git-version-control-governance.md
+    done_when:
+      - The contract says selected changes require at least one local commit.
+      - The contract allows follow-up evidence commits without amend.
+      - Remote mutation remains outside the local boundary.
+  - task_id: T004
+    title: Record queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G013 selection and completion evidence are recorded.
+      - G014 becomes the next recommended candidate.
+  - task_id: T005
+    title: Validate implementation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

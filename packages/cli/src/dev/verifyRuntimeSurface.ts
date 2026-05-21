@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
+import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 
 const CURRENT_FILE = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(CURRENT_FILE), "../../../..");
@@ -58,6 +58,7 @@ async function main(): Promise<number> {
   await verifyGeneratedSkillRepositoryValidation();
   await verifyGitGovernanceDogfoodFixtures();
   await verifyLocalFeatBranchAutomation();
+  await verifySelectedChangeCommitAutomation();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -139,6 +140,31 @@ async function runInCwd(cwd: string, command: string[]): Promise<void> {
         resolvePromise();
       } else {
         reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}`));
+      }
+    });
+  });
+}
+
+async function runCaptureInCwd(cwd: string, command: string[]): Promise<string> {
+  return new Promise<string>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd,
+      env: process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise(output);
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}\n${output}`));
       }
     });
   });
@@ -1064,6 +1090,77 @@ async function verifyLocalFeatBranchAutomation(): Promise<void> {
     });
     assert(!dirty.ok, "local branch automation should refuse dirty trees");
     assert(dirty.dirtyPaths.length > 0, "dirty-tree refusal should report dirty paths");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifySelectedChangeCommitAutomation(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-local-commit-automation-"));
+  try {
+    const gitRoot = join(tempRoot, "selected-change-commit");
+    await mkdir(gitRoot, { recursive: true });
+    await runInCwd(gitRoot, ["git", "init"]);
+    await runInCwd(gitRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(gitRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(gitRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(gitRoot, ["git", "switch", "-c", "codex/m71-commit-fixture"]);
+
+    await mkdir(join(gitRoot, "allowed"), { recursive: true });
+    await writeFile(join(gitRoot, "allowed", "change.txt"), "selected change\n", "utf8");
+    await writeFile(join(gitRoot, "unrelated.txt"), "unrelated\n", "utf8");
+
+    const unrelated = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(!unrelated.ok, "commit automation should refuse unrelated dirty paths");
+    assert(unrelated.unrelatedDirtyPaths.includes("unrelated.txt"), "commit automation should report unrelated dirty path");
+
+    await unlink(join(gitRoot, "unrelated.txt"));
+    const preview = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(preview.ok, `commit automation preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.preview?.args.join(" ") === "commit -m M71-git-version-control-governance/G013 Commit selected change fixture", "commit preview command mismatch");
+
+    const committed = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      evidencePath: "changes/G013/LOCAL_COMMIT_EVIDENCE.yaml",
+      commitEvidence: true,
+      dryRun: false,
+    });
+    assert(committed.ok, `commit automation execution failed: ${committed.errors.join(", ")}`);
+    assert(/^[0-9a-f]{40}$/i.test(committed.primaryCommit ?? ""), "commit automation did not return primary commit hash");
+    assert(/^[0-9a-f]{40}$/i.test(committed.evidenceCommit ?? ""), "commit automation did not return evidence commit hash");
+    assert(committed.headCommit === committed.evidenceCommit, "commit automation should report evidence commit as final HEAD");
+
+    const evidence = await read(join(gitRoot, "changes", "G013", "LOCAL_COMMIT_EVIDENCE.yaml"));
+    assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
+    const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
+    assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }

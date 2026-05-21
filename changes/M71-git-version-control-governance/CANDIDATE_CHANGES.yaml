@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G013
+next_recommended_candidate_id: G014
 changes:
   - id: G001
     status: done
@@ -716,17 +716,18 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G013
-    status: ready
+    status: done
     title: Implement selected-change local commit automation
     purpose: >
-      Add local-only automation that commits exactly one completed selected
+      Add local-only automation that commits at least one completed selected
       change after validation evidence is present.
     scope:
       includes:
-        - one selected change to one local commit
+        - one selected change to at least one local commit
         - commit message using plan id and candidate id
         - validation evidence gate before commit
-        - completion evidence update with commit hash after commit
+        - completion evidence update with commit hash after the primary commit
+        - optional follow-up evidence commit without amend
       excludes:
         - committing dirty unrelated paths
         - amending previous commits
@@ -751,10 +752,28 @@ changes:
     acceptance:
       - Commit automation refuses unrelated dirty paths.
       - Commit message includes plan id and candidate id.
-      - Commit hash is recorded as completion evidence.
+      - Commit hash can be recorded as completion evidence without amending the primary commit.
       - No push or remote mutation occurs.
+    selection:
+      selected_change_id: G013-selected-change-commit-automation
+      reason: >
+        G013 is ready after G012 and adds selected-change local commit
+        automation before PR-ready summaries depend on commit evidence.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G013-selected-change-commit-automation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
   - id: G014
-    status: candidate
+    status: ready
     title: Implement local PR-ready summary generation for completed queues
     purpose: >
       Add local-only automation that creates `PR_READY_SUMMARY.md` for a fully
@@ -1244,6 +1263,37 @@ operations:
       - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
       - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP029
+    operation_type: select
+    target_candidate_ids:
+      - G013
+    actor: agent
+    reason: Select G013 because local branch automation is complete and commit evidence is required before PR-ready summary generation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP030
+    operation_type: complete
+    target_candidate_ids:
+      - G013
+    actor: agent
+    reason: Complete G013 after adding selected-change commit automation with validation, branch, allowed-path, and evidence-commit guards.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
       - "validation: npm run verify:runtime-surface"

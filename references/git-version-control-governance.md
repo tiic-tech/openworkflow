@@ -123,7 +123,7 @@ boundaries:
 
 - create or check out the local feat branch recorded in
   `queue_policy.branch_boundary`
-- commit one completed selected change as one local commit
+- commit one completed selected change as at least one local commit
 - generate a local `PR_READY_SUMMARY.md` for a fully implemented and validated
   candidate queue
 
@@ -143,6 +143,13 @@ The command must refuse local mutation when:
 - the selected change is not complete
 - required validation evidence is missing
 - the operation would require push, remote PR creation, Issue mutation, or merge
+
+Selected changes must not finish without a local commit. A selected change may
+produce multiple local commits when traceability requires a follow-up evidence
+commit. Do not amend solely to force a commit to contain its own hash. Treat the
+latest local HEAD produced for the selected change as the relationship anchor,
+and record the primary implementation commit hash when a follow-up evidence
+commit is used.
 
 Remote operations are outside the approved local boundary. Push, remote PR
 creation or update, Issue mutation, and merge require explicit operation-level

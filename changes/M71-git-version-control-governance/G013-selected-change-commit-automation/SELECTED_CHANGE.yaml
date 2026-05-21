@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: selected_change:G013-selected-change-commit-automation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G013-selected-change-commit-automation
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G013
+title: Implement selected-change local commit automation
+status: done
+selection_reason: >
+  G013 is ready after G012. It adds the local-only commit primitive needed
+  before PR-ready summary generation can rely on selected-change commit
+  evidence.
+user_decision:
+  decided_at: 2026-05-21
+  summary: >
+    A selected change must have at least one local commit. It may have multiple
+    commits when evidence needs to be recorded after the primary commit, and the
+    selected change's latest HEAD commit preserves traceability.
+rejected_alternatives:
+  - candidate_ref: G014
+    reason: PR-ready summary generation depends on selected-change commit evidence.
+  - candidate_ref: G015
+    reason: the command shell remains high risk until local primitives exist.
+scope:
+  includes:
+    - selected-change local commit primitive
+    - allowed-path dirty-tree guard
+    - branch-boundary guard
+    - validation evidence gate
+    - commit message validation for plan id and candidate id
+    - optional follow-up evidence commit without amend
+  excludes:
+    - committing unrelated dirty paths
+    - amending commits
+    - pushing commits
+    - remote PR creation
+    - GitHub Issue mutation
+owned_paths:
+  - packages/core/src/git/localGitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - references/git-version-control-governance.md
+  - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/**
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Commit automation refuses unrelated dirty paths.
+  - Commit message includes plan id and candidate id.
+  - Commit automation can record the primary commit hash as completion evidence through a follow-up evidence commit.
+  - No push or remote mutation occurs.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - references/git-version-control-governance.md
+    - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"

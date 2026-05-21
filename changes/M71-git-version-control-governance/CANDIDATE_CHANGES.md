@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G013`.
+- Next recommended candidate: `G014`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -305,11 +305,11 @@ Completion evidence:
 
 ## G013 - Implement Selected-Change Local Commit Automation
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
-Purpose: add local-only automation that commits exactly one completed selected
+Purpose: add local-only automation that commits at least one completed selected
 change after validation evidence is present.
 
 Dependencies: `G011`, `G012`
@@ -326,9 +326,19 @@ Validation:
 - `git diff --check`
 - `npm run verify:runtime-surface`
 
+Selection: `G013-selected-change-commit-automation`
+
+Completion evidence:
+
+- `packages/core/src/git/localGitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `references/git-version-control-governance.md`
+- `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml`
+
 ## G014 - Implement Local PR-Ready Summary Generation For Completed Queues
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
