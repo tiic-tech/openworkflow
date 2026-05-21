@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M85-validation-proto-target-contract
 title: Candidate changes for validation prototype target contract
-status: completed
+status: active
 source:
   kind: mixed
   refs:
@@ -28,35 +28,34 @@ queue_policy:
 selection_policy:
   prefer:
     - makes /ow:validation a prototype validation target compiler
-    - preserves /ow:validation as a user-triggered command with artifact write authority
-    - exposes validation as an agent built-in read-only gate before /ow:proto
+    - preserves validation as a durable artifact-producing command whether user-triggered or agent-auto-triggered
     - preserves vision as source truth and proto as downstream consumer
     - gives /ow:proto a clear experiment brief and observable evidence criteria
     - blocks weak or conflicted vision instead of forcing a validation target
     - keeps one selected change implementation-sized
   avoid:
     - rebuilding /ow:proto prompt generation in this queue
-    - letting agents silently write validation artifacts while running /ow:proto
+    - letting agents use ephemeral validation context without durable artifacts
     - treating validation as a generic feature ranking or backlog planner
     - creating prototype artifacts during validation
     - expanding into full discovery-loop E2E dogfood
 command_boundary_decision:
   decided_at: 2026-05-22
   decision: >
-    Validation should be both a user-triggered formal command and an agent
-    built-in consumer gate. /ow:validation owns artifact creation and human
-    product judgment. Downstream agents, especially /ow:proto, may consume
-    validation as a read-only readiness gate that reports ready_for_proto,
-    missing_validation, thin_validation, stale_validation, or return_to_vision.
+    Validation should be both a user-triggered formal command and an
+    agent-auto-triggered artifact-producing command. When /ow:proto is invoked
+    without a current validation artifact, the agent must first run the same
+    validation pass and write VALIDATION.yaml, NOTE.md, and index/current-state
+    updates before generating prototype artifacts.
   write_authority: >
-    Built-in validation gates must not silently create or overwrite validation
-    artifacts. They may propose a target draft, but durable writes require
-    explicit /ow:validation flow or user confirmation.
+    Agent-auto validation has durable write authority, but must record
+    trigger.mode as agent_auto, requested_command as /ow:proto, and reason as
+    missing_current_validation so audit can distinguish it from user_explicit
+    validation.
   impact_on_m85: >
-    C002 must encode fields and readiness checks that make validation
-    consumable by agents. C003 must make the generated /ow:validation command
-    preserve explicit command write authority. Proto-side enforcement is
-    deferred to M86.
+    C005 corrects the prior read-only gate decision. /ow:proto should block
+    direct prototype generation when validation is missing and should auto-run
+    validation as a durable artifact-producing prerequisite.
 scope_control:
   current_boundary: >
     Upgrade /ow:validation to compile proto-ready vision into one prototype
@@ -88,7 +87,7 @@ scope_control:
       reason: >
         End-to-end pressure testing belongs after command-specific contracts land.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -315,6 +314,65 @@ changes:
       commit: c56b3c9
       evidence:
         - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C005
+    status: selected
+    title: Make agent-auto validation artifact-producing before proto
+    purpose: >
+      Correct M85's read-only gate decision so /ow:proto without current
+      validation must first create a durable validation artifact with explicit
+      agent_auto provenance.
+    scope:
+      includes:
+        - validation trigger provenance fields
+        - /ow:proto missing-validation readiness blocker
+        - generated /ow:proto protocol auto-validation guidance
+        - runtime surface verification for missing_validation behavior
+      excludes:
+        - prototype prompt generation changes
+        - image generation or tune behavior
+        - full execution engine for multi-command chaining
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/validation-target.schema.json
+      - schemas/validation.schema.json
+      - packages/core/src/artifacts/readiness.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - changes/M85-validation-proto-target-contract/
+    dependencies:
+      - C001
+      - C002
+      - C003
+      - C004
+    unlocks:
+      - M86-proto-strategy-prompt-compiler
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - validation_target template and schema include trigger provenance.
+      - /ow:proto missing current_validation reports missing_validation as a blocker, not a vision_only pass.
+      - Generated /ow:proto guidance says to auto-run /ow:validation and write artifacts before prototype generation.
+      - Auto validation provenance distinguishes agent_auto from user_explicit.
+    selection:
+      selected_change_id: C005-agent-auto-validation-artifacts
+      reason: >
+        User corrected the workflow decision: agent-triggered validation must
+        be durable and audit-visible, not ephemeral read-only context.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -464,3 +522,18 @@ operations:
     after_status: done
     evidence:
       - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: user+agent
+    reason: >
+      Supplement M85 after user clarified that agent-triggered validation must
+      produce durable artifacts for downstream audit.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: selected
+    evidence:
+      - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/SELECTED_CHANGE.yaml
+      - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/ATOM_TASKS.yaml
+      - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/IMPLEMENTATION_BRIEF.md

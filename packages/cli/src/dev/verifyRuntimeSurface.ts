@@ -489,6 +489,81 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   await assertNoStageArtifacts(root);
   await verifyVisionSummaryQualityFixtures(root, env);
 
+  const missingValidationCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(missingValidationCheck.code !== 0, "proto check should block before auto validation writes an artifact");
+  const missingValidationReport = parseJsonReport(missingValidationCheck.output, "check");
+  const missingValidationData = record(missingValidationReport.data, "missing validation check data");
+  const missingValidationSemantic = record(missingValidationData.semantic_readiness, "missing validation semantic readiness");
+  assert(missingValidationSemantic.gate_status === "missing_validation", "proto check should expose missing_validation before auto validation");
+  assert(Array.isArray(missingValidationReport.health_errors) && missingValidationReport.health_errors.some((item) => String(item).includes("auto-run /ow:validation")), "missing validation check should instruct auto validation");
+
+  const summaryValidationPath = ".openworkflow/validation/summary-val/VALIDATION.yaml";
+  await mkdir(join(root, ".openworkflow", "validation", "summary-val"), { recursive: true });
+  await writeFile(join(root, summaryValidationPath), [
+    "schema_version: 0.1.0",
+    "contract_id: validation:summary-val",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Summary fixture validation",
+    "status: active",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: runtime_surface_summary_fixture",
+    "core_question: Can prototype summary health remain advisory?",
+    "central_uncertainty: Whether unrelated prototype summary health should block proto readiness.",
+    "hypothesis: A ready validation target keeps missing prototype summaries advisory.",
+    "target_behavior: Agent can distinguish validation readiness from prototype summary freshness.",
+    "feature_classification:",
+    "  existential:",
+    "    - validation readiness",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - Validation exists before proto.",
+    "prototype_scope:",
+    "  include:",
+    "    - summary health check",
+    "  exclude: []",
+    "prototype_experiment:",
+    "  scenario: Agent checks /ow:proto with current validation set.",
+    "  must_show:",
+    "    - validation artifact is current",
+    "  must_not_show:",
+    "    - missing validation blocker",
+    "observable_signals:",
+    "  pass:",
+    "    - check remains ready when only prototype summary is missing",
+    "  fail:",
+    "    - check reports missing_validation",
+    "  ambiguous: []",
+    "acceptance:",
+    "  - prototype summary health is advisory",
+    "decision_rules:",
+    "  continue:",
+    "    - ready_for_proto",
+    "  revise:",
+    "    - summary warning only",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence: []",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+    "",
+  ].join("\n"), "utf8");
+  parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", summaryValidationPath, "--current", "--write", "--json"], env), "register");
+
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
   await mkdir(artifactDir, { recursive: true });
   await writeFile(join(artifactDir, "EVIDENCE.yaml"), "artifact_type: prototype_evidence\ncore_question: Test\nresult: promising\nhandoff:\n  next_command: /ow:design\n", "utf8");
@@ -615,6 +690,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
     "artifact_type: validation_target",
     "status: active",
     "title: Ready validation target",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: runtime_surface_fixture",
     "core_question: Test",
     "central_uncertainty: Whether the prototype target is specific enough.",
     "hypothesis: A concrete target lets agents produce useful prototype prompts.",
@@ -672,7 +751,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
   assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "current"), "summary health did not report current validation current_slice");
   const protoContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:proto", "--json"], env);
-  assert(protoContextStatus.code === 0, "proto context should stay ready with vision-only semantics when no current validation pointer is set");
+  assert(protoContextStatus.code === 0, "proto context should stay ready when current validation pointer is set");
   const protoContext = parseJsonReport(protoContextStatus.output, "context");
   const protoContextData = record(protoContext.data, "proto context data");
   assert(Array.isArray(protoContextData.included) && protoContextData.included.some((item) => record(item, "included proto context").source === "current_slice" && record(item, "included proto context").path === ".openworkflow/validation/val-1/VALIDATION.yaml"), "proto context should include validation current_slice");
@@ -721,10 +800,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(nonEmptyArray(inspect.health_errors), "inspect should expose health_errors when health fails");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(checkStatus.code === 0, "proto check should stay ready when summary health is advisory");
+  assert(checkStatus.code === 0, "proto check should stay ready after current validation is registered");
   const check = parseJsonReport(checkStatus.output, "check");
   const checkData = record(check.data, "check data");
-  assert(check.ok === true, "proto check should report ok=true without current validation blockers");
+  assert(check.ok === true, "proto check should report ok=true after current validation is registered");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
 
 }
@@ -1031,6 +1110,10 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
     "artifact_type: validation_target",
     "title: Vision gap validation target",
     "status: active",
+    "trigger:",
+    "  mode: agent_auto",
+    "  requested_command: /ow:proto",
+    "  reason: missing_current_validation",
     "core_question: Can the prototype proceed without more vision detail?",
     "central_uncertainty: Whether the missing user context would force strategy invention.",
     "hypothesis: The prototype should not proceed until the vision gap is resolved.",
@@ -1101,6 +1184,10 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
     "artifact_type: validation_target",
     "title: Filled validation target",
     "status: active",
+    "trigger:",
+    "  mode: agent_auto",
+    "  requested_command: /ow:proto",
+    "  reason: missing_current_validation",
     "core_question: Does the first prototype answer the core workflow risk?",
     "central_uncertainty: Whether agents can consume validation without inventing the prototype target.",
     "hypothesis: A focused validation target lets /ow:proto generate useful prototype directions.",
@@ -1947,7 +2034,8 @@ function verifyProtoSkill(content: string): void {
   for (const required of [
     "image-first-strategic-proto-prompt-pack",
     "<validation_consumption>",
-    "validation_input.mode",
+    "trigger.mode: agent_auto",
+    "missing_current_validation",
     "<strategic_prompt_pack>",
     "prompt_pack_type: strategic_proto_prompt_pack",
     "Each direction must include direction_id",

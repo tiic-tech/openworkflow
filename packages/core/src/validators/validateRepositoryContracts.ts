@@ -1216,6 +1216,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
   const requiredByType: Record<string, string[]> = {
     vision_session: ["current_question", "stable_answers", "unresolved_questions", "vision_delta", "handoff"],
     validation_target: [
+      "trigger",
       "core_question",
       "central_uncertainty",
       "hypothesis",
@@ -1306,6 +1307,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
 }
 
 function validateValidationTarget(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validateValidationTrigger(label, data.trigger, errors);
   const featureClassification = data.feature_classification;
   if (isRecord(featureClassification)) {
     for (const key of ["existential", "supporting", "later", "out_of_scope"]) {
@@ -1319,6 +1321,21 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
   validateSignalSet(label, "observable_signals", data.observable_signals, ["pass", "fail", "ambiguous"], errors);
   validateSignalSet(label, "decision_rules", data.decision_rules, ["continue", "revise", "pivot", "stop", "needs_more_evidence"], errors);
   validateAgentReadinessGate(label, data.agent_readiness_gate, errors);
+}
+
+function validateValidationTrigger(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["mode", "requested_command", "reason"]) {
+    if (!(key in value)) {
+      errors.push(`${label} trigger missing ${key}`);
+    }
+  }
+  const mode = String(value.mode ?? "");
+  if (mode && !["user_explicit", "agent_auto"].includes(mode)) {
+    errors.push(`${label} trigger.mode has invalid value ${mode}`);
+  }
 }
 
 function validatePrototypeExperiment(label: string, value: unknown, errors: string[]): void {

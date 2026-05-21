@@ -330,6 +330,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
   }
   if (artifactType === "validation_target") {
     return [
+      "trigger",
       "core_question",
       "central_uncertainty",
       "hypothesis",
@@ -432,6 +433,18 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
 }
 
 function validateValidationTarget(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const trigger = data.trigger;
+  if (isRecord(trigger)) {
+    for (const key of ["mode", "requested_command", "reason"]) {
+      if (!(key in trigger)) {
+        errors.push(`${label} trigger missing ${key}`);
+      }
+    }
+    const mode = String(trigger.mode ?? "");
+    if (mode && !["user_explicit", "agent_auto"].includes(mode)) {
+      errors.push(`${label} trigger.mode has invalid value ${mode}`);
+    }
+  }
   const featureClassification = data.feature_classification;
   if (isRecord(featureClassification)) {
     for (const key of ["existential", "supporting", "later", "out_of_scope"]) {

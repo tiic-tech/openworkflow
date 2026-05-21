@@ -193,6 +193,9 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
   assertPhase(phase, "decision_rules" in template, "validation template missing decision_rules");
   assertPhase(phase, "vision_gaps" in template, "validation template missing vision_gaps");
   const agentGate = recordField(template, "agent_readiness_gate", phase);
+  const trigger = recordField(template, "trigger", phase);
+  assertPhase(phase, trigger.mode === "user_explicit", "validation template should default trigger mode to user_explicit");
+  assertPhase(phase, trigger.requested_command === "/ow:validation", "validation template should default trigger requested_command to /ow:validation");
   assertPhase(phase, agentGate.status === "thin_validation", "validation template should default agent readiness to thin_validation");
   assertPhase(phase, agentGate.write_authority === "/ow:validation", "validation template should preserve /ow:validation write authority");
   assertPhase(phase, stringList(template, "decision_options", phase).includes("needs_more_evidence"), "validation template missing decision options");
@@ -205,7 +208,9 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertPhase(phase, protocol.interactionMode === "image-first-strategic-proto-prompt-pack", "prototype source protocol is not image-first prompt pack");
   assertDiscoveryHandoffs(phase, protocol.handoffCommands, "source prototype handoffs");
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "prototype cannot write decision audit");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "validation_input.mode", "prototype does not record validation mode");
+  assertSomeIncludes(phase, protocol.conditionalOutputs ?? [], ".openworkflow/validation/<id>/VALIDATION.yaml", "prototype cannot auto-write validation artifacts");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "auto-run /ow:validation", "prototype does not auto-run validation when missing");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "trigger.mode agent_auto", "prototype auto validation does not record provenance");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "5-8 strategic prototype hypotheses", "prototype does not generate strategic hypotheses");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "PROTO_PROMPT_PACK.yaml", "prototype does not write prompt pack");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "decision audit record internally", "prototype does not write decision audit internally");
@@ -216,6 +221,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertDiscoveryHandoffs(phase, stringList(generated, "handoff_commands", phase), "generated prototype handoffs");
   assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/decisions/<id>/DECISION.yaml", "generated prototype cannot write decision audit");
   assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml", "generated prototype missing prompt pack output");
+  assertListIncludes(phase, stringList(generated, "conditional_outputs", phase), ".openworkflow/validation/<id>/VALIDATION.yaml", "generated prototype missing conditional validation output");
 
   const packet = packetRecord(runtime, "/ow:proto", phase);
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
@@ -232,6 +238,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
   assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
+  assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
   assertIncludes(phase, skill, "Do not write HTML, CSS, runnable prototypes", "skill lost image-only boundary");
   assertIncludes(phase, skill, "decision_record", "skill does not expose decision artifact contract for internal audit");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in prototype handoffs");

@@ -10,6 +10,7 @@
     "artifact_type",
     "title",
     "status",
+    "trigger",
     "core_question",
     "central_uncertainty",
     "hypothesis",
@@ -43,6 +44,33 @@
     },
     "status": {
       "type": "string"
+    },
+    "trigger": {
+      "type": "object",
+      "required": [
+        "mode",
+        "requested_command",
+        "reason"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "user_explicit",
+            "agent_auto"
+          ]
+        },
+        "requested_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
     },
     "core_question": {
       "type": "string"

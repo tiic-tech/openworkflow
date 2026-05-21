@@ -143,13 +143,18 @@ packets:
       - .openworkflow/changes/**
       - .openworkflow/specs/**
     conditional_outputs:
-      []
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/<id>/VALIDATION.yaml
+      - .openworkflow/validation/<id>/NOTE.md
     audit_checkpoints:
       before:
-        - Load vision and optional validation context; validation is optional but must be consumed
-          when present.
-        - Record validation_input.mode as vision_only or validation_present; do not silently
-          auto-generate validation.
+        - Load vision and current validation context; validation is required before prototype
+          generation.
+        - If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml,
+          NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command
+          /ow:proto, and reason missing_current_validation.
+        - Proceed only after validation_input.mode can reference a durable validation artifact; do
+          not use ephemeral vision_only validation context.
         - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
           boundary conditions, and central uncertainty."
       during:

@@ -26,18 +26,18 @@ Completed candidates: none
 
 Completed candidates: `C001`, `C002`, `C003`, `C004`
 
-Selected candidate: none
+Selected candidate: `C005`
 
-Next recommended candidate: none. M85 is complete.
+Next recommended candidate: `C005`
 
 ## Command Boundary Decision
 
-Validation is both a user-triggered formal command and an agent built-in
-read-only gate. `/ow:validation` owns durable artifact creation and human
-product judgment. Downstream agents, especially `/ow:proto`, may consume
-validation readiness states such as `ready_for_proto`, `missing_validation`,
-`thin_validation`, `stale_validation`, and `return_to_vision`, but must not
-silently create or overwrite validation artifacts.
+Validation is both a user-triggered formal command and an agent-auto-triggered
+artifact-producing command. When `/ow:proto` is invoked without a current
+validation artifact, the agent must first run the same validation pass and write
+durable validation artifacts before prototype generation. Auto validation must
+record `trigger.mode: agent_auto`, `trigger.requested_command: /ow:proto`, and
+`trigger.reason: missing_current_validation`.
 
 ## Candidates
 
@@ -85,3 +85,13 @@ Risk: `medium`
 Adds thin, vision-gap blocked, and proto-ready validation fixtures.
 
 Completed in commit `c56b3c9`.
+
+### C005 - Make agent-auto validation artifact-producing before proto
+
+Status: `selected`
+
+Risk: `medium`
+
+Corrects the prior read-only gate decision so missing validation before
+`/ow:proto` becomes an artifact-producing validation preflight, not ephemeral
+context.

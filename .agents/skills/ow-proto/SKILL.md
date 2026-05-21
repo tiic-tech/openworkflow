@@ -71,7 +71,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </allowed_outputs>
 
 <conditional_outputs>
-- None
+- .openworkflow/validation/VALIDATION_INDEX.yaml
+- .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml
+- .openworkflow/validation/&lt;id&gt;/NOTE.md
 </conditional_outputs>
 
 <artifact_contracts>
@@ -88,8 +90,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Load vision and optional validation context; validation is optional but must be consumed when present.
-- Record validation_input.mode as vision_only or validation_present; do not silently auto-generate validation.
+- Load vision and current validation context; validation is required before prototype generation.
+- If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.
+- Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.
 - Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.
 </before>
 <during>
@@ -124,8 +127,9 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 </artifact_checkpoint>
 
 <validation_consumption>
-- If validation artifacts are absent but a vision exists, proceed in vision_only mode.
-- If VALIDATION.yaml and PROTOTYPE_BRIEF.md exist, consume them and preserve their include/exclude boundaries.
+- If validation artifacts are absent but a vision exists, auto-run /ow:validation first and persist VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml.
+- Auto validation must set trigger.mode: agent_auto, trigger.requested_command: /ow:proto, and trigger.reason: missing_current_validation.
+- If VALIDATION.yaml exists, consume it and preserve central_uncertainty, prototype_experiment, observable_signals, decision_rules, and include/exclude boundaries.
 - If validation conflicts with vision, stop for a decision instead of broadening scope silently.
 </validation_consumption>
 
@@ -157,7 +161,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 <anti_patterns>
 - Do not generate HTML, CSS, local runnable apps, or implementation tasks from /ow:proto.
 - Do not treat visual style variants as strategic directions.
-- Do not hide missing validation; record vision_only mode when validation artifacts are absent.
+- Do not hide missing validation or proceed in ephemeral vision_only mode.
 - Do not convert prompt packs into production specs or change backlogs.
 - Do not create design, specs, changes, or teams from unaccepted prompt-pack evidence.
 - Do not ask the user to manually invoke /ow:decision after prototype work; record the decision audit internally.

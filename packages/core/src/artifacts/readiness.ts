@@ -37,10 +37,12 @@ async function assessOptionalCurrentArtifact(
   const artifactPath = stringValue(currentState?.[pointerKey]);
   if (!artifactPath) {
     return {
-      ok: true,
+      ok: false,
       gate_status: "missing_validation",
-      blockers: [],
-      warnings: [`CURRENT_STATE.${pointerKey} is not set; /ow:proto should record validation_input.mode as vision_only and must not silently write validation artifacts`],
+      blockers: [
+        `CURRENT_STATE.${pointerKey} is not set; before /ow:proto, auto-run /ow:validation and write a validation artifact with trigger.mode agent_auto`,
+      ],
+      warnings: [],
     };
   }
   const artifact = await readArtifact(root, artifactPath);

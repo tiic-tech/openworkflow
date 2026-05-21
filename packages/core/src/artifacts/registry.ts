@@ -266,6 +266,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
     disclosureLevel: 2,
     requiredKeys: [
       "artifact_type",
+      "trigger",
       "core_question",
       "central_uncertainty",
       "hypothesis",
@@ -310,6 +311,11 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       artifact_type: "validation_target",
       title: "<short validation target title>",
       status: "draft",
+      trigger: {
+        mode: "user_explicit",
+        requested_command: "/ow:validation",
+        reason: "user_invoked_validation",
+      },
       core_question: "",
       central_uncertainty: "",
       hypothesis: "",

@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:C005-agent-auto-validation-artifacts
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C005-agent-auto-validation-artifacts
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C005
+title: Make agent-auto validation artifact-producing before proto
+status: selected
+selection_reason: >
+  The prior read-only gate loses validation artifacts in the audit chain. C005
+  makes agent-auto validation produce the same durable artifact set as explicit
+  /ow:validation while recording provenance.
+scope:
+  includes:
+    - validation trigger provenance fields
+    - /ow:proto missing-validation readiness blocker
+    - generated /ow:proto protocol auto-validation guidance
+    - runtime surface verification for missing_validation behavior
+  excludes:
+    - prototype prompt generation changes
+    - image generation or tune behavior
+    - full execution engine for multi-command chaining
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M85-validation-proto-target-contract/
+forbidden_paths:
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+acceptance:
+  - validation_target template and schema include trigger provenance.
+  - /ow:proto missing current_validation reports missing_validation as a blocker, not a vision_only pass.
+  - Generated /ow:proto guidance says to auto-run /ow:validation and write artifacts before prototype generation.
+  - Auto validation provenance distinguishes agent_auto from user_explicit.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one local commit because provenance, proto readiness, generated
+  guidance, and verification must stay aligned.
