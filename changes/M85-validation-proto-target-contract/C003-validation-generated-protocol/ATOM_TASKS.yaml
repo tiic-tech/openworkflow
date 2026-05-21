@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-validation-generated-protocol
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-validation-generated-protocol
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C003
+title: Atom tasks for validation generated protocol
+status: ready
+tasks:
+  - task_id: T001
+    title: Update source command protocol
+    status: pending
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when: >
+      /ow:validation protocol describes prototype target compilation,
+      return-to-vision gating, and no-prototype boundaries.
+  - task_id: T002
+    title: Refresh generated command surfaces
+    status: pending
+    type: generate
+    owned_paths:
+      - .agents/skills/ow-validation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when: >
+      openworkflow sync regenerates managed surfaces from source protocol.
+  - task_id: T003
+    title: Update drift verification
+    status: pending
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Workflow and runtime-surface verifiers fail if generated validation
+      protocol loses experiment-compiler behavior.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

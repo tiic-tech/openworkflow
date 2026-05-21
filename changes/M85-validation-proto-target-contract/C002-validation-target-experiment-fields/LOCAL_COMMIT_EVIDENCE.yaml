@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C002-validation-target-experiment-fields
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+selected_change_id: C002-validation-target-experiment-fields
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C002
+title: Local commit evidence for C002 validation target experiment fields
+status: complete
+completed_at: 2026-05-22
+commit: 30e3a4e
+summary: >
+  Extended validation_target with experiment brief fields and agent-facing
+  read-only semantic readiness states while preserving /ow:validation as the
+  durable write authority.
+changed_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/commands/check.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - .agents/skills/ow-validation/SKILL.md
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js check /ow:proto --root . --json
+    - git diff --check
+  result: pass
+risk:
+  level: medium
+  high_risk_report: not_applicable

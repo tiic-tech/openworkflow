@@ -33,12 +33,12 @@ outputs:
   summary: changes/M85-validation-proto-target-contract/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 3
-completed_candidate_id: C001
-completed_change_id: C001-build-validation-prototype-target-contract
-selected_candidate_id: C002
-selected_change_id: C002-validation-target-experiment-fields
-next_recommended_candidate_id: C002
+active_candidate_count: 2
+completed_candidate_id: C002
+completed_change_id: C002-validation-target-experiment-fields
+selected_candidate_id: C003
+selected_change_id: C003-validation-generated-protocol
+next_recommended_candidate_id: C003
 key_dependencies:
   - M84 completed proto-ready vision structures and generated /ow:vision guidance.
   - /ow:proto should not invent the experiment target when validation is present.
@@ -74,3 +74,5 @@ validation:
     - OP003 completed C001 in commit 0acbf94.
     - OP004 recorded the validation command boundary decision.
     - OP005 selected C002 directly with SC.
+    - OP006 completed C002 in commit 30e3a4e.
+    - OP007 selected C003 directly with SC.

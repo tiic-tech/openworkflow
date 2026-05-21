@@ -88,7 +88,7 @@ scope_control:
       reason: >
         End-to-end pressure testing belongs after command-specific contracts land.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -142,7 +142,7 @@ changes:
       evidence:
         - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: selected
+    status: done
     title: Extend validation_target artifact with experiment brief fields
     purpose: >
       Add structured validation fields that let /ow:proto consume the target as
@@ -186,6 +186,7 @@ changes:
       - npm run build
       - npm run validate
       - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
       - node dist/cli/src/index.js sync --root . --json
       - node dist/cli/src/index.js validate --root . --json
       - git diff --check
@@ -201,8 +202,14 @@ changes:
         validation target shape and read-only readiness signals that agents
         need before generated command protocol work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-validation-target-experiment-fields
+      completed_at: 2026-05-22
+      commit: 30e3a4e
+      evidence:
+        - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: candidate
+    status: selected
     title: Upgrade /ow:validation generated protocol for experiment compilation
     purpose: >
       Make generated /ow:validation guidance consume build-validation and the
@@ -243,6 +250,13 @@ changes:
       - The generated skill requires central uncertainty, experiment boundary, evidence, and decision rules.
       - The generated skill returns to /ow:vision when vision gaps block a valid target.
       - Verification catches generated-surface drift.
+    selection:
+      selected_change_id: C003-validation-generated-protocol
+      reason: >
+        Single-queue SC selected C003 after C002 because the artifact shape is
+        now stable enough for generated /ow:validation protocol wording and
+        runtime-surface drift checks.
+      selected_at: 2026-05-22
   - id: C004
     status: candidate
     title: Add validation target stress fixtures
@@ -362,3 +376,31 @@ operations:
       - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/SELECTED_CHANGE.yaml
       - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/ATOM_TASKS.yaml
       - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 extended validation_target fields, summary quality, read-only
+      readiness status, validators, and generated artifact contract projection.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 directly with SC because M85 remains the single active queue
+      and C003 depends on completed C001-C002.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/SELECTED_CHANGE.yaml
+      - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/ATOM_TASKS.yaml
+      - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/IMPLEMENTATION_BRIEF.md

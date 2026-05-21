@@ -6,11 +6,11 @@ selected_change_id: C002-validation-target-experiment-fields
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C002
 title: Atom tasks for validation target experiment fields
-status: ready
+status: complete
 tasks:
   - task_id: T001
     title: Extend validation target schemas and templates
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - schemas/validation-target.schema.json
@@ -21,7 +21,7 @@ tasks:
       prototype experiment, observable signals, decision rules, and vision gaps.
   - task_id: T002
     title: Upgrade summary and readiness checks
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/workflow/summaryHealth.ts
@@ -34,7 +34,7 @@ tasks:
       can report read-only gate states without writing artifacts.
   - task_id: T003
     title: Update workflow verification and synced contracts
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -48,6 +48,7 @@ validation:
   - npm run build
   - npm run validate
   - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
   - node dist/cli/src/index.js sync --root . --json
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check

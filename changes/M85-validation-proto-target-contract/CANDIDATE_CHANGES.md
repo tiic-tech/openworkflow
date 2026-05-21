@@ -24,11 +24,11 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: none
 
-Completed candidates: `C001`
+Completed candidates: `C001`, `C002`
 
-Selected candidate: `C002`
+Selected candidate: `C003`
 
-Next recommended candidate: `C002`
+Next recommended candidate: `C003`
 
 ## Command Boundary Decision
 
@@ -56,16 +56,18 @@ Completed in commit `0acbf94`.
 
 ### C002 - Extend validation_target artifact with experiment brief fields
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
 Adds structured fields that let `/ow:proto` consume validation as an experiment
 brief and lets agents evaluate validation through a read-only readiness gate.
 
+Completed in commit `30e3a4e`.
+
 ### C003 - Upgrade /ow:validation generated protocol for experiment compilation
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `medium`
 
