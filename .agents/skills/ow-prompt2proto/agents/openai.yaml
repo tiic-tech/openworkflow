@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.prompt2proto
+interface:
+  display_name: "ow:prompt2proto"
+  short_description: "Internally generate high-fidelity prototype image groups from prepared prompt text. Internal audit only."
+  default_prompt: "Use /ow:prompt2proto for this OpenWorkflow repository."

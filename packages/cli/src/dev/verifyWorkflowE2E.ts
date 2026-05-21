@@ -39,6 +39,7 @@ async function main(): Promise<number> {
     await verifyCurrentState(runtime);
     await verifyVisionPhase(runtime);
     await verifyValidationPhase(runtime);
+    await verifyInternalProtoPipelinePhase(runtime);
     await verifyPrototypePhase(runtime);
     await verifyTunePhase(runtime);
     await verifyInternalDecisionPhase(runtime);
@@ -236,6 +237,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
 
   const skill = await readSkill(runtime, "ow-proto");
   for (const tag of [
+    "internal_proto_pipeline",
     "validation_consumption",
     "preflight_quality_gate",
     "direction_count_policy",
@@ -249,6 +251,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
   assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
+  assertIncludes(phase, skill, "/ow:vision2prompt and /ow:prompt2proto are internal commands", "skill lost internal proto pipeline rule");
   assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
   assertIncludes(phase, skill, "askUserQuestion", "skill lost direction-count question rule");
   assertIncludes(phase, skill, "resolved_count: 3", "skill lost delegated default direction count");
@@ -264,6 +267,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   const template = recordField(artifactRecord(runtime, "prototype_evidence", phase), "template", phase);
   assertPhase(phase, "prompt_pack_type" in template, "prototype template missing prompt pack type");
   assertPhase(phase, "validation_input" in template, "prototype template missing validation input");
+  assertPhase(phase, "internal_pipeline" in template, "prototype template missing internal pipeline");
   assertPhase(phase, "preflight_quality_gate" in template, "prototype template missing preflight quality gate");
   assertPhase(phase, "direction_count_policy" in template, "prototype template missing direction count policy");
   assertPhase(phase, "normalized_input" in template, "prototype template missing normalized input");
@@ -282,6 +286,32 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.next_command !== "/ow:decision", "prototype template exposes manual decision as next command");
   assertListIncludes(phase, USER_FACING_DISCOVERY_HANDOFFS, String(handoff.next_command), "prototype template next command is not user-facing");
+}
+
+async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void> {
+  const phase = "internal-proto-pipeline";
+  const vision2Prompt = command("vision2prompt", phase);
+  const prompt2Proto = command("prompt2proto", phase);
+  assertPhase(phase, vision2Prompt.visibility === "internal", "source vision2prompt command is not internal");
+  assertPhase(phase, prompt2Proto.visibility === "internal", "source prompt2proto command is not internal");
+  assertPhase(phase, protocolFor(vision2Prompt, phase).interactionMode === "internal-vision-to-strategic-prompt-text", "vision2prompt source protocol mismatch");
+  assertPhase(phase, protocolFor(prompt2Proto, phase).interactionMode === "internal-prompt-text-to-prototype-images", "prompt2proto source protocol mismatch");
+
+  const generatedVision2Prompt = commandRecord(runtime, "vision2prompt", phase);
+  const generatedPrompt2Proto = commandRecord(runtime, "prompt2proto", phase);
+  assertPhase(phase, stringField(generatedVision2Prompt, "visibility", phase) === "internal", "generated vision2prompt command is not internal");
+  assertPhase(phase, stringField(generatedPrompt2Proto, "visibility", phase) === "internal", "generated prompt2proto command is not internal");
+
+  const protoHandoffs = stringList(commandRecord(runtime, "proto", phase), "handoff_commands", phase);
+  assertListExcludes(phase, protoHandoffs, "/ow:vision2prompt", "proto exposes vision2prompt as user handoff");
+  assertListExcludes(phase, protoHandoffs, "/ow:prompt2proto", "proto exposes prompt2proto as user handoff");
+
+  const vision2PromptSkill = await readSkill(runtime, "ow-vision2prompt");
+  const prompt2ProtoSkill = await readSkill(runtime, "ow-prompt2proto");
+  assertIncludes(phase, vision2PromptSkill, "<command_visibility>internal</command_visibility>", "vision2prompt skill is not internal");
+  assertIncludes(phase, vision2PromptSkill, "ready_for_image_generation", "vision2prompt skill missing prompt readiness output");
+  assertIncludes(phase, prompt2ProtoSkill, "<command_visibility>internal</command_visibility>", "prompt2proto skill is not internal");
+  assertIncludes(phase, prompt2ProtoSkill, "Every generated image must record image_id", "prompt2proto skill missing image metadata contract");
 }
 
 async function verifyTunePhase(runtime: Runtime): Promise<void> {

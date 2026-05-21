@@ -58,6 +58,24 @@ commands:
     interface_path: .agents/skills/ow-validation/agents/openai.yaml
     legacy_triggers:
       - /build-validation
+  - id: vision2prompt
+    trigger: /ow:vision2prompt
+    visibility: internal
+    skill_name: ow-vision2prompt
+    explicit_invocation: $ow-vision2prompt
+    skill_path: .agents/skills/ow-vision2prompt/SKILL.md
+    interface_path: .agents/skills/ow-vision2prompt/agents/openai.yaml
+    legacy_triggers:
+      - /vision-to-strategic-prototype-prompt
+  - id: prompt2proto
+    trigger: /ow:prompt2proto
+    visibility: internal
+    skill_name: ow-prompt2proto
+    explicit_invocation: $ow-prompt2proto
+    skill_path: .agents/skills/ow-prompt2proto/SKILL.md
+    interface_path: .agents/skills/ow-prompt2proto/agents/openai.yaml
+    legacy_triggers:
+      - /prompt-to-prototype-images
   - id: proto
     trigger: /ow:proto
     visibility: user
@@ -169,6 +187,10 @@ generated_files:
   - .agents/skills/ow-vision/agents/openai.yaml
   - .agents/skills/ow-validation/SKILL.md
   - .agents/skills/ow-validation/agents/openai.yaml
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-vision2prompt/agents/openai.yaml
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .agents/skills/ow-prompt2proto/agents/openai.yaml
   - .agents/skills/ow-proto/SKILL.md
   - .agents/skills/ow-proto/agents/openai.yaml
   - .agents/skills/ow-tune/SKILL.md

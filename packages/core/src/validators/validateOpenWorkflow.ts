@@ -625,6 +625,7 @@ function validatePrototypeValidationInput(label: string, value: unknown, errors:
 
 function validateStrategicPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
   validatePreflightQualityGate(label, data.preflight_quality_gate, errors);
+  validateInternalPipeline(label, data.internal_pipeline, errors);
   validateDirectionCountPolicy(label, data.direction_count_policy, errors);
   validateRequiredObjectFields(label, "normalized_input", data.normalized_input, STRATEGIC_NORMALIZED_FIELDS, errors);
   validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
@@ -652,6 +653,43 @@ function validatePreflightQualityGate(label: string, value: unknown, errors: str
   }
   if (value.can_proceed !== true && value.next_command_when_blocked !== "/ow:vision") {
     errors.push(`${label} preflight_quality_gate must route blocked prototype work back to /ow:vision`);
+  }
+}
+
+function validateInternalPipeline(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} internal_pipeline must be a mapping`);
+    return;
+  }
+  if (value.orchestrator_command !== "/ow:proto" || value.user_visible_command !== "/ow:proto") {
+    errors.push(`${label} internal_pipeline must keep /ow:proto as the user-visible orchestrator`);
+  }
+  const stages = value.stages;
+  if (!Array.isArray(stages)) {
+    errors.push(`${label} internal_pipeline.stages must be an array`);
+    return;
+  }
+  const stageIds = new Set<string>();
+  for (const item of stages) {
+    if (!isRecord(item)) {
+      errors.push(`${label} internal_pipeline.stages entries must be mappings`);
+      continue;
+    }
+    const stageId = String(item.stage_id ?? "");
+    stageIds.add(stageId);
+    for (const key of ["stage_id", "command", "visibility", "status", "outputs"]) {
+      if (!(key in item)) {
+        errors.push(`${label} internal_pipeline stage missing ${key}`);
+      }
+    }
+    if ((stageId === "vision2prompt" || stageId === "prompt2proto") && item.visibility !== "internal") {
+      errors.push(`${label} internal pipeline stage ${stageId} must be internal`);
+    }
+  }
+  for (const required of ["proto-preflight", "vision2prompt", "prompt2proto"]) {
+    if (!stageIds.has(required)) {
+      errors.push(`${label} internal_pipeline missing stage ${required}`);
+    }
   }
 }
 
@@ -748,9 +786,33 @@ function validateImageGeneration(label: string, value: unknown, errors: string[]
   }
   if (!Array.isArray(value.generated_images)) {
     errors.push(`${label} image_generation.generated_images must be an array`);
+  } else {
+    value.generated_images.forEach((item, index) => validateGeneratedImageMetadata(label, item, index, errors));
   }
   if (!Array.isArray(value.collection_notes)) {
     errors.push(`${label} image_generation.collection_notes must be an array`);
+  }
+}
+
+function validateGeneratedImageMetadata(label: string, value: unknown, index: number, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} image_generation.generated_images[${index}] must be a mapping`);
+    return;
+  }
+  for (const key of ["image_id", "direction_id", "prompt_id", "screen_name", "path", "metadata"]) {
+    if (!hasUsefulValue(value[key])) {
+      errors.push(`${label} image_generation.generated_images[${index}].${key} must be non-empty`);
+    }
+  }
+  const metadata = value.metadata;
+  if (!isRecord(metadata)) {
+    errors.push(`${label} image_generation.generated_images[${index}].metadata must be a mapping`);
+    return;
+  }
+  for (const key of ["source_prompt_ref", "generated_at", "generator", "generation_status", "review_status"]) {
+    if (!hasUsefulValue(metadata[key])) {
+      errors.push(`${label} image_generation.generated_images[${index}].metadata.${key} must be non-empty`);
+    }
   }
 }
 

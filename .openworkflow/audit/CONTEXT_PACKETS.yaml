@@ -123,6 +123,78 @@ packets:
           command.
         - Mark superseded validation targets accordingly when a new validation target replaces them.
         - Confirm no prototype, spec, change, or runtime artifacts were created.
+  - packet_id: context:vision2prompt
+    command: /ow:vision2prompt
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/**/VALIDATION.yaml
+    optional:
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal stage after /ow:proto preflight has confirmed vision and
+          validation are ready.
+        - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or
+          generate images.
+        - Resolve direction_count_policy before writing prompt text; use resolved_count from
+          /ow:proto preflight.
+      during:
+        - Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.
+        - Generate more candidate hypotheses than needed and select the resolved direction count for
+          maximum strategic diversity.
+        - Write complete multi-image prompt text for every selected direction with screen_prompts
+          and acceptance criteria.
+      after:
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
+          prompt_text_manifest.status ready_for_image_generation.
+        - Record internal_pipeline stage vision2prompt status and outputs.
+        - Do not generate images; hand internally to /ow:prompt2proto.
+  - packet_id: context:prompt2proto
+    command: /ow:prompt2proto
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/**/EVIDENCE.yaml
+    optional:
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/**/NOTE.md
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal stage after /ow:vision2prompt has written
+          prompt_text_manifest.status ready_for_image_generation.
+        - Load prepared prompt text and verify every selected direction has screen_prompts before
+          image generation.
+      during:
+        - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
+        - Write one metadata record for every generated image with image_id, direction_id,
+          prompt_id, screen_name, path, source_prompt_ref, generator, and status.
+        - Do not revise product strategy or prompt text during image generation.
+      after:
+        - Update image_generation.status, generated_images, collection_notes, and internal_pipeline
+          stage prompt2proto outputs.
+        - Record decision audit internally after image evidence changes.
+        - Hand the user-facing flow back to /ow:proto for summary and next command.
   - packet_id: context:proto
     command: /ow:proto
     visibility: user
@@ -148,6 +220,8 @@ packets:
       - .openworkflow/validation/<id>/NOTE.md
     audit_checkpoints:
       before:
+        - "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight,
+          /ow:vision2prompt, then /ow:prompt2proto."
         - Load vision and current validation context; validation is required before prototype
           generation.
         - If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml,
@@ -164,16 +238,14 @@ packets:
         - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
           boundary conditions, and central uncertainty."
       during:
-        - Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
-        - Make directions differ by product form, initiation trigger, interaction model, emotional
-          driver, retention mechanism, validation metric, or main risk.
-        - Write all multi-direction, multi-image prompt text first, including screens, journey,
-          interactions, AI/system behavior, trust controls, anti-goals, sample content, and
-          acceptance criteria.
-        - Do not start image generation until prompt_text_manifest.status is
+        - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses,
+          select the resolved direction count, and write all multi-direction, multi-image prompt
+          text.
+        - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is
           ready_for_image_generation and every selected direction has concrete screen prompts.
-        - Batch-generate prototype images from the prepared prompt text and collect generated image
-          paths, direction ids, screen ids, and notes into EVIDENCE.yaml.
+        - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared
+          prompt text and collect generated image paths, direction ids, prompt ids, metadata, and
+          notes into EVIDENCE.yaml.
         - Recommend the first direction to generate based on risk reduction, observability,
           feasibility, and closeness to the success signal.
       after:

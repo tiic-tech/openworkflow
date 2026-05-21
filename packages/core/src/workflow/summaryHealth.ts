@@ -413,6 +413,7 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
     return [
       "core_question",
       "prompt_pack_type",
+      "internal_pipeline.current_stage",
       "preflight_quality_gate.can_proceed",
       "direction_count_policy.resolved_count",
       "normalized_input.primary_user",

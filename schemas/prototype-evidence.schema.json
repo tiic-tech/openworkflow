@@ -16,6 +16,7 @@
     "prompt_pack_type",
     "validation_input",
     "source",
+    "internal_pipeline",
     "preflight_quality_gate",
     "direction_count_policy",
     "normalized_input",
@@ -123,6 +124,16 @@
         "can_proceed",
         "blockers",
         "next_command_when_blocked"
+      ],
+      "additionalProperties": true
+    },
+    "internal_pipeline": {
+      "type": "object",
+      "required": [
+        "orchestrator_command",
+        "user_visible_command",
+        "current_stage",
+        "stages"
       ],
       "additionalProperties": true
     },
@@ -283,6 +294,23 @@
         "generated_images",
         "collection_notes"
       ],
+      "properties": {
+        "generated_images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "image_id",
+              "direction_id",
+              "prompt_id",
+              "screen_name",
+              "path",
+              "metadata"
+            ],
+            "additionalProperties": true
+          }
+        }
+      },
       "additionalProperties": true
     },
     "negative_constraints": {

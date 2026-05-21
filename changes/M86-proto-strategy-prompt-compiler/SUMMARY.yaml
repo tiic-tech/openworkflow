@@ -33,12 +33,12 @@ outputs:
   summary: changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 1
+active_candidate_count: 2
 completed_candidate_id: C003
 completed_change_id: C003-proto-generated-protocol
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C004
+selected_candidate_id: C005
+selected_change_id: C005-internal-proto-pipeline-image-metadata
+next_recommended_candidate_id: null
 key_dependencies:
   - M84 completed proto-ready vision structures and generated /ow:vision guidance.
   - M85 completed durable validation target artifacts and /ow:proto missing-validation gating.
@@ -46,6 +46,7 @@ key_dependencies:
   - C001 aligned native build-prototype source behavior with M85 and reference skill evidence.
   - C002 encoded preflight, direction count, prompt text readiness, and image generation collection into prototype artifacts.
   - C003 upgraded generated /ow:proto protocol to execute the preflight, prompt-text, and image-generation flow.
+  - C005 was added before C004 so stress fixtures target the internal command pipeline instead of a monolithic proto command.
 risks:
   - id: R001
     level: medium
@@ -72,3 +73,4 @@ validation:
     - OP005 completed C002 in commit b00a12b.
     - OP006 selected C003 directly inside the current M86 queue.
     - OP007 completed C003 in commit d67d05a.
+    - OP008 added and selected C005 to define the internal proto pipeline and image metadata before C004 stress fixtures.

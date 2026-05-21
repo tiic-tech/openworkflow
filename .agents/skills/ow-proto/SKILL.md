@@ -90,6 +90,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
+- Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.
 - Load vision and current validation context; validation is required before prototype generation.
 - If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.
 - Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.
@@ -98,11 +99,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.
 </before>
 <during>
-- Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
-- Make directions differ by product form, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.
-- Write all multi-direction, multi-image prompt text first, including screens, journey, interactions, AI/system behavior, trust controls, anti-goals, sample content, and acceptance criteria.
-- Do not start image generation until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
-- Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, screen ids, and notes into EVIDENCE.yaml.
+- Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
+- Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
+- Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
 - Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.
 </during>
 <after>
@@ -129,6 +128,13 @@ Do not treat artifact writing as the opening move for conversation-first command
 When a downstream stage supersedes an older question or draft, update lifecycle status and clear stale current_question values in the affected artifacts.
 Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
+
+<internal_proto_pipeline>
+- /ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.
+- Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.
+- Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.
+- Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.
+</internal_proto_pipeline>
 
 <validation_consumption>
 - If validation artifacts are absent but a vision exists, auto-run /ow:validation first and persist VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml.
@@ -167,7 +173,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 </prompt_text_manifest>
 
 <image_generation>
-- After prompt_text_manifest.status is ready_for_image_generation, batch-generate prototype images from the prepared prompt text.
+- After prompt_text_manifest.status is ready_for_image_generation, Batch-generate prototype images from the prepared prompt text.
 - Generate image groups by direction and screen prompt; keep each generated image linked to direction_id and prompt_id.
 - Record image_generation.status, batch_strategy, generated_images, and collection_notes in EVIDENCE.yaml.
 - Do not use image generation as a substitute for missing strategy or incomplete prompt text.

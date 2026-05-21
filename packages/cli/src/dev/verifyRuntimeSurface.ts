@@ -15,6 +15,8 @@ const SKILL_NAMES = [
   "ow-context",
   "ow-vision",
   "ow-validation",
+  "ow-vision2prompt",
+  "ow-prompt2proto",
   "ow-proto",
   "ow-tune",
   "ow-decision",
@@ -1405,6 +1407,12 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-proto") {
       verifyProtoSkill(skillContent);
     }
+    if (name === "ow-vision2prompt") {
+      verifyVision2PromptSkill(skillContent);
+    }
+    if (name === "ow-prompt2proto") {
+      verifyPrompt2ProtoSkill(skillContent);
+    }
     if (name === "ow-tune") {
       verifyTuneSkill(skillContent);
     }
@@ -2033,6 +2041,8 @@ function verifyVisionSkill(content: string): void {
 function verifyProtoSkill(content: string): void {
   for (const required of [
     "image-first-strategic-proto-prompt-pack",
+    "<internal_proto_pipeline>",
+    "/ow:vision2prompt and /ow:prompt2proto are internal commands",
     "<validation_consumption>",
     "trigger.mode: agent_auto",
     "missing_current_validation",
@@ -2055,6 +2065,32 @@ function verifyProtoSkill(content: string): void {
     "PROTO_PROMPT_PACK.yaml",
   ]) {
     assert(content.includes(required), `ow-proto missing image-first prompt guidance: ${required}`);
+  }
+}
+
+function verifyVision2PromptSkill(content: string): void {
+  for (const required of [
+    "internal-vision-to-strategic-prompt-text",
+    "<command_visibility>internal</command_visibility>",
+    "<internal_command_boundary>",
+    "/ow:vision2prompt is internal",
+    "ready_for_image_generation",
+    "Do not generate images",
+  ]) {
+    assert(content.includes(required), `ow-vision2prompt missing internal prompt guidance: ${required}`);
+  }
+}
+
+function verifyPrompt2ProtoSkill(content: string): void {
+  for (const required of [
+    "internal-prompt-text-to-prototype-images",
+    "<command_visibility>internal</command_visibility>",
+    "<image_metadata_contract>",
+    "Every generated image must record image_id",
+    "source_prompt_ref",
+    "Do not expose /ow:prompt2proto as a user-facing workflow step",
+  ]) {
+    assert(content.includes(required), `ow-prompt2proto missing internal image guidance: ${required}`);
   }
 }
 
@@ -2125,9 +2161,11 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("SUMMARY.yaml"), "artifact contracts missing summary file paths");
   assert(artifacts.includes("template:"), "artifact contracts missing embedded templates");
   assert(artifacts.includes("preflight_quality_gate:"), "artifact contracts missing proto preflight quality gate");
+  assert(artifacts.includes("internal_pipeline:"), "artifact contracts missing proto internal pipeline");
   assert(artifacts.includes("direction_count_policy:"), "artifact contracts missing proto direction count policy");
   assert(artifacts.includes("prompt_text_manifest:"), "artifact contracts missing proto prompt text manifest");
   assert(artifacts.includes("image_generation:"), "artifact contracts missing proto image generation state");
+  assert(artifacts.includes("generated_images:"), "artifact contracts missing generated image metadata container");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
 }
 
@@ -2139,6 +2177,8 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const protoSection = commandIndex.split("trigger: /ow:proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const tuneSection = commandIndex.split("trigger: /ow:tune", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const vision2PromptSection = commandIndex.split("trigger: /ow:vision2prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const prompt2ProtoSection = commandIndex.split("trigger: /ow:prompt2proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
   assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
@@ -2148,6 +2188,10 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(extractBlock(tuneSection, "forbidden_outputs").includes("review.html"), "tune forbidden outputs missing HTML review surface");
   assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
+  assert(vision2PromptSection.includes("visibility: internal"), "vision2prompt command is not internal");
+  assert(prompt2ProtoSection.includes("visibility: internal"), "prompt2proto command is not internal");
+  assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:vision2prompt"), "proto exposes vision2prompt as user-facing handoff");
+  assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:prompt2proto"), "proto exposes prompt2proto as user-facing handoff");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
 
   const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));

@@ -12,6 +12,7 @@
     "prompt_pack_type",
     "source",
     "validation_input",
+    "internal_pipeline",
     "preflight_quality_gate",
     "direction_count_policy",
     "normalized_input",
@@ -130,6 +131,76 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "internal_pipeline": {
+      "type": "object",
+      "required": [
+        "orchestrator_command",
+        "user_visible_command",
+        "current_stage",
+        "stages"
+      ],
+      "properties": {
+        "orchestrator_command": {
+          "const": "/ow:proto"
+        },
+        "user_visible_command": {
+          "const": "/ow:proto"
+        },
+        "current_stage": {
+          "type": "string"
+        },
+        "stages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "stage_id",
+              "command",
+              "visibility",
+              "status",
+              "outputs"
+            ],
+            "properties": {
+              "stage_id": {
+                "type": "string",
+                "enum": [
+                  "proto-preflight",
+                  "vision2prompt",
+                  "prompt2proto"
+                ]
+              },
+              "command": {
+                "type": "string"
+              },
+              "visibility": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "internal"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "in_progress",
+                  "complete",
+                  "blocked"
+                ]
+              },
+              "outputs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
           }
         }
       },
@@ -467,6 +538,42 @@
           "type": "array",
           "items": {
             "type": "object",
+            "required": [
+              "image_id",
+              "direction_id",
+              "prompt_id",
+              "screen_name",
+              "path",
+              "metadata"
+            ],
+            "properties": {
+              "image_id": {
+                "type": "string"
+              },
+              "direction_id": {
+                "type": "string"
+              },
+              "prompt_id": {
+                "type": "string"
+              },
+              "screen_name": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "metadata": {
+                "type": "object",
+                "required": [
+                  "source_prompt_ref",
+                  "generated_at",
+                  "generator",
+                  "generation_status",
+                  "review_status"
+                ],
+                "additionalProperties": true
+              }
+            },
             "additionalProperties": true
           }
         },

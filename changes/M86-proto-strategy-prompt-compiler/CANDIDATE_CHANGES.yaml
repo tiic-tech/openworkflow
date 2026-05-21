@@ -73,7 +73,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after prompt
         generation and tuning stabilize.
       suggested_plan_id: M90-proto2html-benchmark-input
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -280,6 +280,7 @@ changes:
       - C001
       - C002
       - C003
+      - C005
     unlocks:
       - M87-tune-product-system-inheritance
     risk: medium
@@ -296,6 +297,73 @@ changes:
       - Tests reject directions that only differ by visual style.
       - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
       - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+  - id: C005
+    status: selected
+    title: Define internal proto pipeline and image metadata
+    purpose: >
+      Split /ow:proto into internal command-sized stages so agents can execute
+      preflight, vision-to-prompt compilation, and prompt-to-prototype
+      generation without one oversized command drifting in intent.
+    scope:
+      includes:
+        - internal /ow:vision2prompt command registration
+        - internal /ow:prompt2proto command registration
+        - /ow:proto orchestration guidance
+        - prototype internal_pipeline artifact fields
+        - per-image metadata requirements
+        - generated internal skills and context packets through sync
+        - verification for internal command visibility and image metadata
+      excludes:
+        - user-facing exposure of the internal commands
+        - /ow:tune internal pipeline implementation
+        - external image API integration
+        - proto2html or HTML generation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - C004
+      - M87-tune-product-system-inheritance
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:vision2prompt and /ow:prompt2proto are registered as internal commands, not user-facing handoffs.
+      - /ow:proto remains the user-facing orchestrator for preflight, vision2prompt, and prompt2proto.
+      - Prototype artifacts record internal_pipeline stage ownership and outputs.
+      - Every generated image entry requires image_id, direction_id, prompt_id, path, and metadata.
+      - Generated skills and context packets include the internal pipeline boundary.
+      - Verification catches accidental user-facing exposure of internal proto commands.
+    selection:
+      selected_change_id: C005-internal-proto-pipeline-image-metadata
+      reason: >
+        User and agent agreed that internal command decomposition will reduce
+        per-command output pressure and drift. C005 must precede C004 because
+        stress fixtures should target the decomposed pipeline shape.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -406,3 +474,20 @@ operations:
     after_status: done
     evidence:
       - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP008
+    operation_type: add
+    target_candidate_ids:
+      - C005
+    actor: user+agent
+    reason: >
+      Add internal proto pipeline split after user proposed decomposing
+      /ow:proto into internal vision2prompt and prompt2proto stages to reduce
+      output pressure and intent drift.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/IMPLEMENTATION_BRIEF.md

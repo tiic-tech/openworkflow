@@ -62,6 +62,24 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     validationProtocol(),
   ),
   command(
+    "vision2prompt",
+    ["vision-to-strategic-prototype-prompt"],
+    "Internally compile ready vision and validation into strategic prototype prompt text.",
+    "prototype",
+    [".openworkflow/prototypes/"],
+    vision2PromptProtocol(),
+    "internal",
+  ),
+  command(
+    "prompt2proto",
+    ["prompt-to-prototype-images"],
+    "Internally generate high-fidelity prototype image groups from prepared prompt text.",
+    "prototype",
+    [".openworkflow/prototypes/"],
+    prompt2ProtoProtocol(),
+    "internal",
+  ),
+  command(
     "proto",
     ["build-prototype", "ow:prototype"],
     "Create image-first strategic prototype prompt packs from vision or validation context.",
@@ -710,6 +728,7 @@ function prototypeProtocol(): CommandProtocol {
     ],
     auditCheckpoints: {
       before: [
+        "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.",
         "Load vision and current validation context; validation is required before prototype generation.",
         "If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.",
         "Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.",
@@ -718,11 +737,9 @@ function prototypeProtocol(): CommandProtocol {
         "Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.",
       ],
       during: [
-        "Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.",
-        "Make directions differ by product form, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.",
-        "Write all multi-direction, multi-image prompt text first, including screens, journey, interactions, AI/system behavior, trust controls, anti-goals, sample content, and acceptance criteria.",
-        "Do not start image generation until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
-        "Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, screen ids, and notes into EVIDENCE.yaml.",
+        "Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
+        "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
+        "Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
       after: [
@@ -741,6 +758,15 @@ function prototypeProtocol(): CommandProtocol {
       "Do not ask the user to manually invoke /ow:decision after prototype work; record the decision audit internally.",
     ],
     internalSections: [
+      {
+        tag: "internal_proto_pipeline",
+        items: [
+          "/ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.",
+          "Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.",
+          "Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.",
+          "Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.",
+        ],
+      },
       {
         tag: "validation_consumption",
         items: [
@@ -790,7 +816,7 @@ function prototypeProtocol(): CommandProtocol {
       {
         tag: "image_generation",
         items: [
-          "After prompt_text_manifest.status is ready_for_image_generation, batch-generate prototype images from the prepared prompt text.",
+          "After prompt_text_manifest.status is ready_for_image_generation, Batch-generate prototype images from the prepared prompt text.",
           "Generate image groups by direction and screen prompt; keep each generated image linked to direction_id and prompt_id.",
           "Record image_generation.status, batch_strategy, generated_images, and collection_notes in EVIDENCE.yaml.",
           "Do not use image generation as a substitute for missing strategy or incomplete prompt text.",
@@ -822,6 +848,142 @@ function prototypeProtocol(): CommandProtocol {
       },
     ],
     handoffCommands: ["/ow:tune", "/ow:design", "/ow:validation"],
+  };
+}
+
+function vision2PromptProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "internal-vision-to-strategic-prompt-text",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/vision/VISION.md",
+      ".openworkflow/validation/**/VALIDATION.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
+    allowedOutputs: [
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.md",
+      ".openworkflow/prototypes/<id>/REVIEW_PLAN.md",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+      ".openworkflow/prototypes/<id>/NOTE.md",
+    ],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/<id>/images/**",
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.",
+        "Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.",
+        "Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.",
+      ],
+      during: [
+        "Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.",
+        "Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.",
+        "Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.",
+      ],
+      after: [
+        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation.",
+        "Record internal_pipeline stage vision2prompt status and outputs.",
+        "Do not generate images; hand internally to /ow:prompt2proto.",
+      ],
+    },
+    antiPatterns: [
+      "Do not expose /ow:vision2prompt as a user-facing workflow step.",
+      "Do not generate prototype images from this stage.",
+      "Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.",
+      "Do not create HTML, specs, changes, or runtime artifacts.",
+    ],
+    internalSections: [
+      {
+        tag: "internal_command_boundary",
+        items: [
+          "/ow:vision2prompt is internal and is invoked by /ow:proto, not by the user.",
+          "Its only job is strategic prompt text generation from ready vision and validation artifacts.",
+          "Its output must be ready for /ow:prompt2proto consumption.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:prompt2proto"],
+  };
+}
+
+function prompt2ProtoProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "internal-prompt-text-to-prototype-images",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/**/EVIDENCE.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/validation/**/VALIDATION.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/**/NOTE.md",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
+    allowedOutputs: [
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+      ".openworkflow/prototypes/<id>/NOTE.md",
+      ".openworkflow/prototypes/<id>/images/**",
+      ".openworkflow/decisions/DECISION_INDEX.yaml",
+      ".openworkflow/decisions/<id>/DECISION.yaml",
+      ".openworkflow/decisions/<id>/NOTE.md",
+    ],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation.",
+        "Load prepared prompt text and verify every selected direction has screen_prompts before image generation.",
+      ],
+      during: [
+        "Batch-generate high-fidelity prototype images by direction_id and prompt_id.",
+        "Write one metadata record for every generated image with image_id, direction_id, prompt_id, screen_name, path, source_prompt_ref, generator, and status.",
+        "Do not revise product strategy or prompt text during image generation.",
+      ],
+      after: [
+        "Update image_generation.status, generated_images, collection_notes, and internal_pipeline stage prompt2proto outputs.",
+        "Record decision audit internally after image evidence changes.",
+        "Hand the user-facing flow back to /ow:proto for summary and next command.",
+      ],
+    },
+    antiPatterns: [
+      "Do not expose /ow:prompt2proto as a user-facing workflow step.",
+      "Do not start image generation when prompt text is not ready.",
+      "Do not create HTML, specs, changes, or runtime artifacts.",
+      "Do not allow generated images without per-image metadata.",
+    ],
+    internalSections: [
+      {
+        tag: "image_metadata_contract",
+        items: [
+          "Every generated image must record image_id, direction_id, prompt_id, screen_name, path, and metadata.",
+          "metadata must include source_prompt_ref, generated_at, generator, generation_status, and review_status.",
+          "Images without metadata are not valid prototype evidence.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:proto"],
   };
 }
 

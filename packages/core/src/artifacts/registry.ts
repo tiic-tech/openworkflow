@@ -380,6 +380,7 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
       "prompt_pack_type",
       "validation_input",
       "source",
+      "internal_pipeline",
       "preflight_quality_gate",
       "direction_count_policy",
       "normalized_input",
@@ -436,6 +437,34 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
         refs: [],
         target_tool: "image_generation",
         output_language: "",
+      },
+      internal_pipeline: {
+        orchestrator_command: "/ow:proto",
+        user_visible_command: "/ow:proto",
+        current_stage: "proto-preflight",
+        stages: [
+          {
+            stage_id: "proto-preflight",
+            command: "/ow:proto",
+            visibility: "user",
+            status: "pending",
+            outputs: [],
+          },
+          {
+            stage_id: "vision2prompt",
+            command: "/ow:vision2prompt",
+            visibility: "internal",
+            status: "pending",
+            outputs: [],
+          },
+          {
+            stage_id: "prompt2proto",
+            command: "/ow:prompt2proto",
+            visibility: "internal",
+            status: "pending",
+            outputs: [],
+          },
+        ],
       },
       preflight_quality_gate: {
         vision_status: "missing|thin|ready",
