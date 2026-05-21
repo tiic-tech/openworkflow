@@ -17,7 +17,7 @@ changing generated `.agents` surfaces directly, treating high-risk reports as
 chat-only guidance, letting `select-change` silently select `risk: high`
 candidates, or committing experimental non-Codex generated surfaces.
 
-Next recommended candidate: `G004`.
+Next recommended candidate: `G005`.
 
 Feat boundary: this queue owns
 `changes/M70-high-risk-governance-planning/`. Each `G###` candidate is expected
@@ -91,13 +91,26 @@ Completion evidence:
 
 ## G004 - Add High-Risk Report Validation And Dogfood Fixtures
 
-Status: `ready`
+Status: `done`
 
 Depends on: `G002`, `G003`
 
 Purpose: make high-risk governance testable by adding lightweight validation or
 dogfood fixtures that prove queues can link a high-risk report and skills can
 be quick-validated after the behavior changes.
+
+Selection: `G004-high-risk-report-validation-fixtures`
+
+Completion evidence:
+
+- `packages/core/src/validators/validateRepositoryContracts.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `quick_validate.py skills/decompose-to-changes`
+- `quick_validate.py skills/select-change`
+- `git diff --check`
 
 ## G005 - Convert M69 S003 Into Design-Only Delivery Boundary Change
 

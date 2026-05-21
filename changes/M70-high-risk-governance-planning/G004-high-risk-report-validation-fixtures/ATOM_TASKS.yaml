@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G004-high-risk-report-validation-fixtures
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G004-high-risk-report-validation-fixtures
+title: Atom tasks for high-risk report validation and fixtures
+status: done
+tasks:
+  - task_id: T001
+    title: Add high-risk report section validation
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Repository validation checks required sections for HIGH_RISK_DECISION_REPORT.md.
+      - Diagnostics name the missing section.
+  - task_id: T002
+    title: Add runtime negative coverage
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - Runtime surface verification proves a missing report section fails validation.
+      - Existing high-risk report satisfies the contract.
+  - task_id: T003
+    title: Run skill and repo validation
+    status: done
+    type: verify
+    owned_paths:
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - quick_validate.py passes for decompose-to-changes.
+      - quick_validate.py passes for select-change.
+      - npm run validate passes.
+      - npm run verify:runtime-surface passes.
+      - git diff --check passes.
+  - task_id: T004
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - G004 selection and completion evidence are recorded.
+      - G005 and G006 readiness is updated when dependencies are satisfied.

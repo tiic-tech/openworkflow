@@ -216,6 +216,17 @@ const REQUIRED_CODEX_SKILL_BLOCKS = [
   "artifact_checkpoint",
   "codex_skill",
 ] as const;
+const HIGH_RISK_REPORT_SECTIONS = [
+  "Trigger",
+  "Change",
+  "Concrete Risks",
+  "Decision Options",
+  "Recommended Path",
+  "Guardrails",
+  "Go Criteria",
+  "Stop Criteria",
+  "Validation Expectations",
+] as const;
 
 export async function validateRepositoryContracts(rootInput: string): Promise<ValidationResult> {
   const root = resolve(rootInput);
@@ -225,6 +236,7 @@ export async function validateRepositoryContracts(rootInput: string): Promise<Va
   await validateYamlContracts(root, errors);
   await validateGeneratedCodexSkills(root, errors);
   await validateGeneratedSurfaceParity(root, errors);
+  await validateHighRiskDecisionReports(root, errors);
   return { ok: errors.length === 0, errors };
 }
 
@@ -772,6 +784,26 @@ function assertStringArray(
 
 function stringArraysEqual(actual: string[], expected: readonly string[]): boolean {
   return actual.length === expected.length && actual.every((item, index) => item === expected[index]);
+}
+
+async function validateHighRiskDecisionReports(root: string, errors: string[]): Promise<void> {
+  for (const path of await findFiles(root, (entry) => entry === "HIGH_RISK_DECISION_REPORT.md")) {
+    const label = relative(root, path);
+    const content = await readFile(path, "utf8");
+    for (const section of HIGH_RISK_REPORT_SECTIONS) {
+      if (!hasMarkdownHeading(content, section)) {
+        errors.push(`${label} missing high-risk report section: ${section}`);
+      }
+    }
+    if (!content.includes("explicit") || !content.includes("approval")) {
+      errors.push(`${label} must state that implementation resumes only after explicit approval`);
+    }
+  }
+}
+
+function hasMarkdownHeading(content: string, heading: string): boolean {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^#{2,4}\\s+.*${escaped}.*$`, "m").test(content);
 }
 
 function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {

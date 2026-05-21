@@ -43,7 +43,7 @@ selection_policy:
     - treating high-risk reports as informal chat-only guidance
     - letting select-change silently select risk: high candidates
     - committing experimental non-Codex generated surfaces
-next_recommended_candidate_id: G004
+next_recommended_candidate_id: G005
 changes:
   - id: G001
     status: done
@@ -201,7 +201,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G004
-    status: ready
+    status: done
     title: Add high-risk report validation and dogfood fixtures
     purpose: >
       Make high-risk governance testable by adding lightweight validation or
@@ -218,11 +218,9 @@ changes:
         - changing risk classification semantics
         - implementing S003 or S007
     owned_paths:
-      - schemas/
       - packages/core/src/validators/validateRepositoryContracts.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
-      - skills/decompose-to-changes/
-      - skills/select-change/
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
       - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/
     dependencies:
       - G002
@@ -243,6 +241,26 @@ changes:
       - Skill validation passes for both planning skills after the new behavior.
       - A high-risk report linked from a queue is treated as evidence, not implementation approval.
       - Diagnostics or fixture notes tell agents not to bypass user approval.
+    selection:
+      selected_change_id: G004-high-risk-report-validation-fixtures
+      reason: >
+        G002 and G003 completed planning-skill high-risk behavior, so G004 can
+        add validation evidence before relying on the behavior in later work.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G004-high-risk-report-validation-fixtures
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+        - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/SELECTED_CHANGE.yaml
+        - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: quick_validate.py skills/decompose-to-changes"
+        - "validation: quick_validate.py skills/select-change"
+        - "validation: git diff --check"
   - id: G005
     status: ready
     title: Convert M69 S003 into design-only delivery boundary change
@@ -459,3 +477,34 @@ operations:
     evidence:
       - skills/decompose-to-changes/SKILL.md
       - skills/select-change/SKILL.md
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: G004 is ready after both planning skills gained high-risk report behavior.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/SELECTED_CHANGE.yaml
+      - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/ATOM_TASKS.yaml
+      - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: Repository validation and runtime verification now check high-risk report required sections.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: quick_validate.py skills/decompose-to-changes"
+      - "validation: quick_validate.py skills/select-change"
+      - "validation: git diff --check"

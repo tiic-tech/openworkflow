@@ -16,6 +16,18 @@ Both are high risk because they touch OpenWorkflow's runtime delivery
 architecture rather than a single generated surface, validator, or reference
 document.
 
+## Change
+
+This report covers two remaining high-risk candidates in the M69 queue:
+
+- `S003`: candidate status, introduces a skill registry and adapter delivery
+  model.
+- `S007`: candidate status, prototypes multi-adapter skill delivery and depends
+  on `S003` plus the dynamic instruction envelope design.
+
+Neither candidate is selected. This report is decision evidence, not approval
+to implement either candidate.
+
 ## S003 - Skill Registry And Adapter Delivery Model
 
 ### Why It Is High Risk
@@ -198,6 +210,21 @@ Stop if the spike requires:
    - narrow internal model,
    - research-only second platform report,
    - dry-run adapter spike.
+
+## Validation Expectations
+
+Any approved follow-up must run at least:
+
+- `npm run validate`
+- `git diff --check`
+
+If the follow-up touches generated runtime surfaces, adapter output, init, sync,
+doctor, or generated-surface parity checks, it must also run:
+
+- `npm run verify:runtime-surface`
+
+If the follow-up changes planning source skills, it must run the matching
+`quick_validate.py` command for those skills.
 
 ## Default Agent Behavior For Future High-Risk Changes
 

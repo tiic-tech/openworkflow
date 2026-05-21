@@ -940,10 +940,12 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const skill = join(REPO_ROOT, ".agents", "skills", "ow-proto", "SKILL.md");
   const manifest = join(REPO_ROOT, ".agents", "openworkflow-adapter.yaml");
   const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
+  const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
   const originalCommandAudit = await read(commandAudit);
+  const originalHighRiskReport = await read(highRiskReport);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -964,10 +966,16 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const commandAuditDrift = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(commandAuditDrift.code !== 0, "validate passed after command audit trigger drifted");
     assert(commandAuditDrift.output.includes("COMMAND_AUDIT_INDEX.yaml proto trigger must be /ow:proto"), "command audit drift validation did not explain trigger mismatch");
+
+    await writeFile(highRiskReport, originalHighRiskReport.replace("## Validation Expectations", "## Validation Notes"), "utf8");
+    const missingHighRiskSection = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingHighRiskSection.code !== 0, "validate passed after high-risk report section was removed");
+    assert(missingHighRiskSection.output.includes("missing high-risk report section: Validation Expectations"), "high-risk report validation did not explain missing section");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
     await writeFile(commandAudit, originalCommandAudit, "utf8");
+    await writeFile(highRiskReport, originalHighRiskReport, "utf8");
   }
 }
 
