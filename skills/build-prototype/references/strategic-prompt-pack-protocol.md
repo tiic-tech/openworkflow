@@ -1,7 +1,26 @@
 # Strategic Prompt Pack Protocol
 
 Use this reference when `/ow:proto` should produce high-fidelity prototype
-prompt directions from a vision or validation context.
+prompt directions from proto-ready vision and a durable validation target.
+
+`/ow:proto` is a strategy-to-prompt compiler. It preserves product intent,
+turns validation uncertainty into prototype directions, and writes prompts that
+an image-generation or design agent can execute without inventing strategy.
+
+## Validation Consumption
+
+Validation is required before prototype generation.
+
+- If a durable validation artifact exists, consume it and preserve its
+  include/exclude boundaries.
+- If validation is absent but vision exists, auto-run the same
+  artifact-producing `/ow:validation` pass first.
+- The auto-validation artifact must record `trigger.mode: agent_auto`,
+  `trigger.requested_command: /ow:proto`, and
+  `trigger.reason: missing_current_validation`.
+- Do not proceed with ephemeral `vision_only` context.
+- If validation conflicts with vision, stop for a decision instead of broadening
+  the prototype target silently.
 
 ## Input Normalization
 
@@ -9,19 +28,23 @@ Extract or infer:
 
 - product domain
 - primary user
+- usage context
 - current alternative
 - core pain
-- behavior to change
-- success signal
+- desired behavior change
+- strongest success signal
 - core differentiator
 - emotional value
+- functional value
 - trust or privacy constraints
 - non-goals
+- future opportunities
 - validation target or central uncertainty
 
-If validation is absent, record `validation_input.mode: vision_only`. If
-validation artifacts are present, record `validation_input.mode:
-validation_present` and preserve their include/exclude boundaries.
+Record `validation_input.mode: validation_present` when consuming a current
+validation artifact. Use `validation_input.mode: agent_auto_generated` only when
+the proto command first created durable validation artifacts because none were
+current.
 
 ## Strategic Core
 
@@ -68,6 +91,10 @@ dimensions:
 Reject directions that only change colors, layout, visual tone, or component
 style.
 
+Each selected direction should name why it deserves prototype generation:
+what it tests, what it risks, what the user should feel, and which validation
+signal it can make observable.
+
 ## Prompt Pack Structure
 
 `PROTO_PROMPT_PACK.yaml` should follow `schemas/proto-prompt-pack.schema.json`
@@ -92,6 +119,7 @@ Each direction needs:
 - `strategic_hypothesis`
 - `validates`
 - `main_risk`
+- `distinctness_rationale`
 - `prototype_prompt`
 - `pm_judgment`
 
@@ -112,6 +140,11 @@ Each prompt must include:
 - anti-goals
 - desired user feeling
 - concrete sample content
+
+The prompt should be specific enough that another agent can generate the first
+screen group without asking what the product is, who it serves, what behavior
+should change, what must be shown, what must not be shown, or what counts as a
+good prototype.
 
 ## Build Recommendation
 
@@ -136,3 +169,4 @@ Revise before finishing if:
 - trust/privacy controls are absent when memory, personalization, or sensitive
   user data is involved
 - output drifts into implementation backlog or production spec
+- validation is missing, stale, or represented only as ephemeral context

@@ -1,0 +1,289 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M86-proto-strategy-prompt-compiler
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M86-proto-strategy-prompt-compiler
+title: Candidate changes for proto strategy prompt compiler
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M85-validation-proto-target-contract/SUMMARY.yaml
+    - skills/build-prototype/SKILL.md
+    - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    - user_direction:2026-05-22-continue-after-validation
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes /ow:proto a strategy-to-prompt compiler that consumes durable validation artifacts
+    - absorbs the vision-to-strategic-prototype reference skill into native OW source behavior
+    - preserves M85 validation as source truth instead of re-inventing the experiment target
+    - produces prompt packs that are specific enough for high-quality image prototype generation
+    - keeps /ow:proto image-first and out of HTML, design, spec, change, team, or production work
+  avoid:
+    - adding /ow:tune inheritance behavior to this queue
+    - creating generated prototype images or HTML in this queue
+    - allowing vision_only or ephemeral validation paths after M85
+    - broadening into discovery-loop E2E dogfood
+    - turning prompt packs into implementation backlogs
+scope_control:
+  current_boundary: >
+    Upgrade /ow:proto as a strategy-to-prompt compiler: consume durable
+    validation targets and proto-ready vision, extract strategic product
+    structure, generate distinct prototype directions, and emit high-quality
+    image-first prompt packs for downstream generation and review.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include only candidates needed to define, encode, generate, and verify the
+    /ow:proto command and prototype prompt-pack artifact as the next stage after
+    /ow:validation.
+  out_of_scope_rule: >
+    Record tune inheritance, proto2html, html2spec, full discovery-loop read
+    model, and E2E dogfood as deferred refs. Do not include them in M86.
+  deferred_features:
+    - title: Align /ow:tune with product-system inheritance
+      reason: >
+        Tune depends on accepted prototype prompt packs or baseline image groups.
+      suggested_plan_id: M87-tune-product-system-inheritance
+    - title: Define discovery-loop read model
+      reason: >
+        Cross-command read models should wait until vision, validation, proto,
+        and tune command contracts are stable.
+      suggested_plan_id: M88-discovery-loop-read-model
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        End-to-end pressure testing belongs after command-specific contracts land.
+      suggested_plan_id: M89-discovery-loop-e2e-dogfood
+    - title: Rebuild proto2html around benchmark prototype input
+      reason: >
+        Proto2html should consume the selected benchmark prototype after prompt
+        generation and tuning stabilize.
+      suggested_plan_id: M90-proto2html-benchmark-input
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: selected
+    title: Align native build-prototype strategy compiler contract
+    purpose: >
+      Absorb the vision-to-strategic-prototype reference skill into OW's native
+      build-prototype behavior and remove stale vision_only validation guidance.
+    scope:
+      includes:
+        - build-prototype role and input policy updates
+        - durable validation consumption after M85
+        - strategic input normalization dimensions
+        - strategic hypothesis and prompt-pack quality bar
+        - image-only and no-production boundaries
+      excludes:
+        - changing artifact schemas
+        - changing generated /ow:proto skill output
+        - adding tune inheritance behavior
+        - generating prototype images
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - build-prototype defines /ow:proto as a strategy-to-prompt compiler.
+      - build-prototype forbids ephemeral vision_only validation after M85.
+      - The reference protocol names the normalized strategy fields needed by prototype prompts.
+      - The protocol requires strategically distinct directions and concrete prompt contents.
+    selection:
+      selected_change_id: C001-build-prototype-strategy-compiler
+      reason: >
+        AC recommended M86 C001 as the current discovery-loop continuation
+        because it is dependency-free, medium risk, and aligns native proto
+        behavior before schema or generated protocol changes.
+      selected_at: 2026-05-22
+  - id: C002
+    status: candidate
+    title: Strengthen strategic prototype prompt-pack artifacts
+    purpose: >
+      Make the prototype evidence and prompt-pack schemas/templates enforce the
+      fields /ow:proto needs for agent-grade prompt generation.
+    scope:
+      includes:
+        - validation_input mode values aligned to durable validation
+        - normalized_input required strategic fields
+        - strategic_core required fields
+        - directions with distinction rationale and screen prompt requirements
+        - build_recommendation signals
+      excludes:
+        - /ow:tune refined prompt pack schema work
+        - generated /ow:proto protocol wording
+        - generated images or HTML prototypes
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Prompt-pack artifacts cannot declare ephemeral vision_only validation.
+      - Templates expose normalized input, strategic core, directions, build recommendation, constraints, and review plan.
+      - Validators catch thin strategic prompt packs.
+      - Summary health reports missing strategy and direction fields.
+  - id: C003
+    status: candidate
+    title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
+    purpose: >
+      Make generated /ow:proto guidance and context packets consume the
+      strengthened native build-prototype behavior and prompt-pack artifact
+      shape.
+    scope:
+      includes:
+        - command registry protocol updates
+        - generated ow-proto skill guidance through sync
+        - context packet drift checks
+        - verification for validation consumption and strategic directions
+      excludes:
+        - artifact schema changes
+        - tune behavior
+        - image generation or HTML
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated /ow:proto says it compiles validated strategy into prompt packs.
+      - Generated /ow:proto preserves M85 durable validation behavior.
+      - Context packets include the strategic prompt-pack quality gates.
+      - Verification catches generated-surface drift.
+  - id: C004
+    status: candidate
+    title: Add strategic prompt-pack stress fixtures
+    purpose: >
+      Pressure-test /ow:proto against weak, style-only, and high-quality
+      strategic prompt-pack outputs before handing off to tune work.
+    scope:
+      includes:
+        - thin prompt-pack fixture
+        - style-only direction fixture
+        - proto-ready strategic prompt-pack fixture
+        - runtime or E2E assertions for prompt quality gates
+      excludes:
+        - generated prototype images
+        - browser or visual inspection
+        - tune refined prompt pack fixtures
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M87-tune-product-system-inheritance
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests cover prompt packs that are too thin for downstream generation.
+      - Tests reject directions that only differ by visual style.
+      - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
+      - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for upgrading /ow:proto as the next
+      discovery-loop command after M85 validation, while deferring tune,
+      proto2html, read-model, and E2E dogfood work.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.md
+      - changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 after cross-queue analysis recommended M86 as the direct
+      continuation from M85 and identified no high-risk approval requirement.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/A01-discovery-loop-next-queue/CHANGE_ANALYSIS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/IMPLEMENTATION_BRIEF.md

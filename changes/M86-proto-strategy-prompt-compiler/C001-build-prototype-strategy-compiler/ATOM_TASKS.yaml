@@ -1,0 +1,37 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M86-proto-strategy-prompt-compiler:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C001
+change_id: C001-build-prototype-strategy-compiler
+title: Atom tasks for build-prototype strategy compiler contract
+status: ready
+tasks:
+  - id: T001
+    title: Update build-prototype role and input policy
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+    acceptance:
+      - The skill describes /ow:proto as a strategy-to-prompt compiler.
+      - The skill requires durable validation or an auto-validation preflight before prototype generation.
+      - The skill removes stale vision_only and no-auto-validation guidance.
+  - id: T002
+    title: Strengthen strategic prompt pack protocol
+    owned_paths:
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    acceptance:
+      - The protocol lists normalized strategic input fields from the reference skill evidence.
+      - The protocol requires direction distinctness beyond visual style.
+      - The protocol requires concrete screens, journeys, system behavior, trust controls, sample content, and review criteria.
+  - id: T003
+    title: Record completion evidence
+    owned_paths:
+      - changes/M86-proto-strategy-prompt-compiler/
+    acceptance:
+      - Candidate status and summary are updated after implementation.
+      - LOCAL_COMMIT_EVIDENCE.yaml records validation commands and commit id.
+verification:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

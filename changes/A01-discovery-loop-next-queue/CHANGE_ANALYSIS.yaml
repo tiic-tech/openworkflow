@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: change_analysis:A01-discovery-loop-next-queue
+contract_type: planning
+planning_artifact_type: change_analysis
+analysis_id: A01-discovery-loop-next-queue
+title: Cross-queue analysis for discovery-loop continuation
+status: complete
+source:
+  kind: cross_queue
+  refs:
+    - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+    - changes/M74-front-chain-command-quality-review/SUMMARY.yaml
+    - changes/M70-high-risk-governance-planning/SUMMARY.yaml
+    - changes/M68-post-proto-workflow-planning/SUMMARY.yaml
+    - changes/M85-validation-proto-target-contract/SUMMARY.yaml
+analysis_context:
+  branch: codex/m73-workflow-blueprint-runtime-alignment
+  dirty_tree: planning_artifacts_created_for_m86
+  user_intent: >
+    Continue after M85 validation work; proceed with non-high-risk changes and
+    stop only for high-risk approval.
+  reason_ac_is_needed: >
+    Multiple historical queues still report active status, so a cross-queue
+    recommendation is recorded before selecting the next candidate.
+recommendation:
+  plan_id: M86-proto-strategy-prompt-compiler
+  candidate_id: C001
+  risk: medium
+  decision: select_next
+  rationale: >
+    M86 is the direct deferred continuation from completed M85. C001 is
+    dependency-free, medium risk, branch-aligned, and fixes the native source
+    behavior that later proto schema and generated protocol changes should
+    follow. It does not touch high-risk runtime exposure or downstream tune,
+    proto2html, or E2E dogfood scope.
+rejected_alternatives:
+  - plan_id: M74-front-chain-command-quality-review
+    candidate_id: C002
+    reason: >
+      M74 C002 reviews /ow:validation broadly, but M85 already completed the
+      focused validation reconstruction. Continuing to M86 has stronger user
+      recency and dependency fit.
+  - plan_id: M70-high-risk-governance-planning
+    candidate_id: G005
+    reason: >
+      Useful governance follow-up, but not on the current discovery-loop
+      critical path after M85.
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: >
+      Proto2html runtime exposure is high risk and downstream of benchmark
+      prototype prompt generation; it should wait until proto and tune stabilize.
+  - plan_id: M69-skill-system-lifecycle-planning
+    candidate_id: null
+    reason: >
+      No concrete next recommended candidate in the summary and lower current
+      relevance than M86.
+  - plan_id: M71-git-version-control-governance
+    candidate_id: null
+    reason: >
+      No concrete next recommended candidate in the summary and not blocking M86.
+high_risk:
+  encountered: false
+  approval_required: false
+handoff:
+  next_command: /ow:select-change
+  target_plan_id: M86-proto-strategy-prompt-compiler
+  target_candidate_id: C001
