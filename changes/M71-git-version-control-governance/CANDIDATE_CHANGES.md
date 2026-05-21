@@ -609,6 +609,7 @@ Selection: `G020-draft-pr-remote-pilot`
 
 Completion evidence:
 
+- `commit: 768bb16e2d107305c780fcc9c16e5e451209efea`
 - `packages/core/src/git/draftPrPilot.ts`
 - `packages/core/src/git/remoteReadonlyPlanner.ts`
 - `packages/cli/src/commands/gitAutomation.ts`
@@ -620,6 +621,7 @@ Completion evidence:
 - `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
 - `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml`
+- `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

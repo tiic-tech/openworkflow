@@ -50,7 +50,9 @@ validation:
   - npm run verify:runtime-surface
 completion:
   completed_at: 2026-05-21
+  primary_commit: 768bb16e2d107305c780fcc9c16e5e451209efea
   evidence:
+    - "commit: 768bb16e2d107305c780fcc9c16e5e451209efea"
     - packages/core/src/git/draftPrPilot.ts
     - packages/core/src/git/remoteReadonlyPlanner.ts
     - packages/cli/src/commands/gitAutomation.ts
@@ -62,6 +64,7 @@ completion:
     - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
     - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml
     - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml
+    - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
     - "validation: npm run validate"
     - "validation: git diff --check"
     - "validation: npm run verify:runtime-surface"

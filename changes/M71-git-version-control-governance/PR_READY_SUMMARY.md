@@ -30,7 +30,7 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G017` Build read-only autonomous git simulator (selected: `G017-autonomous-git-simulator`; commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282)
 - `G018` Plan narrow autonomous remote pilot (selected: `G018-narrow-autonomous-remote-pilot`; commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c)
 - `G019` Implement remote read-only PR-ready planning (selected: `G019-remote-readonly-pr-plan`; commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e)
-- `G020` Pilot draft PR remote mutation (selected: `G020-draft-pr-remote-pilot`; commit: not recorded)
+- `G020` Pilot draft PR remote mutation (selected: `G020-draft-pr-remote-pilot`; commit: 768bb16e2d107305c780fcc9c16e5e451209efea)
 
 ## Deferred Or Blocked Changes
 
