@@ -229,6 +229,10 @@ Validation:
 Stop condition: do not select or implement automated git or gh mutation behavior
 without explicit approval of a concrete high-risk decision option.
 
+High-risk report:
+
+- `changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md`
+
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 
 Status: `done`

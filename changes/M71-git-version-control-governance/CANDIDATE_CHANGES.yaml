@@ -909,3 +909,14 @@ operations:
       - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP022
+    operation_type: query
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: High-risk stop converted into a decision report before any git or gh mutation automation is selected.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md

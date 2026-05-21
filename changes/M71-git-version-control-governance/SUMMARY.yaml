@@ -19,6 +19,7 @@ outputs:
   candidate_changes_yaml: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
+  high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 10
 completed_candidate_id: G009
@@ -95,3 +96,4 @@ validation:
     - G005 completed the PR-ready summary contract and made G006 ready.
     - G006 completed branch-per-feat dogfood fixtures and made G009 the next recommended governance change.
     - G009 completed gh operation governance and made G007 the next high-risk stop.
+    - G007 high-risk stop report was created; implementation requires explicit approval of a concrete option.
