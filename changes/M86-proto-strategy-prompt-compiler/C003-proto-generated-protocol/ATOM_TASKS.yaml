@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M86-proto-strategy-prompt-compiler:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C003
+change_id: C003-proto-generated-protocol
+title: Atom tasks for proto generated protocol
+status: ready
+tasks:
+  - id: T001
+    title: Update source command protocol
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    acceptance:
+      - Protocol verifies vision and validation quality before prompt generation.
+      - Protocol routes insufficient source quality to /ow:vision.
+      - Protocol asks for direction count when absent and defaults to 3 only after user delegation.
+      - Protocol lands prompt text before batch image generation.
+  - id: T002
+    title: Sync generated /ow:proto surfaces
+    owned_paths:
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    acceptance:
+      - Generated skill includes preflight, direction count, prompt text, and image generation protocol blocks.
+      - Context packet includes the corresponding checkpoints.
+  - id: T003
+    title: Update generated-surface verification
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M86-proto-strategy-prompt-compiler/
+    acceptance:
+      - Verification fails if generated /ow:proto loses the new protocol behaviors.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

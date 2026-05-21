@@ -155,19 +155,30 @@ packets:
           /ow:proto, and reason missing_current_validation.
         - Proceed only after validation_input.mode can reference a durable validation artifact; do
           not use ephemeral vision_only validation context.
+        - Verify vision and validation artifact quality before prompt work; if either is missing,
+          thin, stale, or not strong enough for high-quality prototype prompts, route back to
+          /ow:vision with focused follow-up questions instead of generating prompts.
+        - If the user has not specified the number of strategically different prototype directions,
+          askUserQuestion for the count; use 3 only when the user explicitly delegates that decision
+          to the agent.
         - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
           boundary conditions, and central uncertainty."
       during:
         - Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
         - Make directions differ by product form, initiation trigger, interaction model, emotional
           driver, retention mechanism, validation metric, or main risk.
-        - Write concrete high-fidelity image-generation prompts with screens, journey, interactions,
-          AI/system behavior, trust controls, anti-goals, and sample content.
+        - Write all multi-direction, multi-image prompt text first, including screens, journey,
+          interactions, AI/system behavior, trust controls, anti-goals, sample content, and
+          acceptance criteria.
+        - Do not start image generation until prompt_text_manifest.status is
+          ready_for_image_generation and every selected direction has concrete screen prompts.
+        - Batch-generate prototype images from the prepared prompt text and collect generated image
+          paths, direction ids, screen ids, and notes into EVIDENCE.yaml.
         - Recommend the first direction to generate based on risk reduction, observability,
           feasibility, and closeness to the success signal.
       after:
-        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact
-          EVIDENCE.yaml.
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, compact EVIDENCE.yaml,
+          prompt_text_manifest, and image_generation collection state.
         - Record review evidence and a decision audit record internally after prompt-pack evidence
           changes.
         - Refresh prototype SUMMARY.yaml when summary_policy is configured and update

@@ -211,8 +211,13 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertSomeIncludes(phase, protocol.conditionalOutputs ?? [], ".openworkflow/validation/<id>/VALIDATION.yaml", "prototype cannot auto-write validation artifacts");
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "auto-run /ow:validation", "prototype does not auto-run validation when missing");
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "trigger.mode agent_auto", "prototype auto validation does not record provenance");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "high-quality prototype prompts", "prototype does not verify vision and validation quality before prompt generation");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "askUserQuestion", "prototype does not ask for direction count when missing");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "5-8 strategic prototype hypotheses", "prototype does not generate strategic hypotheses");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "prompt_text_manifest.status is ready_for_image_generation", "prototype does not gate image generation on prompt text readiness");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Batch-generate prototype images", "prototype does not batch-generate images after prompt text");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "PROTO_PROMPT_PACK.yaml", "prototype does not write prompt pack");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "image_generation collection state", "prototype does not write image generation collection state");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "decision audit record internally", "prototype does not write decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "prototype permits manual decision handoff");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not generate HTML", "prototype permits HTML generation");
@@ -224,13 +229,19 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(generated, "conditional_outputs", phase), ".openworkflow/validation/<id>/VALIDATION.yaml", "generated prototype missing conditional validation output");
 
   const packet = packetRecord(runtime, "/ow:proto", phase);
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "askUserQuestion", "context packet lost direction-count question behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Batch-generate prototype images", "context packet lost image generation behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "decision audit record internally", "context packet lost internal decision audit");
 
   const skill = await readSkill(runtime, "ow-proto");
   for (const tag of [
     "validation_consumption",
+    "preflight_quality_gate",
+    "direction_count_policy",
     "strategic_prompt_pack",
+    "prompt_text_manifest",
+    "image_generation",
     "image_only_boundary",
     "review_evidence",
     "internal_decision_audit",
@@ -239,6 +250,9 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   }
   assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
   assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
+  assertIncludes(phase, skill, "askUserQuestion", "skill lost direction-count question rule");
+  assertIncludes(phase, skill, "resolved_count: 3", "skill lost delegated default direction count");
+  assertIncludes(phase, skill, "Batch-generate prototype images", "skill lost batch image generation rule");
   assertIncludes(phase, skill, "Do not write HTML, CSS, runnable prototypes", "skill lost image-only boundary");
   assertIncludes(phase, skill, "decision_record", "skill does not expose decision artifact contract for internal audit");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in prototype handoffs");
