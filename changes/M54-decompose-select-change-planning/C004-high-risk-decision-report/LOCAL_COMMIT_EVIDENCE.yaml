@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C004-high-risk-decision-report
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C004-high-risk-decision-report
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C004
+selected_change_id: C004-high-risk-decision-report
+primary_commit: 2f9e16b066af241dd5eeafb0b14381106c7cbc82
+validation_evidence:
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run validate
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
