@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G008
+next_recommended_candidate_id: G010
 changes:
   - id: G001
     status: done
@@ -334,7 +334,7 @@ changes:
       - The report defines explicit user approval conditions and stop criteria.
       - No automated git or gh mutation implementation is performed by this candidate.
   - id: G008
-    status: ready
+    status: done
     title: Formalize Issue governance and source-of-truth rules
     purpose: >
       Define how OW relates external Issues to local planning queues, including
@@ -372,8 +372,26 @@ changes:
       - The contract defines when local issue artifacts are tracked in git.
       - The contract defines GitHub Issues as the source of truth when gh is authorized and configured.
       - The contract defines local linkage artifacts that can audit decomposition without duplicating remote issue bodies.
+    selection:
+      selected_change_id: G008-issue-governance-source-of-truth
+      reason: >
+        G008 is ready after G001 and defines the Issue source-of-truth model
+        needed before gh risk boundaries or cross-queue analysis can depend on
+        Issue metadata without creating local/remote drift.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G008-issue-governance-source-of-truth
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - references/issue-governance.md
+        - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G009
-    status: candidate
+    status: ready
     title: Define gh issue and PR operation risk boundaries
     purpose: >
       Define which gh operations OW may treat as read-only, evidence-writing,
@@ -412,7 +430,7 @@ changes:
       - High-risk remote mutations remain behind HIGH_RISK_DECISION_REPORT.md and explicit approval.
       - Local audit artifacts remain the OW-owned record even when GitHub is the remote source of truth.
   - id: G010
-    status: candidate
+    status: ready
     title: Create analyze-changes skill for cross-queue priority analysis
     purpose: >
       Add a read-only planning skill that compares multiple active
@@ -525,5 +543,35 @@ operations:
       - references/git-version-control-governance.md
       - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - G008
+    actor: agent
+    reason: Select G008 because it is ready after G001 and defines Issue source-of-truth rules before gh and cross-queue analysis behavior.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - G008
+    actor: agent
+    reason: Complete G008 after adding Issue governance, linking existing contracts, and validating the repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"

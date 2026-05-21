@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G008-issue-governance-source-of-truth
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G008-issue-governance-source-of-truth
+title: Atom tasks for Issue governance source-of-truth rules
+status: done
+tasks:
+  - task_id: T001
+    title: Define Issue governance reference
+    status: done
+    type: edit
+    owned_paths:
+      - references/issue-governance.md
+    done_when:
+      - Issue is defined as an intent source rather than a selected change.
+      - Local and GitHub-backed source-of-truth modes are documented.
+      - Linkage metadata fields are documented.
+  - task_id: T002
+    title: Link Issue governance from existing contracts
+    status: done
+    type: edit
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+    done_when:
+      - Planning contracts point to Issue governance.
+      - Git governance explains how Issues relate to queues, branches, commits, and PRs.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G008 selection and completion evidence are recorded.
+      - G009 and G010 become ready after their dependencies are satisfied.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - references/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

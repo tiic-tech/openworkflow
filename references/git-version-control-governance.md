@@ -17,6 +17,8 @@ Use these boundaries when planning and implementing work:
 An Issue is an intent, problem, request, bug, or external tracking source. It
 can decompose into one or more candidate queues, and one candidate queue can
 reference one or more Issues. An Issue is not automatically a selected change.
+Use `references/issue-governance.md` for local and GitHub-backed
+source-of-truth rules.
 
 ## Commit Boundary
 
@@ -67,6 +69,22 @@ The PR summary should explain:
 
 Opening, editing, or merging PRs is not implied by this planning contract. Those
 remote operations require their own gh or GitHub governance.
+
+## Issue Boundary
+
+Issues sit before decomposition in the governance hierarchy:
+
+```text
+Issue -> CANDIDATE_CHANGES -> selected change -> commit -> branch -> PR
+```
+
+The arrow is not one-to-one. A single Issue can lead to multiple feat queues,
+and a single feat queue can aggregate several related Issues.
+
+When local issue artifacts are the source of truth, they are git-tracked
+planning artifacts. When GitHub Issues are the source of truth, local OW
+artifacts should record linkage such as issue URLs, plan ids, candidate ids,
+commit hashes, branch names, and PR refs.
 
 ## Non-Destructive Git Policy
 

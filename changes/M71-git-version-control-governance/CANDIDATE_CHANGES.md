@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G008`.
+- Next recommended candidate: `G010`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -185,7 +185,7 @@ without explicit approval of a concrete high-risk decision option.
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 
-Status: `candidate`
+Status: `done`
 
 Risk: `low`
 
@@ -207,9 +207,19 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G008-issue-governance-source-of-truth`
+
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `references/git-version-control-governance.md`
+- `references/issue-governance.md`
+- `changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml`
+
 ## G009 - Define Gh Issue And PR Operation Risk Boundaries
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
@@ -232,7 +242,7 @@ Validation:
 
 ## G010 - Create Analyze-Changes Skill For Cross-Queue Priority Analysis
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

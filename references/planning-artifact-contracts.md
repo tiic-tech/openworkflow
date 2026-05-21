@@ -47,6 +47,15 @@ Skills may inspect git state for planning and audit, but they must not perform
 destructive or remote-impacting git operations unless the user explicitly asks
 for that specific operation. Remote gh operations require separate governance.
 
+## Issue Governance Link
+
+Use `references/issue-governance.md` as the source contract for Issue
+source-of-truth rules. Issues are intent sources, not direct selected changes.
+When `gh` is unavailable or unauthorized, local issue artifacts may be tracked
+in git. When the user authorizes `gh` and GitHub Issues are configured as the
+source of truth, local OW artifacts should store linkage and audit evidence
+rather than duplicate remote Issue bodies as authoritative text.
+
 ## Skill Lifecycle Link
 
 When a selected planning change touches runtime skill generation, adapter

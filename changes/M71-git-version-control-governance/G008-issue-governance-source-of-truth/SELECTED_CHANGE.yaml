@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:G008-issue-governance-source-of-truth
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G008-issue-governance-source-of-truth
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G008
+title: Formalize Issue governance and source-of-truth rules
+status: done
+selection_reason: >
+  G008 is ready after G001 and defines the Issue source-of-truth model needed
+  before gh risk boundaries or cross-queue analysis can depend on Issue
+  metadata without creating drift.
+rejected_alternatives:
+  - candidate_ref: G002
+    reason: branch field behavior can proceed after Issue governance because G010 depends on G008.
+  - candidate_ref: G003
+    reason: select-change guard behavior remains ready but does not unlock Issue or analysis semantics.
+  - candidate_ref: G009
+    reason: gh operation boundaries depend on Issue source-of-truth rules.
+scope:
+  includes:
+    - Issue to CANDIDATE_CHANGES relationship model
+    - local issue backlog policy when gh is absent or unauthorized
+    - GitHub Issue source-of-truth policy when gh is configured
+    - linkage fields from issues to plan ids, candidate ids, commits, branches, and PRs
+    - drift prevention rules for remote issue bodies and local audit artifacts
+  excludes:
+    - implementing gh commands
+    - creating or editing issues
+    - changing select-change behavior
+    - changing validator implementation
+owned_paths:
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - references/issue-governance.md
+  - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/
+forbidden_paths:
+  - skills/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Issue is defined as an intent or problem source, not as a direct selected change.
+  - The contract defines when local issue artifacts are tracked in git.
+  - The contract defines GitHub Issues as the source of truth when gh is authorized and configured.
+  - The contract defines local linkage artifacts that can audit decomposition without duplicating remote issue bodies.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/planning-artifact-contracts.md
+    - references/git-version-control-governance.md
+    - references/issue-governance.md
+    - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
