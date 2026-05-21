@@ -237,6 +237,23 @@ M73 intentionally stops at taxonomy and stage-graph alignment. The following
 items are future feature boundaries, not active M73 candidates. Each item needs
 a later DTC pass before selection or implementation.
 
+Each command deserves its own candidate-change boundary. When a future queue
+reviews multiple existing commands together, such as the front-chain quality
+review, each command should still become its own candidate change inside that
+queue. Do not merge multiple command quality efforts into one broad candidate.
+
+For existing commands, the work is repair and enhancement. The queue should
+define strict acceptance criteria and stress tests before implementation starts:
+
+- behavioral acceptance for normal command use
+- malformed or missing artifact inputs
+- stale, thin, or conflicting summary/current-state inputs
+- dirty-tree and branch-boundary friction where relevant
+- JSON report quality and `ok:false` error clarity
+- generated adapter and source-of-truth drift where relevant
+- regression coverage that proves the command remains usable by a low-context
+  Agent
+
 | Order | Suggested Queue | Boundary | Risk Note |
 |---|---|---|---|
 | 1 | `M74-front-chain-command-quality-review` | Reassess `/ow:vision`, `/ow:validation`, `/ow:proto`, and `/ow:tune` under the expanded workflow. | Medium; quality of these commands affects every downstream artifact. |
@@ -255,6 +272,8 @@ a later DTC pass before selection or implementation.
 - Future queues must cite this M73 reference and the relevant source plan.
 - Future queues must run DTC scope control and avoid bundling multiple feature
   boundaries into one `CANDIDATE_CHANGES.yaml`.
+- Future command-review queues should split one candidate per command, with
+  explicit repair/enhancement scope, acceptance criteria, and stress tests.
 - High-risk queues require a `HIGH_RISK_DECISION_REPORT.md` and explicit user
   approval before selection or implementation of the high-risk option.
 - Front-chain command quality review must happen before proto2html work. Even
