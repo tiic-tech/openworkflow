@@ -118,3 +118,4 @@ validation:
     - User approved G015 managed command shell: local automation is available; remote operations produce ordered plans and remain approval-gated.
     - User clarified managed remote handoff must let agents reconstruct push, PR, conflict resolution, and merge order from local commits and evidence, even for large local histories.
     - G015 completed the managed git-automation command shell and added G016 as the autonomous-mode high-risk follow-up.
+    - G015 primary implementation commit is 47b708131bc87a1175c3603f0a9643c6f21b0e2e; commit evidence is recorded in a follow-up evidence commit.

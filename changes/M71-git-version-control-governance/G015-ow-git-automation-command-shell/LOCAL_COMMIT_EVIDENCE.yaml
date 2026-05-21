@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G015-ow-git-automation-command-shell
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G015 managed git automation shell
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G015
+selected_change_id: G015-ow-git-automation-command-shell
+branch_boundary: codex/m71-git-version-governance
+primary_commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e
+validation_evidence:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+managed_remote_handoff:
+  requires_user_approval: true
+  includes:
+    - branch boundary
+    - target base
+    - ordered local commits
+    - PR-ready summary path
+    - conflict-resolution checkpoint
+    - merge evidence expectations
+autonomous_mode:
+  implemented: false
+  follow_up_candidate: G016
+audit_notes:
+  - The primary commit implemented the managed git-automation shell.
+  - Remote execution remains approval-gated; G015 produces plans but does not push, create PRs, mutate Issues, or merge.
+  - Fully autonomous mode is deferred to G016.

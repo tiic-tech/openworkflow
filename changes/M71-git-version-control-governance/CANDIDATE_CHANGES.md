@@ -414,8 +414,10 @@ Completion evidence:
 - `.agents/openworkflow-adapter.yaml`
 - `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
 - `.openworkflow/audit/CONTEXT_PACKETS.yaml`
+- `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/LOCAL_COMMIT_EVIDENCE.yaml`
 - `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml`
+- `commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e`
 
 ## G016 - Define Autonomous Git Automation Lifecycle
 
