@@ -88,7 +88,7 @@ scope_control:
       reason: >
         End-to-end pressure testing belongs after command-specific contracts land.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -209,7 +209,7 @@ changes:
       evidence:
         - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: selected
+    status: done
     title: Upgrade /ow:validation generated protocol for experiment compilation
     purpose: >
       Make generated /ow:validation guidance consume build-validation and the
@@ -257,8 +257,14 @@ changes:
         now stable enough for generated /ow:validation protocol wording and
         runtime-surface drift checks.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-validation-generated-protocol
+      completed_at: 2026-05-22
+      commit: 4e2f19f
+      evidence:
+        - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: candidate
+    status: selected
     title: Add validation target stress fixtures
     purpose: >
       Verify thin, vision-blocked, and proto-ready validation target states
@@ -296,6 +302,13 @@ changes:
       - Tests cover a validation target blocked by vision gaps.
       - Tests cover a validation target that is usable by /ow:proto.
       - Runtime verification fails clearly if experiment fields are dropped.
+    selection:
+      selected_change_id: C004-validation-target-stress-fixtures
+      reason: >
+        Single-queue SC selected C004 after C003 because command behavior and
+        artifact shape are stable enough to add explicit thin, blocked, and
+        ready validation fixtures.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -404,3 +417,31 @@ operations:
       - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/SELECTED_CHANGE.yaml
       - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/ATOM_TASKS.yaml
       - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 upgraded source and generated /ow:validation protocol to prototype
+      validation target compiler behavior.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 directly with SC because M85 remains the single active queue
+      and C004 is the final verification candidate after C001-C003.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/IMPLEMENTATION_BRIEF.md

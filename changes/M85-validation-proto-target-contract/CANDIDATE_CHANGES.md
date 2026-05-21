@@ -24,11 +24,11 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: none
 
-Completed candidates: `C001`, `C002`
+Completed candidates: `C001`, `C002`, `C003`
 
-Selected candidate: `C003`
+Selected candidate: `C004`
 
-Next recommended candidate: `C003`
+Next recommended candidate: `C004`
 
 ## Command Boundary Decision
 
@@ -67,16 +67,18 @@ Completed in commit `30e3a4e`.
 
 ### C003 - Upgrade /ow:validation generated protocol for experiment compilation
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
 Updates generated `/ow:validation` guidance and context packets after artifact
 shape stabilizes.
 
+Completed in commit `4e2f19f`.
+
 ### C004 - Add validation target stress fixtures
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `medium`
 

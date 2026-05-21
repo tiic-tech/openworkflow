@@ -6,11 +6,11 @@ selected_change_id: C003-validation-generated-protocol
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C003
 title: Atom tasks for validation generated protocol
-status: ready
+status: complete
 tasks:
   - task_id: T001
     title: Update source command protocol
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/commands/registry.ts
@@ -19,7 +19,7 @@ tasks:
       return-to-vision gating, and no-prototype boundaries.
   - task_id: T002
     title: Refresh generated command surfaces
-    status: pending
+    status: done
     type: generate
     owned_paths:
       - .agents/skills/ow-validation/SKILL.md
@@ -30,7 +30,7 @@ tasks:
       openworkflow sync regenerates managed surfaces from source protocol.
   - task_id: T003
     title: Update drift verification
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
