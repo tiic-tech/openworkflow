@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C004` after high-risk report review.
+Next recommended candidate: `C004` after high-risk option approval.
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
@@ -245,8 +245,15 @@ Completion evidence:
 - `quick_validate.py skills/select-change`
 - `npm run validate`
 - `git diff --check`
-- Cross-queue decisions record rejected alternatives by plan id and candidate id.
-- The `M68/H003` versus `M69/S001` dogfood decision is captured as evidence.
+
+## C004 High-Risk Stop
+
+`C004` is dependency-satisfied after `C007`, but remains high risk because it
+would expose planning skills through runtime and generated adapter surfaces.
+
+Decision report: `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+
+Recommended option: Option B, design-only boundary first.
 
 ## Operation Audit
 
@@ -257,3 +264,4 @@ Completion evidence:
 - `OP005`: update queue branch boundary to `codex/m54-decompose-select-change-planning`
 - `OP006`: select `C007`
 - `OP007`: complete `C007`
+- `OP008`: query `C004` high-risk stop and create decision report

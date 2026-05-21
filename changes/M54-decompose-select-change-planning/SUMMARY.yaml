@@ -19,6 +19,7 @@ outputs:
   candidate_changes_yaml: changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
   summary: changes/M54-decompose-select-change-planning/SUMMARY.yaml
+  high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
 candidate_count: 7
 completed_candidate_id: C007
@@ -34,6 +35,7 @@ key_dependencies:
   - C007 is ready and should precede C004 because C004 depends on it.
   - C007 is complete and makes C004 dependency-satisfied.
   - C004 remains high risk and should stop for a high-risk report or explicit approved option before selection.
+  - C004 high-risk report recommends Option B, design-only boundary first, before runtime exposure implementation.
 risks:
   - id: R001
     level: medium
@@ -59,3 +61,4 @@ validation:
     - OP006 selected C007 and created implementation-ready planning artifacts.
     - OP007 completed C007 cross-queue selection arbitration guidance and dogfood evidence.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml.
+    - OP008 created the C004 high-risk decision report without selecting or implementing C004.

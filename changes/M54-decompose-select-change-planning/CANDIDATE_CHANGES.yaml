@@ -488,3 +488,17 @@ operations:
       - "validation: quick_validate.py skills/select-change"
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP008
+    operation_type: query
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 is dependency-satisfied after C007 but remains high risk because it
+      would expose planning skills through runtime and generated adapter
+      surfaces.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
