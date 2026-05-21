@@ -23,11 +23,11 @@ outputs:
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
 candidate_count: 13
-completed_candidate_id: C011
-completed_change_id: C011-codex-planning-adapter
-previous_completed_candidate_id: C010
-previous_completed_change_id: C010-planning-registry-semantics
-next_recommended_candidate_id: C013
+completed_candidate_id: C013
+completed_change_id: C013-runtime-exposure-reassessment
+previous_completed_candidate_id: C011
+previous_completed_change_id: C011-codex-planning-adapter
+next_recommended_candidate_id: null
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -48,6 +48,8 @@ key_dependencies:
   - C010 is complete and C011 is the next generated-surface follow-up; C011 remains high risk.
   - User approved C011; Codex generated planning skill surfaces are now delivered from source registry data.
   - C011 is complete and C013 is the next high-risk reassessment candidate.
+  - User approved C013 workflow blueprint reassessment.
+  - C013 is complete: DTC, AC, and SC are complete for the /ow:change planning command slice, but full OW workflow runtime alignment belongs in a new queue.
 risks:
   - id: R001
     level: medium
@@ -87,4 +89,6 @@ validation:
     - OP019 completed C010 planning registry semantics for DTC, AC, and SC.
     - OP020 selected C011 after explicit high-risk approval.
     - OP021 completed C011 Codex generated planning skill delivery.
+    - OP022 selected C013 after explicit high-risk approval.
+    - OP023 completed C013 workflow blueprint reassessment and recommends a new full workflow alignment queue.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

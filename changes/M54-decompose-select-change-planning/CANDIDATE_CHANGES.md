@@ -14,11 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C013` after high-risk approval.
+Next recommended candidate: none in this queue. Start a new workflow blueprint alignment queue.
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
-Latest completed candidate: `C011`
+Latest completed candidate: `C013`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -428,12 +428,30 @@ Completion evidence:
 
 ## C013 - Reassess Full Planning Skill Runtime Exposure
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
 Purpose: reassess C004 after registration, semantic registry, adapter, and
 verification boundaries have been proven or blocked.
+
+Conclusion:
+
+- DTC, AC, and SC are complete for the `/ow:change` planning command slice.
+- They do not replace the full workflow blueprint.
+- Remaining runtime alignment should move to a new queue covering
+  `/ow:proto2html`, `/ow:html2spec`, `/ow:build`, `/ow:review`,
+  `/ow:archive`, `/ow:build-agent`, and `/ow:build-skill`.
+
+Completion evidence:
+
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/IMPLEMENTATION_BRIEF.md`
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+- `npm run validate`
+- `git diff --check`
 
 ## Operation Audit
 
@@ -458,3 +476,5 @@ verification boundaries have been proven or blocked.
 - `OP019`: complete `C010`
 - `OP020`: select `C011`
 - `OP021`: complete `C011`
+- `OP022`: select `C013`
+- `OP023`: complete `C013`

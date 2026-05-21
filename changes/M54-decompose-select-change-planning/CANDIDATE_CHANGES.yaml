@@ -37,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C013
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -684,7 +684,7 @@ changes:
         - "validation: npm run verify:agent-e2e"
         - "validation: git diff --check"
   - id: C013
-    status: ready
+    status: done
     title: Reassess full planning skill runtime exposure
     purpose: >
       Reassess C004 after registration, semantic registry, adapter, and
@@ -711,6 +711,24 @@ changes:
     acceptance:
       - Reassessment records whether full runtime exposure is still justified.
       - High-risk approvals are explicit and current.
+    selection:
+      selected_change_id: C013-runtime-exposure-reassessment
+      reason: >
+        User approved C013 under the principle that DTC, AC, and SC must stay
+        inside the /ow:change loop and must not eclipse the overall OW workflow
+        blueprint from OW_DEVELOP_PLAN.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C013-runtime-exposure-reassessment
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+        - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/IMPLEMENTATION_BRIEF.md
+        - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+        - "validation: npm run validate"
+        - "validation: git diff --check"
 operations:
   - operation_id: OP001
     operation_type: add
@@ -1054,4 +1072,42 @@ operations:
       - "validation: npm run validate"
       - "validation: npm run verify:runtime-surface"
       - "validation: npm run verify:agent-e2e"
+      - "validation: git diff --check"
+  - operation_id: OP022
+    operation_type: select
+    target_candidate_ids:
+      - C013
+    actor: agent
+    reason: >
+      User approved a C013 reassessment that aligns the planning command
+      runtime exposure work with the full OW workflow blueprint instead of
+      continuing local DTC/AC/SC expansion.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP023
+    operation_type: complete
+    target_candidate_ids:
+      - C013
+    actor: agent
+    reason: >
+      C013 records that DTC, AC, and SC are complete for the /ow:change planning
+      command slice, while full OW workflow runtime alignment belongs in a new
+      queue covering proto2html, html2spec, build, review, archive, build-agent,
+      and build-skill.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/IMPLEMENTATION_BRIEF.md
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+      - "validation: npm run validate"
       - "validation: git diff --check"

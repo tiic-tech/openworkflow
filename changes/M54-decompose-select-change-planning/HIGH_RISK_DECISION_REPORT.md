@@ -125,6 +125,23 @@ does not authorize Codex adapter generation, generated `.agents/**` surfaces,
 or broad runtime delivery. Those remain gated by the C011 high-risk candidate
 after the C010 semantics are complete.
 
+Approved on 2026-05-21: proceed with the **C013 Workflow Blueprint
+Reassessment** follow-up.
+
+The approved scope is limited to reassessing the completed DTC/AC/SC runtime
+delivery against the overall OpenWorkflow blueprint in `docs/OW_DEVELOP_PLAN.md`.
+The reassessment must treat DTC, AC, and SC as the planning intelligence layer
+inside `/ow:change`, not as a replacement for the full workflow:
+
+```text
+/ow:vision -> /ow:validation -> /ow:proto -> /ow:tune -> /ow:proto2html
+  -> /ow:html2spec -> /ow:build -> /ow:change -> /ow:archive
+```
+
+It may recommend a new planning queue for `/ow:proto2html`, `/ow:html2spec`,
+`/ow:build`, `/ow:review`, `/ow:archive`, `/ow:build-agent`, and
+`/ow:build-skill`, but it must not implement those runtime surfaces in C013.
+
 ## Guardrails
 
 - Do not hand-edit generated `.agents/**`, `.openworkflow/**`, or `AGENTS.md`
@@ -149,6 +166,7 @@ option:
 - `Approve Option C`
 - `Approve Option D`
 - `Approve C010 Narrow Core Command Semantics`
+- `Approve C013 Workflow Blueprint Reassessment`
 
 Ambiguous instructions such as "continue" are not enough to select or implement
 runtime exposure.
