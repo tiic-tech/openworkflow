@@ -1,0 +1,78 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-review-enhance-vision
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-review-enhance-vision
+source_plan_id: M74-front-chain-command-quality-review
+source_candidate_id: C001
+title: Atom tasks for /ow:vision Agent-first consumption review
+status: ready
+tasks:
+  - task_id: T001
+    title: Inspect current /ow:vision command and generated Agent surfaces
+    status: pending
+    type: read
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-vision/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    done_when: >
+      The current /ow:vision consumer path, artifact contract, generated skill,
+      and existing verification coverage are understood from source-first files.
+  - task_id: T002
+    title: Audit /ow:vision against the Agent-first artifact quality bar
+    status: pending
+    type: document
+    owned_paths:
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/
+    done_when: >
+      The implementation pass has a concise list of concrete gaps to fix,
+      focused on low-context Agent orientation, source-of-truth clarity,
+      handoff readiness, and failure-mode usefulness.
+  - task_id: T003
+    title: Repair or enhance /ow:vision source behavior and contracts
+    status: pending
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - schemas/vision-session.schema.json
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Source files make /ow:vision more useful to a first-consuming Agent
+      without expanding into validation, prototype, spec, change, or runtime
+      outputs.
+  - task_id: T004
+    title: Regenerate managed surfaces and verify coherency
+    status: pending
+    type: verify
+    owned_paths:
+      - .agents/skills/ow-vision/
+      - .openworkflow/audit/
+    done_when: >
+      openworkflow sync refreshes generated surfaces from source and the
+      generated /ow:vision skill, context packet, and artifact contracts remain
+      coherent.
+  - task_id: T005
+    title: Run validation and record completion evidence
+    status: pending
+    type: verify
+    owned_paths:
+      - changes/M74-front-chain-command-quality-review/
+    done_when: >
+      Required validation commands pass, the queue records completion evidence,
+      and the selected change can be committed as one coherent C001 change.
+validation:
+  - npm run validate
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

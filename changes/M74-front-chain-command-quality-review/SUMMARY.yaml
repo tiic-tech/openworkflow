@@ -1,0 +1,99 @@
+schema_version: 0.1.0
+contract_id: summary:M74-front-chain-command-quality-review
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M74-front-chain-command-quality-review
+title: Summary for front-chain command quality review
+status: active
+source:
+  kind: mixed
+  summary: >
+    Tracks a bounded queue for reassessing the existing front-chain workflow
+    commands under the expanded OW blueprint. The queue uses an Agent-first
+    artifact consumer lens: every command should help an implementing Agent
+    orient, decide, act, verify, and hand off with low context.
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - references/workflow-blueprint-runtime-alignment.md
+    - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+scope_boundary:
+  current_boundary: >
+    Review and enhance /ow:vision, /ow:validation, /ow:proto, and /ow:tune as
+    the existing front-chain command surfaces.
+  boundary_type: workflow_slice
+  note: >
+    M74 intentionally stops before proto2html. Each front-chain command is its
+    own candidate so repair, enhancement, acceptance criteria, and stress tests
+    stay implementation-sized.
+agent_first_quality_bar:
+  statement: >
+    OW is designed for Agents as first consumers. Command artifacts should feel
+    like a precise development instrument: compact, structured, coherent,
+    auditable, and immediately useful for safe action.
+  required_review_questions:
+    - What is the current state?
+    - What should the Agent read first?
+    - What context is required, optional, or forbidden?
+    - What artifact is source of truth, summary, evidence, or view?
+    - What can the Agent safely modify?
+    - What is blocked, stale, risky, or missing?
+    - What validation proves the command behaved correctly?
+    - What next command or handoff is appropriate?
+deferred_feature_refs:
+  - M75-proto2html-runtime-contract
+  - M76-html2spec-artifact-contract
+  - M77-build-command-contract
+  - M78-change-planning-loop
+  - M79-review-async-pipeline
+  - M80-archive-completion-transaction
+  - M81-build-agent-skill-registry
+  - M82-workflow-lifecycle-transactions
+  - M83-expanded-workflow-read-model
+outputs:
+  candidate_changes_yaml: changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.md
+  summary: changes/M74-front-chain-command-quality-review/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: C001
+selected_change_id: C001-review-enhance-vision
+next_recommended_candidate_id: null
+key_dependencies:
+  - M73 completed the workflow taxonomy and established that front-chain quality review should precede proto2html.
+  - The current queue is a single active queue, so SC should select within it directly; AC is only needed when multiple queues compete.
+  - Each command review must use the Agent-first artifact consumer lens from the Phase 2 plan and user direction.
+risks:
+  - id: R001
+    level: medium
+    description: Front-chain command artifacts may be valid but still too weak for low-context Agent consumption.
+    mitigation: Require each candidate to pass strict Agent-first acceptance questions and stress tests before completion.
+  - id: R002
+    level: medium
+    description: Repairing multiple commands in one selected change could blur ownership and hide regressions.
+    mitigation: Keep one command per candidate and let SC select one implementation-sized command repair at a time.
+  - id: R003
+    level: medium
+    description: Generated adapter files can drift from source skill or registry changes.
+    mitigation: Change source first, run openworkflow sync, and validate generated output coherency.
+  - id: R004
+    level: high
+    description: Expanding M74 into downstream runtime command exposure would bypass the agreed DTC scope boundary.
+    mitigation: Keep proto2html and later surfaces deferred; require a separate DTC queue and high-risk report where runtime exposure is involved.
+unresolved_questions:
+  - Should M74 update a shared command-review rubric source file after C001 proves the review pattern, or keep the rubric queue-local?
+validation:
+  commands_run:
+    - node dist/cli/src/index.js --help
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js context --root . --for /ow:decompose-to-changes --handoff --json
+    - git status --short --branch
+  notes:
+    - OP001 created M74 as a bounded DTC queue with one candidate per front-chain command.
+    - OP002 aligned candidate owned_paths with the current repository source layout before selection.
+    - OP003 selected C001 directly with SC because M74 is the single active queue.
+    - No high-risk candidate is currently next recommended; C001 is medium risk and can proceed through SC under the user's standing rule.

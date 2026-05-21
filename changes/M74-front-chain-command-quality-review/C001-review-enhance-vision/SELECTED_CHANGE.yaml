@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-review-enhance-vision
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-review-enhance-vision
+source_plan_id: M74-front-chain-command-quality-review
+source_candidate_id: C001
+title: Review and enhance /ow:vision for Agent-first consumption
+status: selected
+selection_reason: >
+  /ow:vision is the first front-chain command and has no candidate
+  dependencies. Improving its Agent-first artifact quality before validation,
+  proto, or tune gives the downstream workflow a stronger source of durable
+  intent, handoff readiness, and low-context trust.
+rejected_alternatives:
+  - id: C002
+    reason: Depends on C001 because validation quality should be assessed after the vision input contract is trustworthy.
+  - id: C003
+    reason: Depends on C001 and C002 because prototype quality depends on clear vision and validation boundaries.
+  - id: C004
+    reason: Depends on C001-C003 because tune quality depends on accepted prototype evidence and upstream handoffs.
+scope:
+  includes:
+    - registry command contract review for /ow:vision
+    - vision artifact source-of-truth and current-slice quality
+    - generated ow-vision adapter synchronization through openworkflow sync
+    - validation and stress tests for normal and failed vision flows
+  excludes:
+    - validation, proto, tune, or downstream command implementation
+    - new runtime command exposure
+    - broad lifecycle transaction design
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - schemas/vision-session.schema.json
+  - packages/adapters/codex/src/generateSkills.ts
+  - packages/adapters/codex/src/generateCommands.ts
+  - schemas/
+  - .agents/skills/ow-vision/
+  - .openworkflow/audit/
+forbidden_paths:
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+  - .openworkflow/specs/**
+  - .openworkflow/changes/**
+  - .openworkflow/runtime/**
+  - skills/build-validation/**
+  - skills/build-prototype/**
+  - skills/tune-prototype/**
+  - implementation paths for proto2html, html2spec, build, review, archive, build-agent, or build-skill
+acceptance:
+  - /ow:vision explicitly tells an Agent required context, forbidden outputs, source-of-truth artifacts, summary/current-slice behavior, and next handoff.
+  - A first-consuming Agent can answer the front-chain state and next-action questions from compact artifacts without whole-repo scanning.
+  - Stress coverage includes normal vision creation, missing or malformed inputs, stale or thin current state, dirty-tree friction where relevant, and clear JSON ok:false failures.
+  - Generated ow-vision skill output is refreshed from source and remains coherent with registry and artifact contracts.
+  - The command output is not merely valid; it gives the Agent useful, confidence-building development intelligence.
+validation:
+  - npm run validate
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one coherent local commit unless implementation review discovers
+  the change must be split before source edits proceed.
