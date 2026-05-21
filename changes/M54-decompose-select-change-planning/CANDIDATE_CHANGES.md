@@ -14,7 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C007`
+Next recommended candidate: `C004` after high-risk report review.
+
+Branch boundary: `codex/m54-decompose-select-change-planning`
+
+Latest completed candidate: `C007`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -122,7 +126,7 @@ Completion evidence:
 
 ## C004 - Expose Planning Skills Through Runtime Surfaces
 
-Status: `ready`
+Status: `done`
 
 Purpose: promote proven source skills into OpenWorkflow command and adapter
 surfaces so future repositories can invoke them consistently.
@@ -231,9 +235,25 @@ Acceptance:
 - Cross-queue decisions record rejected alternatives by plan id and candidate id.
 - The `M68/H003` versus `M69/S001` dogfood decision is captured as evidence.
 
+Completion evidence:
+
+- `skills/select-change/SKILL.md`
+- `skills/select-change/references/selection-protocol.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M54-decompose-select-change-planning/C007-cross-queue-selection/DOGFOOD_CROSS_QUEUE_EVIDENCE.md`
+- `changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml`
+- `quick_validate.py skills/select-change`
+- `npm run validate`
+- `git diff --check`
+- Cross-queue decisions record rejected alternatives by plan id and candidate id.
+- The `M68/H003` versus `M69/S001` dogfood decision is captured as evidence.
+
 ## Operation Audit
 
 - `OP001`: add `C006`
 - `OP002`: select `C006`
 - `OP003`: complete `C006`
 - `OP004`: add `C007`
+- `OP005`: update queue branch boundary to `codex/m54-decompose-select-change-planning`
+- `OP006`: select `C007`
+- `OP007`: complete `C007`

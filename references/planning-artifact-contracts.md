@@ -164,6 +164,19 @@ The selected change must name rejected alternatives when the choice is not
 obvious. Rejected alternatives should be short and should reference candidate
 ids, not copy the full candidate body.
 
+When selection consumes a cross-queue recommendation, rejected alternatives
+must include both `plan_id` and `candidate_id`:
+
+```yaml
+rejected_alternatives:
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: High risk and missing a local high-risk decision report.
+```
+
+Use a short `id` field only when the rejected candidate belongs to the same
+`source_plan_id` as the selected change.
+
 ## ATOM_TASKS.yaml
 
 Purpose: break one selected change into focused tasks an Agent can execute
@@ -304,6 +317,13 @@ The analysis artifact is advisory. It must not create
 `SELECTED_CHANGE.yaml`, mutate candidate status, or authorize high-risk
 implementation. `select-change` owns selection artifacts after consuming a
 recommended target.
+
+When `select-change` consumes the recommendation, it should create selection
+artifacts inside `changes/<target_plan_id>/`, re-check current readiness gates,
+and copy only the decision-relevant rejected alternatives into
+`SELECTED_CHANGE.yaml`. The analysis folder remains evidence for why the
+cross-queue comparison happened; it is not the owning feat folder for the
+selected candidate.
 
 ## PR_READY_SUMMARY.md
 

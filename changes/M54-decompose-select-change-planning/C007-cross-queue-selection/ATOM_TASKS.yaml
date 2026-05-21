@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C007-cross-queue-selection
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C007-cross-queue-selection
+title: C007 Cross-queue selection atom tasks
+status: completed
+tasks:
+  - task_id: C007-A001
+    title: Extend select-change cross-queue protocol
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+    done_when:
+      - select-change describes explicit multi-queue arbitration mode.
+      - The default remains one active queue and one selected candidate.
+      - Branch-boundary and dirty-tree guards still apply before selection.
+  - task_id: C007-A002
+    title: Document cross-queue artifact evidence
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/
+    done_when:
+      - SELECTED_CHANGE.yaml rejected alternatives can carry plan id and candidate id.
+      - Meta-selection versus in-queue selection guidance is documented.
+      - Dogfood evidence references the M68/H003, M69/S001, and M70/G005 comparison.
+  - task_id: C007-A003
+    title: Validate planning skill behavior
+    status: completed
+    type: verify
+    owned_paths:
+      - skills/select-change/
+      - references/planning-artifact-contracts.md
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - Skill quick validation passes when available.
+      - Repository validation passes.
+      - Queue status and operation history remain audit-ready.
+  - task_id: C007-A004
+    title: Record completion evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+    done_when:
+      - C007 is marked done only after implementation and validation.
+      - Completion evidence names changed paths and validation commands.
+      - The next recommended candidate reflects C004 being unlocked or high-risk gated.

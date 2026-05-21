@@ -11,6 +11,10 @@ Choose one candidate change and turn it into implementation-ready planning
 artifacts. This skill prepares the next change; it does not execute the
 implementation.
 
+By default, operate on one active queue. Use cross-queue arbitration only when
+the user provides multiple queues, points to a `CHANGE_ANALYSIS.yaml`, or asks
+which queue and candidate should go next.
+
 ## Feat Boundary
 
 The source `CANDIDATE_CHANGES.yaml` is the feat boundary. A selected candidate
@@ -50,6 +54,7 @@ Read these only as needed:
 - `skills/select-change/references/selection-protocol.md`
 - The target `CANDIDATE_CHANGES.yaml`
 - The matching `CANDIDATE_CHANGES.md` only as a readable aid
+- `CHANGE_ANALYSIS.yaml` when consuming a cross-queue recommendation
 
 ## Workflow
 
@@ -61,28 +66,54 @@ Read these only as needed:
    selected change or blur the one-change-one-commit boundary.
 5. If the user names a candidate id, perform targeted readiness review for
    that id before considering the rest of the queue.
-6. Filter candidates to `ready` first. If none are ready, inspect `candidate`
+6. If the user provides multiple queues or a `CHANGE_ANALYSIS.yaml`, run the
+   cross-queue arbitration path before choosing a target queue.
+7. Filter candidates to `ready` first. If none are ready, inspect `candidate`
    entries and report the blockers instead of forcing a selection.
-7. Prefer `next_recommended_candidate_id` when it points to a ready candidate
+8. Prefer `next_recommended_candidate_id` when it points to a ready candidate
    and the dependencies still hold.
-8. Otherwise choose the candidate that best matches the queue's
+9. Otherwise choose the candidate that best matches the queue's
    `selection_policy`, unlocks downstream work, has focused owned paths, and
    has realistic validation.
-9. If the candidate is `risk: high`, stop before selection unless the user has
+10. If the candidate is `risk: high`, stop before selection unless the user has
    explicitly approved a concrete decision option from a high-risk decision
    report.
-10. Create a candidate-specific folder inside the current feat folder, usually
+11. Create a candidate-specific folder inside the current feat folder, usually
    `changes/<plan_id>/<candidate-id>-<slug>/`.
-11. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+12. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
-12. Update the candidate queue:
+13. Update the candidate queue:
    - set the selected candidate to `selected`
    - add `selection.selected_change_id`
    - add concise `selection.reason`
    - append an `operations` entry for the selection
    - leave all other candidates in place
-13. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
-14. Stop before implementation unless the user explicitly asks to continue.
+14. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
+15. Stop before implementation unless the user explicitly asks to continue.
+
+## Cross-Queue Arbitration
+
+Cross-queue arbitration is explicit. Do not discover every queue in the repo
+unless the user asks for a global comparison or provides an existing
+`CHANGE_ANALYSIS.yaml`.
+
+When arbitration is active:
+
+- Prefer an existing `CHANGE_ANALYSIS.yaml` produced by `analyze-changes`.
+- Confirm the recommended `target_plan_id` and `target_candidate_id` still
+  exist, are not done, and satisfy dependencies.
+- Re-run branch-boundary, dirty-tree, and high-risk gates against the target
+  queue before writing selection artifacts.
+- Keep selection artifacts inside the target queue folder, not inside the
+  analysis folder.
+- Record rejected alternatives in `SELECTED_CHANGE.yaml` with `plan_id`,
+  `candidate_id`, and a concise reason.
+- If no candidate is clearly safe to select, stop and recommend queue
+  maintenance, a high-risk report, or a fresh `analyze-changes` run.
+
+Use a separate meta-selection artifact only when the user's requested output is
+itself an analysis or governance decision. Normal implementation selection
+should select one candidate inside the target queue.
 
 ## Targeted Review
 

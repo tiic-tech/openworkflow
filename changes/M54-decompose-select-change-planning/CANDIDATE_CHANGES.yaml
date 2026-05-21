@@ -12,6 +12,7 @@ source:
     - AGENTS.md
     - changes/M54-decompose-select-change-planning/CHANGE.yaml
 queue_policy:
+  branch_boundary: codex/m54-decompose-select-change-planning
   source_of_truth: CANDIDATE_CHANGES.yaml
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable ids are assigned once and referenced by select-change.
@@ -36,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C007
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -329,7 +330,7 @@ changes:
         - changes/M62-planning-skill-queue-maintenance/CHANGE.yaml
         - "validation: npm run validate"
   - id: C007
-    status: ready
+    status: done
     title: Support cross-queue selection arbitration
     purpose: >
       Extend select-change's source behavior so an agent can make an audited
@@ -366,6 +367,28 @@ changes:
       - The skill still states that one active queue is the preferred default.
       - Cross-queue decisions record rejected alternatives by plan id and candidate id.
       - The M68/H003 versus M69/S001 dogfood decision is captured as evidence.
+    selection:
+      selected_change_id: C007-cross-queue-selection
+      reason: >
+        M72 recommended C007 because it is ready, medium risk,
+        dependency-satisfied, and directly improves cross-queue selection
+        arbitration before C004 runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C007-cross-queue-selection
+      completed_at: 2026-05-21
+      evidence:
+        - skills/select-change/SKILL.md
+        - skills/select-change/references/selection-protocol.md
+        - references/planning-artifact-contracts.md
+        - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/IMPLEMENTATION_BRIEF.md
+        - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/DOGFOOD_CROSS_QUEUE_EVIDENCE.md
+        - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: PYTHONPATH=/Users/archy/Projects/Develop/develop_notebooks/.venv/lib/python3.13/site-packages python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
 operations:
   - operation_id: OP001
     operation_type: add
@@ -417,3 +440,51 @@ operations:
     after_status: ready
     evidence:
       - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/SELECTED_CHANGE.yaml
+  - operation_id: OP005
+    operation_type: update
+    target_candidate_ids: []
+    actor: agent
+    reason: >
+      Retrofitted the legacy M54 queue with the owning feat branch boundary
+      required by current git governance before selecting C007.
+    changed_at: 2026-05-21
+    before_status: active
+    after_status: active
+    evidence:
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C007 is the M72-recommended medium-risk candidate for native cross-queue
+      selection arbitration and unlocks C004 after completion.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      select-change now documents explicit cross-queue arbitration, consumes
+      CHANGE_ANALYSIS recommendations as advisory evidence, and records
+      cross-queue rejected alternatives by plan id and candidate id.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - references/planning-artifact-contracts.md
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/DOGFOOD_CROSS_QUEUE_EVIDENCE.md
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: quick_validate.py skills/select-change"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
