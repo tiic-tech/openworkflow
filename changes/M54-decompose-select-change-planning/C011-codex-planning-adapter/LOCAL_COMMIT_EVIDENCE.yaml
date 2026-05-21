@@ -1,0 +1,22 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C011-codex-planning-adapter
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C011-codex-planning-adapter
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C011
+selected_change_id: C011-codex-planning-adapter
+primary_commit: 887112c9de04b57eebabdbae70d03f2160412f75
+validation_evidence:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js doctor --root . --json
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
