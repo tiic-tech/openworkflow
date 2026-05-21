@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G005
+next_recommended_candidate_id: G006
 changes:
   - id: G001
     status: done
@@ -276,7 +276,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G005
-    status: ready
+    status: done
     title: Define feat completion and PR-ready summary artifact
     purpose: >
       Create a lightweight artifact contract for completing a candidate queue as
@@ -311,8 +311,24 @@ changes:
       - The contract explains how to summarize candidate completion status.
       - The contract records branch name, commit evidence, validation evidence, and unresolved risks.
       - The contract does not require automatic PR creation.
+    selection:
+      selected_change_id: G005-pr-ready-summary-contract
+      reason: >
+        G005 is the next recommended candidate after G004 and defines the
+        review handoff artifact needed before branch-per-feat dogfood fixtures.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G005-pr-ready-summary-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G006
-    status: candidate
+    status: ready
     title: Add dogfood fixtures for branch-per-feat workflow
     purpose: >
       Add focused dogfood fixtures and examples that show a clean feat branch,
@@ -767,3 +783,32 @@ operations:
       - "validation: npm run validate"
       - "validation: git diff --check"
       - "validation: npm run verify:runtime-surface"
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - G005
+    actor: agent
+    reason: Select G005 because PR-ready summary semantics should be defined before dogfood fixtures model a branch-per-feat handoff.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - G005
+    actor: agent
+    reason: Complete G005 after defining PR_READY_SUMMARY.md and linking it from git governance.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"

@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G005`.
+- Next recommended candidate: `G006`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -143,7 +143,7 @@ Completion evidence:
 
 ## G005 - Define Feat Completion And PR-Ready Summary Artifact
 
-Status: `ready`
+Status: `done`
 
 Risk: `low`
 
@@ -164,9 +164,18 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G005-pr-ready-summary-contract`
+
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `references/git-version-control-governance.md`
+- `changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml`
+
 ## G006 - Add Dogfood Fixtures For Branch-Per-Feat Workflow
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

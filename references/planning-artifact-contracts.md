@@ -299,6 +299,31 @@ The analysis artifact is advisory. It must not create
 implementation. `select-change` owns selection artifacts after consuming a
 recommended target.
 
+## PR_READY_SUMMARY.md
+
+Purpose: summarize a feat branch for human PR review without creating,
+editing, or opening a remote pull request.
+
+The summary belongs to the completed or review-ready queue:
+
+```text
+changes/<plan_id>/PR_READY_SUMMARY.md
+```
+
+Required sections:
+
+- `Feat`: plan id, title, branch boundary, and source queue path.
+- `Completed Changes`: selected change ids, candidate ids, and commit evidence
+  when available.
+- `Deferred Or Blocked Changes`: candidates intentionally left out of the PR.
+- `High-Risk Decisions`: linked reports and unresolved approvals.
+- `Validation`: commands run and results.
+- `Review Notes`: risks, assumptions, and follow-up queues.
+
+The artifact is a handoff packet, not a remote operation. It must not imply
+that a PR was opened, edited, pushed, merged, or approved. Any gh or GitHub
+mutation must follow separate operation governance and user authorization.
+
 ## Status Update Rules
 
 When select-change chooses a candidate:

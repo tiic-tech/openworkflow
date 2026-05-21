@@ -59,7 +59,8 @@ touches a branch-governed queue from a different branch.
 ## Pull Request Boundary
 
 A pull request should normally represent one feat branch, not one atom task.
-The PR summary should explain:
+Use `changes/<plan_id>/PR_READY_SUMMARY.md` to prepare the branch for review
+before any remote PR operation. The PR-ready summary should explain:
 
 - the owning candidate queue
 - completed selected changes and commit evidence
@@ -67,8 +68,9 @@ The PR summary should explain:
 - validation commands and results
 - unresolved risks or follow-up queues
 
-Opening, editing, or merging PRs is not implied by this planning contract. Those
-remote operations require their own gh or GitHub governance.
+Opening, editing, or merging PRs is not implied by either the planning contract
+or `PR_READY_SUMMARY.md`. Those remote operations require their own gh or GitHub
+governance.
 
 ## Issue Boundary
 
