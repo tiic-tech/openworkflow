@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C014-deferred-feature-handoff-map
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C014-deferred-feature-handoff-map
+title: C014 deferred feature handoff map atom tasks
+status: pending
+tasks:
+  - task_id: C014-A001
+    title: Define future queue order
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Front-chain review is first after M73.
+      - proto2html and downstream queues follow in explicit order.
+  - task_id: C014-A002
+    title: Define future queue boundaries
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Each future feature has a distinct boundary.
+      - Deferred features are not represented as active M73 candidates.
+  - task_id: C014-A003
+    title: Define risk and approval notes
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - High-risk future surfaces remain approval-gated.
+      - The handoff map distinguishes review/design work from runtime exposure.
+  - task_id: C014-A004
+    title: Validate handoff-map-only change
+    status: pending
+    type: verify
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

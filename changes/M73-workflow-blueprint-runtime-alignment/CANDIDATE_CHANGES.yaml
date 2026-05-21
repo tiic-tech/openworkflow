@@ -84,7 +84,7 @@ scope_control:
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
       suggested_plan_id: M83-expanded-workflow-read-model
-next_recommended_candidate_id: C014
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: superseded
@@ -224,7 +224,7 @@ changes:
         - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/LOCAL_COMMIT_EVIDENCE.yaml
         - references/workflow-blueprint-runtime-alignment.md
   - id: C013
-    status: selected
+    status: done
     title: Define /ow:change planning intelligence boundary
     purpose: >
       Place DTC, AC, and SC inside the /ow:change loop as planning
@@ -264,8 +264,16 @@ changes:
         M73 queue because C011 and C012 are complete, C013 is dependency-
         satisfied, and it unlocks C014.
       selected_at: 2026-05-21
+    completion:
+      completed_change_id: C013-change-planning-intelligence-boundary
+      completed_at: 2026-05-21
+      primary_commit: 2ddb49eba14d1e411a18020bc0136cef666465e2
+      evidence_commit: 3b9ff2af4daec69b50b8f895a715556949a2d279
+      evidence:
+        - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+        - references/workflow-blueprint-runtime-alignment.md
   - id: C014
-    status: candidate
+    status: selected
     title: Define deferred feature handoff map
     purpose: >
       Turn the out-of-scope runtime surfaces into a concise future-queue handoff
@@ -297,6 +305,13 @@ changes:
       - Front-chain quality review appears before proto2html and downstream implementation work.
       - High-risk future surfaces remain explicitly approval-gated.
       - Later DTC passes can cite M73 without inheriting an oversized queue.
+    selection:
+      selected_change_id: C014-deferred-feature-handoff-map
+      reason: >
+        select-change ranked C014 as the final M73 candidate because C011,
+        C012, and C013 are complete and the handoff map is needed to close the
+        workflow-slice queue.
+      selected_at: 2026-05-21
 operations:
   - operation_id: OP001
     operation_type: add
@@ -471,3 +486,31 @@ operations:
     after_status: selected
     evidence:
       - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/SELECTED_CHANGE.yaml
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C013
+    actor: agent
+    reason: >
+      C013 implemented the /ow:change planning intelligence boundary and
+      recorded local commit evidence through ow:git-automation.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+      - references/workflow-blueprint-runtime-alignment.md
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C014
+    actor: agent
+    reason: >
+      SC selected C014 directly from the single active M73 queue as the final
+      dependency-satisfied candidate. AC was not used because no cross-queue
+      arbitration was needed.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C014-deferred-feature-handoff-map/SELECTED_CHANGE.yaml

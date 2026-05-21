@@ -231,6 +231,38 @@ This reference defines the planning-intelligence boundary only. Full
 is triggered, and how archive completion is enforced, remains a deferred
 feature and needs its own DTC queue.
 
+## Future DTC Handoff Map
+
+M73 intentionally stops at taxonomy and stage-graph alignment. The following
+items are future feature boundaries, not active M73 candidates. Each item needs
+a later DTC pass before selection or implementation.
+
+| Order | Suggested Queue | Boundary | Risk Note |
+|---|---|---|---|
+| 1 | `M74-front-chain-command-quality-review` | Reassess `/ow:vision`, `/ow:validation`, `/ow:proto`, and `/ow:tune` under the expanded workflow. | Medium; quality of these commands affects every downstream artifact. |
+| 2 | `M75-proto2html-runtime-contract` | Define benchmark-image to high-fidelity HTML reconstruction. | High if runtime exposure or generated surfaces are changed. |
+| 3 | `M76-html2spec-artifact-contract` | Define locked HTML to implementation-ready SPEC artifacts. | Medium; must avoid inventing requirements not grounded in locked HTML. |
+| 4 | `M77-build-command-contract` | Define `/ow:build` team, skill, milestone, and workstream planning. | High if it creates executable agents or adapter-visible commands. |
+| 5 | `M78-change-planning-loop` | Define full `/ow:change` orchestration around DTC, AC, SC, implementation, and evidence. | Medium to high depending on runtime scope. |
+| 6 | `M79-review-async-pipeline` | Define `/ow:review` findings, monitoring triggers, and feedback into planning. | High if background automation or monitoring runtime is introduced. |
+| 7 | `M80-archive-completion-transaction` | Define verified completion and archive semantics for implemented changes. | High if it mutates state, git, or workflow pointers automatically. |
+| 8 | `M81-build-agent-skill-registry` | Define `/ow:build-agent` and `/ow:build-skill` registry semantics. | High if generated adapter surfaces or execution capabilities are materialized. |
+| 9 | `M82-workflow-lifecycle-transactions` | Define explicit dry-run/write transactions for workflow state movement. | Medium to high depending on mutation authority. |
+| 10 | `M83-expanded-workflow-read-model` | Extend summary-first read models across the expanded workflow. | Medium; protects low-context Agent consumption. |
+
+### Handoff Rules
+
+- Future queues must cite this M73 reference and the relevant source plan.
+- Future queues must run DTC scope control and avoid bundling multiple feature
+  boundaries into one `CANDIDATE_CHANGES.yaml`.
+- High-risk queues require a `HIGH_RISK_DECISION_REPORT.md` and explicit user
+  approval before selection or implementation of the high-risk option.
+- Front-chain command quality review must happen before proto2html work. Even
+  though `/ow:vision`, `/ow:validation`, `/ow:proto`, and `/ow:tune` already
+  exist, their output quality determines downstream reconstruction, spec, build,
+  and implementation quality.
+
 ## Deferred Work
 
-The deferred feature handoff map is C014.
+M73 closes after C014. The next queue should be
+`M74-front-chain-command-quality-review`.

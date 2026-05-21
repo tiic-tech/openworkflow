@@ -22,7 +22,7 @@ the whole workflow.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Next recommended candidate: `C014`
+Next recommended candidate: none
 
 ## Current Candidates
 
@@ -53,7 +53,7 @@ surface attachment points.
 
 ### C013 - Define /ow:change Planning Intelligence Boundary
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -64,7 +64,7 @@ as the implementation orchestration boundary.
 
 ### C014 - Define Deferred Feature Handoff Map
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `medium`
 
@@ -114,3 +114,5 @@ with its own queue boundary.
 - `OP008`: selected C012 after AC recommendation.
 - `OP009`: completed C012 with local commit evidence.
 - `OP010`: selected C013 directly with SC because M73 is the single active queue.
+- `OP011`: completed C013 with local commit evidence.
+- `OP012`: selected C014 directly with SC because M73 is the single active queue.

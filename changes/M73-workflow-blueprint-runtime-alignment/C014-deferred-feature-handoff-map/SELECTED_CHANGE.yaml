@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: selected_change:C014-deferred-feature-handoff-map
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C014-deferred-feature-handoff-map
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C014
+title: Define deferred feature handoff map
+status: selected
+selection_reason:
+  - SC selected C014 directly from the single active M73 queue; AC was not needed.
+  - C011, C012, and C013 are complete, satisfying all C014 dependencies.
+  - C014 closes M73 by preserving future feature boundaries without creating new queues.
+rejected_alternatives: []
+scope:
+  includes:
+    - future queue hints for vision, validation, proto, tune, proto2html, html2spec, build, change, review, archive, build-agent, build-skill, lifecycle, and read model work
+    - risk notes for future high-risk surfaces
+    - evidence links back to OW_DEVELOP_PLAN and M73
+  excludes:
+    - creating the future queues
+    - selecting or approving high-risk candidates
+    - implementing any runtime surface
+owned_paths:
+  - references/workflow-blueprint-runtime-alignment.md
+  - changes/M73-workflow-blueprint-runtime-alignment/C014-deferred-feature-handoff-map/
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Deferred features are listed as future queue boundaries, not active candidates.
+  - Front-chain quality review appears before proto2html and downstream implementation work.
+  - High-risk future surfaces remain explicitly approval-gated.
+  - Later DTC passes can cite M73 without inheriting an oversized queue.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

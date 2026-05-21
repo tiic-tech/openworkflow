@@ -43,11 +43,11 @@ branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 5
 active_candidate_count: 4
 superseded_candidate_id: C001
-completed_candidate_id: C012
-completed_change_id: C012-workflow-stage-graph
-selected_candidate_id: C013
-selected_change_id: C013-change-planning-intelligence-boundary
-next_recommended_candidate_id: C014
+completed_candidate_id: C013
+completed_change_id: C013-change-planning-intelligence-boundary
+selected_candidate_id: C014
+selected_change_id: C014-deferred-feature-handoff-map
+next_recommended_candidate_id: null
 key_dependencies:
   - M54 completed DTC/AC/SC as Codex-delivered planning commands.
   - C013 clarified that DTC/AC/SC belong inside /ow:change, not as the full OW workflow.
@@ -88,3 +88,5 @@ validation:
     - OP008 selected C012 after AC recommended it as the next low-risk candidate.
     - OP009 completed C012 with local commit evidence.
     - OP010 selected C013 directly with SC because M73 is the single active queue.
+    - OP011 completed C013 with local commit evidence.
+    - OP012 selected C014 directly with SC because M73 is the single active queue.
