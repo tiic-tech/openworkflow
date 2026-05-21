@@ -36,10 +36,10 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Define planning artifact contracts for candidate and selected changes
     purpose: >
       Establish the artifact shapes, lifecycle states, and update rules that
@@ -77,8 +77,22 @@ changes:
     selection_notes: >
       This should be selected first because both skills depend on the same
       durable artifact vocabulary.
+    selection:
+      selected_change_id: M55-planning-artifact-contracts
+      reason: Shared artifact contracts unlock both planning skills.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M55-planning-artifact-contracts
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M55-planning-artifact-contracts/CHANGE.yaml
+        - schemas/candidate-changes.schema.json
+        - schemas/selected-change.schema.json
+        - schemas/atom-tasks.schema.json
+        - references/planning-artifact-contracts.md
+        - "validation: npm run validate"
   - id: C002
-    status: candidate
+    status: ready
     title: Implement decompose-to-changes source skill
     purpose: >
       Add a repo-local source skill that turns user input, current discussion,

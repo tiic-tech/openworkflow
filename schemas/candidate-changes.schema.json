@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/candidate-changes.schema.json",
+  "title": "OpenWorkflow Candidate Changes",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "planning_artifact_type",
+    "plan_id",
+    "title",
+    "status",
+    "source",
+    "queue_policy",
+    "selection_policy",
+    "changes"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "planning"
+    },
+    "planning_artifact_type": {
+      "const": "candidate_changes"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed",
+        "superseded",
+        "archived"
+      ]
+    },
+    "source": {
+      "type": "object"
+    },
+    "queue_policy": {
+      "type": "object"
+    },
+    "selection_policy": {
+      "type": "object"
+    },
+    "next_recommended_candidate_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "title",
+          "purpose",
+          "scope",
+          "owned_paths",
+          "dependencies",
+          "unlocks",
+          "risk",
+          "size",
+          "validation",
+          "acceptance"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*[0-9]{3}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "ready",
+              "selected",
+              "in_progress",
+              "done",
+              "blocked",
+              "deferred",
+              "superseded"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "object",
+            "required": [
+              "includes",
+              "excludes"
+            ]
+          },
+          "owned_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unlocks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "risk": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "validation": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "selection": {
+            "type": "object"
+          },
+          "completion": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

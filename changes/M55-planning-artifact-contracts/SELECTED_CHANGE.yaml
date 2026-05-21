@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:M55-planning-artifact-contracts
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M55-planning-artifact-contracts
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C001
+title: Define planning artifact contracts for candidate and selected changes
+status: active
+selection_reason:
+  - Both planning skills depend on the same durable artifact vocabulary.
+  - The change is bounded to schemas, references, and M55 planning artifacts.
+  - It unlocks decompose-to-changes and select-change without implementing either skill.
+rejected_alternatives:
+  - id: C002
+    reason: Depends on candidate and selected change contracts.
+  - id: C003
+    reason: Depends on candidate and selected change contracts.
+scope:
+  includes:
+    - CANDIDATE_CHANGES.yaml source-of-truth contract
+    - CANDIDATE_CHANGES.md readable-view rule
+    - SELECTED_CHANGE.yaml contract
+    - ATOM_TASKS.yaml contract
+    - IMPLEMENTATION_BRIEF.md contract
+    - status transition rules for candidate selection and completion
+  excludes:
+    - source skill implementation
+    - command registry exposure
+    - generated Codex adapter surfaces
+    - /ow:proto redesign
+owned_paths:
+  - schemas/
+  - references/planning-artifact-contracts.md
+  - changes/M55-planning-artifact-contracts/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - Candidate and selected change artifacts have stable required fields.
+  - Candidate status updates are specified without deleting historical entries.
+  - select-change can query candidates by id and status.
+  - Markdown readable views are explicitly non-authoritative.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/atom-tasks.schema.json",
+  "title": "OpenWorkflow Atom Tasks",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "planning_artifact_type",
+    "selected_change_id",
+    "title",
+    "status",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "planning"
+    },
+    "planning_artifact_type": {
+      "const": "atom_tasks"
+    },
+    "selected_change_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed",
+        "blocked",
+        "archived"
+      ]
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "task_id",
+          "title",
+          "status",
+          "type",
+          "owned_paths",
+          "done_when"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed",
+              "blocked",
+              "deferred"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "read",
+              "edit",
+              "verify",
+              "document"
+            ]
+          },
+          "owned_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "done_when": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -14,11 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C001`
+Next recommended candidate: `C002`
 
 ## C001 - Define Planning Artifact Contracts
 
-Status: `ready`
+Status: `done`
 
 Purpose: establish the artifact shapes, lifecycle states, and update rules that
 `decompose-to-changes` and `select-change` will read and write.
@@ -51,9 +51,18 @@ Validation:
 
 Why first: both skills depend on the same durable artifact vocabulary.
 
+Completion evidence:
+
+- `changes/M55-planning-artifact-contracts/CHANGE.yaml`
+- `schemas/candidate-changes.schema.json`
+- `schemas/selected-change.schema.json`
+- `schemas/atom-tasks.schema.json`
+- `references/planning-artifact-contracts.md`
+- `npm run validate`
+
 ## C002 - Implement decompose-to-changes Source Skill
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: add a repo-local source skill that turns user input, current
 discussion, or explicit planning source text into a complete candidate change
