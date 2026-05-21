@@ -105,6 +105,9 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertIncludes(phase, skill, ".openworkflow/CURRENT_STATE.yaml", "skill missing current state loading guidance");
   assertIncludes(phase, skill, "clear stale current_question", "skill missing stale question closure guidance");
   assertIncludes(phase, skill, "summary_policy", "skill missing summary policy guidance");
+  assertIncludes(phase, skill, "<agent_first_consumer>", "skill missing Agent-first consumer guidance");
+  assertIncludes(phase, skill, "Treat the next implementing Agent as the first consumer", "skill missing first-consumer framing");
+  assertIncludes(phase, skill, "vision_delta must preserve enough handoff intelligence", "skill missing compact handoff intelligence guidance");
   assertIncludes(phase, skill, "<conversation_first>", "skill missing conversation_first block");
   assertIncludes(phase, skill, "Ask exactly one question", "skill no longer limits vision to one focused question");
   assertIncludes(phase, skill, "<mandatory_coverage>", "skill missing mandatory coverage block");
@@ -113,9 +116,16 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertIncludes(phase, skill, "<artifact_checkpoint>", "skill missing artifact checkpoint separation");
 
   const template = recordField(artifactRecord(runtime, "vision_session", phase), "template", phase);
+  const visionDelta = recordField(template, "vision_delta", phase);
+  assertPhase(phase, Object.hasOwn(visionDelta, "problem"), "vision template missing problem field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "ai_native_role"), "vision template missing ai_native_role field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "success_signals"), "vision template missing success_signals field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "failure_signals"), "vision template missing failure_signals field");
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.ready === false, "vision template should default to not ready");
   assertPhase(phase, handoff.next_command === null, "vision template should not default to validation handoff");
+  assertPhase(phase, Object.hasOwn(handoff, "blockers"), "vision handoff template missing blockers field");
+  assertPhase(phase, Object.hasOwn(handoff, "readiness_notes"), "vision handoff template missing readiness_notes field");
 }
 
 async function verifyValidationPhase(runtime: Runtime): Promise<void> {

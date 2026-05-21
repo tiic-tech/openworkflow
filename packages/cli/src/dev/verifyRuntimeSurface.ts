@@ -1565,6 +1565,9 @@ function hasYamlScalar(content: string, key: string, value: string): boolean {
 function verifyVisionSkill(content: string): void {
   for (const required of [
     "conversation-first-sustained-grill",
+    "<agent_first_consumer>",
+    "Treat the next implementing Agent as the first consumer of vision artifacts.",
+    "The vision_delta must preserve enough handoff intelligence",
     "<conversation_first>",
     "<mandatory_coverage>",
     "Cover target user and beneficiary.",

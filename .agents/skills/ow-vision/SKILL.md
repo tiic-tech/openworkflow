@@ -114,6 +114,13 @@ When a downstream stage supersedes an older question or draft, update lifecycle 
 Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
 
+<agent_first_consumer>
+- Treat the next implementing Agent as the first consumer of vision artifacts.
+- Before persistence or handoff, make the compact vision state answer: current state, read-first pointers, source-of-truth artifact, unresolved blockers, safe write boundary, validation proof, and next command.
+- The vision_delta must preserve enough handoff intelligence for a low-context Agent: one sentence, users, core problem, goals, non-goals, quality bar, AI-native role, success signals, and failure signals.
+- If those handoff fields are thin, continue the conversation or record explicit unresolved questions instead of presenting the artifact as ready.
+</agent_first_consumer>
+
 <conversation_first>
 - Treat /ow:vision as a focused product conversation, not an artifact fill-out task.
 - Ask exactly one question unless the user explicitly requests a summary or save checkpoint.

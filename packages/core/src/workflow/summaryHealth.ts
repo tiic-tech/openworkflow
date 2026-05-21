@@ -350,7 +350,7 @@ function qualityForArtifact(
     };
   }
   const sourceStatus = stringValue(source.status);
-  const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(source[field]));
+  const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(valueAtPath(source, field)));
   const qualityWarnings = [
     ...(sourceStatus === "draft" ? [`source artifact is draft: ${artifactPath}`] : []),
     ...(emptyKeyFields.length > 0 ? [`source artifact has empty handoff fields in ${artifactPath}: ${emptyKeyFields.join(", ")}`] : []),
@@ -365,7 +365,17 @@ function qualityForArtifact(
 
 function qualityFieldsForArtifact(artifactType: string): string[] {
   if (artifactType === "vision_session") {
-    return ["vision_delta"];
+    return [
+      "vision_delta.one_sentence",
+      "vision_delta.problem",
+      "vision_delta.users",
+      "vision_delta.goals",
+      "vision_delta.non_goals",
+      "vision_delta.quality_bar",
+      "vision_delta.ai_native_role",
+      "vision_delta.success_signals",
+      "vision_delta.failure_signals",
+    ];
   }
   if (artifactType === "validation_target") {
     return ["core_question", "prototype_scope", "acceptance"];
@@ -529,6 +539,15 @@ function hasNonEmptyValue(value: unknown): boolean {
     return Object.values(value).some((item) => hasNonEmptyValue(item));
   }
   return true;
+}
+
+function valueAtPath(source: Record<string, unknown>, path: string): unknown {
+  return path.split(".").reduce<unknown>((current, part) => {
+    if (!isRecord(current)) {
+      return undefined;
+    }
+    return current[part];
+  }, source);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

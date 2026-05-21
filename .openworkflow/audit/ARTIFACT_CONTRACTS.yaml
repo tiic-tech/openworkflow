@@ -58,6 +58,7 @@ artifacts:
         []
       vision_delta:
         one_sentence: ""
+        problem: ""
         goals:
           []
         non_goals:
@@ -66,9 +67,18 @@ artifacts:
           []
         quality_bar:
           []
+        ai_native_role: ""
+        success_signals:
+          []
+        failure_signals:
+          []
       handoff:
         ready: false
         next_command: null
+        blockers:
+          []
+        readiness_notes:
+          []
       updated_at: null
     conditional_packets:
       []
