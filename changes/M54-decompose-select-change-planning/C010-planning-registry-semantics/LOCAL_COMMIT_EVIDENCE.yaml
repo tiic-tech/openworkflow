@@ -1,0 +1,20 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C010-planning-registry-semantics
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C010-planning-registry-semantics
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C010
+selected_change_id: C010-planning-registry-semantics
+primary_commit: 629449d398cacf428985cedd90e817ccde6b904c
+validation_evidence:
+  - npm run validate
+  - git diff --check
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js doctor --root . --json
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
