@@ -76,7 +76,7 @@ scope_control:
 next_recommended_candidate_id: C001
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Align native build-prototype strategy compiler contract
     purpose: >
       Absorb the vision-to-strategic-prototype reference skill into OW's native
@@ -120,6 +120,12 @@ changes:
         because it is dependency-free, medium risk, and aligns native proto
         behavior before schema or generated protocol changes.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-build-prototype-strategy-compiler
+      completed_at: 2026-05-22
+      commit: d277697
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
     status: candidate
     title: Strengthen strategic prototype prompt-pack artifacts
@@ -287,3 +293,18 @@ operations:
       - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/SELECTED_CHANGE.yaml
       - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/ATOM_TASKS.yaml
       - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 aligned native build-prototype behavior with the M85 durable
+      validation gate and absorbed strategic prompt-pack quality requirements.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
