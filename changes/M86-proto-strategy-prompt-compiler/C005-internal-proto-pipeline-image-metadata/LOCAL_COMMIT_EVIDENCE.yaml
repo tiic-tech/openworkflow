@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M86-proto-strategy-prompt-compiler:C005
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C005
+change_id: C005-internal-proto-pipeline-image-metadata
+title: Local commit evidence for internal proto pipeline and image metadata
+status: complete
+implemented_at: 2026-05-22
+implementation_commit: c766f8f
+evidence_commit: pending
+branch: codex/m73-workflow-blueprint-runtime-alignment
+files_changed:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/openworkflow-adapter.yaml
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+acceptance:
+  - criterion: /ow:vision2prompt and /ow:prompt2proto are registered as internal commands, not user-facing handoffs.
+    status: pass
+  - criterion: /ow:proto remains the user-facing orchestrator for preflight, vision2prompt, and prompt2proto.
+    status: pass
+  - criterion: Prototype artifacts record internal_pipeline stage ownership and outputs.
+    status: pass
+  - criterion: Every generated image entry requires image_id, direction_id, prompt_id, path, and metadata.
+    status: pass
+  - criterion: Generated skills and context packets include the internal pipeline boundary.
+    status: pass
+  - criterion: Verification catches accidental user-facing exposure of internal proto commands.
+    status: pass
+notes:
+  - C005 formalized /ow:proto as the user-facing orchestrator over internal command stages.
+  - /ow:tune internal decomposition remains deferred to M87.
+  - docs/OW_DEVELOP_PLAN_Phase2.md records the future built-in subagent direction for internal command stages.
+  - No high-risk approval was required.

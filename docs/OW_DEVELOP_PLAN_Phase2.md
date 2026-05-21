@@ -294,6 +294,36 @@ Phase 2 direction:
 - consume compact OW summaries, not raw provider state.
 - use code-intel later for guard, review, archive, release, and handoff.
 
+### Design Note - Internal Commands As Future Agent-Team Tasks
+
+Decision record, 2026-05-22:
+
+OW is still in the first synchronous implementation pass. During this pass,
+internal command boundaries should be made explicit before adding asynchronous
+runtime behavior.
+
+The `/ow:proto` split is the first concrete example:
+
+- user-facing `/ow:proto` remains the orchestration command.
+- internal `/ow:vision2prompt` compiles validated vision into strategic prompt
+  text artifacts.
+- internal `/ow:prompt2proto` consumes prompt text and produces prototype
+  image assets with metadata.
+- future `/ow:tune` can similarly route through an internal
+  `/ow:tune-proto-prompt` stage before reusing prompt-to-prototype generation.
+
+The future built-in Agent Team layer should be able to assign these internal
+stages to dedicated subagents. The orchestrating Agent would load the
+user-facing command, then spawn the appropriate subagent for each internal
+stage. This should reduce main-Agent context pressure, improve isolation
+between independent tasks, and preserve attention quality while keeping the
+audit trail attached to the same OW command chain.
+
+This is a later runtime architecture direction, not a current M86 requirement.
+The current requirement is to define clean internal command contracts and
+artifact handoffs so asynchronous execution can be added without redesigning
+the discovery loop.
+
 ## Immediate Priority Recommendation
 
 The current cross-queue analysis recommends:

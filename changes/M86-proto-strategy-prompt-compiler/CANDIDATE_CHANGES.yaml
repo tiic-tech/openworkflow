@@ -73,7 +73,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after prompt
         generation and tuning stabilize.
       suggested_plan_id: M90-proto2html-benchmark-input
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -298,7 +298,7 @@ changes:
       - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
       - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
   - id: C005
-    status: selected
+    status: done
     title: Define internal proto pipeline and image metadata
     purpose: >
       Split /ow:proto into internal command-sized stages so agents can execute
@@ -364,6 +364,12 @@ changes:
         per-command output pressure and drift. C005 must precede C004 because
         stress fixtures should target the decomposed pipeline shape.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C005-internal-proto-pipeline-image-metadata
+      completed_at: 2026-05-22
+      commit: c766f8f
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -491,3 +497,17 @@ operations:
       - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/SELECTED_CHANGE.yaml
       - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/ATOM_TASKS.yaml
       - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 registered the internal /ow:vision2prompt and /ow:prompt2proto
+      stages, kept /ow:proto as the user-facing orchestrator, added internal
+      pipeline artifact metadata, and required per-image generation metadata.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/LOCAL_COMMIT_EVIDENCE.yaml
