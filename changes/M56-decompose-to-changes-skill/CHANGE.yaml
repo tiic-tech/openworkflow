@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: change:M56-decompose-to-changes-skill
+contract_type: change
+title: M56 Decompose to changes source skill
+status: draft
+source_artifacts:
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - references/planning-artifact-contracts.md
+depends_on:
+  - change:M55-planning-artifact-contracts
+produces:
+  - selected_change:M56-decompose-to-changes-skill
+  - atom_tasks:M56-decompose-to-changes-skill
+  - work_items:M56-decompose-to-changes-skill
+summary: >
+  Add the repo-local decompose-to-changes source skill so broad planning input
+  can be transformed into focused candidate change queues before selection or
+  implementation begins.
+problem: >
+  OpenWorkflow self-development needs a repeatable way to split discussion,
+  roadmap text, or explicit source artifacts into durable candidate changes
+  without crossing into implementation or generated runtime surfaces.
+goals:
+  - Add `skills/decompose-to-changes/SKILL.md`.
+  - Add decomposition reference guidance for source normalization, sizing, ids,
+    statuses, and outputs.
+  - Dogfood the skill against the current `/ow:proto` redesign discussion.
+  - Update M54 candidate status with completion evidence.
+non_goals:
+  - Do not implement select-change.
+  - Do not expose new `/ow:*` runtime commands.
+  - Do not implement the `/ow:proto` redesign.
+  - Do not edit generated `.agents` or `.openworkflow` surfaces.
+affected_paths:
+  - skills/decompose-to-changes/
+  - changes/M56-decompose-to-changes-skill/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+acceptance:
+  - Skill produces candidate changes with stable ids and focused owned paths.
+  - Skill separates includes, excludes, dependencies, risks, validation, and acceptance.
+  - Skill avoids ranking as a primary responsibility but may set a next recommended candidate.
+  - Skill does not write broad implementation plans that cross unrelated modules.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+  - manual dogfood run against the current /ow:proto redesign discussion
+created_at: 2026-05-21
+updated_at: 2026-05-21

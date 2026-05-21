@@ -36,7 +36,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -92,7 +92,7 @@ changes:
         - references/planning-artifact-contracts.md
         - "validation: npm run validate"
   - id: C002
-    status: ready
+    status: done
     title: Implement decompose-to-changes source skill
     purpose: >
       Add a repo-local source skill that turns user input, current discussion,
@@ -124,8 +124,22 @@ changes:
       - Skill separates includes, excludes, dependencies, risks, validation, and acceptance.
       - Skill avoids ranking as a primary responsibility but may set a next recommended candidate.
       - Skill does not write broad implementation plans that cross unrelated modules.
+    selection:
+      selected_change_id: M56-decompose-to-changes-skill
+      reason: C001 completed the artifact contracts required to implement this source skill.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M56-decompose-to-changes-skill
+      completed_at: 2026-05-21
+      evidence:
+        - skills/decompose-to-changes/SKILL.md
+        - skills/decompose-to-changes/references/decomposition-protocol.md
+        - changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.yaml
+        - changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_SUMMARY.yaml
+        - "validation: quick_validate.py skills/decompose-to-changes"
+        - "validation: npm run validate"
   - id: C003
-    status: candidate
+    status: ready
     title: Implement select-change source skill
     purpose: >
       Add a repo-local source skill that reads CANDIDATE_CHANGES.yaml, selects

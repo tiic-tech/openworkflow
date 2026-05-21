@@ -1,0 +1,197 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M56-proto-redesign-dogfood
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M56-proto-redesign-dogfood
+title: Dogfood candidate changes for ow:proto redesign
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - user discussion about ow:proto prototype skills
+    - user discussion about validation visibility and consumption
+    - skills/decompose-to-changes/SKILL.md
+queue_policy:
+  source_of_truth: DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.yaml
+  readable_view: DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.md
+  id_policy: Stable P-prefixed ids are assigned once for this dogfood queue.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - unlocks proto redesign decisions
+    - focused owned paths
+    - keeps validation and proto behavior separated
+    - avoids generated adapter edits before source behavior is proven
+  avoid:
+    - mixing skill authoring with runtime command exposure
+    - implementing proto UI before artifact contracts are clear
+    - changing validation semantics without an explicit decision
+next_recommended_candidate_id: P001
+changes:
+  - id: P001
+    status: ready
+    title: Define proto redesign artifact contract
+    purpose: >
+      Specify how image-first prototype planning consumes vision and optional
+      validation evidence before changing ow:proto behavior.
+    scope:
+      includes:
+        - proto redesign output contract
+        - required and optional source artifacts
+        - image prompt and critique evidence shape
+        - explicit non-goals for HTML generation
+      excludes:
+        - source skill implementation
+        - runtime command exposure
+        - generated adapter surfaces
+    owned_paths:
+      - references/
+      - schemas/
+      - changes/proto-redesign-artifact-contract/
+    dependencies: []
+    unlocks:
+      - P002
+      - P003
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Proto redesign artifacts define vision and validation inputs.
+      - Image-only output is separated from later HTML conversion.
+      - Validation consumption rules are explicit.
+  - id: P002
+    status: candidate
+    title: Implement image-first proto source behavior
+    purpose: >
+      Update source prototype guidance so ow:proto produces strategic image
+      prototype prompts and evidence instead of implementation-heavy artifacts.
+    scope:
+      includes:
+        - source ow:proto skill guidance
+        - image prompt iteration workflow
+        - evidence capture for user review
+      excludes:
+        - validation command changes
+        - runtime command registry exposure
+        - HTML conversion
+    owned_paths:
+      - skills/build-prototype/
+      - changes/proto-image-first-source/
+    dependencies:
+      - P001
+    unlocks:
+      - P004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - manual proto dogfood with VISION.md input
+    acceptance:
+      - Prototype guidance prioritizes image prompt artifacts.
+      - It supports VISION.md-only experiments.
+      - It records evidence without starting production implementation.
+  - id: P003
+    status: candidate
+    title: Decide validation consumption model for proto
+    purpose: >
+      Resolve whether validation remains a user-facing command or becomes an
+      internal artifact automatically derived after vision creation.
+    scope:
+      includes:
+        - decision record for validation visibility
+        - proto input rules for validation artifacts
+        - migration notes for existing validation skill
+      excludes:
+        - implementing automatic validation
+        - removing validation command surfaces
+        - changing proto rendering behavior
+    owned_paths:
+      - changes/proto-validation-consumption/
+      - references/
+    dependencies:
+      - P001
+    unlocks:
+      - P004
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - A clear decision explains validation's role.
+      - ow:proto has explicit behavior when validation is missing.
+      - Future runtime changes have bounded requirements.
+  - id: P004
+    status: candidate
+    title: Expose proven proto redesign through runtime surfaces
+    purpose: >
+      Promote source-level proto redesign behavior into OpenWorkflow command
+      and Codex adapter surfaces after contracts and validation consumption are
+      settled.
+    scope:
+      includes:
+        - command registry or artifact registry updates
+        - generated Codex skill surface regeneration
+        - runtime verification updates
+      excludes:
+        - source behavior discovery
+        - validation product decision
+        - HTML conversion
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/proto-runtime-surface/
+    dependencies:
+      - P002
+      - P003
+    unlocks:
+      - P005
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:agent-e2e
+    acceptance:
+      - Runtime surfaces expose the proven proto behavior.
+      - Generated adapter output is produced by sync/generation paths.
+      - Existing command behavior remains healthy.
+  - id: P005
+    status: candidate
+    title: Dogfood final proto redesign on OpenWorkflow itself
+    purpose: >
+      Use the redesigned proto flow to create image-first prototype evidence
+      for OpenWorkflow's own development workflow.
+    scope:
+      includes:
+        - VISION.md or current vision input
+        - image-first prototype prompt artifacts
+        - user review evidence and tuning notes
+      excludes:
+        - production implementation
+        - HTML conversion
+        - runtime command changes
+    owned_paths:
+      - changes/proto-redesign-final-dogfood/
+    dependencies:
+      - P004
+    unlocks: []
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - openworkflow handoff --root . --json
+    acceptance:
+      - The redesigned proto flow is exercised on this repo.
+      - Evidence shows what changed after user review.
+      - Follow-up production changes remain scoped and selectable.

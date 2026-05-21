@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: selected_change:M56-decompose-to-changes-skill
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M56-decompose-to-changes-skill
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C002
+title: Implement decompose-to-changes source skill
+status: active
+selection_reason:
+  - C001 is complete, so planning artifact contracts are available.
+  - decompose-to-changes unlocks select-change and the later /ow:proto planning dogfood.
+  - The change is bounded to one source skill plus M56 planning evidence.
+rejected_alternatives:
+  - id: C003
+    reason: Depends on decompose-to-changes behavior and sample queues.
+  - id: C004
+    reason: Runtime exposure should wait until both source skills are proven.
+scope:
+  includes:
+    - skills/decompose-to-changes/SKILL.md
+    - decomposition reference guidance
+    - guidance for CANDIDATE_CHANGES.yaml, CANDIDATE_CHANGES.md, and SUMMARY.yaml
+    - M56 dogfood evidence for /ow:proto redesign decomposition
+  excludes:
+    - select-change behavior
+    - generated /ow:* command exposure
+    - automatic implementation
+    - /ow:proto redesign implementation
+owned_paths:
+  - skills/decompose-to-changes/
+  - changes/M56-decompose-to-changes-skill/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - Skill produces candidate changes with stable ids and focused owned paths.
+  - Skill separates includes, excludes, dependencies, risks, validation, and acceptance.
+  - Skill avoids ranking as a primary responsibility but may set a next recommended candidate.
+  - Skill does not write broad implementation plans that cross unrelated modules.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+  - manual dogfood run against the current /ow:proto redesign discussion
+created_at: 2026-05-21
+updated_at: 2026-05-21

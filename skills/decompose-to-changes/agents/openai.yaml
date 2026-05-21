@@ -1,0 +1,4 @@
+interface:
+  display_name: "Decompose to Changes"
+  short_description: "Turn planning input into focused candidate changes."
+  default_prompt: "Create a focused CANDIDATE_CHANGES queue from the latest planning discussion or the provided source text."

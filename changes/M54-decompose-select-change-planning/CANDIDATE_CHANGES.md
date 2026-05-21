@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C002`
+Next recommended candidate: `C003`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -62,7 +62,7 @@ Completion evidence:
 
 ## C002 - Implement decompose-to-changes Source Skill
 
-Status: `ready`
+Status: `done`
 
 Purpose: add a repo-local source skill that turns user input, current
 discussion, or explicit planning source text into a complete candidate change
@@ -80,9 +80,18 @@ Validation:
 - `npm run validate`
 - manual dogfood run against the current `/ow:proto` redesign discussion
 
+Completion evidence:
+
+- `skills/decompose-to-changes/SKILL.md`
+- `skills/decompose-to-changes/references/decomposition-protocol.md`
+- `changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.yaml`
+- `changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_SUMMARY.yaml`
+- `quick_validate.py skills/decompose-to-changes`
+- `npm run validate`
+
 ## C003 - Implement select-change Source Skill
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: add a repo-local source skill that reads `CANDIDATE_CHANGES.yaml`,
 selects the best next change, and emits implementation-ready active change

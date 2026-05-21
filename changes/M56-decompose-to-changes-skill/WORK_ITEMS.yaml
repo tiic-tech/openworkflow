@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: work_items:M56-decompose-to-changes-skill
+contract_type: work_items
+title: M56 Decompose to changes work items
+status: draft
+change_contract: changes/M56-decompose-to-changes-skill/CHANGE.yaml
+items:
+  - task_id: M56-T001
+    title: Create decompose-to-changes skill body
+    status: completed
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/agents/openai.yaml
+    acceptance:
+      - Skill frontmatter has a concrete trigger description.
+      - Workflow explains source discovery, decomposition, output, and validation.
+      - Boundaries prevent selection and implementation work.
+  - task_id: M56-T002
+    title: Add decomposition protocol reference
+    status: completed
+    owned_paths:
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+    acceptance:
+      - Reference covers input normalization, candidate sizing, statuses, and output checklist.
+      - Reference explains stable ids and update behavior.
+  - task_id: M56-T003
+    title: Dogfood against proto redesign discussion
+    status: completed
+    owned_paths:
+      - changes/M56-decompose-to-changes-skill/
+    acceptance:
+      - Dogfood candidate queue exists for the current /ow:proto redesign discussion.
+      - Dogfood summary records source, candidate count, and validation notes.
+  - task_id: M56-T004
+    title: Validate and update queue state
+    status: completed
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M56-decompose-to-changes-skill/
+      - skills/decompose-to-changes/
+    acceptance:
+      - Skill validation passes.
+      - Repository validation passes.
+      - M54 C002 is marked done with evidence and C003 becomes ready.

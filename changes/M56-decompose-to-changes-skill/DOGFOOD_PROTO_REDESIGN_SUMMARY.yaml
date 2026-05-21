@@ -1,0 +1,21 @@
+schema_version: 0.1.0
+contract_id: planning_summary:M56-proto-redesign-dogfood
+contract_type: planning
+title: M56 Proto redesign decomposition dogfood summary
+status: completed
+source:
+  kind: planning_discussion
+  refs:
+    - user discussion about ow:proto validation and image-only prototype flow
+    - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+outputs:
+  - changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.yaml
+  - changes/M56-decompose-to-changes-skill/DOGFOOD_PROTO_REDESIGN_CANDIDATE_CHANGES.md
+candidate_count: 5
+next_recommended_candidate_id: P001
+unresolved_questions:
+  - Whether validation remains user-visible or becomes an internal automatic step.
+  - Whether proto output should stop at image prompts or include later HTML conversion as a separate command.
+validation_notes:
+  - This is dogfood evidence for the source skill, not the authoritative M59 proto redesign queue.
+  - Candidates are intentionally split by artifact contract, skill behavior, validation consumption, runtime exposure, and dogfood execution.
