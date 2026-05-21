@@ -1,0 +1,4 @@
+interface:
+  display_name: "Select Change"
+  short_description: "Choose and prepare one focused change."
+  default_prompt: "Read a CANDIDATE_CHANGES queue, select the best next change, and create SELECTED_CHANGE, ATOM_TASKS, and IMPLEMENTATION_BRIEF artifacts."

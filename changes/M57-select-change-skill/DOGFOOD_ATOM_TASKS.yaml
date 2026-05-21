@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M57-dogfood-proto-redesign-artifact-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M57-dogfood-proto-redesign-artifact-contract
+title: Dogfood proto redesign artifact contract atom tasks
+status: active
+tasks:
+  - task_id: P001-A001
+    title: Inspect current proto and validation artifact contracts
+    status: planned
+    type: read
+    owned_paths:
+      - references/
+      - schemas/
+      - skills/build-prototype/
+      - skills/build-validation/
+    done_when:
+      - Existing proto and validation inputs are understood.
+      - Current image-first gaps are listed.
+  - task_id: P001-A002
+    title: Define image-first proto artifact contract
+    status: planned
+    type: document
+    owned_paths:
+      - references/
+      - schemas/
+      - changes/proto-redesign-artifact-contract/
+    done_when:
+      - Contract defines vision and optional validation inputs.
+      - Contract separates image prompt evidence from HTML conversion.
+      - Contract names critique and tuning evidence fields.
+  - task_id: P001-A003
+    title: Validate contract additions
+    status: planned
+    type: verify
+    owned_paths:
+      - references/
+      - schemas/
+      - changes/proto-redesign-artifact-contract/
+    done_when:
+      - "`npm run validate` passes."
+      - Follow-up candidates P002 and P003 remain focused.

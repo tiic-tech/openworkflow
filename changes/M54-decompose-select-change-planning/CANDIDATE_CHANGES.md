@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C003`
+Next recommended candidate: `C005`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -91,7 +91,7 @@ Completion evidence:
 
 ## C003 - Implement select-change Source Skill
 
-Status: `ready`
+Status: `done`
 
 Purpose: add a repo-local source skill that reads `CANDIDATE_CHANGES.yaml`,
 selects the best next change, and emits implementation-ready active change
@@ -109,9 +109,20 @@ Validation:
 - `npm run validate`
 - manual dogfood selection from a sample `CANDIDATE_CHANGES.yaml`
 
+Completion evidence:
+
+- `skills/select-change/SKILL.md`
+- `skills/select-change/references/selection-protocol.md`
+- `changes/M57-select-change-skill/DOGFOOD_SELECTED_CHANGE.yaml`
+- `changes/M57-select-change-skill/DOGFOOD_ATOM_TASKS.yaml`
+- `changes/M57-select-change-skill/DOGFOOD_IMPLEMENTATION_BRIEF.md`
+- `changes/M57-select-change-skill/DOGFOOD_UPDATED_CANDIDATE_CHANGES.yaml`
+- `quick_validate.py skills/select-change`
+- `npm run validate`
+
 ## C004 - Expose Planning Skills Through Runtime Surfaces
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: promote proven source skills into OpenWorkflow command and adapter
 surfaces so future repositories can invoke them consistently.
@@ -135,7 +146,7 @@ Validation:
 
 ## C005 - Dogfood Planning Skills On /ow:proto Redesign
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: use the new planning skills to create and select the implementation
 queue for `/ow:proto` image-only redesign.

@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: work_items:M57-select-change-skill
+contract_type: work_items
+title: M57 Select change work items
+status: draft
+change_contract: changes/M57-select-change-skill/CHANGE.yaml
+items:
+  - task_id: M57-T001
+    title: Create select-change skill body
+    status: completed
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/agents/openai.yaml
+    acceptance:
+      - Skill frontmatter has a concrete trigger description.
+      - Workflow explains candidate filtering, selection, queue updates, and output artifacts.
+      - Boundaries prevent implementation and runtime exposure.
+  - task_id: M57-T002
+    title: Add selection protocol reference
+    status: completed
+    owned_paths:
+      - skills/select-change/references/selection-protocol.md
+    acceptance:
+      - Reference covers selection inputs, decision order, selected change output, atom tasks, briefs, and queue updates.
+      - Reference explains how to handle blocked or user-specified candidates.
+  - task_id: M57-T003
+    title: Dogfood selection from proto redesign queue
+    status: completed
+    owned_paths:
+      - changes/M57-select-change-skill/
+    acceptance:
+      - Dogfood selected change exists for candidate P001.
+      - Dogfood atom tasks and implementation brief exist.
+      - Dogfood updated queue shows selection state without deleting other candidates.
+  - task_id: M57-T004
+    title: Validate and update queue state
+    status: completed
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M57-select-change-skill/
+      - skills/select-change/
+    acceptance:
+      - Skill validation passes.
+      - Repository validation passes.
+      - M54 C003 is marked done and the next dogfood candidate is ready.
