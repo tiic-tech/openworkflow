@@ -1,0 +1,17 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C009-planning-artifact-registration
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C009-planning-artifact-registration
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C009
+selected_change_id: C009-planning-artifact-registration
+primary_commit: 9e5719b00a4c57ea1e49f63660c54f03eedfc02d
+validation_evidence:
+  - npm run validate
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
