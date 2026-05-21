@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: work_items:M64-proto-tune-refined-prompt-source
+contract_type: work_items
+title: Work items for prototype tune refined prompt source behavior
+status: completed
+change_contract: changes/M64-proto-tune-refined-prompt-source/CHANGE.yaml
+items:
+  - task_id: M64-T001
+    status: completed
+    title: Add refinement mode, workflow, and rules
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/agents/openai.yaml
+    acceptance:
+      - Skill chooses refinement mode when baseline screens or accepted prompt packs plus tune feedback are present.
+      - Skill keeps runtime and HTML conversion out of scope.
+  - task_id: M64-T002
+    status: completed
+    title: Add refined prompt pack protocol
+    owned_paths:
+      - skills/build-prototype/references/refined-prompt-pack-protocol.md
+    acceptance:
+      - Protocol covers baseline audit, product-system continuity, delta rules, screen manifests, and quality gates.
+  - task_id: M64-T003
+    status: completed
+    title: Update queue state and operations
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    acceptance:
+      - P003 is completed.
+      - P005 is ready and recommended.
+  - task_id: M64-T004
+    status: completed
+    title: Validate source skill and repository
+    owned_paths:
+      - skills/build-prototype/
+      - changes/M64-proto-tune-refined-prompt-source/
+    acceptance:
+      - build-prototype skill validation passes.
+      - "`npm run validate` passes."

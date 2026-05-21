@@ -1,4 +1,4 @@
 interface:
   display_name: "Build Prototype"
-  short_description: "Create image-first prototype prompt packs"
-  default_prompt: "Use /ow:proto to turn vision or validation context into strategic prototype prompt packs for review."
+  short_description: "Create and refine prototype prompt packs"
+  default_prompt: "Use /ow:proto to turn vision, validation context, or baseline screens into image-first prototype prompt packs for review."

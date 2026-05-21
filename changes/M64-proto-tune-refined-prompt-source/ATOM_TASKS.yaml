@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M64-proto-tune-refined-prompt-source
+contract_type: planning
+title: Atom tasks for prototype tune refined prompt source behavior
+status: completed
+planning_artifact_type: atom_tasks
+selected_change_id: M64-proto-tune-refined-prompt-source
+tasks:
+  - task_id: M64-A001
+    title: Read imported tune skill source
+    status: completed
+    type: research
+    owned_paths:
+      - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+    done_when:
+      - Tune source behavior is summarized into audit, extraction, delta, manifest, and quality gates.
+  - task_id: M64-A002
+    title: Add refinement mode to build-prototype
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/agents/openai.yaml
+    done_when:
+      - Skill distinguishes strategic, refinement, and local runnable modes.
+      - Skill defines baseline audit, delta, manifest, and prompt binding rules.
+  - task_id: M64-A003
+    title: Add refined prompt protocol reference
+    status: completed
+    type: document
+    owned_paths:
+      - skills/build-prototype/references/refined-prompt-pack-protocol.md
+    done_when:
+      - Reference defines input normalization, baseline audit, product system extraction, delta rules, screen manifest, prompt structure, and quality gates.
+  - task_id: M64-A004
+    title: Update queue and change artifacts
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    done_when:
+      - P003 is marked done with select and complete operations.
+      - P005 becomes the next ready candidate.
+  - task_id: M64-A005
+    title: Validate repository
+    status: completed
+    type: verify
+    owned_paths:
+      - skills/build-prototype/
+      - changes/M64-proto-tune-refined-prompt-source/
+    done_when:
+      - build-prototype skill validation passes.
+      - "`npm run validate` passes."

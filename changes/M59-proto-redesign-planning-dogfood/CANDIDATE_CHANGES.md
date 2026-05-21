@@ -15,7 +15,7 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Next recommended candidate: `P003`
+Next recommended candidate: `P005`
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
@@ -64,12 +64,21 @@ Completion evidence:
 
 ## P003 - Implement Prototype Tune To Refined Prompt Source Behavior
 
-Status: `ready`
+Status: `done`
 
 Purpose: update tune guidance so a baseline prototype screen group and user
 feedback can become screen-bound refined prompt packs without product drift.
 
 Depends on: `P001`, `P002`
+
+Completion evidence:
+
+- `skills/build-prototype/SKILL.md`
+- `skills/build-prototype/references/refined-prompt-pack-protocol.md`
+- `skills/build-prototype/agents/openai.yaml`
+- `changes/M64-proto-tune-refined-prompt-source/CHANGE.yaml`
+- `quick_validate.py skills/build-prototype`
+- `npm run validate`
 
 ## P004 - Clarify Validation Consumption For Proto
 
@@ -89,7 +98,7 @@ Completion evidence:
 
 ## P005 - Dogfood Image-First Proto Flow On OpenWorkflow
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: exercise the redesigned source-level proto flow on OpenWorkflow's own
 product vision and record evidence for acceptance, tuning, or pivot.
@@ -110,3 +119,6 @@ Depends on: `P005`
 - `OP001`: select `P002`
 - `OP002`: complete `P002`
 - `OP003`: mark `P003` ready and make it next recommended
+- `OP004`: select `P003`
+- `OP005`: complete `P003`
+- `OP006`: mark `P005` ready and make it next recommended

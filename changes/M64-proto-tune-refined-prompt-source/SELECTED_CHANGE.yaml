@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: selected_change:M64-proto-tune-refined-prompt-source
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M64-proto-tune-refined-prompt-source
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P003
+title: Selected change for prototype tune refined prompt source behavior
+status: completed
+selection_reason:
+  - P003 is ready after P001 and P002.
+  - The change completes source-level proto redesign before dogfood.
+  - Runtime exposure remains blocked until dogfood evidence exists.
+rejected_alternatives:
+  - id: P005
+    reason: Depends on P003 completion before dogfood.
+  - id: P006
+    reason: Runtime exposure depends on dogfood evidence.
+scope:
+  includes:
+    - source tune skill guidance
+    - baseline screen audit rules
+    - inheritance and delta rules
+    - screen-bound prompt manifest behavior
+  excludes:
+    - first-pass strategic prototype generation
+    - runtime command exposure
+    - HTML conversion
+owned_paths:
+  - skills/build-prototype/
+  - changes/M64-proto-tune-refined-prompt-source/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+acceptance:
+  - Tune behavior preserves product system and accepted baseline screens.
+  - Each refined prompt is bound to a target screen id.
+  - MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE are explicit.
+validation:
+  - npm run validate
+  - manual tune dogfood with baseline screen descriptions
+created_at: 2026-05-21
+updated_at: 2026-05-21
