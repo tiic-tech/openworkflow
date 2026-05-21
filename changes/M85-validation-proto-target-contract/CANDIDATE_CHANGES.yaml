@@ -28,15 +28,35 @@ queue_policy:
 selection_policy:
   prefer:
     - makes /ow:validation a prototype validation target compiler
+    - preserves /ow:validation as a user-triggered command with artifact write authority
+    - exposes validation as an agent built-in read-only gate before /ow:proto
     - preserves vision as source truth and proto as downstream consumer
     - gives /ow:proto a clear experiment brief and observable evidence criteria
     - blocks weak or conflicted vision instead of forcing a validation target
     - keeps one selected change implementation-sized
   avoid:
     - rebuilding /ow:proto prompt generation in this queue
+    - letting agents silently write validation artifacts while running /ow:proto
     - treating validation as a generic feature ranking or backlog planner
     - creating prototype artifacts during validation
     - expanding into full discovery-loop E2E dogfood
+command_boundary_decision:
+  decided_at: 2026-05-22
+  decision: >
+    Validation should be both a user-triggered formal command and an agent
+    built-in consumer gate. /ow:validation owns artifact creation and human
+    product judgment. Downstream agents, especially /ow:proto, may consume
+    validation as a read-only readiness gate that reports ready_for_proto,
+    missing_validation, thin_validation, stale_validation, or return_to_vision.
+  write_authority: >
+    Built-in validation gates must not silently create or overwrite validation
+    artifacts. They may propose a target draft, but durable writes require
+    explicit /ow:validation flow or user confirmation.
+  impact_on_m85: >
+    C002 must encode fields and readiness checks that make validation
+    consumable by agents. C003 must make the generated /ow:validation command
+    preserve explicit command write authority. Proto-side enforcement is
+    deferred to M86.
 scope_control:
   current_boundary: >
     Upgrade /ow:validation to compile proto-ready vision into one prototype
@@ -71,7 +91,7 @@ scope_control:
 next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Define native build-validation prototype-target compiler contract
     purpose: >
       Reposition skills/build-validation from feature prioritization into a
@@ -115,8 +135,14 @@ changes:
         build-validation source behavior before artifact shape or generated
         /ow:validation protocol changes.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-build-validation-prototype-target-contract
+      completed_at: 2026-05-22
+      commit: 0acbf94
+      evidence:
+        - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: candidate
+    status: selected
     title: Extend validation_target artifact with experiment brief fields
     purpose: >
       Add structured validation fields that let /ow:proto consume the target as
@@ -130,9 +156,11 @@ changes:
         - observable_signals
         - decision_rules
         - vision_gaps
+        - agent read-only readiness gate status values
       excludes:
         - generated /ow:validation protocol
         - /ow:proto prompt pack schema
+        - /ow:proto runtime enforcement
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - schemas/validation-target.schema.json
@@ -159,6 +187,14 @@ changes:
       - validation templates expose experiment brief structures for /ow:proto.
       - Summary quality reports thin or missing experiment fields.
       - Readiness blocks /ow:proto when central experiment fields are missing.
+      - Readiness can distinguish missing_validation, thin_validation, stale_validation, ready_for_proto, and return_to_vision without writing artifacts.
+    selection:
+      selected_change_id: C002-validation-target-experiment-fields
+      reason: >
+        Single-queue SC selected C002 after C001 because it encodes the
+        validation target shape and read-only readiness signals that agents
+        need before generated command protocol work.
+      selected_at: 2026-05-22
   - id: C003
     status: candidate
     title: Upgrade /ow:validation generated protocol for experiment compilation
@@ -274,3 +310,49 @@ operations:
       - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/SELECTED_CHANGE.yaml
       - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/ATOM_TASKS.yaml
       - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 source contract was implemented and validated, defining validation
+      as a prototype target compiler with return-to-vision gating.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-validation/SKILL.md
+      - skills/build-validation/references/prototype-validation-target-rubric.md
+      - skills/build-validation/references/return-to-vision-gate.md
+      - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: decision
+    target_candidate_ids:
+      - C002
+      - C003
+    actor: agent
+    reason: >
+      Record the command boundary decision: explicit /ow:validation writes
+      artifacts, while downstream agents consume validation through a read-only
+      built-in readiness gate.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: recorded
+    evidence:
+      - changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 directly with SC because M85 remains the single active queue
+      and C002 is the next dependency after C001.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/SELECTED_CHANGE.yaml
+      - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/ATOM_TASKS.yaml
+      - changes/M85-validation-proto-target-contract/C002-validation-target-experiment-fields/IMPLEMENTATION_BRIEF.md

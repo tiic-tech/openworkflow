@@ -6,11 +6,11 @@ selected_change_id: C001-build-validation-prototype-target-contract
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C001
 title: Atom tasks for build-validation prototype target contract
-status: ready
+status: complete
 tasks:
   - task_id: T001
     title: Rewrite build-validation source behavior
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - skills/build-validation/SKILL.md
@@ -19,7 +19,7 @@ tasks:
       and names the required source inputs, outputs, gates, and boundaries.
   - task_id: T002
     title: Add validation compiler references
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - skills/build-validation/references/
@@ -28,7 +28,7 @@ tasks:
       gate for future generated protocol work.
   - task_id: T003
     title: Validate source contract boundary
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - changes/M85-validation-proto-target-contract/

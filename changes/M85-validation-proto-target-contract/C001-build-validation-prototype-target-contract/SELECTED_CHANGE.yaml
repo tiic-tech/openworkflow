@@ -6,7 +6,7 @@ selected_change_id: C001-build-validation-prototype-target-contract
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C001
 title: Define native build-validation prototype-target compiler contract
-status: selected
+status: complete
 selection_reason: >
   C001 establishes the source behavior for /ow:validation before schema,
   generated skill, or verification changes. It keeps M85 focused on validation
@@ -44,6 +44,11 @@ validation:
 risk:
   level: medium
   high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: 0acbf94
+  evidence:
+    - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary: >
   Complete as one local commit because this is a source skill contract update
   plus planning evidence only.

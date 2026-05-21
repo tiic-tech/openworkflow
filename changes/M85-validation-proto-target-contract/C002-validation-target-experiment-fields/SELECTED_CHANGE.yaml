@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-validation-target-experiment-fields
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-validation-target-experiment-fields
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C002
+title: Extend validation_target artifact with experiment brief fields
+status: selected
+selection_reason: >
+  C002 follows C001 because the source behavior now requires structured fields
+  that let /ow:proto consume validation as an experiment brief. It also records
+  the new decision that downstream agents may use validation as a read-only
+  readiness gate, while artifact writes remain owned by /ow:validation.
+scope:
+  includes:
+    - central_uncertainty
+    - hypothesis
+    - target_behavior
+    - prototype_experiment
+    - observable_signals
+    - decision_rules
+    - vision_gaps
+    - read-only validation readiness status values
+  excludes:
+    - generated /ow:validation protocol
+    - /ow:proto prompt pack schema
+    - /ow:proto runtime enforcement
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/artifacts/readiness.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M85-validation-proto-target-contract/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - .agents/skills/ow-validation/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+acceptance:
+  - validation templates expose experiment brief structures for /ow:proto.
+  - Summary quality reports thin or missing experiment fields.
+  - Readiness blocks proto handoff when central experiment fields are missing.
+  - Readiness can distinguish missing_validation, thin_validation, stale_validation, ready_for_proto, and return_to_vision without writing artifacts.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one local commit because the schema, readiness, summary quality,
+  and generated audit contract updates are one artifact-shape change.

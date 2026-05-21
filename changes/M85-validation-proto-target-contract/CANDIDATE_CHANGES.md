@@ -24,15 +24,26 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: none
 
-Selected candidate: `C001`
+Completed candidates: `C001`
 
-Next recommended candidate: none until `C001` is completed or superseded.
+Selected candidate: `C002`
+
+Next recommended candidate: `C002`
+
+## Command Boundary Decision
+
+Validation is both a user-triggered formal command and an agent built-in
+read-only gate. `/ow:validation` owns durable artifact creation and human
+product judgment. Downstream agents, especially `/ow:proto`, may consume
+validation readiness states such as `ready_for_proto`, `missing_validation`,
+`thin_validation`, `stale_validation`, and `return_to_vision`, but must not
+silently create or overwrite validation artifacts.
 
 ## Candidates
 
 ### C001 - Define native build-validation prototype-target compiler contract
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -41,14 +52,16 @@ return-to-vision gating.
 
 Selection: `C001-build-validation-prototype-target-contract`
 
+Completed in commit `0acbf94`.
+
 ### C002 - Extend validation_target artifact with experiment brief fields
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `medium`
 
 Adds structured fields that let `/ow:proto` consume validation as an experiment
-brief.
+brief and lets agents evaluate validation through a read-only readiness gate.
 
 ### C003 - Upgrade /ow:validation generated protocol for experiment compilation
 
