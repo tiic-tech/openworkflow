@@ -29,7 +29,7 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G016` Define autonomous git automation lifecycle (selected: `G016-autonomous-git-automation-lifecycle`; commit: 94ddaa74596a6428eacad297faf1a851bceb1e10)
 - `G017` Build read-only autonomous git simulator (selected: `G017-autonomous-git-simulator`; commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282)
 - `G018` Plan narrow autonomous remote pilot (selected: `G018-narrow-autonomous-remote-pilot`; commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c)
-- `G019` Implement remote read-only PR-ready planning (selected: `G019-remote-readonly-pr-plan`; commit: not recorded)
+- `G019` Implement remote read-only PR-ready planning (selected: `G019-remote-readonly-pr-plan`; commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e)
 
 ## Deferred Or Blocked Changes
 

@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G019-remote-readonly-pr-plan
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G019 remote read-only PR-ready planning
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G019
+selected_change_id: G019-remote-readonly-pr-plan
+recorded_at: 2026-05-21
+primary_commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e
+primary_commit_message: M71/G019 Add remote read-only PR planning
+next_candidate: G020
+mutation_boundary:
+  mutation_performed: false
+  denied:
+    - git push
+    - gh pr create
+    - gh pr edit
+    - gh pr merge
+    - gh issue mutation
+validations:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+evidence:
+  - packages/core/src/git/remoteReadonlyPlanner.ts
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/index.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/commands/registry.ts
+  - references/git-automation-governance.md
+  - .agents/skills/ow-git-automation/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml
+  - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml

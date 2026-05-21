@@ -566,6 +566,7 @@ Selection: `G019-remote-readonly-pr-plan`
 
 Completion evidence:
 
+- `commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e`
 - `packages/core/src/git/remoteReadonlyPlanner.ts`
 - `packages/cli/src/commands/gitAutomation.ts`
 - `packages/cli/src/index.ts`
@@ -576,6 +577,7 @@ Completion evidence:
 - `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
 - `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml`
+- `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ## G020 - Pilot Draft PR Remote Mutation
 

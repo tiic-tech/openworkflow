@@ -66,7 +66,7 @@ key_dependencies:
   - G016 is complete and defines the design-only autonomous git automation lifecycle contract.
   - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation; primary commit 5a5d2e21008b9e31456a9b8b9810cf1014dca282 records the implementation.
   - G018 is complete and records the approved B -> C path: remote read-only planning first, then a narrow draft PR mutation pilot; primary commit a853ae5581e3a21d8f0ff7e865fb480b92df433c records the planning decision.
-  - G019 is complete and implements remote read-only PR-ready planning without mutation.
+  - G019 is complete and implements remote read-only PR-ready planning without mutation; primary commit 55e62cd3615b047b44705b0dd81be540dc3a1e2e records the implementation.
   - G020 is next and pilots draft PR mutation only, with merge and Issue mutation still excluded.
 risks:
   - id: R001
@@ -137,3 +137,4 @@ validation:
     - G018 completed the B -> C high-risk decision and added G019 remote read-only planning plus G020 draft PR pilot.
     - G018 primary implementation commit is a853ae5581e3a21d8f0ff7e865fb480b92df433c; commit evidence is recorded in a follow-up evidence commit.
     - G019 completed the remote read-only PR-ready planner and made G020 the next draft PR mutation pilot.
+    - G019 primary implementation commit is 55e62cd3615b047b44705b0dd81be540dc3a1e2e; commit evidence is recorded in a follow-up evidence commit.
