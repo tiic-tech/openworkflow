@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C004-validation-target-stress-fixtures
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+selected_change_id: C004-validation-target-stress-fixtures
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C004
+title: Local commit evidence for C004 validation target stress fixtures
+status: complete
+completed_at: 2026-05-22
+commit: c56b3c9
+summary: >
+  Added runtime surface fixtures that assert /ow:proto distinguishes
+  thin_validation, return_to_vision, and ready_for_proto validation target
+  states through semantic_readiness.
+changed_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+risk:
+  level: medium
+  high_risk_report: not_applicable

@@ -6,7 +6,7 @@ selected_change_id: C004-validation-target-stress-fixtures
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C004
 title: Add validation target stress fixtures
-status: selected
+status: complete
 selection_reason: >
   C004 is the final M85 verification candidate. It should prove the runtime
   read model distinguishes thin validation, return-to-vision validation, and
@@ -46,6 +46,11 @@ validation:
 risk:
   level: medium
   high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: c56b3c9
+  evidence:
+    - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary: >
   Complete as one local commit because C004 is test-only verification plus
   planning evidence.

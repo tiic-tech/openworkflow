@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M85-validation-proto-target-contract
 title: Candidate changes for validation prototype target contract
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -88,7 +88,7 @@ scope_control:
       reason: >
         End-to-end pressure testing belongs after command-specific contracts land.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -264,7 +264,7 @@ changes:
       evidence:
         - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: selected
+    status: done
     title: Add validation target stress fixtures
     purpose: >
       Verify thin, vision-blocked, and proto-ready validation target states
@@ -309,6 +309,12 @@ changes:
         artifact shape are stable enough to add explicit thin, blocked, and
         ready validation fixtures.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-validation-target-stress-fixtures
+      completed_at: 2026-05-22
+      commit: c56b3c9
+      evidence:
+        - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -445,3 +451,16 @@ operations:
       - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/SELECTED_CHANGE.yaml
       - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/ATOM_TASKS.yaml
       - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added runtime stress fixtures for thin_validation, return_to_vision,
+      and ready_for_proto validation target states.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

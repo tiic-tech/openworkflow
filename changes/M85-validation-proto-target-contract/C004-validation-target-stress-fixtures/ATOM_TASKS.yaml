@@ -6,11 +6,11 @@ selected_change_id: C004-validation-target-stress-fixtures
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C004
 title: Atom tasks for validation target stress fixtures
-status: ready
+status: complete
 tasks:
   - task_id: T001
     title: Add thin validation fixture
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
@@ -19,7 +19,7 @@ tasks:
       semantic_readiness.gate_status thin_validation.
   - task_id: T002
     title: Add return-to-vision fixture
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
@@ -28,7 +28,7 @@ tasks:
       set agent_readiness_gate.status to return_to_vision.
   - task_id: T003
     title: Confirm ready-for-proto fixture
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts

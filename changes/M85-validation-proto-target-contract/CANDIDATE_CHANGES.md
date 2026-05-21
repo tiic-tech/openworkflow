@@ -24,11 +24,11 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: none
 
-Completed candidates: `C001`, `C002`, `C003`
+Completed candidates: `C001`, `C002`, `C003`, `C004`
 
-Selected candidate: `C004`
+Selected candidate: none
 
-Next recommended candidate: `C004`
+Next recommended candidate: none. M85 is complete.
 
 ## Command Boundary Decision
 
@@ -78,8 +78,10 @@ Completed in commit `4e2f19f`.
 
 ### C004 - Add validation target stress fixtures
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
 Adds thin, vision-gap blocked, and proto-ready validation fixtures.
+
+Completed in commit `c56b3c9`.
