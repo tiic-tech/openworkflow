@@ -6,7 +6,7 @@ selected_change_id: C003-vision-generated-protocol
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C003
 title: Upgrade /ow:vision generated protocol for product partner interrogation
-status: selected
+status: completed
 selection_reason: >
   C003 is the next dependency after C002. It makes the generated /ow:vision
   command and Codex skill consume the new build-vision contract: product partner,
@@ -55,3 +55,8 @@ risk:
 commit_boundary: >
   Complete as one coherent local commit because the source protocol, generated
   surfaces, and verification assertions are one behavior boundary.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml

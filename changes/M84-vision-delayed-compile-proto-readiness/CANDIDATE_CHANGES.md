@@ -26,11 +26,11 @@ Deferred features:
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Completed candidates: `C001`, `C002`
+Completed candidates: `C001`, `C002`, `C003`
 
-Selected candidate: `C003`
+Selected candidate: none
 
-Next recommended candidate: none until `C003` is completed or superseded.
+Next recommended candidate: `C004`
 
 ## Selection Policy
 
@@ -78,7 +78,7 @@ Completion evidence:
 
 ### C003 - Upgrade /ow:vision skill protocol for product partner interrogation
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -87,9 +87,14 @@ into `/ow:vision` generated guidance and command protocol.
 
 Selection: `C003-vision-generated-protocol`
 
+Completion evidence:
+
+- `changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml`
+- `010ab1af29850200987ad80a7023f27024a7e1eb`
+
 ### C004 - Add /ow:vision delayed-compile stress tests and fixtures
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

@@ -6,11 +6,11 @@ selected_change_id: C003-vision-generated-protocol
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C003
 title: Atom tasks for /ow:vision generated protocol
-status: ready
+status: completed
 tasks:
   - task_id: T001
     title: Update source command protocol
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/commands/registry.ts
@@ -20,7 +20,7 @@ tasks:
       proto-readiness compile gate.
   - task_id: T002
     title: Refresh generated OW surfaces
-    status: pending
+    status: done
     type: generate
     owned_paths:
       - .agents/skills/ow-vision/SKILL.md
@@ -31,7 +31,7 @@ tasks:
       the source registry changes.
   - task_id: T003
     title: Strengthen verification
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -46,3 +46,6 @@ validation:
   - node dist/cli/src/index.js sync --root . --json
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
