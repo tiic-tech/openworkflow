@@ -43,11 +43,11 @@ branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 5
 active_candidate_count: 4
 superseded_candidate_id: C001
-completed_candidate_id: null
-completed_change_id: null
-selected_candidate_id: C011
-selected_change_id: C011-command-family-taxonomy
-next_recommended_candidate_id: C012
+completed_candidate_id: C011
+completed_change_id: C011-command-family-taxonomy
+selected_candidate_id: C012
+selected_change_id: C012-workflow-stage-graph
+next_recommended_candidate_id: C013
 key_dependencies:
   - M54 completed DTC/AC/SC as Codex-delivered planning commands.
   - C013 clarified that DTC/AC/SC belong inside /ow:change, not as the full OW workflow.
@@ -84,3 +84,5 @@ validation:
     - OP004 split C001 into C011-C014 and marked C001 superseded.
     - OP005 updated C014 so front-chain command quality review precedes proto2html in the deferred handoff map.
     - OP006 selected C011 after AC recommended it as the next low-risk candidate.
+    - OP007 completed C011 with local commit evidence.
+    - OP008 selected C012 after AC recommended it as the next low-risk candidate.

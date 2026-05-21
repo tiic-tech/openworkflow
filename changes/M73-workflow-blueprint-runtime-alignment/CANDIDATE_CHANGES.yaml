@@ -84,7 +84,7 @@ scope_control:
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
       suggested_plan_id: M83-expanded-workflow-read-model
-next_recommended_candidate_id: C012
+next_recommended_candidate_id: C013
 changes:
   - id: C001
     status: superseded
@@ -129,7 +129,7 @@ changes:
         first. DTC later split it into narrower current candidates.
       selected_at: 2026-05-21
   - id: C011
-    status: selected
+    status: done
     title: Define command family taxonomy
     purpose: >
       Define the command families used by the full workflow blueprint without
@@ -168,8 +168,16 @@ changes:
         analyze-changes recommends C011 because it is low risk, dependency-free,
         and unlocks the remaining M73 taxonomy and handoff candidates.
       selected_at: 2026-05-21
+    completion:
+      completed_change_id: C011-command-family-taxonomy
+      completed_at: 2026-05-21
+      primary_commit: ca555de52982735afa22dacedb65f3b9ef79f4eb
+      evidence_commit: 9c6c42c4dfcfb7c2b4e7d52c484cffd764857de5
+      evidence:
+        - changes/M73-workflow-blueprint-runtime-alignment/C011-command-family-taxonomy/LOCAL_COMMIT_EVIDENCE.yaml
+        - references/workflow-blueprint-runtime-alignment.md
   - id: C012
-    status: candidate
+    status: selected
     title: Define workflow stage graph
     purpose: >
       Define the main stage graph from vision through archive and show where
@@ -201,6 +209,12 @@ changes:
       - Stage graph matches the user-approved blueprint.
       - Optional tune behavior is represented without breaking the main chain.
       - Future runtime stages remain deferred feature refs.
+    selection:
+      selected_change_id: C012-workflow-stage-graph
+      reason: >
+        analyze-changes recommends C012 because C011 is complete and the stage
+        graph is the next low-risk prerequisite for C013 and C014.
+      selected_at: 2026-05-21
   - id: C013
     status: candidate
     title: Define /ow:change planning intelligence boundary
@@ -384,3 +398,32 @@ operations:
     evidence:
       - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
       - changes/M73-workflow-blueprint-runtime-alignment/C011-command-family-taxonomy/SELECTED_CHANGE.yaml
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C011
+    actor: agent
+    reason: >
+      C011 implemented the command family taxonomy reference and recorded local
+      commit evidence through ow:git-automation.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C011-command-family-taxonomy/LOCAL_COMMIT_EVIDENCE.yaml
+      - references/workflow-blueprint-runtime-alignment.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C012
+    actor: agent
+    reason: >
+      AC recommended C012 as the next low-risk candidate after C011 completion.
+      SC selected it to define the workflow stage graph before /ow:change
+      planning-boundary work.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+      - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/SELECTED_CHANGE.yaml

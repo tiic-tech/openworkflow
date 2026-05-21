@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C012-workflow-stage-graph
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C012-workflow-stage-graph
+title: C012 workflow stage graph atom tasks
+status: pending
+tasks:
+  - task_id: C012-A001
+    title: Define main stage chain
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Vision through archive stage order is explicit.
+      - The graph is described as blueprint alignment, not runtime exposure.
+  - task_id: C012-A002
+    title: Define tune loop placement
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Tune is represented as optional and repeatable.
+      - Tune does not replace proto acceptance.
+  - task_id: C012-A003
+    title: Attach support surfaces
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Review is shown as async support.
+      - build-agent and build-skill are shown as advanced support.
+  - task_id: C012-A004
+    title: Validate stage-graph-only boundary
+    status: pending
+    type: verify
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

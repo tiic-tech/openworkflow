@@ -112,7 +112,67 @@ authorize repairs without a selected change.
 - DTC, AC, and SC must remain inside the `/ow:change` planning loop unless a
   later approved change deliberately revises the taxonomy.
 
+## Stage Graph
+
+The intended primary workflow chain is:
+
+```text
+/ow:vision
+  -> /ow:validation
+  -> /ow:proto
+  -> /ow:tune          # optional, repeatable
+  -> /ow:proto2html
+  -> /ow:html2spec
+  -> /ow:build
+  -> /ow:change
+  -> /ow:archive
+```
+
+The graph is a blueprint for stage responsibility. It does not mean every
+listed command is already implemented, registered, or safe to expose at runtime.
+
+### Stage Responsibilities
+
+- `/ow:vision` creates or revises durable product intent.
+- `/ow:validation` chooses the core assumption or feature that must be proven.
+- `/ow:proto` explores the accepted direction through image-first prototype
+  evidence.
+- `/ow:tune` refines accepted prototype evidence. It is optional and repeatable;
+  it should improve fidelity without silently changing the product thesis.
+- `/ow:proto2html` reconstructs the accepted benchmark prototype image as a
+  high-fidelity HTML prototype.
+- `/ow:html2spec` turns locked HTML prototype evidence into implementation-ready
+  specification artifacts.
+- `/ow:build` turns approved specs into project-specific team, skill, milestone,
+  and workstream planning.
+- `/ow:change` executes selected, bounded implementation changes through the
+  planning intelligence loop and implementation work.
+- `/ow:archive` verifies and closes completed implementation work.
+
+### Loop And Support Attachments
+
+`/ow:tune` is the only loop inside the discovery/prototype segment. It can run
+multiple times while the accepted prototype still needs refinement. Once the
+benchmark prototype is accepted for reconstruction, downstream work should
+avoid reopening product direction unless new validation evidence requires it.
+
+`/ow:review` attaches to `/ow:change` as asynchronous support. It should produce
+findings that influence the next analysis or selection pass, not bypass the
+selected-change boundary.
+
+`/ow:build-agent` and `/ow:build-skill` attach to `/ow:build` and later
+workflow loops as advanced creation commands. They create capability that may be
+used by implementation work, but they are not normal stage transitions.
+
+### Deferred Stage Surfaces
+
+The stage graph intentionally names future surfaces before they are implemented.
+Detailed contracts for `proto2html`, `html2spec`, `build`, `change`, `review`,
+`archive`, `build-agent`, and `build-skill` require separate DTC queues. The
+next deferred queue after M73 should reassess `/ow:vision`, `/ow:validation`,
+`/ow:proto`, and `/ow:tune` quality before `proto2html` proceeds.
+
 ## Deferred Work
 
-The detailed stage graph is C012. The `/ow:change` planning intelligence
-boundary is C013. The deferred feature handoff map is C014.
+The `/ow:change` planning intelligence boundary is C013. The deferred feature
+handoff map is C014.

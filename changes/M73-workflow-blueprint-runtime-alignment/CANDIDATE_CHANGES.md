@@ -22,13 +22,13 @@ the whole workflow.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Next recommended candidate: `C012`
+Next recommended candidate: `C013`
 
 ## Current Candidates
 
 ### C011 - Define Command Family Taxonomy
 
-Status: `selected`
+Status: `done`
 
 Risk: `low`
 
@@ -42,7 +42,7 @@ Owned paths:
 
 ### C012 - Define Workflow Stage Graph
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `low`
 
@@ -110,3 +110,5 @@ with its own queue boundary.
 - `OP005`: updated C014 deferred handoff map so front-chain command quality
   review precedes proto2html.
 - `OP006`: selected C011 after AC recommendation.
+- `OP007`: completed C011 with local commit evidence.
+- `OP008`: selected C012 after AC recommendation.

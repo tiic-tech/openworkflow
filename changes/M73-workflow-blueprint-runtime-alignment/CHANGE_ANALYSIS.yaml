@@ -12,33 +12,28 @@ source:
 git_state:
   branch: codex/m73-workflow-blueprint-runtime-alignment
   dirty: false
-  note: Analysis was refreshed after committing the front-chain handoff update.
+  note: Analysis refreshed after C011 implementation evidence was recorded.
 recommendation:
   target_plan_id: M73-workflow-blueprint-runtime-alignment
-  target_candidate_id: C011
+  target_candidate_id: C012
   action: handoff_to_select_change
   reason: >
-    C011 is ready, low risk, has no dependencies, and establishes the command
-    family taxonomy that C012, C013, and C014 depend on. It stays within the M73
-    workflow-slice boundary and does not touch runtime registry or generated
-    adapter surfaces.
+    C012 is low risk, depends only on completed C011 taxonomy work, and defines
+    the stage graph needed before the /ow:change planning intelligence boundary
+    and deferred feature handoff map can be finalized.
 rejected_alternatives:
   - plan_id: M73-workflow-blueprint-runtime-alignment
-    candidate_id: C012
-    reason: Depends on C011 command family taxonomy.
-  - plan_id: M73-workflow-blueprint-runtime-alignment
     candidate_id: C013
-    reason: Depends on C011 and C012.
+    reason: Depends on C012 stage graph.
   - plan_id: M73-workflow-blueprint-runtime-alignment
     candidate_id: C014
-    reason: Depends on C011, C012, and C013.
+    reason: Depends on C012 and C013.
 high_risk_stop:
   required: false
-  reason: Recommended candidate C011 is low risk and design-only.
+  reason: Recommended candidate C012 is low risk and design-only.
 validation:
   commands_run:
     - git status --short --branch
-    - node dist/cli/src/index.js sync --root . --json
   notes:
-    - AC recommends C011 for selection.
-    - High-risk deferred features remain outside the active M73 implementation.
+    - AC recommends C012 for selection.
+    - High-risk deferred features remain outside active M73 implementation.
