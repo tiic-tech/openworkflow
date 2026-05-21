@@ -19,6 +19,7 @@ source:
 outputs:
   candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
   readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
+  high_risk_decision_report: changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
 candidate_count: 7
 completed_candidate_id: S004
 completed_change_id: S004-skill-format-validation
@@ -50,3 +51,4 @@ notes:
   - S005 completed generated-surface drift and parity checks.
   - S006 completed the dynamic instruction envelope design without adding runtime behavior.
   - Remaining candidates S003 and S007 are high risk and require explicit confirmation.
+  - A high-risk decision report was created for S003 and S007 before any implementation.

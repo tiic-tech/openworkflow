@@ -601,3 +601,18 @@ operations:
       - references/skill-system-lifecycle.md
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP015
+    operation_type: query
+    target_candidate_ids:
+      - S003
+      - S007
+    actor: agent
+    reason: >
+      High-risk stop converted into a decision report before implementation,
+      covering concrete risks, options, recommended path, guardrails, and
+      go/stop criteria.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md

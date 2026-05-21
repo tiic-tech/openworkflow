@@ -26,6 +26,9 @@ Feat boundary: this queue owns the top-level
 expected to land as a focused commit with selection artifacts under this feat
 folder.
 
+High-risk decision report:
+`changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md`
+
 ## S001 - Document Native Skill Format And Lifecycle Contract
 
 Status: `done`
@@ -100,6 +103,7 @@ Risk: `high`
 
 ## Operation Audit
 
+- `OP015`: produce high-risk decision report for `S003` and `S007`
 - `OP001`: select `S001` after cross-queue comparison with `M68/H003`
 - `OP002`: complete `S001`
 - `OP003`: mark `S002` ready and make it next recommended
