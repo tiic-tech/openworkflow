@@ -1,0 +1,23 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G013-selected-change-commit-automation
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G013 selected-change commit automation
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G013
+selected_change_id: G013-selected-change-commit-automation
+branch_boundary: codex/m71-git-version-governance
+primary_commit: fb003d7346ce027e08a9f149718caadf82755ad6
+commit_policy:
+  minimum: selected changes must have at least one local commit
+  allowed: multiple local commits are allowed when evidence is recorded after the primary commit
+  relationship_anchor: latest local HEAD commit for the selected change
+validation_evidence:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+audit_notes:
+  - The primary commit implemented the selected-change local commit automation.
+  - This evidence file is recorded by a follow-up evidence commit rather than amending the primary commit.
+  - Remote push, PR creation, Issue mutation, and merge remain outside the approved local boundary.

@@ -333,8 +333,10 @@ Completion evidence:
 - `packages/core/src/git/localGitAutomation.ts`
 - `packages/cli/src/dev/verifyRuntimeSurface.ts`
 - `references/git-version-control-governance.md`
+- `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/LOCAL_COMMIT_EVIDENCE.yaml`
 - `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml`
+- `commit: fb003d7346ce027e08a9f149718caadf82755ad6`
 
 ## G014 - Implement Local PR-Ready Summary Generation For Completed Queues
 

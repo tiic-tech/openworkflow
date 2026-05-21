@@ -111,3 +111,4 @@ validation:
     - G012 completed local feat branch automation and made G013 ready.
     - User clarified selected changes must have at least one commit, but may have multiple commits when the final selected-change HEAD preserves traceability.
     - G013 completed selected-change local commit automation and made G014 ready.
+    - G013 primary implementation commit is fb003d7346ce027e08a9f149718caadf82755ad6; commit evidence is recorded in a follow-up evidence commit.
