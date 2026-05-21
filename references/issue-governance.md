@@ -57,7 +57,8 @@ In GitHub mode:
 - the GitHub Issue body and comments are the remote source of truth
 - OW local artifacts should not copy the remote Issue body as authoritative text
 - local artifacts should store linkage, decomposition, and audit evidence
-- remote mutation requires explicit gh operation governance
+- remote mutation requires explicit gh operation governance defined in
+  `references/gh-operation-governance.md`
 
 Local OW artifacts can still be tracked in git, but they should be linkage
 records rather than duplicated Issues.
@@ -95,7 +96,7 @@ When GitHub is configured as the source of truth:
 - do not rewrite local linkage just because a remote Issue body changes unless
   the linkage itself changed
 - treat comments, labels, closures, and body edits as gh operations with their
-  own risk tier
+  own risk tier in `references/gh-operation-governance.md`
 
 When local mode is used, local issue artifacts are normal repo artifacts and
 should follow the same commit, branch, and PR governance as other OW planning

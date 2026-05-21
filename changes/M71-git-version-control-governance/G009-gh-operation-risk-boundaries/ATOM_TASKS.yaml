@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G009-gh-operation-risk-boundaries
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G009-gh-operation-risk-boundaries
+title: Atom tasks for gh operation risk boundaries
+status: done
+tasks:
+  - task_id: T001
+    title: Define gh operation governance reference
+    status: done
+    type: edit
+    owned_paths:
+      - references/gh-operation-governance.md
+    done_when:
+      - gh operations are classified into read-only, evidence-writing, and high-risk mutation tiers.
+      - Preconditions and audit requirements are documented.
+  - task_id: T002
+    title: Link gh governance from git and Issue references
+    status: done
+    type: edit
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+    done_when:
+      - Git governance points remote mutation to gh operation governance.
+      - Issue governance points comments, labels, closures, and body edits to gh operation governance.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G009 selection and completion evidence are recorded.
+      - G007 becomes the next high-risk stop.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - references/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

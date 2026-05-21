@@ -69,8 +69,8 @@ before any remote PR operation. The PR-ready summary should explain:
 - unresolved risks or follow-up queues
 
 Opening, editing, or merging PRs is not implied by either the planning contract
-or `PR_READY_SUMMARY.md`. Those remote operations require their own gh or GitHub
-governance.
+or `PR_READY_SUMMARY.md`. Those remote operations are governed by
+`references/gh-operation-governance.md`.
 
 ## Issue Boundary
 
@@ -112,7 +112,8 @@ include:
 Local commits may be created when the user has authorized the dogfood workflow
 that treats each selected change as a commit. Remote mutation requires separate
 authorization and should be governed by a high-risk decision report until OW has
-an approved gh operation model.
+an approved gh operation model. See `references/gh-operation-governance.md` for
+read-only, evidence-writing, and high-risk mutation tiers.
 
 ## Evidence
 

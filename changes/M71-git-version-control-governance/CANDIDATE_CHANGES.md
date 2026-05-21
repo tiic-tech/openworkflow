@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G009`.
+- Next recommended candidate: `G007`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -207,7 +207,7 @@ Completion evidence:
 
 ## G007 - Decide Whether OW Should Automate Git And Gh Mutation Operations
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `high`
 
@@ -265,7 +265,7 @@ Completion evidence:
 
 ## G009 - Define Gh Issue And PR Operation Risk Boundaries
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -285,6 +285,16 @@ Validation:
 
 - `npm run validate`
 - `git diff --check`
+
+Selection: `G009-gh-operation-risk-boundaries`
+
+Completion evidence:
+
+- `references/git-version-control-governance.md`
+- `references/issue-governance.md`
+- `references/gh-operation-governance.md`
+- `changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml`
 
 ## G010 - Create Analyze-Changes Skill For Cross-Queue Priority Analysis
 
