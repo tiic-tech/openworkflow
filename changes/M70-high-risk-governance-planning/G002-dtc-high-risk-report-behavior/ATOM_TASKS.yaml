@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G002-dtc-high-risk-report-behavior
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G002-dtc-high-risk-report-behavior
+title: Atom tasks for decompose-to-changes high-risk report behavior
+status: done
+tasks:
+  - task_id: T001
+    title: Add high-risk report workflow to DTC skill
+    status: done
+    type: document
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+    done_when:
+      - The skill tells agents when to create or update HIGH_RISK_DECISION_REPORT.md.
+      - The skill says report creation is a stop/decision packet, not implementation approval.
+  - task_id: T002
+    title: Add protocol details for report maintenance
+    status: done
+    type: document
+    owned_paths:
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+    done_when:
+      - The protocol covers output linkage, operation logs, candidate status preservation, and duplicate avoidance.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - G002 selection and completion evidence are recorded.
+      - G004 readiness is updated only if dependencies are satisfied.
+  - task_id: T004
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - skills/decompose-to-changes/
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - quick_validate.py passes for skills/decompose-to-changes.
+      - npm run validate passes.
+      - git diff --check passes.

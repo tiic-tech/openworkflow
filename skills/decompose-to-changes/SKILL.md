@@ -52,11 +52,14 @@ Read these only as needed:
    includes and excludes, dependencies, validation, and acceptance.
 7. For queue maintenance, write an `operations` entry for every targeted
    change. Include the operation type, target id, reason, and evidence.
-8. Write `CANDIDATE_CHANGES.yaml` first. Then write
+8. If the current queue reaches one or more `risk: high` candidates that need
+   user confirmation, create or update `HIGH_RISK_DECISION_REPORT.md` in the
+   owning queue folder before implementation continues.
+9. Write `CANDIDATE_CHANGES.yaml` first. Then write
    `CANDIDATE_CHANGES.md` as a non-authoritative readable view.
-9. Write `SUMMARY.yaml` with source refs, candidate count, key dependencies,
+10. Write `SUMMARY.yaml` with source refs, candidate count, key dependencies,
    risks, and the optional next recommended candidate.
-10. Run repository validation when available, usually `npm run validate`.
+11. Run repository validation when available, usually `npm run validate`.
 
 ## Candidate Rules
 
@@ -90,6 +93,29 @@ For an existing queue, operate by stable candidate id.
 
 Every maintenance edit must append an `operations` item to the YAML queue and
 refresh the Markdown readable view.
+
+## High-Risk Reports
+
+When a queue's next actionable work is `risk: high`, or when the user asks for a
+high-risk stop/report, produce a `HIGH_RISK_DECISION_REPORT.md` instead of
+selecting or implementing the candidate. Use
+`references/planning-artifact-contracts.md` for the report contract.
+
+High-risk report behavior:
+
+- Keep candidate ids and candidate statuses stable unless the user explicitly
+  approves a status change.
+- Create the report under the owning queue folder, usually
+  `changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md`.
+- Update an existing report when it covers the same decision boundary; do not
+  create duplicate reports for the same high-risk stop.
+- Link the report from `SUMMARY.yaml` outputs or notes.
+- Add an `operations` entry with `operation_type: query` or `block` and the
+  report path as evidence.
+- Treat the report as a decision packet, not as approval to implement.
+
+The report must include concrete risks, decision options, a recommended path,
+guardrails, go criteria, stop criteria, and validation expectations.
 
 ## Boundaries
 

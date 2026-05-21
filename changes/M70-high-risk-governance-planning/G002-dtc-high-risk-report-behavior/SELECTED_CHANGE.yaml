@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:G002-dtc-high-risk-report-behavior
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G002-dtc-high-risk-report-behavior
+source_plan_id: M70-high-risk-governance-planning
+source_candidate_id: G002
+title: Add high-risk report behavior to decompose-to-changes
+status: done
+selection_reason: >
+  G002 is the next recommended candidate after G001. The high-risk report
+  contract is now stable, so decompose-to-changes can be taught to create and
+  maintain report evidence without changing selection behavior.
+rejected_alternatives:
+  - candidate_ref: G003
+    reason: select-change stop-gate behavior should follow or parallel DTC report creation, but G002 is next recommended.
+  - candidate_ref: G005
+    reason: delivery-boundary mitigation should wait until planning skills know how to handle high-risk reports.
+scope:
+  includes:
+    - high-risk detection guidance for candidate queues
+    - report creation and maintenance mode behavior
+    - operation log expectations for high-risk query/report actions
+    - readable-view and summary linkage guidance
+  excludes:
+    - select-change selection gate behavior
+    - runtime command generation
+    - schema or validator implementation
+owned_paths:
+  - skills/decompose-to-changes/SKILL.md
+  - skills/decompose-to-changes/references/decomposition-protocol.md
+  - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/
+forbidden_paths:
+  - skills/select-change/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - decompose-to-changes says when to create HIGH_RISK_DECISION_REPORT.md.
+  - decompose-to-changes preserves candidate ids and statuses while adding high-risk report evidence.
+  - decompose-to-changes can update an existing report instead of creating duplicate reports.
+  - The skill keeps implementation out of scope.
+validation:
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - skills/decompose-to-changes/SKILL.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - "validation: quick_validate.py skills/decompose-to-changes"
+    - "validation: npm run validate"
+    - "validation: git diff --check"

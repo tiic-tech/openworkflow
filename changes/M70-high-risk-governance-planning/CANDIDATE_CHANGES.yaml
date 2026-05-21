@@ -43,7 +43,7 @@ selection_policy:
     - treating high-risk reports as informal chat-only guidance
     - letting select-change silently select risk: high candidates
     - committing experimental non-Codex generated surfaces
-next_recommended_candidate_id: G002
+next_recommended_candidate_id: G003
 changes:
   - id: G001
     status: done
@@ -96,7 +96,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G002
-    status: ready
+    status: done
     title: Add high-risk report behavior to decompose-to-changes
     purpose: >
       Teach decompose-to-changes to plan high-risk governance explicitly,
@@ -131,6 +131,23 @@ changes:
       - decompose-to-changes preserves candidate ids and statuses while adding high-risk report evidence.
       - decompose-to-changes can update an existing report instead of creating duplicate reports.
       - The skill keeps implementation out of scope.
+    selection:
+      selected_change_id: G002-dtc-high-risk-report-behavior
+      reason: >
+        G001 completed the report artifact contract, so decompose-to-changes can
+        now reference and maintain HIGH_RISK_DECISION_REPORT.md safely.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G002-dtc-high-risk-report-behavior
+      completed_at: 2026-05-21
+      evidence:
+        - skills/decompose-to-changes/SKILL.md
+        - skills/decompose-to-changes/references/decomposition-protocol.md
+        - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/SELECTED_CHANGE.yaml
+        - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/decompose-to-changes"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G003
     status: ready
     title: Add high-risk stop gate to select-change
@@ -356,3 +373,31 @@ operations:
     after_status: ready
     evidence:
       - references/planning-artifact-contracts.md
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: G002 is the next recommended candidate after the high-risk report contract completed.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/SELECTED_CHANGE.yaml
+      - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/ATOM_TASKS.yaml
+      - changes/M70-high-risk-governance-planning/G002-dtc-high-risk-report-behavior/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: decompose-to-changes now defines when and how to create or update high-risk decision reports.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - "validation: quick_validate.py skills/decompose-to-changes"
+      - "validation: npm run validate"
+      - "validation: git diff --check"

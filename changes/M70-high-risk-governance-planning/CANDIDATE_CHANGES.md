@@ -17,7 +17,7 @@ changing generated `.agents` surfaces directly, treating high-risk reports as
 chat-only guidance, letting `select-change` silently select `risk: high`
 candidates, or committing experimental non-Codex generated surfaces.
 
-Next recommended candidate: `G002`.
+Next recommended candidate: `G003`.
 
 Feat boundary: this queue owns
 `changes/M70-high-risk-governance-planning/`. Each `G###` candidate is expected
@@ -51,13 +51,23 @@ Completion evidence:
 
 ## G002 - Add High-Risk Report Behavior To Decompose-To-Changes
 
-Status: `ready`
+Status: `done`
 
 Depends on: `G001`
 
 Purpose: teach `decompose-to-changes` to plan high-risk governance explicitly,
 including creating or updating a high-risk decision report when a queue reaches
 `risk: high` candidates that require user confirmation.
+
+Selection: `G002-dtc-high-risk-report-behavior`
+
+Completion evidence:
+
+- `skills/decompose-to-changes/SKILL.md`
+- `skills/decompose-to-changes/references/decomposition-protocol.md`
+- `quick_validate.py skills/decompose-to-changes`
+- `npm run validate`
+- `git diff --check`
 
 ## G003 - Add High-Risk Stop Gate To Select-Change
 

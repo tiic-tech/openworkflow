@@ -114,6 +114,51 @@ Do not hard-delete historical candidates. Prefer `superseded`, `deferred`, or
 `blocked`. Hard deletion is only acceptable for a malformed candidate created in
 the same uncommitted operation; log the reason.
 
+## High-Risk Decision Reports
+
+Use `HIGH_RISK_DECISION_REPORT.md` when queue maintenance discovers that the
+next work is high risk and needs user confirmation before implementation. This
+is especially important for adapter delivery, generated runtime surfaces,
+security, data handling, trust model, or broad architecture changes.
+
+Report creation is a queue maintenance action. It does not select the high-risk
+candidate and does not authorize implementation.
+
+When creating or updating the report:
+
+1. Keep the high-risk candidate id stable.
+2. Preserve the candidate status unless the user explicitly asks to mark it
+   `blocked`, `deferred`, or `superseded`.
+3. Write or update `changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md`.
+4. Add the report path to `SUMMARY.yaml` outputs or notes.
+5. Refresh `CANDIDATE_CHANGES.md` with the report path when useful.
+6. Append an operation entry:
+
+```yaml
+operations:
+  - operation_id: OP012
+    operation_type: query
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: High-risk stop converted into a decision report before implementation.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+```
+
+Use `operation_type: block` only when the queue status or candidate status is
+also changed to `blocked`. Use `query` when the report is informational and the
+candidate remains in its current status.
+
+Required report sections are defined in
+`references/planning-artifact-contracts.md`.
+
+Do not create multiple reports for the same risk boundary. Update the existing
+report unless the new high-risk stop concerns a materially different decision.
+
 ## Output Checklist
 
 `CANDIDATE_CHANGES.yaml` must include:
@@ -160,3 +205,5 @@ Check that:
 - generated or runtime paths are protected unless explicitly in scope
 - every mutating maintenance edit has an operation log entry
 - every status change preserves or adds evidence
+- high-risk candidates that require confirmation have a linked report before
+  implementation resumes
