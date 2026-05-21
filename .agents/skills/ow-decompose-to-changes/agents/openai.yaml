@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.decompose-to-changes
+interface:
+  display_name: "ow:decompose-to-changes"
+  short_description: "Create, update, query, or maintain an OpenWorkflow candidate change queue."
+  default_prompt: "Use /ow:decompose-to-changes for this OpenWorkflow repository."

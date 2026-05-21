@@ -23,11 +23,11 @@ outputs:
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
 candidate_count: 13
-completed_candidate_id: C010
-completed_change_id: C010-planning-registry-semantics
-previous_completed_candidate_id: C012
-previous_completed_change_id: C012-planning-read-model-verification
-next_recommended_candidate_id: C011
+completed_candidate_id: C011
+completed_change_id: C011-codex-planning-adapter
+previous_completed_candidate_id: C010
+previous_completed_change_id: C010-planning-registry-semantics
+next_recommended_candidate_id: C013
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -46,6 +46,8 @@ key_dependencies:
   - C012 is complete and the next remaining ready candidate is C010, which is high risk.
   - User approved C010 Narrow Core Command Semantics: DTC, AC, and SC should be formal /ow:* command ids.
   - C010 is complete and C011 is the next generated-surface follow-up; C011 remains high risk.
+  - User approved C011; Codex generated planning skill surfaces are now delivered from source registry data.
+  - C011 is complete and C013 is the next high-risk reassessment candidate.
 risks:
   - id: R001
     level: medium
@@ -83,4 +85,6 @@ validation:
     - OP017 completed C012 planning artifact read-model verification fixtures.
     - OP018 selected C010 after explicit high-risk approval.
     - OP019 completed C010 planning registry semantics for DTC, AC, and SC.
+    - OP020 selected C011 after explicit high-risk approval.
+    - OP021 completed C011 Codex generated planning skill delivery.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

@@ -24,7 +24,7 @@
 - Use `openworkflow summarize --root . --artifact <path> --json` to preview SUMMARY.yaml refreshes; add `--write` only when you intend to update summary files without changing source artifacts.
 - Use `openworkflow validate --root . --json` for contract shape; SUMMARY.yaml trust is checked by `summaries`, not by `validate`.
 - Use `openworkflow clean --root . --tools codex --json` to preview managed/generated cleanup; `--yes` removes OpenWorkflow managed metadata and generated adapter files while preserving source artifacts, SUMMARY.yaml, evidence, notes, and user AGENTS.md content.
-- Repo-local workflow commands are delivered as Agent skills under `.agents/skills/ow-*/SKILL.md` and map to semantic commands: `/ow:vision`, `/ow:validation`, `/ow:proto`, `/ow:tune`, `/ow:design`, `/ow:spec`, `/ow:change`, `/ow:team`, and `/ow:git-automation`.
+- Repo-local workflow commands are delivered as Agent skills under `.agents/skills/ow-*/SKILL.md` and map to semantic commands: `/ow:vision`, `/ow:validation`, `/ow:proto`, `/ow:tune`, `/ow:design`, `/ow:spec`, `/ow:change`, `/ow:team`, `/ow:decompose-to-changes`, `/ow:analyze-changes`, `/ow:select-change`, and `/ow:git-automation`.
 - Respect lazy creation: `openworkflow init` only creates the minimal workflow root; stage artifacts must be created only by the first matching `/ow:*` command.
 - Prefer summary/current-state files for orientation, and load raw evidence only when the current task requires it.
 <!-- END OPENWORKFLOW AGENT GUIDE -->

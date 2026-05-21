@@ -14,11 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C011` after high-risk approval.
+Next recommended candidate: `C013` after high-risk approval.
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
-Latest completed candidate: `C010`
+Latest completed candidate: `C011`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -361,12 +361,31 @@ Generated adapter delivery remains gated by `C011`.
 
 ## C011 - Add Codex Adapter Generation For Accepted Planning Surfaces
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
 Purpose: generate accepted planning runtime surfaces through the Codex adapter
 only after the semantic registry boundary is approved.
+
+Generated command surfaces:
+
+- `.agents/skills/ow-decompose-to-changes/SKILL.md`
+- `.agents/skills/ow-analyze-changes/SKILL.md`
+- `.agents/skills/ow-select-change/SKILL.md`
+
+Completion evidence:
+
+- `packages/core/src/commands/registry.ts`
+- `references/planning-skill-runtime-exposure.md`
+- `.agents/openworkflow-adapter.yaml`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `.openworkflow/audit/CONTEXT_PACKETS.yaml`
+- `changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/SELECTED_CHANGE.yaml`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
 
 ## C012 - Add Planning Artifact Read-Model Verification Fixtures
 
@@ -409,7 +428,7 @@ Completion evidence:
 
 ## C013 - Reassess Full Planning Skill Runtime Exposure
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `high`
 
@@ -437,3 +456,5 @@ verification boundaries have been proven or blocked.
 - `OP017`: complete `C012`
 - `OP018`: select `C010`
 - `OP019`: complete `C010`
+- `OP020`: select `C011`
+- `OP021`: complete `C011`

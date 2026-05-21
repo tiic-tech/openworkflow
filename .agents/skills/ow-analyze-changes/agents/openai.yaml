@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.analyze-changes
+interface:
+  display_name: "ow:analyze-changes"
+  short_description: "Analyze one or more candidate change queues and recommend the next candidate without selecting it."
+  default_prompt: "Use /ow:analyze-changes for this OpenWorkflow repository."

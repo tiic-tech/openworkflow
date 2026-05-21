@@ -37,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C011
+next_recommended_candidate_id: C013
 changes:
   - id: C001
     status: done
@@ -560,7 +560,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: C011
-    status: ready
+    status: done
     title: Add Codex adapter generation for accepted planning surfaces
     purpose: >
       Generate accepted planning runtime surfaces through the Codex adapter only
@@ -573,8 +573,16 @@ changes:
         - non-Codex adapters
         - remote operations
     owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/planning-skill-runtime-exposure.md
       - packages/adapters/codex/src/
       - .agents/
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - AGENTS.md
       - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/
     dependencies:
       - C010
@@ -590,6 +598,35 @@ changes:
     acceptance:
       - Codex generated surfaces come only from source templates and registries.
       - Generated parity and agent e2e checks cover the new surfaces.
+    selection:
+      selected_change_id: C011-codex-planning-adapter
+      reason: >
+        User approved C011 after C010 accepted DTC, AC, and SC as formal
+        /ow:* command ids; C011 delivers those ids through generated Codex
+        repo-local skills.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C011-codex-planning-adapter
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/commands/registry.ts
+        - packages/core/src/onboarding/agentsGuide.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - references/planning-skill-runtime-exposure.md
+        - .agents/openworkflow-adapter.yaml
+        - .agents/skills/ow-decompose-to-changes/SKILL.md
+        - .agents/skills/ow-analyze-changes/SKILL.md
+        - .agents/skills/ow-select-change/SKILL.md
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/IMPLEMENTATION_BRIEF.md
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: npm run verify:agent-e2e"
+        - "validation: git diff --check"
   - id: C012
     status: done
     title: Add planning artifact read-model verification fixtures
@@ -647,7 +684,7 @@ changes:
         - "validation: npm run verify:agent-e2e"
         - "validation: git diff --check"
   - id: C013
-    status: candidate
+    status: ready
     title: Reassess full planning skill runtime exposure
     purpose: >
       Reassess C004 after registration, semantic registry, adapter, and
@@ -971,4 +1008,50 @@ operations:
       - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml
       - changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md
       - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP020
+    operation_type: select
+    target_candidate_ids:
+      - C011
+    actor: agent
+    reason: >
+      User approved C011 after C010 established formal /ow:* command semantics
+      for decompose-to-changes, analyze-changes, and select-change.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP021
+    operation_type: complete
+    target_candidate_ids:
+      - C011
+    actor: agent
+    reason: >
+      The Codex adapter now generates repo-local skills, manifest entries,
+      command audit entries, and context packets for the three accepted
+      planning commands from source registry data.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/planning-skill-runtime-exposure.md
+      - .agents/openworkflow-adapter.yaml
+      - .agents/skills/ow-decompose-to-changes/SKILL.md
+      - .agents/skills/ow-analyze-changes/SKILL.md
+      - .agents/skills/ow-select-change/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/IMPLEMENTATION_BRIEF.md
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: npm run verify:agent-e2e"
       - "validation: git diff --check"

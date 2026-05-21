@@ -124,6 +124,33 @@ commands:
     legacy_triggers:
       - /run-team
       - /build-team
+  - id: decompose-to-changes
+    trigger: /ow:decompose-to-changes
+    visibility: user
+    skill_name: ow-decompose-to-changes
+    explicit_invocation: $ow-decompose-to-changes
+    skill_path: .agents/skills/ow-decompose-to-changes/SKILL.md
+    interface_path: .agents/skills/ow-decompose-to-changes/agents/openai.yaml
+    legacy_triggers:
+      []
+  - id: analyze-changes
+    trigger: /ow:analyze-changes
+    visibility: user
+    skill_name: ow-analyze-changes
+    explicit_invocation: $ow-analyze-changes
+    skill_path: .agents/skills/ow-analyze-changes/SKILL.md
+    interface_path: .agents/skills/ow-analyze-changes/agents/openai.yaml
+    legacy_triggers:
+      []
+  - id: select-change
+    trigger: /ow:select-change
+    visibility: user
+    skill_name: ow-select-change
+    explicit_invocation: $ow-select-change
+    skill_path: .agents/skills/ow-select-change/SKILL.md
+    interface_path: .agents/skills/ow-select-change/agents/openai.yaml
+    legacy_triggers:
+      []
   - id: git-automation
     trigger: /ow:git-automation
     visibility: user
@@ -156,6 +183,12 @@ generated_files:
   - .agents/skills/ow-change/agents/openai.yaml
   - .agents/skills/ow-team/SKILL.md
   - .agents/skills/ow-team/agents/openai.yaml
+  - .agents/skills/ow-decompose-to-changes/SKILL.md
+  - .agents/skills/ow-decompose-to-changes/agents/openai.yaml
+  - .agents/skills/ow-analyze-changes/SKILL.md
+  - .agents/skills/ow-analyze-changes/agents/openai.yaml
+  - .agents/skills/ow-select-change/SKILL.md
+  - .agents/skills/ow-select-change/agents/openai.yaml
   - .agents/skills/ow-git-automation/SKILL.md
   - .agents/skills/ow-git-automation/agents/openai.yaml
 sync_command: openworkflow sync --tools codex

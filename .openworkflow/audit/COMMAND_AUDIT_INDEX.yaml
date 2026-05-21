@@ -235,6 +235,79 @@ commands:
       []
     handoff_commands:
       - /ow:change
+  - id: decompose-to-changes
+    trigger: /ow:decompose-to-changes
+    stage: planning
+    visibility: user
+    depth: deep
+    context_packet: context:decompose-to-changes
+    allowed_outputs:
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+      - changes/<plan_id>/CANDIDATE_CHANGES.md
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md when the next actionable work is high risk
+    conditional_outputs:
+      - "high-risk decision report when a risk: high candidate becomes the next actionable work"
+      - queue maintenance operation entries for add, update, split, merge, defer, block, supersede,
+        restore, or complete
+    forbidden_outputs:
+      - SELECTED_CHANGE.yaml
+      - ATOM_TASKS.yaml
+      - IMPLEMENTATION_BRIEF.md
+      - implementation code changes
+      - generated .agents/** or .openworkflow/** edits unless selected and explicitly approved
+    handoff_commands:
+      - /ow:analyze-changes
+      - /ow:select-change
+  - id: analyze-changes
+    trigger: /ow:analyze-changes
+    stage: planning
+    visibility: user
+    depth: deep
+    context_packet: context:analyze-changes
+    allowed_outputs:
+      - changes/<analysis_id>/CHANGE_ANALYSIS.yaml
+      - changes/<analysis_id>/CHANGE_ANALYSIS.md
+      - changes/<plan_id>/CHANGE_ANALYSIS.yaml for single-queue analysis
+      - changes/<plan_id>/CHANGE_ANALYSIS.md for single-queue analysis
+    conditional_outputs:
+      - high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md
+      - queue maintenance recommendation when no candidate is safe to select
+    forbidden_outputs:
+      - CANDIDATE_CHANGES.yaml mutations unless the user separately requests maintenance
+      - SELECTED_CHANGE.yaml
+      - ATOM_TASKS.yaml
+      - IMPLEMENTATION_BRIEF.md
+      - implementation code changes
+      - high-risk implementation approval
+    handoff_commands:
+      - /ow:select-change
+      - /ow:decompose-to-changes
+  - id: select-change
+    trigger: /ow:select-change
+    stage: planning
+    visibility: user
+    depth: deep
+    context_packet: context:select-change
+    allowed_outputs:
+      - changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml
+      - changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml
+      - changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md
+      - selection and operation entries in changes/<plan_id>/CANDIDATE_CHANGES.yaml
+      - refreshed changes/<plan_id>/CANDIDATE_CHANGES.md
+    conditional_outputs:
+      - rejected alternatives copied from CHANGE_ANALYSIS.yaml when consuming cross-queue analysis
+      - targeted readiness report when the user asks to inspect a candidate without selecting it
+    forbidden_outputs:
+      - implementation code changes
+      - local commits, stashes, resets, branch switches, or destructive git operations
+      - "risk: high selection without explicit approval of a concrete option from
+        HIGH_RISK_DECISION_REPORT.md"
+      - generated .agents/** or .openworkflow/** edits unless selected and explicitly approved
+    handoff_commands:
+      - /ow:change
+      - /ow:team
+      - /ow:git-automation
   - id: git-automation
     trigger: /ow:git-automation
     stage: governance

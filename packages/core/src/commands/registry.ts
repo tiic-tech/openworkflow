@@ -119,6 +119,38 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     teamProtocol(),
   ),
   command(
+    "decompose-to-changes",
+    [],
+    "Create, update, query, or maintain an OpenWorkflow candidate change queue.",
+    "planning",
+    [
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+      "changes/<plan_id>/CANDIDATE_CHANGES.md",
+      "changes/<plan_id>/SUMMARY.yaml",
+    ],
+    decomposeToChangesProtocol(),
+  ),
+  command(
+    "analyze-changes",
+    [],
+    "Analyze one or more candidate change queues and recommend the next candidate without selecting it.",
+    "planning",
+    ["changes/<analysis_id>/CHANGE_ANALYSIS.yaml", "changes/<analysis_id>/CHANGE_ANALYSIS.md"],
+    analyzeChangesProtocol(),
+  ),
+  command(
+    "select-change",
+    [],
+    "Select one implementable candidate change and create implementation-ready planning artifacts.",
+    "planning",
+    [
+      "changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md",
+    ],
+    selectChangeProtocol(),
+  ),
+  command(
     "git-automation",
     [],
     "Operate the managed git lifecycle shell for local branch, commit, PR-ready summary, and remote approval gates.",
@@ -151,6 +183,189 @@ function command(
     visibility,
     targetArtifacts,
     protocol,
+  };
+}
+
+function decomposeToChangesProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "candidate-queue-decomposition-and-maintenance",
+    requiredContext: [
+      "references/planning-artifact-contracts.md",
+      "skills/decompose-to-changes/references/decomposition-protocol.md",
+    ],
+    optionalContext: [
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+      "changes/<plan_id>/SUMMARY.yaml",
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
+      "docs/OW_DEVELOP_PLAN.md",
+      "docs/OW_DEVELOP_PLAN_Phase2.md",
+      "user-provided planning source",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+      "changes/<plan_id>/CANDIDATE_CHANGES.md",
+      "changes/<plan_id>/SUMMARY.yaml",
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md when the next actionable work is high risk",
+    ],
+    conditionalOutputs: [
+      "high-risk decision report when a risk: high candidate becomes the next actionable work",
+      "queue maintenance operation entries for add, update, split, merge, defer, block, supersede, restore, or complete",
+    ],
+    forbiddenOutputs: [
+      "SELECTED_CHANGE.yaml",
+      "ATOM_TASKS.yaml",
+      "IMPLEMENTATION_BRIEF.md",
+      "implementation code changes",
+      "generated .agents/** or .openworkflow/** edits unless selected and explicitly approved",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run git status --short --branch and record branch and dirty-tree state.",
+        "Decide whether this is new decomposition or maintenance of an existing queue.",
+        "Read existing queue YAML before changing candidate ids or statuses.",
+      ],
+      during: [
+        "Preserve stable candidate ids and branch_boundary when updating an existing queue.",
+        "Keep candidates focused, dependency-aware, and bounded by owned paths.",
+        "Append an operation entry for every queue maintenance edit.",
+      ],
+      after: [
+        "Refresh CANDIDATE_CHANGES.md as a readable view of YAML source truth.",
+        "Refresh SUMMARY.yaml with candidate count, next recommended candidate, risks, and validation evidence.",
+        "Stop with a high-risk report instead of selecting or implementing risk: high candidates.",
+      ],
+    },
+    antiPatterns: [
+      "Do not select a candidate from decompose-to-changes.",
+      "Do not implement code from decompose-to-changes.",
+      "Do not create a new top-level changes folder for every small candidate inside the same feat boundary.",
+      "Do not delete historical candidate ids; use status transitions and operation evidence.",
+    ],
+    handoffCommands: ["/ow:analyze-changes", "/ow:select-change"],
+  };
+}
+
+function analyzeChangesProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "read-only-cross-queue-priority-analysis",
+    requiredContext: [
+      "references/planning-artifact-contracts.md",
+      "skills/analyze-changes/references/analysis-protocol.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+    ],
+    optionalContext: [
+      "references/git-version-control-governance.md",
+      "references/issue-governance.md",
+      "changes/*/CANDIDATE_CHANGES.yaml when the user asks for global or cross-queue analysis",
+      "changes/<plan_id>/SUMMARY.yaml",
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      "changes/<analysis_id>/CHANGE_ANALYSIS.yaml",
+      "changes/<analysis_id>/CHANGE_ANALYSIS.md",
+      "changes/<plan_id>/CHANGE_ANALYSIS.yaml for single-queue analysis",
+      "changes/<plan_id>/CHANGE_ANALYSIS.md for single-queue analysis",
+    ],
+    conditionalOutputs: [
+      "high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md",
+      "queue maintenance recommendation when no candidate is safe to select",
+    ],
+    forbiddenOutputs: [
+      "CANDIDATE_CHANGES.yaml mutations unless the user separately requests maintenance",
+      "SELECTED_CHANGE.yaml",
+      "ATOM_TASKS.yaml",
+      "IMPLEMENTATION_BRIEF.md",
+      "implementation code changes",
+      "high-risk implementation approval",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run git status --short --branch and record branch and dirty-tree state.",
+        "Discover only user-provided queues, or obvious changes/*/CANDIDATE_CHANGES.yaml files when global analysis is requested.",
+        "Read YAML queues as source truth and Markdown views only as aids.",
+      ],
+      during: [
+        "Score candidates by readiness, dependency unlock value, risk, branch fit, dirty-tree fit, Issue linkage, validation realism, and user recency.",
+        "Treat high-risk candidates as stop recommendations unless a concrete high-risk option is already approved.",
+        "Recommend exactly one target plan id and candidate id only when evidence supports selection.",
+      ],
+      after: [
+        "Write CHANGE_ANALYSIS.yaml before CHANGE_ANALYSIS.md.",
+        "Record rejected alternatives with plan id, candidate id, and concise reasons.",
+        "Hand off to select-change without mutating selection artifacts.",
+      ],
+    },
+    antiPatterns: [
+      "Do not select candidates from analyze-changes.",
+      "Do not implement candidates from analyze-changes.",
+      "Do not treat CHANGE_ANALYSIS.yaml as approval for high-risk implementation.",
+      "Do not discover every queue unless the user requests global comparison.",
+    ],
+    handoffCommands: ["/ow:select-change", "/ow:decompose-to-changes"],
+  };
+}
+
+function selectChangeProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "single-candidate-selection-and-atomization",
+    requiredContext: [
+      "references/planning-artifact-contracts.md",
+      "skills/select-change/references/selection-protocol.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+    ],
+    optionalContext: [
+      "changes/<plan_id>/CANDIDATE_CHANGES.md",
+      "changes/<analysis_id>/CHANGE_ANALYSIS.yaml",
+      "changes/<plan_id>/SUMMARY.yaml",
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      "changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md",
+      "selection and operation entries in changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+      "refreshed changes/<plan_id>/CANDIDATE_CHANGES.md",
+    ],
+    conditionalOutputs: [
+      "rejected alternatives copied from CHANGE_ANALYSIS.yaml when consuming cross-queue analysis",
+      "targeted readiness report when the user asks to inspect a candidate without selecting it",
+    ],
+    forbiddenOutputs: [
+      "implementation code changes",
+      "local commits, stashes, resets, branch switches, or destructive git operations",
+      "risk: high selection without explicit approval of a concrete option from HIGH_RISK_DECISION_REPORT.md",
+      "generated .agents/** or .openworkflow/** edits unless selected and explicitly approved",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run git status --short --branch and compare current branch with queue_policy.branch_boundary.",
+        "Check dirty-tree state and stop if unrelated work would contaminate the selected change.",
+        "Confirm candidate dependencies, readiness, risk, owned paths, validation, and acceptance.",
+      ],
+      during: [
+        "Select exactly one candidate inside the owning queue folder.",
+        "Re-check high-risk approval before writing selection artifacts for risk: high candidates.",
+        "Keep atom tasks small enough for one focused implementation pass.",
+      ],
+      after: [
+        "Update candidate status to selected and append a selection operation.",
+        "Refresh the readable Markdown queue view.",
+        "Stop before implementation unless the user explicitly asks to continue.",
+      ],
+    },
+    antiPatterns: [
+      "Do not silently select a high-risk candidate.",
+      "Do not select on the wrong branch without an explicit planning-only exception.",
+      "Do not mark the candidate done from select-change.",
+      "Do not create a new top-level changes folder for a candidate inside an existing feat queue.",
+    ],
+    handoffCommands: ["/ow:change", "/ow:team", "/ow:git-automation"],
   };
 }
 

@@ -372,6 +372,105 @@ packets:
           CURRENT_STATE.yaml with current_run, blockers, and next action.
         - Run the verification named by the change plan when practical.
         - Report changed artifacts, verification result, and remaining blockers.
+  - packet_id: context:decompose-to-changes
+    command: /ow:decompose-to-changes
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+    optional:
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+      - docs/OW_DEVELOP_PLAN.md
+      - docs/OW_DEVELOP_PLAN_Phase2.md
+      - user-provided planning source
+    forbidden:
+      []
+    conditional_outputs:
+      - "high-risk decision report when a risk: high candidate becomes the next actionable work"
+      - queue maintenance operation entries for add, update, split, merge, defer, block, supersede,
+        restore, or complete
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and record branch and dirty-tree state.
+        - Decide whether this is new decomposition or maintenance of an existing queue.
+        - Read existing queue YAML before changing candidate ids or statuses.
+      during:
+        - Preserve stable candidate ids and branch_boundary when updating an existing queue.
+        - Keep candidates focused, dependency-aware, and bounded by owned paths.
+        - Append an operation entry for every queue maintenance edit.
+      after:
+        - Refresh CANDIDATE_CHANGES.md as a readable view of YAML source truth.
+        - Refresh SUMMARY.yaml with candidate count, next recommended candidate, risks, and
+          validation evidence.
+        - "Stop with a high-risk report instead of selecting or implementing risk: high candidates."
+  - packet_id: context:analyze-changes
+    command: /ow:analyze-changes
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/*/CANDIDATE_CHANGES.yaml when the user asks for global or cross-queue analysis
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+    forbidden:
+      []
+    conditional_outputs:
+      - high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md
+      - queue maintenance recommendation when no candidate is safe to select
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and record branch and dirty-tree state.
+        - Discover only user-provided queues, or obvious changes/*/CANDIDATE_CHANGES.yaml files when
+          global analysis is requested.
+        - Read YAML queues as source truth and Markdown views only as aids.
+      during:
+        - Score candidates by readiness, dependency unlock value, risk, branch fit, dirty-tree fit,
+          Issue linkage, validation realism, and user recency.
+        - Treat high-risk candidates as stop recommendations unless a concrete high-risk option is
+          already approved.
+        - Recommend exactly one target plan id and candidate id only when evidence supports
+          selection.
+      after:
+        - Write CHANGE_ANALYSIS.yaml before CHANGE_ANALYSIS.md.
+        - Record rejected alternatives with plan id, candidate id, and concise reasons.
+        - Hand off to select-change without mutating selection artifacts.
+  - packet_id: context:select-change
+    command: /ow:select-change
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - changes/<plan_id>/CANDIDATE_CHANGES.md
+      - changes/<analysis_id>/CHANGE_ANALYSIS.yaml
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+    forbidden:
+      []
+    conditional_outputs:
+      - rejected alternatives copied from CHANGE_ANALYSIS.yaml when consuming cross-queue analysis
+      - targeted readiness report when the user asks to inspect a candidate without selecting it
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and compare current branch with
+          queue_policy.branch_boundary.
+        - Check dirty-tree state and stop if unrelated work would contaminate the selected change.
+        - Confirm candidate dependencies, readiness, risk, owned paths, validation, and acceptance.
+      during:
+        - Select exactly one candidate inside the owning queue folder.
+        - "Re-check high-risk approval before writing selection artifacts for risk: high candidates."
+        - Keep atom tasks small enough for one focused implementation pass.
+      after:
+        - Update candidate status to selected and append a selection operation.
+        - Refresh the readable Markdown queue view.
+        - Stop before implementation unless the user explicitly asks to continue.
   - packet_id: context:git-automation
     command: /ow:git-automation
     visibility: user

@@ -22,6 +22,9 @@ const SKILL_NAMES = [
   "ow-spec",
   "ow-change",
   "ow-team",
+  "ow-decompose-to-changes",
+  "ow-analyze-changes",
+  "ow-select-change",
   "ow-git-automation",
 ] as const;
 
@@ -209,6 +212,9 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
+    "/ow:decompose-to-changes",
+    "/ow:analyze-changes",
+    "/ow:select-change",
     "/ow:git-automation",
     "Respect lazy creation",
   ]) {
@@ -238,6 +244,9 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
     "/ow:team",
+    "/ow:decompose-to-changes",
+    "/ow:analyze-changes",
+    "/ow:select-change",
     "/ow:git-automation",
     "Lazy creation boundary",
     "Sync safety",
@@ -983,6 +992,15 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-team") {
       verifyTeamSkill(skillContent);
     }
+    if (name === "ow-decompose-to-changes") {
+      verifyDecomposeToChangesSkill(skillContent);
+    }
+    if (name === "ow-analyze-changes") {
+      verifyAnalyzeChangesSkill(skillContent);
+    }
+    if (name === "ow-select-change") {
+      verifySelectChangeSkill(skillContent);
+    }
     if (name === "ow-git-automation") {
       verifyGitAutomationSkill(skillContent);
     }
@@ -1493,6 +1511,50 @@ function verifyGitAutomationSkill(content: string): void {
     "openworkflow git-automation draft-pr",
   ]) {
     assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
+  }
+}
+
+function verifyDecomposeToChangesSkill(content: string): void {
+  for (const required of [
+    "Create, update, query, or maintain an OpenWorkflow candidate change queue.",
+    "candidate-queue-decomposition-and-maintenance",
+    "skills/decompose-to-changes/references/decomposition-protocol.md",
+    "changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml",
+    "HIGH_RISK_DECISION_REPORT.md when the next actionable work is high risk",
+    "Do not select a candidate from decompose-to-changes.",
+    "/ow:analyze-changes",
+    "/ow:select-change",
+  ]) {
+    assert(content.includes(required), `ow-decompose-to-changes missing planning guidance: ${required}`);
+  }
+}
+
+function verifyAnalyzeChangesSkill(content: string): void {
+  for (const required of [
+    "Analyze one or more candidate change queues and recommend the next candidate without selecting it.",
+    "read-only-cross-queue-priority-analysis",
+    "skills/analyze-changes/references/analysis-protocol.md",
+    "CHANGE_ANALYSIS.yaml",
+    "high-risk stop recommendation",
+    "Do not select candidates from analyze-changes.",
+    "/ow:select-change",
+  ]) {
+    assert(content.includes(required), `ow-analyze-changes missing planning guidance: ${required}`);
+  }
+}
+
+function verifySelectChangeSkill(content: string): void {
+  for (const required of [
+    "Select one implementable candidate change and create implementation-ready planning artifacts.",
+    "single-candidate-selection-and-atomization",
+    "skills/select-change/references/selection-protocol.md",
+    "SELECTED_CHANGE.yaml",
+    "ATOM_TASKS.yaml",
+    "IMPLEMENTATION_BRIEF.md",
+    "Do not silently select a high-risk candidate.",
+    "/ow:git-automation",
+  ]) {
+    assert(content.includes(required), `ow-select-change missing planning guidance: ${required}`);
   }
 }
 

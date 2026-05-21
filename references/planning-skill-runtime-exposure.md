@@ -92,12 +92,14 @@ OpenWorkflow semantic command ids:
   `IMPLEMENTATION_BRIEF.md` for one commit-sized candidate. It must re-check
   branch, dirty-tree, dependency, and high-risk gates before selection.
 
-These command ids are core semantic decisions, not adapter delivery decisions.
-Core owns the command names, source-of-truth behavior boundaries, required and
-forbidden context, output contracts, and high-risk gates. Source skills remain
-the behavior references until runtime registry code and adapter generation are
-implemented. Codex `.agents/skills/ow-*` delivery belongs to a later generated
-surface candidate.
+These command ids are core semantic decisions. Core owns the command names,
+source-of-truth behavior boundaries, required and forbidden context, output
+contracts, and high-risk gates.
+
+The C011 generated-surface follow-up delivers these command ids through Codex
+repo-local skills generated from the command registry. Source skills remain the
+behavior references for the planning protocols; generated `.agents/skills/ow-*`
+surfaces must stay derived from source registries and templates.
 
 ## Read-Model Expectations
 
@@ -125,8 +127,8 @@ Future runtime exposure should be split into smaller candidates:
   contract. Complete when limited to contract/reference design.
 - `C010`: add command or capability registry semantics without adapter
   generation. High risk until a specific registry boundary is approved.
-- `C011`: add Codex adapter generation for accepted planning surfaces. High
-  risk because it changes generated delivery.
+- `C011`: add Codex adapter generation for accepted planning surfaces. Complete
+  for Codex repo-local delivery of DTC, AC, and SC generated skills.
 - `C012`: add runtime-surface and agent e2e verification fixtures. Medium risk
   when it only verifies existing source behavior; high risk if it changes
   generated surfaces.
