@@ -24,11 +24,11 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: none
 
-Completed candidates: `C001`, `C002`, `C003`, `C004`
+Completed candidates: `C001`, `C002`, `C003`, `C004`, `C005`
 
-Selected candidate: `C005`
+Selected candidate: none
 
-Next recommended candidate: `C005`
+Next recommended candidate: none. M85 is complete.
 
 ## Command Boundary Decision
 
@@ -88,10 +88,12 @@ Completed in commit `c56b3c9`.
 
 ### C005 - Make agent-auto validation artifact-producing before proto
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
 Corrects the prior read-only gate decision so missing validation before
 `/ow:proto` becomes an artifact-producing validation preflight, not ephemeral
 context.
+
+Completed in commit `c21b560`.

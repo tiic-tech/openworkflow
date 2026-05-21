@@ -6,7 +6,7 @@ selected_change_id: C005-agent-auto-validation-artifacts
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C005
 title: Make agent-auto validation artifact-producing before proto
-status: selected
+status: complete
 selection_reason: >
   The prior read-only gate loses validation artifacts in the audit chain. C005
   makes agent-auto validation produce the same durable artifact set as explicit
@@ -54,6 +54,11 @@ validation:
 risk:
   level: medium
   high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: c21b560
+  evidence:
+    - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary: >
   Complete as one local commit because provenance, proto readiness, generated
   guidance, and verification must stay aligned.

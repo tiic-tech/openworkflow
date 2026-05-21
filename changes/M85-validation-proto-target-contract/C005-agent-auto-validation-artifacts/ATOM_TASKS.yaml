@@ -6,11 +6,11 @@ selected_change_id: C005-agent-auto-validation-artifacts
 source_plan_id: M85-validation-proto-target-contract
 source_candidate_id: C005
 title: Atom tasks for agent-auto validation artifacts
-status: ready
+status: complete
 tasks:
   - task_id: T001
     title: Add validation trigger provenance
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/artifacts/registry.ts
@@ -22,7 +22,7 @@ tasks:
       validation_target exposes trigger.mode, requested_command, and reason.
   - task_id: T002
     title: Make missing validation a proto preflight blocker
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/artifacts/readiness.ts
@@ -32,7 +32,7 @@ tasks:
       blocker and instructs the agent to write validation artifacts first.
   - task_id: T003
     title: Refresh generated surfaces and tests
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts

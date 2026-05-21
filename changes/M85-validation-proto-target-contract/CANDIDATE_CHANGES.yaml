@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M85-validation-proto-target-contract
 title: Candidate changes for validation prototype target contract
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -87,7 +87,7 @@ scope_control:
       reason: >
         End-to-end pressure testing belongs after command-specific contracts land.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -315,7 +315,7 @@ changes:
       evidence:
         - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
-    status: selected
+    status: done
     title: Make agent-auto validation artifact-producing before proto
     purpose: >
       Correct M85's read-only gate decision so /ow:proto without current
@@ -373,6 +373,12 @@ changes:
         User corrected the workflow decision: agent-triggered validation must
         be durable and audit-visible, not ephemeral read-only context.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C005-agent-auto-validation-artifacts
+      completed_at: 2026-05-22
+      commit: c21b560
+      evidence:
+        - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -537,3 +543,16 @@ operations:
       - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/SELECTED_CHANGE.yaml
       - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/ATOM_TASKS.yaml
       - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 made missing validation before /ow:proto an artifact-producing
+      auto-validation preflight with explicit trigger provenance.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M85-validation-proto-target-contract/C005-agent-auto-validation-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
