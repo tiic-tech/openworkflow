@@ -485,6 +485,7 @@ Selection: `G017-autonomous-git-simulator`
 
 Completion evidence:
 
+- `commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282`
 - `packages/core/src/git/autonomousSimulator.ts`
 - `packages/cli/src/commands/gitAutomation.ts`
 - `packages/cli/src/index.ts`
@@ -495,6 +496,7 @@ Completion evidence:
 - `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
 - `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml`
+- `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ## G018 - Plan Narrow Autonomous Remote Pilot
 

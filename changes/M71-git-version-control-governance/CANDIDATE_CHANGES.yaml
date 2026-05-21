@@ -1005,7 +1005,9 @@ changes:
     completion:
       completed_by_change_id: G017-autonomous-git-simulator
       completed_at: 2026-05-21
+      primary_commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282
       evidence:
+        - "commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282"
         - packages/core/src/git/autonomousSimulator.ts
         - packages/cli/src/commands/gitAutomation.ts
         - packages/cli/src/index.ts
@@ -1016,6 +1018,7 @@ changes:
         - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
         - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml
         - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/LOCAL_COMMIT_EVIDENCE.yaml
         - "validation: npm run validate"
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
@@ -1664,6 +1667,7 @@ operations:
     before_status: selected
     after_status: done
     evidence:
+      - "commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282"
       - packages/core/src/git/autonomousSimulator.ts
       - packages/cli/src/commands/gitAutomation.ts
       - packages/cli/src/index.ts
@@ -1674,6 +1678,7 @@ operations:
       - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
       - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/LOCAL_COMMIT_EVIDENCE.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
       - "validation: npm run verify:runtime-surface"

@@ -64,7 +64,7 @@ key_dependencies:
   - G014 is complete and generates local PR-ready summaries without remote mutation.
   - G015 is complete and introduces the managed git-automation command shell with remote operation planning.
   - G016 is complete and defines the design-only autonomous git automation lifecycle contract.
-  - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation.
+  - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation; primary commit 5a5d2e21008b9e31456a9b8b9810cf1014dca282 records the implementation.
   - G018 is ready but high risk because it plans the first narrow autonomous remote mutation pilot.
 risks:
   - id: R001
