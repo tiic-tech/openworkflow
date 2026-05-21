@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G004`.
+- Next recommended candidate: `G005`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -111,7 +111,7 @@ Completion evidence:
 
 ## G004 - Validate Git Governance Fields And Completion Evidence
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -131,6 +131,15 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G004-git-governance-validation`
+
+Completion evidence:
+
+- `packages/core/src/validators/validateRepositoryContracts.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml`
 
 ## G005 - Define Feat Completion And PR-Ready Summary Artifact
 

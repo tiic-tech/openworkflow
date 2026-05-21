@@ -293,6 +293,7 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
+      validateCandidateChanges(root, path, data, errors);
     }
   }
 }
@@ -842,6 +843,72 @@ function validateCurrentState(root: string, path: string, data: Record<string, u
   }
   if (!isRecord(data.last_decision)) {
     errors.push(`${label} last_decision must be a mapping`);
+  }
+}
+
+function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "CANDIDATE_CHANGES.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  if (data.planning_artifact_type !== "candidate_changes") {
+    return;
+  }
+  const queuePolicy = data.queue_policy;
+  if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
+    validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
+  }
+  if (!Array.isArray(data.changes)) {
+    errors.push(`${label} changes must be a list`);
+    return;
+  }
+  for (const candidate of data.changes) {
+    if (!isRecord(candidate)) {
+      errors.push(`${label} changes entries must be mappings`);
+      continue;
+    }
+    validateCandidateCompletionEvidence(label, candidate, errors);
+  }
+}
+
+function validateBranchBoundary(label: string, value: unknown, errors: string[]): void {
+  if (!nonEmptyString(value)) {
+    errors.push(`${label} queue_policy.branch_boundary must be a non-empty string when present`);
+    return;
+  }
+  const branch = String(value).trim();
+  if (branch !== value || branch.includes(" ") || branch.startsWith("/") || branch.endsWith("/")) {
+    errors.push(`${label} queue_policy.branch_boundary must be a branch-like string without spaces or leading/trailing slashes`);
+  }
+}
+
+function validateCandidateCompletionEvidence(
+  label: string,
+  candidate: Record<string, unknown>,
+  errors: string[],
+): void {
+  if (candidate.status !== "done") {
+    return;
+  }
+  const id = typeof candidate.id === "string" ? candidate.id : "<unknown>";
+  const completion = candidate.completion;
+  if (!isRecord(completion)) {
+    errors.push(`${label} ${id} done candidate must include completion evidence`);
+    return;
+  }
+  const evidence = completion.evidence;
+  if (!Array.isArray(evidence) || evidence.length === 0) {
+    errors.push(`${label} ${id} completion.evidence must be a non-empty list`);
+    return;
+  }
+  for (const item of evidence) {
+    if (typeof item !== "string") {
+      errors.push(`${label} ${id} completion.evidence values must be strings`);
+      continue;
+    }
+    if (item.startsWith("commit:") && !/^commit:\s+[0-9a-f]{7,40}$/i.test(item)) {
+      errors.push(`${label} ${id} completion commit evidence must use 'commit: <7-40 hex chars>'`);
+    }
   }
 }
 

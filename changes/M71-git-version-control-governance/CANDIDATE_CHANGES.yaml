@@ -21,7 +21,7 @@ queue_policy:
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable G-prefixed ids are assigned once and referenced by select-change, completion records, commits, and PR summaries.
   feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat for git version control governance.
-  branch_boundary: The owning branch for this feat is codex/m71-git-version-governance.
+  branch_boundary: codex/m71-git-version-governance
   selected_artifact_location: changes/M71-git-version-control-governance/<candidate-id>-<slug>/
   commit_policy: Each selected candidate should complete with one coherent git commit whose message references the plan id and candidate id.
   pr_policy: A PR should represent the feat branch, summarize all completed and deferred candidates, and link validation evidence.
@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G004
+next_recommended_candidate_id: G005
 changes:
   - id: G001
     status: done
@@ -221,7 +221,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G004
-    status: ready
+    status: done
     title: Validate git governance fields and completion evidence
     purpose: >
       Extend repository validation so planning queues can enforce required git
@@ -258,6 +258,23 @@ changes:
       - Repository validation catches malformed branch boundary fields in generated fixtures.
       - Runtime-surface verification includes at least one negative case for git governance metadata.
       - Historical queues remain valid unless they opt into the new fields incorrectly.
+    selection:
+      selected_change_id: G004-git-governance-validation
+      reason: >
+        G004 is ready after G002 and G003 and provides mechanical validation
+        before later fixtures rely on branch-governed queue metadata.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G004-git-governance-validation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
   - id: G005
     status: ready
     title: Define feat completion and PR-ready summary artifact
@@ -720,3 +737,33 @@ operations:
       - "validation: quick_validate.py skills/select-change"
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP014
+    operation_type: select
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: Select G004 because DTC and select-change now both emit or consume branch governance and need validation coverage.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: Complete G004 after adding branch-governance validation and runtime negative coverage.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"

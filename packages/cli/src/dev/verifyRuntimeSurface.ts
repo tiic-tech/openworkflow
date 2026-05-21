@@ -941,11 +941,13 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const manifest = join(REPO_ROOT, ".agents", "openworkflow-adapter.yaml");
   const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
   const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
+  const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
   const originalCommandAudit = await read(commandAudit);
   const originalHighRiskReport = await read(highRiskReport);
+  const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -971,11 +973,17 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const missingHighRiskSection = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(missingHighRiskSection.code !== 0, "validate passed after high-risk report section was removed");
     assert(missingHighRiskSection.output.includes("missing high-risk report section: Validation Expectations"), "high-risk report validation did not explain missing section");
+
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue.replace("branch_boundary: codex/m71-git-version-governance", "branch_boundary: bad branch with spaces"), "utf8");
+    const malformedBranchBoundary = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedBranchBoundary.code !== 0, "validate passed after branch boundary was malformed");
+    assert(malformedBranchBoundary.output.includes("queue_policy.branch_boundary"), "branch boundary validation did not explain malformed branch boundary");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
     await writeFile(commandAudit, originalCommandAudit, "utf8");
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
   }
 }
 

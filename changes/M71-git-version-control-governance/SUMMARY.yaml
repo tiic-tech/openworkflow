@@ -21,22 +21,25 @@ outputs:
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 10
-completed_candidate_id: G003
-completed_change_id: G003-select-branch-dirty-guards
-previous_completed_candidate_id: G002
-previous_completed_change_id: G002-dtc-branch-boundary-fields
-earlier_completed_candidate_id: G010
-earlier_completed_change_id: G010-analyze-changes-skill
-prior_completed_candidate_id: G008
-prior_completed_change_id: G008-issue-governance-source-of-truth
+completed_candidate_id: G004
+completed_change_id: G004-git-governance-validation
+previous_completed_candidate_id: G003
+previous_completed_change_id: G003-select-branch-dirty-guards
+earlier_completed_candidate_id: G002
+earlier_completed_change_id: G002-dtc-branch-boundary-fields
+prior_completed_candidate_id: G010
+prior_completed_change_id: G010-analyze-changes-skill
+issue_completed_candidate_id: G008
+issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G004
+next_recommended_candidate_id: G005
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
   - G002 is complete and teaches decompose-to-changes to record branch boundaries.
   - G003 is complete and teaches select-change to guard branch and dirty-tree state.
+  - G004 is complete and validates branch-governance metadata.
   - G002 and G003 must complete before G004 can validate the new behavior.
   - G005 should complete before any PR-ready handoff fixture work.
   - G008 defines Issue source-of-truth rules before gh operation boundaries or cross-queue analysis depend on Issues.
@@ -80,3 +83,4 @@ validation:
     - G010 completed the analyze-changes skill and made G002 the next recommended governance hardening change.
     - G002 completed DTC branch-boundary guidance and made G003 the next recommended governance hardening change.
     - G003 completed select-change branch and dirty-tree guards and made G004 ready.
+    - G004 completed branch-governance validation and made G005 the next recommended governance change.

@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:G004-git-governance-validation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G004-git-governance-validation
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G004
+title: Validate git governance fields and completion evidence
+status: done
+selection_reason: >
+  G004 is ready after G002 and G003. It adds mechanical validation for branch
+  boundary metadata and completion evidence shape before downstream dogfood
+  fixtures rely on the governance fields.
+rejected_alternatives:
+  - candidate_ref: G005
+    reason: PR-ready summaries should follow validation for branch-governed queues.
+  - candidate_ref: G006
+    reason: fixtures depend on G004 and G005.
+  - candidate_ref: G009
+    reason: gh operation boundaries can wait until local git governance validation exists.
+scope:
+  includes:
+    - validation for queue_policy.branch_boundary when present
+    - validation for selected candidate completion commit evidence when done
+    - negative runtime-surface coverage for malformed git governance fields
+    - compatibility with existing queues that predate branch governance
+  excludes:
+    - forcing every historical queue to add branch fields immediately
+    - git command execution
+    - PR creation
+owned_paths:
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M71-git-version-control-governance/G004-git-governance-validation/
+forbidden_paths:
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Repository validation accepts the new M71 queue shape.
+  - Repository validation catches malformed branch boundary fields in generated fixtures.
+  - Runtime-surface verification includes at least one negative case for git governance metadata.
+  - Historical queues remain valid unless they opt into the new fields incorrectly.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"
