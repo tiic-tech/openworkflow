@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G007`.
+- Next recommended candidate: `G011`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -207,7 +207,7 @@ Completion evidence:
 
 ## G007 - Decide Whether OW Should Automate Git And Gh Mutation Operations
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -232,6 +232,128 @@ without explicit approval of a concrete high-risk decision option.
 High-risk report:
 
 - `changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md`
+
+Decision: approved Option B plus narrowed local automation. Remote push, remote
+PR creation, Issue mutation, and merge still require explicit approval.
+
+## G011 - Formalize Approved Local Git Automation Command Contract
+
+Status: `ready`
+
+Risk: `medium`
+
+Purpose: define the command-level contract for future `ow:git-automation`, with
+a strict split between approved local automation and separately approved remote
+mutation.
+
+Dependencies: `G007`
+
+Owned paths:
+
+- `references/git-version-control-governance.md`
+- `references/gh-operation-governance.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M71-git-version-control-governance/G011-local-git-automation-contract/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+## G012 - Implement Local Feat Branch Creation For Candidate Queues
+
+Status: `candidate`
+
+Risk: `medium`
+
+Purpose: add local-only automation that creates or checks out the branch
+recorded by a queue's `queue_policy.branch_boundary` when starting a new feat.
+
+Dependencies: `G011`
+
+Owned paths:
+
+- `packages/core/src/`
+- `packages/cli/src/`
+- `changes/M71-git-version-control-governance/G012-local-feat-branch-automation/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
+
+## G013 - Implement Selected-Change Local Commit Automation
+
+Status: `candidate`
+
+Risk: `medium`
+
+Purpose: add local-only automation that commits exactly one completed selected
+change after validation evidence is present.
+
+Dependencies: `G011`, `G012`
+
+Owned paths:
+
+- `packages/core/src/`
+- `packages/cli/src/`
+- `changes/M71-git-version-control-governance/G013-selected-change-commit-automation/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
+
+## G014 - Implement Local PR-Ready Summary Generation For Completed Queues
+
+Status: `candidate`
+
+Risk: `medium`
+
+Purpose: add local-only automation that creates `PR_READY_SUMMARY.md` for a
+fully implemented and validated `CANDIDATE_CHANGES` queue.
+
+Dependencies: `G011`, `G013`
+
+Owned paths:
+
+- `packages/core/src/`
+- `packages/cli/src/`
+- `changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
+
+## G015 - Add Ow:Git-Automation Command Shell With Remote Approval Gates
+
+Status: `candidate`
+
+Risk: `high`
+
+Purpose: introduce the command surface for approved local git automation while
+requiring explicit user approval before push, remote PR creation, Issue
+mutation, or merge.
+
+Dependencies: `G011`, `G012`, `G013`, `G014`
+
+Owned paths:
+
+- `packages/core/src/commands/registry.ts`
+- `packages/adapters/codex/src/`
+- `packages/cli/src/`
+- `skills/`
+- `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

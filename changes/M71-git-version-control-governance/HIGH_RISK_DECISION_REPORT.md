@@ -85,22 +85,48 @@ creation, or merge behavior.
 Impact: highest risk. This should not proceed until OW has a mature permission,
 preview, rollback, and audit model.
 
+## Approved Decision
+
+Approved on 2026-05-21: proceed with **Option B plus a narrowed local
+automation path**.
+
+The approved path allows OW to design and later implement local-only git
+automation for:
+
+- binding each `CANDIDATE_CHANGES.yaml` feat queue to a local branch
+- creating or checking out the local feat branch for that queue
+- committing one completed selected change as one local commit
+- generating a PR-ready summary for a fully implemented and validated queue
+
+Remote-impacting operations remain outside the approved scope unless the user
+gives explicit operation-level approval:
+
+- pushing a branch
+- creating or updating a remote PR
+- merging a PR
+- editing or closing GitHub Issues
+- any other `gh` mutation
+
+Future `ow:git-automation` work must preserve this split: local automation may
+be implemented under explicit command governance, while remote mutation stays
+behind preview, target-specific approval, and audit evidence.
+
 ## Recommended Path
 
-Choose Option B now.
+Choose Option B plus the narrowed local automation path.
 
 Reason: M71 has already established the local governance model and gh operation
-tiers. The next best step is to keep mutation automation out of scope while
-hardening the approval model, dry-run expectations, and local audit artifacts.
-This preserves OW as an audit-first dogfood system and avoids prematurely
-granting it remote mutation authority.
+tiers. The next best step is to keep remote mutation automation out of scope
+while allowing local branch, local commit, and PR-ready summary automation under
+strict command governance.
 
-After Option B, a later queue can consider Option C for read-only gh inspection.
-Evidence-writing or mutation should remain separate high-risk candidates.
+After the local path is implemented, later queues can consider read-only gh
+inspection. Evidence-writing or remote mutation should remain separate
+high-risk candidates.
 
 ## Guardrails
 
-- No automatic branch switching.
+- No automatic branch switching outside an approved local feat-branch workflow.
 - No automatic push.
 - No force-push.
 - No Issue creation, body edit, closure, or destructive label change.
@@ -108,10 +134,14 @@ Evidence-writing or mutation should remain separate high-risk candidates.
 - No mutation based only on inferred user intent.
 - Every remote-impacting operation must have a previewable payload, explicit
   user approval, local audit evidence, and a target URL or identifier.
-- `select-change` must not select a high-risk mutation candidate unless the
-  approved option is named in the selection reason.
+- Local branch creation/checkout must be tied to one queue's
+  `queue_policy.branch_boundary`.
+- Local commit automation must only run after the selected change is complete,
+  validated, and scoped to one candidate.
+- PR-ready summary generation must be local-only unless separate remote approval
+  is granted.
 - Any approved follow-up must be narrower than G007 and should become a new
-  candidate or replacement queue before implementation.
+  candidate before implementation.
 
 ## Go Criteria
 
@@ -123,6 +153,7 @@ option:
 - `Approve Option C`
 - `Approve Option D` with an exact remote target and payload class
 - `Approve Option E` with exact operations and guardrails
+- `Approve B + local automation`, which has been approved in this report
 
 Ambiguous instructions such as "continue" or "go ahead" are not enough for git
 or gh mutation automation.

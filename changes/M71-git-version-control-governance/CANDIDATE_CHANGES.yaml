@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G007
+next_recommended_candidate_id: G011
 changes:
   - id: G001
     status: done
@@ -383,7 +383,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G007
-    status: ready
+    status: done
     title: Decide whether OW should automate git and gh mutation operations
     purpose: >
       Produce a high-risk decision packet for any future move from planning
@@ -420,6 +420,15 @@ changes:
       - The report separates branch creation, local commit, push, issue mutation, and PR creation decisions.
       - The report defines explicit user approval conditions and stop criteria.
       - No automated git or gh mutation implementation is performed by this candidate.
+    completion:
+      completed_by_change_id: G007-git-automation-high-risk-decision-report
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+        - "approved: Option B plus narrowed local automation path"
+        - "remote operations still require explicit user approval"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G008
     status: done
     title: Formalize Issue governance and source-of-truth rules
@@ -591,6 +600,198 @@ changes:
         - "validation: quick_validate.py skills/analyze-changes"
         - "validation: npm run validate"
         - "validation: git diff --check"
+  - id: G011
+    status: ready
+    title: Formalize approved local git automation command contract
+    purpose: >
+      Define the command-level contract for future `ow:git-automation`, with a
+      strict split between approved local automation and separately approved
+      remote mutation.
+    scope:
+      includes:
+        - local branch creation and checkout boundary
+        - selected-change commit boundary
+        - local PR-ready summary generation boundary
+        - dry-run and preview expectations
+        - explicit exclusion of push, merge, and gh mutation without approval
+      excludes:
+        - implementing the command
+        - running git mutation commands
+        - pushing branches
+        - creating remote PRs
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/
+    dependencies:
+      - G007
+    unlocks:
+      - G012
+      - G013
+      - G014
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The approved local automation boundary is documented.
+      - The future command contract separates local automation from remote mutation.
+      - The contract requires preview or dry-run behavior before mutation.
+      - Remote push, PR creation, Issue mutation, and merge remain explicit-approval operations.
+  - id: G012
+    status: candidate
+    title: Implement local feat branch creation for candidate queues
+    purpose: >
+      Add local-only automation that creates or checks out the branch recorded
+      by a queue's `queue_policy.branch_boundary` when starting a new feat.
+    scope:
+      includes:
+        - local branch existence check
+        - local branch creation from the current base when approved by command contract
+        - refusal on dirty-tree or branch-boundary mismatch
+        - audit evidence written to local planning artifacts
+      excludes:
+        - pushing branches
+        - deleting branches
+        - rebasing or resetting
+        - remote PR creation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/
+    dependencies:
+      - G011
+    unlocks:
+      - G013
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Local branch automation only uses the recorded branch boundary.
+      - The command stops on dirty-tree risk.
+      - No remote operation is performed.
+      - Audit evidence records branch action and queue id.
+  - id: G013
+    status: candidate
+    title: Implement selected-change local commit automation
+    purpose: >
+      Add local-only automation that commits exactly one completed selected
+      change after validation evidence is present.
+    scope:
+      includes:
+        - one selected change to one local commit
+        - commit message using plan id and candidate id
+        - validation evidence gate before commit
+        - completion evidence update with commit hash after commit
+      excludes:
+        - committing dirty unrelated paths
+        - amending previous commits
+        - pushing commits
+        - remote PR creation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/
+    dependencies:
+      - G011
+      - G012
+    unlocks:
+      - G014
+      - G015
+    risk: medium
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Commit automation refuses unrelated dirty paths.
+      - Commit message includes plan id and candidate id.
+      - Commit hash is recorded as completion evidence.
+      - No push or remote mutation occurs.
+  - id: G014
+    status: candidate
+    title: Implement local PR-ready summary generation for completed queues
+    purpose: >
+      Add local-only automation that creates `PR_READY_SUMMARY.md` for a fully
+      implemented and validated `CANDIDATE_CHANGES` queue.
+    scope:
+      includes:
+        - completed, deferred, blocked, and high-risk candidate summary
+        - branch and commit evidence summary
+        - validation evidence summary
+        - explicit remote PR non-creation notice
+      excludes:
+        - creating a remote PR
+        - pushing a branch
+        - editing GitHub PR body
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/
+    dependencies:
+      - G011
+      - G013
+    unlocks:
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - PR_READY_SUMMARY.md is generated locally from queue evidence.
+      - The summary states no remote PR was opened.
+      - Missing validation or incomplete candidates are reported clearly.
+      - No remote mutation occurs.
+  - id: G015
+    status: candidate
+    title: Add ow:git-automation command shell with remote approval gates
+    purpose: >
+      Introduce the command surface for approved local git automation while
+      requiring explicit user approval before push, remote PR creation, Issue
+      mutation, or merge.
+    scope:
+      includes:
+        - command registry entry
+        - generated skill or command guidance
+        - local-only modes for branch, commit, and PR-ready summary
+        - remote operation refusal unless explicit approval is provided
+      excludes:
+        - implementing remote push by default
+        - implementing merge automation
+        - bypassing high-risk approval for gh mutation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/
+      - skills/
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/
+    dependencies:
+      - G011
+      - G012
+      - G013
+      - G014
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - A command surface exists for approved local git automation.
+      - Remote operations require explicit user approval and preview.
+      - Generated command surfaces remain in sync.
+      - The command refuses unsafe dirty-tree or branch-boundary states.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -919,4 +1120,32 @@ operations:
     before_status: ready
     after_status: ready
     evidence:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP023
+    operation_type: update
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: Record user approval of Option B plus narrowed local automation and complete the high-risk decision candidate without implementing mutation automation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: done
+    evidence:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+      - "approved: Option B plus narrowed local automation path"
+  - operation_id: OP024
+    operation_type: add
+    target_candidate_ids:
+      - G011
+      - G012
+      - G013
+      - G014
+      - G015
+    actor: agent
+    reason: Decompose the approved path into local automation contract, local branch automation, selected-change commit automation, PR-ready summary generation, and a high-risk command-shell candidate.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
       - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
