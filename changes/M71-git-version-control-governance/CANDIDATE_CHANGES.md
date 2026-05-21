@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G011`.
+- Next recommended candidate: `G012`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -238,7 +238,7 @@ PR creation, Issue mutation, and merge still require explicit approval.
 
 ## G011 - Formalize Approved Local Git Automation Command Contract
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -260,9 +260,19 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G011-local-git-automation-contract`
+
+Completion evidence:
+
+- `references/git-version-control-governance.md`
+- `references/gh-operation-governance.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M71-git-version-control-governance/G011-local-git-automation-contract/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml`
+
 ## G012 - Implement Local Feat Branch Creation For Candidate Queues
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

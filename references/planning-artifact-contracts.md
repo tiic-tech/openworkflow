@@ -47,6 +47,12 @@ Skills may inspect git state for planning and audit, but they must not perform
 destructive or remote-impacting git operations unless the user explicitly asks
 for that specific operation. Remote gh operations require separate governance.
 
+Approved local git automation is limited to the boundaries in
+`references/git-version-control-governance.md`: local feat branch handling,
+one selected change to one local commit, and local `PR_READY_SUMMARY.md`
+generation. Remote push, remote PR creation, Issue mutation, and merge require
+separate explicit approval.
+
 ## Issue Governance Link
 
 Use `references/issue-governance.md` as the source contract for Issue

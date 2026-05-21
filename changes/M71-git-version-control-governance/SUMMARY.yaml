@@ -22,10 +22,12 @@ outputs:
   high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 15
-completed_candidate_id: G009
-completed_change_id: G009-gh-operation-risk-boundaries
-previous_completed_candidate_id: G006
-previous_completed_change_id: G006-branch-per-feat-dogfood-fixtures
+completed_candidate_id: G011
+completed_change_id: G011-local-git-automation-contract
+previous_completed_candidate_id: G009
+previous_completed_change_id: G009-gh-operation-risk-boundaries
+fixture_completed_candidate_id: G006
+fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
 pr_completed_candidate_id: G005
 pr_completed_change_id: G005-pr-ready-summary-contract
 validation_completed_candidate_id: G004
@@ -40,7 +42,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G011
+next_recommended_candidate_id: G012
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -56,7 +58,7 @@ key_dependencies:
   - G009 is complete and classifies gh issue and PR operation risk before G007 decides mutation automation.
   - G010 is complete and enables read-only cross-queue priority analysis before select-change.
   - G007 is complete as a high-risk decision; approved path is Option B plus narrowed local automation.
-  - G011 should define the command contract before any local git automation implementation.
+  - G011 is complete and defines the command contract before local git automation implementation.
   - G015 remains high risk because it introduces the eventual command surface and remote approval gates.
 risks:
   - id: R001
@@ -101,3 +103,4 @@ validation:
     - G007 high-risk stop report was created; implementation requires explicit approval of a concrete option.
     - User approved Option B plus narrowed local automation: local branch, local commit, and local PR-ready summary are in scope; push, remote PR, Issue mutation, and merge still require explicit approval.
     - G011-G015 were added to decompose the approved path.
+    - G011 completed approved local git automation contract and made G012 ready.

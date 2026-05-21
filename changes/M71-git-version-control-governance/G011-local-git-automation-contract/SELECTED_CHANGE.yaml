@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:G011-local-git-automation-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G011-local-git-automation-contract
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G011
+title: Formalize approved local git automation command contract
+status: done
+selection_reason: >
+  G011 is the next recommended candidate after the approved G007 high-risk
+  decision. It defines the command contract before any local git automation is
+  implemented.
+rejected_alternatives:
+  - candidate_ref: G012
+    reason: local branch automation needs the command contract first.
+  - candidate_ref: G013
+    reason: commit automation depends on the local automation guardrails.
+  - candidate_ref: G015
+    reason: the command shell is high risk and should wait for the contract and local pieces.
+scope:
+  includes:
+    - local branch creation and checkout boundary
+    - selected-change commit boundary
+    - local PR-ready summary generation boundary
+    - dry-run and preview expectations
+    - explicit exclusion of push, merge, and gh mutation without approval
+  excludes:
+    - implementing the command
+    - running git mutation commands
+    - pushing branches
+    - creating remote PRs
+owned_paths:
+  - references/git-version-control-governance.md
+  - references/gh-operation-governance.md
+  - references/planning-artifact-contracts.md
+  - changes/M71-git-version-control-governance/G011-local-git-automation-contract/
+forbidden_paths:
+  - packages/**
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - The approved local automation boundary is documented.
+  - The future command contract separates local automation from remote mutation.
+  - The contract requires preview or dry-run behavior before mutation.
+  - Remote push, PR creation, Issue mutation, and merge remain explicit-approval operations.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - changes/M71-git-version-control-governance/G011-local-git-automation-contract/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"

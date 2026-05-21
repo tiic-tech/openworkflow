@@ -18,6 +18,17 @@ avoid remote mutation.
 
 ## Operation Tiers
 
+### Local-Only Git Automation
+
+Local-only git automation is not a gh operation. It is governed by
+`references/git-version-control-governance.md` and may cover local branch
+creation or checkout, local selected-change commits, and local
+`PR_READY_SUMMARY.md` generation after preview and validation.
+
+Local-only automation must not push, create remote PRs, edit Issues, mutate
+labels, or merge. The moment an operation reaches a remote or authenticated
+GitHub target, it enters one of the gh tiers below.
+
 ### Read-Only
 
 Read-only operations inspect remote state and do not mutate GitHub.

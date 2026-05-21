@@ -115,6 +115,39 @@ authorization and should be governed by a high-risk decision report until OW has
 an approved gh operation model. See `references/gh-operation-governance.md` for
 read-only, evidence-writing, and high-risk mutation tiers.
 
+## Approved Local Automation Boundary
+
+The M71 high-risk decision approved a narrowed local automation path. A future
+`ow:git-automation` command may automate local git actions only inside these
+boundaries:
+
+- create or check out the local feat branch recorded in
+  `queue_policy.branch_boundary`
+- commit one completed selected change as one local commit
+- generate a local `PR_READY_SUMMARY.md` for a fully implemented and validated
+  candidate queue
+
+Every local mutation mode must support preview or dry-run output before it
+changes the repository. The preview should show:
+
+- target plan id and candidate id when applicable
+- current branch and expected branch boundary
+- dirty paths that would be included or rejected
+- exact commit message or summary path when applicable
+- validation evidence required before mutation
+
+The command must refuse local mutation when:
+
+- the working tree contains unrelated dirty paths
+- the current branch conflicts with the queue's branch boundary
+- the selected change is not complete
+- required validation evidence is missing
+- the operation would require push, remote PR creation, Issue mutation, or merge
+
+Remote operations are outside the approved local boundary. Push, remote PR
+creation or update, Issue mutation, and merge require explicit operation-level
+approval and must follow `references/gh-operation-governance.md`.
+
 ## Evidence
 
 When a selected change completes, the owning queue should record enough
