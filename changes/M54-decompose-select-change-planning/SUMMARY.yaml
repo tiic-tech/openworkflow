@@ -22,11 +22,11 @@ outputs:
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
 candidate_count: 13
-completed_candidate_id: C009
-completed_change_id: C009-planning-artifact-registration
-previous_completed_candidate_id: C008
-previous_completed_change_id: C008-runtime-exposure-design
-next_recommended_candidate_id: C012
+completed_candidate_id: C012
+completed_change_id: C012-planning-read-model-verification
+previous_completed_candidate_id: C009
+previous_completed_change_id: C009-planning-artifact-registration
+next_recommended_candidate_id: C010
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -42,6 +42,7 @@ key_dependencies:
   - C009 is complete and makes C012 ready.
   - C010, C011, and C013 are high-risk or high-risk-dependent and require approval before selection.
   - C012 is the next non-high-risk candidate because it adds verification fixtures without generated surface changes.
+  - C012 is complete and the next remaining ready candidate is C010, which is high risk.
 risks:
   - id: R001
     level: medium
@@ -75,4 +76,6 @@ validation:
     - OP013 selected C009.
     - OP014 completed C009 planning artifact registration and summary contract.
     - OP015 added C010, C011, C012, and C013 follow-up candidates.
+    - OP016 selected C012.
+    - OP017 completed C012 planning artifact read-model verification fixtures.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

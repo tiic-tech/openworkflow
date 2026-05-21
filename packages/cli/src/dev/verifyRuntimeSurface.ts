@@ -63,6 +63,7 @@ async function main(): Promise<number> {
   await verifySelectedChangeCommitAutomation();
   await verifyPrReadySummaryGeneration();
   await verifyGitAutomationManagedShell();
+  await verifyPlanningArtifactRegistrationContract();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -1648,6 +1649,25 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {
   assert(!(await exists(join(root, ".codex", "commands", "ow"))), ".codex command references generated unexpectedly");
   assert(!(await exists(join(root, ".codex", "skills"))), ".codex skills generated unexpectedly");
+}
+
+async function verifyPlanningArtifactRegistrationContract(): Promise<void> {
+  const contracts = await read(join(REPO_ROOT, "references", "planning-artifact-contracts.md"));
+  const exposure = await read(join(REPO_ROOT, "references", "planning-skill-runtime-exposure.md"));
+  for (const required of [
+    "Planning Artifact Registration",
+    "`SUMMARY.yaml`: default queue handoff and read-model artifact",
+    "`CHANGE_ANALYSIS.yaml`: advisory cross-queue recommendation evidence",
+    "`SELECTED_CHANGE.yaml`: implementation boundary",
+    "`LOCAL_COMMIT_EVIDENCE.yaml`: local implementation evidence",
+    "`HIGH_RISK_DECISION_REPORT.md`: stop packet",
+    "Read-model order for planning work",
+    "`CANDIDATE_CHANGES.yaml` only when source truth is needed",
+  ]) {
+    assert(contracts.includes(required), `planning artifact registration contract missing: ${required}`);
+  }
+  assert(exposure.includes("must not load full planning history by default"), "runtime exposure reference lost summary-first read-model rule");
+  assert(exposure.includes("depend on that registration contract"), "runtime exposure reference does not depend on planning registration contract");
 }
 
 function extractBlock(content: string, key: string): string {

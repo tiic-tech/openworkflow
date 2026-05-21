@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C012`
+Next recommended candidate: `C010` after high-risk approval.
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
@@ -354,7 +354,7 @@ only after the semantic registry boundary is approved.
 
 ## C012 - Add Planning Artifact Read-Model Verification Fixtures
 
-Status: `ready`
+Status: `done`
 
 Purpose: add verification fixtures for the planning artifact registration
 contract without changing runtime command semantics or adapter generation.
@@ -380,6 +380,16 @@ Acceptance:
 - Verification covers planning artifact summary-first expectations.
 - Verification does not add generated surfaces or adapter behavior.
 - Full candidate queues are not required for default low-context read models.
+
+Completion evidence:
+
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/cli/src/dev/verifyAgentE2E.ts`
+- `changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
 
 ## C013 - Reassess Full Planning Skill Runtime Exposure
 
@@ -407,3 +417,5 @@ verification boundaries have been proven or blocked.
 - `OP013`: select `C009`
 - `OP014`: complete `C009`
 - `OP015`: add `C010`, `C011`, `C012`, and `C013`
+- `OP016`: select `C012`
+- `OP017`: complete `C012`

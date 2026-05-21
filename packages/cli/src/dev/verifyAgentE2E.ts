@@ -31,6 +31,7 @@ async function main(): Promise<number> {
     await createValidationArtifact(target, env);
     await createThinPrototypeArtifact(target, env);
     await verifyThinSummaryTrustGates(target, env);
+    await verifyPlanningArtifactRegistrationContract();
 
     const sourceSnapshots = await readSnapshots(target, [
       VALIDATION_PATH,
@@ -194,6 +195,18 @@ async function verifyThinSummaryTrustGates(target: string, env: NodeJS.ProcessEn
   const doctorData = record(doctor.data, "doctor data");
   assert(doctor.ok === true, "doctor should keep maintenance ok for thin handoff quality");
   assert(doctorData.handoff_quality_ok === false, "doctor should expose handoff_quality_ok=false for thin summaries");
+}
+
+async function verifyPlanningArtifactRegistrationContract(): Promise<void> {
+  const contracts = await read(join(REPO_ROOT, "references", "planning-artifact-contracts.md"));
+  for (const required of [
+    "Planning Artifact Registration",
+    "must not load full planning history",
+    "`SUMMARY.yaml`: default queue handoff and read-model artifact",
+    "`CANDIDATE_CHANGES.yaml` only when source truth is needed",
+  ]) {
+    assert(contracts.includes(required), `planning registration contract missing for Agent E2E: ${required}`);
+  }
 }
 
 async function verifyCleanAndSyncRecovery(target: string, env: NodeJS.ProcessEnv, sourceSnapshots: Record<string, string>): Promise<void> {

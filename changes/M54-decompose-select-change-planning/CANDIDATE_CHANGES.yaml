@@ -37,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C012
+next_recommended_candidate_id: C010
 changes:
   - id: C001
     status: done
@@ -571,7 +571,7 @@ changes:
       - Codex generated surfaces come only from source templates and registries.
       - Generated parity and agent e2e checks cover the new surfaces.
   - id: C012
-    status: ready
+    status: done
     title: Add planning artifact read-model verification fixtures
     purpose: >
       Add verification fixtures for the planning artifact registration contract
@@ -605,6 +605,27 @@ changes:
       - Verification covers planning artifact summary-first expectations.
       - Verification does not add generated surfaces or adapter behavior.
       - Full candidate queues are not required for default low-context read models.
+    selection:
+      selected_change_id: C012-planning-read-model-verification
+      reason: >
+        C012 is the next non-high-risk candidate after C009 and verifies the
+        planning artifact registration contract without runtime registry or
+        adapter generation changes.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C012-planning-read-model-verification
+      completed_at: 2026-05-21
+      evidence:
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/cli/src/dev/verifyAgentE2E.ts
+        - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/IMPLEMENTATION_BRIEF.md
+        - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: npm run verify:agent-e2e"
+        - "validation: git diff --check"
   - id: C013
     status: candidate
     title: Reassess full planning skill runtime exposure
@@ -859,3 +880,38 @@ operations:
     evidence:
       - references/planning-artifact-contracts.md
       - references/planning-skill-runtime-exposure.md
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - C012
+    actor: agent
+    reason: >
+      C012 is a non-high-risk verification follow-up that avoids runtime
+      registry, adapter generation, and generated-surface changes.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - C012
+    actor: agent
+    reason: >
+      Runtime-surface and Agent e2e verification now assert the planning
+      artifact registration contract without generated-surface or adapter
+      changes.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: npm run verify:agent-e2e"
+      - "validation: git diff --check"

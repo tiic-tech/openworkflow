@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C012-planning-read-model-verification
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C012-planning-read-model-verification
+title: C012 planning read-model verification atom tasks
+status: completed
+tasks:
+  - task_id: C012-A001
+    title: Add runtime surface contract assertion
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification asserts planning artifact registration is summary-first.
+      - Verification asserts full candidate queues are not the default read model.
+  - task_id: C012-A002
+    title: Add agent e2e contract assertion
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyAgentE2E.ts
+    done_when:
+      - Agent e2e verification checks the planning registration contract exists.
+      - No generated surfaces or adapters are changed.
+  - task_id: C012-A003
+    title: Record completion evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - C012 selection and completion are recorded.
+      - Next high-risk candidate is not selected without approval.
+  - task_id: C012-A004
+    title: Validate C012
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - "npm run validate passes."
+      - "npm run verify:runtime-surface passes."
+      - "npm run verify:agent-e2e passes."
+      - "git diff --check passes."
