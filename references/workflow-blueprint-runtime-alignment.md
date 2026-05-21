@@ -172,7 +172,65 @@ Detailed contracts for `proto2html`, `html2spec`, `build`, `change`, `review`,
 next deferred queue after M73 should reassess `/ow:vision`, `/ow:validation`,
 `/ow:proto`, and `/ow:tune` quality before `proto2html` proceeds.
 
+## /ow:change Planning Intelligence Boundary
+
+`/ow:change` is the implementation orchestration stage. It owns the loop that
+turns approved build or milestone context into bounded implementation work,
+evidence, review input, and completion handoff.
+
+DTC, AC, and SC sit inside that loop as planning intelligence:
+
+- DTC, `/ow:decompose-to-changes`, creates or maintains one bounded
+  `CANDIDATE_CHANGES.yaml` queue for the current feature boundary.
+- AC, `/ow:analyze-changes`, performs cross-queue priority analysis when more
+  than one active queue competes for the next change.
+- SC, `/ow:select-change`, ranks candidates inside one owning queue, selects one
+  implementable candidate, and creates implementation-ready planning artifacts.
+
+Single-queue work should normally go directly from DTC to SC. AC is not a
+mandatory pre-step when there is only one active queue; using it for every
+selection adds cost and weakens SC into a marker instead of a decision command.
+
+### Planning Loop Inputs
+
+At the boundary level, `/ow:change` can consume:
+
+- approved specs or milestone plans from `/ow:build`
+- an existing candidate queue from DTC
+- review findings from `/ow:review`
+- high-risk decision reports
+- branch, dirty-tree, validation, and commit evidence
+- user sequencing or approval constraints
+
+### Planning Loop Outputs
+
+The planning intelligence loop can produce:
+
+- a bounded `CANDIDATE_CHANGES.yaml` queue
+- optional cross-queue `CHANGE_ANALYSIS.yaml` when more than one queue competes
+- `SELECTED_CHANGE.yaml`
+- `ATOM_TASKS.yaml`
+- `IMPLEMENTATION_BRIEF.md`
+- high-risk stop packets when approval is required
+
+These outputs prepare implementation. They do not by themselves implement the
+selected change, update runtime registries, push to remote services, or approve
+high-risk work.
+
+### High-Risk Stops
+
+A high-risk report is a stop packet. It names risks, options, guardrails, go
+criteria, and stop criteria, but it is not approval. Selection or
+implementation of high-risk work requires explicit user approval of a concrete
+option from the report.
+
+### Deferred /ow:change Runtime
+
+This reference defines the planning-intelligence boundary only. Full
+`/ow:change` orchestration, including how implementation agents run, how review
+is triggered, and how archive completion is enforced, remains a deferred
+feature and needs its own DTC queue.
+
 ## Deferred Work
 
-The `/ow:change` planning intelligence boundary is C013. The deferred feature
-handoff map is C014.
+The deferred feature handoff map is C014.

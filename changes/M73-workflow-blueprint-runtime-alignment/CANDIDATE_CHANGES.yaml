@@ -84,7 +84,7 @@ scope_control:
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
       suggested_plan_id: M83-expanded-workflow-read-model
-next_recommended_candidate_id: C013
+next_recommended_candidate_id: C014
 changes:
   - id: C001
     status: superseded
@@ -177,7 +177,7 @@ changes:
         - changes/M73-workflow-blueprint-runtime-alignment/C011-command-family-taxonomy/LOCAL_COMMIT_EVIDENCE.yaml
         - references/workflow-blueprint-runtime-alignment.md
   - id: C012
-    status: selected
+    status: done
     title: Define workflow stage graph
     purpose: >
       Define the main stage graph from vision through archive and show where
@@ -215,8 +215,16 @@ changes:
         analyze-changes recommends C012 because C011 is complete and the stage
         graph is the next low-risk prerequisite for C013 and C014.
       selected_at: 2026-05-21
+    completion:
+      completed_change_id: C012-workflow-stage-graph
+      completed_at: 2026-05-21
+      primary_commit: 192777e41f8f170224a6042498bc73df07ea0b3d
+      evidence_commit: 1676aea889ba6f5639a9caca2f070644a401814d
+      evidence:
+        - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/LOCAL_COMMIT_EVIDENCE.yaml
+        - references/workflow-blueprint-runtime-alignment.md
   - id: C013
-    status: candidate
+    status: selected
     title: Define /ow:change planning intelligence boundary
     purpose: >
       Place DTC, AC, and SC inside the /ow:change loop as planning
@@ -249,6 +257,13 @@ changes:
       - DTC, AC, and SC are explicitly subordinate to /ow:change.
       - High-risk report behavior remains a planning-loop stop, not approval.
       - /ow:change implementation remains a deferred feature ref.
+    selection:
+      selected_change_id: C013-change-planning-intelligence-boundary
+      reason: >
+        select-change ranked C013 as the next candidate in the single active
+        M73 queue because C011 and C012 are complete, C013 is dependency-
+        satisfied, and it unlocks C014.
+      selected_at: 2026-05-21
   - id: C014
     status: candidate
     title: Define deferred feature handoff map
@@ -427,3 +442,32 @@ operations:
     evidence:
       - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
       - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/SELECTED_CHANGE.yaml
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C012
+    actor: agent
+    reason: >
+      C012 implemented the workflow stage graph reference and recorded local
+      commit evidence through ow:git-automation.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/LOCAL_COMMIT_EVIDENCE.yaml
+      - references/workflow-blueprint-runtime-alignment.md
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C013
+    actor: agent
+    reason: >
+      SC selected C013 directly from the single active M73 queue using
+      dependency satisfaction, next_recommended_candidate_id, unlock value, risk,
+      owned paths, and validation realism. AC was not used because no cross-queue
+      arbitration was needed.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/SELECTED_CHANGE.yaml

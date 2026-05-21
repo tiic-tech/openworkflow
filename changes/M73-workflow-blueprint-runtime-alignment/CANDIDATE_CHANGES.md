@@ -22,7 +22,7 @@ the whole workflow.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Next recommended candidate: `C013`
+Next recommended candidate: `C014`
 
 ## Current Candidates
 
@@ -42,7 +42,7 @@ Owned paths:
 
 ### C012 - Define Workflow Stage Graph
 
-Status: `selected`
+Status: `done`
 
 Risk: `low`
 
@@ -53,7 +53,7 @@ surface attachment points.
 
 ### C013 - Define /ow:change Planning Intelligence Boundary
 
-Status: `candidate`
+Status: `selected`
 
 Risk: `medium`
 
@@ -112,3 +112,5 @@ with its own queue boundary.
 - `OP006`: selected C011 after AC recommendation.
 - `OP007`: completed C011 with local commit evidence.
 - `OP008`: selected C012 after AC recommendation.
+- `OP009`: completed C012 with local commit evidence.
+- `OP010`: selected C013 directly with SC because M73 is the single active queue.
