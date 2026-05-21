@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: work_items:M66-proto-redesign-source-dogfood
+contract_type: work_items
+title: M66 Proto redesign source dogfood work items
+status: completed
+change_contract: changes/M66-proto-redesign-source-dogfood/CHANGE.yaml
+items:
+  - task_id: M66-T001
+    title: Produce strategic prompt pack
+    status: completed
+    owned_paths:
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md
+    acceptance:
+      - Prompt pack is vision-only and schema-compatible.
+      - Strategic directions are meaningfully distinct.
+  - task_id: M66-T002
+    title: Record review evidence
+    status: completed
+    owned_paths:
+      - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+      - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+    acceptance:
+      - First generation direction is selected.
+      - Tune handoff is explicit and does not imply HTML work.
+  - task_id: M66-T003
+    title: Update M59 queue
+    status: completed
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/
+    acceptance:
+      - P005 is complete with operation evidence.
+      - P006 is ready after P005 completion.
+  - task_id: M66-T004
+    title: Validate
+    status: completed
+    owned_paths:
+      - changes/M66-proto-redesign-source-dogfood/
+      - changes/M59-proto-redesign-planning-dogfood/
+    acceptance:
+      - "`npm run validate` passes."
+      - "`node dist/cli/src/index.js handoff --root . --json` passes."

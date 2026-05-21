@@ -15,7 +15,7 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Next recommended candidate: `P005`
+Next recommended candidate: `P006`
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
@@ -98,7 +98,7 @@ Completion evidence:
 
 ## P005 - Dogfood Image-First Proto Flow On OpenWorkflow
 
-Status: `ready`
+Status: `done`
 
 Purpose: exercise the redesigned source-level proto flow on OpenWorkflow's own
 product vision and record evidence for acceptance, tuning, or pivot.
@@ -106,9 +106,18 @@ product vision and record evidence for acceptance, tuning, or pivot.
 Depends on: `P002`, `P003`, `P004`
 Also waits for temporary boundary change: `P007`
 
+Completion evidence:
+
+- `changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml`
+- `changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md`
+- `changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md`
+- `changes/M66-proto-redesign-source-dogfood/EVIDENCE.md`
+- `npm run validate`
+- `node dist/cli/src/index.js handoff --root . --json`
+
 ## P006 - Expose Proven Proto Redesign Through Runtime Surfaces
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: promote the proven source-level proto redesign into command, artifact,
 and generated Codex adapter surfaces after dogfood evidence is accepted.
@@ -149,3 +158,6 @@ Completion evidence:
 - `OP009`: select `P007`
 - `OP010`: complete `P007`
 - `OP011`: restore `P005` as next recommended
+- `OP012`: select `P005`
+- `OP013`: complete `P005`
+- `OP014`: mark `P006` ready and make it next recommended

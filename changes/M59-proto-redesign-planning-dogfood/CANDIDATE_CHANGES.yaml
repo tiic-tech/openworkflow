@@ -38,7 +38,7 @@ selection_policy:
     - mixing prompt contract design with CLI runtime changes
     - treating validation removal as an implicit side effect
     - adding HTML conversion to the proto redesign scope
-next_recommended_candidate_id: P005
+next_recommended_candidate_id: P006
 changes:
   - id: P001
     status: done
@@ -233,7 +233,7 @@ changes:
         - changes/M61-proto-validation-consumption-policy/CHANGE.yaml
         - "validation: npm run validate"
   - id: P005
-    status: ready
+    status: done
     title: Dogfood image-first proto flow on OpenWorkflow
     purpose: >
       Exercise the redesigned source-level proto flow on OpenWorkflow's own
@@ -266,8 +266,22 @@ changes:
       - The redesigned proto flow produces actionable image-generation prompt artifacts.
       - Evidence records what should be accepted or tuned.
       - Follow-up production work remains selectable by stable id.
+    selection:
+      selected_change_id: M66-proto-redesign-source-dogfood
+      reason: P005 is the next recommended candidate, all dependencies are done, and source-level dogfood is required before runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M66-proto-redesign-source-dogfood
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+        - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md
+        - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+        - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+        - "validation: npm run validate"
+        - "validation: node dist/cli/src/index.js handoff --root . --json"
   - id: P006
-    status: candidate
+    status: ready
     title: Expose proven proto redesign through runtime surfaces
     purpose: >
       Promote the proven source-level proto redesign into command, artifact,
@@ -488,5 +502,42 @@ operations:
     changed_at: 2026-05-21
     before_status: P007 done
     after_status: P005 ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: P005 is ready, next recommended, and validates source-level proto/tune behavior before runtime exposure.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M66-proto-redesign-source-dogfood/SELECTED_CHANGE.yaml
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: OpenWorkflow source dogfood produced a strategic prompt pack, selected first generation direction, and review/tune evidence.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+      - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+      - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+      - "validation: npm run validate"
+      - "validation: node dist/cli/src/index.js handoff --root . --json"
+  - operation_id: OP014
+    operation_type: priority_change
+    target_candidate_ids:
+      - P006
+    actor: agent
+    reason: P006 becomes ready after P005 dogfood evidence is complete.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
     evidence:
       - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml

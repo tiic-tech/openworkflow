@@ -1,0 +1,254 @@
+schema_version: 0.1.0
+contract_id: prototype:M66-proto-redesign-source-dogfood
+contract_type: prototype
+title: OpenWorkflow strategic prototype prompt pack
+status: ready_for_generation
+prompt_pack_type: strategic_proto_prompt_pack
+source:
+  mode: vision_only_dogfood
+  refs:
+    - build_system_vision.md
+    - docs/OW_DEVELOP_PLAN.md
+    - skills/build-prototype/SKILL.md
+    - references/proto-redesign-artifact-contracts.md
+  requested_direction_count: 3
+  target_tool: image generation or visual design generation
+  output_language: English UI copy with concise engineering vocabulary
+validation_input:
+  mode: vision_only
+  refs: []
+  notes:
+    - No dedicated VALIDATION.yaml or PROTOTYPE_BRIEF.md was present for this dogfood run.
+    - The pack proceeds from accepted project vision and records the inferred central uncertainty.
+    - Validation is not treated as completed or internally generated.
+normalized_input:
+  product_domain: Agent-assisted software development workflow control plane
+  primary_user: AI coding agent and human developer working in a shared repository
+  current_alternative: Chat history, ad hoc markdown notes, raw git status, and one-off command memory
+  core_pain: Agents lose context, misread repo state, skip maintenance steps, and pollute generated or managed surfaces when workflow state is not explicit.
+  behavior_change: Agents should start each work segment by trusting repo-local contracts, choosing the next valid command, and recording evidence before implementation expands.
+  success_signal: A fresh agent can understand current state, choose the correct next action, recover from missing generated surfaces, and continue without rereading the whole repository.
+  differentiator: Contract-first local workflow state that combines command guidance, artifact lineage, trust gates, and non-destructive recovery semantics.
+  emotional_value: The agent feels oriented and bounded; the human sees an auditable workflow rather than opaque chat momentum.
+  trust_privacy_constraints:
+    - Repository-local files are the source of truth.
+    - Generated adapter surfaces must be recoverable without damaging source artifacts.
+    - Handoff JSON and summaries are public contracts for agents.
+    - The system should surface uncertainty instead of pretending false health.
+  non_goals:
+    - Do not present OpenWorkflow as a generic project management dashboard.
+    - Do not hide command or artifact maintenance behind invisible magic.
+    - Do not encourage broad implementation before validation, prototype, spec, or change scope exists.
+    - Do not imply cloud sync, collaboration SaaS, billing, auth, or deployment features.
+strategic_core:
+  statement: >
+    AI coding agents and human developers use repo-local contracts to convert
+    ambiguous intent into bounded, auditable workflow steps, with handoff trust
+    gates and recovery semantics preventing context loss and repository
+    pollution.
+  target_user: AI coding agent and human developer pair
+  behavior_change: Start from trusted workflow state and selected next command instead of reconstructing intent from chat.
+  mechanism: Contract stack, handoff JSON, command guidance, artifact lineage, current state, and non-destructive recovery.
+  differentiator: Agent-first local operating system for workflow continuity rather than a human-only planning UI.
+  boundary_conditions:
+    - Local repository is canonical.
+    - Generated surfaces are not hand-edited.
+    - Prototype artifacts are planning evidence, not production tasks.
+    - Runtime exposure waits for dogfood evidence.
+  central_uncertainty: >
+    Which visual product form best communicates trust, next action, and audit
+    continuity to an AI agent as first consumer while remaining legible to the
+    human developer?
+directions:
+  - direction_id: D01
+    name: Agent Handoff Command Center
+    strategic_hypothesis: >
+      If OpenWorkflow is shaped as a compact handoff command center and uses a
+      trust-gated current-state panel to reduce orientation cost, then agents
+      will start work from the correct next action because all trusted facts,
+      blockers, and forbidden surfaces are visible at once.
+    validates: Agent-first trust, next-command clarity, and recovery confidence.
+    main_risk: The product may look like a static status dashboard rather than an active workflow control plane.
+    prototype_prompt: |
+      Create a high-fidelity desktop web app screen group for OpenWorkflow, a contract-first local workflow control plane for AI coding agents and human developers.
+
+      Product positioning:
+      "Repo-local workflow state that tells an agent what can be trusted, what to read, and what to do next."
+
+      Target user:
+      An AI coding agent resuming a long-running repository and a human developer reviewing whether the agent is staying inside scope.
+
+      Required screens:
+      1. Handoff Overview: current branch, active workflow phase, next recommended command, trust score, dirty worktree state, latest completed change, and current candidate queue.
+      2. Trusted Context Panel: source-of-truth artifacts, summary freshness, forbidden paths, generated surface recovery status, and exact files the agent should read first.
+      3. Recovery Action Drawer: detected drift, missing generated surfaces, safe sync actions, expected effects, and JSON envelope preview.
+      4. Change Scope Detail: selected candidate id, includes, excludes, owned paths, validation commands, acceptance checks, and operation audit.
+
+      Complete user journey:
+      The agent opens the handoff view, reads the trust gate, sees "Next: /ow:proto dogfood P005", checks the candidate scope, confirms forbidden paths, and runs only the recommended next action. The human can inspect why the action is safe.
+
+      Interaction requirements:
+      - Status chips for trusted, stale, blocked, dirty, and generated.
+      - Expandable evidence rows with artifact refs and timestamps.
+      - A command preview button that shows structured JSON before execution.
+      - A non-destructive recovery path that explains what will be regenerated.
+
+      System behavior:
+      The UI must show that OpenWorkflow does not invent state. Unknown facts appear as "needs evidence" with links to the missing artifact.
+
+      Trust/privacy/user control:
+      Include visible warnings for dirty worktree, generated adapter surfaces, forbidden paths, and source artifacts that must not be overwritten.
+
+      Visual direction:
+      Dense professional developer tool. Quiet light interface, crisp table/list structure, compact cards only for repeated status modules, code-like JSON preview, restrained accent colors for trust states, strong information hierarchy, no decorative hero.
+
+      Anti-goals:
+      Do not make it look like a generic project management SaaS, task board, chatbot, CI dashboard, or marketing landing page. Do not show cloud billing, team invites, auth, or deployment.
+
+      Desired user feeling:
+      The agent feels oriented and constrained; the human feels the workflow is inspectable.
+
+      Concrete sample content:
+      Branch `codex/m53-self-dogfood-init`; next command `P005 Dogfood image-first proto flow`; forbidden paths `.agents/`, `.openworkflow/`, generated adapter surfaces; validation `npm run validate`; current risk `runtime exposure waits for dogfood`.
+    pm_judgment: Strong for validating first-consumer trust, but less directly focused on visual prototype/tune workflow.
+  - direction_id: D02
+    name: Prototype Discovery Flight Deck
+    strategic_hypothesis: >
+      If OpenWorkflow is shaped as a product-discovery flight deck and uses a
+      visual pipeline from vision to proto, tune, decision, and change, then
+      agents will keep image-first exploration separate from implementation
+      because each artifact handoff and boundary is visible before code begins.
+    validates: The redesigned `/ow:proto -> /ow:tune -> decision -> change` workflow and whether visual exploration feels operational rather than decorative.
+    main_risk: The flow may feel too product-design focused and underemphasize agent trust/recovery guarantees.
+    prototype_prompt: |
+      Create a high-fidelity desktop web app screen group for OpenWorkflow's redesigned visual discovery workflow.
+
+      Product positioning:
+      "A repo-local control plane that turns product vision into auditable prototype evidence before implementation starts."
+
+      Target user:
+      A human founder/developer and an AI coding agent co-developing a product through `/ow:vision`, `/ow:proto`, `/ow:tune`, `/ow:decision`, `/ow:html2spec`, `/ow:build`, and `/ow:change`.
+
+      Required screens:
+      1. Discovery Pipeline Map: a left-to-right workflow from Vision to Proto to Tune to Decision to Spec/Build/Change. Each stage shows status, source artifacts, allowed outputs, forbidden outputs, and next command.
+      2. Proto Prompt Pack Workspace: three strategic prototype directions with hypothesis, validation target, main risk, prompt preview, and first-generation recommendation.
+      3. Tune Boundary Workspace: accepted baseline direction, tune request area, MUST_INHERIT/MUST_ADD/MUST_REMOVE/FLEXIBLE_CHANGE panels, screen manifest preview, and handoff to `tune-prototype`.
+      4. Decision Evidence Ledger: accepted elements, rejected elements, tune requests, recommendation, linked candidate ids, and the rule "no HTML until benchmark image is accepted."
+
+      Complete user journey:
+      The user enters with a vision-only input. The agent produces three strategic prototype prompt directions. The user selects "Prototype Discovery Flight Deck" as the first generation direction. The system records why this direction is closest to the current uncertainty, then prepares a tune handoff without creating HTML or production tasks.
+
+      Interaction requirements:
+      - Stage cards should be compact workflow nodes with status, allowed artifact types, and next command.
+      - Direction comparison table with strategic hypothesis, risk, observability, and generation readiness.
+      - Prompt preview pane with copyable screen requirements and negative constraints.
+      - Tune boundary panel that clearly separates accepted baseline elements from new requested deltas.
+      - Evidence ledger with operation ids, source refs, and follow-up candidate ids.
+
+      System behavior:
+      The UI must show `validation_input.mode: vision_only` and explain that validation is absent, not completed. It should also show that `/ow:tune` is a separate source skill and that runtime exposure is blocked until dogfood evidence exists.
+
+      Trust/privacy/user control:
+      Include visible controls for accepting a direction, requesting tune, pivoting, or stopping. Each action should list exactly which artifacts will be created and which paths are forbidden.
+
+      Visual direction:
+      Sophisticated developer-product interface, not a marketing page. Use a clean workspace layout with a narrow left rail, central visual pipeline, right evidence inspector, compact tables, status tokens, and a prompt editor surface. Palette should combine neutral grays, off-white backgrounds, dark text, and a few semantic accents for vision/proto/tune/decision states. Avoid purple-blue gradient dominance.
+
+      Anti-goals:
+      Do not show HTML editing, CSS repair, deployment, auth, billing, social collaboration, or generic Kanban boards. Do not imply the prototype has already been accepted. Do not hide the vision-only validation gap.
+
+      Desired user feeling:
+      Product discovery feels controlled, visual, and auditable; the agent can see exactly when it is exploring, tuning, or implementing.
+
+      Concrete sample content:
+      Direction ids `D01 Agent Handoff Command Center`, `D02 Prototype Discovery Flight Deck`, `D03 Contract Ledger Replay`; selected first generation `D02`; next possible action `/ow:tune`; forbidden output `/ow:proto2html` until benchmark image acceptance; follow-up candidate `P006 Runtime exposure`.
+    pm_judgment: Best first generation direction because it validates the redesigned proto/tune boundary itself while still showing agent-trust mechanics.
+  - direction_id: D03
+    name: Contract Ledger Replay
+    strategic_hypothesis: >
+      If OpenWorkflow is shaped as an audit replay ledger and uses operation
+      history, artifact lineage, and recovery checkpoints to make workflow
+      state inspectable, then agents will recover from context loss and branch
+      drift because every state transition is queryable by stable id.
+    validates: Queue maintenance, operation logs, artifact lineage, replay, and non-destructive recovery semantics.
+    main_risk: The product may over-index on audit history and underrepresent the actual next-action workflow.
+    prototype_prompt: |
+      Create a high-fidelity desktop web app screen group for OpenWorkflow as a contract ledger and replay system for AI-assisted development.
+
+      Product positioning:
+      "Every workflow transition is a repo-local contract event an agent can inspect, replay, or recover from."
+
+      Target user:
+      An AI coding agent that needs to understand why a candidate was added, selected, completed, deferred, or superseded, plus a human developer reviewing auditability.
+
+      Required screens:
+      1. Operation Timeline: OP001 through OP011 with operation type, target candidate ids, before/after status, evidence, and linked commit.
+      2. Artifact Lineage Graph: Vision, proto prompt pack, tune protocol, selected change, atom tasks, work items, and runtime exposure dependency.
+      3. Candidate Detail Inspector: stable id, status, dependencies, unlocks, selection rationale, completion evidence, and validation commands.
+      4. Recovery Replay Preview: what a fresh agent should read first, what can be regenerated, and which source artifacts are protected.
+
+      Complete user journey:
+      The agent wakes up with only a handoff summary, opens the ledger, filters to P007, sees why it was inserted before P005, verifies P005 is now ready, and proceeds without rereading every previous artifact.
+
+      Interaction requirements:
+      - Timeline filter by candidate id, operation type, status, and artifact path.
+      - Diff-style before/after status panels.
+      - Evidence links that explain trust freshness.
+      - Replay button that generates a bounded "what to read next" handoff.
+
+      System behavior:
+      The interface should make hard deletion impossible for historical candidates. Superseded/deferred/blocked states remain visible.
+
+      Trust/privacy/user control:
+      Show protected source artifacts, generated surfaces, dirty worktree status, and exact recovery effects before action.
+
+      Visual direction:
+      Information-dense engineering audit surface with timeline, graph, inspector, and command preview. Use clean typography, compact spacing, and semantic state colors. Avoid decorative hero or playful illustration.
+
+      Anti-goals:
+      Do not present this as analytics, team productivity metrics, or a bug tracker. Do not hide uncertainty or collapse audit entries into a vague activity feed.
+
+      Desired user feeling:
+      The workflow can survive context loss because every transition is explainable.
+
+      Concrete sample content:
+      OP007 add P007; OP008 prioritize P007 ahead of P005; OP010 complete P007; next recommended P005; validation `quick_validate.py skills/tune-prototype`; forbidden generated adapter edits.
+    pm_judgment: Strong audit concept and useful for later replay/recovery work, but less suitable as the first image-first proto dogfood direction.
+build_recommendation:
+  recommended_direction_id: D02
+  reason: >
+    D02 directly tests the redesigned image-first proto/tune workflow. It makes
+    the build-prototype and tune-prototype boundary visible, includes prompt
+    lineage and evidence, and avoids drifting into runtime or HTML work.
+  success_signals:
+    - A reviewer can tell what `/ow:proto` creates and what `/ow:tune` owns without explanation.
+    - Direction comparison is based on strategic hypotheses, risks, and evidence rather than visual skins.
+    - The interface clearly blocks HTML and runtime exposure until benchmark image evidence exists.
+    - The prompt is concrete enough for image generation without extra repository context.
+  failure_signals:
+    - The generated image looks like a generic workflow dashboard or Kanban board.
+    - The design implies implementation or HTML editing has started.
+    - The validation gap is hidden or represented as completed.
+    - The tune boundary is invisible or collapsed into proto.
+  next_test_if_successful: >
+    Use tune-prototype to convert the generated D02 baseline screen group into
+    a refined prompt pack that preserves workflow boundaries and strengthens
+    first-consumer trust cues.
+negative_constraints:
+  - Do not generate HTML, CSS, code editor screens, deployment screens, auth, billing, or social collaboration flows.
+  - Do not imply validation artifacts exist or have been accepted.
+  - Do not treat prompt packs as production specs or implementation tasks.
+  - Do not present OpenWorkflow as a generic project management SaaS, Kanban board, chatbot, or CI dashboard.
+  - Do not hand-edit generated `.agents/` or `.openworkflow/` surfaces.
+  - Do not hide forbidden paths, source refs, validation gaps, or runtime exposure blockers.
+review_plan:
+  review_type: prompt_pack_dogfood
+  selected_first_generation_direction: D02
+  reviewer_questions:
+    - Can a human and agent distinguish proto exploration from tune refinement?
+    - Are the three directions strategically distinct?
+    - Is the recommended first direction concrete enough for image generation?
+    - Does the prompt preserve OpenWorkflow's agent-first trust and audit goals?
+    - Does the pack avoid runtime, HTML, and production implementation drift?
+  expected_next_action: Use tune-prototype after generated D02 baseline screens exist.
+  recommendation: continue_to_first_image_generation

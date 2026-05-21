@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: change:M66-proto-redesign-source-dogfood
+contract_type: change
+title: M66 Proto redesign source dogfood
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - build_system_vision.md
+  - docs/OW_DEVELOP_PLAN.md
+  - skills/build-prototype/SKILL.md
+  - skills/tune-prototype/SKILL.md
+depends_on:
+  - change:M63-proto-vision-to-strategic-prompt-source
+  - change:M64-proto-tune-refined-prompt-source
+  - change:M65-proto-tune-skill-boundary
+produces:
+  - selected_change:M66-proto-redesign-source-dogfood
+  - atom_tasks:M66-proto-redesign-source-dogfood
+  - prototype:M66-proto-redesign-source-dogfood
+summary: >
+  Dogfood the image-first prototype source flow on OpenWorkflow's own vision by
+  producing a strategic proto prompt pack, selecting the first generation
+  direction, and recording review/tune evidence.
+problem: >
+  The redesigned proto and tune source skills need first-consumer evidence
+  before runtime exposure. The dogfood run should prove that `build-prototype`
+  can turn OpenWorkflow's own vision into actionable visual prototype prompts
+  while keeping tuning and production implementation out of scope.
+goals:
+  - Produce a strategic prototype prompt pack from OpenWorkflow vision-only input.
+  - Choose one first generation direction based on risk reduction and flow
+    relevance.
+  - Record evidence for what to accept, tune, or avoid in the next pass.
+  - Keep runtime command exposure and HTML conversion out of scope.
+non_goals:
+  - Do not expose runtime command or adapter surfaces.
+  - Do not generate HTML, CSS, or production implementation tasks.
+  - Do not create real image assets in this change.
+  - Do not change proto prompt pack schema.
+affected_paths:
+  - changes/M66-proto-redesign-source-dogfood/
+  - changes/M59-proto-redesign-planning-dogfood/
+acceptance:
+  - The redesigned proto flow produces actionable image-generation prompt artifacts.
+  - Evidence records what should be accepted or tuned.
+  - Follow-up production work remains selectable by stable id.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js handoff --root . --json
+created_at: 2026-05-21
+updated_at: 2026-05-21

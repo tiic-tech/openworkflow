@@ -21,15 +21,16 @@ candidate_count: 7
 selected_candidate_id: P001
 selected_change_id: M60-proto-redesign-artifact-contracts
 completed_candidate_id: P001
-next_recommended_candidate_id: P005
+next_recommended_candidate_id: P006
 completed_policy_candidate_id: P004
 completed_source_candidate_id: P002
 completed_tune_candidate_id: P003
 completed_boundary_candidate_id: P007
-next_dogfood_candidate_id: P005
+completed_dogfood_candidate_id: P005
+next_runtime_candidate_id: P006
 unresolved_questions:
   - Whether automatic validation should be implemented after the proto input policy is defined.
-  - Whether `/ow:tune` should become its own command surface or remain part of prototype refinement.
+  - How much runtime surface should be exposed before real image generation artifacts exist.
 validation_commands:
   - npm run validate
   - node dist/cli/src/index.js handoff --root . --json
