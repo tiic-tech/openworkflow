@@ -19,7 +19,7 @@ moving Codex command exposure to global prompts, editing generated `.agents` or
 proto2html runtime exposure, and broad multi-platform adapter work before the
 format contract is stable.
 
-Next recommended candidate: `S001`
+Next recommended candidate: none while `S001` is selected.
 
 Feat boundary: this queue owns the top-level
 `changes/M69-skill-system-lifecycle-planning/` folder. Each `S###` candidate is
@@ -28,7 +28,7 @@ folder.
 
 ## S001 - Document Native Skill Format And Lifecycle Contract
 
-Status: `ready`
+Status: `selected`
 
 Purpose: define OpenWorkflow's first-class skill system contract after the
 OpenSpec research, including source-of-truth ownership, static skill file shape,
@@ -44,6 +44,12 @@ Validation:
 
 - `npm run validate`
 - `git diff --check`
+
+Selection: `S001-skill-lifecycle-contract`
+
+Selection reason: cross-queue selection compared `M68/H003` and `M69/S001`.
+`S001` is the safer next step because it creates the native skill lifecycle
+contract needed before more high-risk runtime and generated-surface changes.
 
 ## S002 - Add Structured Generated Metadata To Codex Skill Output
 
@@ -66,6 +72,10 @@ future tools can install skills, commands, or both without baking Codex
 assumptions into the core workflow registry.
 
 Risk: `high`
+
+## Operation Audit
+
+- `OP001`: select `S001` after cross-queue comparison with `M68/H003`
 
 ## S004 - Validate Generated Skill Format And Protocol Blocks
 

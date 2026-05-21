@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C004`
+Next recommended candidate: `C007`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -136,7 +136,7 @@ Owned paths:
 - `packages/cli/src/dev/verifyAgentE2E.ts`
 - `changes/M58-planning-skill-runtime-surface/`
 
-Depends on: `C002`, `C003`
+Depends on: `C002`, `C003`, `C007`
 
 Validation:
 
@@ -203,8 +203,37 @@ Completion evidence:
 - `changes/M62-planning-skill-queue-maintenance/CHANGE.yaml`
 - `npm run validate`
 
+## C007 - Support Cross-Queue Selection Arbitration
+
+Status: `ready`
+
+Purpose: extend `select-change` source behavior so an agent can make an audited
+priority decision when multiple active `CANDIDATE_CHANGES` queues exist, while
+preserving the norm that one active queue is preferred.
+
+Owned paths:
+
+- `skills/select-change/`
+- `references/planning-artifact-contracts.md`
+- `changes/M54-decompose-select-change-planning/C007-cross-queue-selection/`
+
+Depends on: `C003`, `C006`
+
+Validation:
+
+- `npm run validate`
+- `quick_validate.py skills/select-change`
+
+Acceptance:
+
+- `select-change` can explicitly arbitrate across multiple queues when asked.
+- The skill still states that one active queue is the preferred default.
+- Cross-queue decisions record rejected alternatives by plan id and candidate id.
+- The `M68/H003` versus `M69/S001` dogfood decision is captured as evidence.
+
 ## Operation Audit
 
 - `OP001`: add `C006`
 - `OP002`: select `C006`
 - `OP003`: complete `C006`
+- `OP004`: add `C007`

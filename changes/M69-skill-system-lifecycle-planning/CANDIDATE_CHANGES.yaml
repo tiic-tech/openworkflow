@@ -46,10 +46,10 @@ selection_policy:
     - editing generated .agents or .openworkflow surfaces directly
     - mixing skill lifecycle architecture with proto2html runtime exposure
     - broad multi-platform adapter work before the format contract is stable
-next_recommended_candidate_id: S001
+next_recommended_candidate_id: null
 changes:
   - id: S001
-    status: ready
+    status: selected
     title: Document native skill format and lifecycle contract
     purpose: >
       Define OpenWorkflow's first-class skill system contract after the
@@ -88,6 +88,13 @@ changes:
       - The reference names source registries and generated surfaces and forbids direct generated-surface edits.
       - The reference explains what OW borrows from OpenSpec and what it rejects.
       - The contract is usable as read-first context for later generator and validator work.
+    selection:
+      selected_change_id: S001-skill-lifecycle-contract
+      reason: >
+        Cross-queue selection compared M68/H003 and M69/S001. S001 is the
+        safer next step because it creates the native skill lifecycle contract
+        needed before more high-risk runtime and generated-surface changes.
+      selected_at: 2026-05-21
   - id: S002
     status: candidate
     title: Add structured generated metadata to Codex skill output
@@ -319,3 +326,20 @@ changes:
       - The spike proves adapter boundaries without changing Codex output semantics.
       - No new generated platform surface is committed unless explicitly accepted.
       - The result identifies what must be formalized before multi-platform support becomes product behavior.
+operations:
+  - operation_id: OP001
+    operation_type: select
+    target_candidate_ids:
+      - S001
+    actor: agent
+    reason: >
+      Cross-queue selection preferred M69/S001 over M68/H003 because H003 is a
+      high-risk generated runtime surface and S001 establishes the skill
+      lifecycle contract that should guide it.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/IMPLEMENTATION_BRIEF.md

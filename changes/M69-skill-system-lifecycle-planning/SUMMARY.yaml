@@ -20,7 +20,9 @@ outputs:
   candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
   readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
 candidate_count: 7
-next_recommended_candidate_id: S001
+selected_candidate_id: S001
+selected_change_id: S001-skill-lifecycle-contract
+next_recommended_candidate_id: null
 unresolved_questions:
   - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
   - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
@@ -31,3 +33,4 @@ notes:
   - S001 is recommended first because later generator, validator, and adapter work needs a stable native skill format contract.
   - S003 and S007 are high risk because they touch delivery architecture and multi-adapter boundaries.
   - The queue intentionally keeps proto2html runtime exposure in M68 and does not mix it into skill-system lifecycle work.
+  - Cross-queue selection preferred M69/S001 before M68/H003 because H003 changes high-risk generated runtime surfaces.

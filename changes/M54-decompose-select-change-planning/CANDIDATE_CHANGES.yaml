@@ -36,7 +36,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C007
 changes:
   - id: C001
     status: done
@@ -216,6 +216,7 @@ changes:
     dependencies:
       - C002
       - C003
+      - C007
     unlocks:
       - C005
     risk: high
@@ -327,6 +328,44 @@ changes:
         - references/planning-artifact-contracts.md
         - changes/M62-planning-skill-queue-maintenance/CHANGE.yaml
         - "validation: npm run validate"
+  - id: C007
+    status: ready
+    title: Support cross-queue selection arbitration
+    purpose: >
+      Extend select-change's source behavior so an agent can make an audited
+      priority decision when multiple active CANDIDATE_CHANGES queues exist,
+      while preserving the norm that one active queue is preferred.
+    scope:
+      includes:
+        - multi-queue discovery and arbitration guidance
+        - queue-level filtering for active, completed, stale, or superseded queues
+        - cross-queue rejected-alternative recording in SELECTED_CHANGE.yaml
+        - guidance for when to create a meta-selection artifact versus selecting inside one queue
+        - dogfood evidence from the M68 versus M69 decision
+      excludes:
+        - runtime command exposure
+        - autonomous implementation loop behavior
+        - changing candidate id semantics inside existing queues
+        - implementing a CLI queue selector
+    owned_paths:
+      - skills/select-change/
+      - references/planning-artifact-contracts.md
+      - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/
+    dependencies:
+      - C003
+      - C006
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - quick_validate.py skills/select-change
+    acceptance:
+      - select-change can explicitly arbitrate across multiple CANDIDATE_CHANGES queues when asked.
+      - The skill still states that one active queue is the preferred default.
+      - Cross-queue decisions record rejected alternatives by plan id and candidate id.
+      - The M68/H003 versus M69/S001 dogfood decision is captured as evidence.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -365,3 +404,16 @@ operations:
       - schemas/candidate-changes.schema.json
       - references/planning-artifact-contracts.md
       - "validation: npm run validate"
+  - operation_id: OP004
+    operation_type: add
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Cross-queue selection between M68/H003 and M69/S001 exposed a missing
+      select-change scenario for choosing across multiple active queues.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/SELECTED_CHANGE.yaml
