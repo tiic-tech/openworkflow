@@ -6,7 +6,7 @@ selected_change_id: C001-review-enhance-vision
 source_plan_id: M74-front-chain-command-quality-review
 source_candidate_id: C001
 title: Review and enhance /ow:vision for Agent-first consumption
-status: selected
+status: done
 selection_reason: >
   /ow:vision is the first front-chain command and has no candidate
   dependencies. Improving its Agent-first artifact quality before validation,
@@ -70,3 +70,8 @@ risk:
 commit_boundary: >
   Complete as one coherent local commit unless implementation review discovers
   the change must be split before source edits proceed.
+completion:
+  completed_at: 2026-05-21
+  primary_commit: 3d585f0eacf415725275268f9f3ab95dd092caa7
+  evidence:
+    - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml

@@ -19,9 +19,9 @@ active candidate queue.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Selected candidate: `C001`
+Completed candidate: `C001`
 
-Next recommended candidate: none until `C001` is completed or superseded.
+Next recommended candidate: `C002`
 
 ## Agent-First Review Lens
 
@@ -45,7 +45,7 @@ Every command review must answer:
 
 ### C001 - Review and enhance /ow:vision for Agent-first consumption
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -59,9 +59,14 @@ artifacts that let a low-context Agent understand durable product intent.
 
 Selection: `C001-review-enhance-vision`
 
+Completion evidence:
+
+- `changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml`
+- `3d585f0eacf415725275268f9f3ab95dd092caa7`
+
 ### C002 - Review and enhance /ow:validation for Agent-first consumption
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

@@ -102,10 +102,10 @@ scope_control:
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow concrete command and artifact surfaces.
       suggested_plan_id: M83-expanded-workflow-read-model
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Review and enhance /ow:vision for Agent-first consumption
     purpose: >
       Audit /ow:vision as the first workflow command and repair or enhance it so
@@ -160,8 +160,15 @@ changes:
         front-chain command, has no dependencies, and determines the quality of
         every downstream Agent handoff.
       selected_at: 2026-05-21
+    completion:
+      completed_change_id: C001-review-enhance-vision
+      completed_at: 2026-05-21
+      primary_commit: 3d585f0eacf415725275268f9f3ab95dd092caa7
+      evidence:
+        - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/AGENT_FIRST_AUDIT.md
   - id: C002
-    status: candidate
+    status: ready
     title: Review and enhance /ow:validation for Agent-first consumption
     purpose: >
       Audit /ow:validation as the risk-prioritization command and repair or
@@ -365,3 +372,30 @@ operations:
       - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/SELECTED_CHANGE.yaml
       - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/ATOM_TASKS.yaml
       - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete the /ow:vision Agent-first quality enhancement with local commit
+      evidence and passing required validation.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml
+      - 3d585f0eacf415725275268f9f3ab95dd092caa7
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 becomes ready after C001 completed the upstream vision quality
+      dependency.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.yaml

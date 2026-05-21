@@ -6,11 +6,11 @@ selected_change_id: C001-review-enhance-vision
 source_plan_id: M74-front-chain-command-quality-review
 source_candidate_id: C001
 title: Atom tasks for /ow:vision Agent-first consumption review
-status: ready
+status: completed
 tasks:
   - task_id: T001
     title: Inspect current /ow:vision command and generated Agent surfaces
-    status: pending
+    status: done
     type: read
     owned_paths:
       - packages/core/src/commands/registry.ts
@@ -26,7 +26,7 @@ tasks:
       and existing verification coverage are understood from source-first files.
   - task_id: T002
     title: Audit /ow:vision against the Agent-first artifact quality bar
-    status: pending
+    status: done
     type: document
     owned_paths:
       - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/
@@ -36,7 +36,7 @@ tasks:
       handoff readiness, and failure-mode usefulness.
   - task_id: T003
     title: Repair or enhance /ow:vision source behavior and contracts
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/commands/registry.ts
@@ -52,7 +52,7 @@ tasks:
       outputs.
   - task_id: T004
     title: Regenerate managed surfaces and verify coherency
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - .agents/skills/ow-vision/
@@ -63,7 +63,7 @@ tasks:
       coherent.
   - task_id: T005
     title: Run validation and record completion evidence
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - changes/M74-front-chain-command-quality-review/
@@ -76,3 +76,7 @@ validation:
   - node dist/cli/src/index.js sync --root . --json
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  primary_commit: 3d585f0eacf415725275268f9f3ab95dd092caa7
+  evidence:
+    - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml
