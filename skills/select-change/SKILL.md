@@ -49,18 +49,21 @@ Read these only as needed:
 6. Otherwise choose the candidate that best matches the queue's
    `selection_policy`, unlocks downstream work, has focused owned paths, and
    has realistic validation.
-7. Create a candidate-specific folder inside the current feat folder, usually
+7. If the candidate is `risk: high`, stop before selection unless the user has
+   explicitly approved a concrete decision option from a high-risk decision
+   report.
+8. Create a candidate-specific folder inside the current feat folder, usually
    `changes/<plan_id>/<candidate-id>-<slug>/`.
-8. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+9. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
-9. Update the candidate queue:
+10. Update the candidate queue:
    - set the selected candidate to `selected`
    - add `selection.selected_change_id`
    - add concise `selection.reason`
    - append an `operations` entry for the selection
    - leave all other candidates in place
-10. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
-11. Stop before implementation unless the user explicitly asks to continue.
+11. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
+12. Stop before implementation unless the user explicitly asks to continue.
 
 ## Targeted Review
 
@@ -71,11 +74,33 @@ When reviewing a specific candidate id, report:
 - owned paths and likely conflict surfaces
 - validation commands
 - acceptance gaps
+- high-risk decision report status when `risk: high`
 - blockers or reasons it should not be selected
 - exact queue maintenance operation needed, if any
 
 Do not select a candidate during targeted review unless the user asks to select
 or the current workflow explicitly requires selection.
+
+## High-Risk Stop Gate
+
+For any `risk: high` candidate, do not create `SELECTED_CHANGE.yaml`,
+`ATOM_TASKS.yaml`, or `IMPLEMENTATION_BRIEF.md` unless the user explicitly
+approves a concrete decision option from a `HIGH_RISK_DECISION_REPORT.md`.
+
+When a high-risk candidate is next:
+
+- Report the candidate id, title, status, and why it is high risk.
+- Reference the existing `HIGH_RISK_DECISION_REPORT.md` when present.
+- If no report exists, instruct `decompose-to-changes` or queue maintenance to
+  create one under the owning queue folder.
+- Name the decision options and recommended path from the report when known.
+- State the exact resume condition: user approval of a concrete option.
+- Leave the candidate status unchanged unless the user asks to block, defer, or
+  supersede it.
+
+If the user explicitly approves a high-risk option, the selection reason must
+name the approved option and the guardrails from the report. Keep atom tasks
+narrow enough to match that approved option.
 
 ## Atom Task Rules
 
@@ -90,6 +115,7 @@ or the current workflow explicitly requires selection.
 
 - Do not delete or renumber candidate ids.
 - Do not silently select a blocked candidate.
+- Do not silently select a `risk: high` candidate.
 - Do not implement the selected change.
 - Do not mark the candidate `done`; implementation completion owns that update.
 - Do not widen scope beyond the selected candidate.

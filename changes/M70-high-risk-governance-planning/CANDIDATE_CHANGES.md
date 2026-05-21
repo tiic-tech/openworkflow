@@ -17,7 +17,7 @@ changing generated `.agents` surfaces directly, treating high-risk reports as
 chat-only guidance, letting `select-change` silently select `risk: high`
 candidates, or committing experimental non-Codex generated surfaces.
 
-Next recommended candidate: `G003`.
+Next recommended candidate: `G004`.
 
 Feat boundary: this queue owns
 `changes/M70-high-risk-governance-planning/`. Each `G###` candidate is expected
@@ -71,13 +71,23 @@ Completion evidence:
 
 ## G003 - Add High-Risk Stop Gate To Select-Change
 
-Status: `ready`
+Status: `done`
 
 Depends on: `G001`
 
 Purpose: teach `select-change` to stop before selecting or implementing
 `risk: high` candidates unless the user explicitly approves a concrete decision
 option.
+
+Selection: `G003-select-high-risk-stop-gate`
+
+Completion evidence:
+
+- `skills/select-change/SKILL.md`
+- `skills/select-change/references/selection-protocol.md`
+- `quick_validate.py skills/select-change`
+- `npm run validate`
+- `git diff --check`
 
 ## G004 - Add High-Risk Report Validation And Dogfood Fixtures
 
@@ -91,7 +101,7 @@ be quick-validated after the behavior changes.
 
 ## G005 - Convert M69 S003 Into Design-Only Delivery Boundary Change
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `G001`
 

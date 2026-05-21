@@ -17,8 +17,9 @@ Optional:
 - top-level queue `operations` for audit history
 
 If the user names a candidate id, verify that its dependencies are satisfied
-before selecting it. If the id is blocked or not ready, report why and stop
-unless the user explicitly overrides the risk.
+before selecting it. If the id is blocked, not ready, or `risk: high`, report
+why and stop unless the user explicitly approves the relevant risk or decision
+option.
 
 ## Feat And Commit Cadence
 
@@ -53,6 +54,7 @@ Return:
 - `dependency_status`
 - `scope_risks`
 - `validation_gaps`
+- `high_risk_report`: required, missing, present, or not_applicable
 - `recommended_operation`: query, select, update, split, defer, block,
   supersede, or none
 
@@ -68,9 +70,39 @@ the recommended operation to be applied.
 5. Prefer focused owned paths over cross-module changes.
 6. Prefer clear validation over unclear or manual-only acceptance.
 7. Prefer lower-risk dogfood or source behavior before runtime exposure.
+8. Stop on `risk: high` unless explicit user approval names a concrete decision
+   option.
 
 When two candidates are close, pick the one that produces better evidence for
 the next planning decision.
+
+## High-Risk Selection Gate
+
+High-risk candidates require a decision report before selection. The report is
+usually `changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md` and is defined in
+`references/planning-artifact-contracts.md`.
+
+When the best next candidate is `risk: high`:
+
+1. Check whether the queue links an existing high-risk decision report.
+2. If a report exists, summarize its concrete risks, options, recommended path,
+   guardrails, go criteria, and stop criteria.
+3. If no report exists, stop and recommend a `decompose-to-changes` maintenance
+   operation to create one.
+4. Do not create selection artifacts unless the user explicitly approves a
+   concrete option such as design-only, research-only, narrow spike, or full
+   implementation.
+
+Explicit approval must be more specific than "continue". It should identify the
+approved option or replacement candidate. If approval is ambiguous, ask for the
+decision option and do not select.
+
+When a high-risk candidate is approved and selected:
+
+- Include the approved option in `selection_reason`.
+- Add the report path to rejected alternatives or evidence.
+- Copy report guardrails into `IMPLEMENTATION_BRIEF.md` stop conditions.
+- Keep atom tasks scoped to the approved option, not the full high-risk surface.
 
 ## SELECTED_CHANGE.yaml
 

@@ -19,11 +19,13 @@ outputs:
   candidate_queue: changes/M70-high-risk-governance-planning/CANDIDATE_CHANGES.yaml
   readable_view: changes/M70-high-risk-governance-planning/CANDIDATE_CHANGES.md
 candidate_count: 7
-completed_candidate_id: G002
-completed_change_id: G002-dtc-high-risk-report-behavior
+completed_candidate_id: G003
+completed_change_id: G003-select-high-risk-stop-gate
 completed_contract_candidate_id: G001
 completed_contract_change_id: G001-high-risk-report-contract
-next_recommended_candidate_id: G003
+completed_dtc_candidate_id: G002
+completed_dtc_change_id: G002-dtc-high-risk-report-behavior
+next_recommended_candidate_id: G004
 unresolved_questions:
   - Whether high-risk report validation should be schema-based, Markdown-section based, or fixture-only.
   - Which second adapter target should be researched after the S003 design-only boundary is accepted.
@@ -36,6 +38,7 @@ notes:
   - G001 is recommended first because both planning skills need a stable report contract before behavior changes.
   - G001 completed the high-risk decision report planning artifact contract.
   - G002 completed decompose-to-changes high-risk report creation and maintenance guidance.
+  - G003 completed select-change high-risk stop-gate guidance.
   - G002 and G003 should be implemented before relying on high-risk stop behavior in future queues.
   - G005 and G006 are lower-risk mitigations for M69 S003 and S007.
   - G007 remains high risk because it approaches multi-adapter delivery, even as a dry-run design.

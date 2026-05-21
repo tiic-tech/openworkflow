@@ -43,7 +43,7 @@ selection_policy:
     - treating high-risk reports as informal chat-only guidance
     - letting select-change silently select risk: high candidates
     - committing experimental non-Codex generated surfaces
-next_recommended_candidate_id: G003
+next_recommended_candidate_id: G004
 changes:
   - id: G001
     status: done
@@ -149,7 +149,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G003
-    status: ready
+    status: done
     title: Add high-risk stop gate to select-change
     purpose: >
       Teach select-change to stop before selecting or implementing risk: high
@@ -183,8 +183,25 @@ changes:
       - select-change does not create SELECTED_CHANGE.yaml for risk: high candidates without explicit user approval.
       - select-change names the required high-risk report path and resume criteria.
       - Targeted candidate review includes high-risk decision report status.
+    selection:
+      selected_change_id: G003-select-high-risk-stop-gate
+      reason: >
+        G003 is the next recommended candidate after G002 and completes the
+        paired planning-skill high-risk governance behavior.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G003-select-high-risk-stop-gate
+      completed_at: 2026-05-21
+      evidence:
+        - skills/select-change/SKILL.md
+        - skills/select-change/references/selection-protocol.md
+        - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/SELECTED_CHANGE.yaml
+        - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/select-change"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G004
-    status: candidate
+    status: ready
     title: Add high-risk report validation and dogfood fixtures
     purpose: >
       Make high-risk governance testable by adding lightweight validation or
@@ -401,3 +418,44 @@ operations:
       - "validation: quick_validate.py skills/decompose-to-changes"
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: G003 is the next recommended candidate after decompose-to-changes high-risk behavior completed.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/SELECTED_CHANGE.yaml
+      - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/ATOM_TASKS.yaml
+      - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: >
+      select-change now stops before silently selecting risk: high candidates.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - "validation: quick_validate.py skills/select-change"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: G002 and G003 are complete, satisfying high-risk report validation and dogfood fixture dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/select-change/SKILL.md
