@@ -1564,10 +1564,19 @@ function hasYamlScalar(content: string, key: string, value: string): boolean {
 
 function verifyVisionSkill(content: string): void {
   for (const required of [
-    "conversation-first-sustained-grill",
+    "delayed-compile-product-interrogation",
+    "<vision_role>",
+    "Act as product partner",
+    "Act as requirements interrogator",
+    "Act as intent compiler",
+    "<interaction_modes>",
+    "Interview mode is the default",
+    "Checkpoint mode writes",
+    "Compile mode writes",
     "<agent_first_consumer>",
     "Treat the next implementing Agent as the first consumer of vision artifacts.",
     "The vision_delta must preserve enough handoff intelligence",
+    "strategic_core and product_system_seed must let /ow:proto generate prototype directions",
     "<conversation_first>",
     "<mandatory_coverage>",
     "Cover target user and beneficiary.",
@@ -1575,12 +1584,16 @@ function verifyVisionSkill(content: string): void {
     "Cover AI-native role, boundaries, and failure modes.",
     "Cover privacy, data, sharing, and retention assumptions.",
     "Cover success signals and failure signals.",
+    "Cover prototype direction seeds and prompt constraints needed by /ow:proto.",
+    "<proto_readiness_gate>",
+    "VISION.md is ready only when /ow:proto can derive",
+    "If proto_readiness.status is missing or thin",
     "<readiness_gate>",
-    "Do not hand off to /ow:validation until mandatory coverage is addressed",
-    "Vision readiness is based on coverage and user confirmation, not on a fixed number of turns.",
+    "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness",
+    "Vision readiness is based on strategic depth, proto-readiness, and user confirmation",
     "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers",
   ]) {
-    assert(content.includes(required), `ow-vision missing M15 guidance: ${required}`);
+    assert(content.includes(required), `ow-vision missing delayed-compile guidance: ${required}`);
   }
 }
 

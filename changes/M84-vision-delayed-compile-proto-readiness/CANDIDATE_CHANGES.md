@@ -28,9 +28,9 @@ Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
 Completed candidates: `C001`, `C002`
 
-Selected candidate: none
+Selected candidate: `C003`
 
-Next recommended candidate: `C003`
+Next recommended candidate: none until `C003` is completed or superseded.
 
 ## Selection Policy
 
@@ -78,12 +78,14 @@ Completion evidence:
 
 ### C003 - Upgrade /ow:vision skill protocol for product partner interrogation
 
-Status: `ready`
+Status: `selected`
 
 Risk: `medium`
 
 Encodes the product partner, requirements interrogator, and intent compiler role
 into `/ow:vision` generated guidance and command protocol.
+
+Selection: `C003-vision-generated-protocol`
 
 ### C004 - Add /ow:vision delayed-compile stress tests and fixtures
 

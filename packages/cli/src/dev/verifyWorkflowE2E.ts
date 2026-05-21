@@ -83,13 +83,15 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   const phase = "vision";
   const source = command("vision", phase);
   const protocol = protocolFor(source, phase);
-  assertPhase(phase, protocol.interactionMode === "conversation-first-sustained-grill", "source protocol is not sustained grill");
+  assertPhase(phase, protocol.interactionMode === "delayed-compile-product-interrogation", "source protocol is not delayed-compile product interrogation");
   assertExactList(phase, protocol.handoffCommands, ["/ow:validation"], "vision source handoffs changed");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/validation/**", "vision can create validation artifacts");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/prototypes/**", "vision can create prototype artifacts");
-  assertListIncludes(phase, protocol.auditCheckpoints.before, "Start in conversation mode and ask the next useful vision question before writing artifacts.", "vision does not start conversation-first");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "product partner, requirements interrogator, and intent compiler", "vision source missing three-role framing");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "do not start by creating or updating durable vision files", "vision does not start conversation-first");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "make each question depend on the previous answer", "vision does not enforce progressive questioning");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "user confirms readiness", "vision handoff does not require user readiness confirmation");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "proto_readiness.status", "vision compile does not require proto-readiness");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "user readiness", "vision handoff does not require user readiness confirmation");
 
   const generated = commandRecord(runtime, "vision", phase);
   assertPhase(phase, stringField(generated, "visibility", phase) === "user", "generated vision command is not user visible");
@@ -97,21 +99,31 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(generated, "forbidden_outputs", phase), ".openworkflow/prototypes/**", "generated vision can create prototypes");
 
   const packet = packetRecord(runtime, "/ow:vision", phase);
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "ask the next useful vision question", "context packet lost conversation-first checkpoint");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Cover mandatory vision dimensions", "context packet lost mandatory coverage checkpoint");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "user confirms readiness", "context packet lost readiness gate");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "Ask the next useful vision question", "context packet lost conversation-first checkpoint");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Cover mandatory vision and proto-readiness dimensions", "context packet lost mandatory proto-readiness checkpoint");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "proto-readiness", "context packet lost proto-readiness gate");
 
   const skill = await readSkill(runtime, "ow-vision");
   assertIncludes(phase, skill, ".openworkflow/CURRENT_STATE.yaml", "skill missing current state loading guidance");
   assertIncludes(phase, skill, "clear stale current_question", "skill missing stale question closure guidance");
   assertIncludes(phase, skill, "summary_policy", "skill missing summary policy guidance");
+  assertIncludes(phase, skill, "<vision_role>", "skill missing vision role block");
+  assertIncludes(phase, skill, "Act as product partner", "skill missing product partner role");
+  assertIncludes(phase, skill, "Act as requirements interrogator", "skill missing requirements interrogator role");
+  assertIncludes(phase, skill, "Act as intent compiler", "skill missing intent compiler role");
+  assertIncludes(phase, skill, "<interaction_modes>", "skill missing delayed compile modes");
+  assertIncludes(phase, skill, "Interview mode is the default", "skill missing interview mode");
+  assertIncludes(phase, skill, "Checkpoint mode writes", "skill missing checkpoint mode");
+  assertIncludes(phase, skill, "Compile mode writes", "skill missing compile mode");
   assertIncludes(phase, skill, "<agent_first_consumer>", "skill missing Agent-first consumer guidance");
   assertIncludes(phase, skill, "Treat the next implementing Agent as the first consumer", "skill missing first-consumer framing");
   assertIncludes(phase, skill, "vision_delta must preserve enough handoff intelligence", "skill missing compact handoff intelligence guidance");
   assertIncludes(phase, skill, "<conversation_first>", "skill missing conversation_first block");
   assertIncludes(phase, skill, "Ask exactly one question", "skill no longer limits vision to one focused question");
   assertIncludes(phase, skill, "<mandatory_coverage>", "skill missing mandatory coverage block");
-  assertIncludes(phase, skill, "Do not hand off to /ow:validation until mandatory coverage is addressed", "skill lost validation handoff gate");
+  assertIncludes(phase, skill, "<proto_readiness_gate>", "skill missing proto-readiness gate");
+  assertIncludes(phase, skill, "VISION.md is ready only when /ow:proto can derive", "skill missing proto-readiness acceptance");
+  assertIncludes(phase, skill, "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness", "skill lost validation handoff gate");
   assertIncludes(phase, skill, "not on a fixed number of turns", "skill permits fixed-turn readiness");
   assertIncludes(phase, skill, "<artifact_checkpoint>", "skill missing artifact checkpoint separation");
 

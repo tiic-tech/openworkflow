@@ -466,7 +466,7 @@ function gitAutomationProtocol(): CommandProtocol {
 function visionProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "conversation-first-sustained-grill",
+    interactionMode: "delayed-compile-product-interrogation",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -498,34 +498,59 @@ function visionProtocol(): CommandProtocol {
       before: [
         "Confirm workflow and context indexes exist.",
         "Load CURRENT_STATE.yaml when present to avoid stale stage routing.",
-        "Start in conversation mode and ask the next useful vision question before writing artifacts.",
+        "Enter interview mode as product partner, requirements interrogator, and intent compiler.",
+        "Ask the next useful vision question before writing artifacts; do not start by creating or updating durable vision files.",
+        "If resuming, load only current vision/context state needed to continue the conversation and identify any stale current_question.",
       ],
       during: [
         "Ask one focused question at a time and make each question depend on the previous answer.",
-        "Cover mandatory vision dimensions before validation handoff.",
+        "Keep brainstorming in conversation memory until a meaningful checkpoint, pause request, or compile readiness boundary.",
+        "Challenge thin, generic, contradictory, or implementation-shaped answers until the strategic product intent is clear.",
+        "Cover mandatory vision and proto-readiness dimensions before validation handoff.",
         "Provide concrete examples or options when the user is stuck.",
       ],
       after: [
-        "Persist artifacts only after stable answers, explicit save request, or readiness checkpoint.",
-        "Handoff to validation only after mandatory coverage, unresolved blockers are named, and the user confirms readiness.",
+        "Persist artifacts only in checkpoint mode or compile mode after stable answers, explicit save request, or readiness checkpoint.",
+        "Compile durable VISION artifacts only after proto_readiness.status can be ready or blockers are explicit and the user confirms the interview can stop.",
+        "Handoff to validation only after mandatory coverage, proto-readiness, unresolved blockers, and user readiness are explicit.",
         "When handing off, mark the vision session active or reviewed, clear stale current_question when answered, and update CURRENT_STATE.yaml.",
         "Confirm no validation, prototype, spec, change, or runtime artifacts were created.",
       ],
     },
     antiPatterns: [
+      "Do not write durable vision artifacts after every user answer.",
       "Do not open by writing vision artifacts before the conversation has stable answers.",
       "Do not create validation rankings during vision work.",
+      "Do not create prototype prompt packs during vision work; record proto-readiness inputs and hand off to /ow:proto later.",
       "Do not create specs, changes, tasks, or teams from a vision session.",
       "Do not batch many interview questions into one turn.",
       "Do not hand off to validation after a fixed small number of questions.",
+      "Do not hide thin or conflicted answers as polished product truth.",
     ],
     internalSections: [
+      {
+        tag: "vision_role",
+        items: [
+          "Act as product partner: improve the product thesis, surface sharper alternatives, and protect the user from weak strategic defaults.",
+          "Act as requirements interrogator: probe unclear assumptions, contradictions, target user ambiguity, trust boundaries, and success criteria.",
+          "Act as intent compiler: convert conversation into structured strategic_core, product_system_seed, proto_readiness, and coverage fields only when the intent is stable.",
+        ],
+      },
+      {
+        tag: "interaction_modes",
+        items: [
+          "Interview mode is the default: ask one focused question at a time and do not write durable .openworkflow/vision artifacts after each answer.",
+          "Checkpoint mode writes a lightweight durable snapshot only when the user asks to save, the session is pausing, a topic has closed, or a load-bearing ambiguity must not be lost.",
+          "Compile mode writes VISION.md, VISION_CONTRACT.yaml, VISION_SESSION.yaml, and NOTE.md only after mandatory discovery coverage and proto-readiness are sufficient or explicitly blocked.",
+        ],
+      },
       {
         tag: "agent_first_consumer",
         items: [
           "Treat the next implementing Agent as the first consumer of vision artifacts.",
-          "Before persistence or handoff, make the compact vision state answer: current state, read-first pointers, source-of-truth artifact, unresolved blockers, safe write boundary, validation proof, and next command.",
+          "Before persistence or handoff, make the compact vision state answer: current state, read-first pointers, source-of-truth artifact, unresolved blockers, safe write boundary, proto-readiness, validation target, and next command.",
           "The vision_delta must preserve enough handoff intelligence for a low-context Agent: one sentence, users, core problem, goals, non-goals, quality bar, AI-native role, success signals, and failure signals.",
+          "The strategic_core and product_system_seed must let /ow:proto generate prototype directions without inventing the core strategy.",
           "If those handoff fields are thin, continue the conversation or record explicit unresolved questions instead of presenting the artifact as ready.",
         ],
       },
@@ -535,6 +560,7 @@ function visionProtocol(): CommandProtocol {
           "Treat /ow:vision as a focused product conversation, not an artifact fill-out task.",
           "Ask exactly one question unless the user explicitly requests a summary or save checkpoint.",
           "Let each answer drive the next deeper question; do not run a generic questionnaire mechanically.",
+          "A long interview is acceptable when it improves product truth; auditability is preserved through checkpoints and compile, not per-answer file churn.",
         ],
       },
       {
@@ -548,20 +574,30 @@ function visionProtocol(): CommandProtocol {
           "Cover privacy, data, sharing, and retention assumptions.",
           "Cover alternatives or competing mental models.",
           "Cover success signals and failure signals.",
+          "Cover prototype direction seeds and prompt constraints needed by /ow:proto.",
+        ],
+      },
+      {
+        tag: "proto_readiness_gate",
+        items: [
+          "VISION.md is ready only when /ow:proto can derive 3-5 strategically distinct prototype directions without inventing the product strategy.",
+          "Before compile, verify target user, behavior change, mechanism, differentiator, boundary conditions, trust controls, anti-goals, strongest success signal, failure signals, prototype direction seeds, prompt constraints, and validation target.",
+          "If proto_readiness.status is missing or thin, keep interviewing or record explicit blockers; do not hand off as ready.",
+          "If the user asks for prototype prompts directly and proto-readiness is ready, hand off to /ow:proto; otherwise continue the vision interview.",
         ],
       },
       {
         tag: "readiness_gate",
         items: [
-          "Do not hand off to /ow:validation until mandatory coverage is addressed, unresolved questions are explicit, and the user confirms readiness.",
+          "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness is ready or explicitly blocked, unresolved questions are explicit, and the user confirms readiness.",
           "If a dimension is thin, ask another targeted question instead of writing a final artifact.",
-          "Vision readiness is based on coverage and user confirmation, not on a fixed number of turns.",
+          "Vision readiness is based on strategic depth, proto-readiness, and user confirmation, not on a fixed number of turns.",
         ],
       },
       {
         tag: "artifact_checkpoint",
         items: [
-          "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers or an explicit checkpoint request.",
+          "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers, explicit checkpoint request, pause boundary, or compile readiness.",
           "Keep brainstorming and tentative hypotheses in NOTE.md or unresolved_questions rather than presenting them as stable product truth.",
           "Summarize at meaningful checkpoints before persisting durable vision state.",
         ],

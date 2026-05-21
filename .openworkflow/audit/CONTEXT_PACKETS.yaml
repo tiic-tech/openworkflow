@@ -61,17 +61,26 @@ packets:
       before:
         - Confirm workflow and context indexes exist.
         - Load CURRENT_STATE.yaml when present to avoid stale stage routing.
-        - Start in conversation mode and ask the next useful vision question before writing
-          artifacts.
+        - Enter interview mode as product partner, requirements interrogator, and intent compiler.
+        - Ask the next useful vision question before writing artifacts; do not start by creating or
+          updating durable vision files.
+        - If resuming, load only current vision/context state needed to continue the conversation
+          and identify any stale current_question.
       during:
         - Ask one focused question at a time and make each question depend on the previous answer.
-        - Cover mandatory vision dimensions before validation handoff.
+        - Keep brainstorming in conversation memory until a meaningful checkpoint, pause request, or
+          compile readiness boundary.
+        - Challenge thin, generic, contradictory, or implementation-shaped answers until the
+          strategic product intent is clear.
+        - Cover mandatory vision and proto-readiness dimensions before validation handoff.
         - Provide concrete examples or options when the user is stuck.
       after:
-        - Persist artifacts only after stable answers, explicit save request, or readiness
-          checkpoint.
-        - Handoff to validation only after mandatory coverage, unresolved blockers are named, and
-          the user confirms readiness.
+        - Persist artifacts only in checkpoint mode or compile mode after stable answers, explicit
+          save request, or readiness checkpoint.
+        - Compile durable VISION artifacts only after proto_readiness.status can be ready or
+          blockers are explicit and the user confirms the interview can stop.
+        - Handoff to validation only after mandatory coverage, proto-readiness, unresolved blockers,
+          and user readiness are explicit.
         - When handing off, mark the vision session active or reviewed, clear stale current_question
           when answered, and update CURRENT_STATE.yaml.
         - Confirm no validation, prototype, spec, change, or runtime artifacts were created.

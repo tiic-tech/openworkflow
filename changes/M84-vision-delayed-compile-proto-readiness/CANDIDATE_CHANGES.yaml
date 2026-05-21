@@ -84,7 +84,7 @@ scope_control:
         through benchmark prototype selection after component commands are
         upgraded.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -207,7 +207,7 @@ changes:
         - packages/core/src/workflow/summaryHealth.ts
         - schemas/vision-session.schema.json
   - id: C003
-    status: ready
+    status: selected
     title: Upgrade /ow:vision skill protocol for product partner interrogation
     purpose: >
       Encode the product partner, requirements interrogator, and intent compiler
@@ -249,6 +249,13 @@ changes:
       - The skill requires deep interview before compile and forbids eager durable writes in interview mode.
       - The skill uses proto-readiness as a compile gate.
       - Verification proves generated skill and context packets preserve the new protocol.
+    selection:
+      selected_change_id: C003-vision-generated-protocol
+      reason: >
+        Single-queue SC selected C003 because C002 added the proto-readiness
+        artifact fields and the generated /ow:vision command protocol is the
+        next dependency before stress fixtures.
+      selected_at: 2026-05-22
   - id: C004
     status: candidate
     title: Add /ow:vision delayed-compile stress tests and fixtures
@@ -409,3 +416,18 @@ operations:
     after_status: ready
     evidence:
       - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 directly with SC because M84 is still a single active queue
+      and C003 is the next ready candidate after C002 completion.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/IMPLEMENTATION_BRIEF.md
