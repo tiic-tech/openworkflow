@@ -64,7 +64,7 @@ as the implementation orchestration boundary.
 
 ### C014 - Define Deferred Feature Handoff Map
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -116,3 +116,4 @@ with its own queue boundary.
 - `OP010`: selected C013 directly with SC because M73 is the single active queue.
 - `OP011`: completed C013 with local commit evidence.
 - `OP012`: selected C014 directly with SC because M73 is the single active queue.
+- `OP013`: completed C014 with local commit evidence; M73 active candidates are complete.

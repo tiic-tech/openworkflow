@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M73-workflow-blueprint-runtime-alignment
 title: Candidate changes for workflow blueprint runtime alignment
-status: active
+status: completed
 source:
   kind: workflow_blueprint_reassessment
   refs:
@@ -273,7 +273,7 @@ changes:
         - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/LOCAL_COMMIT_EVIDENCE.yaml
         - references/workflow-blueprint-runtime-alignment.md
   - id: C014
-    status: selected
+    status: done
     title: Define deferred feature handoff map
     purpose: >
       Turn the out-of-scope runtime surfaces into a concise future-queue handoff
@@ -312,6 +312,14 @@ changes:
         C012, and C013 are complete and the handoff map is needed to close the
         workflow-slice queue.
       selected_at: 2026-05-21
+    completion:
+      completed_change_id: C014-deferred-feature-handoff-map
+      completed_at: 2026-05-21
+      primary_commit: 929f54ca7a0de5eee9f2718c249248ceee9ce0c3
+      evidence_commit: bc93c4cb6262f759f96c4fead5935a93e61bc1c5
+      evidence:
+        - changes/M73-workflow-blueprint-runtime-alignment/C014-deferred-feature-handoff-map/LOCAL_COMMIT_EVIDENCE.yaml
+        - references/workflow-blueprint-runtime-alignment.md
 operations:
   - operation_id: OP001
     operation_type: add
@@ -514,3 +522,18 @@ operations:
     after_status: selected
     evidence:
       - changes/M73-workflow-blueprint-runtime-alignment/C014-deferred-feature-handoff-map/SELECTED_CHANGE.yaml
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C014
+    actor: agent
+    reason: >
+      C014 implemented the deferred feature handoff map and recorded local
+      commit evidence through ow:git-automation. This completes all active M73
+      candidates.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/C014-deferred-feature-handoff-map/LOCAL_COMMIT_EVIDENCE.yaml
+      - references/workflow-blueprint-runtime-alignment.md
