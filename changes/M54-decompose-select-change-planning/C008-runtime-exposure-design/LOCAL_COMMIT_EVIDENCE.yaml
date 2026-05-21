@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C008-runtime-exposure-design
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C008-runtime-exposure-design
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C008
+selected_change_id: C008-runtime-exposure-design
+primary_commit: 6fc5389fba423db288ee0ab2a70037735cea24fd
+validation_evidence:
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run validate
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
