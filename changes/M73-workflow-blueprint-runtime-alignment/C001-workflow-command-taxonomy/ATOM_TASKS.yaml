@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-workflow-command-taxonomy
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-workflow-command-taxonomy
+title: C001 workflow command taxonomy atom tasks
+status: pending
+tasks:
+  - task_id: C001-A001
+    title: Define command taxonomy
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Primary, internal, advanced, and async command categories are defined.
+      - DTC, AC, and SC are placed inside /ow:change.
+  - task_id: C001-A002
+    title: Define stage graph
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - The graph covers vision, validation, proto, tune, proto2html, html2spec, build, change, and archive.
+      - Review, build-agent, and build-skill surfaces are attached without disrupting the main path.
+  - task_id: C001-A003
+    title: Define deferred feature refs
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - Remaining runtime surfaces are listed as future feature refs, not current candidates.
+      - Each future feature ref has a clear reason and likely queue boundary.
+  - task_id: C001-A004
+    title: Validate design-only taxonomy
+    status: pending
+    type: verify
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

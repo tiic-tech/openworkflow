@@ -22,6 +22,18 @@ Each `CANDIDATE_CHANGES.yaml` queue is a feat boundary. The top-level
 `changes/<plan_id>/` folder owns the feature-sized planning source, readable
 view, summary, operation log, and candidate-specific selection artifacts.
 
+The queue boundary is intentionally smaller than a roadmap. A queue may own one
+feature, bounded module, command surface, artifact family, or workflow slice. It
+must not include multiple independent features or a large module family just
+because the source discussion contains a deep product plan.
+
+When planning input contains more features than the current queue should own,
+record the extra features as deferred refs, usually under
+`scope_control.deferred_features` in `CANDIDATE_CHANGES.yaml` and mirrored in
+`SUMMARY.yaml`. Deferred refs are not candidates, do not participate in
+dependencies or unlocks, and require a later `decompose-to-changes` pass before
+selection or implementation.
+
 Each candidate inside that queue is a commit-sized change. A selected candidate
 should normally write its `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
 `IMPLEMENTATION_BRIEF.md` under `changes/<plan_id>/<candidate-id>-<slug>/` and
@@ -146,7 +158,22 @@ Required top-level fields:
 
 Optional but recommended after maintenance:
 
+- `scope_control` when the source discussion spans multiple possible features
 - `operations`
+
+Recommended `scope_control` fields:
+
+- `current_boundary`
+- `boundary_type`
+- `in_scope_rule`
+- `out_of_scope_rule`
+- `deferred_features`
+
+Each deferred feature should include:
+
+- `title`
+- `reason`
+- `suggested_plan_id` when a likely future queue name is clear
 
 Each candidate change requires:
 

@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: change_analysis:M73-workflow-blueprint-runtime-alignment
+contract_type: planning
+planning_artifact_type: change_analysis
+analysis_id: M73-workflow-blueprint-runtime-alignment
+title: Change analysis for workflow blueprint runtime alignment
+status: complete
+source:
+  kind: single_queue_analysis
+  analyzed_queues:
+    - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+git_state:
+  branch: codex/m73-workflow-blueprint-runtime-alignment
+  dirty: true
+  note: Analysis was produced during the DTC/AC/SC exploration artifact write.
+recommendation:
+  target_plan_id: M73-workflow-blueprint-runtime-alignment
+  target_candidate_id: C001
+  action: handoff_to_select_change
+  reason: >
+    C001 is ready, medium risk, has no dependencies, and prevents the next
+    workflow runtime work from drifting away from the full OW_DEVELOP_PLAN
+    blueprint. Scope-control review narrowed M73 so C001 is the only active
+    candidate; adjacent workflow features are deferred refs for future DTC
+    passes.
+rejected_alternatives:
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: null
+    reason: >
+      proto2html, html2spec, build, change orchestration, review, archive,
+      build-agent, build-skill, lifecycle transactions, and expanded read
+      models are separate future features, not alternatives inside the current
+      M73 candidate list.
+high_risk_stop:
+  required: false
+  reason: Recommended candidate C001 is medium risk and design-only.
+validation:
+  commands_run:
+    - git status --short --branch
+  notes:
+    - AC recommends C001 for selection.
+    - M73 was narrowed after scope-control review so the queue remains one workflow slice.

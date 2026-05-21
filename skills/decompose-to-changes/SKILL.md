@@ -18,6 +18,16 @@ boundary. The top-level folder `changes/<plan_id>/` owns the feat-level queue,
 summary, and audit history. Candidate changes inside that queue are
 commit-sized slices of the feat, not separate top-level feats.
 
+Before writing candidates, perform a scope triage. A queue may cover one
+feature, one bounded module, one command surface, one artifact family, or one
+workflow slice. It must not become a roadmap bucket for multiple features or a
+large module family just because the source discussion contains a deep vision.
+
+When the source includes more features than the current queue can responsibly
+own, record those features as future refs in `scope_control.deferred_features`
+or `SUMMARY.yaml` notes. Do not include them as current `changes` candidates
+unless they are inside the selected queue boundary.
+
 Create a new top-level `changes/<plan_id>/` only for a new decomposition queue,
 product theme, or broad planning source. When the current queue still owns the
 work, maintain that queue and let `select-change` create candidate-specific
@@ -66,26 +76,38 @@ Read these only as needed:
 6. If updating an existing queue, preserve existing candidate ids, branch
    boundary, and history.
    Add new ids only for genuinely new candidates.
-7. Decompose the source into candidates with focused owned paths, explicit
+7. Run the queue scope gate:
+   - name the current feature boundary in `scope_control.current_boundary`
+   - decide which discussed features are outside that boundary
+   - record outside features as deferred refs, not current candidates
+   - if the remaining queue would still span multiple features or a broad
+     module family, split the planning source into separate future queues
+8. Decompose the in-bound source into candidates with focused owned paths, explicit
    includes and excludes, dependencies, validation, and acceptance.
-8. For queue maintenance, write an `operations` entry for every targeted
+9. For queue maintenance, write an `operations` entry for every targeted
    change. Include the operation type, target id, reason, and evidence.
-9. If the current queue reaches one or more `risk: high` candidates that need
+10. If the current queue reaches one or more `risk: high` candidates that need
    user confirmation, create or update `HIGH_RISK_DECISION_REPORT.md` in the
    owning queue folder before implementation continues.
-10. Write `CANDIDATE_CHANGES.yaml` first. Then write
+11. Write `CANDIDATE_CHANGES.yaml` first. Then write
    `CANDIDATE_CHANGES.md` as a non-authoritative readable view.
-11. Write `SUMMARY.yaml` with source refs, candidate count, branch boundary,
+12. Write `SUMMARY.yaml` with source refs, candidate count, branch boundary,
     key dependencies, risks, and the optional next recommended candidate.
-12. Run repository validation when available, usually `npm run validate`.
+13. Run repository validation when available, usually `npm run validate`.
 
 ## Candidate Rules
 
 - Assign stable ids such as `C001`, `C002`, `C003`.
 - Prefer one module, feature, command surface, artifact family, or workflow
   slice per candidate.
+- Prefer one feature, bounded module, command surface, artifact family, or
+  workflow slice per queue. A queue that needs several independent feature
+  outcomes is too broad even when every candidate is individually small.
 - Split candidates that require unrelated owned paths or mix planning,
   implementation, and runtime exposure.
+- Do not include "later but known" features as normal candidates in the current
+  queue. Capture them as deferred refs with enough title, rationale, and
+  suggested future queue hints for a later DTC pass.
 - Use dependencies and unlocks instead of forcing one sorted backlog.
 - Set `next_recommended_candidate_id` only when one candidate clearly unlocks
   the rest.

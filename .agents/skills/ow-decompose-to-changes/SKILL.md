@@ -81,10 +81,12 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run git status --short --branch and record branch and dirty-tree state.
 - Decide whether this is new decomposition or maintenance of an existing queue.
+- Run the queue scope gate: choose one feature, bounded module, command surface, artifact family, or workflow slice for this queue.
 - Read existing queue YAML before changing candidate ids or statuses.
 </before>
 <during>
 - Preserve stable candidate ids and branch_boundary when updating an existing queue.
+- Record features outside the current queue boundary as deferred refs instead of current candidates.
 - Keep candidates focused, dependency-aware, and bounded by owned paths.
 - Append an operation entry for every queue maintenance edit.
 </during>
@@ -118,6 +120,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not select a candidate from decompose-to-changes.
 - Do not implement code from decompose-to-changes.
 - Do not create a new top-level changes folder for every small candidate inside the same feat boundary.
+- Do not turn one CANDIDATE_CHANGES queue into a roadmap bucket for multiple features or a large module family.
 - Do not delete historical candidate ids; use status transitions and operation evidence.
 </anti_patterns>
 

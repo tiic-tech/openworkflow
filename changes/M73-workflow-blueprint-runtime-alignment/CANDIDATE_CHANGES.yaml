@@ -1,0 +1,190 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M73-workflow-blueprint-runtime-alignment
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M73-workflow-blueprint-runtime-alignment
+title: Candidate changes for workflow blueprint runtime alignment
+status: active
+source:
+  kind: workflow_blueprint_reassessment
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by analyze-changes and select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - preserves the full workflow blueprint before adding runtime surfaces
+    - clarifies the command taxonomy and stage graph before runtime exposure
+    - improves summary-first Agent consumption
+    - reduces risk before generated adapter changes
+  avoid:
+    - implementing multiple runtime commands in one change
+    - treating DTC AC SC as the full workflow
+    - turning one candidate queue into a roadmap bucket
+    - broad generated-surface churn before contracts are stable
+scope_control:
+  current_boundary: >
+    Define the workflow command taxonomy and stage graph only. This queue owns
+    the blueprint alignment needed before any individual runtime surface is
+    decomposed.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only changes required to establish the command families, stage
+    graph, and DTC/AC/SC placement inside /ow:change.
+  out_of_scope_rule: >
+    Record individual runtime surfaces as deferred feature refs. Do not include
+    proto2html, html2spec, build, change orchestration, review, archive,
+    build-agent, build-skill, lifecycle transactions, or expanded read models
+    as current candidates in this queue.
+  deferred_features:
+    - title: Define proto2html runtime contract
+      reason: Separate command surface; should receive its own DTC pass after taxonomy.
+      suggested_plan_id: M74-proto2html-runtime-contract
+    - title: Define html2spec artifact contract
+      reason: Separate artifact family; depends on proto2html and should not be bundled into taxonomy.
+      suggested_plan_id: M75-html2spec-artifact-contract
+    - title: Define build command team and milestone planning contract
+      reason: Separate command surface with agent/team implications and high-risk runtime exposure.
+      suggested_plan_id: M76-build-command-contract
+    - title: Align /ow:change with DTC AC SC loop
+      reason: Separate orchestration feature; depends on build/milestone boundaries.
+      suggested_plan_id: M77-change-planning-loop
+    - title: Design async review command pipeline
+      reason: Separate async/internal pipeline with review findings and monitoring behavior.
+      suggested_plan_id: M78-review-async-pipeline
+    - title: Design archive completion transaction
+      reason: Separate completion transaction; depends on review and change-loop boundaries.
+      suggested_plan_id: M79-archive-completion-transaction
+    - title: Define build-agent and build-skill registry semantics
+      reason: Separate advanced command and registry feature with generated-surface risk.
+      suggested_plan_id: M80-build-agent-skill-registry
+    - title: Design workflow lifecycle transaction map
+      reason: Cross-surface transaction map should follow individual command contract queues.
+      suggested_plan_id: M81-workflow-lifecycle-transactions
+    - title: Define summary-first read model for expanded workflow
+      reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
+      suggested_plan_id: M82-expanded-workflow-read-model
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: selected
+    title: Define workflow command taxonomy and stage graph
+    purpose: >
+      Convert the OW_DEVELOP_PLAN blueprint into a compact command taxonomy and
+      stage graph that places DTC, AC, and SC inside /ow:change while preserving
+      proto2html, html2spec, build, review, archive, build-agent, and build-skill
+      as separate future workflow surfaces.
+    scope:
+      includes:
+        - full workflow stage graph
+        - command categories for primary, internal, advanced, and async surfaces
+        - boundary between /ow:change and DTC/AC/SC planning commands
+        - deferred feature refs for remaining runtime surfaces
+      excludes:
+        - runtime command implementation
+        - adapter generation
+        - artifact registry implementation
+        - separate candidate changes for individual runtime surfaces
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/C001-workflow-command-taxonomy/
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    dependencies: []
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Workflow graph matches the user-approved blueprint.
+      - DTC, AC, and SC are explicitly scoped to the /ow:change loop.
+      - Remaining command surfaces are recorded as deferred feature refs, not current candidates.
+      - No generated or runtime source surfaces are changed.
+    selection:
+      selected_change_id: C001-workflow-command-taxonomy
+      reason: >
+        analyze-changes recommends the non-high-risk taxonomy change first
+        because it prevents local planning-command work from drifting away from
+        the full OW workflow blueprint while keeping this queue bounded.
+      selected_at: 2026-05-21
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+      - C008
+      - C009
+      - C010
+    actor: agent
+    reason: >
+      Initial DTC exploration decomposed the workflow blueprint reassessment
+      into one broad queue so OW could continue from the full product-to-
+      implementation architecture.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
+    evidence:
+      - docs/OW_DEVELOP_PLAN.md
+      - docs/OW_DEVELOP_PLAN_Phase2.md
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      AC recommended C001 as the next non-high-risk change because it establishes
+      the workflow command taxonomy and stage graph before any runtime exposure
+      or generated-surface work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+      - changes/M73-workflow-blueprint-runtime-alignment/C001-workflow-command-taxonomy/SELECTED_CHANGE.yaml
+  - operation_id: OP003
+    operation_type: remove
+    target_candidate_ids:
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+      - C008
+      - C009
+      - C010
+    actor: agent
+    reason: >
+      Scope-control review found that the initial queue included multiple
+      independent workflow features. Because those candidates were created in
+      the same uncommitted exploration operation, they were removed from the
+      active changes list and preserved as scope_control.deferred_features for
+      future DTC passes.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: null
+    evidence:
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - references/planning-artifact-contracts.md

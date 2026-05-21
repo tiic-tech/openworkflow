@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: summary:M73-workflow-blueprint-runtime-alignment
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M73-workflow-blueprint-runtime-alignment
+title: Summary for workflow blueprint runtime alignment
+status: active
+source:
+  kind: workflow_blueprint_reassessment
+  summary: >
+    Tracks a narrowed DTC queue for aligning OpenWorkflow command taxonomy and
+    stage graph with the overall product-to-implementation blueprint. DTC, AC,
+    and SC are treated as the planning intelligence layer inside /ow:change,
+    not as the whole workflow.
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+scope_boundary:
+  current_boundary: Workflow command taxonomy and stage graph only.
+  boundary_type: workflow_slice
+  note: >
+    Individual runtime surfaces were intentionally removed from the active
+    candidate list and kept as deferred feature refs so M73 does not become a
+    broad workflow roadmap bucket.
+deferred_feature_refs:
+  - M74-proto2html-runtime-contract
+  - M75-html2spec-artifact-contract
+  - M76-build-command-contract
+  - M77-change-planning-loop
+  - M78-review-async-pipeline
+  - M79-archive-completion-transaction
+  - M80-build-agent-skill-registry
+  - M81-workflow-lifecycle-transactions
+  - M82-expanded-workflow-read-model
+outputs:
+  candidate_changes_yaml: changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  change_analysis_yaml: changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+  change_analysis_md: changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.md
+  summary: changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 1
+selected_candidate_id: C001
+selected_change_id: C001-workflow-command-taxonomy
+next_recommended_candidate_id: C001
+key_dependencies:
+  - M54 completed DTC/AC/SC as Codex-delivered planning commands.
+  - C013 clarified that DTC/AC/SC belong inside /ow:change, not as the full OW workflow.
+  - OW_DEVELOP_PLAN defines the intended chain from vision through archive plus advanced build-agent, build-skill, and async review surfaces.
+  - C001 should happen first because every downstream runtime surface depends on stable command taxonomy and stage graph.
+risks:
+  - id: R001
+    level: medium
+    description: A taxonomy queue could drift into a full workflow roadmap if deferred features are treated as active candidates.
+    mitigation: Keep only C001 in active changes and require separate DTC passes for deferred feature refs.
+  - id: R002
+    level: high
+    description: Implementing proto2html, html2spec, build, review, archive, build-agent, or build-skill before command taxonomy is stable could recreate runtime authority drift.
+    mitigation: Select C001 first and keep it design-only.
+unresolved_questions:
+  - Should /ow:archive be user-facing, internal, or both depending on loop mode?
+  - Should /ow:review be represented as a command surface, a runtime service, or both?
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js sync --root . --json
+  notes:
+    - OP001 created the initial broad M73 workflow blueprint runtime alignment candidate queue.
+    - OP002 selected C001 from the queue after AC recommended it as the safest first step.
+    - OP003 narrowed M73 to C001 and converted C002-C010 into deferred feature refs.
