@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G017`.
+- Next recommended candidate: `G018`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -458,7 +458,7 @@ Completion evidence:
 
 ## G017 - Build Read-Only Autonomous Git Simulator
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -480,6 +480,42 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G017-autonomous-git-simulator`
+
+Completion evidence:
+
+- `packages/core/src/git/autonomousSimulator.ts`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/core/src/commands/registry.ts`
+- `references/git-automation-governance.md`
+- `.agents/skills/ow-git-automation/SKILL.md`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml`
+
+## G018 - Plan Narrow Autonomous Remote Pilot
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: decide and design the first narrow autonomous remote mutation pilot
+after simulator evidence exists, such as draft PR creation or branch push only.
+
+Dependencies: `G017`
+
+Owned paths:
+
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/`
+- `references/git-automation-governance.md`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

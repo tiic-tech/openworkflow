@@ -139,6 +139,7 @@ When readiness is not satisfied, keep asking one focused question or record unre
 - openworkflow git-automation branch --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --json
 - openworkflow git-automation commit --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --candidate &lt;id&gt; --message &lt;msg&gt; --validation-evidence &lt;cmds&gt; --json
 - openworkflow git-automation summary --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --json
+- openworkflow git-automation simulate --root . --queue changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml --base &lt;base-ref&gt; --json
 </handoff_commands>
 </agent_protocol>
 

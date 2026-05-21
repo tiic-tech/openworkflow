@@ -107,7 +107,7 @@ Usage:
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--strict] [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
-  openworkflow git-automation <branch|commit|summary|remote> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
+  openworkflow git-automation <branch|commit|summary|remote|simulate> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -125,7 +125,7 @@ Commands:
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
   summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
-  git-automation  Managed git lifecycle shell: local branch, commit, and PR-ready summary; remote mutation is gated.
+  git-automation  Managed git lifecycle shell and read-only autonomous simulator; remote mutation is gated.
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -164,7 +164,8 @@ Two command surfaces:
     git-automation  Preview or apply managed local git operations. In managed mode,
                branch, commit, and summary actions are local-only; remote push,
                PR creation, Issue mutation, and merge require explicit approval
-               and are refused by this command shell.
+               and are refused by this command shell. Use simulate for read-only
+               autonomous push/PR/merge planning.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
   Agent-readable JSON:

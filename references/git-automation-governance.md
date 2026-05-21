@@ -213,3 +213,33 @@ Every git operation should record enough evidence to reconstruct what happened:
 
 Remote operations require separate operation-level approval until autonomous
 mode is explicitly designed and accepted.
+
+## Read-Only Autonomous Simulator
+
+The simulator is the required bridge between design-only autonomous contracts
+and any autonomous remote pilot. It must be impossible for simulator mode to
+push, create or update PRs, merge, mutate Issues, resolve conflicts, or change
+refs.
+
+Simulator input:
+
+- source `CANDIDATE_CHANGES.yaml`
+- target base or base ref
+- target remote when remote metadata is available
+- optional `PR_READY_SUMMARY.md` path
+
+Simulator output:
+
+- clean-tree and branch-boundary status
+- ordered local commits from base to HEAD
+- commit evidence from the queue
+- validation evidence discovered in the queue
+- PR-ready summary status
+- remote branch and base metadata when readable
+- simulated push, PR, checks, merge, and rollback plan
+- blockers that must be resolved before any autonomous pilot
+
+The simulator is successful only when it can produce a complete plan without
+missing branch, commit, validation, PR-summary, or rollback evidence. Unknown
+remote metadata is a warning when local evidence is otherwise complete; stale
+or conflicting remote metadata is a blocker for later execution candidates.

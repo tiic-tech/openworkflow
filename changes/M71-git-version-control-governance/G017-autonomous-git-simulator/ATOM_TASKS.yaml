@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G017-autonomous-git-simulator
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G017-autonomous-git-simulator
+title: Atom tasks for read-only autonomous git simulator
+status: done
+tasks:
+  - task_id: T001
+    title: Implement simulator core
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/git/autonomousSimulator.ts
+    done_when:
+      - Simulator reads queue, branch, dirty paths, ordered commits, validation evidence, and PR summary state.
+      - Simulator returns plan, blockers, warnings, rollback plan, and mutation_performed false.
+  - task_id: T002
+    title: Expose CLI simulator action
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+    done_when:
+      - git-automation simulate exists.
+      - Simulate mode cannot perform remote mutation.
+  - task_id: T003
+    title: Refresh generated skill guidance
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - .agents/skills/ow-git-automation/
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    done_when:
+      - Generated /ow:git-automation guidance includes the simulate handoff command.
+  - task_id: T004
+    title: Verify simulator behavior
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification checks no mutation output.
+      - Runtime verification checks ordered commits, rollback plan, and blockers.
+  - task_id: T005
+    title: Validate implementation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/
+      - references/
+      - .agents/
+      - .openworkflow/audit/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

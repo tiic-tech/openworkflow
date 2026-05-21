@@ -213,6 +213,7 @@ function gitAutomationProtocol(): CommandProtocol {
       "openworkflow git-automation branch --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
       "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --json",
       "openworkflow git-automation summary --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
+      "openworkflow git-automation simulate --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --json",
     ],
     internalSections: [
       {

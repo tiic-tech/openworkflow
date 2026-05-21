@@ -1290,6 +1290,33 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert(Array.isArray(data.ordered_local_commits), "managed remote report missing ordered local commits");
     assert((data.ordered_local_commits as unknown[]).length > 0, "managed remote report should include ordered commits from base");
     assert(remote.output.includes("does not execute it"), "managed remote report missing non-execution reason");
+
+    await writeFile(join(tempRoot, "changes", "M71-shell", "PR_READY_SUMMARY.md"), "# PR Ready\n", "utf8");
+    const simulate = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "simulate",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(simulate.code !== 0, "simulator should report blockers when validation evidence is missing");
+    const simulateReport = parseJsonReport(simulate.output, "git-automation simulate");
+    const simulateData = record(simulateReport.data, "git-automation simulate data");
+    const simulateResult = record(simulateData.result, "git-automation simulate result");
+    assert(simulateResult.mutation_performed === false, "simulator must report no mutation");
+    assert(Array.isArray(simulateResult.orderedLocalCommits), "simulator missing ordered local commits");
+    assert((simulateResult.orderedLocalCommits as unknown[]).length > 0, "simulator should include ordered local commits");
+    assert(Array.isArray(simulateResult.rollbackPlan), "simulator missing rollback plan");
+    assert(Array.isArray(simulateResult.blockers), "simulator missing blockers");
+    assert(simulate.output.includes("validation evidence is missing"), "simulator should report missing validation blocker");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -1345,6 +1372,7 @@ function verifyGitAutomationSkill(content: string): void {
     "openworkflow git-automation branch",
     "openworkflow git-automation commit",
     "openworkflow git-automation summary",
+    "openworkflow git-automation simulate",
   ]) {
     assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
   }

@@ -2,12 +2,13 @@ import { execFile } from "node:child_process";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
+import { simulateAutonomousGit } from "../../../core/src/git/autonomousSimulator.js";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
 
-type GitAutomationAction = "branch" | "commit" | "summary" | "remote";
+type GitAutomationAction = "branch" | "commit" | "summary" | "remote" | "simulate";
 const execFileAsync = promisify(execFile);
 
 export async function gitAutomationCommand(positional: string[], flags: Map<string, string | boolean>): Promise<number> {
@@ -17,7 +18,7 @@ export async function gitAutomationCommand(positional: string[], flags: Map<stri
   const write = booleanFlag(flags, "write");
   const automation = stringFlag(flags, "automation", "managed") ?? "managed";
 
-  if (!action || !["branch", "commit", "summary", "remote"].includes(action)) {
+  if (!action || !["branch", "commit", "summary", "remote", "simulate"].includes(action)) {
     return finishGitAutomationUsage(root, json);
   }
   if (automation === "autonomous") {
@@ -34,6 +35,9 @@ export async function gitAutomationCommand(positional: string[], flags: Map<stri
   }
   if (action === "summary") {
     return gitAutomationSummary(root, flags, write, json);
+  }
+  if (action === "simulate") {
+    return gitAutomationSimulate(root, flags, json);
   }
   return gitAutomationRemote(root, flags, json);
 }
@@ -147,6 +151,26 @@ async function gitAutomationRemote(root: string, flags: Map<string, string | boo
   }, ["review remote_operation_plan, then approve a concrete push/PR/merge operation or create a follow-up autonomous high-risk candidate"]);
 }
 
+async function gitAutomationSimulate(root: string, flags: Map<string, string | boolean>, json: boolean): Promise<number> {
+  const queuePath = stringFlag(flags, "queue");
+  if (!queuePath) {
+    return finishGitAutomationError(root, json, "simulate mode requires --queue <CANDIDATE_CHANGES.yaml>", []);
+  }
+  const result = await simulateAutonomousGit({
+    root,
+    queuePath,
+    baseRef: stringFlag(flags, "base"),
+    targetRemote: stringFlag(flags, "remote"),
+    targetBase: stringFlag(flags, "target-base"),
+    prSummaryPath: stringFlag(flags, "pr-summary"),
+  });
+  return finishGitAutomationResult(root, json, "git-automation simulate", result.ok, {
+    mode: "autonomous-simulator",
+    action: "simulate",
+    result,
+  }, result.ok ? ["review simulator evidence before considering a narrow autonomous pilot"] : ["resolve simulator blockers before autonomous pilot work"]);
+}
+
 async function loadQueue(root: string, queuePath: string): Promise<Record<string, unknown>> {
   const { readFile } = await import("node:fs/promises");
   return record(parseYaml(await readFile(join(root, queuePath), "utf8")));
@@ -157,7 +181,7 @@ function findCandidate(queue: Record<string, unknown>, candidateId: string): Rec
 }
 
 function finishGitAutomationUsage(root: string, json: boolean): number {
-  const usage = "usage: openworkflow git-automation <branch|commit|summary|remote> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]";
+  const usage = "usage: openworkflow git-automation <branch|commit|summary|remote|simulate> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]";
   if (json) {
     printJsonReport({
       command: "git-automation",

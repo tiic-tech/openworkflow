@@ -27,17 +27,19 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G014` Implement local PR-ready summary generation for completed queues (selected: `G014-pr-ready-summary-generation`; commit: c8d48b1dc387f40d1aae27193155e5fc3847f912)
 - `G015` Add ow:git-automation command shell with remote approval gates (selected: `G015-ow-git-automation-command-shell`; commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e)
 - `G016` Define autonomous git automation lifecycle (selected: `G016-autonomous-git-automation-lifecycle`; commit: 94ddaa74596a6428eacad297faf1a851bceb1e10)
+- `G017` Build read-only autonomous git simulator (selected: `G017-autonomous-git-simulator`; commit: not recorded)
 
 ## Deferred Or Blocked Changes
 
-- `G017` status `ready`: Build read-only autonomous git simulator
+- `G018` status `ready`: Plan narrow autonomous remote pilot
 
 ## High-Risk Decisions
 
 - `G007` status `done`: Decide whether OW should automate git and gh mutation operations
 - `G015` status `done`: Add ow:git-automation command shell with remote approval gates
 - `G016` status `done`: Define autonomous git automation lifecycle
-- `G017` status `ready`: Build read-only autonomous git simulator
+- `G017` status `done`: Build read-only autonomous git simulator
+- `G018` status `ready`: Plan narrow autonomous remote pilot
 
 ## Validation
 
