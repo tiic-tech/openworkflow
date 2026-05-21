@@ -46,6 +46,48 @@ When updating an existing queue, never renumber stable ids. If a candidate
 changes meaningfully, add a note or create a new candidate rather than reusing
 the old id for a different scope.
 
+## Queue Maintenance Operations
+
+Use queue maintenance when the user asks to inspect or surgically change an
+existing `CANDIDATE_CHANGES.yaml`.
+
+Supported operations:
+
+- `query`: answer by candidate id, status, dependency, owned path, risk, or
+  readiness.
+- `add`: append a new candidate with a fresh stable id.
+- `update`: change fields while preserving candidate identity.
+- `status_change`: move between `candidate`, `ready`, `blocked`, `deferred`,
+  `superseded`, `selected`, `in_progress`, or `done`.
+- `split`: replace one broad candidate with multiple narrower candidates.
+- `merge`: combine overlapping candidates by keeping one survivor and marking
+  the others `superseded`.
+- `priority_change`: update `next_recommended_candidate_id` or ready ordering.
+
+Each mutating operation should append an item under top-level `operations`:
+
+```yaml
+operations:
+  - operation_id: OP001
+    operation_type: update
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Clarify owned paths before selection.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/<id>/...
+```
+
+Use sequential operation ids such as `OP001`, `OP002`, `OP003`. If the queue
+already has operations, continue the sequence.
+
+Do not hard-delete historical candidates. Prefer `superseded`, `deferred`, or
+`blocked`. Hard deletion is only acceptable for a malformed candidate created in
+the same uncommitted operation; log the reason.
+
 ## Output Checklist
 
 `CANDIDATE_CHANGES.yaml` must include:
@@ -62,6 +104,7 @@ the old id for a different scope.
 - `selection_policy`
 - `next_recommended_candidate_id` when appropriate
 - `changes`
+- `operations` when the queue has been maintained after initial creation
 
 `CANDIDATE_CHANGES.md` should include:
 
@@ -89,3 +132,5 @@ Check that:
 - validation commands are realistic for this repo
 - no candidate silently starts implementation
 - generated or runtime paths are protected unless explicitly in scope
+- every mutating maintenance edit has an operation log entry
+- every status change preserves or adds evidence

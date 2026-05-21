@@ -1,6 +1,6 @@
 ---
 name: select-change
-description: Select one implementable OpenWorkflow candidate change from CANDIDATE_CHANGES.yaml and create SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, and IMPLEMENTATION_BRIEF.md. Use when a candidate queue exists and the user wants the next focused change prepared for implementation.
+description: Select, inspect, or prepare one implementable OpenWorkflow candidate change from CANDIDATE_CHANGES.yaml and create SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, and IMPLEMENTATION_BRIEF.md. Use when a candidate queue exists and the user wants the next focused change prepared for implementation, or when a specific candidate id needs readiness review before selection.
 ---
 
 # Select Change
@@ -24,23 +24,41 @@ Read these only as needed:
 
 1. Run `git status --short --branch` and note whether the tree is dirty.
 2. Read `CANDIDATE_CHANGES.yaml` as the source of truth.
-3. Filter candidates to `ready` first. If none are ready, inspect `candidate`
+3. If the user names a candidate id, perform targeted readiness review for
+   that id before considering the rest of the queue.
+4. Filter candidates to `ready` first. If none are ready, inspect `candidate`
    entries and report the blockers instead of forcing a selection.
-4. Prefer `next_recommended_candidate_id` when it points to a ready candidate
+5. Prefer `next_recommended_candidate_id` when it points to a ready candidate
    and the dependencies still hold.
-5. Otherwise choose the candidate that best matches the queue's
+6. Otherwise choose the candidate that best matches the queue's
    `selection_policy`, unlocks downstream work, has focused owned paths, and
    has realistic validation.
-6. Create a new change folder, usually `changes/<selected_change_id>/`.
-7. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+7. Create a new change folder, usually `changes/<selected_change_id>/`.
+8. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
-8. Update the candidate queue:
-   - set the selected candidate to `selected` or `in_progress`
+9. Update the candidate queue:
+   - set the selected candidate to `selected`
    - add `selection.selected_change_id`
    - add concise `selection.reason`
+   - append an `operations` entry for the selection
    - leave all other candidates in place
-9. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
-10. Stop before implementation unless the user explicitly asks to continue.
+10. Refresh `CANDIDATE_CHANGES.md` from the YAML facts.
+11. Stop before implementation unless the user explicitly asks to continue.
+
+## Targeted Review
+
+When reviewing a specific candidate id, report:
+
+- current status and readiness
+- dependencies and whether each is satisfied
+- owned paths and likely conflict surfaces
+- validation commands
+- acceptance gaps
+- blockers or reasons it should not be selected
+- exact queue maintenance operation needed, if any
+
+Do not select a candidate during targeted review unless the user asks to select
+or the current workflow explicitly requires selection.
 
 ## Atom Task Rules
 
@@ -56,6 +74,7 @@ Read these only as needed:
 - Do not delete or renumber candidate ids.
 - Do not silently select a blocked candidate.
 - Do not implement the selected change.
+- Do not mark the candidate `done`; implementation completion owns that update.
 - Do not widen scope beyond the selected candidate.
 - Do not hand-edit generated `.agents/` or `.openworkflow/` surfaces unless the
   selected candidate explicitly owns those paths and the user accepts that

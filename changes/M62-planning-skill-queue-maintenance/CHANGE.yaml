@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: change:M62-planning-skill-queue-maintenance
+contract_type: change
+title: M62 Planning skill queue maintenance
+status: completed
+source_artifacts:
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - skills/decompose-to-changes/SKILL.md
+  - skills/select-change/SKILL.md
+depends_on:
+  - change:M56-decompose-to-changes-skill
+  - change:M57-select-change-skill
+produces:
+  - selected_change:M62-planning-skill-queue-maintenance
+  - atom_tasks:M62-planning-skill-queue-maintenance
+summary: >
+  Harden the planning skills so existing candidate queues can be queried and
+  surgically maintained by stable candidate id with operation-level audit
+  records.
+problem: >
+  Dogfood showed the planning skills can create and select candidate queues,
+  but existing queue maintenance was still implicit. A strong planning workflow
+  needs point-to-point add, query, update, status, priority, split, merge, and
+  soft-delete behavior with durable audit history.
+goals:
+  - Add queue maintenance mode to decompose-to-changes.
+  - Add targeted candidate readiness review to select-change.
+  - Define top-level candidate queue operations for auditability.
+  - Extend candidate changes schema with optional operations.
+  - Dogfood the operation log by adding this hardening change to M54.
+non_goals:
+  - Do not add runtime command exposure.
+  - Do not implement a CLI for queue operations.
+  - Do not edit generated `.agents` or `.openworkflow` surfaces.
+  - Do not change proto redesign source behavior.
+affected_paths:
+  - skills/decompose-to-changes/
+  - skills/select-change/
+  - schemas/candidate-changes.schema.json
+  - references/planning-artifact-contracts.md
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M62-planning-skill-queue-maintenance/
+acceptance:
+  - Existing CANDIDATE_CHANGES queues can be maintained by stable candidate id.
+  - Mutating queue operations have an auditable top-level operations entry.
+  - select-change can perform targeted candidate readiness review.
+  - Queue deletion semantics prefer superseded, deferred, or blocked over hard deletion.
+  - "`npm run validate` passes."
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

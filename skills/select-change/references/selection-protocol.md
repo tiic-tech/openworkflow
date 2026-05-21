@@ -14,10 +14,31 @@ Optional:
 - `CANDIDATE_CHANGES.md` as a readable view
 - upstream source artifacts named by the queue
 - user constraints such as "choose C004" or "avoid runtime changes"
+- top-level queue `operations` for audit history
 
 If the user names a candidate id, verify that its dependencies are satisfied
 before selecting it. If the id is blocked or not ready, report why and stop
 unless the user explicitly overrides the risk.
+
+## Targeted Candidate Review
+
+For point-to-point review, inspect only the requested candidate plus the
+dependencies, unlocks, operation history, and directly owned paths needed to
+judge readiness.
+
+Return:
+
+- `candidate_id`
+- `status`
+- `readiness`: ready, not_ready, blocked, already_done, or superseded
+- `dependency_status`
+- `scope_risks`
+- `validation_gaps`
+- `recommended_operation`: query, select, update, split, defer, block,
+  supersede, or none
+
+This mode is read-first. It should not mutate the queue unless the user asks for
+the recommended operation to be applied.
 
 ## Decision Order
 
@@ -83,12 +104,35 @@ entire planning conversation.
 
 After selecting:
 
-- set candidate `status` to `selected` or `in_progress`
+- set candidate `status` to `selected`
 - add `selection.selected_change_id`
 - add `selection.reason`
 - add `selection.selected_at` when the date is known
+- append a top-level `operations` entry with `operation_type: select`
 - update `next_recommended_candidate_id` only if the queue has another obvious
   ready candidate
 
 After implementation completes, the implementation agent should set status to
 `done` and add completion evidence.
+
+## Operation Log Expectations
+
+When select-change mutates a queue, append an operation item:
+
+```yaml
+operations:
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - P002
+    actor: agent
+    reason: Candidate is ready and unlocks P005.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/<selected-change-id>/SELECTED_CHANGE.yaml
+```
+
+Do not create selection artifacts without updating the operation log when the
+queue already uses `operations`.

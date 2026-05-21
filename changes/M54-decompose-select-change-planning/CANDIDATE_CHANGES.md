@@ -171,3 +171,40 @@ Completion evidence:
 - `changes/M60-proto-redesign-artifact-contracts/IMPLEMENTATION_BRIEF.md`
 - `npm run validate`
 - `node dist/cli/src/index.js handoff --root . --json`
+
+## C006 - Harden Planning Skills With Queue Maintenance Operations
+
+Status: `done`
+
+Purpose: add explicit support for point-to-point candidate queue maintenance so
+existing `CANDIDATE_CHANGES` queues can be queried and surgically changed by
+stable id with operation-level audit history.
+
+Owned paths:
+
+- `skills/decompose-to-changes/`
+- `skills/select-change/`
+- `schemas/candidate-changes.schema.json`
+- `references/planning-artifact-contracts.md`
+- `changes/M62-planning-skill-queue-maintenance/`
+
+Depends on: `C002`, `C003`
+
+Validation:
+
+- `npm run validate`
+
+Completion evidence:
+
+- `skills/decompose-to-changes/SKILL.md`
+- `skills/select-change/SKILL.md`
+- `schemas/candidate-changes.schema.json`
+- `references/planning-artifact-contracts.md`
+- `changes/M62-planning-skill-queue-maintenance/CHANGE.yaml`
+- `npm run validate`
+
+## Operation Audit
+
+- `OP001`: add `C006`
+- `OP002`: select `C006`
+- `OP003`: complete `C006`

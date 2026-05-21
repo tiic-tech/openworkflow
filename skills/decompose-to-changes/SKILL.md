@@ -1,6 +1,6 @@
 ---
 name: decompose-to-changes
-description: Create or update an OpenWorkflow CANDIDATE_CHANGES queue from explicit source text, the latest planning discussion, or selected repo artifacts. Use when a broad goal, roadmap topic, prototype redesign, or feature idea needs to be split into focused implementable changes before select-change or implementation begins.
+description: Create, update, query, or maintain an OpenWorkflow CANDIDATE_CHANGES queue from explicit source text, the latest planning discussion, or selected repo artifacts. Use when a broad goal, roadmap topic, prototype redesign, feature idea, or existing candidate queue needs to be split into focused implementable changes, surgically edited by candidate id, or prepared before select-change or implementation begins.
 ---
 
 # Decompose To Changes
@@ -23,21 +23,27 @@ Read these only as needed:
 ## Workflow
 
 1. Run `git status --short --branch` and note whether the tree is dirty.
-2. Identify the planning source:
+2. Decide whether this is decomposition mode or queue maintenance mode:
+   - use decomposition mode for new broad goals or new planning sources
+   - use queue maintenance mode for add, query, update, defer, block,
+     supersede, split, merge, or priority changes in an existing queue
+3. Identify the planning source:
    - explicit user-provided text or files first
    - latest session discussion when the user refers to "current discussion"
    - repo vision, roadmap, or existing OpenWorkflow artifacts only when needed
-3. Choose a `plan_id` and output location. Default to
+4. Choose a `plan_id` and output location. Default to
    `changes/<plan_id>/CANDIDATE_CHANGES.yaml`.
-4. If updating an existing queue, preserve existing candidate ids and history.
+5. If updating an existing queue, preserve existing candidate ids and history.
    Add new ids only for genuinely new candidates.
-5. Decompose the source into candidates with focused owned paths, explicit
+6. Decompose the source into candidates with focused owned paths, explicit
    includes and excludes, dependencies, validation, and acceptance.
-6. Write `CANDIDATE_CHANGES.yaml` first. Then write
+7. For queue maintenance, write an `operations` entry for every targeted
+   change. Include the operation type, target id, reason, and evidence.
+8. Write `CANDIDATE_CHANGES.yaml` first. Then write
    `CANDIDATE_CHANGES.md` as a non-authoritative readable view.
-7. Write `SUMMARY.yaml` with source refs, candidate count, key dependencies,
+9. Write `SUMMARY.yaml` with source refs, candidate count, key dependencies,
    risks, and the optional next recommended candidate.
-8. Run repository validation when available, usually `npm run validate`.
+10. Run repository validation when available, usually `npm run validate`.
 
 ## Candidate Rules
 
@@ -50,6 +56,27 @@ Read these only as needed:
 - Set `next_recommended_candidate_id` only when one candidate clearly unlocks
   the rest.
 - Keep Markdown synchronized with YAML, but treat YAML as the source of truth.
+
+## Queue Maintenance
+
+For an existing queue, operate by stable candidate id.
+
+- `query`: inspect one candidate or a filtered set without changing status.
+- `add`: append a new candidate with a new stable id.
+- `update`: revise scope, dependencies, validation, acceptance, or notes
+  without changing the candidate's identity.
+- `split`: keep the original candidate as `superseded` or narrowed, then add
+  replacement candidates with new ids.
+- `merge`: mark redundant candidates as `superseded` and point to the survivor.
+- `defer`, `block`, `restore`, `supersede`, `complete`: status transitions
+  with evidence.
+- `remove`: do not hard-delete a historical candidate. Use `superseded`,
+  `deferred`, or `blocked`. Hard deletion is allowed only for a malformed
+  candidate created in the same uncommitted operation, and the operation log
+  must say why.
+
+Every maintenance edit must append an `operations` item to the YAML queue and
+refresh the Markdown readable view.
 
 ## Boundaries
 

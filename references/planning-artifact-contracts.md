@@ -12,6 +12,10 @@ Markdown view.
 Do not delete candidate entries when selection or implementation progresses.
 Update status and attach selection or completion evidence.
 
+Queues may also carry a top-level `operations` list. Use it to audit targeted
+maintenance such as adding a candidate, updating a scope, changing priority,
+selecting a candidate, or marking completion.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.
@@ -29,6 +33,10 @@ Required top-level fields:
 - `queue_policy`
 - `selection_policy`
 - `changes`
+
+Optional but recommended after maintenance:
+
+- `operations`
 
 Each candidate change requires:
 
@@ -56,6 +64,23 @@ Candidate statuses:
 - `blocked`: cannot proceed without a blocker resolution.
 - `deferred`: intentionally postponed.
 - `superseded`: replaced by another candidate.
+
+Operation types:
+
+- `query`
+- `add`
+- `update`
+- `status_change`
+- `split`
+- `merge`
+- `priority_change`
+- `select`
+- `complete`
+- `remove`
+
+Hard removal is discouraged. Use `superseded`, `deferred`, or `blocked` for
+historical candidates. Only remove malformed candidates created in the same
+uncommitted operation, and record why.
 
 ## SELECTED_CHANGE.yaml
 
@@ -141,10 +166,11 @@ long product discussion.
 
 When select-change chooses a candidate:
 
-1. Set candidate `status` to `selected` or `in_progress`.
+1. Set candidate `status` to `selected`.
 2. Add `selection.selected_change_id`.
 3. Add concise `selection.reason`.
-4. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
+4. Append an `operations` entry with `operation_type: select`.
+5. Write `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
    `IMPLEMENTATION_BRIEF.md`.
 
 When the selected change completes:
@@ -152,4 +178,5 @@ When the selected change completes:
 1. Set candidate `status` to `done`.
 2. Add `completion.completed_by_change_id`.
 3. Add evidence such as change artifacts, validation commands, or commit ids.
-4. Leave other candidates in place for future selection.
+4. Append an `operations` entry with `operation_type: complete`.
+5. Leave other candidates in place for future selection.

@@ -154,6 +154,75 @@
         },
         "additionalProperties": true
       }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "operation_type",
+          "target_candidate_ids",
+          "actor",
+          "reason",
+          "changed_at"
+        ],
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "pattern": "^OP[0-9]{3}$"
+          },
+          "operation_type": {
+            "type": "string",
+            "enum": [
+              "query",
+              "add",
+              "update",
+              "status_change",
+              "split",
+              "merge",
+              "priority_change",
+              "select",
+              "complete",
+              "remove"
+            ]
+          },
+          "target_candidate_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actor": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "changed_at": {
+            "type": "string"
+          },
+          "before_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "after_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
     }
   },
   "additionalProperties": true

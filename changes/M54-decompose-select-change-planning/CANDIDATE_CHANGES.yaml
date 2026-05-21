@@ -274,3 +274,94 @@ changes:
         - changes/M60-proto-redesign-artifact-contracts/IMPLEMENTATION_BRIEF.md
         - "validation: npm run validate"
         - "validation: node dist/cli/src/index.js handoff --root . --json"
+  - id: C006
+    status: done
+    title: Harden planning skills with queue maintenance operations
+    purpose: >
+      Add explicit support for point-to-point candidate queue maintenance so
+      existing CANDIDATE_CHANGES queues can be queried and surgically changed
+      by stable id with operation-level audit history.
+    scope:
+      includes:
+        - queue maintenance mode for decompose-to-changes
+        - targeted candidate readiness review for select-change
+        - top-level operations audit contract
+        - candidate changes schema operations support
+        - dogfood operation log entries on this M54 queue
+      excludes:
+        - runtime command exposure
+        - CLI implementation for queue operations
+        - generated adapter changes
+        - proto redesign source behavior
+    owned_paths:
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - schemas/candidate-changes.schema.json
+      - references/planning-artifact-contracts.md
+      - changes/M62-planning-skill-queue-maintenance/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Existing CANDIDATE_CHANGES queues can be maintained by stable candidate id.
+      - Mutating queue operations have an auditable top-level operations entry.
+      - select-change can perform targeted candidate readiness review.
+      - Queue deletion semantics prefer superseded, deferred, or blocked over hard deletion.
+    selection:
+      selected_change_id: M62-planning-skill-queue-maintenance
+      reason: Existing queue CRUD is a hard capability for auditability before runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M62-planning-skill-queue-maintenance
+      completed_at: 2026-05-21
+      evidence:
+        - skills/decompose-to-changes/SKILL.md
+        - skills/select-change/SKILL.md
+        - schemas/candidate-changes.schema.json
+        - references/planning-artifact-contracts.md
+        - changes/M62-planning-skill-queue-maintenance/CHANGE.yaml
+        - "validation: npm run validate"
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: User identified existing queue CRUD as a required audit capability.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
+    evidence:
+      - changes/M62-planning-skill-queue-maintenance/SELECTED_CHANGE.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: C006 is the highest-value hardening before planning skill runtime exposure.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M62-planning-skill-queue-maintenance/SELECTED_CHANGE.yaml
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: Queue maintenance behavior was added to both planning skills and validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/select-change/SKILL.md
+      - schemas/candidate-changes.schema.json
+      - references/planning-artifact-contracts.md
+      - "validation: npm run validate"
