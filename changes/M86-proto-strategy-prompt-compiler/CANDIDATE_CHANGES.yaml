@@ -127,7 +127,7 @@ changes:
       evidence:
         - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: selected
+    status: done
     title: Strengthen strategic prototype prompt-pack artifacts
     purpose: >
       Make the prototype evidence and prompt-pack schemas/templates enforce the
@@ -186,6 +186,12 @@ changes:
         encodes the source behavior requirements into artifact schema,
         templates, validators, and summary quality.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-strategic-prompt-pack-artifacts
+      completed_at: 2026-05-22
+      commit: b00a12b
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
     status: candidate
     title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
@@ -342,3 +348,18 @@ operations:
       - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/SELECTED_CHANGE.yaml
       - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/ATOM_TASKS.yaml
       - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 strengthened strategic prompt-pack artifacts with preflight quality
+      gates, direction-count policy, durable validation modes, prompt text
+      readiness, image-generation collection status, summary quality, and
+      validator checks.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/LOCAL_COMMIT_EVIDENCE.yaml

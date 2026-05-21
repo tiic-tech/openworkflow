@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M86-proto-strategy-prompt-compiler:C002
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C002
+change_id: C002-strategic-prompt-pack-artifacts
+title: Local commit evidence for strategic prompt-pack artifacts
+status: complete
+implemented_at: 2026-05-22
+implementation_commit: b00a12b
+evidence_commit: pending
+branch: codex/m73-workflow-blueprint-runtime-alignment
+files_changed:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+acceptance:
+  - criterion: Artifacts can record whether vision and validation quality are sufficient for high-quality prototype prompts.
+    status: pass
+  - criterion: Artifacts can represent askUserQuestion for missing strategic direction count and default to 3 when the user delegates to the agent.
+    status: pass
+  - criterion: Prompt-pack artifacts cannot declare ephemeral vision_only validation.
+    status: pass
+  - criterion: Prompt-pack artifacts separate prompt text readiness from image generation and collection status.
+    status: pass
+  - criterion: Templates expose normalized input, strategic core, directions, build recommendation, constraints, and review plan.
+    status: pass
+  - criterion: Validators catch thin strategic prompt packs.
+    status: pass
+  - criterion: Summary health reports missing strategy and direction fields.
+    status: pass
+notes:
+  - C002 absorbed the reference skill's input contract, direction count default, strategic decomposition, prompt text readiness, and generation collection needs into OW artifact structure.
+  - C003 should next encode the corresponding generated /ow:proto protocol behavior.
+  - No high-risk approval was required.
