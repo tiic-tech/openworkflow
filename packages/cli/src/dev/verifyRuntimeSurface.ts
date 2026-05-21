@@ -1021,6 +1021,78 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(draftProtoReport.ok === false, "draft optional current validation should make proto check ok=false");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("status must be beyond draft")), "proto check missing draft status blocker");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("core_question must be non-empty")), "proto check missing core_question readiness blocker");
+  const draftSemanticReadiness = record(draftProtoData.semantic_readiness, "draft proto semantic readiness");
+  assert(draftSemanticReadiness.gate_status === "thin_validation", "draft proto check should expose thin_validation semantic readiness");
+
+  await writeFile(join(root, artifactPath), [
+    "schema_version: 0.1.0",
+    "contract_id: validation:val-draft",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Vision gap validation target",
+    "status: active",
+    "core_question: Can the prototype proceed without more vision detail?",
+    "central_uncertainty: Whether the missing user context would force strategy invention.",
+    "hypothesis: The prototype should not proceed until the vision gap is resolved.",
+    "target_behavior: Agent returns to /ow:vision instead of generating prototype prompts.",
+    "feature_classification:",
+    "  existential:",
+    "    - missing vision strategy",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - The missing context changes the prototype direction.",
+    "prototype_scope:",
+    "  include:",
+    "    - Return-to-vision gate.",
+    "  exclude:",
+    "    - Prototype prompt generation.",
+    "prototype_experiment:",
+    "  scenario: Agent checks validation before /ow:proto.",
+    "  must_show:",
+    "    - Missing vision gap is explicit.",
+    "  must_not_show:",
+    "    - Prototype prompt generation.",
+    "observable_signals:",
+    "  pass:",
+    "    - /ow:proto check blocks and points back to /ow:vision.",
+    "  fail:",
+    "    - /ow:proto proceeds despite vision gaps.",
+    "  ambiguous: []",
+    "acceptance:",
+    "  - Agent does not invent product strategy.",
+    "decision_rules:",
+    "  continue: []",
+    "  revise:",
+    "    - Ask the next vision question.",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence:",
+    "    - Vision gap must be resolved.",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps:",
+    "  - target user context is unresolved",
+    "agent_readiness_gate:",
+    "  status: return_to_vision",
+    "  blockers:",
+    "    - target user context is unresolved",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+    "",
+  ].join("\n"), "utf8");
+  const blockedProtoCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(blockedProtoCheck.code !== 0, "proto check should block when validation returns to vision");
+  const blockedProtoReport = parseJsonReport(blockedProtoCheck.output, "check");
+  const blockedProtoData = record(blockedProtoReport.data, "blocked proto check data");
+  const blockedSemanticReadiness = record(blockedProtoData.semantic_readiness, "blocked proto semantic readiness");
+  assert(blockedSemanticReadiness.gate_status === "return_to_vision", "blocked proto check should expose return_to_vision semantic readiness");
+  assert(Array.isArray(blockedProtoData.blockers) && blockedProtoData.blockers.some((item) => String(item).includes("run /ow:vision")), "return-to-vision fixture should tell the agent to run /ow:vision");
 
   await writeFile(join(root, artifactPath), [
     "schema_version: 0.1.0",
