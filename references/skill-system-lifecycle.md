@@ -43,16 +43,17 @@ Required fields for generated runtime skills:
 
 - `name`: the repo-local skill name, such as `ow-proto`
 - `description`: short invocation guidance for the target agent platform
-
-Future generator changes may add structured metadata such as generator name,
-adapter id, adapter version, template id, source command id, and semantic
-trigger. When metadata is added, it should be generated from source registries
-and verified by runtime-surface checks. Generated metadata must not replace the
-generated marker until doctor and sync can rely on it.
+- `metadata`: generated identity fields, including generator name, adapter id,
+  adapter version, template id, source command id, semantic trigger, and skill
+  name
 
 Source skills under `skills/` may use their own frontmatter as required by the
 skill authoring system, but source skills are not runtime `/ow:*` surfaces until
 they are registered and generated through an adapter.
+
+The generated marker remains the ownership signal used by sync and cleanup.
+Structured metadata gives validators and agents a queryable identity layer, but
+it does not replace the generated marker.
 
 ## Protocol Blocks
 
@@ -155,8 +156,9 @@ OpenWorkflow should not copy these parts directly:
 Runtime skills are static command contracts. They tell the agent what command
 means, what context to load, what outputs are allowed, and when to hand off.
 
-Dynamic artifact instructions are a separate possible layer. If OW later adds
-an OpenSpec-like instruction envelope, it should be generated for a specific
+Dynamic artifact instructions are a separate possible layer. The design contract
+is in `references/artifact-instruction-envelope.md`. If OW later adds an
+OpenSpec-like instruction envelope, it should be generated for a specific
 artifact or selected task and may use tags such as `<task>`, `<context>`,
 `<rules>`, `<dependencies>`, `<output>`, `<template>`, and
 `<success_criteria>`.

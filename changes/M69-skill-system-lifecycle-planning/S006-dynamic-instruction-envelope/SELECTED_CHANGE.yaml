@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: selected_change:S006-dynamic-instruction-envelope
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: S006-dynamic-instruction-envelope
+source_plan_id: M69-skill-system-lifecycle-planning
+source_candidate_id: S006
+title: Design dynamic instruction envelope model
+status: done
+selection_reason: >
+  S006 is the remaining non-high-risk item. It records the boundary between
+  static runtime skill protocol and possible dynamic artifact/task instruction
+  envelopes before higher-risk delivery model work.
+rejected_alternatives:
+  - candidate_ref: S003
+    reason: Adapter delivery model work is high risk and should not proceed without explicit confirmation.
+  - candidate_ref: S007
+    reason: Multi-adapter delivery is high risk and depends on S006.
+scope:
+  includes:
+    - comparison between static skill protocol blocks and dynamic artifact instruction envelopes
+    - candidate envelope tags such as task, context, rules, dependencies, output, template, and success criteria
+    - boundaries for avoiding protocol leakage into produced artifacts
+    - decision on whether this belongs in CLI commands, summaries, or skills
+  excludes:
+    - implementing a new CLI instruction command
+    - changing existing runtime skill generation
+    - changing artifact schemas
+owned_paths:
+  - references/skill-system-lifecycle.md
+  - references/artifact-instruction-envelope.md
+  - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/
+forbidden_paths:
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - The design clearly separates static skill protocol from dynamic per-artifact instruction output.
+  - The design states when XML-like envelope tags are useful and when Markdown or YAML is better.
+  - The design includes leakage prevention rules for generated artifacts.
+  - The design does not implement a new runtime command.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/artifact-instruction-envelope.md
+    - references/skill-system-lifecycle.md
+    - "validation: npm run validate"
+    - "validation: git diff --check"

@@ -1,0 +1,37 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:S006-dynamic-instruction-envelope
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: S006-dynamic-instruction-envelope
+title: Atom tasks for dynamic instruction envelope design
+status: done
+tasks:
+  - task_id: T001
+    title: Write envelope reference
+    status: done
+    type: document
+    owned_paths:
+      - references/artifact-instruction-envelope.md
+    done_when:
+      - The reference defines when dynamic instruction envelopes are useful.
+      - The reference names candidate tags and leakage prevention rules.
+      - The reference chooses a non-implementation path for now.
+  - task_id: T002
+    title: Link lifecycle reference
+    status: done
+    type: document
+    owned_paths:
+      - references/skill-system-lifecycle.md
+    done_when:
+      - Skill lifecycle reference points to the envelope reference.
+      - Static runtime skill protocol remains separate from dynamic envelope guidance.
+  - task_id: T003
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - references/skill-system-lifecycle.md
+      - references/artifact-instruction-envelope.md
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

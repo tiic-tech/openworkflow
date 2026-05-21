@@ -46,7 +46,7 @@ selection_policy:
     - editing generated .agents or .openworkflow surfaces directly
     - mixing skill lifecycle architecture with proto2html runtime exposure
     - broad multi-platform adapter work before the format contract is stable
-next_recommended_candidate_id: S006
+next_recommended_candidate_id: null
 changes:
   - id: S001
     status: done
@@ -324,7 +324,7 @@ changes:
         - "validation: npm run verify:runtime-surface"
         - "validation: git diff --check"
   - id: S006
-    status: ready
+    status: done
     title: Design dynamic instruction envelope model
     purpose: >
       Decide whether OW should add an OpenSpec-like dynamic instruction output
@@ -358,6 +358,23 @@ changes:
       - The design states when XML-like envelope tags are useful and when Markdown or YAML is better.
       - The design includes leakage prevention rules for generated artifacts.
       - The design does not implement a new runtime command.
+    selection:
+      selected_change_id: S006-dynamic-instruction-envelope
+      reason: >
+        S006 is the last non-high-risk item in the queue and can clarify future
+        instruction envelope boundaries before any high-risk adapter delivery
+        or multi-platform work.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S006-dynamic-instruction-envelope
+      completed_at: 2026-05-21
+      evidence:
+        - references/artifact-instruction-envelope.md
+        - references/skill-system-lifecycle.md
+        - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: S007
     status: candidate
     title: Prototype multi-adapter skill delivery without changing runtime semantics
@@ -557,3 +574,30 @@ operations:
     after_status: ready
     evidence:
       - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: S006 is ready and is the remaining non-high-risk design item in the queue.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: Dynamic instruction envelope design was documented without adding runtime command or adapter behavior.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/artifact-instruction-envelope.md
+      - references/skill-system-lifecycle.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"

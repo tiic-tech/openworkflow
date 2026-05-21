@@ -19,7 +19,7 @@ moving Codex command exposure to global prompts, editing generated `.agents` or
 proto2html runtime exposure, and broad multi-platform adapter work before the
 format contract is stable.
 
-Next recommended candidate: `S006`.
+Next recommended candidate: none; remaining candidates are high risk.
 
 Feat boundary: this queue owns the top-level
 `changes/M69-skill-system-lifecycle-planning/` folder. Each `S###` candidate is
@@ -112,6 +112,8 @@ Risk: `high`
 - `OP010`: select `S005`
 - `OP011`: complete `S005`
 - `OP012`: mark `S006` ready and make it next recommended
+- `OP013`: select `S006`
+- `OP014`: complete `S006`
 
 ## S004 - Validate Generated Skill Format And Protocol Blocks
 
@@ -155,13 +157,22 @@ Completion evidence:
 
 ## S006 - Design Dynamic Instruction Envelope Model
 
-Status: `ready`
+Status: `done`
 
 Depends on: `S001`
 
 Purpose: decide whether OW should add an OpenSpec-like dynamic instruction
 output layer for selected artifacts while keeping static runtime skills focused
 on command protocol and context boundaries.
+
+Selection: `S006-dynamic-instruction-envelope`
+
+Completion evidence:
+
+- `references/artifact-instruction-envelope.md`
+- `references/skill-system-lifecycle.md`
+- `npm run validate`
+- `git diff --check`
 
 ## S007 - Prototype Multi-Adapter Skill Delivery Without Changing Runtime Semantics
 

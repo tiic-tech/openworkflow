@@ -28,7 +28,9 @@ completed_metadata_candidate_id: S002
 completed_metadata_change_id: S002-generated-skill-metadata
 completed_drift_candidate_id: S005
 completed_drift_change_id: S005-generated-surface-drift-tests
-next_recommended_candidate_id: S006
+completed_envelope_candidate_id: S006
+completed_envelope_change_id: S006-dynamic-instruction-envelope
+next_recommended_candidate_id: null
 unresolved_questions:
   - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
   - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
@@ -46,4 +48,5 @@ notes:
   - S002 completed generated Codex skill metadata and runtime-surface metadata verification.
   - S004 completed generated skill format validation with negative runtime-surface coverage.
   - S005 completed generated-surface drift and parity checks.
-  - S006 is now ready as the remaining non-high-risk design item.
+  - S006 completed the dynamic instruction envelope design without adding runtime behavior.
+  - Remaining candidates S003 and S007 are high risk and require explicit confirmation.
