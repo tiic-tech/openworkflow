@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:H004-proto2html-dogfood
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: H004-proto2html-dogfood
+title: H004 Proto2html dogfood atom tasks
+status: completed
+tasks:
+  - task_id: H004-A001
+    title: Create accepted benchmark fixture
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+    done_when:
+      - Fixture references M66 source evidence.
+      - Fixture names accepted D02 screen group and reconstruction scope.
+  - task_id: H004-A002
+    title: Draft HTML reconstruction artifact
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html
+    done_when:
+      - HTML artifact is single-file and bounded to benchmark reconstruction.
+      - HTML_PROTOTYPE.yaml follows the H001 contract shape.
+  - task_id: H004-A003
+    title: Record fidelity evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/EVIDENCE.md
+    done_when:
+      - Fidelity matches, gaps, and limits are explicit.
+      - Recommendation names whether H003 can proceed.
+  - task_id: H004-A004
+    title: Complete queue and validate
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/
+    done_when:
+      - H004 is completed with evidence.
+      - H003 is ready but remains high risk.
+      - "`npm run validate` passes."

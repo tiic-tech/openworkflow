@@ -17,12 +17,13 @@ outputs:
   atom_tasks: changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/ATOM_TASKS.yaml
   implementation_brief: changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/IMPLEMENTATION_BRIEF.md
 candidate_count: 7
-selected_candidate_id: H002
-selected_change_id: H002-proto2html-source-behavior
-completed_candidate_id: H002
-completed_change_id: H002-proto2html-source-behavior
+selected_candidate_id: H004
+selected_change_id: H004-proto2html-dogfood
+completed_candidate_id: H004
+completed_change_id: H004-proto2html-dogfood
 completed_contract_candidate_id: H001
-next_recommended_candidate_id: H004
+completed_source_candidate_id: H002
+next_recommended_candidate_id: H003
 unresolved_questions:
   - Whether proto2html should eventually be user-facing or hidden behind accepted benchmark handoff.
   - Whether html2spec replaces `/ow:spec` or coexists as a stricter source path.
@@ -35,3 +36,4 @@ notes:
   - M68 is the feat boundary; each H-prefixed candidate should complete as a focused commit inside this folder.
   - H001 completed the proto2html reference and schema contract; H002 is the next source-skill behavior change.
   - H002 completed proto2html source skill behavior; H004 dogfood is ready before runtime exposure.
+  - H004 completed dogfood with prompt-fixture fidelity evidence; H003 runtime exposure is ready but high risk.

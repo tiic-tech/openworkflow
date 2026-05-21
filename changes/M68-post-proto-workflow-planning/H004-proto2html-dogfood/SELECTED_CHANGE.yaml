@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: selected_change:H004-proto2html-dogfood
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: H004-proto2html-dogfood
+source_plan_id: M68-post-proto-workflow-planning
+source_candidate_id: H004
+title: Dogfood proto2html reconstruction contract
+status: completed
+selection_reason:
+  - H004 is ready after H001 and H002.
+  - It produces first-consumer evidence before high-risk H003 runtime exposure.
+  - Owned paths are limited to dogfood artifacts inside the M68 feat.
+rejected_alternatives:
+  - id: H003
+    reason: Runtime exposure requires dogfood evidence first.
+scope:
+  includes:
+    - benchmark input fixture or current prototype evidence
+    - HTML reconstruction artifact draft
+    - fidelity report evidence
+    - decision audit notes for acceptance or tune
+  excludes:
+    - runtime command exposure
+    - html2spec extraction
+    - production implementation
+owned_paths:
+  - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/
+forbidden_paths:
+  - skills/proto2html/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Dogfood output proves the contract is usable by a first-consumer agent.
+  - Fidelity gaps are explicit and reviewable.
+  - Follow-up runtime work remains selectable by stable id.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

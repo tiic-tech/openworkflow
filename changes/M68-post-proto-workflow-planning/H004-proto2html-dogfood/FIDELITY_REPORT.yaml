@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: fidelity_report:H004-proto2html-dogfood
+contract_type: fidelity_report
+title: H004 Proto2html fidelity report
+status: reviewed
+dogfood_artifact_type: fidelity_report
+benchmark_refs:
+  - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+screenshot_refs:
+  - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/screenshots/README.md
+matched_elements:
+  - Workflow pipeline stages and command boundaries are visible.
+  - D02 recommendation is centered in the prompt workspace.
+  - Tune rules preserve the four delta buckets.
+  - Decision ledger keeps no-HTML-before-benchmark rule visible.
+gaps:
+  - gap_id: FID001
+    severity: medium
+    description: Benchmark source is accepted prompt evidence, not a generated image.
+    disposition: accept_for_source_dogfood
+  - gap_id: FID002
+    severity: low
+    description: Combined screen compresses four benchmark screens into one review surface.
+    disposition: accept_before_runtime_exposure
+browser_checks:
+  - Static single-file HTML path recorded.
+known_limits:
+  - No automated screenshot comparison was run in this contract dogfood pass.
+  - H003 runtime verification should add browser screenshot checks after command exposure.
+recommendation: accepted
+next_candidate: H003

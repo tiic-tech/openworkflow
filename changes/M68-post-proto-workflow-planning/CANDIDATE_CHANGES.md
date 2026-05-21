@@ -16,7 +16,7 @@ Avoid mixing proto2html with html2spec or build planning, adding commands before
 contracts exist, turning proto/tune back into HTML loops, and broad autonomous
 runtime changes before production-stage contracts are clear.
 
-Next recommended candidate: `H004`
+Next recommended candidate: `H003`
 
 Feat boundary: this queue owns the top-level `changes/M68-post-proto-workflow-planning/`
 folder. Each `H###` candidate is expected to land as a focused commit with
@@ -71,7 +71,7 @@ Completion evidence:
 
 ## H003 - Expose Proto2html Runtime Command Surface
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `H002`, `H004`
 
@@ -80,12 +80,20 @@ and verification surfaces after source behavior is defined.
 
 ## H004 - Dogfood Proto2html Reconstruction Contract
 
-Status: `ready`
+Status: `done`
 
 Depends on: `H001`, `H002`
 
 Purpose: exercise proto2html source behavior on an accepted benchmark-style
 prototype input before runtime exposure.
+
+Completion evidence:
+
+- `changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml`
+- `changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml`
+- `changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html`
+- `changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml`
+- `npm run validate`
 
 ## H005 - Define Html2spec Artifact Contracts
 
@@ -122,3 +130,6 @@ without forgetting register, pointer, summary, and handoff maintenance.
 - `OP004`: select `H002`
 - `OP005`: complete `H002`
 - `OP006`: mark `H004` ready and make it next recommended
+- `OP007`: select `H004`
+- `OP008`: complete `H004`
+- `OP009`: mark `H003` ready and make it next recommended

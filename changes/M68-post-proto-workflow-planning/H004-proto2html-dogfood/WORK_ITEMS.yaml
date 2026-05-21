@@ -1,0 +1,38 @@
+schema_version: 0.1.0
+contract_id: work_items:H004-proto2html-dogfood
+contract_type: work_items
+title: H004 Proto2html dogfood work items
+status: completed
+change_contract: changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/CHANGE.yaml
+items:
+  - task_id: H004-T001
+    title: Benchmark fixture
+    status: completed
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+    acceptance:
+      - Accepted D02 source evidence and scope are explicit.
+  - task_id: H004-T002
+    title: HTML reconstruction
+    status: completed
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html
+    acceptance:
+      - Reconstruction is single-file and non-production.
+  - task_id: H004-T003
+    title: Fidelity evidence
+    status: completed
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/EVIDENCE.md
+    acceptance:
+      - Fidelity gaps and next recommendation are reviewable.
+  - task_id: H004-T004
+    title: Queue and validation
+    status: completed
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/
+    acceptance:
+      - H004 is complete and H003 is ready.
+      - "`npm run validate` passes."

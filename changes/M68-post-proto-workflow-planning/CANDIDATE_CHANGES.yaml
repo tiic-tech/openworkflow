@@ -39,7 +39,7 @@ selection_policy:
     - adding user-facing commands before contracts exist
     - turning proto or tune back into HTML implementation loops
     - broad autonomous runtime changes before production-stage contracts are clear
-next_recommended_candidate_id: H004
+next_recommended_candidate_id: H003
 changes:
   - id: H001
     status: done
@@ -138,7 +138,7 @@ changes:
         - "validation: quick_validate.py skills/proto2html"
         - "validation: npm run validate"
   - id: H003
-    status: candidate
+    status: ready
     title: Expose proto2html runtime command surface
     purpose: >
       Add `/ow:proto2html` to runtime command, artifact, generated adapter, and
@@ -178,7 +178,7 @@ changes:
       - Generated adapter surfaces are produced through sync.
       - Existing proto and tune image-only boundaries remain intact.
   - id: H004
-    status: ready
+    status: done
     title: Dogfood proto2html reconstruction contract
     purpose: >
       Exercise proto2html source behavior on an accepted benchmark-style
@@ -208,6 +208,19 @@ changes:
       - Dogfood output proves the contract is usable by a first-consumer agent.
       - Fidelity gaps are explicit and reviewable.
       - Follow-up runtime work remains selectable by stable id.
+    selection:
+      selected_change_id: H004-proto2html-dogfood
+      reason: H004 is ready after H001 and H002 and provides dogfood evidence before H003 runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H004-proto2html-dogfood
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+        - "validation: npm run validate"
   - id: H005
     status: candidate
     title: Define html2spec artifact contracts
@@ -373,6 +386,41 @@ operations:
       - H004
     actor: agent
     reason: H004 becomes ready after H001 and H002; dogfood evidence is required before H003 runtime exposure.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: H004 is ready and provides dogfood evidence before high-risk H003 runtime exposure.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/SELECTED_CHANGE.yaml
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: Proto2html source behavior produced a benchmark fixture, HTML reconstruction, and fidelity evidence.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+      - "validation: npm run validate"
+  - operation_id: OP009
+    operation_type: priority_change
+    target_candidate_ids:
+      - H003
+    actor: agent
+    reason: H003 becomes ready after H002 source behavior and H004 dogfood evidence are complete, but remains high risk.
     changed_at: 2026-05-21
     before_status: candidate
     after_status: ready

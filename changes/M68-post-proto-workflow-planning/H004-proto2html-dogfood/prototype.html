@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenWorkflow Prototype Discovery Flight Deck</title>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --panel-strong: #111416;
+      --ink: #182022;
+      --muted: #6a7374;
+      --line: #d9dedb;
+      --proto: #256d85;
+      --tune: #8a5a16;
+      --decision: #46632f;
+      --danger: #b43f36;
+      --html: #5f4b8b;
+      --shadow: 0 18px 48px rgba(31, 40, 43, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr) 350px;
+      min-height: 100vh;
+    }
+
+    .rail {
+      background: #151a1c;
+      color: #eef1ec;
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .mark {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255,255,255,0.18);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 15px;
+      background: #22292b;
+    }
+
+    .rail button {
+      width: 46px;
+      height: 42px;
+      border: 0;
+      color: #cad1cc;
+      background: transparent;
+      font-weight: 700;
+    }
+
+    .rail button.active {
+      color: #fff;
+      background: #2d3638;
+      border-left: 3px solid #9bc46d;
+    }
+
+    main {
+      padding: 26px 30px 30px;
+      min-width: 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.16;
+    }
+
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status-row, .pipeline, .cards, .delta-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .status-row {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .token {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 10px 12px;
+      min-height: 76px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .value {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .pipeline {
+      grid-template-columns: repeat(8, minmax(112px, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .stage {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 12px;
+      min-height: 138px;
+      position: relative;
+    }
+
+    .stage strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stage span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .stage.current {
+      border-color: var(--proto);
+      box-shadow: inset 0 0 0 2px rgba(37,109,133,0.12);
+    }
+
+    .stage.blocked {
+      background: #fff9f2;
+      border-color: #e0c08b;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #253034;
+      background: #f7f8f5;
+      white-space: nowrap;
+    }
+
+    .content {
+      padding: 16px;
+    }
+
+    .direction {
+      border: 1px solid var(--line);
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fbfcfa;
+    }
+
+    .direction.selected {
+      border-color: var(--proto);
+      background: #eef7f9;
+    }
+
+    .direction h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .direction p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .prompt-box {
+      background: #111416;
+      color: #edf2ee;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 14px;
+      margin-top: 12px;
+      overflow: auto;
+      max-height: 220px;
+    }
+
+    .delta-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .delta {
+      border: 1px solid var(--line);
+      padding: 12px;
+      min-height: 112px;
+      background: #fbfbf8;
+    }
+
+    .delta b {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .delta ul {
+      padding-left: 18px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    aside {
+      border-left: 1px solid var(--line);
+      background: #fbfcfa;
+      padding: 24px 18px;
+    }
+
+    .ledger {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .ledger h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .event {
+      border-top: 1px solid var(--line);
+      padding: 12px 0;
+    }
+
+    .event:first-of-type {
+      border-top: 0;
+    }
+
+    .event b {
+      display: block;
+      font-size: 13px;
+    }
+
+    .event span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .warning {
+      border: 1px solid #e1b7b2;
+      background: #fff6f4;
+      color: #74342e;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1120px) {
+      .shell {
+        grid-template-columns: 72px minmax(0, 1fr);
+      }
+      aside {
+        grid-column: 2;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .pipeline {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .grid, .status-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav class="rail" aria-label="OpenWorkflow sections">
+      <div class="mark">OW</div>
+      <button class="active" title="Prototype">PR</button>
+      <button title="Tune">TN</button>
+      <button title="Decision">DC</button>
+      <button title="HTML">HT</button>
+      <button title="Build">BD</button>
+    </nav>
+
+    <main>
+      <header>
+        <div>
+          <h1>Prototype Discovery Flight Deck</h1>
+          <div class="sub">
+            Accepted D02 reconstruction for the image-first OpenWorkflow flow:
+            vision to proto prompt pack, tune boundary, decision ledger, and
+            delayed HTML reconstruction.
+          </div>
+        </div>
+        <span class="badge">validation_input.mode: vision_only</span>
+      </header>
+
+      <section class="status-row" aria-label="Current workflow status">
+        <div class="token"><div class="label">Current feat</div><div class="value">M68 post-proto workflow closure</div></div>
+        <div class="token"><div class="label">Selected direction</div><div class="value">D02 Prototype Discovery Flight Deck</div></div>
+        <div class="token"><div class="label">Next safe action</div><div class="value">Dogfood before runtime exposure</div></div>
+        <div class="token"><div class="label">Forbidden now</div><div class="value">No generated adapters or production code</div></div>
+      </section>
+
+      <section class="pipeline" aria-label="Workflow pipeline">
+        <div class="stage"><strong>Vision</strong><span>Vision-only source. No validation artifact is treated as completed.</span></div>
+        <div class="stage current"><strong>Proto</strong><span>Strategic prompt pack with D01, D02, D03 directions.</span></div>
+        <div class="stage current"><strong>Tune</strong><span>Separate source skill. Preserves product system before implementation.</span></div>
+        <div class="stage"><strong>Decision</strong><span>Internal ledger records continue, tune, pivot, stop, or needs evidence.</span></div>
+        <div class="stage blocked"><strong>Proto2html</strong><span>Allowed only after accepted benchmark evidence. H004 is testing that boundary.</span></div>
+        <div class="stage"><strong>Html2spec</strong><span>Future locked-HTML to engineering specs extraction.</span></div>
+        <div class="stage"><strong>Build</strong><span>Future milestone and agent-team planning; no hidden implementation.</span></div>
+        <div class="stage"><strong>Change</strong><span>Commit-sized execution slices with audit evidence.</span></div>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Proto Prompt Pack Workspace</h2>
+            <span class="badge">First generation: D02</span>
+          </div>
+          <div class="content">
+            <div class="direction">
+              <h3>D01 Agent Handoff Command Center</h3>
+              <p>Validates trust-gated next action and recovery confidence.</p>
+            </div>
+            <div class="direction selected">
+              <h3>D02 Prototype Discovery Flight Deck</h3>
+              <p>Validates whether image-first proto and tune boundaries stay visible before code begins.</p>
+            </div>
+            <div class="direction">
+              <h3>D03 Contract Ledger Replay</h3>
+              <p>Validates replay, operation history, artifact lineage, and context recovery.</p>
+            </div>
+            <div class="prompt-box">
+Direction D02 requires: Discovery Pipeline Map, Proto Prompt Pack Workspace,
+Tune Boundary Workspace, Decision Evidence Ledger. Preserve the no-HTML rule
+until a benchmark image is accepted. Show allowed outputs, forbidden outputs,
+operation ids, source refs, and next commands.
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Tune Boundary Workspace</h2>
+            <span class="badge">source skill: tune-prototype</span>
+          </div>
+          <div class="content delta-grid">
+            <div class="delta"><b>MUST_INHERIT</b><ul><li>Image-first exploration</li><li>Agent trust and audit state</li><li>Visible validation gap</li></ul></div>
+            <div class="delta"><b>MUST_ADD</b><ul><li>Benchmark acceptance control</li><li>Proto2html blocked state</li><li>Fidelity handoff evidence</li></ul></div>
+            <div class="delta"><b>MUST_REMOVE</b><ul><li>HTML editing inside proto</li><li>CSS repair loops</li><li>Production backlog leakage</li></ul></div>
+            <div class="delta"><b>FLEXIBLE_CHANGE</b><ul><li>Panel density</li><li>Stage emphasis</li><li>Prompt preview depth</li></ul></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <aside>
+      <section class="ledger">
+        <h2>Decision Evidence Ledger</h2>
+        <div class="event"><b>Accepted</b><span>D02 best tests the redesigned proto/tune boundary.</span></div>
+        <div class="event"><b>Rejected</b><span>Do not show HTML editing, deployment, auth, billing, or generic boards.</span></div>
+        <div class="event"><b>Tune request</b><span>Preserve visible validation_input.mode and forbidden-output cues.</span></div>
+        <div class="event"><b>Follow-up</b><span>H003 may expose runtime surfaces after dogfood evidence.</span></div>
+      </section>
+      <div class="warning">
+        Runtime exposure remains high risk. H003 touches command registry,
+        artifact registry, generated adapter, and managed audit surfaces.
+      </div>
+    </aside>
+  </div>
+</body>
+</html>

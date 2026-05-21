@@ -1,0 +1,76 @@
+schema_version: 0.1.0
+contract_id: html_prototype:H004-proto2html-dogfood
+contract_type: html_prototype
+dogfood_artifact_type: html_prototype
+title: D02 Prototype Discovery Flight Deck HTML reconstruction
+status: reviewed
+source_prototype:
+  evidence_ref: changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+  prompt_pack_ref: changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+  accepted_decision_ref: changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+  notes:
+    - D02 was accepted as the benchmark-style source fixture for proto2html dogfood.
+    - No binary generated image exists yet; this dogfood reconstructs the accepted screen-group prompt.
+benchmark:
+  kind: screen_group
+  refs:
+    - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+  selected_ref: changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml#D02
+  acceptance_notes:
+    - D02 directly validates the redesigned proto/tune boundary.
+    - Reconstruction is accepted for source-behavior dogfood, not visual-production fidelity.
+reconstruction_scope:
+  include:
+    - single-file desktop HTML reconstruction
+    - pipeline, prompt workspace, tune boundary, and evidence ledger
+    - visible forbidden-output and next-command cues
+  exclude:
+    - runtime command exposure
+    - generated adapter surfaces
+    - html2spec artifacts
+    - production app scaffolding
+html_artifact:
+  path: changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html
+  type: single_file_html
+  entrypoint: prototype.html
+render_targets:
+  - target_id: desktop
+    width: 1440
+    height: 1000
+    device: desktop
+  - target_id: narrow
+    width: 900
+    height: 1100
+    device: compact desktop
+fidelity:
+  benchmark_refs:
+    - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+  screenshot_refs:
+    - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/screenshots/README.md
+  matched_elements:
+    - Discovery pipeline with Vision, Proto, Tune, Decision, HTML, Spec, Build, and Change stages.
+    - D02 prompt workspace with strategic directions and first-generation recommendation.
+    - Tune boundary with MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE.
+    - Evidence ledger with accepted elements, rejected elements, tune requests, and no-HTML boundary.
+  gaps:
+    - gap_id: FID001
+      severity: medium
+      description: No binary benchmark image exists, so fidelity is compared to accepted screen-group prompt evidence rather than pixels.
+      disposition: accept_for_source_dogfood
+    - gap_id: FID002
+      severity: low
+      description: Screens are combined into one dense desktop view rather than four separate screenshots.
+      disposition: acceptable_before_runtime_exposure
+  browser_checks:
+    - Static HTML is single-file and can be opened directly.
+implementation_notes:
+  - Used static HTML/CSS only; no package manager, backend, persistence, or deployment files.
+  - Preserved the image-first boundary and visible proto2html gating.
+known_limits:
+  - This is not a pixel comparison because the benchmark is a prompt-derived screen-group fixture.
+  - Future runtime dogfood should use real generated benchmark images and browser screenshots.
+result: accepted
+handoff:
+  next_command: /ow:proto2html-runtime-review
+  notes:
+    - H003 can be considered, but it is high risk because it exposes runtime command and generated adapter surfaces.
