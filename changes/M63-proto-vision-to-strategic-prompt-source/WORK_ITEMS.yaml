@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: work_items:M63-proto-vision-to-strategic-prompt-source
+contract_type: work_items
+title: M63 Proto vision-to-strategic prompt source work items
+status: completed
+change_contract: changes/M63-proto-vision-to-strategic-prompt-source/CHANGE.yaml
+items:
+  - task_id: M63-T001
+    title: Update build-prototype source workflow
+    status: completed
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/agents/openai.yaml
+    acceptance:
+      - Skill supports vision-only and validation-present input.
+      - Skill outputs strategic prompt packs before local runnable prototypes.
+      - Skill preserves forbidden defaults around runtime, validation automation, and HTML conversion.
+  - task_id: M63-T002
+    title: Add strategic prompt pack protocol
+    status: completed
+    owned_paths:
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    acceptance:
+      - Reference defines input normalization, strategic core, hypotheses, prompt pack structure, build recommendation, and quality gates.
+  - task_id: M63-T003
+    title: Update queue state and operations
+    status: completed
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    acceptance:
+      - P002 is marked done with select and complete operations.
+      - P003 becomes the next ready candidate.
+  - task_id: M63-T004
+    title: Validate source skill
+    status: completed
+    owned_paths:
+      - skills/build-prototype/
+      - changes/M63-proto-vision-to-strategic-prompt-source/
+    acceptance:
+      - build-prototype skill validation passes.
+      - "`npm run validate` passes."

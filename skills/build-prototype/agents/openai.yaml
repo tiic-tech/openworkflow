@@ -1,4 +1,4 @@
 interface:
   display_name: "Build Prototype"
-  short_description: "Create a focused prototype from validation artifacts"
-  default_prompt: "Use /ow:prototype to turn a validation target into a local prototype plan."
+  short_description: "Create image-first prototype prompt packs"
+  default_prompt: "Use /ow:proto to turn vision or validation context into strategic prototype prompt packs for review."

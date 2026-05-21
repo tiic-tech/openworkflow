@@ -21,8 +21,9 @@ candidate_count: 6
 selected_candidate_id: P001
 selected_change_id: M60-proto-redesign-artifact-contracts
 completed_candidate_id: P001
-next_recommended_candidate_id: P002
+next_recommended_candidate_id: P003
 completed_policy_candidate_id: P004
+completed_source_candidate_id: P002
 unresolved_questions:
   - Whether automatic validation should be implemented after the proto input policy is defined.
   - Whether `/ow:tune` should become its own command surface or remain part of prototype refinement.

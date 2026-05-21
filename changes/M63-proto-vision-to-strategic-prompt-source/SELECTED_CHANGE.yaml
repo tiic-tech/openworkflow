@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:M63-proto-vision-to-strategic-prompt-source
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M63-proto-vision-to-strategic-prompt-source
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P002
+title: Implement vision-to-strategic prototype source behavior
+status: completed
+selection_reason:
+  - P002 is ready and next_recommended_candidate_id points to it.
+  - Dependencies P001 and P004 are complete.
+  - The change unlocks P003 and P005 while staying source-level.
+rejected_alternatives:
+  - id: P003
+    reason: Depends on first-pass strategic prototype behavior.
+  - id: P006
+    reason: Runtime exposure depends on source dogfood evidence.
+scope:
+  includes:
+    - source prototype skill guidance
+    - strategic hypothesis generation
+    - prompt pack output rules
+    - build-order recommendation behavior
+  excludes:
+    - tune/refinement behavior
+    - runtime command exposure
+    - validation automation
+    - HTML conversion
+owned_paths:
+  - skills/build-prototype/
+  - changes/M63-proto-vision-to-strategic-prompt-source/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+acceptance:
+  - "`/ow:proto` source behavior can operate from VISION-only input."
+  - Output directions differ by strategic hypothesis, not visual skin.
+  - Prompt packs are concrete enough for downstream image generation.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+created_at: 2026-05-21
+updated_at: 2026-05-21

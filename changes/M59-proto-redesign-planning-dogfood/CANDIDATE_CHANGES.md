@@ -15,7 +15,7 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Next recommended candidate: `P002`
+Next recommended candidate: `P003`
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
@@ -46,16 +46,25 @@ Completion evidence:
 
 ## P002 - Implement Vision-To-Strategic Prototype Source Behavior
 
-Status: `ready`
+Status: `done`
 
 Purpose: update source prototype guidance so `/ow:proto` can consume a vision
 and produce multiple strategic high-fidelity prototype prompt directions.
 
 Depends on: `P001`, `P004`
 
+Completion evidence:
+
+- `skills/build-prototype/SKILL.md`
+- `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
+- `skills/build-prototype/agents/openai.yaml`
+- `changes/M63-proto-vision-to-strategic-prompt-source/CHANGE.yaml`
+- `quick_validate.py skills/build-prototype`
+- `npm run validate`
+
 ## P003 - Implement Prototype Tune To Refined Prompt Source Behavior
 
-Status: `candidate`
+Status: `ready`
 
 Purpose: update tune guidance so a baseline prototype screen group and user
 feedback can become screen-bound refined prompt packs without product drift.
@@ -95,3 +104,9 @@ Purpose: promote the proven source-level proto redesign into command, artifact,
 and generated Codex adapter surfaces after dogfood evidence is accepted.
 
 Depends on: `P005`
+
+## Operation Audit
+
+- `OP001`: select `P002`
+- `OP002`: complete `P002`
+- `OP003`: mark `P003` ready and make it next recommended
