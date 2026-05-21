@@ -17,7 +17,7 @@ changing generated `.agents` surfaces directly, treating high-risk reports as
 chat-only guidance, letting `select-change` silently select `risk: high`
 candidates, or committing experimental non-Codex generated surfaces.
 
-Next recommended candidate: `G001`.
+Next recommended candidate: `G002`.
 
 Feat boundary: this queue owns
 `changes/M70-high-risk-governance-planning/`. Each `G###` candidate is expected
@@ -25,7 +25,7 @@ to land as one focused commit with selection artifacts under this feat folder.
 
 ## G001 - Formalize High-Risk Decision Report Contract
 
-Status: `ready`
+Status: `done`
 
 Purpose: define `HIGH_RISK_DECISION_REPORT.md` as a first-class planning
 artifact so high-risk stops have a stable structure, output path, required
@@ -41,9 +41,17 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+Selection: `G001-high-risk-report-contract`
+
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `npm run validate`
+- `git diff --check`
+
 ## G002 - Add High-Risk Report Behavior To Decompose-To-Changes
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `G001`
 
@@ -53,7 +61,7 @@ including creating or updating a high-risk decision report when a queue reaches
 
 ## G003 - Add High-Risk Stop Gate To Select-Change
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `G001`
 
@@ -63,7 +71,7 @@ option.
 
 ## G004 - Add High-Risk Report Validation And Dogfood Fixtures
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `G002`, `G003`
 

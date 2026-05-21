@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G001-high-risk-report-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G001-high-risk-report-contract
+title: Atom tasks for high-risk decision report contract
+status: done
+tasks:
+  - task_id: T001
+    title: Document report artifact contract
+    status: done
+    type: document
+    owned_paths:
+      - references/planning-artifact-contracts.md
+    done_when:
+      - The report purpose, path, required sections, and resume rule are documented.
+      - Summary linkage and operation log expectations are documented.
+  - task_id: T002
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M70-high-risk-governance-planning/CANDIDATE_CHANGES.yaml
+      - changes/M70-high-risk-governance-planning/CANDIDATE_CHANGES.md
+      - changes/M70-high-risk-governance-planning/SUMMARY.yaml
+      - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/
+    done_when:
+      - G001 selection and completion evidence are recorded.
+      - Candidates unlocked by G001 are marked ready where dependencies are satisfied.
+  - task_id: T003
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

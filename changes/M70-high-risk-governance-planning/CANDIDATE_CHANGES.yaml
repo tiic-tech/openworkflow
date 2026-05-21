@@ -43,10 +43,10 @@ selection_policy:
     - treating high-risk reports as informal chat-only guidance
     - letting select-change silently select risk: high candidates
     - committing experimental non-Codex generated surfaces
-next_recommended_candidate_id: G001
+next_recommended_candidate_id: G002
 changes:
   - id: G001
-    status: ready
+    status: done
     title: Formalize high-risk decision report contract
     purpose: >
       Define HIGH_RISK_DECISION_REPORT.md as a first-class planning artifact so
@@ -80,8 +80,23 @@ changes:
       - The contract states that implementation resumes only after explicit user approval of an option.
       - The contract explains how the report is referenced from SUMMARY.yaml and operation logs.
       - Existing planning artifacts remain valid.
+    selection:
+      selected_change_id: G001-high-risk-report-contract
+      reason: >
+        G001 has no dependencies and creates the report contract needed before
+        the source planning skills can enforce high-risk stop behavior.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G001-high-risk-report-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/SELECTED_CHANGE.yaml
+        - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
   - id: G002
-    status: candidate
+    status: ready
     title: Add high-risk report behavior to decompose-to-changes
     purpose: >
       Teach decompose-to-changes to plan high-risk governance explicitly,
@@ -117,7 +132,7 @@ changes:
       - decompose-to-changes can update an existing report instead of creating duplicate reports.
       - The skill keeps implementation out of scope.
   - id: G003
-    status: candidate
+    status: ready
     title: Add high-risk stop gate to select-change
     purpose: >
       Teach select-change to stop before selecting or implementing risk: high
@@ -195,7 +210,7 @@ changes:
       - A high-risk report linked from a queue is treated as evidence, not implementation approval.
       - Diagnostics or fixture notes tell agents not to bypass user approval.
   - id: G005
-    status: candidate
+    status: ready
     title: Convert M69 S003 into design-only delivery boundary change
     purpose: >
       Apply the high-risk report recommendation by creating a lower-risk
@@ -301,3 +316,43 @@ changes:
       - The design names the exact user approval required to proceed beyond dry-run.
       - The design keeps Codex output semantics unchanged.
       - Remaining high-risk implementation questions are explicit.
+operations:
+  - operation_id: OP001
+    operation_type: select
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: G001 is the next recommended candidate and has no dependencies.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/SELECTED_CHANGE.yaml
+      - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/ATOM_TASKS.yaml
+      - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP002
+    operation_type: complete
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: HIGH_RISK_DECISION_REPORT.md is now defined in the planning artifact contracts.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP003
+    operation_type: status_change
+    target_candidate_ids:
+      - G002
+      - G003
+      - G005
+    actor: agent
+    reason: G001 completed the shared report contract dependency for planning skill behavior and design-only mitigation work.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - references/planning-artifact-contracts.md

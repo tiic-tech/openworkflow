@@ -185,6 +185,59 @@ Required sections:
 The brief should be short. It should not duplicate the entire candidate queue or
 long product discussion.
 
+## HIGH_RISK_DECISION_REPORT.md
+
+Purpose: stop high-risk implementation before it starts and give the user a
+concrete decision packet. Use this report when the next candidate is
+`risk: high`, when a selected candidate's blast radius grows into high risk, or
+when continuing would require changing trust, delivery, generated-runtime, data,
+security, or architecture boundaries.
+
+The report belongs to the queue that encountered the high-risk stop:
+
+```text
+changes/<plan_id>/
+  CANDIDATE_CHANGES.yaml
+  CANDIDATE_CHANGES.md
+  SUMMARY.yaml
+  HIGH_RISK_DECISION_REPORT.md
+```
+
+If a queue needs multiple high-risk reports over time, update the existing
+report when it covers the same decision boundary. Create a named variant only
+when the new stop covers a materially different boundary.
+
+Required sections:
+
+- `Trigger`: why execution stopped now.
+- `Change`: candidate id, title, status, and why the candidate is high risk.
+- `Concrete Risks`: specific ways implementation could damage correctness,
+  trust, generated surfaces, architecture, data, or user workflow.
+- `Decision Options`: at least defer, design-only, narrow spike, and full
+  implementation when those options make sense.
+- `Recommended Path`: one recommended option with reasoning.
+- `Guardrails`: constraints that must hold if the user approves progress.
+- `Go Criteria`: what explicit user decision is required before implementation
+  resumes.
+- `Stop Criteria`: conditions that force another stop even after approval.
+- `Validation Expectations`: commands or evidence required for any approved
+  follow-up.
+
+The report is evidence, not approval. Implementation may resume only after the
+user explicitly approves a concrete decision option or narrower replacement
+candidate.
+
+Queue linkage:
+
+- Add the report path to `SUMMARY.yaml` outputs or notes.
+- Append an `operations` entry with `operation_type: query` or
+  `operation_type: block` for the high-risk stop.
+- Keep the high-risk candidate status unchanged unless the report recommends
+  and the user approves a status transition such as `blocked`, `deferred`, or
+  `superseded`.
+- Do not create `SELECTED_CHANGE.yaml` for a high-risk candidate solely because
+  the report exists.
+
 ## Status Update Rules
 
 When select-change chooses a candidate:
