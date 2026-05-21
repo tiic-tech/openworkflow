@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: work_items:M67-proto-redesign-runtime-surface
+contract_type: work_items
+title: M67 Proto redesign runtime surface work items
+status: completed
+change_contract: changes/M67-proto-redesign-runtime-surface/CHANGE.yaml
+items:
+  - task_id: M67-T001
+    title: Runtime protocols
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/readiness.ts
+    acceptance:
+      - Proto and tune command protocols describe prompt-pack behavior.
+      - Proto does not require validation when starting from vision-only context.
+  - task_id: M67-T002
+    title: Artifact contracts
+    status: completed
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/validators/
+      - schemas/prototype-evidence.schema.json
+      - references/artifact-authoring-templates.md
+    acceptance:
+      - Prototype evidence contract uses prompt-pack fields.
+      - Validator and summary quality behavior match the new contract.
+  - task_id: M67-T003
+    title: Verification and generated surfaces
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/
+      - .agents/skills/
+      - .openworkflow/audit/
+    acceptance:
+      - Runtime and workflow verification assert proto/tune prompt-pack boundaries.
+      - Managed files are regenerated through sync.
+  - task_id: M67-T004
+    title: Queue completion
+    status: completed
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/
+      - changes/M67-proto-redesign-runtime-surface/
+    acceptance:
+      - P006 is marked done with operation evidence.
+      - Required validation commands pass.

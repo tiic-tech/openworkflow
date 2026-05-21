@@ -422,10 +422,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(entries), "summary health entries must be array");
   assert(entries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "missing"), "summary health did not report missing prototype summary");
   const missingCheckStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(missingCheckStatus.code !== 0, "proto check should fail without required validation context");
+  assert(missingCheckStatus.code === 0, "proto check should stay ready when only prototype summary health is missing");
   const missingCheck = parseJsonReport(missingCheckStatus.output, "check");
+  assert(missingCheck.ok === true, "proto check should report ok=true when summary health is only advisory");
   assert(Array.isArray(missingCheck.warnings) && missingCheck.warnings.some((item) => String(item).includes("summary health for prototype_evidence")), "check warnings missing summary health promotion");
-  assert(nonEmptyArray(missingCheck.health_errors), "blocked check should expose health_errors");
+  assert(Array.isArray(missingCheck.health_errors) && missingCheck.health_errors.length === 0, "advisory proto check should not expose blocker health_errors");
 
   const dryRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--json"], env), "summarize");
   const dryEffects = record(dryRun.effects, "summarize dry-run effects");
@@ -452,7 +453,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(currentPrototypeItem !== undefined, "summary health missing prototype item");
   const currentPrototypeRecord = record(currentPrototypeItem, "prototype summary item");
   assert(currentPrototypeRecord.quality_status === "current_but_thin", "fresh thin prototype summary should report current_but_thin quality");
-  assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prototype_artifact"), "thin prototype summary should report empty key fields");
+  assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prompt_pack_type"), "thin prototype summary should report empty key fields");
   assert(Array.isArray(currentPrototypeRecord.quality_warnings) && currentPrototypeRecord.quality_warnings.some((item) => String(item).includes("empty handoff fields")), "thin prototype summary should report quality warnings");
   assert(currentAfterWrite.ok === true, "current but thin summary should not fail freshness health");
   const strictSummaryStatus = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--strict", "--json"], env);
@@ -536,7 +537,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
   assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "current"), "summary health did not report current validation current_slice");
   const protoContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:proto", "--json"], env);
-  assert(protoContextStatus.code !== 0, "proto context should return nonzero while readiness blockers exist");
+  assert(protoContextStatus.code === 0, "proto context should stay ready with vision-only semantics when no current validation pointer is set");
   const protoContext = parseJsonReport(protoContextStatus.output, "context");
   const protoContextData = record(protoContext.data, "proto context data");
   assert(Array.isArray(protoContextData.included) && protoContextData.included.some((item) => record(item, "included proto context").source === "current_slice" && record(item, "included proto context").path === ".openworkflow/validation/val-1/VALIDATION.yaml"), "proto context should include validation current_slice");
@@ -585,9 +586,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(nonEmptyArray(inspect.health_errors), "inspect should expose health_errors when health fails");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(checkStatus.code !== 0, "proto check should fail without required validation context");
+  assert(checkStatus.code === 0, "proto check should stay ready when summary health is advisory");
   const check = parseJsonReport(checkStatus.output, "check");
   const checkData = record(check.data, "check data");
+  assert(check.ok === true, "proto check should report ok=true without current validation blockers");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
 
 }
@@ -698,10 +700,10 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(currentIndex.includes("current_validation: val-draft"), "register current did not update index pointer");
 
   const draftProtoCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(draftProtoCheck.code !== 0, "proto check should block when current validation is still a draft scaffold");
+  assert(draftProtoCheck.code !== 0, "proto check should block when optional current validation is still a draft scaffold");
   const draftProtoReport = parseJsonReport(draftProtoCheck.output, "check");
   const draftProtoData = record(draftProtoReport.data, "draft proto check data");
-  assert(draftProtoReport.ok === false, "draft current validation should make proto check ok=false");
+  assert(draftProtoReport.ok === false, "draft optional current validation should make proto check ok=false");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("status must be beyond draft")), "proto check missing draft status blocker");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("core_question must be non-empty")), "proto check missing core_question readiness blocker");
 
@@ -970,42 +972,39 @@ function verifyVisionSkill(content: string): void {
 
 function verifyProtoSkill(content: string): void {
   for (const required of [
-    "<prototype_classification>",
-    "prototype mode",
-    "visual, interaction, technical feasibility, 3D/material, workflow, or data/logic",
-    "<reference_extraction>",
-    "reference-pattern extraction",
-    "target image, URL, screenshot, HTML/CSS",
-    "<visual_first_path>",
-    "high-fidelity static concept",
-    "image generation",
-    "visual_concept_policy.image_generation",
-    "<design_seed_protocol>",
-    "design system, template seed",
-    "<verification_protocol>",
-    "browser verification",
-    "screenshot",
-    "<self_critique>",
-    "philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior",
-    "repair pass before evidence handoff",
+    "image-first-strategic-proto-prompt-pack",
+    "<validation_consumption>",
+    "validation_input.mode",
+    "<strategic_prompt_pack>",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "Each direction must include direction_id",
+    "<image_only_boundary>",
+    "Do not write HTML, CSS, runnable prototypes",
+    "<review_evidence>",
+    "Record selected direction",
+    "PROTO_PROMPT_PACK.yaml",
   ]) {
-    assert(content.includes(required), `ow-proto missing M16 guidance: ${required}`);
+    assert(content.includes(required), `ow-proto missing image-first prompt guidance: ${required}`);
   }
 }
 
 function verifyTuneSkill(content: string): void {
   for (const required of [
+    "screen-bound-prototype-refinement",
     "<target_resolution>",
-    "/ow:tune resolves to the current prototype by default.",
+    "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.",
     "/ow:tune:proto is an explicit alias",
-    "<proto_orchestration>",
-    "no current prototype exists but a current validation target exists",
-    "<revision_protocol>",
+    "<baseline_screen_audit>",
+    "Treat the screen group as one product system",
+    "<inheritance_delta_rules>",
+    "MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE",
+    "<screen_manifest>",
+    "Every screen prompt must include prompt_id",
     "<internal_decision_audit>",
     "Every tune pass must write or update a decision audit record internally.",
     "Do not expose /ow:decision as the next manual user step",
   ]) {
-    assert(content.includes(required), `ow-tune missing M17 guidance: ${required}`);
+    assert(content.includes(required), `ow-tune missing refined prompt guidance: ${required}`);
   }
 }
 
@@ -1068,7 +1067,11 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
+  assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
+  assert(extractBlock(protoSection, "forbidden_outputs").includes("review.html"), "proto forbidden outputs missing HTML review surface");
   assert(!extractBlock(tuneSection, "handoff_commands").includes("/ow:decision"), "tune exposes manual decision handoff");
+  assert(extractBlock(tuneSection, "allowed_outputs").includes("REFINED_PROTO_PROMPT_PACK.yaml"), "tune allowed outputs missing refined prompt pack");
+  assert(extractBlock(tuneSection, "forbidden_outputs").includes("review.html"), "tune forbidden outputs missing HTML review surface");
   assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");

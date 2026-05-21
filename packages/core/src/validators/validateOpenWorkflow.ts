@@ -336,18 +336,11 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "validation_target",
       "core_question",
       "prototype_mode",
-      "reference_analysis",
-      "visual_direction",
-      "visual_concept_policy",
-      "concept_evidence",
-      "prototype_artifact",
-      "run",
-      "implementation_evidence",
-      "observations",
-      "evidence",
-      "verification",
-      "self_critique",
-      "known_limits",
+      "prompt_pack_type",
+      "validation_input",
+      "source",
+      "negative_constraints",
+      "review_plan",
       "result",
       "handoff",
     ];
@@ -445,7 +438,7 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
 function validatePrototypeEvidence(root: string, label: string, data: Record<string, unknown>, errors: string[]): void {
   if (
     typeof data.prototype_mode === "string" &&
-    !["visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(data.prototype_mode)
+    !["image_prompt_pack", "visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(data.prototype_mode)
   ) {
     errors.push(`${label} has invalid prototype_mode ${data.prototype_mode}`);
   }
@@ -457,7 +450,9 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   if ("visual_direction" in data && !isRecord(data.visual_direction)) {
     errors.push(`${label} visual_direction must be a mapping`);
   }
-  validateVisualConceptPolicy(label, data, errors);
+  if ("visual_concept_policy" in data) {
+    validateVisualConceptPolicy(label, data, errors);
+  }
   if ("verification" in data && !isRecord(data.verification)) {
     errors.push(`${label} verification must be a mapping`);
   }
@@ -476,6 +471,30 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
     validateLocalRef(root, label, "prototype_artifact.path", prototypeArtifact.path, errors);
   }
   validateEvidenceRefs(root, label, data, errors);
+  if ("validation_input" in data && !isRecord(data.validation_input)) {
+    errors.push(`${label} validation_input must be a mapping`);
+  }
+  if ("source" in data && !isRecord(data.source)) {
+    errors.push(`${label} source must be a mapping`);
+  }
+  if ("negative_constraints" in data && !Array.isArray(data.negative_constraints)) {
+    errors.push(`${label} negative_constraints must be an array`);
+  }
+  if ("review_plan" in data && !isRecord(data.review_plan)) {
+    errors.push(`${label} review_plan must be a mapping`);
+  }
+  if ("directions" in data && !Array.isArray(data.directions)) {
+    errors.push(`${label} directions must be an array`);
+  }
+  if ("screen_manifest" in data && !Array.isArray(data.screen_manifest)) {
+    errors.push(`${label} screen_manifest must be an array`);
+  }
+  if ("screen_prompts" in data && !Array.isArray(data.screen_prompts)) {
+    errors.push(`${label} screen_prompts must be an array`);
+  }
+  if ("prompt_pack_type" in data && !["strategic_proto_prompt_pack", "refined_proto_prompt_pack", "proto_review_evidence"].includes(String(data.prompt_pack_type))) {
+    errors.push(`${label} has invalid prompt_pack_type ${String(data.prompt_pack_type)}`);
+  }
   if (typeof data.result === "string" && !["pass", "fail", "unclear", "not_reviewed"].includes(data.result)) {
     errors.push(`${label} has invalid result ${data.result}`);
   }

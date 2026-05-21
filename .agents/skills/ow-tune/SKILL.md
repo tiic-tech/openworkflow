@@ -1,11 +1,11 @@
 ---
 name: "ow-tune"
-description: "Revise the current prototype and record the decision audit automatically. Use this skill for /ow:tune in OpenWorkflow repositories."
+description: "Refine accepted prototype screens or prompt packs and record the decision audit automatically. Use this skill for /ow:tune in OpenWorkflow repositories."
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.tune -->
 # /ow:tune
 
-Revise the current prototype and record the decision audit automatically.
+Refine accepted prototype screens or prompt packs and record the decision audit automatically.
 
 <user_behavior>
 Keep visible responses concise and outcome-focused.
@@ -20,7 +20,7 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 <source_of_truth>.openworkflow/</source_of_truth>
 <stage>prototype</stage>
 <command_visibility>user</command_visibility>
-<interaction_mode>prototype-revision-orchestration</interaction_mode>
+<interaction_mode>screen-bound-prototype-refinement</interaction_mode>
 
 <inner_thinking>
 Use this protocol for private reasoning, classification, critique, and scope checks.
@@ -37,6 +37,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - .openworkflow/validation/**/VALIDATION.yaml
 - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
 - .openworkflow/prototypes/**/EVIDENCE.yaml
+- .openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml
+- .openworkflow/prototypes/**/REFINED_PROTO_PROMPT_PACK.yaml
 - .openworkflow/prototypes/**/NOTE.md
 - .openworkflow/decisions/DECISION_INDEX.yaml
 - .openworkflow/decisions/**/DECISION.yaml
@@ -51,14 +53,15 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <allowed_outputs>
 - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+- .openworkflow/prototypes/&lt;id&gt;/REFINED_PROTO_PROMPT_PACK.yaml
+- .openworkflow/prototypes/&lt;id&gt;/REFINED_PROTO_PROMPT_PACK.md
+- .openworkflow/prototypes/&lt;id&gt;/REVIEW_PLAN.md
 - .openworkflow/prototypes/&lt;id&gt;/EVIDENCE.yaml
 - .openworkflow/prototypes/&lt;id&gt;/NOTE.md
-- .openworkflow/prototypes/&lt;id&gt;/review.html
-- .openworkflow/prototypes/&lt;id&gt;/evidence/**
+- .openworkflow/prototypes/&lt;id&gt;/images/**
 - .openworkflow/decisions/DECISION_INDEX.yaml
 - .openworkflow/decisions/&lt;id&gt;/DECISION.yaml
 - .openworkflow/decisions/&lt;id&gt;/NOTE.md
-- .openworkflow/decisions/&lt;id&gt;/review.html
 </allowed_outputs>
 
 <conditional_outputs>
@@ -66,11 +69,12 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </conditional_outputs>
 
 <artifact_contracts>
-- prototype_evidence: template .openworkflow/prototypes/_templates/EVIDENCE.yaml, source .openworkflow/prototypes/&lt;id&gt;/EVIDENCE.yaml, note .openworkflow/prototypes/&lt;id&gt;/NOTE.md, review .openworkflow/prototypes/&lt;id&gt;/review.html, load_by_default true, max_yaml_lines 190, summary_policy summary_file at .openworkflow/prototypes/&lt;id&gt;/SUMMARY.yaml
+- prototype_evidence: template .openworkflow/prototypes/_templates/EVIDENCE.yaml, source .openworkflow/prototypes/&lt;id&gt;/EVIDENCE.yaml, note .openworkflow/prototypes/&lt;id&gt;/NOTE.md, review none, load_by_default true, max_yaml_lines 190, summary_policy summary_file at .openworkflow/prototypes/&lt;id&gt;/SUMMARY.yaml
 - decision_record: template .openworkflow/decisions/_templates/DECISION.yaml, source .openworkflow/decisions/&lt;id&gt;/DECISION.yaml, note .openworkflow/decisions/&lt;id&gt;/NOTE.md, review .openworkflow/decisions/&lt;id&gt;/review.html, load_by_default true, max_yaml_lines 120, summary_policy current_slice at outcome + rationale + next_command + follow_up_questions
 </artifact_contracts>
 
 <forbidden_outputs>
+- .openworkflow/prototypes/&lt;id&gt;/review.html
 - .openworkflow/specs/**
 - .openworkflow/changes/**
 - .openworkflow/runtime/**
@@ -78,18 +82,19 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Resolve tune target: /ow:tune and /ow:tune:proto default to the current prototype.
-- If no current prototype exists but a current validation target exists, orchestrate prototype creation through /ow:proto behavior.
-- Load only the current prototype evidence, relevant validation target, and latest decision audit context.
+- Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted baseline screen group.
+- Require baseline screens, screenshots, screen descriptions, generated images, or an accepted PROTO_PROMPT_PACK plus a tune request.
+- Load only the baseline prompt pack, current prototype evidence, relevant validation or vision context, and latest decision audit context.
 </before>
 <during>
-- Apply exactly one focused revision loop from user feedback.
-- Preserve M16 prototype evidence separation for concept, implementation, verification, self-critique, and known limits.
-- Run required verification for changed rendered artifacts.
+- Audit the full baseline screen group before writing refined prompts.
+- Extract the product system and preserve product thesis, primary loop, component vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+- Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per target screen.
+- Bind every refined prompt to target screen id, source screen id(s), generation scope, target form factor, negative constraints, and acceptance criteria.
 - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
 </during>
 <after>
-- Write updated prototype evidence and review artifacts.
+- Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact EVIDENCE.yaml.
 - Write or update the internal decision audit record.
 - Refresh prototype SUMMARY.yaml and CURRENT_STATE.yaml after the revision outcome is known.
 - Show the user only the tuning result, unresolved question if any, and the next user-facing command.
@@ -114,22 +119,28 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 </artifact_checkpoint>
 
 <target_resolution>
-- /ow:tune resolves to the current prototype by default.
+- /ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.
 - /ow:tune:proto is an explicit alias for tuning the current prototype.
-- /ow:tune:&lt;target&gt; reserves routing for explicit future artifact targets; in M17, implement prototype target behavior and record unsupported targets as unresolved.
+- If no baseline prototype exists, return to /ow:proto instead of inventing refinement context.
 </target_resolution>
 
-<proto_orchestration>
-- When no current prototype exists but a current validation target exists, use /ow:proto behavior to create the first prototype evidence before tuning.
-- When a current prototype exists, revise it in place unless the user explicitly requests a new prototype branch.
-- Keep the revision scoped to the user's feedback and the active validation question.
-</proto_orchestration>
+<baseline_screen_audit>
+- For each source screen, record screen id, screen name, journey stage, user goal, system state, components, copy tone, represented feature, AI/system behavior, trust controls, visual cues, must-preserve elements, platform artifacts to transform or remove, and assumptions.
+- Treat the screen group as one product system, not unrelated images.
+- State excluded source screens explicitly when the user limits scope.
+</baseline_screen_audit>
 
-<revision_protocol>
-- Treat user feedback as the tune brief; ask one clarifying question only when the requested revision is ambiguous or unsafe.
-- Update the smallest artifact set needed: prototype evidence, note, review surface, and evidence files.
-- Preserve visual concept policy, evidence refs, verification, and self-critique integrity from the prototype evidence contract.
-</revision_protocol>
+<inheritance_delta_rules>
+- Build MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets before writing prompts.
+- Requested removals must appear in global negative constraints, per-screen negative constraints, and acceptance checks.
+- Flexible changes must remain inside the product thesis, brand promise, non-goals, and screen purpose.
+</inheritance_delta_rules>
+
+<screen_manifest>
+- Preserve target screen ids across rounds unless screens are deleted, split, merged, or explicitly renamed.
+- Every screen prompt must include prompt_id, target_screen_id, screen_name, source_screen_ids, target form factor, generation scope, dependencies, prompt, negative prompt, and acceptance criteria.
+- Do not output anonymous prompts that downstream generation cannot map back to screens.
+</screen_manifest>
 
 <internal_decision_audit>
 - Every tune pass must write or update a decision audit record internally.
@@ -139,9 +150,12 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 
 <anti_patterns>
 - Do not ask the user to manually invoke /ow:decision during a tune loop.
-- Do not restart full prototype discovery when a focused revision is enough.
+- Do not restart full strategic prototype discovery when a focused refinement is enough.
+- Do not tune from one representative screen when the input is a screen group unless the user explicitly limits scope.
+- Do not silently drop accepted baseline controls, privacy affordances, memory controls, or non-goals.
+- Do not generate HTML, CSS, or runnable app work from /ow:tune.
 - Do not create design, specs, changes, or runtime work from unaccepted tune evidence.
-- Do not tune outside the current validation scope unless the user explicitly changes the target or validation.
+- Do not ignore the current validation scope when one is explicitly present and accepted for the prototype.
 </anti_patterns>
 
 <handoff>

@@ -145,38 +145,37 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   const phase = "prototype";
   const source = command("proto", phase);
   const protocol = protocolFor(source, phase);
-  assertPhase(phase, protocol.interactionMode === "classified-prototype-creation", "prototype source protocol is not classified creation");
+  assertPhase(phase, protocol.interactionMode === "image-first-strategic-proto-prompt-pack", "prototype source protocol is not image-first prompt pack");
   assertDiscoveryHandoffs(phase, protocol.handoffCommands, "source prototype handoffs");
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "prototype cannot write decision audit");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Classify prototype mode", "prototype does not classify mode first");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Detect reference inputs", "prototype does not detect references");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "high-fidelity static concept", "prototype does not require static concept");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "validation_input.mode", "prototype does not record validation mode");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "5-8 strategic prototype hypotheses", "prototype does not generate strategic hypotheses");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "PROTO_PROMPT_PACK.yaml", "prototype does not write prompt pack");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "decision audit record internally", "prototype does not write decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "prototype permits manual decision handoff");
+  assertSomeIncludes(phase, protocol.antiPatterns, "Do not generate HTML", "prototype permits HTML generation");
 
   const generated = commandRecord(runtime, "proto", phase);
   assertDiscoveryHandoffs(phase, stringList(generated, "handoff_commands", phase), "generated prototype handoffs");
   assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/decisions/<id>/DECISION.yaml", "generated prototype cannot write decision audit");
+  assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml", "generated prototype missing prompt pack output");
 
   const packet = packetRecord(runtime, "/ow:proto", phase);
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "before HTML", "context packet lost visual-first ordering");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "decision audit record internally", "context packet lost internal decision audit");
 
   const skill = await readSkill(runtime, "ow-proto");
   for (const tag of [
-    "prototype_classification",
-    "reference_extraction",
-    "visual_first_path",
-    "design_seed_protocol",
-    "verification_protocol",
-    "self_critique",
+    "validation_consumption",
+    "strategic_prompt_pack",
+    "image_only_boundary",
+    "review_evidence",
     "internal_decision_audit",
   ]) {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
-  assertIncludes(phase, skill, "image generation before HTML", "skill lost image generation before HTML rule");
-  assertIncludes(phase, skill, "reference-pattern extraction", "skill lost reference-pattern extraction wording");
-  assertIncludes(phase, skill, "repair pass before evidence handoff", "skill lost critique repair gate");
+  assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
+  assertIncludes(phase, skill, "Do not write HTML, CSS, runnable prototypes", "skill lost image-only boundary");
   assertIncludes(phase, skill, "decision_record", "skill does not expose decision artifact contract for internal audit");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in prototype handoffs");
 
@@ -185,18 +184,12 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, artifacts, "decision_record", "source proto artifacts missing decision record");
 
   const template = recordField(artifactRecord(runtime, "prototype_evidence", phase), "template", phase);
-  assertPhase(phase, "reference_analysis" in template, "prototype template missing reference analysis");
-  assertPhase(phase, "visual_concept_policy" in template, "prototype template missing visual concept policy");
-  assertPhase(phase, "concept_evidence" in template, "prototype template missing concept evidence");
-  assertPhase(phase, "implementation_evidence" in template, "prototype template missing implementation evidence");
-  assertPhase(phase, "verification" in template, "prototype template missing verification evidence");
-  assertPhase(phase, "self_critique" in template, "prototype template missing self critique");
-  const conceptPolicy = recordField(template, "visual_concept_policy", phase);
-  assertPhase(phase, conceptPolicy.image_generation === "generated|skipped_by_user|not_applicable", "prototype template lost image generation policy");
-  const critique = recordField(template, "self_critique", phase);
-  for (const key of ["philosophy", "hierarchy", "execution", "specificity", "restraint", "accessibility", "responsive_behavior", "repairs"]) {
-    assertPhase(phase, key in critique, `prototype critique missing ${key}`);
-  }
+  assertPhase(phase, "prompt_pack_type" in template, "prototype template missing prompt pack type");
+  assertPhase(phase, "validation_input" in template, "prototype template missing validation input");
+  assertPhase(phase, "directions" in template, "prototype template missing directions");
+  assertPhase(phase, "build_recommendation" in template, "prototype template missing build recommendation");
+  assertPhase(phase, "negative_constraints" in template, "prototype template missing negative constraints");
+  assertPhase(phase, "review_plan" in template, "prototype template missing review plan");
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.next_command !== "/ow:decision", "prototype template exposes manual decision as next command");
   assertListIncludes(phase, USER_FACING_DISCOVERY_HANDOFFS, String(handoff.next_command), "prototype template next command is not user-facing");
@@ -206,13 +199,14 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   const phase = "tune";
   const source = command("tune", phase);
   const protocol = protocolFor(source, phase);
-  assertPhase(phase, protocol.interactionMode === "prototype-revision-orchestration", "tune source protocol is not revision orchestration");
+  assertPhase(phase, protocol.interactionMode === "screen-bound-prototype-refinement", "tune source protocol is not screen-bound refinement");
   assertDiscoveryHandoffs(phase, protocol.handoffCommands, "source tune handoffs");
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "tune cannot write decision audit");
   assertListExcludes(phase, protocol.requiredContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune requires prototype index and cannot bootstrap from validation");
   assertListIncludes(phase, protocol.optionalContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune optional context missing prototype index");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "/ow:tune:proto default to the current prototype", "tune does not default to current prototype");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "no current prototype exists", "tune does not orchestrate proto when prototype is absent");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "accepted baseline screen group", "tune does not require baseline screens");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "MUST_INHERIT", "tune does not require delta rules");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "target screen id", "tune does not bind screen prompts");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "internal decision audit record", "tune does not record decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "tune permits manual decision handoff");
 
@@ -225,10 +219,11 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(packet, "optional", phase), ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "context packet optional context missing prototype index");
 
   const skill = await readSkill(runtime, "ow-tune");
-  for (const tag of ["target_resolution", "proto_orchestration", "revision_protocol", "internal_decision_audit"]) {
+  for (const tag of ["target_resolution", "baseline_screen_audit", "inheritance_delta_rules", "screen_manifest", "internal_decision_audit"]) {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
-  assertIncludes(phase, skill, "/ow:tune resolves to the current prototype by default.", "skill lost default target behavior");
+  assertIncludes(phase, skill, "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.", "skill lost default target behavior");
+  assertIncludes(phase, skill, "Every screen prompt must include prompt_id", "skill lost screen manifest rule");
   assertIncludes(phase, skill, "Every tune pass must write or update a decision audit record internally.", "skill lost decision audit requirement");
   assertIncludes(phase, skill, "Do not expose /ow:decision as the next manual user step", "skill exposes decision as user step");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in tune handoffs");

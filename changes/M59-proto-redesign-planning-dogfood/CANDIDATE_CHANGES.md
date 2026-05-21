@@ -15,7 +15,7 @@ paths focused.
 Avoid direct generated adapter edits, mixing prompt contract design with CLI
 runtime changes, implicit validation removal, and HTML conversion.
 
-Next recommended candidate: `P006`
+Next recommended candidate: none
 
 ## P001 - Define Proto Redesign Artifact Contracts
 
@@ -117,12 +117,39 @@ Completion evidence:
 
 ## P006 - Expose Proven Proto Redesign Through Runtime Surfaces
 
-Status: `ready`
+Status: `done`
 
 Purpose: promote the proven source-level proto redesign into command, artifact,
 and generated Codex adapter surfaces after dogfood evidence is accepted.
 
 Depends on: `P005`
+
+Owned paths:
+
+- `packages/core/src/commands/registry.ts`
+- `packages/core/src/artifacts/registry.ts`
+- `packages/core/src/artifacts/readiness.ts`
+- `packages/core/src/validators/`
+- `packages/core/src/workflow/summaryHealth.ts`
+- `packages/adapters/codex/src/`
+- `packages/cli/src/`
+- `schemas/prototype-evidence.schema.json`
+- `references/artifact-authoring-templates.md`
+- `changes/M67-proto-redesign-runtime-surface/`
+
+Completion evidence:
+
+- `packages/core/src/commands/registry.ts`
+- `packages/core/src/artifacts/registry.ts`
+- `schemas/prototype-evidence.schema.json`
+- `.agents/skills/ow-proto/SKILL.md`
+- `.agents/skills/ow-tune/SKILL.md`
+- `changes/M67-proto-redesign-runtime-surface/CHANGE.yaml`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `npm run verify:e2e-workflow`
+- `npm run verify:clean`
 
 ## P007 - Split Prototype Tuning Into Dedicated Tune-Prototype Skill
 
@@ -161,3 +188,5 @@ Completion evidence:
 - `OP012`: select `P005`
 - `OP013`: complete `P005`
 - `OP014`: mark `P006` ready and make it next recommended
+- `OP015`: select `P006`
+- `OP016`: complete `P006`

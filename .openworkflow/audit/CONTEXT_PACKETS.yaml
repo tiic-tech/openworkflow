@@ -112,11 +112,14 @@ packets:
     required:
       - .openworkflow/workflow/WORKFLOW_INDEX.yaml
       - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
-      - .openworkflow/validation/VALIDATION_INDEX.yaml
     optional:
-      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
-      - .openworkflow/validation/**/VALIDATION.yaml
       - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
       - package.json
     forbidden:
       - .openworkflow/runtime/**
@@ -126,26 +129,29 @@ packets:
       []
     audit_checkpoints:
       before:
-        - Confirm validation target exists.
-        - "Classify prototype mode before implementation: visual, interaction, technical
-          feasibility, 3D/material, workflow, or data/logic."
-        - "Detect reference inputs: image, URL, screenshot, HTML/CSS source, existing artifact, or
-          design-system hint."
+        - Load vision and optional validation context; validation is optional but must be consumed
+          when present.
+        - Record validation_input.mode as vision_only or validation_present; do not silently
+          auto-generate validation.
+        - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
+          boundary conditions, and central uncertainty."
       during:
-        - For visual-first prototypes, extract reference patterns and create a high-fidelity static
-          concept with image generation before HTML unless the user explicitly skips it.
-        - Derive a compact visual direction and token packet before implementation.
-        - Build only what answers the validation question and keep one command or URL to run the
-          prototype.
-        - Verify rendered prototypes with browser and screenshot checks before handoff.
+        - Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
+        - Make directions differ by product form, initiation trigger, interaction model, emotional
+          driver, retention mechanism, validation metric, or main risk.
+        - Write concrete high-fidelity image-generation prompts with screens, journey, interactions,
+          AI/system behavior, trust controls, anti-goals, and sample content.
+        - Recommend the first direction to generate based on risk reduction, observability,
+          feasibility, and closeness to the success signal.
       after:
-        - Record reference analysis, static concept evidence, runnable implementation evidence,
-          verification, self-critique, and known limits separately.
-        - Write a decision audit record internally after prototype evidence changes.
-        - Write evidence and result artifacts.
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact
+          EVIDENCE.yaml.
+        - Record review evidence and a decision audit record internally after prompt-pack evidence
+          changes.
         - Refresh prototype SUMMARY.yaml when summary_policy is configured and update
           CURRENT_STATE.yaml with current_prototype, last_decision, and next_command.
-        - Confirm no design, spec, change, team, persistence, or production hardening was created.
+        - Confirm no HTML, design, spec, change, team, persistence, or production hardening was
+          created.
   - packet_id: context:tune
     command: /ow:tune
     visibility: user
@@ -157,6 +163,8 @@ packets:
       - .openworkflow/validation/**/VALIDATION.yaml
       - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
       - .openworkflow/prototypes/**/EVIDENCE.yaml
+      - .openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/**/REFINED_PROTO_PROMPT_PACK.yaml
       - .openworkflow/prototypes/**/NOTE.md
       - .openworkflow/decisions/DECISION_INDEX.yaml
       - .openworkflow/decisions/**/DECISION.yaml
@@ -169,19 +177,24 @@ packets:
       []
     audit_checkpoints:
       before:
-        - "Resolve tune target: /ow:tune and /ow:tune:proto default to the current prototype."
-        - If no current prototype exists but a current validation target exists, orchestrate
-          prototype creation through /ow:proto behavior.
-        - Load only the current prototype evidence, relevant validation target, and latest decision
-          audit context.
+        - "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted
+          baseline screen group."
+        - Require baseline screens, screenshots, screen descriptions, generated images, or an
+          accepted PROTO_PROMPT_PACK plus a tune request.
+        - Load only the baseline prompt pack, current prototype evidence, relevant validation or
+          vision context, and latest decision audit context.
       during:
-        - Apply exactly one focused revision loop from user feedback.
-        - Preserve M16 prototype evidence separation for concept, implementation, verification,
-          self-critique, and known limits.
-        - Run required verification for changed rendered artifacts.
+        - Audit the full baseline screen group before writing refined prompts.
+        - Extract the product system and preserve product thesis, primary loop, component
+          vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+        - Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per
+          target screen.
+        - Bind every refined prompt to target screen id, source screen id(s), generation scope,
+          target form factor, negative constraints, and acceptance criteria.
         - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
       after:
-        - Write updated prototype evidence and review artifacts.
+        - Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and
+          compact EVIDENCE.yaml.
         - Write or update the internal decision audit record.
         - Refresh prototype SUMMARY.yaml and CURRENT_STATE.yaml after the revision outcome is known.
         - Show the user only the tuning result, unresolved question if any, and the next user-facing

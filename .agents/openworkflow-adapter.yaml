@@ -67,6 +67,7 @@ commands:
     skill_path: .agents/skills/ow-tune/SKILL.md
     interface_path: .agents/skills/ow-tune/agents/openai.yaml
     legacy_triggers:
+      - /tune-prototype
       - /ow:tune:proto
   - id: decision
     trigger: /ow:decision

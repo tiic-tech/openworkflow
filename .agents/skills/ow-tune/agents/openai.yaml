@@ -1,5 +1,5 @@
 # generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.tune
 interface:
   display_name: "ow:tune"
-  short_description: "Revise the current prototype and record the decision audit automatically."
+  short_description: "Refine accepted prototype screens or prompt packs and record the decision audit automatically."
   default_prompt: "Use /ow:tune for this OpenWorkflow repository."

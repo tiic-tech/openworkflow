@@ -86,17 +86,19 @@ commands:
     context_packet: context:proto
     allowed_outputs:
       - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.md
+      - .openworkflow/prototypes/<id>/REVIEW_PLAN.md
       - .openworkflow/prototypes/<id>/EVIDENCE.yaml
       - .openworkflow/prototypes/<id>/NOTE.md
-      - .openworkflow/prototypes/<id>/review.html
-      - .openworkflow/prototypes/<id>/evidence/**
+      - .openworkflow/prototypes/<id>/images/**
       - .openworkflow/decisions/DECISION_INDEX.yaml
       - .openworkflow/decisions/<id>/DECISION.yaml
       - .openworkflow/decisions/<id>/NOTE.md
-      - .openworkflow/decisions/<id>/review.html
     conditional_outputs:
       []
     forbidden_outputs:
+      - .openworkflow/prototypes/<id>/review.html
       - .openworkflow/specs/**
       - .openworkflow/changes/**
       - .openworkflow/runtime/**
@@ -112,17 +114,19 @@ commands:
     context_packet: context:tune
     allowed_outputs:
       - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/<id>/REFINED_PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/<id>/REFINED_PROTO_PROMPT_PACK.md
+      - .openworkflow/prototypes/<id>/REVIEW_PLAN.md
       - .openworkflow/prototypes/<id>/EVIDENCE.yaml
       - .openworkflow/prototypes/<id>/NOTE.md
-      - .openworkflow/prototypes/<id>/review.html
-      - .openworkflow/prototypes/<id>/evidence/**
+      - .openworkflow/prototypes/<id>/images/**
       - .openworkflow/decisions/DECISION_INDEX.yaml
       - .openworkflow/decisions/<id>/DECISION.yaml
       - .openworkflow/decisions/<id>/NOTE.md
-      - .openworkflow/decisions/<id>/review.html
     conditional_outputs:
       []
     forbidden_outputs:
+      - .openworkflow/prototypes/<id>/review.html
       - .openworkflow/specs/**
       - .openworkflow/changes/**
       - .openworkflow/runtime/**

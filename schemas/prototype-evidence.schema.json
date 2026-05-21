@@ -13,18 +13,11 @@
     "validation_target",
     "core_question",
     "prototype_mode",
-    "reference_analysis",
-    "visual_direction",
-    "visual_concept_policy",
-    "concept_evidence",
-    "prototype_artifact",
-    "run",
-    "implementation_evidence",
-    "observations",
-    "evidence",
-    "verification",
-    "self_critique",
-    "known_limits",
+    "prompt_pack_type",
+    "validation_input",
+    "source",
+    "negative_constraints",
+    "review_plan",
     "result",
     "handoff"
   ],
@@ -48,158 +41,170 @@
       "type": "string"
     },
     "validation_target": {
-      "type": "string"
+      "type": [
+        "string",
+        "null"
+      ]
     },
     "core_question": {
       "type": "string"
     },
     "prototype_mode": {
+      "const": "image_prompt_pack"
+    },
+    "prompt_pack_type": {
       "type": "string",
       "enum": [
-        "visual",
-        "interaction",
-        "technical_feasibility",
-        "3d_material",
-        "workflow",
-        "data_logic"
+        "strategic_proto_prompt_pack",
+        "refined_proto_prompt_pack",
+        "proto_review_evidence"
       ]
     },
-    "reference_analysis": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "kind",
-          "ref"
-        ],
-        "properties": {
-          "kind": {
-            "type": "string"
-          },
-          "ref": {
-            "type": "string"
-          },
-          "patterns": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "anti_patterns": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "additionalProperties": true
-      }
-    },
-    "visual_direction": {
-      "type": "object",
-      "properties": {
-        "source": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "summary": {
-          "type": "string"
-        },
-        "tokens": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": true
-    },
-    "visual_concept_policy": {
+    "validation_input": {
       "type": "object",
       "required": [
-        "image_generation",
-        "skip_reason"
+        "mode",
+        "refs"
       ],
       "properties": {
-        "image_generation": {
+        "mode": {
           "type": "string",
           "enum": [
-            "generated",
-            "skipped_by_user",
-            "not_applicable"
+            "vision_only",
+            "validation_present",
+            "internally_derived"
           ]
         },
-        "skip_reason": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "additionalProperties": true
     },
-    "concept_evidence": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "kind",
-          "ref"
-        ],
-        "properties": {
-          "kind": {
-            "type": "string"
-          },
-          "ref": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": true
-      }
-    },
-    "prototype_artifact": {
+    "source": {
       "type": "object",
-      "required": [
-        "path",
-        "type"
-      ],
       "properties": {
-        "path": {
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target_tool": {
           "type": "string"
         },
-        "type": {
+        "output_language": {
           "type": "string"
         }
       },
       "additionalProperties": true
     },
-    "run": {
+    "normalized_input": {
       "type": "object",
       "additionalProperties": true
     },
-    "implementation_evidence": {
+    "strategic_core": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "directions": {
       "type": "array",
       "items": {
         "type": "object",
         "required": [
-          "kind",
-          "ref"
+          "direction_id",
+          "hypothesis",
+          "screen_prompts"
         ],
-        "properties": {
-          "kind": {
-            "type": "string"
-          },
-          "ref": {
+        "additionalProperties": true
+      }
+    },
+    "build_recommendation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "baseline_audit": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "product_system": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "delta_rules": {
+      "type": "object",
+      "properties": {
+        "must_inherit": {
+          "type": "array",
+          "items": {
             "type": "string"
           }
         },
+        "must_add": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_remove": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flexible_change": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "screen_manifest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "screen_id"
+        ],
         "additionalProperties": true
       }
+    },
+    "global_design_prompt": {
+      "type": "string"
+    },
+    "screen_prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "prompt_id"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "negative_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_plan": {
+      "type": "object",
+      "additionalProperties": true
     },
     "observations": {
       "type": "array",
@@ -226,72 +231,12 @@
         "additionalProperties": true
       }
     },
-    "verification": {
-      "type": "object",
-      "properties": {
-        "browser_checks": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "screenshots": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "logs": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": true
-    },
-    "self_critique": {
-      "type": "object",
-      "required": [
-        "philosophy",
-        "hierarchy",
-        "execution",
-        "specificity",
-        "restraint",
-        "accessibility",
-        "responsive_behavior",
-        "repairs"
-      ],
-      "properties": {
-        "philosophy": {
-          "type": "string"
-        },
-        "hierarchy": {
-          "type": "string"
-        },
-        "execution": {
-          "type": "string"
-        },
-        "specificity": {
-          "type": "string"
-        },
-        "restraint": {
-          "type": "string"
-        },
-        "accessibility": {
-          "type": "string"
-        },
-        "responsive_behavior": {
-          "type": "string"
-        },
-        "repairs": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": true
+    "generated_images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
     },
     "known_limits": {
       "type": "array",

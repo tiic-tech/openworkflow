@@ -371,7 +371,7 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
     return ["core_question", "prototype_scope", "acceptance"];
   }
   if (artifactType === "prototype_evidence") {
-    return ["core_question", "prototype_artifact", "verification", "result"];
+    return ["core_question", "prompt_pack_type", "review_plan", "result"];
   }
   if (artifactType === "decision_record") {
     return ["outcome", "rationale", "next_command"];
