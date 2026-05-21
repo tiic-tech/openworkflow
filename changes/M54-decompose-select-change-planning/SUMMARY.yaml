@@ -21,12 +21,12 @@ outputs:
   summary: changes/M54-decompose-select-change-planning/SUMMARY.yaml
   high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m54-decompose-select-change-planning
-candidate_count: 7
-completed_candidate_id: C007
-completed_change_id: C007-cross-queue-selection
-previous_completed_candidate_id: C006
-previous_completed_change_id: M62-planning-skill-queue-maintenance
-next_recommended_candidate_id: C004
+candidate_count: 9
+completed_candidate_id: C008
+completed_change_id: C008-runtime-exposure-design
+previous_completed_candidate_id: C007
+previous_completed_change_id: C007-cross-queue-selection
+next_recommended_candidate_id: C009
 key_dependencies:
   - C001 established planning artifact contracts.
   - C002 implemented decompose-to-changes.
@@ -36,6 +36,9 @@ key_dependencies:
   - C007 is complete and makes C004 dependency-satisfied.
   - C004 remains high risk and should stop for a high-risk report or explicit approved option before selection.
   - C004 high-risk report recommends Option B, design-only boundary first, before runtime exposure implementation.
+  - User approved C004 Option B; C008 is the medium-risk design-only boundary candidate that implements that approved path.
+  - C008 is complete and splits follow-up work into smaller candidates.
+  - C009 is the next non-high-risk candidate for planning artifact registration and summary contracts.
 risks:
   - id: R001
     level: medium
@@ -62,3 +65,8 @@ validation:
     - OP007 completed C007 cross-queue selection arbitration guidance and dogfood evidence.
     - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml.
     - OP008 created the C004 high-risk decision report without selecting or implementing C004.
+    - OP009 added C008 after user approval of C004 Option B.
+    - OP010 selected C008.
+    - OP011 completed C008 design-only runtime exposure boundary.
+    - OP012 added C009 as the next non-high-risk follow-up.
+    - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

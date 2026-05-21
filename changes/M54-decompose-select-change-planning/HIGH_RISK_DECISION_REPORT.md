@@ -91,6 +91,16 @@ not by missing source-skill behavior. A design-only change can decide what
 belongs in core, artifacts, adapters, summaries, and generated surfaces before
 any runtime exposure changes are made.
 
+## Approved Decision
+
+Approved on 2026-05-21: proceed with **Option B - Design-Only Boundary**.
+
+The approved scope is limited to design and planning artifacts. It may define
+runtime exposure boundaries, invariants, validation gates, and follow-up
+candidate splits, but it must not edit runtime registry code, artifact registry
+code, adapter generation code, or generated `.agents/**` and `.openworkflow/**`
+surfaces.
+
 After Option B, split implementation into smaller candidates such as:
 
 - `C004a`: runtime exposure design and checklist only.

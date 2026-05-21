@@ -14,7 +14,7 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C004` after high-risk option approval.
+Next recommended candidate: `C009`
 
 Branch boundary: `codex/m54-decompose-select-change-planning`
 
@@ -255,6 +255,75 @@ Decision report: `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISIO
 
 Recommended option: Option B, design-only boundary first.
 
+Approved option: Option B, design-only boundary first.
+
+## C008 - Design Planning Skill Runtime Exposure Boundary
+
+Status: `done`
+
+Purpose: convert the approved C004 Option B path into a design-only boundary
+for later planning skill runtime exposure.
+
+Owned paths:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/`
+- M54 queue and summary artifacts
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+
+Depends on: `C007`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+Acceptance:
+
+- Design documents core, artifact, adapter, generated-surface, read-model, and validation boundaries.
+- Design preserves repo-local delivery and summary-first context consumption.
+- Design splits C004 follow-up work into smaller implementation candidates.
+- No runtime registry, artifact registry, adapter generation, or generated-surface files are edited.
+
+Completion evidence:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/IMPLEMENTATION_BRIEF.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `git diff --check`
+
+## C009 - Define Planning Artifact Registration And Summary Contract
+
+Status: `ready`
+
+Purpose: define the contract and validator expectations for registering
+planning artifacts in read models without exposing runtime command or adapter
+generation changes.
+
+Owned paths:
+
+- `references/planning-skill-runtime-exposure.md`
+- `references/planning-artifact-contracts.md`
+- `schemas/`
+- `changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/`
+
+Depends on: `C008`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+Acceptance:
+
+- Planning artifact registration contract is explicit and summary-first.
+- Candidate queues, change analyses, selected changes, atom tasks, and evidence have clear read-model roles.
+- Runtime command and adapter generation remain out of scope.
+- Future C010/C012 work can use the contract without loading full planning history by default.
+
 ## Operation Audit
 
 - `OP001`: add `C006`
@@ -265,3 +334,7 @@ Recommended option: Option B, design-only boundary first.
 - `OP006`: select `C007`
 - `OP007`: complete `C007`
 - `OP008`: query `C004` high-risk stop and create decision report
+- `OP009`: add `C008`
+- `OP010`: select `C008`
+- `OP011`: complete `C008`
+- `OP012`: add `C009`

@@ -37,7 +37,7 @@ selection_policy:
     - unclear acceptance
     - mixed planning and implementation
     - manual edits to generated .agents or .openworkflow surfaces
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C009
 changes:
   - id: C001
     status: done
@@ -389,6 +389,103 @@ changes:
         - "validation: PYTHONPATH=/Users/archy/Projects/Develop/develop_notebooks/.venv/lib/python3.13/site-packages python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change"
         - "validation: npm run validate"
         - "validation: git diff --check"
+  - id: C008
+    status: done
+    title: Design planning skill runtime exposure boundary
+    purpose: >
+      Convert the approved C004 Option B path into a design-only boundary that
+      defines how planning skills may later be exposed through runtime and
+      generated adapter surfaces without changing runtime code in this change.
+    scope:
+      includes:
+        - runtime exposure boundary and invariants for planning skills
+        - generated-surface ownership rules
+        - summary-first read-model expectations for planning artifacts
+        - validation gates for future runtime exposure slices
+        - follow-up candidate split for safer implementation
+      excludes:
+        - command registry edits
+        - artifact registry edits
+        - Codex adapter generation changes
+        - generated .agents or .openworkflow changes
+        - selecting or implementing C004 full runtime exposure
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+    dependencies:
+      - C007
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Design documents core, artifact, adapter, generated-surface, read-model, and validation boundaries.
+      - Design preserves repo-local delivery and summary-first context consumption.
+      - Design splits C004 follow-up work into smaller implementation candidates.
+      - No runtime registry, artifact registry, adapter generation, or generated-surface files are edited.
+    selection:
+      selected_change_id: C008-runtime-exposure-design
+      reason: >
+        User approved C004 Option B, and C008 is the medium-risk design-only
+        boundary that avoids runtime registry, adapter, and generated-surface
+        changes.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: C008-runtime-exposure-design
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-skill-runtime-exposure.md
+        - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/SELECTED_CHANGE.yaml
+        - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/ATOM_TASKS.yaml
+        - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/IMPLEMENTATION_BRIEF.md
+        - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: C009
+    status: ready
+    title: Define planning artifact registration and summary contract
+    purpose: >
+      Define the contract and validator expectations for registering planning
+      artifacts in read models without exposing runtime command or adapter
+      generation changes.
+    scope:
+      includes:
+        - planning artifact registration contract
+        - summary/read-model fields for planning queues, analyses, selections, and evidence
+        - validation expectations for summary-first planning artifacts
+        - fixture or reference-only examples when needed
+      excludes:
+        - runtime command registry edits
+        - Codex adapter generation changes
+        - generated .agents or .openworkflow changes
+        - full C004 runtime exposure
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+      - references/planning-artifact-contracts.md
+      - schemas/
+      - changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/
+    dependencies:
+      - C008
+    unlocks:
+      - C010
+      - C012
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Planning artifact registration contract is explicit and summary-first.
+      - Candidate queues, change analyses, selected changes, atom tasks, and evidence have clear read-model roles.
+      - Runtime command and adapter generation remain out of scope.
+      - Future C010/C012 work can use the contract without loading full planning history by default.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -502,3 +599,65 @@ operations:
     after_status: ready
     evidence:
       - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP009
+    operation_type: add
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      User approved C004 Option B, so the high-risk runtime exposure path is
+      decomposed into a medium-risk design-only boundary candidate before any
+      runtime or generated-surface implementation.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      User approved C004 Option B, and C008 is the non-runtime design-only
+      selected change that implements that approved option.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      The design-only boundary now defines planning skill runtime exposure
+      ownership, invariants, read-model expectations, validation gates, and
+      follow-up candidate split without runtime or generated-surface edits.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/SELECTED_CHANGE.yaml
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/ATOM_TASKS.yaml
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/IMPLEMENTATION_BRIEF.md
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP012
+    operation_type: add
+    target_candidate_ids:
+      - C009
+    actor: agent
+    reason: >
+      C008 split the next safe follow-up into a medium-risk planning artifact
+      registration and summary contract before command or adapter runtime work.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - references/planning-skill-runtime-exposure.md
