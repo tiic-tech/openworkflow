@@ -1,6 +1,14 @@
 ---
 name: "ow-team"
 description: "Execute approved production work through the Agent Team runtime. Use this skill for /ow:team in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.team"
+  source_command_id: "team"
+  semantic_trigger: "/ow:team"
+  skill_name: "ow-team"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.team -->
 # /ow:team

@@ -46,7 +46,7 @@ selection_policy:
     - editing generated .agents or .openworkflow surfaces directly
     - mixing skill lifecycle architecture with proto2html runtime exposure
     - broad multi-platform adapter work before the format contract is stable
-next_recommended_candidate_id: S002
+next_recommended_candidate_id: S004
 changes:
   - id: S001
     status: done
@@ -106,7 +106,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: S002
-    status: ready
+    status: done
     title: Add structured generated metadata to Codex skill output
     purpose: >
       Make generated skill files self-identifying through structured
@@ -123,8 +123,11 @@ changes:
         - changing command semantics
         - manual edits to existing generated files outside sync
     owned_paths:
+      - packages/adapters/codex/src/constants.ts
       - packages/adapters/codex/src/generateSkills.ts
       - packages/adapters/codex/src/generatedFiles.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/templates.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - .agents/skills/
       - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/
@@ -144,6 +147,25 @@ changes:
       - Runtime verification checks the metadata on generated skill surfaces.
       - Generated files are refreshed through sync rather than direct edits.
       - Existing semantic command invocation remains unchanged.
+    selection:
+      selected_change_id: S002-generated-skill-metadata
+      reason: S001 completed the skill lifecycle contract, so generated metadata can be added before validation hardening.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S002-generated-skill-metadata
+      completed_at: 2026-05-21
+      evidence:
+        - packages/adapters/codex/src/constants.ts
+        - packages/adapters/codex/src/generateSkills.ts
+        - packages/adapters/codex/src/manifest.ts
+        - packages/adapters/codex/src/generatedFiles.ts
+        - packages/adapters/codex/src/templates.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - .agents/skills/ow-proto/SKILL.md
+        - .agents/openworkflow-adapter.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
   - id: S003
     status: candidate
     title: Introduce skill registry and adapter delivery model
@@ -186,7 +208,7 @@ changes:
       - Delivery metadata can express skill-only, command-only, or both without changing individual workflow semantics.
       - The change does not create non-Codex generated surfaces yet.
   - id: S004
-    status: candidate
+    status: ready
     title: Validate generated skill format and protocol blocks
     purpose: >
       Add automated checks that generated OW skills conform to the native skill
@@ -378,3 +400,45 @@ operations:
     after_status: ready
     evidence:
       - references/skill-system-lifecycle.md
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - S002
+    actor: agent
+    reason: S002 is ready after S001 and unlocks metadata validation work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - S002
+    actor: agent
+    reason: Generated Codex skills now include structured metadata and runtime verification checks it.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/adapters/codex/src/constants.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/openworkflow-adapter.yaml
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: status_change
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: S001 and S002 are complete, satisfying the generated skill format validation dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml

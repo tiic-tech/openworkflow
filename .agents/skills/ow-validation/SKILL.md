@@ -1,6 +1,14 @@
 ---
 name: "ow-validation"
 description: "Prioritize the core feature or assumption that must be validated first. Use this skill for /ow:validation in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.validation"
+  source_command_id: "validation"
+  semantic_trigger: "/ow:validation"
+  skill_name: "ow-validation"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.validation -->
 # /ow:validation

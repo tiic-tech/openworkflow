@@ -1,6 +1,14 @@
 ---
 name: "ow-tune"
 description: "Refine accepted prototype screens or prompt packs and record the decision audit automatically. Use this skill for /ow:tune in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.tune"
+  source_command_id: "tune"
+  semantic_trigger: "/ow:tune"
+  skill_name: "ow-tune"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.tune -->
 # /ow:tune

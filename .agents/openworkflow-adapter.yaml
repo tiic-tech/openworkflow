@@ -12,6 +12,15 @@ skill_surface:
   frontmatter:
     - name
     - description
+    - metadata
+  metadata_fields:
+    - generated_by
+    - adapter
+    - adapter_version
+    - template_id
+    - source_command_id
+    - semantic_trigger
+    - skill_name
 commands:
   - id: workflow
     trigger: /ow:workflow

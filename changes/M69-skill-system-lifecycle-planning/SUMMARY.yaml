@@ -20,17 +20,18 @@ outputs:
   candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
   readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
 candidate_count: 7
-selected_candidate_id: S001
-selected_change_id: S001-skill-lifecycle-contract
-completed_candidate_id: S001
-completed_change_id: S001-skill-lifecycle-contract
-next_recommended_candidate_id: S002
+completed_candidate_id: S002
+completed_change_id: S002-generated-skill-metadata
+completed_contract_candidate_id: S001
+completed_contract_change_id: S001-skill-lifecycle-contract
+next_recommended_candidate_id: S004
 unresolved_questions:
   - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
   - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
   - Whether generated metadata belongs only in frontmatter or also in `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`.
 validation_commands:
   - npm run validate
+  - npm run verify:runtime-surface
   - git diff --check
 notes:
   - S001 is recommended first because later generator, validator, and adapter work needs a stable native skill format contract.
@@ -38,3 +39,5 @@ notes:
   - The queue intentionally keeps proto2html runtime exposure in M68 and does not mix it into skill-system lifecycle work.
   - Cross-queue selection preferred M69/S001 before M68/H003 because H003 changes high-risk generated runtime surfaces.
   - S001 completed the native skill lifecycle contract and unblocked generated metadata work in S002.
+  - S002 completed generated Codex skill metadata and runtime-surface metadata verification.
+  - S004 is now ready because its S001 and S002 dependencies are complete.

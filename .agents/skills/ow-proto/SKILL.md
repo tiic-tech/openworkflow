@@ -1,6 +1,14 @@
 ---
 name: "ow-proto"
 description: "Create image-first strategic prototype prompt packs from vision or validation context. Use this skill for /ow:proto in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.proto"
+  source_command_id: "proto"
+  semantic_trigger: "/ow:proto"
+  skill_name: "ow-proto"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.proto -->
 # /ow:proto

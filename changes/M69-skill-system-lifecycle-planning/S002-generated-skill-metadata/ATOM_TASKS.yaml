@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:S002-generated-skill-metadata
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: S002-generated-skill-metadata
+title: Atom tasks for generated Codex skill metadata
+status: done
+tasks:
+  - task_id: T001
+    title: Add structured metadata to generated skill frontmatter
+    status: done
+    type: edit
+    owned_paths:
+      - packages/adapters/codex/src/constants.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/templates.ts
+    done_when:
+      - Generated SKILL.md frontmatter keeps name and description.
+      - Frontmatter includes metadata for generator, adapter, adapter version, template id, source command id, semantic trigger, and skill name.
+  - task_id: T002
+    title: Preserve generated marker ownership
+    status: done
+    type: edit
+    owned_paths:
+      - packages/adapters/codex/src/generatedFiles.ts
+      - .agents/skills/
+    done_when:
+      - Generated marker remains present after sync.
+      - Generated skills are refreshed by sync, not hand-edited.
+  - task_id: T003
+    title: Verify metadata in runtime surface checks
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime surface verification asserts expected metadata for every generated Codex skill.
+      - Checks preserve existing semantic command expectations.
+  - task_id: T004
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/generatedFiles.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/templates.ts
+      - packages/adapters/codex/src/constants.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/
+    done_when:
+      - npm run validate passes.
+      - npm run verify:runtime-surface passes.
+      - git diff --check passes.

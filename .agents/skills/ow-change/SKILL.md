@@ -1,6 +1,14 @@
 ---
 name: "ow-change"
 description: "Create one focused production change for the current core feature. Use this skill for /ow:change in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.change"
+  source_command_id: "change"
+  semantic_trigger: "/ow:change"
+  skill_name: "ow-change"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.change -->
 # /ow:change

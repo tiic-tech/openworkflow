@@ -1,6 +1,14 @@
 ---
 name: "ow-decision"
 description: "Internally record prototype review outcomes for audit. Internal audit skill for /ow:decision in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.decision"
+  source_command_id: "decision"
+  semantic_trigger: "/ow:decision"
+  skill_name: "ow-decision"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.decision -->
 # /ow:decision

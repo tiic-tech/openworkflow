@@ -1,6 +1,6 @@
 import { rm } from "node:fs/promises";
 import { readTextFile, writeTextFile, isNotFound } from "../../../core/src/fs/index.js";
-import { CODEX_ADAPTER_VERSION } from "./templates.js";
+import { CODEX_ADAPTER_VERSION } from "./constants.js";
 
 export function renderGeneratedFile(path: string, content: string, templateId: string): string {
   const marker = `generated-by: openworkflow; adapter: codex; adapter-version: ${CODEX_ADAPTER_VERSION}; template-id: ${templateId}`;

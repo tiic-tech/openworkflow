@@ -1,6 +1,14 @@
 ---
 name: "ow-spec"
 description: "Create one focused production spec from accepted product design. Use this skill for /ow:spec in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.spec"
+  source_command_id: "spec"
+  semantic_trigger: "/ow:spec"
+  skill_name: "ow-spec"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.spec -->
 # /ow:spec

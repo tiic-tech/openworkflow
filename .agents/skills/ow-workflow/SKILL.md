@@ -1,6 +1,14 @@
 ---
 name: "ow-workflow"
 description: "Initialize or reconcile OpenWorkflow contracts. Use this skill for /ow:workflow in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.workflow"
+  source_command_id: "workflow"
+  semantic_trigger: "/ow:workflow"
+  skill_name: "ow-workflow"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.workflow -->
 # /ow:workflow

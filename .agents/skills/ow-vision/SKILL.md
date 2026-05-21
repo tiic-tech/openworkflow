@@ -1,6 +1,14 @@
 ---
 name: "ow-vision"
 description: "Create or refine the product vision contract through focused collaboration. Use this skill for /ow:vision in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.vision"
+  source_command_id: "vision"
+  semantic_trigger: "/ow:vision"
+  skill_name: "ow-vision"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.vision -->
 # /ow:vision

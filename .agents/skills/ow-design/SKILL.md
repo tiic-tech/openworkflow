@@ -1,6 +1,14 @@
 ---
 name: "ow-design"
 description: "Convert accepted prototype evidence into product design for production specification. Use this skill for /ow:design in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.design"
+  source_command_id: "design"
+  semantic_trigger: "/ow:design"
+  skill_name: "ow-design"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.design -->
 # /ow:design

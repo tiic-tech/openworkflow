@@ -8,6 +8,19 @@ import { spawn } from "node:child_process";
 const CURRENT_FILE = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(CURRENT_FILE), "../../../..");
 const CLI = join(REPO_ROOT, "dist", "cli", "src", "index.js");
+const SKILL_NAMES = [
+  "ow-workflow",
+  "ow-context",
+  "ow-vision",
+  "ow-validation",
+  "ow-proto",
+  "ow-tune",
+  "ow-decision",
+  "ow-design",
+  "ow-spec",
+  "ow-change",
+  "ow-team",
+] as const;
 
 async function main(): Promise<number> {
   await assertFile(CLI);
@@ -850,13 +863,20 @@ async function verifyConfig(root: string): Promise<void> {
 }
 
 async function verifyNoDefaultPrompts(codexHome: string): Promise<void> {
-  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-tune.md", "ow-design.md", "ow-spec.md", "ow-change.md", "ow-team.md"]) {
-    assert(!(await exists(join(codexHome, "prompts", name))), `default global prompt generated unexpectedly: ${name}`);
+  for (const name of SKILL_NAMES) {
+    const promptName = `${name}.md`;
+    assert(!(await exists(join(codexHome, "prompts", promptName))), `default global prompt generated unexpectedly: ${promptName}`);
   }
 }
 
 async function verifySkills(root: string): Promise<void> {
-  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-tune", "ow-decision", "ow-design", "ow-spec", "ow-change", "ow-team"]) {
+  const manifest = await read(join(root, ".agents", "openworkflow-adapter.yaml"));
+  assert(manifest.includes("metadata_fields:"), "Codex manifest missing skill metadata fields");
+  assert(manifest.includes("generated_by"), "Codex manifest missing generated_by metadata field");
+  assert(manifest.includes("source_command_id"), "Codex manifest missing source command metadata field");
+  assert(manifest.includes("semantic_trigger"), "Codex manifest missing semantic trigger metadata field");
+
+  for (const name of SKILL_NAMES) {
     const skill = join(root, ".agents", "skills", name, "SKILL.md");
     const interfaceFile = join(root, ".agents", "skills", name, "agents", "openai.yaml");
     await assertFile(skill);
@@ -866,6 +886,14 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.startsWith("---\n"), `${name} missing SKILL.md frontmatter`);
     assert(skillContent.includes(`name: "${name}"`), `${name} missing skill name`);
     assert(skillContent.includes("description:"), `${name} missing skill description`);
+    assert(skillContent.includes("metadata:"), `${name} missing generated metadata`);
+    assert(skillContent.includes('generated_by: "openworkflow"'), `${name} missing generated_by metadata`);
+    assert(skillContent.includes('adapter: "codex"'), `${name} missing adapter metadata`);
+    assert(skillContent.includes('adapter_version: "0.1.0"'), `${name} missing adapter_version metadata`);
+    assert(skillContent.includes(`template_id: "codex.skill.ow.${name.replace("ow-", "")}"`), `${name} missing template_id metadata`);
+    assert(skillContent.includes(`source_command_id: "${name.replace("ow-", "")}"`), `${name} missing source_command_id metadata`);
+    assert(skillContent.includes(`semantic_trigger: "/ow:${name.replace("ow-", "")}"`), `${name} missing semantic_trigger metadata`);
+    assert(skillContent.includes(`skill_name: "${name}"`), `${name} missing skill_name metadata`);
     assert(skillContent.includes("generated-by: openworkflow"), `${name} missing generated marker`);
     assert(skillContent.includes("<user_behavior>"), `${name} missing user behavior block`);
     assert(skillContent.includes("<agent_protocol>"), `${name} missing agent protocol block`);

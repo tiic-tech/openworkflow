@@ -1,6 +1,14 @@
 ---
 name: "ow-context"
 description: "Map the repo context needed for vision and downstream workflow decisions. Use this skill for /ow:context in OpenWorkflow repositories."
+metadata:
+  generated_by: "openworkflow"
+  adapter: "codex"
+  adapter_version: "0.1.0"
+  template_id: "codex.skill.ow.context"
+  source_command_id: "context"
+  semantic_trigger: "/ow:context"
+  skill_name: "ow-context"
 ---
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.context -->
 # /ow:context

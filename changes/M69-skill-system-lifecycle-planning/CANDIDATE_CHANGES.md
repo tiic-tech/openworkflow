@@ -19,7 +19,7 @@ moving Codex command exposure to global prompts, editing generated `.agents` or
 proto2html runtime exposure, and broad multi-platform adapter work before the
 format contract is stable.
 
-Next recommended candidate: `S002`
+Next recommended candidate: `S004`.
 
 Feat boundary: this queue owns the top-level
 `changes/M69-skill-system-lifecycle-planning/` folder. Each `S###` candidate is
@@ -62,13 +62,29 @@ Completion evidence:
 
 ## S002 - Add Structured Generated Metadata To Codex Skill Output
 
-Status: `ready`
+Status: `done`
 
 Depends on: `S001`
 
 Purpose: make generated skill files self-identifying through structured
 frontmatter metadata so doctor, sync, and tests can detect stale or mismatched
 skill surfaces without relying only on comments.
+
+Selection: `S002-generated-skill-metadata`
+
+Completion evidence:
+
+- `packages/adapters/codex/src/constants.ts`
+- `packages/adapters/codex/src/generateSkills.ts`
+- `packages/adapters/codex/src/generatedFiles.ts`
+- `packages/adapters/codex/src/manifest.ts`
+- `packages/adapters/codex/src/templates.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `.agents/openworkflow-adapter.yaml`
+- `.agents/skills/ow-proto/SKILL.md`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `git diff --check`
 
 ## S003 - Introduce Skill Registry And Adapter Delivery Model
 
@@ -87,10 +103,13 @@ Risk: `high`
 - `OP001`: select `S001` after cross-queue comparison with `M68/H003`
 - `OP002`: complete `S001`
 - `OP003`: mark `S002` ready and make it next recommended
+- `OP004`: select `S002`
+- `OP005`: complete `S002`
+- `OP006`: mark `S004` ready and make it next recommended
 
 ## S004 - Validate Generated Skill Format And Protocol Blocks
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `S001`, `S002`
 
