@@ -1,0 +1,66 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G015-ow-git-automation-command-shell
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G015-ow-git-automation-command-shell
+title: Atom tasks for ow:git-automation command shell
+status: done
+tasks:
+  - task_id: T001
+    title: Implement CLI command shell
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+    done_when:
+      - CLI exposes branch, commit, summary, and remote planning modes.
+      - Local actions default to dry-run unless --write is passed.
+      - Remote and autonomous modes refuse execution without follow-up approval path.
+  - task_id: T002
+    title: Add generated workflow skill surface
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - .agents/skills/ow-git-automation/
+      - .agents/openworkflow-adapter.yaml
+      - .openworkflow/audit/
+      - AGENTS.md
+    done_when:
+      - /ow:git-automation appears in generated skills and adapter manifest.
+      - Skill guidance records managed and autonomous mode boundaries.
+      - Agent guide lists /ow:git-automation as a repo-local workflow command.
+  - task_id: T003
+    title: Document managed and autonomous policy
+    status: done
+    type: document
+    owned_paths:
+      - references/git-automation-governance.md
+    done_when:
+      - Managed mode and autonomous mode are distinguished.
+      - Managed remote approval handoff requires ordered commits and operation sequence.
+  - task_id: T004
+    title: Verify runtime shell behavior
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification checks generated /ow:git-automation skill.
+      - Runtime verification checks managed remote refusal and ordered commit output.
+  - task_id: T005
+    title: Validate implementation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/
+      - references/
+      - .agents/
+      - .openworkflow/audit/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

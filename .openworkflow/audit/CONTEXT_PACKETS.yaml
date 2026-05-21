@@ -372,4 +372,36 @@ packets:
           CURRENT_STATE.yaml with current_run, blockers, and next action.
         - Run the verification named by the change plan when practical.
         - Report changed artifacts, verification result, and remaining blockers.
+  - packet_id: context:git-automation
+    command: /ow:git-automation
+    visibility: user
+    required:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+      - changes/<plan_id>/PR_READY_SUMMARY.md
+      - changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml
+    forbidden:
+      []
+    conditional_outputs:
+      - high-risk decision report when remote mutation or autonomous mode is requested
+      - follow-up CANDIDATE_CHANGES entry for autonomous git automation
+    audit_checkpoints:
+      before:
+        - Read the queue branch boundary and confirm current git state.
+        - Confirm whether the requested mode is managed or autonomous.
+        - Stop on autonomous or remote mutation requests unless a high-risk approval exists for
+          exact operations.
+      during:
+        - Use dry-run or preview before any local mutation.
+        - Record plan id, candidate id, branch, dirty paths, command preview, validation evidence,
+          and affected paths.
+        - Keep local branch, commit, and summary actions scoped to the selected queue.
+      after:
+        - Record commit hash and evidence path when a local commit is created.
+        - Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.
+        - Report remote operations as gated and include ordered commit or queue evidence for push,
+          PR, and merge planning.
 updated_at: null

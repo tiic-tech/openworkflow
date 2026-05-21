@@ -124,6 +124,15 @@ commands:
     legacy_triggers:
       - /run-team
       - /build-team
+  - id: git-automation
+    trigger: /ow:git-automation
+    visibility: user
+    skill_name: ow-git-automation
+    explicit_invocation: $ow-git-automation
+    skill_path: .agents/skills/ow-git-automation/SKILL.md
+    interface_path: .agents/skills/ow-git-automation/agents/openai.yaml
+    legacy_triggers:
+      []
 generated_files:
   - .agents/skills/ow-workflow/SKILL.md
   - .agents/skills/ow-workflow/agents/openai.yaml
@@ -147,4 +156,6 @@ generated_files:
   - .agents/skills/ow-change/agents/openai.yaml
   - .agents/skills/ow-team/SKILL.md
   - .agents/skills/ow-team/agents/openai.yaml
+  - .agents/skills/ow-git-automation/SKILL.md
+  - .agents/skills/ow-git-automation/agents/openai.yaml
 sync_command: openworkflow sync --tools codex

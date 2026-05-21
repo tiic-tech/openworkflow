@@ -118,6 +118,14 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     [".openworkflow/runtime/"],
     teamProtocol(),
   ),
+  command(
+    "git-automation",
+    [],
+    "Operate the managed git lifecycle shell for local branch, commit, PR-ready summary, and remote approval gates.",
+    "governance",
+    ["changes/<plan_id>/CANDIDATE_CHANGES.yaml", "changes/<plan_id>/PR_READY_SUMMARY.md"],
+    gitAutomationProtocol(),
+  ),
 ] as const;
 
 export function getWorkflowCommands(): readonly WorkflowCommand[] {
@@ -143,6 +151,88 @@ function command(
     visibility,
     targetArtifacts,
     protocol,
+  };
+}
+
+function gitAutomationProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "managed-git-lifecycle-shell",
+    requiredContext: [
+      "references/git-version-control-governance.md",
+      "references/gh-operation-governance.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+    ],
+    optionalContext: [
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
+      "changes/<plan_id>/PR_READY_SUMMARY.md",
+      "changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      "local branch checkout or creation through openworkflow git-automation branch",
+      "local selected-change commit through openworkflow git-automation commit",
+      "local PR_READY_SUMMARY.md through openworkflow git-automation summary",
+      "remote operation plan through openworkflow git-automation remote",
+      "local evidence artifacts under changes/<plan_id>/",
+    ],
+    conditionalOutputs: [
+      "high-risk decision report when remote mutation or autonomous mode is requested",
+      "follow-up CANDIDATE_CHANGES entry for autonomous git automation",
+    ],
+    forbiddenOutputs: [
+      "git push without explicit operation-level user approval",
+      "gh pr create/edit/merge without explicit operation-level user approval",
+      "gh issue create/edit/close without explicit operation-level user approval",
+      "git reset, rebase, force-push, or destructive branch deletion",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Read the queue branch boundary and confirm current git state.",
+        "Confirm whether the requested mode is managed or autonomous.",
+        "Stop on autonomous or remote mutation requests unless a high-risk approval exists for exact operations.",
+      ],
+      during: [
+        "Use dry-run or preview before any local mutation.",
+        "Record plan id, candidate id, branch, dirty paths, command preview, validation evidence, and affected paths.",
+        "Keep local branch, commit, and summary actions scoped to the selected queue.",
+      ],
+      after: [
+        "Record commit hash and evidence path when a local commit is created.",
+        "Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.",
+        "Report remote operations as gated and include ordered commit or queue evidence for push, PR, and merge planning.",
+      ],
+    },
+    antiPatterns: [
+      "Do not treat git-automation enabled as permission to push, merge, or mutate GitHub in this G015 shell.",
+      "Do not hide dirty paths or omit command previews from evidence.",
+      "Do not create a selected change with no local commit when implementation changed files.",
+      "Do not amend only to force a commit to contain its own hash.",
+    ],
+    handoffCommands: [
+      "openworkflow git-automation branch --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
+      "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --json",
+      "openworkflow git-automation summary --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
+    ],
+    internalSections: [
+      {
+        tag: "mode_policy",
+        items: [
+          "managed mode may perform approved local branch, commit, and summary operations with previews and evidence.",
+          "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
+          "autonomous mode is a future high-risk path and is not implemented by the G015 command shell.",
+        ],
+      },
+      {
+        tag: "evidence_policy",
+        items: [
+          "Every git operation must be traceable to a plan id, candidate id, command preview, before and after state, and validation evidence when applicable.",
+          "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+          "A selected change must have at least one local commit when implementation changed files.",
+          "Follow-up evidence commits are allowed when they preserve the selected-change HEAD relationship.",
+        ],
+      },
+    ],
   };
 }
 

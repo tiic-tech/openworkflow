@@ -235,4 +235,31 @@ commands:
       []
     handoff_commands:
       - /ow:change
+  - id: git-automation
+    trigger: /ow:git-automation
+    stage: governance
+    visibility: user
+    depth: deep
+    context_packet: context:git-automation
+    allowed_outputs:
+      - local branch checkout or creation through openworkflow git-automation branch
+      - local selected-change commit through openworkflow git-automation commit
+      - local PR_READY_SUMMARY.md through openworkflow git-automation summary
+      - remote operation plan through openworkflow git-automation remote
+      - local evidence artifacts under changes/<plan_id>/
+    conditional_outputs:
+      - high-risk decision report when remote mutation or autonomous mode is requested
+      - follow-up CANDIDATE_CHANGES entry for autonomous git automation
+    forbidden_outputs:
+      - git push without explicit operation-level user approval
+      - gh pr create/edit/merge without explicit operation-level user approval
+      - gh issue create/edit/close without explicit operation-level user approval
+      - git reset, rebase, force-push, or destructive branch deletion
+    handoff_commands:
+      - openworkflow git-automation branch --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml
+        --json
+      - openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml
+        --candidate <id> --message <msg> --validation-evidence <cmds> --json
+      - openworkflow git-automation summary --root . --queue
+        changes/<plan_id>/CANDIDATE_CHANGES.yaml --json
 updated_at: null

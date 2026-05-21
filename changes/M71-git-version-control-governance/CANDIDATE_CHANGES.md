@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G015`.
+- Next recommended candidate: `G016`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -375,7 +375,7 @@ Completion evidence:
 
 ## G015 - Add Ow:Git-Automation Command Shell With Remote Approval Gates
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -391,6 +391,7 @@ Owned paths:
 - `packages/adapters/codex/src/`
 - `packages/cli/src/`
 - `skills/`
+- `references/git-automation-governance.md`
 - `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/`
 
 Validation:
@@ -398,6 +399,45 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G015-ow-git-automation-command-shell`
+
+Completion evidence:
+
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/index.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/core/src/commands/registry.ts`
+- `packages/core/src/onboarding/agentsGuide.ts`
+- `references/git-automation-governance.md`
+- `.agents/skills/ow-git-automation/SKILL.md`
+- `.agents/openworkflow-adapter.yaml`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `.openworkflow/audit/CONTEXT_PACKETS.yaml`
+- `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml`
+
+## G016 - Define Autonomous Git Automation Lifecycle
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: plan the fully autonomous git automation mode that can push, create or
+update PRs, handle merge readiness, and merge without per-step approval after
+explicit configuration and safety policy are accepted.
+
+Dependencies: `G015`
+
+Owned paths:
+
+- `references/git-automation-governance.md`
+- `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

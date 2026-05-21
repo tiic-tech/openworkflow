@@ -22,6 +22,7 @@ const SKILL_NAMES = [
   "ow-spec",
   "ow-change",
   "ow-team",
+  "ow-git-automation",
 ] as const;
 
 async function main(): Promise<number> {
@@ -61,6 +62,7 @@ async function main(): Promise<number> {
   await verifyLocalFeatBranchAutomation();
   await verifySelectedChangeCommitAutomation();
   await verifyPrReadySummaryGeneration();
+  await verifyGitAutomationManagedShell();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -206,6 +208,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
+    "/ow:git-automation",
     "Respect lazy creation",
   ]) {
     assert(guide.includes(required), `AGENTS.md missing onboarding guidance: ${required}`);
@@ -234,6 +237,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
     "/ow:team",
+    "/ow:git-automation",
     "Lazy creation boundary",
     "Sync safety",
     "status",
@@ -257,6 +261,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "--strict",
     "summarize",
     "pass --write to update summary files",
+    "git-automation",
+    "Managed git lifecycle shell",
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
@@ -976,6 +982,9 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-team") {
       verifyTeamSkill(skillContent);
     }
+    if (name === "ow-git-automation") {
+      verifyGitAutomationSkill(skillContent);
+    }
     const semanticCommand = `/${name.replace("ow-", "ow:")}`;
     const displayName = semanticCommand.slice(1);
     assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
@@ -1225,6 +1234,67 @@ async function verifyPrReadySummaryGeneration(): Promise<void> {
   }
 }
 
+async function verifyGitAutomationManagedShell(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-git-automation-shell-"));
+  try {
+    await runInCwd(tempRoot, ["git", "init"]);
+    await runInCwd(tempRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(tempRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(tempRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(tempRoot, ["git", "switch", "-c", "codex/m71-shell-fixture"]);
+    await writeFile(join(tempRoot, "change.txt"), "change\n", "utf8");
+    await runInCwd(tempRoot, ["git", "add", "change.txt"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "M71/G015 shell fixture"]);
+    await mkdir(join(tempRoot, "changes", "M71-shell"), { recursive: true });
+    await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-shell",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-shell",
+      "title: Candidate changes for shell fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-shell-fixture",
+      "changes:",
+      "  - id: G015",
+      "    status: done",
+      "    title: Shell fixture",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "",
+    ].join("\n"), "utf8");
+
+    const remote = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "remote",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--operation",
+      "pr",
+      "--base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(remote.code !== 0, "managed remote operation should be refused without approval");
+    const remoteReport = parseJsonReport(remote.output, "git-automation remote");
+    const data = record(remoteReport.data, "git-automation remote data");
+    assert(data.refused === true, "managed remote report should mark operation refused");
+    assert(Array.isArray(data.remote_operation_plan), "managed remote report missing operation plan");
+    assert(Array.isArray(data.ordered_local_commits), "managed remote report missing ordered local commits");
+    assert((data.ordered_local_commits as unknown[]).length > 0, "managed remote report should include ordered commits from base");
+    assert(remote.output.includes("does not execute it"), "managed remote report missing non-execution reason");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
 function verifySpecSkill(content: string): void {
   for (const required of [
     "accepted-design-to-production-spec",
@@ -1262,6 +1332,21 @@ function verifyTeamSkill(content: string): void {
     "When work is incomplete, leave the next action and blocker explicit in runtime state.",
   ]) {
     assert(content.includes(required), `ow-team missing production guidance: ${required}`);
+  }
+}
+
+function verifyGitAutomationSkill(content: string): void {
+  for (const required of [
+    "managed-git-lifecycle-shell",
+    "<mode_policy>",
+    "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
+    "<evidence_policy>",
+    "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+    "openworkflow git-automation branch",
+    "openworkflow git-automation commit",
+    "openworkflow git-automation summary",
+  ]) {
+    assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
   }
 }
 

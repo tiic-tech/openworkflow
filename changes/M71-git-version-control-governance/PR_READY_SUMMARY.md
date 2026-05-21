@@ -25,15 +25,17 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G012` Implement local feat branch creation for candidate queues (selected: `G012-local-feat-branch-automation`; commit: not recorded)
 - `G013` Implement selected-change local commit automation (selected: `G013-selected-change-commit-automation`; commit: fb003d7346ce027e08a9f149718caadf82755ad6)
 - `G014` Implement local PR-ready summary generation for completed queues (selected: `G014-pr-ready-summary-generation`; commit: c8d48b1dc387f40d1aae27193155e5fc3847f912)
+- `G015` Add ow:git-automation command shell with remote approval gates (selected: `G015-ow-git-automation-command-shell`; commit: not recorded)
 
 ## Deferred Or Blocked Changes
 
-- `G015` status `ready`: Add ow:git-automation command shell with remote approval gates
+- `G016` status `ready`: Define autonomous git automation lifecycle
 
 ## High-Risk Decisions
 
 - `G007` status `done`: Decide whether OW should automate git and gh mutation operations
-- `G015` status `ready`: Add ow:git-automation command shell with remote approval gates
+- `G015` status `done`: Add ow:git-automation command shell with remote approval gates
+- `G016` status `ready`: Define autonomous git automation lifecycle
 
 ## Validation
 

@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G015
+next_recommended_candidate_id: G016
 changes:
   - id: G001
     status: done
@@ -831,7 +831,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G015
-    status: ready
+    status: done
     title: Add ow:git-automation command shell with remote approval gates
     purpose: >
       Introduce the command surface for approved local git automation while
@@ -843,6 +843,7 @@ changes:
         - generated skill or command guidance
         - local-only modes for branch, commit, and PR-ready summary
         - remote operation refusal unless explicit approval is provided
+        - remote operation plan with ordered local commits for approved handoff
       excludes:
         - implementing remote push by default
         - implementing merge automation
@@ -852,13 +853,15 @@ changes:
       - packages/adapters/codex/src/
       - packages/cli/src/
       - skills/
+      - references/git-automation-governance.md
       - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/
     dependencies:
       - G011
       - G012
       - G013
       - G014
-    unlocks: []
+    unlocks:
+      - G016
     risk: high
     size: large
     validation:
@@ -870,6 +873,67 @@ changes:
       - Remote operations require explicit user approval and preview.
       - Generated command surfaces remain in sync.
       - The command refuses unsafe dirty-tree or branch-boundary states.
+      - Managed remote handoff includes ordered local commits and operation sequence.
+    selection:
+      selected_change_id: G015-ow-git-automation-command-shell
+      reason: >
+        The user approved the managed command shell scheme: local automation is
+        exposed, remote operations are gated with operation plans, and
+        autonomous mode is split into a follow-up high-risk candidate.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G015-ow-git-automation-command-shell
+      completed_at: 2026-05-21
+      evidence:
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/core/src/commands/registry.ts
+        - packages/core/src/onboarding/agentsGuide.ts
+        - references/git-automation-governance.md
+        - .agents/skills/ow-git-automation/SKILL.md
+        - .agents/openworkflow-adapter.yaml
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G016
+    status: ready
+    title: Define autonomous git automation lifecycle
+    purpose: >
+      Plan the fully autonomous git automation mode that can push, create or
+      update PRs, handle merge readiness, and merge without per-step approval
+      after explicit configuration and safety policy are accepted.
+    scope:
+      includes:
+        - autonomous mode configuration contract
+        - allowed remote operation matrix
+        - evidence and rollback requirements for every git or gh mutation
+        - conflict-resolution and merge-readiness gates
+        - repository protection and recovery expectations
+      excludes:
+        - implementing autonomous push, PR, or merge execution in this candidate queue without a new high-risk approval
+        - bypassing repository protection
+        - force-push or destructive history rewrite by default
+    owned_paths:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/
+    dependencies:
+      - G015
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Autonomous mode has an explicit enablement contract.
+      - Every remote mutation class has evidence and rollback requirements.
+      - Merge-readiness and conflict-resolution rules are documented.
+      - Implementation remains blocked until a separate high-risk approval is granted.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -1354,3 +1418,53 @@ operations:
       - "validation: npm run validate"
       - "validation: git diff --check"
       - "validation: npm run verify:runtime-surface"
+  - operation_id: OP033
+    operation_type: select
+    target_candidate_ids:
+      - G015
+    actor: agent
+    reason: Select G015 after user approved the managed command shell scheme with remote operation planning and autonomous mode deferred.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP034
+    operation_type: complete
+    target_candidate_ids:
+      - G015
+    actor: agent
+    reason: Complete G015 after adding the managed git-automation CLI and generated skill with local automation, remote refusal, and ordered commit handoff planning.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - references/git-automation-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .agents/openworkflow-adapter.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP035
+    operation_type: add
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Add a follow-up high-risk candidate for fully autonomous git automation after G015 intentionally limited itself to managed mode.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
