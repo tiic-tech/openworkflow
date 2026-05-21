@@ -1,13 +1,15 @@
 # Change Analysis: M73 Workflow Blueprint Runtime Alignment
 
-Recommendation: select `M73-workflow-blueprint-runtime-alignment / C001`.
+Recommendation: select `M73-workflow-blueprint-runtime-alignment / C011`.
 
-Reason: `C001` is the lowest-risk first move. It defines the command taxonomy
-and stage graph so later runtime work for `proto2html`, `html2spec`, `build`,
-`review`, `archive`, `build-agent`, and `build-skill` does not drift from the
-approved OW blueprint.
+Reason: `C011` is ready, low risk, and has no dependencies. It defines the
+command family taxonomy needed before the stage graph and `/ow:change`
+planning-intelligence boundary can be finalized.
 
-Scope-control review narrowed M73 to one workflow slice. The later runtime
-surfaces are deferred feature refs, not rejected candidates in this queue.
+Rejected alternatives:
 
-High-risk stop: not required for `C001`.
+- `C012`: depends on C011.
+- `C013`: depends on C011 and C012.
+- `C014`: depends on C011, C012, and C013.
+
+High-risk stop: not required for `C011`.

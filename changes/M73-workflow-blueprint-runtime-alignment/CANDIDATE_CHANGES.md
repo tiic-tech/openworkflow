@@ -22,13 +22,13 @@ the whole workflow.
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Next recommended candidate: `C011`
+Next recommended candidate: `C012`
 
 ## Current Candidates
 
 ### C011 - Define Command Family Taxonomy
 
-Status: `ready`
+Status: `selected`
 
 Risk: `low`
 
@@ -109,3 +109,4 @@ with its own queue boundary.
 - `OP004`: split selected C001 into C011-C014 and marked C001 superseded.
 - `OP005`: updated C014 deferred handoff map so front-chain command quality
   review precedes proto2html.
+- `OP006`: selected C011 after AC recommendation.

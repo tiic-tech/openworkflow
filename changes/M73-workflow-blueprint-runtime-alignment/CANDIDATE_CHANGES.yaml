@@ -84,7 +84,7 @@ scope_control:
     - title: Define summary-first read model for expanded workflow
       reason: Expanded read model should follow the concrete artifact surfaces it summarizes.
       suggested_plan_id: M83-expanded-workflow-read-model
-next_recommended_candidate_id: C011
+next_recommended_candidate_id: C012
 changes:
   - id: C001
     status: superseded
@@ -129,7 +129,7 @@ changes:
         first. DTC later split it into narrower current candidates.
       selected_at: 2026-05-21
   - id: C011
-    status: ready
+    status: selected
     title: Define command family taxonomy
     purpose: >
       Define the command families used by the full workflow blueprint without
@@ -162,6 +162,12 @@ changes:
       - Command families are named and described.
       - Existing DTC, AC, and SC are classified as planning intelligence, not primary workflow stages.
       - No runtime command registry or generated adapter surface changes are made.
+    selection:
+      selected_change_id: C011-command-family-taxonomy
+      reason: >
+        analyze-changes recommends C011 because it is low risk, dependency-free,
+        and unlocks the remaining M73 taxonomy and handoff candidates.
+      selected_at: 2026-05-21
   - id: C012
     status: candidate
     title: Define workflow stage graph
@@ -363,3 +369,18 @@ operations:
     evidence:
       - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
       - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C011
+    actor: agent
+    reason: >
+      AC recommended C011 as the next low-risk, dependency-free candidate.
+      SC selected it to define command family taxonomy before stage graph and
+      /ow:change planning-boundary work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+      - changes/M73-workflow-blueprint-runtime-alignment/C011-command-family-taxonomy/SELECTED_CHANGE.yaml

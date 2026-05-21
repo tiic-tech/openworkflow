@@ -45,9 +45,9 @@ active_candidate_count: 4
 superseded_candidate_id: C001
 completed_candidate_id: null
 completed_change_id: null
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C011
+selected_candidate_id: C011
+selected_change_id: C011-command-family-taxonomy
+next_recommended_candidate_id: C012
 key_dependencies:
   - M54 completed DTC/AC/SC as Codex-delivered planning commands.
   - C013 clarified that DTC/AC/SC belong inside /ow:change, not as the full OW workflow.
@@ -83,3 +83,4 @@ validation:
     - OP003 narrowed M73 to C001 and converted C002-C010 into deferred feature refs.
     - OP004 split C001 into C011-C014 and marked C001 superseded.
     - OP005 updated C014 so front-chain command quality review precedes proto2html in the deferred handoff map.
+    - OP006 selected C011 after AC recommended it as the next low-risk candidate.

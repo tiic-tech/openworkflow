@@ -11,32 +11,34 @@ source:
     - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
 git_state:
   branch: codex/m73-workflow-blueprint-runtime-alignment
-  dirty: true
-  note: Analysis was produced during the DTC/AC/SC exploration artifact write.
+  dirty: false
+  note: Analysis was refreshed after committing the front-chain handoff update.
 recommendation:
   target_plan_id: M73-workflow-blueprint-runtime-alignment
-  target_candidate_id: C001
+  target_candidate_id: C011
   action: handoff_to_select_change
   reason: >
-    C001 is ready, medium risk, has no dependencies, and prevents the next
-    workflow runtime work from drifting away from the full OW_DEVELOP_PLAN
-    blueprint. Scope-control review narrowed M73 so C001 is the only active
-    candidate; adjacent workflow features are deferred refs for future DTC
-    passes.
+    C011 is ready, low risk, has no dependencies, and establishes the command
+    family taxonomy that C012, C013, and C014 depend on. It stays within the M73
+    workflow-slice boundary and does not touch runtime registry or generated
+    adapter surfaces.
 rejected_alternatives:
   - plan_id: M73-workflow-blueprint-runtime-alignment
-    candidate_id: null
-    reason: >
-      proto2html, html2spec, build, change orchestration, review, archive,
-      build-agent, build-skill, lifecycle transactions, and expanded read
-      models are separate future features, not alternatives inside the current
-      M73 candidate list.
+    candidate_id: C012
+    reason: Depends on C011 command family taxonomy.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C013
+    reason: Depends on C011 and C012.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C014
+    reason: Depends on C011, C012, and C013.
 high_risk_stop:
   required: false
-  reason: Recommended candidate C001 is medium risk and design-only.
+  reason: Recommended candidate C011 is low risk and design-only.
 validation:
   commands_run:
     - git status --short --branch
+    - node dist/cli/src/index.js sync --root . --json
   notes:
-    - AC recommends C001 for selection.
-    - M73 was narrowed after scope-control review so the queue remains one workflow slice.
+    - AC recommends C011 for selection.
+    - High-risk deferred features remain outside the active M73 implementation.
