@@ -12,6 +12,49 @@ angles:
 It is not a change contract. Use it as the starting brief for the next planning
 session.
 
+## Phase Status Update - 2026-05-21
+
+This document is the broad long-term roadmap. The active Phase 2 planning brief
+is now `docs/OW_DEVELOP_PLAN_Phase2.md`.
+
+The dogfood cycle after this plan completed several items that were originally
+listed as future direction:
+
+| Area | Status | Evidence |
+|---|---|---|
+| `/ow:proto` image-first redesign | Completed | `changes/M59-proto-redesign-planning-dogfood/` and related proto/tune skill changes |
+| `/ow:tune` split from proto | Completed | dedicated `tune-prototype` source behavior and generated `ow-tune` boundary |
+| high-risk report governance | Completed | `changes/M70-high-risk-governance-planning/` |
+| planning artifact contracts and queue maintenance | Completed | `changes/M54-decompose-select-change-planning/` through `C006` |
+| `decompose-to-changes` | Completed and dogfooded | `skills/decompose-to-changes/` |
+| `select-change` | Completed and dogfooded | `skills/select-change/` |
+| `analyze-changes` | Completed and dogfooded | `skills/analyze-changes/` and `changes/M72-remaining-change-priority-analysis/` |
+| local git governance and automation | Completed | `changes/M71-git-version-control-governance/` |
+| read-only autonomous simulator | Completed | `M71/G017` |
+| remote read-only PR-ready planning | Completed | `M71/G019` |
+| disabled-by-default draft PR pilot gate | Completed | `M71/G020` |
+| `proto2html` source behavior and dogfood | Partially completed | `changes/M68-post-proto-workflow-planning/H001-H004` |
+| `proto2html` runtime exposure | Not completed | `M68/H003`, high-risk report needed |
+| `html2spec`, `build`, archive/review/devlog/learn loop | Not completed | moved behind Phase 2 artifact-economy and transaction work |
+| lifecycle transactions | Not completed | raised to Phase 2 priority |
+| context budget and artifact lifecycle policy | Not completed | raised to Phase 2 priority |
+
+Phase 2 changes the near-term priority. Before adding the full
+`html2spec -> build -> review -> archive` chain, OW must protect its core
+philosophy: auditable and traceable development with low-context,
+high-quality Agent intelligence.
+
+The current recommended next development target is:
+
+```text
+M54-decompose-select-change-planning / C007
+```
+
+Reason: `C007` makes cross-queue selection arbitration native to
+`select-change`, which is now required because multiple active candidate queues
+exist. See `changes/M72-remaining-change-priority-analysis/CHANGE_ANALYSIS.yaml`
+and `docs/OW_DEVELOP_PLAN_Phase2.md`.
+
 ## Current Product Judgment
 
 OpenWorkflow has moved beyond artifact scaffolding. It is becoming a local
@@ -2006,10 +2049,26 @@ Recommended next planning sequence:
 
 ## Next Session Starting Point
 
-Start by planning the first concrete change around `/ow:proto` image-only
-redefinition.
+This section is superseded by the Phase 2 brief.
 
-Before implementation, inspect:
+The previous starting point was `/ow:proto` image-only redefinition. That work
+has been completed and dogfooded. The current starting point is:
+
+```text
+M54-decompose-select-change-planning / C007
+```
+
+Before implementation:
+
+- read `docs/OW_DEVELOP_PLAN_Phase2.md`
+- read `changes/M72-remaining-change-priority-analysis/CHANGE_ANALYSIS.yaml`
+- reconcile the M54 queue with current branch-boundary governance
+- then use `select-change` to select `M54/C007`
+
+Historical note: the original `/ow:proto` guidance below is complete and kept
+only as roadmap context, not as the next active task.
+
+Original superseded checklist:
 
 - current command registry
 - current artifact contracts for prototype evidence
@@ -2019,6 +2078,5 @@ Before implementation, inspect:
 - `verify:runtime-surface`
 - `verify:agent-e2e`
 
-Do not start by editing HTML generation behavior only. The real change is a
-workflow semantics change: `/ow:proto` becomes product-image exploration, and
-HTML moves to `/ow:proto2html`.
+Original outcome: the workflow semantics changed so `/ow:proto` became
+product-image exploration and HTML moved to `/ow:proto2html`.
