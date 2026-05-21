@@ -26,11 +26,11 @@ Deferred features:
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
-Completed candidate: `C001`
+Completed candidates: `C001`, `C002`
 
-Selected candidate: `C002`
+Selected candidate: none
 
-Next recommended candidate: none until `C002` is completed or superseded.
+Next recommended candidate: `C003`
 
 ## Selection Policy
 
@@ -61,7 +61,7 @@ Completion evidence:
 
 ### C002 - Extend vision artifacts with proto-readiness and coverage matrix
 
-Status: `selected`
+Status: `done`
 
 Risk: `medium`
 
@@ -71,9 +71,14 @@ strong prototype prompt packs without inventing strategy.
 
 Selection: `C002-vision-proto-readiness-artifacts`
 
+Completion evidence:
+
+- `changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml`
+- `83d3acc4113b45f860c2873649ef397285b361f6`
+
 ### C003 - Upgrade /ow:vision skill protocol for product partner interrogation
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 

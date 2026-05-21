@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C002-vision-proto-readiness-artifacts
+contract_type: evidence
+planning_artifact_type: local_commit_evidence
+selected_change_id: C002-vision-proto-readiness-artifacts
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C002
+title: Local commit evidence for vision proto-readiness artifacts
+status: completed
+completed_at: 2026-05-22
+primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6
+summary: >
+  Added proto-readiness-oriented vision artifact structures and schema support,
+  refreshed generated artifact contracts, and strengthened summary quality so
+  non-ready vision proto_readiness.status is reported as current_but_thin.
+files_changed:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/vision-session.schema.json
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/SELECTED_CHANGE.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/ATOM_TASKS.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/IMPLEMENTATION_BRIEF.md
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+risk:
+  level: medium
+  high_risk_report: not_applicable
+  notes:
+    - Artifact structures are optional in schema for compatibility, with quality gates identifying thin or non-ready vision artifacts.
+    - No validation, proto, tune, spec, runtime, or generated command behavior was changed in this candidate.

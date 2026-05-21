@@ -84,7 +84,7 @@ scope_control:
         through benchmark prototype selection after component commands are
         upgraded.
       suggested_plan_id: M89-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -147,7 +147,7 @@ changes:
         - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
         - skills/build-vision/SKILL.md
   - id: C002
-    status: selected
+    status: done
     title: Extend vision artifacts with proto-readiness and coverage matrix
     purpose: >
       Add structured vision fields that let /ow:proto evaluate whether it can
@@ -197,8 +197,17 @@ changes:
         source contract and C002 is the next required step before the generated
         /ow:vision protocol can use proto-readiness as a compile gate.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-vision-proto-readiness-artifacts
+      completed_at: 2026-05-22
+      primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/core/src/artifacts/registry.ts
+        - packages/core/src/workflow/summaryHealth.ts
+        - schemas/vision-session.schema.json
   - id: C003
-    status: candidate
+    status: ready
     title: Upgrade /ow:vision skill protocol for product partner interrogation
     purpose: >
       Encode the product partner, requirements interrogator, and intent compiler
@@ -373,3 +382,30 @@ operations:
       - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/SELECTED_CHANGE.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/ATOM_TASKS.yaml
       - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete vision artifact proto-readiness structures and summary quality
+      checks with local commit evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+      - 83d3acc4113b45f860c2873649ef397285b361f6
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 becomes ready after C002 added the artifact structures that the
+      generated /ow:vision protocol should reference.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml

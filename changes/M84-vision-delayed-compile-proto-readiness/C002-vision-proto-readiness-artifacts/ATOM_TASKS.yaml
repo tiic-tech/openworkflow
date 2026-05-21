@@ -6,11 +6,11 @@ selected_change_id: C002-vision-proto-readiness-artifacts
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C002
 title: Atom tasks for vision proto-readiness artifacts
-status: ready
+status: completed
 tasks:
   - task_id: T001
     title: Extend vision artifact template and schema
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/artifacts/registry.ts
@@ -20,7 +20,7 @@ tasks:
       product_system_seed, proto_readiness, and coverage structures.
   - task_id: T002
     title: Strengthen summary quality for proto-readiness
-    status: pending
+    status: done
     type: edit
     owned_paths:
       - packages/core/src/workflow/summaryHealth.ts
@@ -30,7 +30,7 @@ tasks:
       warnings.
   - task_id: T003
     title: Refresh generated artifact contracts
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
@@ -38,7 +38,7 @@ tasks:
       openworkflow sync refreshes managed artifact contracts from source.
   - task_id: T004
     title: Update verification coverage
-    status: pending
+    status: done
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -51,3 +51,6 @@ validation:
   - node dist/cli/src/index.js sync --root . --json
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6

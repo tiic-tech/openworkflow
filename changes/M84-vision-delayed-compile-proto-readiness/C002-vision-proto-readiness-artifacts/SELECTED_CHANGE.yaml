@@ -6,7 +6,7 @@ selected_change_id: C002-vision-proto-readiness-artifacts
 source_plan_id: M84-vision-delayed-compile-proto-readiness
 source_candidate_id: C002
 title: Extend vision artifacts with proto-readiness and coverage matrix
-status: selected
+status: completed
 selection_reason: >
   C002 is the next dependency after C001. It turns the delayed-compile concept
   into artifact structure so /ow:vision can distinguish interview drafts from
@@ -57,3 +57,8 @@ risk:
 commit_boundary: >
   Complete as one coherent local commit unless schema or summary quality
   updates reveal a need for a separate compatibility migration.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
