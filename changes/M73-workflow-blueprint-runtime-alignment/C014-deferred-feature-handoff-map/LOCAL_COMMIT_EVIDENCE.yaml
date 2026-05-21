@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C014-deferred-feature-handoff-map
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C014-deferred-feature-handoff-map
+status: current
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C014
+selected_change_id: C014-deferred-feature-handoff-map
+primary_commit: 929f54ca7a0de5eee9f2718c249248ceee9ce0c3
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+  - npm run validate
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
