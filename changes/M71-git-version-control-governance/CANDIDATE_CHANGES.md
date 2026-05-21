@@ -441,6 +441,10 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 
+High-risk report:
+
+- `changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md`
+
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 
 Status: `done`

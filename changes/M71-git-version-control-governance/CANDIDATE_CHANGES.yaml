@@ -1472,3 +1472,14 @@ operations:
     evidence:
       - references/git-automation-governance.md
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+  - operation_id: OP036
+    operation_type: query
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Create a high-risk decision report before selecting or implementing autonomous git automation lifecycle work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
