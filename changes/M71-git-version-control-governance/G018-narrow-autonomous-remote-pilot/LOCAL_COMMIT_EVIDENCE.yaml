@@ -1,0 +1,27 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G018-narrow-autonomous-remote-pilot
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G018 narrow autonomous remote pilot planning
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G018
+selected_change_id: G018-narrow-autonomous-remote-pilot
+recorded_at: 2026-05-21
+primary_commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c
+primary_commit_message: M71/G018 Plan narrow autonomous remote pilot
+approved_path:
+  option_b: remote read-only plus PR-ready remote plan
+  option_c: narrow draft PR remote mutation pilot
+next_candidates:
+  - G019
+  - G020
+validations:
+  - npm run validate
+  - git diff --check
+evidence:
+  - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+  - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+  - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+  - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+  - references/git-automation-governance.md

@@ -528,10 +528,12 @@ Approved path:
 
 Completion evidence:
 
+- `commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c`
 - `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md`
 - `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml`
 - `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml`
 - `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md`
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml`
 - `references/git-automation-governance.md`
 
 ## G019 - Implement Remote Read-Only PR-Ready Planning
