@@ -55,6 +55,7 @@ async function main(): Promise<number> {
   }
 
   await verifyGeneratedSkillRepositoryValidation();
+  await verifyGitGovernanceDogfoodFixtures();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -985,6 +986,20 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
   }
+}
+
+async function verifyGitGovernanceDogfoodFixtures(): Promise<void> {
+  const queue = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml"));
+  const fixture = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "G006-branch-per-feat-dogfood-fixtures", "BRANCH_PER_FEAT_FIXTURE.md"));
+  const prReadyExample = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "G006-branch-per-feat-dogfood-fixtures", "EXAMPLE_PR_READY_SUMMARY.md"));
+
+  assert(queue.includes("branch_boundary: codex/m71-git-version-governance"), "M71 queue missing branch boundary fixture");
+  assert(queue.includes("completed_by_change_id: G004-git-governance-validation"), "M71 queue missing completed selected-change evidence");
+  assert(fixture.includes("selected change -> commit"), "branch-per-feat fixture missing commit boundary");
+  assert(fixture.includes("CANDIDATE_CHANGES -> feat branch"), "branch-per-feat fixture missing feat branch boundary");
+  assert(prReadyExample.includes("## Completed Changes"), "PR-ready example missing completed changes section");
+  assert(prReadyExample.includes("## Validation"), "PR-ready example missing validation section");
+  assert(prReadyExample.includes("does not mean a PR was opened"), "PR-ready example must avoid implying remote PR mutation");
 }
 
 function verifySpecSkill(content: string): void {

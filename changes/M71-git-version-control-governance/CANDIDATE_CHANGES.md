@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G006`.
+- Next recommended candidate: `G009`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -175,7 +175,7 @@ Completion evidence:
 
 ## G006 - Add Dogfood Fixtures For Branch-Per-Feat Workflow
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -194,6 +194,16 @@ Validation:
 - `npm run validate`
 - `git diff --check`
 - `npm run verify:runtime-surface`
+
+Selection: `G006-branch-per-feat-dogfood-fixtures`
+
+Completion evidence:
+
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md`
+- `changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md`
+- `changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml`
 
 ## G007 - Decide Whether OW Should Automate Git And Gh Mutation Operations
 

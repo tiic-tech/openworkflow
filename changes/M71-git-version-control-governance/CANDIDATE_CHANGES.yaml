@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G006
+next_recommended_candidate_id: G009
 changes:
   - id: G001
     status: done
@@ -328,7 +328,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G006
-    status: ready
+    status: done
     title: Add dogfood fixtures for branch-per-feat workflow
     purpose: >
       Add focused dogfood fixtures and examples that show a clean feat branch,
@@ -363,6 +363,25 @@ changes:
       - Fixtures prove a completed selected change can be audited back to a commit.
       - Fixtures prove a feat summary can be audited back to the candidate queue.
       - The fixture scope remains planning-only and does not mutate git history.
+    selection:
+      selected_change_id: G006-branch-per-feat-dogfood-fixtures
+      reason: >
+        G006 is ready after G002, G003, G004, and G005 and adds dogfood
+        verification for the branch-per-feat workflow without mutating git
+        history.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G006-branch-per-feat-dogfood-fixtures
+      completed_at: 2026-05-21
+      evidence:
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
   - id: G007
     status: candidate
     title: Decide whether OW should automate git and gh mutation operations
@@ -812,3 +831,34 @@ operations:
       - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP018
+    operation_type: select
+    target_candidate_ids:
+      - G006
+    actor: agent
+    reason: Select G006 because branch-per-feat governance now has source contracts and validation, so dogfood fixtures can lock the behavior down.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP019
+    operation_type: complete
+    target_candidate_ids:
+      - G006
+    actor: agent
+    reason: Complete G006 after adding branch-per-feat fixtures and runtime verification checks.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"

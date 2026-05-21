@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G006-branch-per-feat-dogfood-fixtures
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G006-branch-per-feat-dogfood-fixtures
+title: Atom tasks for branch-per-feat dogfood fixtures
+status: done
+tasks:
+  - task_id: T001
+    title: Add branch-per-feat fixtures
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/
+    done_when:
+      - Fixture documents show branch, commit, queue, and PR-ready summary boundaries.
+      - Fixture documents state they do not mutate git or gh state.
+  - task_id: T002
+    title: Add runtime fixture checks
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime surface verification checks branch boundary fixture evidence.
+      - Runtime surface verification checks PR-ready example evidence.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G006 selection and completion evidence are recorded.
+      - G009 becomes the next recommended candidate.
+  - task_id: T004
+    title: Validate repository and runtime surface
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

@@ -21,12 +21,14 @@ outputs:
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
 branch_boundary: codex/m71-git-version-governance
 candidate_count: 10
-completed_candidate_id: G005
-completed_change_id: G005-pr-ready-summary-contract
-previous_completed_candidate_id: G004
-previous_completed_change_id: G004-git-governance-validation
-earlier_completed_candidate_id: G003
-earlier_completed_change_id: G003-select-branch-dirty-guards
+completed_candidate_id: G006
+completed_change_id: G006-branch-per-feat-dogfood-fixtures
+previous_completed_candidate_id: G005
+previous_completed_change_id: G005-pr-ready-summary-contract
+validation_completed_candidate_id: G004
+validation_completed_change_id: G004-git-governance-validation
+selection_completed_candidate_id: G003
+selection_completed_change_id: G003-select-branch-dirty-guards
 dtc_completed_candidate_id: G002
 dtc_completed_change_id: G002-dtc-branch-boundary-fields
 analysis_completed_candidate_id: G010
@@ -35,7 +37,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G006
+next_recommended_candidate_id: G009
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -43,6 +45,7 @@ key_dependencies:
   - G003 is complete and teaches select-change to guard branch and dirty-tree state.
   - G004 is complete and validates branch-governance metadata.
   - G005 is complete and defines PR-ready summary handoff semantics.
+  - G006 is complete and adds branch-per-feat dogfood fixtures.
   - G002 and G003 must complete before G004 can validate the new behavior.
   - G005 should complete before any PR-ready handoff fixture work.
   - G008 defines Issue source-of-truth rules before gh operation boundaries or cross-queue analysis depend on Issues.
@@ -88,3 +91,4 @@ validation:
     - G003 completed select-change branch and dirty-tree guards and made G004 ready.
     - G004 completed branch-governance validation and made G005 the next recommended governance change.
     - G005 completed the PR-ready summary contract and made G006 ready.
+    - G006 completed branch-per-feat dogfood fixtures and made G009 the next recommended governance change.
