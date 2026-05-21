@@ -124,3 +124,4 @@ validation:
     - User approved G016 Option B: design-only autonomous contract now, then read-only simulator before full autonomous mode.
     - G016 completed autonomous enablement, operation matrix, evidence, merge-readiness, conflict, rollback, and implementation-path contracts.
     - G017 read-only autonomous simulator was added as the next recommended candidate.
+    - G016 primary implementation commit is 94ddaa74596a6428eacad297faf1a851bceb1e10; commit evidence is recorded in a follow-up evidence commit.

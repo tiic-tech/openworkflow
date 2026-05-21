@@ -26,7 +26,7 @@ This is a local review handoff artifact. It does not mean a remote PR was opened
 - `G013` Implement selected-change local commit automation (selected: `G013-selected-change-commit-automation`; commit: fb003d7346ce027e08a9f149718caadf82755ad6)
 - `G014` Implement local PR-ready summary generation for completed queues (selected: `G014-pr-ready-summary-generation`; commit: c8d48b1dc387f40d1aae27193155e5fc3847f912)
 - `G015` Add ow:git-automation command shell with remote approval gates (selected: `G015-ow-git-automation-command-shell`; commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e)
-- `G016` Define autonomous git automation lifecycle (selected: `G016-autonomous-git-automation-lifecycle`; commit: not recorded)
+- `G016` Define autonomous git automation lifecycle (selected: `G016-autonomous-git-automation-lifecycle`; commit: 94ddaa74596a6428eacad297faf1a851bceb1e10)
 
 ## Deferred Or Blocked Changes
 

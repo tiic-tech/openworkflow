@@ -949,8 +949,10 @@ changes:
       evidence:
         - references/git-automation-governance.md
         - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/LOCAL_COMMIT_EVIDENCE.yaml
         - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
         - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+        - "commit: 94ddaa74596a6428eacad297faf1a851bceb1e10"
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G017
@@ -1564,8 +1566,10 @@ operations:
     evidence:
       - references/git-automation-governance.md
       - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/LOCAL_COMMIT_EVIDENCE.yaml
       - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
       - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+      - "commit: 94ddaa74596a6428eacad297faf1a851bceb1e10"
       - "validation: npm run validate"
       - "validation: git diff --check"
   - operation_id: OP039
