@@ -191,10 +191,33 @@ The safe implementation path is:
 1. Design-only autonomous contract.
 2. Read-only autonomous simulator that produces full plans and evidence without
    remote mutation.
-3. Narrow autonomous pilot for one remote operation class, such as draft PR
-   creation.
-4. Full autonomous lifecycle only after the simulator and pilot prove evidence,
+3. Remote read-only PR-ready planning that inspects remote state and produces
+   an executable operation plan without mutation.
+4. Narrow autonomous pilot for one remote operation class, starting with draft
+   PR creation or update.
+5. Branch push, ready-for-review transition, merge, and Issue mutation only as
+   later high-risk candidates.
+6. Full autonomous lifecycle only after the simulator and pilots prove evidence,
    conflict, and rollback behavior.
+
+### Approved Narrow Pilot Sequence
+
+G018 approves the staged B -> C path:
+
+- **B: remote read-only plus PR-ready remote plan.** The next implementation
+  candidate is G019. It may read remote refs and PR metadata, compare them to
+  local evidence, and write a local plan. It must not push, create or edit PRs,
+  merge, or mutate Issues.
+- **C: draft PR remote mutation pilot.** The follow-up candidate is G020. It is
+  limited to draft PR creation or managed-section update after G019 proves the
+  evidence model. It must still deny merge, ready-for-review transition, Issue
+  mutation, force-push, reset, rebase, and destructive branch deletion.
+
+The recommended first mutation class is draft PR creation or update because the
+result is reviewable and reversible by closing or editing the PR. It remains a
+remote mutation and therefore requires explicit configuration, current simulator
+evidence, target identity checks, payload preview, before/after evidence, and a
+rollback plan.
 
 ## Evidence
 

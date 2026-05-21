@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G018`.
+- Next recommended candidate: `G019`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -500,7 +500,7 @@ Completion evidence:
 
 ## G018 - Plan Narrow Autonomous Remote Pilot
 
-Status: `ready`
+Status: `done`
 
 Risk: `high`
 
@@ -518,6 +518,73 @@ Validation:
 
 - `npm run validate`
 - `git diff --check`
+
+Selection: `G018-narrow-autonomous-remote-pilot`
+
+Approved path:
+
+- `B`: remote read-only plus PR-ready remote plan, implemented next as `G019`.
+- `C`: narrow draft PR mutation pilot, implemented later as `G020`.
+
+Completion evidence:
+
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml`
+- `changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md`
+- `references/git-automation-governance.md`
+
+## G019 - Implement Remote Read-Only PR-Ready Planning
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: add a non-mutating remote planning path that reads remote refs and PR
+metadata, compares them to local queue evidence, and emits a PR-ready remote
+operation plan.
+
+Dependencies: `G018`
+
+Owned paths:
+
+- `packages/core/src/git/`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `references/git-automation-governance.md`
+- `changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
+
+## G020 - Pilot Draft PR Remote Mutation
+
+Status: `ready`
+
+Risk: `high`
+
+Purpose: implement the first narrow autonomous remote mutation pilot after
+remote read-only planning is validated, limited to draft PR creation or managed
+body update.
+
+Dependencies: `G019`
+
+Owned paths:
+
+- `packages/core/src/git/`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `references/git-automation-governance.md`
+- `changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+- `npm run verify:runtime-surface`
 
 ## G008 - Formalize Issue Governance And Source-Of-Truth Rules
 

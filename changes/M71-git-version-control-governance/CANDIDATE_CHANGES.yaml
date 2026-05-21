@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G018
+next_recommended_candidate_id: G019
 changes:
   - id: G001
     status: done
@@ -1023,7 +1023,7 @@ changes:
         - "validation: git diff --check"
         - "validation: npm run verify:runtime-surface"
   - id: G018
-    status: ready
+    status: done
     title: Plan narrow autonomous remote pilot
     purpose: >
       Decide and design the first narrow autonomous remote mutation pilot after
@@ -1043,7 +1043,9 @@ changes:
       - references/git-automation-governance.md
     dependencies:
       - G017
-    unlocks: []
+    unlocks:
+      - G019
+      - G020
     risk: high
     size: medium
     validation:
@@ -1053,7 +1055,104 @@ changes:
       - The first autonomous remote pilot operation is explicitly scoped.
       - Merge and Issue mutation remain excluded unless separately approved.
       - Simulator evidence requirements are documented.
-      - Implementation remains blocked until a concrete high-risk option is approved.
+      - The next implementation step is remote read-only planning, not mutation.
+    selection:
+      selected_change_id: G018-narrow-autonomous-remote-pilot
+      reason: >
+        The user approved the staged B -> C path: first remote read-only
+        planning, then a narrow draft PR mutation pilot as a later candidate.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G018-narrow-autonomous-remote-pilot
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+        - references/git-automation-governance.md
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G019
+    status: ready
+    title: Implement remote read-only PR-ready planning
+    purpose: >
+      Add a non-mutating remote planning path that reads remote refs and PR
+      metadata, compares them to local queue evidence, and emits a PR-ready
+      remote operation plan.
+    scope:
+      includes:
+        - explicit target remote and target base identity checks
+        - read-only remote branch/base/PR metadata collection
+        - stale-plan blockers when local HEAD or remote refs change
+        - local plan artifact or JSON output for push and draft PR sequencing
+        - runtime coverage proving no mutation occurs
+      excludes:
+        - git push
+        - creating, editing, closing, or merging PRs
+        - Issue mutation
+        - force-push, reset, rebase, or destructive branch deletion
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/
+    dependencies:
+      - G018
+    unlocks:
+      - G020
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Remote reads are explicit and non-mutating.
+      - Output includes target identity, remote refs, PR metadata when available, ordered commits, blockers, and rollback guidance.
+      - The command refuses or warns on stale local HEAD, unknown base, dirty tree, or missing simulator evidence.
+      - No push, PR mutation, merge, or Issue mutation code path is introduced.
+  - id: G020
+    status: ready
+    title: Pilot draft PR remote mutation
+    purpose: >
+      Implement the first narrow autonomous remote mutation pilot after remote
+      read-only planning is validated, limited to draft PR creation or managed
+      body update.
+    scope:
+      includes:
+        - explicit config gate for draft PR mutation
+        - dry-run payload preview
+        - managed PR body section and digest tracking
+        - before and after evidence record
+        - rollback guidance for closing the draft PR or restoring the body
+      excludes:
+        - PR merge
+        - ready-for-review transition
+        - Issue mutation
+        - force-push, reset, rebase, or destructive branch deletion
+        - full autonomous lifecycle
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/
+    dependencies:
+      - G019
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Draft PR mutation is disabled by default and requires explicit config.
+      - Dry-run output fully previews target repo, branch, base, title, body digest, and rollback.
+      - The implementation records before and after evidence for every mutation.
+      - Merge, Issue mutation, and destructive git operations remain impossible from this pilot.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -1693,4 +1792,48 @@ operations:
     after_status: ready
     evidence:
       - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - references/git-automation-governance.md
+  - operation_id: OP043
+    operation_type: select
+    target_candidate_ids:
+      - G018
+    actor: agent
+    reason: Select G018 after the user approved the staged B -> C path for autonomous remote automation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP044
+    operation_type: complete
+    target_candidate_ids:
+      - G018
+    actor: agent
+    reason: Complete G018 by recording the B -> C high-risk decision, narrowing the first remote pilot to draft PR mutation, and adding read-only remote planning as the next step.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+      - references/git-automation-governance.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP045
+    operation_type: add
+    target_candidate_ids:
+      - G019
+      - G020
+    actor: agent
+    reason: Add follow-up candidates for the approved staged path, with G019 as read-only remote planning and G020 as the later draft PR mutation pilot.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
       - references/git-automation-governance.md

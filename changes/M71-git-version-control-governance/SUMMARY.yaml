@@ -21,11 +21,11 @@ outputs:
   summary: changes/M71-git-version-control-governance/SUMMARY.yaml
   high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
 branch_boundary: codex/m71-git-version-governance
-candidate_count: 18
-completed_candidate_id: G017
-completed_change_id: G017-autonomous-git-simulator
-previous_completed_candidate_id: G016
-previous_completed_change_id: G016-autonomous-git-automation-lifecycle
+candidate_count: 20
+completed_candidate_id: G018
+completed_change_id: G018-narrow-autonomous-remote-pilot
+previous_completed_candidate_id: G017
+previous_completed_change_id: G017-autonomous-git-simulator
 fixture_completed_candidate_id: G006
 fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
 pr_completed_candidate_id: G005
@@ -42,7 +42,7 @@ issue_completed_candidate_id: G008
 issue_completed_change_id: G008-issue-governance-source-of-truth
 initial_completed_candidate_id: G001
 initial_completed_change_id: G001-git-governance-contract
-next_recommended_candidate_id: G018
+next_recommended_candidate_id: G019
 key_dependencies:
   - G001 unlocks the source skill and validation changes.
   - G001 is complete and established the git governance contract.
@@ -65,7 +65,9 @@ key_dependencies:
   - G015 is complete and introduces the managed git-automation command shell with remote operation planning.
   - G016 is complete and defines the design-only autonomous git automation lifecycle contract.
   - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation; primary commit 5a5d2e21008b9e31456a9b8b9810cf1014dca282 records the implementation.
-  - G018 is ready but high risk because it plans the first narrow autonomous remote mutation pilot.
+  - G018 is complete and records the approved B -> C path: remote read-only planning first, then a narrow draft PR mutation pilot.
+  - G019 is next and implements remote read-only PR-ready planning without mutation.
+  - G020 is ready after G019 and pilots draft PR mutation only, with merge and Issue mutation still excluded.
 risks:
   - id: R001
     level: medium
@@ -83,11 +85,16 @@ risks:
     level: medium
     description: Cross-queue analysis could silently become selection if its boundary is not explicit.
     mitigation: Keep analyze-changes read-only and hand off recommended plan and candidate ids to select-change.
+  - id: R005
+    level: high
+    description: Draft PR mutation could expose incomplete work or overwrite human PR body edits if target identity, body digest, and rollback evidence are weak.
+    mitigation: Implement remote read-only planning first, then gate the draft PR pilot with explicit config, payload preview, managed-section boundaries, before/after evidence, and rollback guidance.
 unresolved_questions:
   - Should OW require a new branch for every new CANDIDATE_CHANGES immediately, or allow a documented exception when retrofitting legacy queues?
   - Should commit hashes become mandatory completion evidence for all future done candidates, or only for queues that opt into branch governance?
   - Should local issue backlog artifacts exist only when gh is absent, or also as an optional cache when gh is available?
   - Should analyze-changes produce one global analysis artifact or one artifact per cross-queue decision episode?
+  - Should the first draft PR pilot create only new draft PRs, or also update an existing managed section when a matching PR already exists?
 validation:
   commands_run:
     - npm run validate
@@ -127,3 +134,4 @@ validation:
     - G017 read-only autonomous simulator was added as the next recommended candidate.
     - G016 primary implementation commit is 94ddaa74596a6428eacad297faf1a851bceb1e10; commit evidence is recorded in a follow-up evidence commit.
     - G017 completed the read-only autonomous simulator and added G018 as the next high-risk narrow remote pilot planning step.
+    - G018 completed the B -> C high-risk decision and added G019 remote read-only planning plus G020 draft PR pilot.
