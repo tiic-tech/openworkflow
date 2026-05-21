@@ -48,7 +48,7 @@ selection_policy:
     - adding destructive git operations to skills
     - creating PR or remote-push automation before branch and commit invariants are validated
     - treating remote GitHub Issues as local files when gh is configured as the source of truth
-next_recommended_candidate_id: G012
+next_recommended_candidate_id: G013
 changes:
   - id: G001
     status: done
@@ -660,7 +660,7 @@ changes:
         - "validation: npm run validate"
         - "validation: git diff --check"
   - id: G012
-    status: ready
+    status: done
     title: Implement local feat branch creation for candidate queues
     purpose: >
       Add local-only automation that creates or checks out the branch recorded
@@ -696,8 +696,27 @@ changes:
       - The command stops on dirty-tree risk.
       - No remote operation is performed.
       - Audit evidence records branch action and queue id.
+    selection:
+      selected_change_id: G012-local-feat-branch-automation
+      reason: >
+        G012 is the next recommended candidate after G011 and implements the
+        approved local-only branch primitive before commit automation depends on
+        it.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G012-local-feat-branch-automation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
   - id: G013
-    status: candidate
+    status: ready
     title: Implement selected-change local commit automation
     purpose: >
       Add local-only automation that commits exactly one completed selected
@@ -1197,3 +1216,34 @@ operations:
       - changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml
       - "validation: npm run validate"
       - "validation: git diff --check"
+  - operation_id: OP027
+    operation_type: select
+    target_candidate_ids:
+      - G012
+    actor: agent
+    reason: Select G012 because it is the next approved local-only automation primitive after the G011 contract.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP028
+    operation_type: complete
+    target_candidate_ids:
+      - G012
+    actor: agent
+    reason: Complete G012 after adding local branch automation and runtime-surface coverage for create, checkout preview, and dirty-tree refusal.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"

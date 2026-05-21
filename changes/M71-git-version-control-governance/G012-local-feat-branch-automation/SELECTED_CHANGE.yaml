@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: selected_change:G012-local-feat-branch-automation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G012-local-feat-branch-automation
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G012
+title: Implement local feat branch creation for candidate queues
+status: done
+selection_reason: >
+  G012 is the next recommended candidate after G011. It implements the approved
+  local-only branch automation boundary before selected-change commit
+  automation depends on it.
+rejected_alternatives:
+  - candidate_ref: G013
+    reason: selected-change commit automation depends on branch automation guards.
+  - candidate_ref: G014
+    reason: PR-ready summary generation depends on commit evidence from G013.
+  - candidate_ref: G015
+    reason: the command shell remains high risk until local branch, commit, and summary primitives exist.
+scope:
+  includes:
+    - local branch boundary validation
+    - clean working-tree guard
+    - local branch existence check
+    - local branch creation or checkout preview
+    - local branch creation or checkout execution
+    - runtime-surface coverage proving no remote operation is required
+  excludes:
+    - pushing branches
+    - deleting branches
+    - rebasing or resetting
+    - creating remote PRs
+    - mutating GitHub Issues
+owned_paths:
+  - packages/core/src/git/localGitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/**
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Local branch automation only uses the recorded branch boundary supplied by the caller.
+  - The automation refuses dirty working trees before branch mutation.
+  - The automation exposes dry-run preview output for create or checkout actions.
+  - No push, remote PR, Issue mutation, reset, rebase, merge, or delete operation is implemented.
+  - Runtime-surface verification covers create, checkout-preview, and dirty-tree refusal paths.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
+    - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"

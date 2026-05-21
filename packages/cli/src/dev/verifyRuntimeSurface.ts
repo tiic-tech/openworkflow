@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 
 const CURRENT_FILE = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(CURRENT_FILE), "../../../..");
@@ -56,6 +57,7 @@ async function main(): Promise<number> {
 
   await verifyGeneratedSkillRepositoryValidation();
   await verifyGitGovernanceDogfoodFixtures();
+  await verifyLocalFeatBranchAutomation();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -119,6 +121,24 @@ async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<st
         resolvePromise(output);
       } else {
         reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}\n${output}`));
+      }
+    });
+  });
+}
+
+async function runInCwd(cwd: string, command: string[]): Promise<void> {
+  await new Promise<void>((resolvePromise, reject) => {
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd,
+      env: process.env,
+      stdio: "ignore",
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise();
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}`));
       }
     });
   });
@@ -1000,6 +1020,53 @@ async function verifyGitGovernanceDogfoodFixtures(): Promise<void> {
   assert(prReadyExample.includes("## Completed Changes"), "PR-ready example missing completed changes section");
   assert(prReadyExample.includes("## Validation"), "PR-ready example missing validation section");
   assert(prReadyExample.includes("does not mean a PR was opened"), "PR-ready example must avoid implying remote PR mutation");
+}
+
+async function verifyLocalFeatBranchAutomation(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-local-git-automation-"));
+  try {
+    const gitRoot = join(tempRoot, "local-branch-automation");
+    await mkdir(gitRoot, { recursive: true });
+    await runInCwd(gitRoot, ["git", "init"]);
+    await runInCwd(gitRoot, ["git", "-c", "user.name=OpenWorkflow Test", "-c", "user.email=openworkflow@example.invalid", "commit", "--allow-empty", "-m", "initial"]);
+
+    const preview = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(preview.ok, `local branch preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.action === "create_branch", "local branch preview should create missing branch");
+    assert(preview.preview?.args.join(" ") === "switch -c codex/m71-local-branch-fixture", "local branch preview command mismatch");
+
+    const created = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: false,
+    });
+    assert(created.ok, `local branch creation failed: ${created.errors.join(", ")}`);
+    assert(created.currentBranch === "codex/m71-local-branch-fixture", "local branch automation did not switch to created branch");
+
+    await runInCwd(gitRoot, ["git", "switch", "-c", "scratch"]);
+    const checkoutExisting = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(checkoutExisting.ok, `existing branch preview failed: ${checkoutExisting.errors.join(", ")}`);
+    assert(checkoutExisting.action === "checkout_existing_branch", "existing branch preview should checkout branch");
+
+    await writeFile(join(gitRoot, "dirty.txt"), "dirty\n", "utf8");
+    const dirty = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(!dirty.ok, "local branch automation should refuse dirty trees");
+    assert(dirty.dirtyPaths.length > 0, "dirty-tree refusal should report dirty paths");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
 }
 
 function verifySpecSkill(content: string): void {

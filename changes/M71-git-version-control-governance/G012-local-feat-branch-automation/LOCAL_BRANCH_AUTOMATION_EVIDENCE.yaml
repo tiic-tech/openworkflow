@@ -1,0 +1,38 @@
+schema_version: 0.1.0
+contract_id: local_branch_automation_evidence:G012-local-feat-branch-automation
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local branch automation evidence for G012
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G012
+selected_change_id: G012-local-feat-branch-automation
+branch_boundary: codex/m71-git-version-governance
+implemented_primitive: packages/core/src/git/localGitAutomation.ts
+local_action_surface:
+  allowed_actions:
+    - already_on_branch
+    - checkout_existing_branch
+    - create_branch
+  implemented_git_commands:
+    - git switch <branch>
+    - git switch -c <branch>
+  explicitly_not_implemented:
+    - git push
+    - git reset
+    - git rebase
+    - git merge
+    - git branch -d
+    - gh pr create
+    - gh issue edit
+runtime_verification:
+  fixture: packages/cli/src/dev/verifyRuntimeSurface.ts
+  covered_paths:
+    - dry-run create_branch preview
+    - create_branch execution in a temporary local repository
+    - checkout_existing_branch preview
+    - dirty-tree refusal before branch mutation
+audit_notes:
+  - This evidence records the queue id and branch action surface for G012.
+  - The implementation is a local primitive only; G015 owns any future command surface.
+  - Remote-impacting operations remain outside the approved scope without explicit user approval.

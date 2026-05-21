@@ -14,7 +14,7 @@ view only.
   decomposition and audit linkage.
 - gh boundary: read-only and evidence-writing operations may be governed
   separately from high-risk remote mutations.
-- Next recommended candidate: `G012`.
+- Next recommended candidate: `G013`.
 
 ## G001 - Formalize Git Governance Hierarchy In Planning Contracts
 
@@ -272,7 +272,7 @@ Completion evidence:
 
 ## G012 - Implement Local Feat Branch Creation For Candidate Queues
 
-Status: `ready`
+Status: `done`
 
 Risk: `medium`
 
@@ -293,9 +293,19 @@ Validation:
 - `git diff --check`
 - `npm run verify:runtime-surface`
 
+Selection: `G012-local-feat-branch-automation`
+
+Completion evidence:
+
+- `packages/core/src/git/localGitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml`
+- `changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml`
+- `changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml`
+
 ## G013 - Implement Selected-Change Local Commit Automation
 
-Status: `candidate`
+Status: `ready`
 
 Risk: `medium`
 
