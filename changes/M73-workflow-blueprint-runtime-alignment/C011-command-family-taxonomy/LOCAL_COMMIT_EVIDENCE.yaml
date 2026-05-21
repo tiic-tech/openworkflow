@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C011-command-family-taxonomy
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C011-command-family-taxonomy
+status: current
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C011
+selected_change_id: C011-command-family-taxonomy
+primary_commit: ca555de52982735afa22dacedb65f3b9ef79f4eb
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+  - npm run validate
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
