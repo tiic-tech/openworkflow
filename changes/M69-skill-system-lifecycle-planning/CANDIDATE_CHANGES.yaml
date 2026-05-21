@@ -46,7 +46,7 @@ selection_policy:
     - editing generated .agents or .openworkflow surfaces directly
     - mixing skill lifecycle architecture with proto2html runtime exposure
     - broad multi-platform adapter work before the format contract is stable
-next_recommended_candidate_id: S004
+next_recommended_candidate_id: S005
 changes:
   - id: S001
     status: done
@@ -208,7 +208,7 @@ changes:
       - Delivery metadata can express skill-only, command-only, or both without changing individual workflow semantics.
       - The change does not create non-Codex generated surfaces yet.
   - id: S004
-    status: ready
+    status: done
     title: Validate generated skill format and protocol blocks
     purpose: >
       Add automated checks that generated OW skills conform to the native skill
@@ -245,8 +245,26 @@ changes:
       - Validation keeps generated skill files as Markdown skill files, not full XML documents.
       - Diagnostics explain whether to update source registry or run sync.
       - Existing generated skills pass after sync.
+    selection:
+      selected_change_id: S004-skill-format-validation
+      reason: >
+        S001 defined the native skill format contract and S002 added generated
+        metadata, so validation can now enforce the generated Codex skill
+        surface without changing command semantics.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S004-skill-format-validation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
   - id: S005
-    status: candidate
+    status: ready
     title: Add generated-surface drift and parity tests
     purpose: >
       Detect when command registry, artifact contracts, generated skill files,
@@ -437,6 +455,45 @@ operations:
       - S004
     actor: agent
     reason: S001 and S002 are complete, satisfying the generated skill format validation dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: S004 is ready after S001 and S002 and is the next non-high-risk validation hardening change.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: Repository contract validation now enforces generated Codex skill frontmatter, metadata, generated markers, and protocol blocks.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: S002 and S004 are complete, satisfying generated-surface drift and parity test dependencies.
     changed_at: 2026-05-21
     before_status: candidate
     after_status: ready

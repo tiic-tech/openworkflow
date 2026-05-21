@@ -54,6 +54,7 @@ async function main(): Promise<number> {
     await rm(tempRoot, { recursive: true, force: true });
   }
 
+  await verifyGeneratedSkillRepositoryValidation();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -932,6 +933,25 @@ async function verifySkills(root: string): Promise<void> {
     assert(!hasYamlScalar(interfaceContent, "display_name", semanticCommand), `${name} display name includes semantic slash`);
     assert(skillContent.includes(`Semantic command: ${semanticCommand}`), `${name} missing semantic command`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
+  }
+}
+
+async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
+  const skill = join(REPO_ROOT, ".agents", "skills", "ow-proto", "SKILL.md");
+  const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
+  const original = await read(skill);
+  try {
+    await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
+    const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingMetadata.code !== 0, "validate passed after generated skill metadata was removed");
+    assert(missingMetadata.output.includes("metadata.generated_by"), "missing metadata validation did not explain generated metadata failure");
+
+    await writeFile(skill, original.replace("# /ow:proto", "<skill>\n# /ow:proto\n</skill>"), "utf8");
+    const malformedWrapper = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedWrapper.code !== 0, "validate passed after generated skill was wrapped in <skill>");
+    assert(malformedWrapper.output.includes("must not use a top-level <skill> XML wrapper"), "malformed wrapper validation did not explain skill wrapper failure");
+  } finally {
+    await writeFile(skill, original, "utf8");
   }
 }
 

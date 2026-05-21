@@ -199,6 +199,22 @@ const REQUIRED_FILES = [
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
 const COMMON_REQUIRED = ["schema_version", "contract_id", "contract_type", "title", "status"];
+const CODEX_SKILL_METADATA_FIELDS = [
+  "generated_by",
+  "adapter",
+  "adapter_version",
+  "template_id",
+  "source_command_id",
+  "semantic_trigger",
+  "skill_name",
+] as const;
+const REQUIRED_CODEX_SKILL_BLOCKS = [
+  "user_behavior",
+  "agent_protocol",
+  "working_protocol",
+  "artifact_checkpoint",
+  "codex_skill",
+] as const;
 
 export async function validateRepositoryContracts(rootInput: string): Promise<ValidationResult> {
   const root = resolve(rootInput);
@@ -206,6 +222,7 @@ export async function validateRepositoryContracts(rootInput: string): Promise<Va
   await validateRequiredFiles(root, errors);
   await validateJsonSchemas(root, errors);
   await validateYamlContracts(root, errors);
+  await validateGeneratedCodexSkills(root, errors);
   return { ok: errors.length === 0, errors };
 }
 
@@ -264,6 +281,240 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validateContractGraph(root, path, data, errors);
     }
   }
+}
+
+async function validateGeneratedCodexSkills(root: string, errors: string[]): Promise<void> {
+  const manifestPath = join(root, ".agents", "openworkflow-adapter.yaml");
+  if (!(await exists(manifestPath))) {
+    return;
+  }
+
+  const label = relative(root, manifestPath);
+  let manifest: unknown;
+  try {
+    manifest = parseYaml(await readFile(manifestPath, "utf8"));
+  } catch (error) {
+    errors.push(`${label} is not valid YAML for generated skill validation: ${messageFor(error)}`);
+    return;
+  }
+  if (!isRecord(manifest)) {
+    errors.push(`${label} must be a mapping`);
+    return;
+  }
+  if (manifest.generated_by !== "openworkflow") {
+    errors.push(`${label} generated_by must be openworkflow for Codex skill validation`);
+  }
+  if (manifest.adapter !== "codex") {
+    errors.push(`${label} adapter must be codex for Codex skill validation`);
+  }
+  const adapterVersion = typeof manifest.adapter_version === "string" ? manifest.adapter_version : null;
+  if (!adapterVersion) {
+    errors.push(`${label} adapter_version must be a non-empty string`);
+  }
+  const namespace = typeof manifest.command_namespace === "string" ? manifest.command_namespace : "ow";
+  validateManifestSkillSurface(label, manifest.skill_surface, errors);
+
+  const commands = manifest.commands;
+  if (!Array.isArray(commands) || commands.length === 0) {
+    errors.push(`${label} commands must be a non-empty list`);
+    return;
+  }
+  for (const [index, command] of commands.entries()) {
+    if (!isRecord(command)) {
+      errors.push(`${label} command ${index} must be a mapping`);
+      continue;
+    }
+    await validateGeneratedCodexSkill(root, label, command, namespace, adapterVersion ?? "", errors);
+  }
+}
+
+function validateManifestSkillSurface(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} skill_surface must be a mapping`);
+    return;
+  }
+  const frontmatter = value.frontmatter;
+  if (!Array.isArray(frontmatter) || !["name", "description", "metadata"].every((field) => frontmatter.includes(field))) {
+    errors.push(`${label} skill_surface.frontmatter must include name, description, and metadata`);
+  }
+  const metadataFields = value.metadata_fields;
+  if (!Array.isArray(metadataFields)) {
+    errors.push(`${label} skill_surface.metadata_fields must list generated metadata fields`);
+    return;
+  }
+  for (const field of CODEX_SKILL_METADATA_FIELDS) {
+    if (!metadataFields.includes(field)) {
+      errors.push(`${label} skill_surface.metadata_fields missing ${field}`);
+    }
+  }
+}
+
+async function validateGeneratedCodexSkill(
+  root: string,
+  manifestLabel: string,
+  command: Record<string, unknown>,
+  namespace: string,
+  adapterVersion: string,
+  errors: string[],
+): Promise<void> {
+  const commandId = stringField(command, "id");
+  const trigger = stringField(command, "trigger");
+  const skillName = stringField(command, "skill_name");
+  const skillPath = stringField(command, "skill_path");
+  const commandLabel = `${manifestLabel} command ${commandId || "<unknown>"}`;
+  if (!commandId || !trigger || !skillName || !skillPath) {
+    errors.push(`${commandLabel} must include id, trigger, skill_name, and skill_path`);
+    return;
+  }
+  const absoluteSkillPath = join(root, skillPath);
+  if (!existsSyncSafe(absoluteSkillPath)) {
+    errors.push(`${commandLabel} references missing generated skill ${skillPath}; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+
+  let content: string;
+  try {
+    if (!statSync(absoluteSkillPath).isFile()) {
+      errors.push(`${skillPath} must be a generated skill file`);
+      return;
+    }
+    content = await readFile(absoluteSkillPath, "utf8");
+  } catch (error) {
+    errors.push(`${skillPath} could not be read for generated skill validation: ${messageFor(error)}`);
+    return;
+  }
+  const frontmatter = parseSkillFrontmatter(skillPath, content, errors);
+  if (!frontmatter) {
+    return;
+  }
+  validateSkillFrontmatter(skillPath, frontmatter, {
+    adapterVersion,
+    commandId,
+    namespace,
+    skillName,
+    trigger,
+  }, errors);
+  validateSkillGeneratedMarker(skillPath, content, namespace, commandId, errors);
+  validateSkillProtocolBlocks(skillPath, content, errors);
+}
+
+function parseSkillFrontmatter(
+  skillPath: string,
+  content: string,
+  errors: string[],
+): Record<string, unknown> | null {
+  if (!content.startsWith("---\n")) {
+    errors.push(`${skillPath} missing SKILL.md frontmatter; update adapter source and run openworkflow sync --tools codex`);
+    return null;
+  }
+  const frontmatterEnd = content.indexOf("\n---\n", 4);
+  if (frontmatterEnd === -1) {
+    errors.push(`${skillPath} has unterminated SKILL.md frontmatter`);
+    return null;
+  }
+  let frontmatter: unknown;
+  try {
+    frontmatter = parseYaml(content.slice(4, frontmatterEnd));
+  } catch (error) {
+    errors.push(`${skillPath} has invalid SKILL.md frontmatter YAML: ${messageFor(error)}`);
+    return null;
+  }
+  if (!isRecord(frontmatter)) {
+    errors.push(`${skillPath} SKILL.md frontmatter must be a mapping`);
+    return null;
+  }
+  return frontmatter;
+}
+
+function validateSkillFrontmatter(
+  skillPath: string,
+  frontmatter: Record<string, unknown>,
+  expected: {
+    adapterVersion: string;
+    commandId: string;
+    namespace: string;
+    skillName: string;
+    trigger: string;
+  },
+  errors: string[],
+): void {
+  if (frontmatter.name !== expected.skillName) {
+    errors.push(`${skillPath} frontmatter.name must be ${expected.skillName}`);
+  }
+  if (!nonEmptyString(frontmatter.description)) {
+    errors.push(`${skillPath} frontmatter.description must be a non-empty string`);
+  }
+  const metadata = frontmatter.metadata;
+  if (!isRecord(metadata)) {
+    errors.push(`${skillPath} missing generated metadata; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+  const expectedMetadata: Record<string, string> = {
+    generated_by: "openworkflow",
+    adapter: "codex",
+    adapter_version: expected.adapterVersion,
+    template_id: `codex.skill.${expected.namespace}.${expected.commandId}`,
+    source_command_id: expected.commandId,
+    semantic_trigger: expected.trigger,
+    skill_name: expected.skillName,
+  };
+  for (const field of CODEX_SKILL_METADATA_FIELDS) {
+    if (metadata[field] !== expectedMetadata[field]) {
+      errors.push(`${skillPath} metadata.${field} must be ${expectedMetadata[field]}`);
+    }
+  }
+}
+
+function validateSkillGeneratedMarker(
+  skillPath: string,
+  content: string,
+  namespace: string,
+  commandId: string,
+  errors: string[],
+): void {
+  if (!content.includes("generated-by: openworkflow")) {
+    errors.push(`${skillPath} missing generated marker; update adapter source and run openworkflow sync --tools codex`);
+  }
+  const templateMarker = `template-id: codex.skill.${namespace}.${commandId}`;
+  if (!content.includes(templateMarker)) {
+    errors.push(`${skillPath} missing generated marker ${templateMarker}`);
+  }
+}
+
+function validateSkillProtocolBlocks(skillPath: string, content: string, errors: string[]): void {
+  if (/<\/?skill(?:\s|>)/.test(content)) {
+    errors.push(`${skillPath} must not use a top-level <skill> XML wrapper; generated skills are Markdown with YAML frontmatter and XML-like protocol blocks`);
+  }
+  for (const tag of REQUIRED_CODEX_SKILL_BLOCKS) {
+    validateRequiredSkillBlock(skillPath, content, tag, errors);
+  }
+}
+
+function validateRequiredSkillBlock(skillPath: string, content: string, tag: string, errors: string[]): void {
+  const openTag = `<${tag}>`;
+  const closeTag = `</${tag}>`;
+  const openCount = countOccurrences(content, openTag);
+  const closeCount = countOccurrences(content, closeTag);
+  if (openCount === 0 || closeCount === 0 || openCount !== closeCount) {
+    errors.push(`${skillPath} must contain a balanced <${tag}> protocol block`);
+    return;
+  }
+  if (tag !== "artifact_checkpoint" && (openCount !== 1 || closeCount !== 1)) {
+    errors.push(`${skillPath} must contain exactly one <${tag}> protocol block`);
+    return;
+  }
+  if (content.indexOf(openTag) > content.indexOf(closeTag)) {
+    errors.push(`${skillPath} <${tag}> protocol block closes before it opens`);
+  }
+}
+
+function countOccurrences(content: string, needle: string): number {
+  return content.split(needle).length - 1;
+}
+
+function stringField(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
 }
 
 function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {

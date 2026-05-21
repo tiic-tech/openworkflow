@@ -20,11 +20,13 @@ outputs:
   candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
   readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
 candidate_count: 7
-completed_candidate_id: S002
-completed_change_id: S002-generated-skill-metadata
+completed_candidate_id: S004
+completed_change_id: S004-skill-format-validation
 completed_contract_candidate_id: S001
 completed_contract_change_id: S001-skill-lifecycle-contract
-next_recommended_candidate_id: S004
+completed_metadata_candidate_id: S002
+completed_metadata_change_id: S002-generated-skill-metadata
+next_recommended_candidate_id: S005
 unresolved_questions:
   - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
   - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
@@ -40,4 +42,5 @@ notes:
   - Cross-queue selection preferred M69/S001 before M68/H003 because H003 changes high-risk generated runtime surfaces.
   - S001 completed the native skill lifecycle contract and unblocked generated metadata work in S002.
   - S002 completed generated Codex skill metadata and runtime-surface metadata verification.
-  - S004 is now ready because its S001 and S002 dependencies are complete.
+  - S004 completed generated skill format validation with negative runtime-surface coverage.
+  - S005 is now ready because its generated metadata and skill format validation dependencies are complete.

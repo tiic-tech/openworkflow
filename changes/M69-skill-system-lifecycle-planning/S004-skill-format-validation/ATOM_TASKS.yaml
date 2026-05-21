@@ -1,0 +1,37 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:S004-skill-format-validation
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: S004-skill-format-validation
+title: Atom tasks for generated skill format validation
+status: done
+tasks:
+  - task_id: T001
+    title: Add generated Codex skill validator
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - validateRepositoryContracts inspects repo-local generated Codex SKILL.md files when the Codex manifest exists.
+      - Validation checks frontmatter, metadata fields, generated marker, and required protocol blocks.
+  - task_id: T002
+    title: Add runtime negative coverage
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime surface verification proves validate fails for missing generated metadata.
+      - Runtime surface verification proves validate fails for a malformed top-level skill wrapper.
+  - task_id: T003
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - npm run validate passes.
+      - npm run verify:runtime-surface passes.
+      - git diff --check passes.

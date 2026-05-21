@@ -19,7 +19,7 @@ moving Codex command exposure to global prompts, editing generated `.agents` or
 proto2html runtime exposure, and broad multi-platform adapter work before the
 format contract is stable.
 
-Next recommended candidate: `S004`.
+Next recommended candidate: `S005`.
 
 Feat boundary: this queue owns the top-level
 `changes/M69-skill-system-lifecycle-planning/` folder. Each `S###` candidate is
@@ -106,10 +106,13 @@ Risk: `high`
 - `OP004`: select `S002`
 - `OP005`: complete `S002`
 - `OP006`: mark `S004` ready and make it next recommended
+- `OP007`: select `S004`
+- `OP008`: complete `S004`
+- `OP009`: mark `S005` ready and make it next recommended
 
 ## S004 - Validate Generated Skill Format And Protocol Blocks
 
-Status: `ready`
+Status: `done`
 
 Depends on: `S001`, `S002`
 
@@ -117,9 +120,19 @@ Purpose: add automated checks that generated OW skills conform to the native
 skill format contract, including frontmatter, generated metadata, required
 XML-like protocol blocks, and forbidden malformed top-level XML wrappers.
 
+Selection: `S004-skill-format-validation`
+
+Completion evidence:
+
+- `packages/core/src/validators/validateRepositoryContracts.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `git diff --check`
+
 ## S005 - Add Generated-Surface Drift And Parity Tests
 
-Status: `candidate`
+Status: `ready`
 
 Depends on: `S002`, `S004`
 
