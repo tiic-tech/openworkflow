@@ -103,14 +103,22 @@ packets:
       []
     audit_checkpoints:
       before:
-        - Confirm a vision contract exists.
+        - Confirm a vision contract exists and is proto-ready enough to validate.
         - Load CURRENT_STATE.yaml when present.
-        - Load only vision and validation index context.
+        - Load only vision, validation index, and build-validation context.
+        - Return to /ow:vision when missing vision fields would force /ow:proto to invent product
+          strategy.
       during:
-        - Classify features as existential, supporting, later, or out of scope.
-        - Name the single highest-risk validation question.
+        - Select exactly one central uncertainty for the next prototype to reduce.
+        - Define target_behavior and the minimum prototype_experiment needed to observe it.
+        - Write observable_signals for pass, fail, and ambiguous evidence.
+        - Write decision_rules for continue, revise, pivot, stop, and needs_more_evidence.
+        - Record vision_gaps and agent_readiness_gate without generating prototype artifacts.
       after:
-        - Record the validation target and prototype brief.
+        - Record central_uncertainty, hypothesis, target_behavior, prototype_experiment,
+          observable_signals, decision_rules, vision_gaps, and agent_readiness_gate.
+        - Set agent_readiness_gate.status to ready_for_proto, thin_validation, stale_validation, or
+          return_to_vision.
         - Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next
           command.
         - Mark superseded validation targets accordingly when a new validation target replaces them.

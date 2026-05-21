@@ -157,6 +157,7 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
   const phase = "validation";
   const source = command("validation", phase);
   const protocol = protocolFor(source, phase);
+  assertPhase(phase, protocol.interactionMode === "prototype-validation-target-compiler", "validation source protocol is not prototype target compiler");
   assertListIncludes(phase, protocol.requiredContext, ".openworkflow/vision/VISION_CONTRACT.yaml", "validation no longer requires vision contract");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/prototypes/**", "validation can create prototype artifacts");
   assertExactList(phase, protocol.handoffCommands, ["/ow:proto", "/ow:vision"], "validation source handoffs changed");
@@ -168,8 +169,20 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
 
   const packet = packetRecord(runtime, "/ow:validation", phase);
   assertListIncludes(phase, stringList(packet, "required", phase), ".openworkflow/vision/VISION_CONTRACT.yaml", "context packet does not require vision contract");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "single highest-risk validation question", "validation does not focus the core risk");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "prototype brief", "validation does not produce prototype brief");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "force /ow:proto to invent product strategy", "validation does not return to vision when strategy is missing");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "central uncertainty", "validation does not focus the central uncertainty");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "prototype_experiment", "validation does not define prototype experiment");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "observable_signals", "validation does not define observable signals");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "agent_readiness_gate", "validation does not write readiness gate");
+
+  const skill = await readSkill(runtime, "ow-validation");
+  assertIncludes(phase, skill, "prototype-validation-target-compiler", "skill missing validation compiler mode");
+  assertIncludes(phase, skill, "central_uncertainty", "skill missing central uncertainty artifact guidance");
+  assertIncludes(phase, skill, "prototype_experiment", "skill missing prototype experiment artifact guidance");
+  assertIncludes(phase, skill, "observable_signals", "skill missing observable signals artifact guidance");
+  assertIncludes(phase, skill, "decision_rules", "skill missing decision rules artifact guidance");
+  assertIncludes(phase, skill, "Return to /ow:vision", "skill missing return-to-vision gate");
+  assertIncludes(phase, skill, "Do not generate prototype prompts", "skill missing no-prototype boundary");
 
   const template = recordField(artifactRecord(runtime, "validation_target", phase), "template", phase);
   assertPhase(phase, "prototype_scope" in template, "validation template missing prototype_scope");

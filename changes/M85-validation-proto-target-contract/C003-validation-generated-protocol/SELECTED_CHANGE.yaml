@@ -25,6 +25,7 @@ owned_paths:
   - packages/cli/src/dev/verifyWorkflowE2E.ts
   - packages/cli/src/dev/verifyRuntimeSurface.ts
   - .agents/skills/ow-validation/SKILL.md
+  - .agents/skills/ow-validation/agents/openai.yaml
   - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
   - .openworkflow/audit/CONTEXT_PACKETS.yaml
   - changes/M85-validation-proto-target-contract/

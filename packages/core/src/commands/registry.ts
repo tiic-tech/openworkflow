@@ -56,7 +56,7 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
   command(
     "validation",
     ["build-validation"],
-    "Prioritize the core feature or assumption that must be validated first.",
+    "Compile proto-ready vision into one prototype validation target.",
     "validation",
     [".openworkflow/validation/"],
     validationProtocol(),
@@ -610,7 +610,7 @@ function visionProtocol(): CommandProtocol {
 function validationProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "audit-and-rank",
+    interactionMode: "prototype-validation-target-compiler",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -635,19 +635,32 @@ function validationProtocol(): CommandProtocol {
       ".openworkflow/runtime/**",
     ],
     auditCheckpoints: {
-      before: ["Confirm a vision contract exists.", "Load CURRENT_STATE.yaml when present.", "Load only vision and validation index context."],
-      during: ["Classify features as existential, supporting, later, or out of scope.", "Name the single highest-risk validation question."],
+      before: [
+        "Confirm a vision contract exists and is proto-ready enough to validate.",
+        "Load CURRENT_STATE.yaml when present.",
+        "Load only vision, validation index, and build-validation context.",
+        "Return to /ow:vision when missing vision fields would force /ow:proto to invent product strategy.",
+      ],
+      during: [
+        "Select exactly one central uncertainty for the next prototype to reduce.",
+        "Define target_behavior and the minimum prototype_experiment needed to observe it.",
+        "Write observable_signals for pass, fail, and ambiguous evidence.",
+        "Write decision_rules for continue, revise, pivot, stop, and needs_more_evidence.",
+        "Record vision_gaps and agent_readiness_gate without generating prototype artifacts.",
+      ],
       after: [
-        "Record the validation target and prototype brief.",
+        "Record central_uncertainty, hypothesis, target_behavior, prototype_experiment, observable_signals, decision_rules, vision_gaps, and agent_readiness_gate.",
+        "Set agent_readiness_gate.status to ready_for_proto, thin_validation, stale_validation, or return_to_vision.",
         "Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next command.",
         "Mark superseded validation targets accordingly when a new validation target replaces them.",
         "Confirm no prototype, spec, change, or runtime artifacts were created.",
       ],
     },
     antiPatterns: [
-      "Do not turn feature ranking into a production task list.",
-      "Do not prototype before naming the validation question.",
-      "Do not treat supporting features as blockers for existential validation.",
+      "Do not treat feature classification or backlog ranking as the validation outcome.",
+      "Do not generate prototype prompts, images, HTML, specs, changes, or runtime artifacts.",
+      "Do not hide missing vision evidence by writing a polished but unsupported validation target.",
+      "Do not select multiple unrelated validation targets in one artifact.",
     ],
     handoffCommands: ["/ow:proto", "/ow:vision"],
   };

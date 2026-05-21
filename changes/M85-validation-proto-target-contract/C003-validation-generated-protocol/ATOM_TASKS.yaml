@@ -23,6 +23,7 @@ tasks:
     type: generate
     owned_paths:
       - .agents/skills/ow-validation/SKILL.md
+      - .agents/skills/ow-validation/agents/openai.yaml
       - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
     done_when: >
