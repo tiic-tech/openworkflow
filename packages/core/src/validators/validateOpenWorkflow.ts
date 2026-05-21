@@ -329,7 +329,22 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
     return ["current_question", "stable_answers", "unresolved_questions", "vision_delta", "handoff"];
   }
   if (artifactType === "validation_target") {
-    return ["core_question", "feature_classification", "critical_assumptions", "prototype_scope", "acceptance", "decision_options"];
+    return [
+      "core_question",
+      "central_uncertainty",
+      "hypothesis",
+      "target_behavior",
+      "feature_classification",
+      "critical_assumptions",
+      "prototype_scope",
+      "prototype_experiment",
+      "observable_signals",
+      "acceptance",
+      "decision_rules",
+      "decision_options",
+      "vision_gaps",
+      "agent_readiness_gate",
+    ];
   }
   if (artifactType === "prototype_evidence") {
     return [
@@ -431,6 +446,39 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
       if (!(key in prototypeScope)) {
         errors.push(`${label} prototype_scope missing ${key}`);
       }
+    }
+  }
+  const prototypeExperiment = data.prototype_experiment;
+  if (isRecord(prototypeExperiment)) {
+    for (const key of ["scenario", "must_show", "must_not_show"]) {
+      if (!(key in prototypeExperiment)) {
+        errors.push(`${label} prototype_experiment missing ${key}`);
+      }
+    }
+  }
+  validateSignalSet(label, "observable_signals", data.observable_signals, ["pass", "fail", "ambiguous"], errors);
+  validateSignalSet(label, "decision_rules", data.decision_rules, ["continue", "revise", "pivot", "stop", "needs_more_evidence"], errors);
+  const agentReadinessGate = data.agent_readiness_gate;
+  if (isRecord(agentReadinessGate)) {
+    for (const key of ["status", "blockers", "warnings", "write_authority"]) {
+      if (!(key in agentReadinessGate)) {
+        errors.push(`${label} agent_readiness_gate missing ${key}`);
+      }
+    }
+    const status = String(agentReadinessGate.status ?? "");
+    if (status && !["missing_validation", "thin_validation", "stale_validation", "ready_for_proto", "return_to_vision"].includes(status)) {
+      errors.push(`${label} agent_readiness_gate.status has invalid value ${status}`);
+    }
+  }
+}
+
+function validateSignalSet(label: string, field: string, value: unknown, keys: string[], errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of keys) {
+    if (!(key in value)) {
+      errors.push(`${label} ${field} missing ${key}`);
     }
   }
 }

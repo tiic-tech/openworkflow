@@ -173,6 +173,15 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
 
   const template = recordField(artifactRecord(runtime, "validation_target", phase), "template", phase);
   assertPhase(phase, "prototype_scope" in template, "validation template missing prototype_scope");
+  assertPhase(phase, "central_uncertainty" in template, "validation template missing central_uncertainty");
+  assertPhase(phase, "target_behavior" in template, "validation template missing target_behavior");
+  assertPhase(phase, "prototype_experiment" in template, "validation template missing prototype_experiment");
+  assertPhase(phase, "observable_signals" in template, "validation template missing observable_signals");
+  assertPhase(phase, "decision_rules" in template, "validation template missing decision_rules");
+  assertPhase(phase, "vision_gaps" in template, "validation template missing vision_gaps");
+  const agentGate = recordField(template, "agent_readiness_gate", phase);
+  assertPhase(phase, agentGate.status === "thin_validation", "validation template should default agent readiness to thin_validation");
+  assertPhase(phase, agentGate.write_authority === "/ow:validation", "validation template should preserve /ow:validation write authority");
   assertPhase(phase, stringList(template, "decision_options", phase).includes("needs_more_evidence"), "validation template missing decision options");
 }
 

@@ -26,6 +26,9 @@ tasks:
     owned_paths:
       - packages/core/src/workflow/summaryHealth.ts
       - packages/core/src/artifacts/readiness.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/commands/check.ts
     done_when: >
       Thin validation targets are flagged before proto handoff and readiness
       can report read-only gate states without writing artifacts.
@@ -35,7 +38,9 @@ tasks:
     type: verify
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
       - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .agents/skills/ow-validation/SKILL.md
     done_when: >
       E2E workflow verification passes and sync refreshes the generated audit
       contract for validation_target.

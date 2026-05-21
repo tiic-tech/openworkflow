@@ -23,6 +23,7 @@ export interface ReadinessModel {
   forbidden_outputs: string[];
   handoff_commands: string[];
   artifact_contracts: ArtifactSummary[];
+  semantic_readiness: SemanticReadinessSummary | null;
   summary_guidance: SummaryGuidance[];
   read_this_first: string[];
   active_pointers: Record<string, string | null>;
@@ -44,6 +45,13 @@ export interface SummaryGuidance {
   artifact_type: string;
   status: string;
   next_actions: string[];
+}
+
+export interface SemanticReadinessSummary {
+  gate_status: string | null;
+  ok: boolean;
+  blockers: string[];
+  warnings: string[];
 }
 
 export async function checkCommand(positional: string[], flags: Map<string, string | boolean>): Promise<number> {
@@ -151,6 +159,12 @@ export async function buildReadiness(root: string, requested: string): Promise<R
       source_of_truth_path: artifact.sourceOfTruthPath,
       summary_policy: artifact.summaryPolicy?.strategy ?? null,
     })),
+    semantic_readiness: {
+      gate_status: semanticReadiness.gate_status ?? null,
+      ok: semanticReadiness.ok,
+      blockers: semanticReadiness.blockers,
+      warnings: semanticReadiness.warnings,
+    },
     summary_guidance: summaryGuidance,
     next_actions: nextActions,
   };
@@ -166,6 +180,9 @@ function printReadiness(model: ReadinessModel): void {
   printList("allowed_outputs", model.allowed_outputs);
   printList("forbidden_outputs", model.forbidden_outputs);
   printList("handoff_commands", model.handoff_commands);
+  if (model.semantic_readiness) {
+    console.log(`semantic_readiness: ${model.semantic_readiness.gate_status ?? "unknown"}`);
+  }
   printList("summary_guidance", model.summary_guidance.map((item) => `${item.artifact_type}: ${item.status}`));
   printList("read_this_first", model.read_this_first);
   printList("next_actions", model.next_actions);
@@ -200,6 +217,7 @@ function missingCommandModel(): ReadinessModel {
     forbidden_outputs: [],
     handoff_commands: [],
     artifact_contracts: [],
+    semantic_readiness: null,
     summary_guidance: [],
     read_this_first: [],
     active_pointers: {},
@@ -222,6 +240,7 @@ function baseModel(requested: string, normalized: string, currentState: Record<s
     forbidden_outputs: [],
     handoff_commands: [],
     artifact_contracts: [],
+    semantic_readiness: null,
     summary_guidance: [],
     read_this_first: stringList(currentState?.read_this_first),
     active_pointers: activePointers(currentState),

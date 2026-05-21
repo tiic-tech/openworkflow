@@ -24,6 +24,7 @@ scope:
     - read-only validation readiness status values
   excludes:
     - generated /ow:validation protocol
+    - semantic wording changes to generated /ow:validation protocol
     - /ow:proto prompt pack schema
     - /ow:proto runtime enforcement
 owned_paths:
@@ -32,12 +33,16 @@ owned_paths:
   - schemas/validation.schema.json
   - packages/core/src/workflow/summaryHealth.ts
   - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/commands/check.ts
   - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
   - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - .agents/skills/ow-validation/SKILL.md
   - changes/M85-validation-proto-target-contract/
 forbidden_paths:
   - packages/core/src/commands/registry.ts
-  - .agents/skills/ow-validation/SKILL.md
   - .agents/skills/ow-proto/SKILL.md
   - .openworkflow/validation/**
   - .openworkflow/prototypes/**

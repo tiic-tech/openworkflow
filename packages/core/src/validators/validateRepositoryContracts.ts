@@ -1217,11 +1217,19 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
     vision_session: ["current_question", "stable_answers", "unresolved_questions", "vision_delta", "handoff"],
     validation_target: [
       "core_question",
+      "central_uncertainty",
+      "hypothesis",
+      "target_behavior",
       "feature_classification",
       "critical_assumptions",
       "prototype_scope",
+      "prototype_experiment",
+      "observable_signals",
       "acceptance",
+      "decision_rules",
       "decision_options",
+      "vision_gaps",
+      "agent_readiness_gate",
     ],
     prototype_evidence: [
       "validation_target",
@@ -1307,6 +1315,47 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
     }
   }
   validatePrototypeScope(label, data.prototype_scope, errors);
+  validatePrototypeExperiment(label, data.prototype_experiment, errors);
+  validateSignalSet(label, "observable_signals", data.observable_signals, ["pass", "fail", "ambiguous"], errors);
+  validateSignalSet(label, "decision_rules", data.decision_rules, ["continue", "revise", "pivot", "stop", "needs_more_evidence"], errors);
+  validateAgentReadinessGate(label, data.agent_readiness_gate, errors);
+}
+
+function validatePrototypeExperiment(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["scenario", "must_show", "must_not_show"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prototype_experiment missing ${key}`);
+    }
+  }
+}
+
+function validateSignalSet(label: string, field: string, value: unknown, keys: string[], errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of keys) {
+    if (!(key in value)) {
+      errors.push(`${label} ${field} missing ${key}`);
+    }
+  }
+}
+
+function validateAgentReadinessGate(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["status", "blockers", "warnings", "write_authority"]) {
+    if (!(key in value)) {
+      errors.push(`${label} agent_readiness_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["missing_validation", "thin_validation", "stale_validation", "ready_for_proto", "return_to_vision"].includes(status)) {
+    errors.push(`${label} agent_readiness_gate.status has invalid value ${status}`);
+  }
 }
 
 function validatePrototypeScope(label: string, value: unknown, errors: string[]): void {

@@ -64,7 +64,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </conditional_outputs>
 
 <artifact_contracts>
-- validation_target: template .openworkflow/validation/_templates/VALIDATION.yaml, source .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml, note .openworkflow/validation/&lt;id&gt;/NOTE.md, review none, load_by_default true, max_yaml_lines 120, summary_policy current_slice at core_question + prototype_scope + acceptance
+- validation_target: template .openworkflow/validation/_templates/VALIDATION.yaml, source .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml, note .openworkflow/validation/&lt;id&gt;/NOTE.md, review none, load_by_default true, max_yaml_lines 120, summary_policy current_slice at core_question + central_uncertainty + target_behavior + prototype_experiment + observable_signals + decision_rules + agent_readiness_gate
 </artifact_contracts>
 
 <forbidden_outputs>

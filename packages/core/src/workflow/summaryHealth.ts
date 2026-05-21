@@ -394,7 +394,20 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
     ];
   }
   if (artifactType === "validation_target") {
-    return ["core_question", "prototype_scope", "acceptance"];
+    return [
+      "core_question",
+      "central_uncertainty",
+      "target_behavior",
+      "prototype_scope",
+      "prototype_experiment.scenario",
+      "prototype_experiment.must_show",
+      "observable_signals.pass",
+      "observable_signals.fail",
+      "acceptance",
+      "decision_rules.continue",
+      "decision_rules.revise",
+      "agent_readiness_gate.status",
+    ];
   }
   if (artifactType === "prototype_evidence") {
     return ["core_question", "prompt_pack_type", "review_plan", "result"];
@@ -418,12 +431,18 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
 }
 
 function readinessWarningsForArtifact(artifactPath: string, artifactType: string, source: Record<string, unknown>): string[] {
-  if (artifactType !== "vision_session") {
+  if (artifactType === "vision_session") {
+    const protoReadinessStatus = stringValue(valueAtPath(source, "proto_readiness.status"));
+    if (protoReadinessStatus !== "ready") {
+      return [`vision proto_readiness.status is not ready in ${artifactPath}: ${protoReadinessStatus || "missing"}`];
+    }
     return [];
   }
-  const protoReadinessStatus = stringValue(valueAtPath(source, "proto_readiness.status"));
-  if (protoReadinessStatus !== "ready") {
-    return [`vision proto_readiness.status is not ready in ${artifactPath}: ${protoReadinessStatus || "missing"}`];
+  if (artifactType === "validation_target") {
+    const readinessStatus = stringValue(valueAtPath(source, "agent_readiness_gate.status"));
+    if (readinessStatus !== "ready_for_proto") {
+      return [`validation agent_readiness_gate.status is not ready_for_proto in ${artifactPath}: ${readinessStatus || "missing"}`];
+    }
   }
   return [];
 }

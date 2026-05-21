@@ -159,11 +159,19 @@ artifacts:
     required_keys:
       - artifact_type
       - core_question
+      - central_uncertainty
+      - hypothesis
+      - target_behavior
       - feature_classification
       - critical_assumptions
       - prototype_scope
+      - prototype_experiment
+      - observable_signals
       - acceptance
+      - decision_rules
       - decision_options
+      - vision_gaps
+      - agent_readiness_gate
     read_policy:
       load_by_default: true
       agent_read_order: 30
@@ -176,13 +184,16 @@ artifacts:
       collection_key: validations
       id_key: validation_id
       path_key: path
-    evidence_policy: Rank features and assumptions in YAML; keep rationale compact and defer examples to NOTE.md.
+    evidence_policy: Compile one prototype validation target in YAML; keep rationale compact and defer
+      examples to NOTE.md.
     handoff_key: prototype_scope
     summary_policy:
       strategy: current_slice
-      path: core_question + prototype_scope + acceptance
+      path: core_question + central_uncertainty + target_behavior + prototype_experiment +
+        observable_signals + decision_rules + agent_readiness_gate
       load_before_full: true
-      refresh_when: Update the current slice when validation scope, acceptance, or decision options change.
+      refresh_when: Update the current slice when the experiment target, evidence signals, decision rules,
+        or readiness gate changes.
     lazy_create: true
     template:
       schema_version: 0.1.0
@@ -192,6 +203,9 @@ artifacts:
       title: <short validation target title>
       status: draft
       core_question: ""
+      central_uncertainty: ""
+      hypothesis: ""
+      target_behavior: ""
       feature_classification:
         existential:
           []
@@ -208,14 +222,47 @@ artifacts:
           []
         exclude:
           []
+      prototype_experiment:
+        scenario: ""
+        must_show:
+          []
+        must_not_show:
+          []
+      observable_signals:
+        pass:
+          []
+        fail:
+          []
+        ambiguous:
+          []
       acceptance:
         []
+      decision_rules:
+        continue:
+          []
+        revise:
+          []
+        pivot:
+          []
+        stop:
+          []
+        needs_more_evidence:
+          []
       decision_options:
         - continue
         - revise
         - pivot
         - stop
         - needs_more_evidence
+      vision_gaps:
+        []
+      agent_readiness_gate:
+        status: thin_validation
+        blockers:
+          []
+        warnings:
+          []
+        write_authority: /ow:validation
       updated_at: null
     conditional_packets:
       []
