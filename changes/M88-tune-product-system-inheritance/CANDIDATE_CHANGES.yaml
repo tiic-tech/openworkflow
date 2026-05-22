@@ -69,7 +69,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after proto
         and tune evidence are reliable.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -248,7 +248,7 @@ changes:
       evidence:
         - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: ready
+    status: selected
     title: Support multi-round tune baseline inheritance
     purpose: >
       Make /ow:tune preserve the latest approved prototype group and locked
@@ -294,6 +294,14 @@ changes:
       - Accepted improvements from prior tune passes are preserved.
       - Multi-round tune guidance forbids cumulative product drift.
       - Generated /ow:tune surfaces expose the latest-baseline rule.
+    selection:
+      selected_change_id: C004-multi-round-tune-baseline-inheritance
+      reason: >
+        Select C004 through ow-select-change single-queue ranking. C001, C002,
+        and C003 are complete, C004 is the only ready M88 candidate, and
+        multi-round latest-baseline inheritance completes the bounded /ow:tune
+        product-system inheritance queue before later async or dogfood work.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -442,3 +450,19 @@ operations:
     after_status: ready
     evidence:
       - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the final ready M88 candidate after C003 completed refined
+      prompt-pack validator stress fixtures; no analyze-changes run is needed
+      for this single active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/SELECTED_CHANGE.yaml
+      - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/ATOM_TASKS.yaml
+      - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/IMPLEMENTATION_BRIEF.md
