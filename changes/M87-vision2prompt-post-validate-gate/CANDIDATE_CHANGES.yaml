@@ -68,7 +68,7 @@ scope_control:
         End-to-end pressure testing should wait until vision, validation,
         proto, post-validate, and tune contracts are stable.
       suggested_plan_id: M90-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -184,7 +184,7 @@ changes:
       evidence:
         - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: ready
+    status: selected
     title: Wire post-validate gate into generated vision2prompt protocol
     purpose: >
       Make generated /ow:vision2prompt guidance require post-validation before
@@ -231,6 +231,14 @@ changes:
       - Generated /ow:vision2prompt does not hand off to /ow:prompt2proto when post_validate fails.
       - Generated /ow:proto orchestration waits for post_validate pass or skipped before image generation.
       - Verification catches generated-surface drift.
+    selection:
+      selected_change_id: C003-generated-protocol-post-validate-gate
+      reason: >
+        Select C003 through ow-select-change single-queue ranking. C001 and
+        C002 are complete, C003 is the next ready candidate, and generated
+        command protocol wiring is required before broader post-validate stress
+        fixtures.
+      selected_at: 2026-05-22
   - id: C004
     status: candidate
     title: Add post-validate stress fixtures
@@ -351,3 +359,33 @@ operations:
       - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/SELECTED_CHANGE.yaml
       - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/ATOM_TASKS.yaml
       - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 implemented the deterministic strategic fingerprint evaluator and
+      runtime coverage for duplicate-fingerprint failure and explicit
+      single-direction skip behavior.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 as the next ready M87 candidate after the post_validate
+      contract and deterministic evaluator completed; no analyze-changes run is
+      needed for this single active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/SELECTED_CHANGE.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/ATOM_TASKS.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/IMPLEMENTATION_BRIEF.md

@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M87-vision2prompt-post-validate-gate:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C003
+change_id: C003-generated-protocol-post-validate-gate
+title: Atom tasks for generated post-validate protocol wiring
+status: ready
+tasks:
+  - id: T001
+    title: Inspect generated command source
+    type: read
+    status: pending
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Source registry sections for /ow:vision2prompt and /ow:proto are mapped.
+      - Existing generated-surface verification points are identified.
+  - id: T002
+    title: Add post-validate protocol requirements
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when:
+      - /ow:vision2prompt requires pass or fail post_validate for resolved_count 2 or more.
+      - /ow:vision2prompt records skipped post_validate when the user explicitly requested one direction.
+      - /ow:proto waits for post_validate pass or skipped before /ow:prompt2proto image generation.
+  - id: T003
+    title: Add generated-surface drift assertions
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification fails when generated /ow:vision2prompt lacks post_validate gate guidance.
+      - Verification fails when generated /ow:proto can bypass failed post_validate.
+  - id: T004
+    title: Sync and verify generated surfaces
+    type: verify
+    status: pending
+    owned_paths:
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Sync regenerates managed skills and audit surfaces from source.
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
