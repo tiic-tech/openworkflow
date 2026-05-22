@@ -58,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C005`
+Next recommended candidate: `C006`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -74,14 +74,14 @@ review, proto2html, or broad workflow redesign.
 | C007 | done | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
 | C003 | done | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
 | C004 | done | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
-| C005 | ready | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
-| C006 | candidate | low | Record no-go criteria for future visual parity work | C005 |
+| C005 | done | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
+| C006 | ready | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001`, `C002`, `C007`, `C003`, and `C004` are complete. The next recommended
-candidate is `C005`, which should run the real smart_city_copilot replay with
-dailin-grade prompt paragraphs.
+`C001`, `C002`, `C007`, `C003`, `C004`, and `C005` are complete. The next
+recommended candidate is `C006`, which should record go/no-go criteria for
+future visual parity or provider-backed work.
 
 The key acceptance shift is:
 
@@ -213,10 +213,18 @@ Acceptance:
 
 ### C005 - Replay smart_city_copilot With Dailin-Grade Prompt Paragraphs
 
-Status: ready
+Status: done
 
 Purpose: prove the real target repo now emits prompt text comparable to dailin
 `OUTPUT_PROMPT.md`.
+
+Evidence:
+
+- `C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/SELECTED_CHANGE.yaml`
+- `C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/ATOM_TASKS.yaml`
+- `C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_BRIEF.md`
+- `C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md`
+- target commit `66f6a38` in `/tmp/smart-city-m99-e2e-worktree`
 
 Acceptance:
 
@@ -227,6 +235,8 @@ Acceptance:
 - image generation remains `not_started`
 
 ### C006 - Record No-Go Criteria For Future Visual Parity Work
+
+Status: ready
 
 Purpose: prevent downstream visual work from starting while prompt text is still
 thin.

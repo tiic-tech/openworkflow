@@ -85,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -434,7 +434,7 @@ changes:
         - packages/cli/src/dev/verifyRuntimeSurface.ts
         - examples/m98-dailin-grade-fixtures/README.md
   - id: C005
-    status: ready
+    status: done
     title: Replay smart_city_copilot with dailin-grade prompt paragraphs
     purpose: >
       Run a clean target-repo replay that proves real /ow:vision2prompt output
@@ -473,8 +473,26 @@ changes:
       - Target prompt paragraphs include complete product context, journey step, screen purpose, components, user actions, system response, concrete copy/data, trust controls, anti-goals, visual direction, and desired user feeling.
       - Direct comparison records the new smart city prompt text as at least dailin-grade on prompt paragraph density and generation usefulness.
       - Target image_generation.status remains not_started unless a later queue explicitly authorizes provider-backed generation.
+    selection:
+      selected_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+      selected_at: 2026-05-23
+      reason: >
+        Select C005 after C004 completed positive and negative prompt
+        paragraph fixtures. C005 is the next ready candidate for proving the
+        same bar in the real smart_city_copilot target replay.
+    completion:
+      completed_by_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md
+        - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+        - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+        - target_commit: 66f6a38
   - id: C006
-    status: candidate
+    status: ready
     title: Record no-go criteria for future visual parity work
     purpose: >
       Prevent visual parity, provider benchmarks, or proto2html from starting
@@ -767,3 +785,38 @@ operations:
       - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - examples/m98-dailin-grade-fixtures/README.md
+  - operation_id: OP015
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Select C005 as the next ready candidate after C004 completed the
+      paragraph-quality fixture matrix and made real target replay safe to run.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP016
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+      - C006
+    actor: agent
+    reason: >
+      Completed C005 by upgrading the real smart_city_copilot target replay
+      prompt paragraphs to dailin-grade density, validating target replay
+      readiness, and committing the target evidence. This satisfies C006's
+      dependency and makes visual-parity no-go criteria the next ready
+      candidate.
+    changed_at: 2026-05-23
+    before_status: C005 selected, C006 candidate
+    after_status: C005 done, C006 ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+      - target_commit: 66f6a38

@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C005
+selected_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+status: completed
+tasks:
+  - task_id: T001
+    title: Confirm target replay baseline fails M100 paragraph quality
+    status: completed
+    type: validate
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+    done_when: Target validate reports missing paragraph-quality dimensions for the old short prompt style.
+  - task_id: T002
+    title: Upgrade target direction and screen prompt paragraphs
+    status: completed
+    type: edit
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+    done_when: Direction and screen prompts carry product thesis, user transformation, journey, system response, copy/data, trust controls, anti-goals, and user feeling.
+  - task_id: T003
+    title: Validate target replay handoff
+    status: completed
+    type: validate
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+    done_when: Target validate, summaries --strict, handoff, and diff-check pass.
+  - task_id: T004
+    title: Commit target replay and record C005 evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: Target commit hash and replay comparison are recorded; C006 becomes ready.
