@@ -209,15 +209,43 @@
       ],
       "additionalProperties": true
     },
+    "tune_input": {
+      "type": "object",
+      "required": [
+        "baseline_source_type",
+        "baseline_refs",
+        "tune_request",
+        "regeneration_scope"
+      ],
+      "additionalProperties": true
+    },
     "baseline_audit": {
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "source_screen_id",
+          "screen_name",
+          "journey_stage",
+          "user_goal",
+          "system_state",
+          "components",
+          "must_preserve"
+        ],
         "additionalProperties": true
       }
     },
     "product_system": {
       "type": "object",
+      "required": [
+        "product_thesis",
+        "primary_loop",
+        "component_vocabulary",
+        "copywriting_style",
+        "trust_and_boundary_system",
+        "stable_constants",
+        "adaptable_variables"
+      ],
       "additionalProperties": true
     },
     "delta_rules": {
@@ -250,12 +278,32 @@
       },
       "additionalProperties": true
     },
+    "screen_delta_matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target_screen_id",
+          "source_screen_ids",
+          "preserve",
+          "add",
+          "remove",
+          "transform",
+          "flexible",
+          "acceptance_criteria"
+        ],
+        "additionalProperties": true
+      }
+    },
     "screen_manifest": {
       "type": "array",
       "items": {
         "type": "object",
         "required": [
-          "screen_id"
+          "target_screen_id",
+          "source_screen_ids",
+          "screen_name",
+          "generation_scope"
         ],
         "additionalProperties": true
       }
@@ -269,12 +317,27 @@
         "type": "object",
         "required": [
           "prompt_id",
+          "target_screen_id",
+          "source_screen_ids",
           "screen_name",
           "image_role",
           "prompt",
+          "negative_prompt",
           "acceptance_criteria"
         ],
         "additionalProperties": true
+      }
+    },
+    "generation_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptance_checklist": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
     "prompt_text_manifest": {

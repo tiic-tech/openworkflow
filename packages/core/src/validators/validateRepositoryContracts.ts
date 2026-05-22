@@ -1476,9 +1476,127 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   if (data.prompt_pack_type === "strategic_proto_prompt_pack") {
     validateStrategicPrototypePromptPack(label, data, errors);
   }
+  if (data.prompt_pack_type === "refined_proto_prompt_pack") {
+    validateRefinedPrototypePromptPack(label, data, errors);
+  }
   if (!["pass", "fail", "unclear", "not_reviewed"].includes(String(data.result))) {
     errors.push(`${label} has invalid result ${String(data.result)}`);
   }
+}
+
+function validateRefinedPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validateRequiredObjectFields(label, "tune_input", data.tune_input, ["baseline_source_type", "baseline_refs", "tune_request", "regeneration_scope"], errors);
+  validateRefinedBaselineAudit(label, data.baseline_audit, errors);
+  validateRequiredObjectFields(label, "product_system", data.product_system, REFINED_PRODUCT_SYSTEM_FIELDS, errors);
+  validateRefinedDeltaRules(label, data.delta_rules, errors);
+  validateRefinedScreenDeltaMatrix(label, data.screen_delta_matrix, errors);
+  const manifestIds = validateRefinedScreenManifest(label, data.screen_manifest, errors);
+  validateRefinedScreenPrompts(label, data.screen_prompts, manifestIds, errors);
+  if (!Array.isArray(data.generation_order) || data.generation_order.length === 0) {
+    errors.push(`${label} generation_order must list target screen ids`);
+  }
+  if (!Array.isArray(data.acceptance_checklist) || data.acceptance_checklist.length === 0) {
+    errors.push(`${label} acceptance_checklist must be non-empty`);
+  }
+}
+
+const REFINED_BASELINE_AUDIT_FIELDS = [
+  "source_screen_id",
+  "screen_name",
+  "journey_stage",
+  "user_goal",
+  "system_state",
+  "components",
+  "must_preserve",
+];
+
+const REFINED_PRODUCT_SYSTEM_FIELDS = [
+  "product_thesis",
+  "primary_loop",
+  "component_vocabulary",
+  "copywriting_style",
+  "trust_and_boundary_system",
+  "stable_constants",
+  "adaptable_variables",
+];
+
+const REFINED_DELTA_RULE_KEYS = ["must_inherit", "must_add", "must_remove", "flexible_change"];
+
+const REFINED_SCREEN_DELTA_FIELDS = [
+  "target_screen_id",
+  "source_screen_ids",
+  "preserve",
+  "add",
+  "remove",
+  "transform",
+  "flexible",
+  "acceptance_criteria",
+];
+
+const REFINED_SCREEN_MANIFEST_FIELDS = ["target_screen_id", "source_screen_ids", "screen_name", "generation_scope"];
+const REFINED_SCREEN_PROMPT_FIELDS = ["prompt_id", "target_screen_id", "source_screen_ids", "screen_name", "prompt", "negative_prompt", "acceptance_criteria"];
+
+function validateRefinedBaselineAudit(label: string, value: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} baseline_audit must contain source screen audits`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `baseline_audit[${index}]`, item, REFINED_BASELINE_AUDIT_FIELDS, errors);
+  });
+}
+
+function validateRefinedDeltaRules(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} delta_rules must be a mapping`);
+    return;
+  }
+  for (const key of REFINED_DELTA_RULE_KEYS) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} delta_rules.${key} must be an array`);
+    }
+  }
+  if (Array.isArray(value.must_inherit) && value.must_inherit.length === 0) {
+    errors.push(`${label} delta_rules.must_inherit must preserve baseline product-system constants`);
+  }
+}
+
+function validateRefinedScreenDeltaMatrix(label: string, value: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_delta_matrix must contain target screen delta rows`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_delta_matrix[${index}]`, item, REFINED_SCREEN_DELTA_FIELDS, errors);
+  });
+}
+
+function validateRefinedScreenManifest(label: string, value: unknown, errors: string[]): Set<string> {
+  const ids = new Set<string>();
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_manifest must contain target screens`);
+    return ids;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_manifest[${index}]`, item, REFINED_SCREEN_MANIFEST_FIELDS, errors);
+    if (isRecord(item) && nonEmptyString(item.target_screen_id)) {
+      ids.add(String(item.target_screen_id));
+    }
+  });
+  return ids;
+}
+
+function validateRefinedScreenPrompts(label: string, value: unknown, manifestIds: Set<string>, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_prompts must contain screen-bound refined prompts`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_prompts[${index}]`, item, REFINED_SCREEN_PROMPT_FIELDS, errors);
+    if (isRecord(item) && nonEmptyString(item.target_screen_id) && manifestIds.size > 0 && !manifestIds.has(String(item.target_screen_id))) {
+      errors.push(`${label} screen_prompts[${index}].target_screen_id must exist in screen_manifest`);
+    }
+  });
 }
 
 const STRATEGIC_NORMALIZED_FIELDS = [

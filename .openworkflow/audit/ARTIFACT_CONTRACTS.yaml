@@ -433,10 +433,64 @@ artifacts:
         failure_signals:
           []
         next_test_if_it_works: ""
+      tune_input:
+        baseline_source_type: images|prompt_pack|screen_descriptions|mixed
+        baseline_refs:
+          []
+        tune_request: ""
+        target_form_factor: ""
+        regeneration_scope: all_screens|selected_screens|one_screen|new_screens_only|design_system_pass
+        target_screen_count: null
+        locked_screens:
+          []
+        locked_elements:
+          []
+        constraints:
+          []
       baseline_audit:
-        []
+        - source_screen_id: ""
+          screen_name: ""
+          journey_stage: ""
+          user_goal: ""
+          system_state: ""
+          components:
+            []
+          copy_tone: ""
+          represented_feature: ""
+          ai_or_system_behavior: ""
+          trust_controls:
+            []
+          visual_cues:
+            []
+          must_preserve:
+            []
+          transform_or_remove:
+            []
+          assumptions:
+            []
       product_system:
-        {}
+        product_thesis: ""
+        target_user: ""
+        primary_loop: ""
+        brand_promise: ""
+        interaction_model: ""
+        information_architecture:
+          []
+        design_language:
+          []
+        component_vocabulary:
+          []
+        copywriting_style: ""
+        feature_system:
+          []
+        trust_and_boundary_system:
+          []
+        anti_goals:
+          []
+        stable_constants:
+          []
+        adaptable_variables:
+          []
       delta_rules:
         must_inherit:
           []
@@ -446,16 +500,47 @@ artifacts:
           []
         flexible_change:
           []
+      screen_delta_matrix:
+        - target_screen_id: ""
+          source_screen_ids:
+            []
+          preserve:
+            []
+          add:
+            []
+          remove:
+            []
+          transform:
+            []
+          flexible:
+            []
+          acceptance_criteria:
+            []
       screen_manifest:
-        []
+        - target_screen_id: ""
+          source_screen_ids:
+            []
+          screen_name: ""
+          target_form_factor: ""
+          generation_scope: ""
+          dependencies:
+            []
       global_design_prompt: ""
       screen_prompts:
         - prompt_id: ""
+          target_screen_id: ""
+          source_screen_ids:
+            []
           screen_name: ""
           image_role: ""
           prompt: ""
+          negative_prompt: ""
           acceptance_criteria:
             []
+      generation_order:
+        []
+      acceptance_checklist:
+        []
       prompt_text_manifest:
         status: draft
         directions_ready: false
