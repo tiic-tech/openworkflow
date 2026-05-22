@@ -158,18 +158,24 @@ packets:
         - Prepare to infer product_experience_model before strategic directions, including product
           archetype, primary canvas, information architecture, domain objects, state model, data
           realism, visual language, anti-generic constraints, and category quality bar.
+        - Prepare to write prototype_system_contract before screen prompts, covering stable app
+          shell, navigation taxonomy, data vocabulary, object anatomy, action bar, audit pattern,
+          copy tone, and allowed screen deltas.
         - Prepare to write dailin-grade long-form prompt paragraphs; prompt text must include
           journey, interaction behavior, system response, trust controls, anti-goals, visual
           direction, desired user feeling, and concrete content.
       during:
         - Compile durable vision and validation into strategic_core, prototype_brief,
-          product_experience_model, screen_manifest, global_design_system_prompt, directions,
-          screen_prompts, review_plan, and readiness gates.
+          product_experience_model, prototype_system_contract, screen_manifest,
+          global_design_system_prompt, directions, screen_prompts, review_plan, and readiness gates.
         - Each selected direction must carry product_thesis, user_transformation, differentiated
           product form, reason_to_exist, and pm_judgment before screen prompt anatomy.
         - Decide whether source concepts are separate strategic product forms or modules, layers,
           workflows, or states inside one product shell; do not split directions by scenario labels
           alone.
+        - Write prototype_system_contract cross-screen invariants before complete multi-image prompt
+          text so downstream prompt2proto preserves technical screen coherence instead of inventing
+          it from visual judgment.
         - Write complete multi-image prompt text for every selected direction with screen_prompts,
           negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
           target_screen_id values.
@@ -179,11 +185,13 @@ packets:
         - "Keep image_generation.status: not_started while this compiler stage runs."
       after:
         - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
-          prompt_text_manifest.status ready_for_image_generation only when all readiness gates pass.
-        - Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and
-          prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is
-          pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is
-          pass or skipped.
+          prototype_system_contract and prompt_text_manifest.status ready_for_image_generation only
+          when all readiness gates pass.
+        - Hand internally to /ow:prompt2proto only when prototype_system_contract is present,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass,
+          quality_rubric.prompt_executability.status is pass,
+          prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or
+          skipped.
         - If any readiness gate fails, keep handoff blocked and repair prompt directions through
           /ow:build-proto-prompt.
         - Do not generate images; do not consume provider image output or prototype review artifacts.
@@ -221,6 +229,9 @@ packets:
           /ow:proto preflight.
         - Prepare to infer product_experience_model before strategic directions; do not start
           directions from scenario labels or visual style variants.
+        - Prepare to write prototype_system_contract before screen prompt text so stable app shell,
+          navigation taxonomy, data vocabulary, object anatomy, action bar, audit pattern, copy
+          tone, and allowed screen deltas are explicit.
         - Prepare to write dailin-grade long-form prompt paragraphs; direction and screen prompt
           text must include journey, interaction behavior, system response, trust controls,
           anti-goals, visual direction, desired user feeling, and concrete content.
@@ -232,7 +243,8 @@ packets:
           reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
         - "Record the intermediate pipeline outputs: perspective engine, normalized input contract,
           vision decomposition, candidate strategic hypotheses, product experience model,
-          screen_manifest, prototype prompt schema, output manifest, and quality rubric."
+          prototype_system_contract, screen_manifest, prototype prompt schema, output manifest, and
+          quality rubric."
         - Each selected direction must carry product_thesis, user_transformation, reason_to_exist,
           differentiated product form, and pm_judgment before screen prompt anatomy.
         - "Infer product_experience_model from VISION and VALIDATION: product archetype, primary
@@ -246,6 +258,9 @@ packets:
           maximum strategic diversity.
         - Only select directions that differ by product form, product loop, initiation trigger,
           interaction model, emotional driver, retention mechanism, validation metric, or main risk.
+        - Write prototype_system_contract cross-screen invariants before complete multi-image prompt
+          text so downstream prompt2proto preserves technical screen coherence instead of inventing
+          it from visual judgment.
         - Write complete multi-image prompt text for every selected direction with screen_prompts,
           negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
           target_screen_id values.
@@ -263,13 +278,14 @@ packets:
           comparison."
       after:
         - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
-          product_experience_model, screen_manifest, screen_prompts, prompt_pack_integrity_gate,
-          prototype_reality_gate, quality_rubric, prompt_text_manifest.status
-          ready_for_image_generation, and post_validate status.
-        - Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and
-          prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is
-          pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is
-          pass or skipped.
+          product_experience_model, prototype_system_contract, screen_manifest, screen_prompts,
+          prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric,
+          prompt_text_manifest.status ready_for_image_generation, and post_validate status.
+        - Hand internally to /ow:prompt2proto only when prototype_system_contract is present,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass,
+          quality_rubric.prompt_executability.status is pass,
+          prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or
+          skipped.
         - If any readiness gate fails, keep handoff blocked and repair prompt directions through
           /ow:vision2prompt.
         - Record internal_pipeline stage vision2prompt status and outputs.
@@ -300,13 +316,13 @@ packets:
           skipped.
         - Load prepared prompt text and verify every selected direction has screen_prompts before
           image generation.
-        - "Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass,
-          quality_rubric.prompt_executability.status: pass,
+        - "Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass,
+          prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass,
           prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before
           image generation."
-        - Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt
-          executability, paragraph quality, screen_manifest linkage, or post_validate is fail or
-          missing.
+        - Block image generation when prototype_system_contract, prompt_pack_integrity_gate,
+          prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage,
+          or post_validate is fail or missing.
       during:
         - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
         - Write one metadata record for every generated image with image_id, direction_id,
@@ -363,6 +379,9 @@ packets:
         - "Before strategic directions, require /ow:vision2prompt to infer product_experience_model:
           product archetype, primary canvas, information architecture, domain objects, task loop,
           interaction states, data realism, visual language, and anti-generic constraints."
+        - Before /ow:prompt2proto, require prototype_system_contract so stable app shell,
+          navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and
+          allowed deltas are explicit.
         - Treat scenarios such as planning, incident, or capacity as possible modules, layers,
           workflows, or states inside one product shell unless they truly imply different product
           forms.
@@ -371,8 +390,9 @@ packets:
           text.
         - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is
           ready_for_image_generation and every selected direction has concrete screen prompts.
-        - Do not internally trigger /ow:prompt2proto until prompt_pack_integrity_gate.status and
-          prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
+        - Do not internally trigger /ow:prompt2proto until prototype_system_contract exists,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and
+          quality_rubric.prompt_executability is pass.
         - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for
           resolved_count 2 or more, or skipped when the user explicitly requested exactly one
           strategic direction.

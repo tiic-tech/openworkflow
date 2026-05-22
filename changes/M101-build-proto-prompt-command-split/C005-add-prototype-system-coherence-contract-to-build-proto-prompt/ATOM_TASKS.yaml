@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C005
+selected_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+status: completed
+tasks:
+  - task_id: T001
+    title: Add prototype system contract fields
+    status: completed
+    type: edit
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/artifacts/registry.ts
+    done_when: Source schemas and artifact contracts expose prototype_system_contract with stable app shell, navigation, data, object, action, trust, copy, and delta fields.
+  - task_id: T002
+    title: Enforce ready prompt-pack coherence
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: Ready strategic prompt packs fail validation when prototype_system_contract is missing or empty, and runtime fixtures prove the gate.
+  - task_id: T003
+    title: Wire guidance through prompt compiler and consumer
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-proto-prompt/
+      - skills/build-prototype/references/
+      - skills/prompt2proto/references/
+    done_when: build-proto-prompt writes the contract before screen prompts and prompt2proto/build-prototype consume it as a coherence input.
+  - task_id: T004
+    title: Regenerate and validate managed surfaces
+    status: completed
+    type: verify
+    owned_paths:
+      - .agents/skills/ow-build-proto-prompt/
+      - .agents/skills/ow-vision2prompt/
+      - .agents/skills/ow-prompt2proto/
+      - .agents/skills/ow-proto/
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    done_when: sync, build, runtime-surface verification, validate, summaries, and diff check pass.

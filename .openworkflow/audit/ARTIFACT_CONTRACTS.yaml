@@ -296,6 +296,7 @@ artifacts:
       - normalized_input
       - strategic_core
       - product_experience_model
+      - prototype_system_contract
       - prototype_reality_gate
       - directions
       - build_recommendation
@@ -434,6 +435,24 @@ artifacts:
         anti_generic_constraints:
           []
         category_quality_bar:
+          []
+      prototype_system_contract:
+        stable_app_shell:
+          []
+        navigation_taxonomy:
+          []
+        data_vocabulary:
+          []
+        domain_object_anatomy:
+          []
+        object_detail_anatomy:
+          []
+        action_bar_contract:
+          []
+        audit_trust_pattern:
+          []
+        copy_tone: ""
+        allowed_screen_deltas:
           []
       prototype_reality_gate:
         status: pending

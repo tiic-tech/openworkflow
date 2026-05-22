@@ -56,7 +56,7 @@ quality comparable to the M100 vision2prompt skill.
 | C002 | done | high | Design prompt2proto skill contract and reference architecture | C001 |
 | C003 | done | high | Introduce build-proto-prompt command and source skill boundary | C001 |
 | C004 | done | high | Create prompt2proto source skill foundation | C001, C002 |
-| C005 | ready | high | Add prototype system coherence contract to build-proto-prompt | C001, C003 |
+| C005 | done | high | Add prototype system coherence contract to build-proto-prompt | C001, C003 |
 | C006 | ready | high | Inject Chief PM and Principal UI/UX philosophy engine into build-prototype | C001, C002, C004 |
 | C007 | candidate | high | Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto | C001, C003, C004, C005, C006 |
 
@@ -76,6 +76,10 @@ lean skill shell, numbered references, and internal validation boundaries.
 `C003` is done with a new internal `/ow:build-proto-prompt` command, source
 skill boundary, generated Codex skill, command audit/context packet updates,
 and runtime-surface assertions.
+`C005` is done with `prototype_system_contract` added as the technical
+multi-screen coherence contract for ready prompt packs. The contract is now in
+schemas, artifact templates, validators, source skill guidance, generated
+skills, context packets, and runtime-surface fixtures.
 
 Current completed artifacts:
 
@@ -85,18 +89,18 @@ Current completed artifacts:
 - `C002-design-prompt2proto-skill-contract-and-reference-architecture/PROMPT2PROTO_SKILL_DESIGN.md`
 - `C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md`
 - `C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md`
+- `C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md`
 - `skills/build-proto-prompt/SKILL.md`
 - `skills/prompt2proto/SKILL.md`
 
-No command registry, generated adapter, `.agents/**`, or `.openworkflow/**`
-managed audit surface changes were made.
+The C005 managed `.agents/**` and `.openworkflow/audit/**` updates were
+regenerated from source by `node dist/cli/src/index.js sync --root . --json`.
 
 ## Next Recommendation
 
-Select `C005` next if the goal is to add the prototype system coherence
-contract to the new prompt compiler before final narrowing. Select `C006` next
-if the goal is to wire the new prompt2proto philosophy engine into existing
-`build-prototype` guidance first.
+Select `C006` next to wire the Chief PM plus Principal UI/UX philosophy engine
+and density calibration guidance into `build-prototype`. `C007` remains blocked
+until C006 is complete.
 
 ## Key Split
 

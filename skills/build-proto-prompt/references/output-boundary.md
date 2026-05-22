@@ -7,6 +7,7 @@ prototype consumption.
 
 - strategic prompt-pack compilation;
 - product experience model extraction;
+- prototype system coherence contract;
 - direction and screen prompt text;
 - prompt-pack readiness gates;
 - review plan for prompt evidence;
@@ -31,6 +32,11 @@ When ready:
 prompt_text_manifest:
   status: ready_for_image_generation
   paragraph_quality_status: pass
+prototype_system_contract:
+  stable_app_shell:
+    - persistent product frame is defined
+  allowed_screen_deltas:
+    - state-specific changes are explicit
 image_generation:
   status: not_started
 internal_pipeline:

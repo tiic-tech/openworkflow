@@ -76,7 +76,7 @@ scope_control:
         Visual parity requires generated images or rendered prototypes and a
         separate review method.
       suggested_plan_id: M103-prototype-visual-reference-parity-gate
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -303,7 +303,7 @@ changes:
         - skills/prompt2proto/references/05_quality_rubric.md
         - changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md
   - id: C005
-    status: ready
+    status: done
     title: Add prototype system coherence contract to build-proto-prompt
     purpose: >
       Address multi-screen drift as a technical prompt-pack consistency
@@ -343,6 +343,32 @@ changes:
       - Prompt packs can state cross-screen invariants separately from screen-specific state deltas.
       - build-prototype guidance consumes those invariants instead of inventing consistency after the fact.
       - The contract treats drift as a technical consistency issue, not as visual parity proof.
+    selection:
+      selected_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+      selected_at: 2026-05-23
+      reason: >
+        C005 became the next recommended ready candidate after C003 created
+        the internal build-proto-prompt compiler boundary. It was selected
+        under the approved C001 split decision to encode multi-screen drift as
+        a technical prompt-pack coherence contract before prompt2proto
+        consumption.
+    completion:
+      completed_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+      completed_at: 2026-05-23
+      evidence:
+        - schemas/proto-prompt-pack.schema.json
+        - schemas/prototype-evidence.schema.json
+        - packages/core/src/validators/validateOpenWorkflow.ts
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/core/src/artifacts/registry.ts
+        - packages/core/src/commands/registry.ts
+        - skills/build-proto-prompt/SKILL.md
+        - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+        - skills/build-proto-prompt/references/output-boundary.md
+        - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+        - skills/prompt2proto/references/02_prompt_pack_readiness.md
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md
   - id: C006
     status: ready
     title: Inject Chief PM and Principal UI/UX philosophy engine into build-prototype
@@ -577,3 +603,29 @@ operations:
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Complete C005 by adding prototype_system_contract as the technical
+      multi-screen coherence contract required for ready strategic prompt
+      packs and consumed by prompt2proto/build-prototype guidance.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: done
+    evidence:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/commands/registry.ts
+      - skills/build-proto-prompt/SKILL.md
+      - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+      - skills/build-proto-prompt/references/output-boundary.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/prompt2proto/references/02_prompt_pack_readiness.md
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md

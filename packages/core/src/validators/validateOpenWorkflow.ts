@@ -778,6 +778,18 @@ const PRODUCT_EXPERIENCE_MODEL_FIELDS = [
   "anti_generic_constraints",
 ];
 
+const PROTOTYPE_SYSTEM_CONTRACT_FIELDS = [
+  "stable_app_shell",
+  "navigation_taxonomy",
+  "data_vocabulary",
+  "domain_object_anatomy",
+  "object_detail_anatomy",
+  "action_bar_contract",
+  "audit_trust_pattern",
+  "copy_tone",
+  "allowed_screen_deltas",
+];
+
 const PROTOTYPE_REALITY_GATE_DIMENSIONS = [
   "product_category_fit",
   "primary_canvas_fit",
@@ -936,6 +948,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateRequiredObjectFields(label, "normalized_input", data.normalized_input, STRATEGIC_NORMALIZED_FIELDS, errors);
   validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
   validateProductExperienceModel(label, data.product_experience_model, data, errors);
+  validatePrototypeSystemContract(label, data.prototype_system_contract, data, errors);
   validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
   validatePromptPackIntegrityGate(label, data.prompt_pack_integrity_gate, data, errors);
   validateScreenBoundExecutability(label, data, errors);
@@ -1056,6 +1069,31 @@ function strategicPromptPackRequiresProductExperienceModel(data: Record<string, 
     promptTextManifest.status === "generated" ||
     (typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started")
   );
+}
+
+function validatePrototypeSystemContract(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prototype_system_contract" in data && !isRecord(value)) {
+      errors.push(`${label} prototype_system_contract must be a mapping when present`);
+    }
+    return;
+  }
+  validateRequiredObjectFields(label, "prototype_system_contract", value, PROTOTYPE_SYSTEM_CONTRACT_FIELDS, errors);
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of PROTOTYPE_SYSTEM_CONTRACT_FIELDS) {
+    if (key === "copy_tone") {
+      if (!nonEmptyString(value[key])) {
+        errors.push(`${label} prototype_system_contract.copy_tone must be a non-empty string`);
+      }
+      continue;
+    }
+    if (!Array.isArray(value[key]) || value[key].length === 0) {
+      errors.push(`${label} prototype_system_contract.${key} must be a non-empty array`);
+    }
+  }
 }
 
 function validatePrototypeRealityGate(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {

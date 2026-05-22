@@ -13,6 +13,8 @@ Verify:
 - screen prompts carry journey stage, interaction behavior, system response,
   trust controls, anti-goals, visual direction, desired user feeling, and
   concrete content;
+- `prototype_system_contract` states stable cross-screen invariants and allowed
+  state deltas before downstream visual translation starts;
 - product thesis, target user, primary loop, trust boundaries, and non-goals
   are consistent across YAML and Markdown views.
 

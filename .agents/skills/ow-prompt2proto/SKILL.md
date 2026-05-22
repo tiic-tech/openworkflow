@@ -83,8 +83,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation, prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or skipped.
 - Load prepared prompt text and verify every selected direction has screen_prompts before image generation.
-- Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.
-- Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage, or post_validate is fail or missing.
+- Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.
+- Block image generation when prototype_system_contract, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage, or post_validate is fail or missing.
 </before>
 <during>
 - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
@@ -120,6 +120,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Refuse prompt packs whose prototype_reality_gate.status is not pass.
 - Refuse prompt packs whose quality_rubric.prompt_executability.status is not pass.
 - Refuse prompt packs whose prompt_text_manifest.paragraph_quality_status is not pass.
+- Refuse prompt packs whose prototype_system_contract does not define stable_app_shell, navigation_taxonomy, data_vocabulary, domain_object_anatomy, object_detail_anatomy, action_bar_contract, audit_trust_pattern, copy_tone, and allowed_screen_deltas.
 - Refuse prompt packs whose screen_prompts[].prompt paragraphs omit journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling, or concrete content.
 - Refuse prompt packs whose direction screen_prompts do not resolve to screen_manifest target_screen_id values.
 - When a prompt pack is refused, keep image_generation.status: not_started and hand back to /ow:vision2prompt repair.
@@ -136,6 +137,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not start image generation when prompt text is not ready.
 - Do not start image generation when prompt_text_manifest.paragraph_quality_status is missing, fail, or unchecked.
 - Do not start image generation when prompt_pack_integrity_gate or prototype_reality_gate is missing or failing.
+- Do not start image generation when prototype_system_contract is missing stable app shell, navigation taxonomy, data vocabulary, object anatomy, action bar, audit trust pattern, copy tone, or allowed screen deltas.
 - Do not start image generation when screen prompts are detached from screen_manifest or prompt executability has not passed.
 - Do not create HTML, specs, changes, or runtime artifacts.
 - Do not allow generated images without per-image metadata.

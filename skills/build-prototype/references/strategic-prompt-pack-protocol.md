@@ -236,6 +236,9 @@ and include:
   alternative, core idea, primary loop, trust boundaries, non-goals, and desired
   feeling
 - `product_experience_model`
+- `prototype_system_contract` with stable app shell, navigation taxonomy, data
+  vocabulary, domain object anatomy, object/detail panel anatomy, action bar,
+  audit/trust pattern, copy tone, and allowed screen-specific deltas
 - `screen_manifest` with target screen ids, journey stages, user goals, system
   states, required components, required data fields, primary actions, AI
   behavior or explicit non-AI rationale, trust controls, example copy, and
@@ -273,8 +276,10 @@ Each direction needs:
 - `user_transformation`
 - `reason_to_exist`
 
-When `prompt_text_manifest.status` becomes `ready_for_image_generation`, every
-direction screen prompt must resolve to a `screen_manifest.target_screen_id`.
+When `prompt_text_manifest.status` becomes `ready_for_image_generation`,
+`prototype_system_contract` must state cross-screen invariants separately from
+screen-specific state deltas, and every direction screen prompt must resolve to
+a `screen_manifest.target_screen_id`.
 Do not mark prompt text ready when screen prompts are detached from the product
 journey, missing negative prompts or example copy, omit paragraph quality
 dimensions, or only restate a freeform `prototype_prompt`.
@@ -346,6 +351,8 @@ Revise before finishing if:
   prototype brief
 - `screen_manifest` or screen-bound prompt content is missing for a
   multi-screen prototype
+- `prototype_system_contract` is missing for a generation-ready multi-screen
+  prompt pack
 - concrete domain objects, data fields, example copy, actions, and state
   behavior are absent
 - non-goals are not converted into anti-goals

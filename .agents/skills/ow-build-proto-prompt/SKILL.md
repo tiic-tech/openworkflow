@@ -90,19 +90,21 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Adopt the Co-Founder plus Chief PM / senior product strategist perspective engine before generating directions.
 - Resolve direction_count_policy before writing prompt text; do not silently default the direction count.
 - Prepare to infer product_experience_model before strategic directions, including product archetype, primary canvas, information architecture, domain objects, state model, data realism, visual language, anti-generic constraints, and category quality bar.
+- Prepare to write prototype_system_contract before screen prompts, covering stable app shell, navigation taxonomy, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed screen deltas.
 - Prepare to write dailin-grade long-form prompt paragraphs; prompt text must include journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling, and concrete content.
 </before>
 <during>
-- Compile durable vision and validation into strategic_core, prototype_brief, product_experience_model, screen_manifest, global_design_system_prompt, directions, screen_prompts, review_plan, and readiness gates.
+- Compile durable vision and validation into strategic_core, prototype_brief, product_experience_model, prototype_system_contract, screen_manifest, global_design_system_prompt, directions, screen_prompts, review_plan, and readiness gates.
 - Each selected direction must carry product_thesis, user_transformation, differentiated product form, reason_to_exist, and pm_judgment before screen prompt anatomy.
 - Decide whether source concepts are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.
+- Write prototype_system_contract cross-screen invariants before complete multi-image prompt text so downstream prompt2proto preserves technical screen coherence instead of inventing it from visual judgment.
 - Write complete multi-image prompt text for every selected direction with screen_prompts, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest target_screen_id values.
 - Populate prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, quality_rubric.prompt_paragraph_quality, prompt_text_manifest.paragraph_quality_status, and post_validate before handoff.
 - Keep image_generation.status: not_started while this compiler stage runs.
 </during>
 <after>
-- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation only when all readiness gates pass.
-- Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or skipped.
+- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prototype_system_contract and prompt_text_manifest.status ready_for_image_generation only when all readiness gates pass.
+- Hand internally to /ow:prompt2proto only when prototype_system_contract is present, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or skipped.
 - If any readiness gate fails, keep handoff blocked and repair prompt directions through /ow:build-proto-prompt.
 - Do not generate images; do not consume provider image output or prototype review artifacts.
 </after>
@@ -146,9 +148,17 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - The legacy vision2prompt references may be reused as detailed prompt-generation tools until the compiler references are fully split.
 </source_skill_reference>
 
+<prototype_system_contract>
+- Write prototype_system_contract as the build-proto-prompt technical multi-screen coherence contract.
+- Required fields: stable_app_shell, navigation_taxonomy, data_vocabulary, domain_object_anatomy, object_detail_anatomy, action_bar_contract, audit_trust_pattern, copy_tone, and allowed_screen_deltas.
+- Use it to tell prompt2proto what must remain stable across screens and what may change by workflow state.
+- This is a consistency contract, not density philosophy, provider image quality, visual review, or visual parity scoring.
+</prototype_system_contract>
+
 <prompt_pack_readiness_gate>
 - prompt_text_manifest.status cannot become ready_for_image_generation until prompt_pack_integrity_gate.status is pass.
 - prompt_text_manifest.status cannot become ready_for_image_generation until prototype_reality_gate.status is pass.
+- prompt_text_manifest.status cannot become ready_for_image_generation until prototype_system_contract records cross-screen invariants and allowed deltas.
 - prompt_text_manifest.status cannot become ready_for_image_generation until quality_rubric.prompt_executability.status is pass.
 - prompt_text_manifest.status cannot become ready_for_image_generation until prompt_text_manifest.paragraph_quality_status is pass.
 - prompt_text_manifest.status cannot become ready_for_image_generation until every direction screen_prompt target_screen_id resolves to screen_manifest.
@@ -170,7 +180,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.
 - Do not treat YAML field completion as quality when the prompt lacks product thesis, user transformation, reason-to-exist, or design philosophy.
 - Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.
-- Do not hand off to /ow:prompt2proto when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, paragraph quality, or prompt executability is missing or failing.
+- Do not hand off to /ow:prompt2proto when prototype_system_contract, prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, paragraph quality, or prompt executability is missing or failing.
 </anti_patterns>
 
 <handoff>

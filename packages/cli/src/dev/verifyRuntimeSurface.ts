@@ -2065,6 +2065,7 @@ function verifyProtoSkill(content: string): void {
     "anti_generic_constraints",
     "Each direction must include direction_id",
     "<prompt_text_manifest>",
+    "prototype_system_contract",
     "ready_for_image_generation",
     "<post_validate_gate>",
     "post_validate.status: pass",
@@ -2100,6 +2101,7 @@ function verifyVision2PromptSkill(content: string): void {
     "quality_rubric.prompt_paragraph_quality",
     "journey stage, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling",
     "<product_experience_model>",
+    "prototype_system_contract",
     "anti_generic_constraints",
     "ready_for_image_generation",
     "<post_validate_gate>",
@@ -2119,6 +2121,8 @@ function verifyBuildProtoPromptSkill(content: string): void {
     "Co-Founder plus Chief PM",
     "skills/build-proto-prompt/SKILL.md",
     "prompt-pack compiler",
+    "prototype_system_contract",
+    "stable app shell",
     "prompt_text_manifest.status ready_for_image_generation",
     "prompt_text_manifest.paragraph_quality_status is pass",
     "repair through /ow:build-proto-prompt",
@@ -2135,6 +2139,8 @@ function verifyPrompt2ProtoSkill(content: string): void {
     "internal-prompt-text-to-prototype-images",
     "<command_visibility>internal</command_visibility>",
     "post_validate.status pass or skipped",
+    "prototype_system_contract",
+    "stable_app_shell",
     "prompt_text_manifest.paragraph_quality_status pass",
     "Refuse prompt packs whose prompt_text_manifest.paragraph_quality_status is not pass",
     "journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling",
@@ -2230,6 +2236,7 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("internal_pipeline:"), "artifact contracts missing proto internal pipeline");
   assert(artifacts.includes("direction_count_policy:"), "artifact contracts missing proto direction count policy");
   assert(artifacts.includes("prompt_text_manifest:"), "artifact contracts missing proto prompt text manifest");
+  assert(artifacts.includes("prototype_system_contract:"), "artifact contracts missing proto prototype system contract");
   assert(artifacts.includes("post_validate:"), "artifact contracts missing proto post-validate gate");
   assert(artifacts.includes("image_generation:"), "artifact contracts missing proto image generation state");
   assert(artifacts.includes("generated_images:"), "artifact contracts missing generated image metadata container");
@@ -2264,6 +2271,10 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
 
   const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
+  const buildProtoPromptPacket = contextPackets.split("command: /ow:build-proto-prompt", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  const prompt2ProtoPacket = contextPackets.split("command: /ow:prompt2proto", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  assert(buildProtoPromptPacket.includes("prototype_system_contract"), "build-proto-prompt context packet missing prototype system contract guidance");
+  assert(prompt2ProtoPacket.includes("prototype_system_contract"), "prompt2proto context packet missing prototype system contract readiness gate");
   const tunePacket = contextPackets.split("command: /ow:tune", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(!extractBlock(tunePacket, "required").includes("PROTOTYPE_INDEX.yaml"), "tune requires prototype index");
   assert(extractBlock(tunePacket, "optional").includes("PROTOTYPE_INDEX.yaml"), "tune optional context missing prototype index");
@@ -2391,6 +2402,20 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
     "missing screen manifest failure should name screen-bound product states",
   );
   await unlink(missingScreenManifestPath);
+
+  const missingPrototypeSystemContractPath = join(fixtureDir, "MISSING_PROTOTYPE_SYSTEM_CONTRACT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(
+    missingPrototypeSystemContractPath,
+    withoutYamlBlock(strategicPromptPackFixture("ready"), "prototype_system_contract", "screen_manifest"),
+    "utf8",
+  );
+  const missingPrototypeSystemContract = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingPrototypeSystemContract.code !== 0, "missing prototype system contract fixture should fail validation");
+  assert(
+    missingPrototypeSystemContract.output.includes("prototype_system_contract must be a mapping"),
+    "missing prototype system contract failure should name prototype_system_contract",
+  );
+  await unlink(missingPrototypeSystemContractPath);
 
   const orphanStrategicScreenPath = join(fixtureDir, "ORPHAN_STRATEGIC_SCREEN_PROMPT_PROTO_PROMPT_PACK.yaml");
   await writeFile(orphanStrategicScreenPath, strategicPromptPackFixture("ready").replace("target_screen_id: practice-entry", "target_screen_id: missing-practice-entry"), "utf8");
@@ -3000,6 +3025,33 @@ function yamlStringList(values: string[], indent: number): string[] {
   return values.length === 0 ? [`${spaces}[]`] : values.map((value) => `${spaces}- ${value}`);
 }
 
+function prototypeSystemContractLines(options?: { shell?: string; navigation?: string[]; objects?: string[]; copyTone?: string }): string[] {
+  const shell = options?.shell ?? "mobile practice shell with scenario context, voice control, and feedback surface";
+  const navigation = options?.navigation ?? ["Daily practice", "Scenario", "Progress", "Memory"];
+  const objects = options?.objects ?? ["practice scenario", "remembered note", "correction card"];
+  const copyTone = options?.copyTone ?? "supportive, specific, and non-exam-like";
+  return [
+    "prototype_system_contract:",
+    "  stable_app_shell:",
+    `    - ${shell}`,
+    "  navigation_taxonomy:",
+    ...navigation.map((item) => `    - ${item}`),
+    "  data_vocabulary:",
+    "    - status labels, timestamps, owners, confidence, and selected object names stay consistent across screens",
+    "  domain_object_anatomy:",
+    ...objects.map((item) => `    - ${item}`),
+    "  object_detail_anatomy:",
+    "    - header, state, concrete data fields, AI/system response, trust controls, and available actions",
+    "  action_bar_contract:",
+    "    - primary action remains first, secondary revise or inspect actions remain adjacent, destructive actions stay separate",
+    "  audit_trust_pattern:",
+    "    - consent, confidence, citation, or audit controls remain visible near the affected decision",
+    `  copy_tone: ${copyTone}`,
+    "  allowed_screen_deltas:",
+    "    - selected object, journey state, evidence detail, and active action may change by screen",
+  ];
+}
+
 function thinStrategicPromptPackFixture(): string {
   return [
     "schema_version: 0.1.0",
@@ -3084,6 +3136,7 @@ function thinImagePromptOnlyStrategicPromptPackFixture(): string {
     "      visibility: internal",
     "      status: complete",
     "      outputs:",
+    "        - prototype_system_contract",
     "        - prompt_text_manifest",
     "    - stage_id: prompt2proto",
     "      command: /ow:prompt2proto",
@@ -3291,6 +3344,7 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "      status: complete",
     "      outputs:",
     "        - product_experience_model",
+    "        - prototype_system_contract",
     "        - prompt_text_manifest",
     "    - stage_id: prompt2proto",
     "      command: /ow:prompt2proto",
@@ -3397,6 +3451,12 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "    - no white-card AI governance report dashboard",
     "    - no scenario-only direction split",
     "    - no HIL/audit/citation as the visual main product",
+    ...prototypeSystemContractLines({
+      shell: "map-first desktop command shell with left domain rail, dominant city map, right detail drawer, and bottom workflow trace",
+      navigation: ["Planning", "Incidents", "Capacity", "Audit"],
+      objects: ["district", "parcel", "incident", "parking asset", "department task"],
+      copyTone: "concise city-operations language with explicit synthetic POC boundaries",
+    }),
     "screen_manifest:",
     "  - target_screen_id: map-shell",
     "    screen_name: Smart city map operations shell",
@@ -3725,6 +3785,7 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "      visibility: internal",
     "      status: complete",
     "      outputs:",
+    "        - prototype_system_contract",
     "        - prompt_text_manifest",
     "    - stage_id: prompt2proto",
     "      command: /ow:prompt2proto",
@@ -3822,6 +3883,7 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "    - no generic chatbot shell",
     "    - no exam dashboard",
     "    - no card wall without a voice practice loop",
+    ...prototypeSystemContractLines(),
     "screen_manifest:",
     "  - target_screen_id: practice-entry",
     "    screen_name: Today practice entry",

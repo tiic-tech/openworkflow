@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: selected_change:C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C005
+title: Add prototype system coherence contract to build-proto-prompt
+status: completed
+selection_reason: >
+  C005 is the next recommended ready candidate after C003 created the internal
+  build-proto-prompt compiler boundary. The user approved continuing through
+  non-new high-risk work under the C001 decision result, and this candidate
+  keeps the work inside the approved prompt-pack contract boundary.
+scope:
+  includes:
+    - prototype_system_contract in build-proto-prompt outputs
+    - stable app shell, navigation taxonomy, data vocabulary, object drawer anatomy, action bar, audit pattern, and copy tone constraints
+    - validator and runtime-surface checks that ready prompt packs expose coherence constraints before prompt2proto consumes them
+  excludes:
+    - density philosophy
+    - provider image generation
+    - visual review
+owned_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/commands/registry.ts
+  - skills/build-proto-prompt/
+  - skills/build-prototype/references/
+  - skills/prompt2proto/references/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - provider-backed image generation implementation
+  - human visual review artifacts
+  - visual reference parity scoring
+  - proto2html implementation
+  - storyboard or motion modeling
+acceptance:
+  - Prompt packs can state cross-screen invariants separately from screen-specific state deltas.
+  - build-prototype guidance consumes those invariants instead of inventing consistency after the fact.
+  - The contract treats drift as a technical consistency issue, not as visual parity proof.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C006
+    reason: C006 addresses density and UI/UX philosophy, but the user's drift decision belongs first in build-proto-prompt as a technical coherence contract.
+  - id: C007
+    reason: Final build-prototype narrowing depends on C005 and C006.

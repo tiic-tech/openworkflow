@@ -252,6 +252,74 @@
       },
       "additionalProperties": true
     },
+    "prototype_system_contract": {
+      "type": "object",
+      "required": [
+        "stable_app_shell",
+        "navigation_taxonomy",
+        "data_vocabulary",
+        "domain_object_anatomy",
+        "object_detail_anatomy",
+        "action_bar_contract",
+        "audit_trust_pattern",
+        "copy_tone",
+        "allowed_screen_deltas"
+      ],
+      "properties": {
+        "stable_app_shell": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "navigation_taxonomy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_vocabulary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domain_object_anatomy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "object_detail_anatomy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "action_bar_contract": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "audit_trust_pattern": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "copy_tone": {
+          "type": "string"
+        },
+        "allowed_screen_deltas": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
     "prototype_reality_gate": {
       "type": "object",
       "required": [

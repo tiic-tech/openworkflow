@@ -78,19 +78,23 @@ The YAML prompt pack is the source of truth. Markdown is the readable view.
 4. Infer product experience model: archetype, primary canvas, information
    architecture, domain objects, task loop, state model, data realism, visual
    language, anti-generic constraints, and category quality bar.
-5. Generate candidate strategic hypotheses, then select materially distinct
+5. Write `prototype_system_contract` before screen prompts: stable app shell,
+   navigation taxonomy, data vocabulary, domain object anatomy, object detail
+   anatomy, action bar, audit/trust pattern, copy tone, and allowed
+   screen-specific deltas.
+6. Generate candidate strategic hypotheses, then select materially distinct
    directions based on product form, trigger, interaction model, emotional
    driver, retention mechanism, validation metric, and main risk.
-6. Write dailin-grade direction and screen prompt paragraphs with journey,
+7. Write dailin-grade direction and screen prompt paragraphs with journey,
    screen components, interaction behavior, system response, concrete content,
    trust controls, anti-goals, visual direction, desired user feeling, product
    thesis, reason-to-exist, and user transformation.
-7. Run prompt-pack readiness gates: integrity, prototype reality, prompt
+8. Run prompt-pack readiness gates: integrity, prototype reality, prompt
    executability, paragraph quality, screen manifest linkage, and
    post-validation.
-8. Set `prompt_text_manifest.status: ready_for_image_generation` only when all
-   readiness gates pass.
-9. Keep `image_generation.status: not_started` and hand off to `prompt2proto`
+9. Set `prompt_text_manifest.status: ready_for_image_generation` only when all
+   readiness gates and the prototype system contract pass.
+10. Keep `image_generation.status: not_started` and hand off to `prompt2proto`
    only after prompt-pack readiness passes.
 
 ## Boundary
@@ -98,6 +102,7 @@ The YAML prompt pack is the source of truth. Markdown is the readable view.
 Allowed:
 
 - compile strategic prompt packs;
+- define prototype system coherence before visual translation;
 - repair prompt-pack text when readiness gates fail;
 - write review plan and evidence about prompt readiness;
 - preserve no-go constraints for downstream stages.

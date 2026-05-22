@@ -100,10 +100,11 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </before>
 <during>
 - Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.
+- Before /ow:prompt2proto, require prototype_system_contract so stable app shell, navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed deltas are explicit.
 - Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.
 - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
 - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
-- Do not internally trigger /ow:prompt2proto until prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
+- Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
 - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
 - If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.
 - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
