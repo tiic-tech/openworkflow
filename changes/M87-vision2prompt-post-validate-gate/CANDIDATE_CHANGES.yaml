@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M87-vision2prompt-post-validate-gate
 title: Candidate changes for vision2prompt post-validate gate
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -246,7 +246,7 @@ changes:
       evidence:
         - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: selected
+    status: done
     title: Add post-validate stress fixtures
     purpose: >
       Pressure-test the post-validate gate against duplicated, near-duplicate,
@@ -296,6 +296,12 @@ changes:
         stress coverage for exact duplicate, near-duplicate, distinct, and
         single-direction post_validate outcomes.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-post-validate-stress-fixtures
+      completed_at: 2026-05-22
+      commit: 75def71
+      evidence:
+        - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -446,3 +452,17 @@ operations:
       - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/SELECTED_CHANGE.yaml
       - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/ATOM_TASKS.yaml
       - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added near-duplicate strategic fingerprint stress coverage and
+      confirmed the post_validate gate rejects rephrased same-strategy prompt
+      assets while preserving distinct and single-direction outcomes.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

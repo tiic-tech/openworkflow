@@ -6,7 +6,7 @@ plan_id: M87-vision2prompt-post-validate-gate
 candidate_id: C004
 change_id: C004-post-validate-stress-fixtures
 title: Add post-validate stress fixtures
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -61,3 +61,8 @@ high_risk:
     C004 is verification fixture coverage for the existing post_validate gate.
     It does not broaden product behavior, call external services, or generate
     prototype images.
+completion:
+  completed_at: 2026-05-22
+  commit: 75def71
+  evidence:
+    - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
@@ -27,13 +27,13 @@ run before `/ow:prompt2proto`.
 | C001 | done | medium | Define prompt asset post-validate contract | none |
 | C002 | done | medium | Implement deterministic strategic fingerprint evaluator | C001 |
 | C003 | done | medium | Wire post-validate gate into generated vision2prompt protocol | C001, C002 |
-| C004 | selected | medium | Add post-validate stress fixtures | C001, C002, C003 |
+| C004 | done | medium | Add post-validate stress fixtures | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C004` is selected. It is the final M87 candidate and covers exact duplicate,
-near-duplicate, distinct multi-direction, and explicit single-direction
-post-validate outcomes.
+M87 is complete. The post-validate gate now has contract, evaluator, generated
+protocol wiring, and stress coverage for exact duplicate, near-duplicate,
+distinct multi-direction, and explicit single-direction outcomes.
 
 ## Deferred
 

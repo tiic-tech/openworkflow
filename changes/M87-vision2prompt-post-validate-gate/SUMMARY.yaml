@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M87-vision2prompt-post-validate-gate
 title: Summary for vision2prompt post-validate gate
-status: active
+status: completed
 source:
   kind: mixed
   summary: >
@@ -33,11 +33,11 @@ outputs:
   summary: changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 1
-completed_candidate_id: C003
-completed_change_id: C003-generated-protocol-post-validate-gate
-selected_candidate_id: C004
-selected_change_id: C004-post-validate-stress-fixtures
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-post-validate-stress-fixtures
+selected_candidate_id: null
+selected_change_id: null
 next_recommended_candidate_id: null
 key_dependencies:
   - M86 completed /ow:proto as a user-facing orchestrator over internal /ow:vision2prompt and /ow:prompt2proto stages.
@@ -76,3 +76,4 @@ validation:
     - OP008 completed C003 in commit 4221206.
     - OP009 marked C004 ready after generated protocol wiring landed.
     - OP010 selected C004 through ow-select-change single-queue ranking.
+    - OP011 completed C004 in commit 75def71 and closed M87.
