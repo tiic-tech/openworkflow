@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M90-discovery-loop-e2e-dogfood:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C002
+change_id: C002-happy-path-discovery-loop-handoff
+title: Atom tasks for happy-path discovery-loop handoff
+status: ready
+tasks:
+  - id: T001
+    title: Inspect command surface and context packet checks
+    type: read
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing generated skill, command audit, and context packet verification patterns are mapped.
+  - id: T002
+    title: Add happy-path discovery-loop handoff assertions
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification checks the generated discovery-loop order and handoff boundaries without entering proto2html.
+  - id: T003
+    title: Verify generated and runtime surfaces
+    type: verify
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

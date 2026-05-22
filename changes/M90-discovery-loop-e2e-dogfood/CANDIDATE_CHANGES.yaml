@@ -71,7 +71,7 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -130,7 +130,7 @@ changes:
       evidence:
         - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: ready
+    status: selected
     title: Verify happy-path discovery-loop command handoff
     purpose: >
       Add E2E checks proving the generated command surfaces and context packets
@@ -171,6 +171,14 @@ changes:
       - Context packets contain enough optional/required context for agents to consume the next artifact.
       - Happy-path fixture handoff reaches benchmark-selection readiness without entering proto2html.
       - The checks fail if a command loses its generated handoff or artifact boundary.
+    selection:
+      selected_change_id: C002-happy-path-discovery-loop-handoff
+      reason: >
+        Select C002 through ow-select-change single-queue ranking. C001
+        completed the canonical fixture chain, and C002 is the next ready
+        candidate to prove generated command surfaces and context packets can
+        guide an agent through the happy-path discovery loop.
+      selected_at: 2026-05-22
   - id: C003
     status: candidate
     title: Verify discovery-loop failure routing
@@ -318,3 +326,19 @@ operations:
     after_status: ready
     evidence:
       - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 as the next ready M90 candidate after C001 completed the
+      canonical fixture chain; no analyze-changes run is needed for this single
+      active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/IMPLEMENTATION_BRIEF.md

@@ -41,9 +41,9 @@ candidate_count: 4
 active_candidate_count: 3
 completed_candidate_id: C001
 completed_change_id: C001-canonical-discovery-loop-dogfood-fixture
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C002
+selected_candidate_id: C002
+selected_change_id: C002-happy-path-discovery-loop-handoff
+next_recommended_candidate_id: null
 key_dependencies:
   - M84 made /ow:vision delayed-compile and proto-ready.
   - M85 upgraded validation as a proto target compiler.
@@ -74,3 +74,4 @@ validation:
     - OP002 selected C001 through ow-select-change single-queue ranking.
     - OP003 completed C001 in commit aae8ed1.
     - OP004 marked C002 ready after the canonical fixture chain landed.
+    - OP005 selected C002 through ow-select-change single-queue ranking.
