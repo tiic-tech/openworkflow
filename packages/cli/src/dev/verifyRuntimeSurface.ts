@@ -2262,6 +2262,15 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   assert(duplicate.output.includes("shared dimensions"), "duplicate strategic fingerprint failure should name shared dimensions");
   await unlink(duplicatePath);
 
+  const nearDuplicatePath = join(fixtureDir, "NEAR_DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(nearDuplicatePath, strategicPromptPackFixture("near-duplicate-fingerprint"), "utf8");
+  const nearDuplicate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(nearDuplicate.code !== 0, "near-duplicate strategic fingerprint fixture should fail validation");
+  assert(nearDuplicate.output.includes("exceeds strategic fingerprint similarity threshold"), "near-duplicate strategic fingerprint failure should name threshold");
+  assert(nearDuplicate.output.includes("score"), "near-duplicate strategic fingerprint failure should name similarity score");
+  assert(nearDuplicate.output.includes("shared dimensions"), "near-duplicate strategic fingerprint failure should name shared dimensions");
+  await unlink(nearDuplicatePath);
+
   const singlePath = join(fixtureDir, "SINGLE_DIRECTION_PROTO_PROMPT_PACK.yaml");
   await writeFile(singlePath, strategicPromptPackFixture("single-direction"), "utf8");
   const single = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
@@ -2306,7 +2315,9 @@ function thinStrategicPromptPackFixture(): string {
   ].join("\n");
 }
 
-function strategicPromptPackFixture(kind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string {
+type StrategicPromptPackFixtureKind = "ready" | "style-only" | "duplicate-fingerprint" | "near-duplicate-fingerprint" | "single-direction";
+
+function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): string {
   const rationales =
     kind === "style-only"
       ? [
@@ -2470,7 +2481,7 @@ function strategicPromptPackFixture(kind: "ready" | "style-only" | "duplicate-fi
   ].join("\n");
 }
 
-function directionLines(id: string, name: string, distinctness: string, fixtureKind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string[] {
+function directionLines(id: string, name: string, distinctness: string, fixtureKind: StrategicPromptPackFixtureKind): string[] {
   const fingerprint = strategicFingerprintLines(id, fixtureKind);
   return [
     `  - direction_id: ${id}`,
@@ -2493,7 +2504,7 @@ function directionLines(id: string, name: string, distinctness: string, fixtureK
   ];
 }
 
-function strategicFingerprintLines(id: string, fixtureKind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string[] {
+function strategicFingerprintLines(id: string, fixtureKind: StrategicPromptPackFixtureKind): string[] {
   if (fixtureKind === "duplicate-fingerprint") {
     return [
       "      product_form: daily companion mission",
@@ -2506,6 +2517,44 @@ function strategicFingerprintLines(id: string, fixtureKind: "ready" | "style-onl
       "      trust_model: remembered encouragement with clear correction",
       "      privacy_model: private conversation memory controls",
     ];
+  }
+  if (fixtureKind === "near-duplicate-fingerprint") {
+    const nearDuplicates: Record<string, string[]> = {
+      D1: [
+        "      product_form: daily companion mission",
+        "      trigger: user opens app for daily practice",
+        "      interaction_model: guided chat rehearsal",
+        "      emotional_driver: warm confidence support",
+        "      retention_mechanism: daily streak and recap",
+        "      metric: three day speaking practice return",
+        "      main_risk: user avoids real speaking",
+        "      trust_model: remembered encouragement with clear correction",
+        "      privacy_model: private conversation memory controls",
+      ],
+      D2: [
+        "      product_form: daily companion practice mission",
+        "      trigger: user opens mobile app for daily practice",
+        "      interaction_model: guided chat speaking rehearsal",
+        "      emotional_driver: warm confidence encouragement",
+        "      retention_mechanism: daily streak plus recap",
+        "      metric: three day speaking practice return rate",
+        "      main_risk: user avoids real speaking moments",
+        "      trust_model: remembered encouragement with gentle correction",
+        "      privacy_model: private conversation memory controls",
+      ],
+      D3: [
+        "      product_form: daily companion rehearsal mission",
+        "      trigger: user opens app for daily speaking practice",
+        "      interaction_model: guided conversational rehearsal",
+        "      emotional_driver: warm support for confidence",
+        "      retention_mechanism: daily recap and streak",
+        "      metric: three day practice return",
+        "      main_risk: user still avoids real speaking",
+        "      trust_model: remembered encouragement with clear corrections",
+        "      privacy_model: private memory controls for conversations",
+      ],
+    };
+    return nearDuplicates[id] ?? nearDuplicates.D1 ?? [];
   }
   const byId: Record<string, string[]> = {
     D1: [
