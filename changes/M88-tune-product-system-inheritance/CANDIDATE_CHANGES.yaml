@@ -69,7 +69,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after proto
         and tune evidence are reliable.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -131,7 +131,7 @@ changes:
       evidence:
         - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: selected
+    status: done
     title: Wire reference methodology into /ow:tune protocol
     purpose: >
       Make generated /ow:tune guidance follow the prototype_tune_to_refined_prompt
@@ -186,8 +186,14 @@ changes:
         prototype_tune_to_refined_prompt methodology into generated /ow:tune
         protocol before validator fixture work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-tune-reference-methodology-protocol
+      completed_at: 2026-05-22
+      commit: 9626f3b
+      evidence:
+        - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: candidate
+    status: ready
     title: Add refined prompt pack validator stress fixtures
     purpose: >
       Pressure-test /ow:tune artifacts so validators reject product-system drift,
@@ -353,3 +359,30 @@ operations:
       - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/SELECTED_CHANGE.yaml
       - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/ATOM_TASKS.yaml
       - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 wired prototype_tune_to_refined_prompt methodology into /ow:tune
+      source protocol, generated skill surface, context packet, and drift
+      verification.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Mark C003 ready after C002 completed generated /ow:tune protocol wiring
+      required for refined prompt-pack validator stress fixtures.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml

@@ -34,12 +34,12 @@ outputs:
   summary: changes/M88-tune-product-system-inheritance/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 3
-completed_candidate_id: C001
-completed_change_id: C001-refined-prompt-pack-inheritance-contract
-selected_candidate_id: C002
-selected_change_id: C002-tune-reference-methodology-protocol
-next_recommended_candidate_id: null
+active_candidate_count: 2
+completed_candidate_id: C002
+completed_change_id: C002-tune-reference-methodology-protocol
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C003
 key_dependencies:
   - M87 completed prompt asset post-validation before image generation.
   - DISCOVER_LOOP_UPGRATE_PLAN identifies /ow:tune product-system inheritance as a deferred discovery-loop upgrade.
@@ -71,3 +71,5 @@ validation:
     - OP003 completed C001 in commit 9b8ac08.
     - OP004 marked C002 ready after the refined prompt-pack contract landed.
     - OP005 selected C002 through ow-select-change single-queue ranking.
+    - OP006 completed C002 in commit 9626f3b.
+    - OP007 marked C003 ready after generated /ow:tune protocol wiring landed.
