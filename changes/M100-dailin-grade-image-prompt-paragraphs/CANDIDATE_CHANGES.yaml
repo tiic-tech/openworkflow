@@ -81,10 +81,10 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Map dailin skill workflow into OW prompt paragraph contract
     purpose: >
       Use the dailin vision_to_strategic_prototype_prompt SKILL as the base
@@ -130,8 +130,31 @@ changes:
       - The prompt schema reference requires long-form generation prompt paragraphs with product context, target user, screen purpose, components, states, interactions, system response, example copy, trust controls, visual direction, anti-goals, journey linkage, and desired user feeling.
       - The quality rubric fails terse one-sentence screen prompts even when YAML fields are present.
       - The queue remains scoped to prompt text quality and does not claim visual parity.
+    selection:
+      selected_change_id: C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract
+      selected_at: 2026-05-23
+      reason: >
+        C001 was the dependency-free recommended first candidate and turns the
+        dailin skill workflow plus OUTPUT_PROMPT quality bar into OW-owned
+        prompt paragraph contract references.
+    completion:
+      completed_by_change_id: C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md
+        - skills/build-prototype/references/vision2prompt/01_input_contract.md
+        - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+        - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+        - skills/build-prototype/references/vision2prompt/04_product_system_extraction.md
+        - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+        - skills/build-prototype/references/vision2prompt/06_output_templates.md
+        - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+        - skills/build-prototype/references/strategic-prompt-pack-protocol.md
   - id: C002
-    status: candidate
+    status: ready
     title: Enforce long-form generation prompt structure in schemas and validators
     purpose: >
       Make dailin-grade prompt text quality fail closed by extending the formal
@@ -358,3 +381,57 @@ operations:
       - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
       - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
       - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the queue's dependency-free recommended first candidate so
+      dailin skill workflow mapping can establish the paragraph-quality
+      contract before schema, validator, generated-surface, fixture, or replay
+      work.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed C001 by mapping dailin Steps 1-6 and references 01-06 into
+      OW-owned vision2prompt references, adding the OUTPUT_PROMPT minimum
+      benchmark, defining long-form prompt paragraph anatomy, and documenting
+      thin-prompt failure modes without changing enforcement code or replaying
+      targets.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md
+      - skills/build-prototype/references/vision2prompt/01_input_contract.md
+      - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+      - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+      - skills/build-prototype/references/vision2prompt/04_product_system_extraction.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/06_output_templates.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C001 completion satisfies C002's only dependency, making validator/schema
+      enforcement the next ready queue candidate.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml

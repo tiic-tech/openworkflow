@@ -3,6 +3,17 @@
 Use this reference before marking `prompt_text_manifest.status` as
 `ready_for_image_generation`.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/06_quality_rubric.md`.
+It maps dailin's final quality check into OW's readiness gate for prompt text.
+
+The dailin `OUTPUT_PROMPT.md` examples are the minimum passing benchmark for
+paragraph density and generation usefulness. Passing means the prompt text is a
+complete high-fidelity prototype-generation brief, not merely a valid YAML
+record with present fields.
+
 ## Strategic Differentiation
 
 Verify:
@@ -44,6 +55,13 @@ Verify:
 - Negative prompts and anti-goals are explicit.
 - Desired user feeling is clear.
 - Acceptance criteria are screen-bound and checkable.
+- Direction-level `prototype_prompt` text includes product context, target
+  user, journey, screens, interactions, system response, trust controls,
+  visual direction, anti-goals, and desired user feeling.
+- Screen-level `screen_prompts[].prompt` text is standalone enough to generate
+  the screen and includes purpose, components, state, concrete data or copy,
+  actions, system response, trust controls, negative constraints, and
+  acceptance criteria.
 
 ## Product Specificity
 
@@ -87,10 +105,34 @@ Verify:
 
 - Strategy collapsed into UI style.
 - Prompt is too abstract for a design tool.
+- Prompt is a short screen-state instruction instead of a full
+  prototype-generation brief.
 - Vision non-goals are ignored.
 - AI behavior is unspecified.
 - Trust controls are described in prose but absent from UI.
 - Markdown prompt is richer than YAML source.
 - EVIDENCE references prompts that do not exist in the prompt pack.
+
+## Thin Prompt Failures
+
+Fail prompt readiness even when YAML fields are present if any prompt paragraph
+looks like these patterns:
+
+```text
+Show the dashboard with the approval drawer open.
+```
+
+```text
+Create a modern AI assistant screen for incident response.
+```
+
+```text
+Design a beautiful analytics page with charts and recommendations.
+```
+
+These prompts fail because they omit the strategic context, target user,
+journey stage, concrete domain objects, user action, system response,
+trust/control behavior, anti-goals, and desired user feeling needed for
+dailin-grade image generation.
 
 Revise before final if any required check fails.

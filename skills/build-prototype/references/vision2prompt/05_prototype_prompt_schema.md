@@ -3,6 +3,21 @@
 Use this reference when writing the human-readable `PROTO_PROMPT_PACK.md` and
 the prompt text embedded in `PROTO_PROMPT_PACK.yaml`.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/04_prototype_prompt_schema.md`.
+It maps dailin Step 5, "Write Each Prototype Prompt", into the concrete text
+requirements for `directions[].prototype_prompt` and
+`screen_prompts[].prompt`.
+
+The dailin `OUTPUT_PROMPT.md` examples are the minimum paragraph quality bar.
+They are not examples of length for its own sake; they are complete
+prototype-generation briefs with positioning, user context, required screens,
+journey, interaction behavior, system response, trust controls, visual
+direction, anti-goals, and desired user feeling. OW prompt text must meet or
+exceed that level before it can be treated as image-generation-ready.
+
 ## Required Prompt Structure
 
 ```text
@@ -60,6 +75,45 @@ The prototype should make the user feel:
 [Desired emotional and behavioral response.]
 ```
 
+## Long-Form Prompt Paragraph Anatomy
+
+Each direction-level `prototype_prompt` must read like a complete
+high-fidelity prototype brief, not a caption for one image. It must include, in
+natural prompt text or clearly equivalent structured sections:
+
+- product name and product positioning, including what the product is not;
+- target user, usage context, pain, motivation, and behavior change;
+- core product idea, mechanism, differentiator, and trust boundary;
+- required screen group with journey stages, not unrelated screenshots;
+- interaction requirements, including user actions and critical state changes;
+- system, AI, workflow, or automation response after meaningful user actions;
+- concrete example copy, data, metrics, objects, labels, owners, timestamps, or
+  messages appropriate to the domain;
+- trust, privacy, safety, approval, memory, or user-control surfaces when
+  relevant;
+- visual direction tied to product category, primary canvas, component
+  vocabulary, density, and anti-generic patterns;
+- anti-goals converted into explicit prohibitions;
+- prototype journey and the intended user feeling or behavioral reaction.
+
+Each screen-level `screen_prompts[].prompt` must be standalone enough for an
+image-generation agent to create that screen without reading chat history. It
+may inherit from the direction, but it still must name the journey stage, user
+goal, system state, selected object when relevant, required components, example
+content, primary actions, system response, trust controls, negative prompt
+relationship, and acceptance criteria.
+
+The old M99-style screen-state prompt is insufficient:
+
+```text
+Show the same map shell with the incident detail panel open.
+```
+
+A dailin-grade screen prompt instead explains why the screen exists, what the
+operator or user is trying to do, what data and controls are visible, what the
+system does next, what must not be implied, and what feeling or behavior the
+image should create.
+
 ## Screen Specification Rules
 
 Each screen must specify:
@@ -71,6 +125,10 @@ Each screen must specify:
 - system response
 - example content
 - acceptance criteria
+
+The screen prompt should bind these fields into image-generation text. Merely
+having the fields elsewhere in YAML is not enough when the prompt paragraph
+itself remains terse.
 
 ## AI/System Behavior Rules
 

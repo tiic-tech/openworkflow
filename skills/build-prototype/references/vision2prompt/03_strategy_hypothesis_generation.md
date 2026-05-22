@@ -3,6 +3,18 @@
 Use this reference to create prototype directions that test different product
 strategy assumptions, not different visual skins.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/03_strategy_hypothesis_generation.md`.
+It maps dailin Steps 3 and 4 into OW prompt-pack generation: create more
+candidate hypotheses than needed, score them, then select the resolved count by
+strategic diversity and prototypeability.
+
+The selected directions must justify different prompt paragraphs. A direction
+does not deserve its own `prototype_prompt` merely because it has a different
+screen title, scenario label, module name, layout, or visual mood.
+
 ## Hypothesis Template
 
 ```text

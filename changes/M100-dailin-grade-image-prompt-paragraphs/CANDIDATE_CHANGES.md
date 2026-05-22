@@ -55,7 +55,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C001`
+Next recommended candidate: `C002`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -66,8 +66,8 @@ review, proto2html, or broad workflow redesign.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | ready | medium | Map dailin skill workflow into OW prompt paragraph contract | none |
-| C002 | candidate | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
+| C001 | done | medium | Map dailin skill workflow into OW prompt paragraph contract | none |
+| C002 | ready | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
 | C003 | candidate | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002 |
 | C004 | candidate | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
 | C005 | candidate | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
@@ -75,9 +75,9 @@ review, proto2html, or broad workflow redesign.
 
 ## Next Recommendation
 
-Start with `C001`. It should map dailin's skill workflow and reference
-instructions into OW-owned vision2prompt references before any schema or
-protocol work begins.
+`C001` is complete. The next recommended candidate is `C002`, which should turn
+the newly mapped prompt paragraph contract into schema and validator
+enforcement.
 
 The key acceptance shift is:
 
@@ -90,9 +90,18 @@ The key acceptance shift is:
 
 ### C001 - Map Dailin Skill Workflow Into OW Prompt Paragraph Contract
 
+Status: done
+
 Purpose: make dailin `vision_to_strategic_prototype_prompt` the source method
 for `/ow:vision2prompt`, with `OUTPUT_PROMPT.md` as the minimum prompt paragraph
 quality bar.
+
+Evidence:
+
+- `C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml`
+- `C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/ATOM_TASKS.yaml`
+- `C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/IMPLEMENTATION_BRIEF.md`
+- `C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md`
 
 Acceptance:
 
@@ -108,6 +117,8 @@ Acceptance:
 - queue remains scoped to prompt text, not visual parity
 
 ### C002 - Enforce Long-Form Generation Prompt Structure In Schemas And Validators
+
+Status: ready
 
 Purpose: make prompt paragraph quality fail closed before
 `ready_for_image_generation`.

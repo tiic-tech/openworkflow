@@ -4,6 +4,25 @@ Use this reference to convert raw vision and validation artifacts into
 decision-ready strategy. Keep the decomposition compact in final artifacts, but
 make it precise enough that later prompt text does not invent product strategy.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/02_vision_decomposition.md`.
+It maps dailin Step 2, "Extract Strategic Core", into durable OW prompt-pack
+fields. The decomposition must be strong enough that every later
+`directions[].prototype_prompt` and `screen_prompts[].prompt` can explain:
+
+- who the product serves;
+- what current alternative or pain it displaces;
+- what behavior should change;
+- what core mechanism and differentiator make the product worth testing;
+- what trust, privacy, and non-goal boundaries constrain the prototype;
+- what validation target the image prompt should make observable.
+
+If these elements are absent, a long prompt will still be strategically thin.
+Do not compensate by adding generic screen inventory, generic AI language, or
+visual style.
+
 ## Extraction Schema
 
 - `target_user`: who has the problem.

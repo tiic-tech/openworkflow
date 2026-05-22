@@ -7,6 +7,14 @@ prompt directions from proto-ready vision and a durable validation target.
 turns validation uncertainty into prototype directions, and writes prompts that
 an image-generation or design agent can execute without inventing strategy.
 
+The concrete quality target is dailin-grade prompt text. The dailin
+`OUTPUT_PROMPT.md` examples are the minimum passing benchmark for
+`directions[].prototype_prompt` and `screen_prompts[].prompt`: complete
+high-fidelity prototype-generation briefs with product context, journey,
+interaction behavior, system response, trust controls, anti-goals, visual
+direction, and desired user feeling. Short screen-state image instructions do
+not pass this protocol.
+
 ## Vision2Prompt Reference Pipeline
 
 Before writing `PROTO_PROMPT_PACK.yaml` or `PROTO_PROMPT_PACK.md`, run the
@@ -35,6 +43,16 @@ Do not collapse this pipeline into a short image prompt. A valid strategic
 prompt pack describes a product prototype system: product thesis, target user,
 primary loop, strategic directions, screen groups, state behavior, concrete
 data/copy, trust boundaries, negative constraints, and acceptance checks.
+
+This pipeline intentionally mirrors dailin
+`vision_to_strategic_prototype_prompt` Steps 1-6:
+
+- normalize inputs;
+- extract the strategic core;
+- generate candidate strategic hypotheses;
+- select the most differentiated directions;
+- write each full prototype-generation prompt;
+- recommend build order with success and failure signals.
 
 ## Validation Consumption
 
@@ -235,10 +253,27 @@ Each prompt must include:
 - desired user feeling
 - concrete sample content
 
+Prompt text must carry those requirements inside the actual paragraphs used for
+generation. Do not rely on adjacent YAML fields to rescue a terse
+`screen_prompts[].prompt`.
+
 Each screen prompt should be able to stand alone. It should name the journey
 stage, user goal, system state, selected object when relevant, required
 components, data fields, actions, AI/system behavior, trust controls, negative
 prompt, and acceptance criteria.
+
+Minimum screen prompt anatomy:
+
+- product and direction context;
+- journey stage and screen purpose;
+- target user goal and current system state;
+- visible components and domain objects;
+- realistic data, copy, labels, metrics, owners, timestamps, or messages;
+- primary user actions and system response;
+- trust, privacy, approval, memory, or user-control surfaces;
+- visual direction tied to the product category and primary canvas;
+- negative constraints and anti-goals;
+- screen-bound acceptance criteria and desired user feeling.
 
 The prompt should be specific enough that another agent can generate the first
 screen group without asking what the product is, who it serves, what behavior

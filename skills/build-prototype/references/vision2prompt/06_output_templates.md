@@ -3,6 +3,19 @@
 Use these shapes when writing `PROTO_PROMPT_PACK.md`. The YAML source artifact
 should carry the same content structurally.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/05_output_templates.md`.
+It maps dailin's Direction Map, full Prototype Prompt sections, PM Judgment,
+and Build Recommendation into OW's `PROTO_PROMPT_PACK.yaml` source and
+`PROTO_PROMPT_PACK.md` readable view.
+
+The Markdown view may be compact for handoff, but the YAML prompt text must not
+be compacted below dailin `OUTPUT_PROMPT.md` quality. If `PROTO_PROMPT_PACK.md`
+or `screen_prompts[].prompt` reads like a short screen-state instruction, the
+output template has failed even if all required keys exist.
+
 ## Strategic Prompt Pack View
 
 ```text

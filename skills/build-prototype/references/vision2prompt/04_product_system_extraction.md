@@ -3,6 +3,19 @@
 Use this reference before writing screen prompts. A dailin-grade prompt pack is
 a product prototype brief, not a single image description.
 
+## Dailin Workflow Mapping
+
+This OW-only step extends the dailin workflow between dailin Step 4, "Select N
+Directions", and Step 5, "Write Each Prototype Prompt". Dailin's prompts work
+because they describe a full product system: first-time setup, home, primary
+interaction surface, correction or system-response moment, memory/trust
+controls, recap, and follow-up. OW must make that product system explicit
+before writing paragraph prompts.
+
+For operations, workflow, dashboard, editor, map, inbox, or AI-mediated
+products, extract the equivalent system shell and journey stages. Do not jump
+from strategy directly to isolated screenshot prompts.
+
 ## Product Experience Model
 
 Populate `product_experience_model` before selecting or finalizing directions:

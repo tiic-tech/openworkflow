@@ -24,6 +24,26 @@ Do not compile prompt text from chat memory alone.
 - `CONSTRAINTS`: brand, platform, compliance, privacy, safety, or product
   boundaries.
 
+## Dailin Workflow Mapping
+
+This file is the OW-owned equivalent of dailin
+`vision_to_strategic_prototype_prompt/reference/01_input_contract.md`.
+`/ow:vision2prompt` must preserve the same normalization behavior before
+writing any image-generation prompt paragraph:
+
+- treat durable vision and validation artifacts as the source of truth;
+- resolve direction count, target tool, output language, fidelity, domain, and
+  constraints before prompt writing;
+- infer conservative defaults only when the durable artifacts contain enough
+  strategy to proceed;
+- record assumptions compactly in the prompt pack rather than hiding them in
+  chat memory.
+
+The dailin `OUTPUT_PROMPT.md` examples are the minimum quality benchmark for
+the prompt paragraphs produced after this normalization step. The normalized
+input must therefore contain enough product strategy to support full
+prototype-generation briefs, not just short screen-state image instructions.
+
 ## Normalized Input Fields
 
 Extract or conservatively infer:
