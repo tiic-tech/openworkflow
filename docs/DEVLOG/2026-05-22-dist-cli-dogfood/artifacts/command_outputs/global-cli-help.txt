@@ -1,0 +1,20 @@
+$ command -v openworkflow
+/opt/homebrew/bin/openworkflow
+
+$ openworkflow --help
+OpenWorkflow CLI
+
+Usage:
+  openworkflow init <folder> --tools codex [--force]
+  openworkflow validate --root <folder>
+  openworkflow sync --root <folder> --tools codex [--force]
+  openworkflow doctor --root <folder> --tools codex
+  openworkflow clean --root <folder> --tools codex [--yes] [--force]
+
+Commands:
+  init       Initialize .openworkflow contracts and optional tool adapters.
+  validate   Validate .openworkflow contract files.
+  sync       Regenerate project-local tool adapters from packaged templates.
+  doctor     Check generated adapter files for missing or stale templates.
+  clean      Remove OpenWorkflow-generated project files. Dry-run unless --yes is passed.
+

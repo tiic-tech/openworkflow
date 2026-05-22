@@ -1,0 +1,44 @@
+$ node dist/cli/src/index.js --help
+OpenWorkflow CLI
+
+Usage:
+  openworkflow init <folder> --tools codex [--force]
+  openworkflow validate --root <folder>
+  openworkflow sync --root <folder> [--tools auto|codex] [--force]
+  openworkflow doctor --root <folder> [--tools auto|codex]
+  openworkflow handoff --root <folder> [--tools auto|codex] [--json]
+  openworkflow status --root <folder> [--json]
+  openworkflow brief --root <folder> [--json]
+  openworkflow inspect --root <folder> [--strict] [--json]
+  openworkflow context --root <folder> [--for <ow-command>] [--mode compact|full] [--max-bytes <n>] [--handoff] [--json]
+  openworkflow draft --root <folder> --artifact <type> --id <id> [--write] [--force] [--json]
+  openworkflow register --root <folder> --artifact <path> [--current] [--next-command <ow-command>] [--write] [--json]
+  openworkflow check <ow-command> --root <folder> [--json]
+  openworkflow summaries --root <folder> [--strict] [--json]
+  openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
+  openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan|draft-pr> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
+  openworkflow clean --root <folder> --tools codex [--yes] [--force]
+
+Commands:
+  init       Initialize .openworkflow contracts and optional tool adapters.
+  validate   Validate .openworkflow contract files and source artifact shape.
+  sync       Non-destructively refresh workflow contracts and detected adapters.
+  doctor     Check managed workflow and adapter files for missing or stale templates.
+  handoff    Strict Agent trust gate for deciding whether current repo context is safe to continue.
+  status     Print a low-context Agent read model for current workflow state.
+  brief      Alias for status, named for Agent entry and handoff.
+  inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
+  context    Materialize a bounded Agent context packet for a /ow:* workflow command.
+  draft      Preview or create a contract-shaped source artifact draft.
+  register   Preview or apply index/current-state registration for a source artifact.
+  check      Check readiness for a repo-local /ow:* workflow command.
+  summaries  Inspect summary/current-slice health for workflow artifacts.
+  summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
+  git-automation  Managed git lifecycle shell, read-only remote planning, and autonomous simulator; remote mutation is gated.
+  clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
+
+Agent quick start excerpt:
+  Read AGENTS.md, then run openworkflow handoff --root . --json.
+  If you need the packet and the trust gate in one call, run openworkflow context --root . --handoff --json.
+  Every command supports --json. In JSON mode stdout is a single report object with schema_version, command, ok, root, data, warnings, errors, health_errors, effects, and next_actions.
+
