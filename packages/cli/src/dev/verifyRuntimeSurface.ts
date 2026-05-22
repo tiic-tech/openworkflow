@@ -2370,6 +2370,10 @@ async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.Proce
   assert(tune.includes("latest_approved_baseline_group_id: dogfood-proto-accepted-v1"), "dogfood tune fixture should include latest baseline id");
   assert(decision.includes(".openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml"), "dogfood decision fixture should reference tune fixture");
   assert(decision.includes("accepted benchmark prototype image metadata"), "dogfood decision fixture should name benchmark readiness");
+  assert(decision.includes("outcome: continue"), "dogfood decision fixture should accept the benchmark for downstream handoff");
+  assert(decision.includes(".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml"), "dogfood decision fixture should retain original prototype evidence ref");
+  assert(!(await exists(join(root, ".openworkflow", "html-prototypes"))), "dogfood benchmark readiness must not create proto2html artifacts");
+  assert(!(await exists(join(root, ".openworkflow", "html2spec"))), "dogfood benchmark readiness must not create html2spec artifacts");
   assert(commandAudit.indexOf("trigger: /ow:vision") < commandAudit.indexOf("trigger: /ow:validation"), "command audit should order vision before validation");
   assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should order validation before internal prompt compilation");
   assert(commandAudit.indexOf("trigger: /ow:vision2prompt") < commandAudit.indexOf("trigger: /ow:prompt2proto"), "command audit should order vision2prompt before prompt2proto");
