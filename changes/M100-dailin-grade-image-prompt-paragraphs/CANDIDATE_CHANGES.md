@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: complete
 
 Branch boundary: `codex/m100-dailin-grade-image-prompt-paragraphs`
 
@@ -58,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C006`
+Next recommended candidate: none
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -75,13 +75,12 @@ review, proto2html, or broad workflow redesign.
 | C003 | done | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
 | C004 | done | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
 | C005 | done | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
-| C006 | ready | low | Record no-go criteria for future visual parity work | C005 |
+| C006 | done | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001`, `C002`, `C007`, `C003`, `C004`, and `C005` are complete. The next
-recommended candidate is `C006`, which should record go/no-go criteria for
-future visual parity or provider-backed work.
+`C001`, `C002`, `C007`, `C003`, `C004`, `C005`, and `C006` are complete.
+M100 is closed.
 
 The key acceptance shift is:
 
@@ -236,16 +235,32 @@ Acceptance:
 
 ### C006 - Record No-Go Criteria For Future Visual Parity Work
 
-Status: ready
+Status: done
 
 Purpose: prevent downstream visual work from starting while prompt text is still
 thin.
+
+Evidence:
+
+- `C006-record-no-go-criteria-for-future-visual-parity-work/SELECTED_CHANGE.yaml`
+- `C006-record-no-go-criteria-for-future-visual-parity-work/ATOM_TASKS.yaml`
+- `C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_BRIEF.md`
+- `C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md`
+- `C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_EVIDENCE.md`
 
 Acceptance:
 
 - handoff report states prompt text go/no-go
 - visual parity is allowed only after C005 passes
 - no image-generation claim is made
+
+Final status:
+
+- prompt paragraph quality: pass
+- target replay evidence: smart city commit `66f6a38`
+- provider-backed image generation: not run
+- human visual review: not run
+- visual reference parity scoring: not run
 
 ## Deferred
 

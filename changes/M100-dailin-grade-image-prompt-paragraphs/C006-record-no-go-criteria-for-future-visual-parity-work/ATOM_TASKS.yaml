@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C006-record-no-go-criteria-for-future-visual-parity-work
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C006
+selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+status: completed
+tasks:
+  - task_id: T001
+    title: Write downstream go/no-go handoff
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: Handoff report distinguishes prompt text readiness from provider/image/visual parity readiness.
+  - task_id: T002
+    title: Update M97 synthesis with M100 closure
+    status: completed
+    type: edit
+    owned_paths:
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    done_when: Synthesis says M100 closes prompt paragraph quality but not visual/provider/proto2html/storyboard work.
+  - task_id: T003
+    title: Mark M100 queue complete
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: C006 is done, active candidate count is zero, and final validation passes.

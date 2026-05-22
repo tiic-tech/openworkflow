@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M100-dailin-grade-image-prompt-paragraphs
 title: Summary for dailin-grade image prompt paragraphs
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -31,12 +31,12 @@ scope_boundary: >
   a checklist that alone creates quality.
 branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
 candidate_count: 7
-active_candidate_count: 1
-completed_candidate_id: C005
-completed_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
-selected_candidate_id: C005
-selected_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
-next_recommended_candidate_id: C006
+active_candidate_count: 0
+completed_candidate_id: C006
+completed_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+selected_candidate_id: C006
+selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+next_recommended_candidate_id: null
 deferred_feature_refs:
   - M101-provider-image-generation-benchmark
   - M102-prototype-visual-reference-parity-gate
@@ -67,6 +67,11 @@ outputs:
   c005_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/ATOM_TASKS.yaml
   c005_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_BRIEF.md
   c005_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md
+  c006_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/SELECTED_CHANGE.yaml
+  c006_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/ATOM_TASKS.yaml
+  c006_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_BRIEF.md
+  c006_handoff_report: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md
+  c006_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_EVIDENCE.md
 key_dependencies:
   - C001 is complete; the dailin skill workflow and reference instructions are now mapped into an explicit OW prompt paragraph contract before schemas or generated protocols enforce it.
   - C002 is complete; validators now enforce paragraph anatomy and failure dimensions.
@@ -74,7 +79,7 @@ key_dependencies:
   - C003 is complete; generated /ow:vision2prompt and /ow:prompt2proto guidance now require paragraph-quality gates before image handoff.
   - C004 is complete; runtime fixtures now prove positive dailin-grade paragraph quality and negative terse/strategyless prompt behavior.
   - C005 is complete; the real smart_city_copilot target replay now carries dailin-grade prompt paragraphs and target commit 66f6a38 records the upgraded artifacts.
-  - C006 is ready because downstream visual parity no-go criteria now have real replay evidence to reference.
+  - C006 is complete; downstream visual/provider work now has explicit go/no-go criteria and M100 is closed as a prompt-text-quality queue.
 risks:
   - id: R001
     level: medium
@@ -141,4 +146,6 @@ validation:
     - C004 completed fixture/regression evidence and made C005 the next recommended candidate.
     - Select-change OP015 selected C005 and created implementation-ready artifacts.
     - C005 completed real smart_city_copilot target replay evidence, target validate/summaries/handoff passed, and target commit 66f6a38 records the dailin-grade prompt paragraphs.
-    - M101-build-proto-prompt-command-split was created as a separate high-risk command-boundary queue and must not be implemented until M100 C007 and C003 are complete.
+    - Select-change OP017 selected C006 and created implementation-ready artifacts.
+    - C006 completed the downstream handoff report and M97 synthesis update, closing M100 without provider image generation, visual review, visual parity scoring, proto2html, or storyboard work.
+    - M101-build-proto-prompt-command-split was created as a separate high-risk command-boundary queue and was not implemented inside M100.

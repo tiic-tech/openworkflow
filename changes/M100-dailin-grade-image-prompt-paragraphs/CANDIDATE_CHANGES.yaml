@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M100-dailin-grade-image-prompt-paragraphs
 title: Candidate changes for dailin-grade image prompt paragraphs
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -85,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C006
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -492,7 +492,7 @@ changes:
         - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
         - target_commit: 66f6a38
   - id: C006
-    status: ready
+    status: done
     title: Record no-go criteria for future visual parity work
     purpose: >
       Prevent visual parity, provider benchmarks, or proto2html from starting
@@ -524,6 +524,23 @@ changes:
       - The handoff report states whether prompt paragraph quality is dailin-grade or still blocked.
       - Downstream visual parity work is allowed only after C005 evidence passes.
       - No image-generation or visual-review claims are made in this queue.
+    selection:
+      selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+      selected_at: 2026-05-23
+      reason: >
+        Select C006 after C005 completed real target replay evidence. C006 is
+        the final ready candidate and records the downstream no-go boundary for
+        visual parity, provider generation, proto2html, and storyboard work.
+    completion:
+      completed_by_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_EVIDENCE.md
+        - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
 operations:
   - operation_id: OP001
     operation_type: add
@@ -820,3 +837,34 @@ operations:
       - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
       - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
       - target_commit: 66f6a38
+  - operation_id: OP017
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Select C006 as the final ready candidate after C005 produced real target
+      replay evidence.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP018
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Completed C006 by recording downstream go/no-go criteria and updating the
+      M97 synthesis report so future visual/provider work cannot confuse M100
+      prompt paragraph quality with image quality or reference parity.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_EVIDENCE.md
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md

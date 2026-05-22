@@ -124,6 +124,17 @@ real target repo. It still does not claim visual reference parity,
 provider-backed image quality, proto2html readiness, or storyboard/motion
 coverage.
 
+M100 target replay update: the prompt paragraph quality gap has now been
+replayed in the real `smart_city_copilot` target repo at target commit
+`66f6a38`. The target direction `prototype_prompt` and all
+`screen_prompts[].prompt` entries now read as dailin-grade high-fidelity
+prototype-generation briefs instead of terse screen-state instructions. The
+prompt text carries product context, target user, workflow journey, screen
+purpose, concrete city data, system response, trust controls, anti-goals,
+visual direction, and desired operator feeling. `prompt_text_manifest` records
+`paragraph_quality_status: pass`, while `image_generation.status` remains
+`not_started`.
+
 The dailin benchmark shows the expected bar: direction map, product system,
 complete screen groups, interaction states, component vocabulary, trust
 boundaries, global design prompt, screen-specific prompts, negative prompts, and
@@ -252,12 +263,14 @@ types should remain explicit.
 
 2. Upgrade the strategic prompt-pack schema and protocol to dailin-level
    screen-bound output.
-   This should include global design prompt, screen manifest, per-screen prompt,
-   data fields, states, interactions, and acceptance checks.
+   M100 has completed this for prompt paragraph text quality. The remaining
+   work is to preserve that bar while later queues test generated output.
 
 3. Add visual/reality review artifacts.
    A `VISUAL_REVIEW.yaml` or equivalent should score map realism, data density,
    drawer anatomy, interaction affordance, readability, and reference parity.
+   This is still a no-go inside M100; it needs a later queue with explicit
+   generated-image or rendered-prototype evidence.
 
 4. Add storyboard/motion modeling.
    This is required before OW can target video-like dashboard experiences rather
@@ -281,10 +294,21 @@ OW repo validation:
 
 - `node dist/cli/src/index.js validate --root . --json`: pass
 
+M100 prompt paragraph replay status:
+
+- prompt paragraph quality: pass
+- target replay commit: `66f6a38`
+- provider-backed image generation: not run
+- human visual review: not run
+- visual reference parity scoring: not run
+- proto2html: not run
+
 ## Final Recommendation
 
 Treat M97 as a successful second pressure test for product-reality direction
-repair, not as a final high-fidelity prototype-generation success.
+repair, and treat M100 as the text-level repair for dailin-grade prompt
+paragraph quality.
 
-The next OpenWorkflow repair work should start with prompt-pack integrity and
-executability before attempting reference-parity visual generation.
+The next OpenWorkflow repair work can now start from stronger prompt text, but
+visual/provider work must carry its own evidence. M100 is not a generated-image
+quality claim, not a human visual review, and not reference-parity proof.
