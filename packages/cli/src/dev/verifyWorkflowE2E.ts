@@ -336,8 +336,14 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListExcludes(phase, protocol.requiredContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune requires prototype index and cannot bootstrap from validation");
   assertListIncludes(phase, protocol.optionalContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune optional context missing prototype index");
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "accepted baseline screen group", "tune does not require baseline screens");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Normalize tune inputs", "tune does not normalize inputs before audit");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Assign stable source screen ids", "tune does not assign stable source ids");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Interpret the tune request", "tune does not interpret tune request modes");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Detect conflicts", "tune does not detect tune conflicts");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "MUST_INHERIT", "tune does not require delta rules");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "screen_delta_matrix", "tune does not require screen delta matrix");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "target screen id", "tune does not bind screen prompts");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "generation_order", "tune does not require generation order");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "internal decision audit record", "tune does not record decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "tune permits manual decision handoff");
 
@@ -350,11 +356,26 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(packet, "optional", phase), ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "context packet optional context missing prototype index");
 
   const skill = await readSkill(runtime, "ow-tune");
-  for (const tag of ["target_resolution", "baseline_screen_audit", "inheritance_delta_rules", "screen_manifest", "internal_decision_audit"]) {
+  for (const tag of [
+    "target_resolution",
+    "input_normalization",
+    "baseline_screen_audit",
+    "product_system_extraction",
+    "tune_request_interpretation",
+    "inheritance_delta_rules",
+    "screen_manifest",
+    "refined_prompt_pack_output",
+    "internal_decision_audit",
+  ]) {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
   assertIncludes(phase, skill, "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.", "skill lost default target behavior");
+  assertIncludes(phase, skill, "Normalize baseline_source_type", "skill lost input normalization rule");
+  assertIncludes(phase, skill, "Extract product thesis", "skill lost product system extraction rule");
+  assertIncludes(phase, skill, "Classify the request", "skill lost tune request interpretation rule");
+  assertIncludes(phase, skill, "screen_delta_matrix rows", "skill lost screen delta matrix rule");
   assertIncludes(phase, skill, "Every screen prompt must include prompt_id", "skill lost screen manifest rule");
+  assertIncludes(phase, skill, "Generation Order, and Acceptance Checklist", "skill lost refined prompt pack output structure");
   assertIncludes(phase, skill, "Every tune pass must write or update a decision audit record internally.", "skill lost decision audit requirement");
   assertIncludes(phase, skill, "Do not expose /ow:decision as the next manual user step", "skill exposes decision as user step");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in tune handoffs");

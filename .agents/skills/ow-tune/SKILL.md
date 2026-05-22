@@ -92,13 +92,19 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted baseline screen group.
 - Require baseline screens, screenshots, screen descriptions, generated images, or an accepted PROTO_PROMPT_PACK plus a tune request.
+- Normalize tune inputs before baseline audit: baseline source type, baseline refs, tune request, target form factor, regeneration scope, screen count, locked screens, locked elements, and constraints.
+- Assign stable source screen ids and target screen ids when the baseline or request does not provide them.
 - Load only the baseline prompt pack, current prototype evidence, relevant validation or vision context, and latest decision audit context.
 </before>
 <during>
 - Audit the full baseline screen group before writing refined prompts.
 - Extract the product system and preserve product thesis, primary loop, component vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+- Interpret the tune request as visual refinement, brand alignment, screen-specific correction, feature addition, feature removal, form-factor transformation, group expansion, group compression, IA adaptation, copy/localization adjustment, interaction-state coverage, design-system pass, or selected-screen regeneration.
+- Detect conflicts between the tune request, locked elements, product boundaries, non-goals, privacy controls, safety boundaries, and accepted prototype evidence before prompt writing.
 - Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per target screen.
+- Build a screen_delta_matrix that binds each target screen to source screen ids, preserve/add/remove/transform/flexible rules, and acceptance criteria.
 - Bind every refined prompt to target screen id, source screen id(s), generation scope, target form factor, negative constraints, and acceptance criteria.
+- Write generation_order and acceptance_checklist so downstream generation agents can run the refined prompt pack without guessing.
 - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
 </during>
 <after>
@@ -132,16 +138,35 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - If no baseline prototype exists, return to /ow:proto instead of inventing refinement context.
 </target_resolution>
 
+<input_normalization>
+- Normalize baseline_source_type, baseline_refs, tune_request, target_form_factor, regeneration_scope, target_screen_count, locked_screens, locked_elements, output_language, target_tool, and constraints before audit.
+- Assign source ids such as SRC_M01, SRC_W01, or SRC_01 when baseline screens lack stable ids.
+- Assign target ids such as MOB_S01, WEB_S01, TAB_S01, or VAR_A_S01 before writing screen-bound prompts.
+</input_normalization>
+
 <baseline_screen_audit>
 - For each source screen, record screen id, screen name, journey stage, user goal, system state, components, copy tone, represented feature, AI/system behavior, trust controls, visual cues, must-preserve elements, platform artifacts to transform or remove, and assumptions.
 - Treat the screen group as one product system, not unrelated images.
 - State excluded source screens explicitly when the user limits scope.
 </baseline_screen_audit>
 
+<product_system_extraction>
+- Extract product thesis, target user, core behavior, primary product loop, brand promise, interaction model, information architecture, design language, component vocabulary, copywriting style, feature system, trust and boundary system, and anti-goals.
+- Separate stable_constants from adaptable_variables before interpreting the tune request.
+- Preserve product meaning and interaction logic over raw geometry when adapting form factors.
+</product_system_extraction>
+
+<tune_request_interpretation>
+- Classify the request into visual refinement, brand alignment, screen-specific correction, feature addition, feature removal, form-factor transformation, screen group expansion, screen group compression, layout or IA adaptation, copy/localization adjustment, interaction-state coverage, design-system pass, or selected-screen regeneration.
+- Apply conflict priority in this order: latest explicit user request, hard constraints, product vision/non-goals/privacy/safety/trust boundaries, locked screens or elements, baseline product system, original upstream prompt, then agent aesthetic judgment.
+- If a request conflicts with a product boundary or locked constraint, record the conflict and generate the closest valid alternative instead of drifting silently.
+</tune_request_interpretation>
+
 <inheritance_delta_rules>
 - Build MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets before writing prompts.
 - Requested removals must appear in global negative constraints, per-screen negative constraints, and acceptance checks.
 - Flexible changes must remain inside the product thesis, brand promise, non-goals, and screen purpose.
+- Build screen_delta_matrix rows with target screen id, source screen ids, preserve, add, remove, transform, flexible, and acceptance criteria.
 </inheritance_delta_rules>
 
 <screen_manifest>
@@ -149,6 +174,12 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Every screen prompt must include prompt_id, target_screen_id, screen_name, source_screen_ids, target form factor, generation scope, dependencies, prompt, negative prompt, and acceptance criteria.
 - Do not output anonymous prompts that downstream generation cannot map back to screens.
 </screen_manifest>
+
+<refined_prompt_pack_output>
+- Output Baseline System Summary, Tuning Intent Summary, Inheritance and Delta Rules, Screen Mapping / Prompt Manifest, Global Design System Prompt, Screen-Specific Refined Prompts, Negative Prompt / Exclusion Rules, Generation Order, and Acceptance Checklist.
+- Every screen-specific refined prompt must be standalone and bound to a target screen id plus source screen ids.
+- Output prompt text only unless a later internal generation stage is explicitly selected; /ow:tune itself does not generate images.
+</refined_prompt_pack_output>
 
 <internal_decision_audit>
 - Every tune pass must write or update a decision audit record internally.

@@ -304,16 +304,32 @@ packets:
           baseline screen group."
         - Require baseline screens, screenshots, screen descriptions, generated images, or an
           accepted PROTO_PROMPT_PACK plus a tune request.
+        - "Normalize tune inputs before baseline audit: baseline source type, baseline refs, tune
+          request, target form factor, regeneration scope, screen count, locked screens, locked
+          elements, and constraints."
+        - Assign stable source screen ids and target screen ids when the baseline or request does
+          not provide them.
         - Load only the baseline prompt pack, current prototype evidence, relevant validation or
           vision context, and latest decision audit context.
       during:
         - Audit the full baseline screen group before writing refined prompts.
         - Extract the product system and preserve product thesis, primary loop, component
           vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+        - Interpret the tune request as visual refinement, brand alignment, screen-specific
+          correction, feature addition, feature removal, form-factor transformation, group
+          expansion, group compression, IA adaptation, copy/localization adjustment,
+          interaction-state coverage, design-system pass, or selected-screen regeneration.
+        - Detect conflicts between the tune request, locked elements, product boundaries, non-goals,
+          privacy controls, safety boundaries, and accepted prototype evidence before prompt
+          writing.
         - Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per
           target screen.
+        - Build a screen_delta_matrix that binds each target screen to source screen ids,
+          preserve/add/remove/transform/flexible rules, and acceptance criteria.
         - Bind every refined prompt to target screen id, source screen id(s), generation scope,
           target form factor, negative constraints, and acceptance criteria.
+        - Write generation_order and acceptance_checklist so downstream generation agents can run
+          the refined prompt pack without guessing.
         - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
       after:
         - Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and
