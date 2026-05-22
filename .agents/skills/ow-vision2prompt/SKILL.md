@@ -85,14 +85,19 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.
 - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.
 - Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.
+- Prepare to run post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto without pass or skipped status.
 </before>
 <during>
 - Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.
 - Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.
 - Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.
+- After prompt text is ready, run the deterministic post_validate gate over strategic_fingerprint dimensions when resolved_count is 2 or more.
+- When the user explicitly requested exactly one strategic direction, set post_validate.status: skipped and record the skip reason instead of running diversity comparison.
 </during>
 <after>
-- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation.
+- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation and post_validate status.
+- Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.
+- If post_validate.status is fail, keep handoff blocked and repair prompt directions through /ow:vision2prompt.
 - Record internal_pipeline stage vision2prompt status and outputs.
 - Do not generate images; hand internally to /ow:prompt2proto.
 </after>
@@ -121,10 +126,18 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Its output must be ready for /ow:prompt2proto consumption.
 </internal_command_boundary>
 
+<post_validate_gate>
+- Run post_validate after prompt assets are ready and before /ow:prompt2proto handoff.
+- For resolved_count 2 or more, require post_validate.status: pass before image generation.
+- For resolved_count 1 from explicit user input, set post_validate.status: skipped and record why the diversity gate did not run.
+- For post_validate.status: fail, repair strategic prompt directions inside /ow:vision2prompt instead of invoking /ow:prompt2proto.
+</post_validate_gate>
+
 <anti_patterns>
 - Do not expose /ow:vision2prompt as a user-facing workflow step.
 - Do not generate prototype images from this stage.
 - Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.
+- Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.
 - Do not create HTML, specs, changes, or runtime artifacts.
 </anti_patterns>
 

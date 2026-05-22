@@ -216,6 +216,8 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "askUserQuestion", "prototype does not ask for direction count when missing");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "5-8 strategic prototype hypotheses", "prototype does not generate strategic hypotheses");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "prompt_text_manifest.status is ready_for_image_generation", "prototype does not gate image generation on prompt text readiness");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "post_validate.status is pass", "prototype does not gate image generation on post_validate pass");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "post_validate.status is fail", "prototype does not route failed post_validate back to prompt repair");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Batch-generate prototype images", "prototype does not batch-generate images after prompt text");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "PROTO_PROMPT_PACK.yaml", "prototype does not write prompt pack");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "image_generation collection state", "prototype does not write image generation collection state");
@@ -232,6 +234,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   const packet = packetRecord(runtime, "/ow:proto", phase);
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "askUserQuestion", "context packet lost direction-count question behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "post_validate.status is pass", "context packet lost post_validate pass gate");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Batch-generate prototype images", "context packet lost image generation behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "decision audit record internally", "context packet lost internal decision audit");
 
@@ -243,6 +246,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
     "direction_count_policy",
     "strategic_prompt_pack",
     "prompt_text_manifest",
+    "post_validate_gate",
     "image_generation",
     "image_only_boundary",
     "review_evidence",
@@ -255,6 +259,9 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
   assertIncludes(phase, skill, "askUserQuestion", "skill lost direction-count question rule");
   assertIncludes(phase, skill, "resolved_count: 3", "skill lost delegated default direction count");
+  assertIncludes(phase, skill, "post_validate.status: pass", "skill lost post_validate pass requirement");
+  assertIncludes(phase, skill, "post_validate.status: skipped", "skill lost post_validate skip requirement");
+  assertIncludes(phase, skill, "post_validate.status is fail", "skill lost post_validate failure route");
   assertIncludes(phase, skill, "Batch-generate prototype images", "skill lost batch image generation rule");
   assertIncludes(phase, skill, "Do not write HTML, CSS, runnable prototypes", "skill lost image-only boundary");
   assertIncludes(phase, skill, "decision_record", "skill does not expose decision artifact contract for internal audit");
@@ -311,7 +318,11 @@ async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void>
   const prompt2ProtoSkill = await readSkill(runtime, "ow-prompt2proto");
   assertIncludes(phase, vision2PromptSkill, "<command_visibility>internal</command_visibility>", "vision2prompt skill is not internal");
   assertIncludes(phase, vision2PromptSkill, "ready_for_image_generation", "vision2prompt skill missing prompt readiness output");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: pass", "vision2prompt skill missing post_validate pass requirement");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: skipped", "vision2prompt skill missing single-direction skip requirement");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: fail", "vision2prompt skill missing post_validate failure repair route");
   assertIncludes(phase, prompt2ProtoSkill, "<command_visibility>internal</command_visibility>", "prompt2proto skill is not internal");
+  assertIncludes(phase, prompt2ProtoSkill, "post_validate.status pass or skipped", "prompt2proto skill missing post_validate readiness gate");
   assertIncludes(phase, prompt2ProtoSkill, "Every generated image must record image_id", "prompt2proto skill missing image metadata contract");
 }
 

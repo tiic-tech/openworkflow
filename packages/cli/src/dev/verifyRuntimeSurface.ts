@@ -2057,6 +2057,10 @@ function verifyProtoSkill(content: string): void {
     "Each direction must include direction_id",
     "<prompt_text_manifest>",
     "ready_for_image_generation",
+    "<post_validate_gate>",
+    "post_validate.status: pass",
+    "post_validate.status: skipped",
+    "post_validate.status is fail",
     "<image_generation>",
     "Batch-generate prototype images",
     "<image_only_boundary>",
@@ -2076,6 +2080,10 @@ function verifyVision2PromptSkill(content: string): void {
     "<internal_command_boundary>",
     "/ow:vision2prompt is internal",
     "ready_for_image_generation",
+    "<post_validate_gate>",
+    "post_validate.status: pass",
+    "post_validate.status: skipped",
+    "post_validate.status: fail",
     "Do not generate images",
   ]) {
     assert(content.includes(required), `ow-vision2prompt missing internal prompt guidance: ${required}`);
@@ -2086,6 +2094,7 @@ function verifyPrompt2ProtoSkill(content: string): void {
   for (const required of [
     "internal-prompt-text-to-prototype-images",
     "<command_visibility>internal</command_visibility>",
+    "post_validate.status pass or skipped",
     "<image_metadata_contract>",
     "Every generated image must record image_id",
     "source_prompt_ref",

@@ -739,6 +739,8 @@ function prototypeProtocol(): CommandProtocol {
       during: [
         "Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
         "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
+        "Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.",
+        "If post_validate.status is fail, route back through /ow:vision2prompt prompt repair instead of starting image generation.",
         "Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
@@ -814,9 +816,18 @@ function prototypeProtocol(): CommandProtocol {
         ],
       },
       {
+        tag: "post_validate_gate",
+        items: [
+          "Run prompt asset post-validation after prompt_text_manifest.status is ready_for_image_generation and before /ow:prompt2proto.",
+          "Require post_validate.status: pass when direction_count_policy.resolved_count is 2 or more.",
+          "Set post_validate.status: skipped only when direction_count_policy.resolved_count is 1 because the user explicitly requested exactly one strategic direction.",
+          "Do not start image_generation or invoke /ow:prompt2proto when post_validate.status is fail; route back to /ow:vision2prompt prompt repair.",
+        ],
+      },
+      {
         tag: "image_generation",
         items: [
-          "After prompt_text_manifest.status is ready_for_image_generation, Batch-generate prototype images from the prepared prompt text.",
+          "After prompt_text_manifest.status is ready_for_image_generation and post_validate.status is pass or skipped, Batch-generate prototype images from the prepared prompt text.",
           "Generate image groups by direction and screen prompt; keep each generated image linked to direction_id and prompt_id.",
           "Record image_generation.status, batch_strategy, generated_images, and collection_notes in EVIDENCE.yaml.",
           "Do not use image generation as a substitute for missing strategy or incomplete prompt text.",
@@ -888,14 +899,19 @@ function vision2PromptProtocol(): CommandProtocol {
         "Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.",
         "Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.",
         "Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.",
+        "Prepare to run post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto without pass or skipped status.",
       ],
       during: [
         "Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.",
         "Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.",
         "Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.",
+        "After prompt text is ready, run the deterministic post_validate gate over strategic_fingerprint dimensions when resolved_count is 2 or more.",
+        "When the user explicitly requested exactly one strategic direction, set post_validate.status: skipped and record the skip reason instead of running diversity comparison.",
       ],
       after: [
-        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation.",
+        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation and post_validate status.",
+        "Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.",
+        "If post_validate.status is fail, keep handoff blocked and repair prompt directions through /ow:vision2prompt.",
         "Record internal_pipeline stage vision2prompt status and outputs.",
         "Do not generate images; hand internally to /ow:prompt2proto.",
       ],
@@ -904,6 +920,7 @@ function vision2PromptProtocol(): CommandProtocol {
       "Do not expose /ow:vision2prompt as a user-facing workflow step.",
       "Do not generate prototype images from this stage.",
       "Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.",
+      "Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.",
       "Do not create HTML, specs, changes, or runtime artifacts.",
     ],
     internalSections: [
@@ -913,6 +930,15 @@ function vision2PromptProtocol(): CommandProtocol {
           "/ow:vision2prompt is internal and is invoked by /ow:proto, not by the user.",
           "Its only job is strategic prompt text generation from ready vision and validation artifacts.",
           "Its output must be ready for /ow:prompt2proto consumption.",
+        ],
+      },
+      {
+        tag: "post_validate_gate",
+        items: [
+          "Run post_validate after prompt assets are ready and before /ow:prompt2proto handoff.",
+          "For resolved_count 2 or more, require post_validate.status: pass before image generation.",
+          "For resolved_count 1 from explicit user input, set post_validate.status: skipped and record why the diversity gate did not run.",
+          "For post_validate.status: fail, repair strategic prompt directions inside /ow:vision2prompt instead of invoking /ow:prompt2proto.",
         ],
       },
     ],
@@ -953,8 +979,9 @@ function prompt2ProtoProtocol(): CommandProtocol {
     ],
     auditCheckpoints: {
       before: [
-        "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation.",
+        "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation and post_validate.status pass or skipped.",
         "Load prepared prompt text and verify every selected direction has screen_prompts before image generation.",
+        "Block image generation when post_validate.status is fail or missing for multi-direction prompt packs.",
       ],
       during: [
         "Batch-generate high-fidelity prototype images by direction_id and prompt_id.",

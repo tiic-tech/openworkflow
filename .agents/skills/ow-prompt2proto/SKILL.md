@@ -81,8 +81,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation.
+- Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation and post_validate.status pass or skipped.
 - Load prepared prompt text and verify every selected direction has screen_prompts before image generation.
+- Block image generation when post_validate.status is fail or missing for multi-direction prompt packs.
 </before>
 <during>
 - Batch-generate high-fidelity prototype images by direction_id and prompt_id.

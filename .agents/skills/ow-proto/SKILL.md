@@ -101,6 +101,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <during>
 - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
 - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
+- Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
+- If post_validate.status is fail, route back through /ow:vision2prompt prompt repair instead of starting image generation.
 - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
 - Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.
 </during>
@@ -172,8 +174,15 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text.
 </prompt_text_manifest>
 
+<post_validate_gate>
+- Run prompt asset post-validation after prompt_text_manifest.status is ready_for_image_generation and before /ow:prompt2proto.
+- Require post_validate.status: pass when direction_count_policy.resolved_count is 2 or more.
+- Set post_validate.status: skipped only when direction_count_policy.resolved_count is 1 because the user explicitly requested exactly one strategic direction.
+- Do not start image_generation or invoke /ow:prompt2proto when post_validate.status is fail; route back to /ow:vision2prompt prompt repair.
+</post_validate_gate>
+
 <image_generation>
-- After prompt_text_manifest.status is ready_for_image_generation, Batch-generate prototype images from the prepared prompt text.
+- After prompt_text_manifest.status is ready_for_image_generation and post_validate.status is pass or skipped, Batch-generate prototype images from the prepared prompt text.
 - Generate image groups by direction and screen prompt; keep each generated image linked to direction_id and prompt_id.
 - Record image_generation.status, batch_strategy, generated_images, and collection_notes in EVIDENCE.yaml.
 - Do not use image generation as a substitute for missing strategy or incomplete prompt text.
