@@ -33,12 +33,12 @@ outputs:
   summary: changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 2
-completed_candidate_id: C002
-completed_change_id: C002-strategic-fingerprint-evaluator
-selected_candidate_id: C003
-selected_change_id: C003-generated-protocol-post-validate-gate
-next_recommended_candidate_id: null
+active_candidate_count: 1
+completed_candidate_id: C003
+completed_change_id: C003-generated-protocol-post-validate-gate
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C004
 key_dependencies:
   - M86 completed /ow:proto as a user-facing orchestrator over internal /ow:vision2prompt and /ow:prompt2proto stages.
   - M86 completed basic strategic prompt-pack stress fixtures for thin and style-only directions.
@@ -73,3 +73,5 @@ validation:
     - OP005 selected C002 through ow-select-change single-queue ranking.
     - OP006 completed C002 in commit 9d4a9ea and marked C003 ready.
     - OP007 selected C003 through ow-select-change single-queue ranking.
+    - OP008 completed C003 in commit 4221206.
+    - OP009 marked C004 ready after generated protocol wiring landed.

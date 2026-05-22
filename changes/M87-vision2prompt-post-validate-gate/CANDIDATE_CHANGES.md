@@ -26,14 +26,13 @@ run before `/ow:prompt2proto`.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Define prompt asset post-validate contract | none |
 | C002 | done | medium | Implement deterministic strategic fingerprint evaluator | C001 |
-| C003 | selected | medium | Wire post-validate gate into generated vision2prompt protocol | C001, C002 |
-| C004 | candidate | medium | Add post-validate stress fixtures | C001, C002, C003 |
+| C003 | done | medium | Wire post-validate gate into generated vision2prompt protocol | C001, C002 |
+| C004 | ready | medium | Add post-validate stress fixtures | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C003` is selected. C002 implemented the deterministic strategic fingerprint
-evaluator, and C003 now wires the gate into generated `/ow:vision2prompt` and
-`/ow:proto` protocol surfaces.
+`C004` is ready. C003 wired the post-validate gate into generated
+`/ow:vision2prompt`, `/ow:prompt2proto`, and `/ow:proto` protocol surfaces.
 
 ## Deferred
 

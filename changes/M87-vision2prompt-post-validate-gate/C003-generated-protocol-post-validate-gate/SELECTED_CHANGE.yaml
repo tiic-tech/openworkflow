@@ -6,7 +6,7 @@ plan_id: M87-vision2prompt-post-validate-gate
 candidate_id: C003
 change_id: C003-generated-protocol-post-validate-gate
 title: Wire post-validate gate into generated vision2prompt protocol
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -65,3 +65,8 @@ high_risk:
     C003 updates generated command protocol source and sync output. It does not
     change artifact schemas, call external services, or generate prototype
     images.
+completion:
+  completed_at: 2026-05-22
+  commit: 4221206
+  evidence:
+    - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml

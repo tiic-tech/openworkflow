@@ -68,7 +68,7 @@ scope_control:
         End-to-end pressure testing should wait until vision, validation,
         proto, post-validate, and tune contracts are stable.
       suggested_plan_id: M90-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -184,7 +184,7 @@ changes:
       evidence:
         - changes/M87-vision2prompt-post-validate-gate/C002-strategic-fingerprint-evaluator/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: selected
+    status: done
     title: Wire post-validate gate into generated vision2prompt protocol
     purpose: >
       Make generated /ow:vision2prompt guidance require post-validation before
@@ -239,8 +239,14 @@ changes:
         command protocol wiring is required before broader post-validate stress
         fixtures.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-generated-protocol-post-validate-gate
+      completed_at: 2026-05-22
+      commit: 4221206
+      evidence:
+        - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: candidate
+    status: ready
     title: Add post-validate stress fixtures
     purpose: >
       Pressure-test the post-validate gate against duplicated, near-duplicate,
@@ -389,3 +395,30 @@ operations:
       - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/SELECTED_CHANGE.yaml
       - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/ATOM_TASKS.yaml
       - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 wired the post_validate gate into generated /ow:vision2prompt,
+      /ow:prompt2proto, and /ow:proto protocol surfaces through source registry
+      updates, sync output, and generated-surface verification.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Mark C004 ready after C003 completed generated protocol wiring required
+      for post-validate stress fixture coverage.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml

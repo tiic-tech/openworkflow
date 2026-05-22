@@ -6,12 +6,12 @@ plan_id: M87-vision2prompt-post-validate-gate
 candidate_id: C003
 change_id: C003-generated-protocol-post-validate-gate
 title: Atom tasks for generated post-validate protocol wiring
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect generated command source
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/commands/registry.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -22,7 +22,7 @@ tasks:
   - id: T002
     title: Add post-validate protocol requirements
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/commands/registry.ts
     done_when:
@@ -32,7 +32,7 @@ tasks:
   - id: T003
     title: Add generated-surface drift assertions
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyWorkflowE2E.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
@@ -42,7 +42,7 @@ tasks:
   - id: T004
     title: Sync and verify generated surfaces
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - .agents/skills/ow-vision2prompt/SKILL.md
       - .agents/skills/ow-proto/SKILL.md
