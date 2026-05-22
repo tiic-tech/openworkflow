@@ -2244,6 +2244,20 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(ready.code === 0, `proto-ready strategic prompt-pack fixture should pass validation: ${ready.output}`);
   await unlink(readyPath);
+
+  const duplicatePath = join(fixtureDir, "DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(duplicatePath, strategicPromptPackFixture("duplicate-fingerprint"), "utf8");
+  const duplicate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(duplicate.code !== 0, "duplicate strategic fingerprint fixture should fail validation");
+  assert(duplicate.output.includes("exceeds strategic fingerprint similarity threshold"), "duplicate strategic fingerprint failure should name threshold");
+  assert(duplicate.output.includes("shared dimensions"), "duplicate strategic fingerprint failure should name shared dimensions");
+  await unlink(duplicatePath);
+
+  const singlePath = join(fixtureDir, "SINGLE_DIRECTION_PROTO_PROMPT_PACK.yaml");
+  await writeFile(singlePath, strategicPromptPackFixture("single-direction"), "utf8");
+  const single = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(single.code === 0, `single-direction strategic prompt-pack fixture should skip post-validation and pass: ${single.output}`);
+  await unlink(singlePath);
 }
 
 function thinStrategicPromptPackFixture(): string {
@@ -2283,7 +2297,7 @@ function thinStrategicPromptPackFixture(): string {
   ].join("\n");
 }
 
-function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
+function strategicPromptPackFixture(kind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string {
   const rationales =
     kind === "style-only"
       ? [
@@ -2295,6 +2309,26 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
           "Strategic difference: product form shifts from open chat to guided daily mission workflow.",
           "Strategic difference: trigger changes from user-initiated practice to calendar-based social rehearsal.",
           "Strategic difference: main risk and metric focus move to trust calibration before free speaking.",
+        ];
+  const directionCount = kind === "single-direction" ? 1 : 3;
+  const postValidateStatus = kind === "single-direction" ? "skipped" : "pass";
+  const directionCountSource = kind === "single-direction" ? "user_input" : "agent_default_after_user_delegation";
+  const askUserQuestionRequired = kind === "single-direction" ? "false" : "true";
+  const directionRows =
+    kind === "single-direction"
+      ? directionLines("D1", "Daily Mission Companion", rationales[0] ?? "", kind)
+      : [
+          ...directionLines("D1", "Daily Mission Companion", rationales[0] ?? "", kind),
+          ...directionLines("D2", "Calendar Rehearsal Coach", rationales[1] ?? "", kind),
+          ...directionLines("D3", "Trust Calibration Lab", rationales[2] ?? "", kind),
+        ];
+  const promptRefs =
+    kind === "single-direction"
+      ? ["    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md"]
+      : [
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md",
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D2.md",
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D3.md",
         ];
   return [
     "schema_version: 0.1.0",
@@ -2351,10 +2385,10 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
     "      outputs:",
     "        - image_generation",
     "direction_count_policy:",
-    "  source: agent_default_after_user_delegation",
-    "  ask_user_question_required: true",
+    `  source: ${directionCountSource}`,
+    `  ask_user_question_required: ${askUserQuestionRequired}`,
     "  ask_user_question: How many strategically different prototype directions should be generated?",
-    "  resolved_count: 3",
+    `  resolved_count: ${directionCount}`,
     "normalized_input:",
     "  product_domain: AI conversation practice",
     "  primary_user: Adult English learner who avoids real social conversations",
@@ -2379,9 +2413,7 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
     "  boundary_conditions: Must avoid feeling like an exam or scripted grammar lesson",
     "  central_uncertainty: Whether companionship creates enough trust to increase speaking frequency",
     "directions:",
-    ...directionLines("D1", "Daily Mission Companion", rationales[0] ?? ""),
-    ...directionLines("D2", "Calendar Rehearsal Coach", rationales[1] ?? ""),
-    ...directionLines("D3", "Trust Calibration Lab", rationales[2] ?? ""),
+    ...directionRows,
     "build_recommendation:",
     "  first_direction_id: D1",
     "  why_first: It tests the central retention hypothesis with the shortest daily loop.",
@@ -2396,11 +2428,9 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
     "  status: ready_for_image_generation",
     "  directions_ready: true",
     "  prompt_text_refs:",
-    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md",
-    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D2.md",
-    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D3.md",
+    ...promptRefs,
     "post_validate:",
-    "  status: pass",
+    `  status: ${postValidateStatus}`,
     "  trigger: after_prompt_assets_ready",
     "  required_when_direction_count_gte: 2",
     "  skip_when_resolved_count: 1",
@@ -2421,7 +2451,7 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
     "  comparisons: []",
     "  failures: []",
     "  outcome_notes:",
-    "    - Fixture assumes post-validation passed so style-only checks remain isolated.",
+    `    - Fixture post-validation status is ${postValidateStatus}.`,
     "  repair_route: /ow:vision2prompt",
     "image_generation:",
     "  status: not_started",
@@ -2431,7 +2461,8 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
   ].join("\n");
 }
 
-function directionLines(id: string, name: string, distinctness: string): string[] {
+function directionLines(id: string, name: string, distinctness: string, fixtureKind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string[] {
+  const fingerprint = strategicFingerprintLines(id, fixtureKind);
   return [
     `  - direction_id: ${id}`,
     `    name: ${name}`,
@@ -2439,6 +2470,8 @@ function directionLines(id: string, name: string, distinctness: string): string[
     "    validates: Whether this product strategy changes speaking practice frequency.",
     "    main_risk: The user may like the concept but avoid actual speaking.",
     `    distinctness_rationale: "${distinctness}"`,
+    "    strategic_fingerprint:",
+    ...fingerprint,
     "    prototype_prompt: Mobile app prototype with a concrete daily scenario, emotional check-in, AI response, correction moment, and progress recap.",
     "    screen_prompts:",
     "      - prompt_id: screen-1",
@@ -2449,6 +2482,58 @@ function directionLines(id: string, name: string, distinctness: string): string[
     "        prompt_text: Show a mobile screen where the AI gives warm feedback, highlights one new phrase, records confidence progress, and suggests a next real-world conversation.",
     "    pm_judgment: Strong enough for image prototype generation because it names user behavior, system response, trust control, and sample content.",
   ];
+}
+
+function strategicFingerprintLines(id: string, fixtureKind: "ready" | "style-only" | "duplicate-fingerprint" | "single-direction"): string[] {
+  if (fixtureKind === "duplicate-fingerprint") {
+    return [
+      "      product_form: daily companion mission",
+      "      trigger: user opens app for daily practice",
+      "      interaction_model: guided chat rehearsal",
+      "      emotional_driver: warm confidence support",
+      "      retention_mechanism: daily streak and recap",
+      "      metric: three day speaking practice return",
+      "      main_risk: user avoids real speaking",
+      "      trust_model: remembered encouragement with clear correction",
+      "      privacy_model: private conversation memory controls",
+    ];
+  }
+  const byId: Record<string, string[]> = {
+    D1: [
+      "      product_form: daily companion mission",
+      "      trigger: user opens app for daily practice",
+      "      interaction_model: guided chat rehearsal",
+      "      emotional_driver: warm confidence support",
+      "      retention_mechanism: daily streak and recap",
+      "      metric: three day speaking practice return",
+      "      main_risk: user avoids real speaking",
+      "      trust_model: remembered encouragement with clear correction",
+      "      privacy_model: private conversation memory controls",
+    ],
+    D2: [
+      "      product_form: calendar rehearsal coach",
+      "      trigger: upcoming real social event",
+      "      interaction_model: scenario planning checklist",
+      "      emotional_driver: readiness before a specific moment",
+      "      retention_mechanism: event followup loop",
+      "      metric: completed rehearsal before event",
+      "      main_risk: calendar prompts feel intrusive",
+      "      trust_model: explicit event permission",
+      "      privacy_model: user controlled calendar context",
+    ],
+    D3: [
+      "      product_form: trust calibration lab",
+      "      trigger: user asks for correction confidence",
+      "      interaction_model: feedback slider and repair practice",
+      "      emotional_driver: safety before speaking freely",
+      "      retention_mechanism: visible confidence calibration",
+      "      metric: correction acceptance rate",
+      "      main_risk: feedback feels too clinical",
+      "      trust_model: transparent correction boundary",
+      "      privacy_model: ephemeral practice snippets",
+    ],
+  };
+  return byId[id] ?? byId.D1 ?? [];
 }
 
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {

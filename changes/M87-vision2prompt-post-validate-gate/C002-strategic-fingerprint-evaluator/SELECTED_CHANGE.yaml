@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:M87-vision2prompt-post-validate-gate:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C002
+change_id: C002-strategic-fingerprint-evaluator
+title: Implement deterministic strategic fingerprint evaluator
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 through ow-select-change single-queue ranking. C001 is complete,
+  C002 is the next ready candidate, and it implements the deterministic
+  evaluator required before generated protocol wiring.
+owned_paths:
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M87-vision2prompt-post-validate-gate/
+dependencies:
+  - C001
+scope:
+  includes:
+    - fingerprint normalization helper
+    - pairwise similarity calculation
+    - configurable max similarity threshold
+    - skip behavior for resolved_count 1
+    - structured validation errors and audit output
+  excludes:
+    - embedding model calls
+    - LLM judging
+    - image generation
+    - changing user-facing /ow:proto command behavior beyond the gate
+forbidden_paths:
+  - external model or embedding provider calls
+  - generated prototype image assets
+  - /ow:tune command behavior
+acceptance:
+  - The evaluator detects prompt directions whose strategic fingerprints exceed the configured similarity threshold.
+  - The evaluator does not treat raw prompt wording changes as sufficient strategic difference.
+  - The evaluator passes direction sets with materially different fingerprints.
+  - The evaluator skips diversity comparison when resolved_count is 1 and records a skipped outcome.
+  - Error messages identify the over-similar direction pair and the shared fingerprint dimensions.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 is a deterministic local validator/evaluator change. It does not call
+    external services, generate images, expose runtime commands, or alter tune
+    behavior.

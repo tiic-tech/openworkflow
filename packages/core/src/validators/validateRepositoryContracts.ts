@@ -1574,7 +1574,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
-  validatePostValidate(label, data.post_validate, data.direction_count_policy, data.prompt_text_manifest, data.image_generation, errors);
+  validatePostValidate(label, data.post_validate, data.direction_count_policy, data.prompt_text_manifest, data.image_generation, data.directions, errors);
   validateImageGeneration(label, data.image_generation, errors);
 }
 
@@ -1719,7 +1719,7 @@ function validatePromptTextManifest(label: string, value: unknown, errors: strin
   }
 }
 
-function validatePostValidate(label: string, value: unknown, countPolicy: unknown, promptTextManifest: unknown, imageGeneration: unknown, errors: string[]): void {
+function validatePostValidate(label: string, value: unknown, countPolicy: unknown, promptTextManifest: unknown, imageGeneration: unknown, directions: unknown, errors: string[]): void {
   if (!isRecord(value)) {
     errors.push(`${label} post_validate must be a mapping`);
     return;
@@ -1792,6 +1792,95 @@ function validatePostValidate(label: string, value: unknown, countPolicy: unknow
       errors.push(`${label} post_validate failed gates must not start image_generation`);
     }
   }
+  if (status === "pass" && promptReady && resolvedCount !== null && resolvedCount >= 2) {
+    validateStrategicFingerprintSimilarity(label, directions, value.fingerprint_dimensions, thresholdPolicy, errors);
+  }
+}
+
+function validateStrategicFingerprintSimilarity(label: string, directions: unknown, dimensions: unknown, thresholdPolicy: unknown, errors: string[]): void {
+  if (!Array.isArray(directions) || !Array.isArray(dimensions) || !isRecord(thresholdPolicy)) {
+    return;
+  }
+  const threshold = typeof thresholdPolicy.max_pairwise_similarity === "number" ? thresholdPolicy.max_pairwise_similarity : null;
+  if (threshold === null) {
+    return;
+  }
+  const records = directions
+    .filter(isRecord)
+    .map((direction, index) => {
+      const directionId = nonEmptyString(direction.direction_id) ? String(direction.direction_id) : `index-${index}`;
+      const fingerprint = isRecord(direction.strategic_fingerprint) ? direction.strategic_fingerprint : null;
+      if (fingerprint === null) {
+        errors.push(`${label} directions[${index}].strategic_fingerprint must be set when post_validate.status is pass`);
+      }
+      return { directionId, index, fingerprint };
+    });
+  for (let left = 0; left < records.length; left += 1) {
+    for (let right = left + 1; right < records.length; right += 1) {
+      const leftRecord = records[left];
+      const rightRecord = records[right];
+      if (!leftRecord?.fingerprint || !rightRecord?.fingerprint) {
+        continue;
+      }
+      const result = compareStrategicFingerprints(leftRecord.fingerprint, rightRecord.fingerprint, dimensions);
+      if (result.comparedCount === 0) {
+        errors.push(`${label} post_validate cannot compare ${leftRecord.directionId} and ${rightRecord.directionId}: no populated strategic_fingerprint dimensions`);
+        continue;
+      }
+      if (result.score > threshold) {
+        errors.push(`${label} post_validate pair ${leftRecord.directionId}/${rightRecord.directionId} exceeds strategic fingerprint similarity threshold ${threshold}: score ${formatSimilarity(result.score)} shared dimensions ${result.sharedDimensions.join(", ")}`);
+      }
+    }
+  }
+}
+
+function compareStrategicFingerprints(left: Record<string, unknown>, right: Record<string, unknown>, dimensions: unknown[]): { score: number; comparedCount: number; sharedDimensions: string[] } {
+  let total = 0;
+  let comparedCount = 0;
+  const sharedDimensions: string[] = [];
+  for (const rawDimension of dimensions) {
+    const dimension = String(rawDimension);
+    const leftTokens = fingerprintTokens(left[dimension]);
+    const rightTokens = fingerprintTokens(right[dimension]);
+    if (leftTokens.size === 0 || rightTokens.size === 0) {
+      continue;
+    }
+    const similarity = jaccardSimilarity(leftTokens, rightTokens);
+    total += similarity;
+    comparedCount += 1;
+    if (similarity >= 0.8) {
+      sharedDimensions.push(dimension);
+    }
+  }
+  return {
+    score: comparedCount === 0 ? 0 : total / comparedCount,
+    comparedCount,
+    sharedDimensions,
+  };
+}
+
+function fingerprintTokens(value: unknown): Set<string> {
+  const raw = Array.isArray(value)
+    ? value.join(" ")
+    : isRecord(value)
+      ? Object.values(value).join(" ")
+      : String(value ?? "");
+  return new Set(raw.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length > 1));
+}
+
+function jaccardSimilarity(left: Set<string>, right: Set<string>): number {
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) {
+      intersection += 1;
+    }
+  }
+  const union = left.size + right.size - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
+
+function formatSimilarity(value: number): string {
+  return value.toFixed(2);
 }
 
 function validateImageGeneration(label: string, value: unknown, errors: string[]): void {
