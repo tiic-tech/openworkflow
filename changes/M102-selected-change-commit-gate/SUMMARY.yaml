@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M102-selected-change-commit-gate
 title: Summary for selected-change commit gate enforcement
-status: active
+status: completed
 source:
   kind: planning_discussion
   summary: >
@@ -25,12 +25,12 @@ branch_note: >
   codex/m101-build-proto-prompt-command-split; the intended feat branch is
   codex/m102-selected-change-commit-gate before implementation begins.
 candidate_count: 4
-active_candidate_count: 1
-completed_candidate_id: C003
-completed_change_id: M102-C003-commit-evidence-trust-gates
-selected_candidate_id: C003
-selected_change_id: M102-C003-commit-evidence-trust-gates
-next_recommended_candidate_id: C004
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: M102-C004-git-automation-commit-evidence-workflow
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
 high_risk_report: changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
 outputs:
   candidate_changes_yaml: changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
@@ -49,6 +49,10 @@ outputs:
   c003_atom_tasks: changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/ATOM_TASKS.yaml
   c003_implementation_brief: changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/IMPLEMENTATION_BRIEF.md
   c003_local_commit_evidence: changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/LOCAL_COMMIT_EVIDENCE.yaml
+  c004_selected_change: changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/IMPLEMENTATION_BRIEF.md
+  c004_local_commit_evidence: changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - Existing git governance already states selected changes must not finish without a local commit.
   - Current enforcement is only inside explicit git-automation commit mode.
@@ -72,8 +76,7 @@ risks:
       Overly aggressive enforcement could block planning-only candidates that
       correctly changed no implementation files.
     mitigation: Allow explicit implementation_changed_files false plus commit_not_required_reason.
-unresolved_questions:
-  - C003 must wire the strict evidence gate into validate, summaries --strict, and handoff.
+unresolved_questions: []
 selected_decision:
   candidate_id: C001
   selected_change_id: M102-C001-selected-change-commit-enforcement-policy
@@ -107,4 +110,4 @@ validation:
     - C001 completed with implementation_changed_files false and standalone local commit evidence recorded under the C001 selected-change folder.
     - C002 implemented the commit evidence contract and queue audit validator.
     - C003 wired the evidence gate into summaries --strict, handoff, inspect, and context trust surfaces.
-    - C004 is next to integrate git-automation commit evidence guidance and workflow examples.
+    - C004 integrated git-automation commit evidence guidance, CLI evidence path inference, runtime fixtures, and synced generated skill/audit surfaces.

@@ -1746,6 +1746,83 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
     const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
     assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
+
+    const cliRoot = join(tempRoot, "selected-change-cli-commit");
+    await mkdir(join(cliRoot, "allowed"), { recursive: true });
+    await runInCwd(cliRoot, ["git", "init"]);
+    await runInCwd(cliRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(cliRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(cliRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(cliRoot, ["git", "switch", "-c", "codex/m102-cli-fixture"]);
+    await mkdir(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation"), { recursive: true });
+    await writeFile(join(cliRoot, "allowed", "change.txt"), "cli selected change\n", "utf8");
+    await writeFile(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "SELECTED_CHANGE.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: selected_change:M102-cli-fixture:C004",
+      "contract_type: planning",
+      "planning_artifact_type: selected_change",
+      "selected_change_id: M102-C004-git-automation",
+      "source_plan_id: M102-cli-fixture",
+      "source_candidate_id: C004",
+      "title: CLI selected change fixture",
+      "status: active",
+      "",
+    ].join("\n"), "utf8");
+    await writeFile(join(cliRoot, "changes", "M102-cli-fixture", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M102-cli-fixture",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M102-cli-fixture",
+      "title: Candidate changes for CLI fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m102-cli-fixture",
+      "changes:",
+      "  - id: C004",
+      "    status: selected",
+      "    title: Git automation selected-change evidence fixture",
+      "    risk: medium",
+      "    owned_paths:",
+      "      - allowed/",
+      "      - changes/M102-cli-fixture/",
+      "    selection:",
+      "      selected_change_id: M102-C004-git-automation",
+      "      evidence:",
+      "        - changes/M102-cli-fixture/C004-git-automation/SELECTED_CHANGE.yaml",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(cliRoot, ["git", "add", "."]);
+    await runInCwd(cliRoot, ["git", "commit", "-m", "M102-cli-fixture initial"]);
+    await writeFile(join(cliRoot, "allowed", "change.txt"), "cli selected change\nupdated\n", "utf8");
+    const cliCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      cliRoot,
+      "--queue",
+      "changes/M102-cli-fixture/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C004",
+      "--message",
+      "M102-cli-fixture/C004 CLI inferred evidence path",
+      "--validation-evidence",
+      "validation: fixture",
+      "--commit-evidence",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(cliCommit.code === 0, `git-automation commit should infer selected-change evidence path: ${cliCommit.output}`);
+    const cliReport = parseJsonReport(cliCommit.output, "git-automation commit");
+    const cliData = record(cliReport.data, "git-automation commit data");
+    const cliResult = record(cliData.result, "git-automation commit result");
+    assert(cliResult.evidencePath === "changes/M102-cli-fixture/C004-git-automation/LOCAL_COMMIT_EVIDENCE.yaml", "git-automation commit did not infer selected-change evidence path");
+    const cliEvidence = await read(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "LOCAL_COMMIT_EVIDENCE.yaml"));
+    assert(cliEvidence.includes("source_candidate_id: C004"), "CLI commit evidence missing source candidate id");
+    const cliCleanStatus = await runCaptureInCwd(cliRoot, ["git", "status", "--porcelain"]);
+    assert(cliCleanStatus.trim().length === 0, "CLI commit evidence fixture should finish clean");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -2058,6 +2135,9 @@ function verifyGitAutomationSkill(content: string): void {
     "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
     "<evidence_policy>",
     "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+    "--commit-evidence",
+    "changes/&lt;plan_id&gt;/&lt;candidate-id&gt;-&lt;slug&gt;/LOCAL_COMMIT_EVIDENCE.yaml",
+    "Do not batch multiple completed selected changes into one checkpoint commit to satisfy commit evidence.",
     "openworkflow git-automation branch",
     "openworkflow git-automation commit",
     "openworkflow git-automation summary",

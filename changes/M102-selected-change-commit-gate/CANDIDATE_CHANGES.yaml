@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M102-selected-change-commit-gate
 title: Candidate changes for selected-change commit gate enforcement
-status: active
+status: completed
 source:
   kind: planning_discussion
   refs:
@@ -62,7 +62,7 @@ scope_control:
     - title: Remote PR mutation governance
       reason: Remote operations require separate approval and are outside this local commit gate bug.
       suggested_plan_id: M103-remote-pr-governance
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -263,7 +263,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C004
-    status: candidate
+    status: done
     title: Integrate git-automation commit evidence into selected-change completion workflow
     purpose: >
       Make the correct path easy and visible: selected-change implementation
@@ -283,6 +283,9 @@ changes:
       - packages/cli/src/commands/gitAutomation.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - references/git-version-control-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - changes/M102-selected-change-commit-gate/
     dependencies:
       - C001
@@ -302,6 +305,33 @@ changes:
       - The generated git-automation guidance names the required selected-change commit evidence path.
       - Runtime tests prove git-automation commit can record evidence for the selected change.
       - Manual batching is documented as a failure mode, not a valid completion path.
+    selection:
+      selected_change_id: M102-C004-git-automation-commit-evidence-workflow
+      selected_at: 2026-05-23
+      approved_option: "Option 1: Strict Evidence Gate With Migration Mode"
+      reason: >
+        C004 is the final dependency-unlocked M102 candidate. It makes the
+        git-automation completion path explicit after C001-C003 established
+        the policy, validator, and trust gates.
+      evidence:
+        - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+        - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/SELECTED_CHANGE.yaml
+    completion:
+      completed_by_change_id: M102-C004-git-automation-commit-evidence-workflow
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/SELECTED_CHANGE.yaml
+        - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/ATOM_TASKS.yaml
+        - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/IMPLEMENTATION_BRIEF.md
+        - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/LOCAL_COMMIT_EVIDENCE.yaml
+      validation:
+        - npm run build
+        - node dist/cli/src/index.js sync --root . --json
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -437,4 +467,43 @@ operations:
       - node dist/cli/src/index.js validate --root . --json
       - node dist/cli/src/index.js summaries --root . --strict --json
       - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 to integrate git-automation commit evidence guidance and
+      defaults into the selected-change completion workflow after strict gate
+      enforcement is in place.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Complete C004 after integrating git-automation commit evidence guidance,
+      CLI evidence-path inference, runtime fixtures, and generated skill/audit
+      surfaces from sync.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/IMPLEMENTATION_BRIEF.md
+      - changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/LOCAL_COMMIT_EVIDENCE.yaml
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
       - git diff --check

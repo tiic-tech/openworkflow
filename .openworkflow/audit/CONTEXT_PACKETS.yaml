@@ -771,7 +771,7 @@ packets:
     optional:
       - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
       - changes/<plan_id>/PR_READY_SUMMARY.md
-      - changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml
     forbidden:
       []
     conditional_outputs:
@@ -788,8 +788,12 @@ packets:
         - Record plan id, candidate id, branch, dirty paths, command preview, validation evidence,
           and affected paths.
         - Keep local branch, commit, and summary actions scoped to the selected queue.
+        - When committing implementation work, write LOCAL_COMMIT_EVIDENCE.yaml under the
+          selected-change folder and reference it from completion evidence.
       after:
         - Record commit hash and evidence path when a local commit is created.
+        - "Confirm the selected candidate completion records implementation_changed_files: true and
+          a repo-relative LOCAL_COMMIT_EVIDENCE.yaml path."
         - Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.
         - Report remote operations as gated and include ordered commit or queue evidence for push,
           PR, and merge planning.

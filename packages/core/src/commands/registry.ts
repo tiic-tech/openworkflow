@@ -413,7 +413,7 @@ function gitAutomationProtocol(): CommandProtocol {
     optionalContext: [
       "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
       "changes/<plan_id>/PR_READY_SUMMARY.md",
-      "changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml",
     ],
     forbiddenContext: [],
     allowedOutputs: [
@@ -445,9 +445,11 @@ function gitAutomationProtocol(): CommandProtocol {
         "Use dry-run or preview before any local mutation.",
         "Record plan id, candidate id, branch, dirty paths, command preview, validation evidence, and affected paths.",
         "Keep local branch, commit, and summary actions scoped to the selected queue.",
+        "When committing implementation work, write LOCAL_COMMIT_EVIDENCE.yaml under the selected-change folder and reference it from completion evidence.",
       ],
       after: [
         "Record commit hash and evidence path when a local commit is created.",
+        "Confirm the selected candidate completion records implementation_changed_files: true and a repo-relative LOCAL_COMMIT_EVIDENCE.yaml path.",
         "Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.",
         "Report remote operations as gated and include ordered commit or queue evidence for push, PR, and merge planning.",
       ],
@@ -456,11 +458,12 @@ function gitAutomationProtocol(): CommandProtocol {
       "Do not treat git-automation enabled as permission to push, merge, or mutate GitHub in this G015 shell.",
       "Do not hide dirty paths or omit command previews from evidence.",
       "Do not create a selected change with no local commit when implementation changed files.",
+      "Do not batch multiple completed selected changes into one checkpoint commit to satisfy commit evidence.",
       "Do not amend only to force a commit to contain its own hash.",
     ],
     handoffCommands: [
       "openworkflow git-automation branch --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
-      "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --json",
+      "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --commit-evidence --json",
       "openworkflow git-automation summary --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
       "openworkflow git-automation simulate --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --json",
       "openworkflow git-automation remote-plan --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base <branch> --json",
@@ -482,7 +485,8 @@ function gitAutomationProtocol(): CommandProtocol {
         items: [
           "Every git operation must be traceable to a plan id, candidate id, command preview, before and after state, and validation evidence when applicable.",
           "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
-          "A selected change must have at least one local commit when implementation changed files.",
+          "A selected change must have at least one local commit when implementation changed files, recorded in changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml.",
+          "The owning queue completion must reference the selected-change LOCAL_COMMIT_EVIDENCE.yaml path; manual checkpoint batching is a failure mode, not valid evidence.",
           "Follow-up evidence commits are allowed when they preserve the selected-change HEAD relationship.",
         ],
       },

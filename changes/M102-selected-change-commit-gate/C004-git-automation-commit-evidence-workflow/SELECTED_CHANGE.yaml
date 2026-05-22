@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:M102-selected-change-commit-gate:C004
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M102-C004-git-automation-commit-evidence-workflow
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C004
+title: Integrate git-automation commit evidence into selected-change completion workflow
+status: completed
+selection_reason:
+  - C001 through C003 completed the policy, validator, and strict trust gates.
+  - C004 is the remaining workflow integration step that makes the correct git-automation evidence path visible and easy to execute.
+  - The scope excludes remote mutation and keeps generated adapter changes flowing from source registry updates plus sync.
+approved_option:
+  id: option_1
+  title: Strict Evidence Gate With Migration Mode
+scope:
+  includes:
+    - generated git-automation skill guidance for LOCAL_COMMIT_EVIDENCE.yaml
+    - git-automation commit command default or explicit evidence path behavior
+    - runtime verification for per-candidate local commit evidence recording
+    - documentation that manual batching is a failure mode
+  excludes:
+    - remote push, PR creation, merge, or issue mutation
+    - changing selected-change trust gate policy
+    - unrelated branch policy
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/git/
+  - packages/cli/src/commands/gitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - references/git-version-control-governance.md
+    - .agents/skills/ow-git-automation/SKILL.md
+    - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    - changes/M102-selected-change-commit-gate/
+forbidden_paths: []
+acceptance:
+  - The generated git-automation guidance names the required selected-change commit evidence path.
+  - Runtime tests prove git-automation commit can record evidence for the selected change.
+  - Manual batching is documented as a failure mode, not a valid completion path.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  local_commit_evidence: changes/M102-selected-change-commit-gate/C004-git-automation-commit-evidence-workflow/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23

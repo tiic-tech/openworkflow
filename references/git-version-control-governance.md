@@ -151,6 +151,17 @@ latest local HEAD produced for the selected change as the relationship anchor,
 and record the primary implementation commit hash when a follow-up evidence
 commit is used.
 
+The preferred local completion path is:
+
+```text
+openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message "<plan-id> <candidate-id> ..." --validation-evidence "<commands>" --commit-evidence --json
+```
+
+When `--commit-evidence` is used, the selected change should record
+`LOCAL_COMMIT_EVIDENCE.yaml` under its own selected-change folder and the queue
+completion should reference that repo-relative path. A checkpoint commit that
+batches multiple completed selected changes is not valid per-candidate evidence.
+
 Remote operations are outside the approved local boundary. Push, remote PR
 creation or update, Issue mutation, and merge require explicit operation-level
 approval and must follow `references/gh-operation-governance.md`.
