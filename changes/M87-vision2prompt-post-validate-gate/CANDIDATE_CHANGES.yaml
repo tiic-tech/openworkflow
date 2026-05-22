@@ -68,7 +68,7 @@ scope_control:
         End-to-end pressure testing should wait until vision, validation,
         proto, post-validate, and tune contracts are stable.
       suggested_plan_id: M90-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -246,7 +246,7 @@ changes:
       evidence:
         - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: ready
+    status: selected
     title: Add post-validate stress fixtures
     purpose: >
       Pressure-test the post-validate gate against duplicated, near-duplicate,
@@ -288,6 +288,14 @@ changes:
       - Tests pass multi-direction prompt assets with distinct strategic fingerprints.
       - Tests skip diversity comparison when resolved_count is 1.
       - Test output makes the gate reason clear enough for /ow:vision2prompt repair.
+    selection:
+      selected_change_id: C004-post-validate-stress-fixtures
+      reason: >
+        Select C004 through ow-select-change single-queue ranking. C001-C003
+        are complete, C004 is the final ready candidate in M87, and it adds
+        stress coverage for exact duplicate, near-duplicate, distinct, and
+        single-direction post_validate outcomes.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -422,3 +430,19 @@ operations:
     after_status: ready
     evidence:
       - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the final ready M87 candidate after C003 completed
+      generated protocol wiring; no analyze-changes run is needed for this
+      single active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C004-post-validate-stress-fixtures/IMPLEMENTATION_BRIEF.md

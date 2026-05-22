@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: selected_change:M87-vision2prompt-post-validate-gate:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C004
+change_id: C004-post-validate-stress-fixtures
+title: Add post-validate stress fixtures
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 through ow-select-change single-queue ranking. C001-C003 are
+  complete, C004 is the final ready candidate in M87, and it adds stress
+  coverage for exact duplicate, near-duplicate, distinct, and single-direction
+  post_validate outcomes.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M87-vision2prompt-post-validate-gate/
+dependencies:
+  - C001
+  - C002
+  - C003
+scope:
+  includes:
+    - duplicate fingerprint fixture
+    - near-duplicate strategic direction fixture
+    - strategically distinct multi-direction fixture
+    - single-direction skip fixture
+    - runtime or E2E assertions for pass, fail, and skipped outcomes
+  excludes:
+    - generated prototype images
+    - browser or visual inspection
+    - tune refined prompt pack fixtures
+    - async subagent execution
+forbidden_paths:
+  - generated prototype images
+  - /ow:tune refined prompt pack fixtures
+  - async subagent runtime behavior
+acceptance:
+  - Tests reject exact duplicate strategic fingerprints.
+  - Tests reject near-duplicate directions that only rephrase the same strategic model.
+  - Tests pass multi-direction prompt assets with distinct strategic fingerprints.
+  - Tests skip diversity comparison when resolved_count is 1.
+  - Test output makes the gate reason clear enough for /ow:vision2prompt repair.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 is verification fixture coverage for the existing post_validate gate.
+    It does not broaden product behavior, call external services, or generate
+    prototype images.
