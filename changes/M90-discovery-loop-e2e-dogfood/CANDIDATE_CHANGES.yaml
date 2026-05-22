@@ -71,10 +71,10 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Create canonical discovery-loop dogfood fixture
     purpose: >
       Establish one maintainable text-first dogfood case that contains
@@ -123,8 +123,14 @@ changes:
         canonical fixture chain required before M90 can verify happy-path or
         negative discovery-loop routing.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-canonical-discovery-loop-dogfood-fixture
+      completed_at: 2026-05-22
+      commit: aae8ed1
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: candidate
+    status: ready
     title: Verify happy-path discovery-loop command handoff
     purpose: >
       Add E2E checks proving the generated command surfaces and context packets
@@ -285,3 +291,30 @@ operations:
       - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/SELECTED_CHANGE.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/ATOM_TASKS.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 added a canonical text-first discovery-loop fixture chain covering
+      vision, validation, strategic prompt pack, generated image metadata,
+      refined tune prompt pack, and benchmark decision evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Mark C002 ready after C001 completed the canonical fixture chain needed
+      for happy-path discovery-loop handoff verification.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml

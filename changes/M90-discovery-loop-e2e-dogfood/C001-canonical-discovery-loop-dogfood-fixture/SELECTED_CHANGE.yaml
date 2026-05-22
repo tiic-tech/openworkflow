@@ -6,7 +6,7 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C001
 change_id: C001-canonical-discovery-loop-dogfood-fixture
 title: Create canonical discovery-loop dogfood fixture
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -58,3 +58,8 @@ high_risk:
     C001 is medium risk because it adds local text fixtures and verification
     helpers only. It does not call external services, generate images, or alter
     async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: aae8ed1
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
