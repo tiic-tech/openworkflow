@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M90-discovery-loop-e2e-dogfood
 title: Summary for discovery-loop E2E dogfood
-status: active
+status: completed
 source:
   kind: mixed
   summary: >
@@ -38,11 +38,11 @@ outputs:
   summary: changes/M90-discovery-loop-e2e-dogfood/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 1
-completed_candidate_id: C003
-completed_change_id: C003-discovery-loop-failure-routing
-selected_candidate_id: C004
-selected_change_id: C004-benchmark-selection-readiness-evidence
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-benchmark-selection-readiness-evidence
+selected_candidate_id: null
+selected_change_id: null
 next_recommended_candidate_id: null
 key_dependencies:
   - M84 made /ow:vision delayed-compile and proto-ready.
@@ -81,3 +81,4 @@ validation:
     - OP009 completed C003 in commit 986727d.
     - OP010 marked C004 ready after negative discovery-loop failure routing landed.
     - OP011 selected C004 through ow-select-change single-queue ranking.
+    - OP012 completed C004 in commit 9f0c828.

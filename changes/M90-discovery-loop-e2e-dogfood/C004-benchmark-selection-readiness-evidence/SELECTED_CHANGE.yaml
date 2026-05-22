@@ -6,7 +6,7 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C004
 change_id: C004-benchmark-selection-readiness-evidence
 title: Record benchmark-selection readiness evidence
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -61,3 +61,8 @@ high_risk:
     C004 is medium risk because it records local benchmark-selection readiness
     checks and planning evidence only. It does not expose proto2html or create
     HTML artifacts.
+completion:
+  completed_at: 2026-05-22
+  commit: 9f0c828
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml

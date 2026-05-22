@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M90-discovery-loop-e2e-dogfood
 title: Candidate changes for discovery-loop E2E dogfood
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -242,7 +242,7 @@ changes:
       evidence:
         - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: selected
+    status: done
     title: Record benchmark-selection readiness evidence
     purpose: >
       Close the synchronous dogfood slice by proving tuned prototype evidence
@@ -292,6 +292,12 @@ changes:
         the final ready M90 candidate and records the benchmark-selection
         handoff evidence without implementing proto2html.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-benchmark-selection-readiness-evidence
+      completed_at: 2026-05-22
+      commit: 9f0c828
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -456,3 +462,16 @@ operations:
       - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/SELECTED_CHANGE.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/ATOM_TASKS.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added benchmark readiness assertions proving decision evidence names
+      accepted prototype refs and no proto2html/html2spec artifacts are created.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml

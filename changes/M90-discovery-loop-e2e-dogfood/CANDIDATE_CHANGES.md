@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m73-workflow-blueprint-runtime-alignment`
 
@@ -23,12 +23,13 @@ tooling, proto2html, html2spec, build, or archive.
 | C001 | done | medium | Create canonical discovery-loop dogfood fixture | none |
 | C002 | done | medium | Verify happy-path discovery-loop command handoff | C001 |
 | C003 | done | medium | Verify discovery-loop failure routing | C001, C002 |
-| C004 | selected | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
+| C004 | done | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C004` is selected. It records benchmark-selection readiness evidence without
-creating proto2html artifacts.
+M90 is complete. The synchronous discovery loop now has text-first dogfood
+coverage for canonical artifacts, happy-path handoff, failure routing, and
+benchmark-selection readiness without creating proto2html artifacts.
 
 ## Deferred
 

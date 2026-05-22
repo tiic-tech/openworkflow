@@ -6,12 +6,12 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C004
 change_id: C004-benchmark-selection-readiness-evidence
 title: Atom tasks for benchmark-selection readiness evidence
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect benchmark decision and tune handoff checks
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/commands/registry.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -21,7 +21,7 @@ tasks:
   - id: T002
     title: Add benchmark-readiness assertions
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -30,7 +30,7 @@ tasks:
   - id: T003
     title: Verify and record M90 completion
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M90-discovery-loop-e2e-dogfood/
@@ -43,3 +43,8 @@ verification:
   - npm run verify:runtime-surface
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  commit: 9f0c828
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml
