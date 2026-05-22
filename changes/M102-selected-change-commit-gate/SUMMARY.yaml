@@ -25,18 +25,22 @@ branch_note: >
   codex/m101-build-proto-prompt-command-split; the intended feat branch is
   codex/m102-selected-change-commit-gate before implementation begins.
 candidate_count: 4
-active_candidate_count: 4
-completed_candidate_id: null
-completed_change_id: null
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C001
+active_candidate_count: 3
+completed_candidate_id: C001
+completed_change_id: M102-C001-selected-change-commit-enforcement-policy
+selected_candidate_id: C001
+selected_change_id: M102-C001-selected-change-commit-enforcement-policy
+next_recommended_candidate_id: C002
 high_risk_report: changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
 outputs:
   candidate_changes_yaml: changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.md
   summary: changes/M102-selected-change-commit-gate/SUMMARY.yaml
   high_risk_decision_report: changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+  selected_change: changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml
+  atom_tasks: changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/ATOM_TASKS.yaml
+  implementation_brief: changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/IMPLEMENTATION_BRIEF.md
+  local_commit_evidence: changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - Existing git governance already states selected changes must not finish without a local commit.
   - Current enforcement is only inside explicit git-automation commit mode.
@@ -61,13 +65,33 @@ risks:
       correctly changed no implementation files.
     mitigation: Allow explicit implementation_changed_files false plus commit_not_required_reason.
 unresolved_questions:
-  - Should missing commit evidence fail validate, summaries --strict, handoff, or all three?
-  - What migration mode should apply to existing historical queues without LOCAL_COMMIT_EVIDENCE.yaml?
-  - Should the first enforcement release warn in non-strict mode and fail only in strict mode?
+  - C002 must translate Option 1 into an auditable LOCAL_COMMIT_EVIDENCE.yaml contract and queue validator.
+  - C003 must wire the strict evidence gate into validate, summaries --strict, and handoff.
+selected_decision:
+  candidate_id: C001
+  selected_change_id: M102-C001-selected-change-commit-enforcement-policy
+  approved_option: "Option 1: Strict Evidence Gate With Migration Mode"
+  strict_gate_targets:
+    - validate
+    - summaries --strict
+    - handoff
+  migration_mode: >
+    Active and new branch-governed queues fail strict gates when completed
+    implementation selected changes lack required commit evidence. Historical
+    queues may warn until touched, selected again, or explicitly opted into the
+    new contract.
+  no_commit_exception: >
+    Planning-only selected changes may complete without an implementation
+    commit only when they record implementation_changed_files: false and
+    commit_not_required_reason.
 validation:
   commands_run:
     - node dist/cli/src/index.js handoff --root . --json
     - git status --short --branch
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
   notes:
     - M102 is now the top-priority queue before returning to M101 implementation work.
-    - C001 is high risk because it changes trust-gate semantics and must remain design-only.
+    - C001 is high risk because it changes trust-gate semantics and remained design-only.
+    - C001 completed with implementation_changed_files false and still requires standalone local commit evidence before C002 starts.

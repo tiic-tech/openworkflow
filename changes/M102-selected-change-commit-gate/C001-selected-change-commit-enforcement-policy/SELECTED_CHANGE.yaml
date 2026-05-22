@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M102-selected-change-commit-gate:C001
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M102-C001-selected-change-commit-enforcement-policy
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C001
+title: Decide selected-change commit enforcement policy and migration guardrails
+status: completed
+selection_reason:
+  - C001 is the dependency-free high-risk decision that must precede all implementation candidates.
+  - Option 1 is the only listed option that closes the M101-style missing per-candidate commit evidence bug.
+  - The approved scope is design-only, limited to queue, decision report, and C001 selection artifacts.
+approved_option:
+  id: option_1
+  title: Strict Evidence Gate With Migration Mode
+  decision: >
+    Completed selected changes with implementation file edits must have
+    LOCAL_COMMIT_EVIDENCE.yaml with at least one local commit hash. A selected
+    change that does not modify implementation files may complete without an
+    implementation commit only when it records implementation_changed_files:
+    false and a commit_not_required_reason.
+enforcement_policy:
+  strict_gates:
+    - validate
+    - summaries --strict
+    - handoff
+  migration_mode: >
+    Active and new branch-governed queues fail strict gates when completed
+    implementation selected changes lack required commit evidence. Historical
+    queues may surface warnings until touched, selected again, or explicitly
+    opted into the new contract.
+  source_of_truth: >
+    The selected-change folder owns LOCAL_COMMIT_EVIDENCE.yaml. The queue may
+    mirror commit ids in completion evidence, but the evidence artifact remains
+    the auditable source for commit hashes, validation commands, changed paths,
+    and selected-change HEAD relationships.
+rejected_alternatives:
+  - id: option_2
+    reason: Warning-only behavior would preserve the existing unauditable completion path.
+  - id: option_3
+    reason: Git-automation-only education would leave validate, summaries --strict, and handoff trusted despite missing evidence.
+scope:
+  includes:
+    - choose Option 1 as the enforcement policy
+    - define strict gate targets and migration behavior
+    - define the planning-only no-commit exception shape
+    - define LOCAL_COMMIT_EVIDENCE.yaml as the selected-change evidence source of truth
+    - update M102 queue and high-risk decision artifacts
+  excludes:
+    - implementation source edits
+    - generated adapter sync
+    - managed .agents or .openworkflow surface edits
+    - remote push or PR mutation
+    - rewriting historical commits
+owned_paths:
+  - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+  - changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
+  - changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.md
+  - changes/M102-selected-change-commit-gate/SUMMARY.yaml
+  - changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/
+forbidden_paths:
+  - packages/
+  - schemas/
+  - references/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - The decision report records the current bug, Option 1 decision, migration guardrails, go criteria, and stop criteria.
+  - The report distinguishes implementation candidates from planning-only candidates.
+  - The report defines validate, summaries --strict, and handoff as strict enforcement targets before implementation begins.
+  - No source, generated adapter, or managed audit surface is changed by C001.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C001 is design-only and changed planning artifacts only. A standalone local
+    commit is still required by the M102 queue cadence before C002 begins.
+  expected_commit_evidence: changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23
