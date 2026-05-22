@@ -22,12 +22,12 @@ scope_boundary: >
   smart_city_copilot, before downstream image generation or visual parity.
 branch_boundary: codex/m99-smart-city-m98-e2e-replay
 candidate_count: 3
-active_candidate_count: 3
-completed_candidate_id: null
-completed_change_id: null
+active_candidate_count: 2
+completed_candidate_id: C001
+completed_change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 deferred_feature_refs:
   - M100-prototype-visual-reference-parity-gate
   - M101-prototype-storyboard-motion-model
@@ -71,3 +71,11 @@ validation:
     - This queue was created on branch codex/m99-smart-city-m98-e2e-replay from the M98 C006 commit.
     - New worktree validation used the already-built dist CLI from /Users/archy/Projects/StartUp/openworkflow because /tmp/openworkflow-m99-e2e-worktree does not contain local dist build output.
     - The first selected candidate should prepare the smart_city_copilot branch and baseline before any target replay commands run.
+    - C001 was selected and completed as the clean smart_city_copilot target worktree baseline before any real replay commands run.
+    - C001 confirmed /tmp/smart-city-m99-e2e-worktree exists on branch codex/m99-smart-city-m98-e2e-replay at HEAD 2b977be with a clean dirty-tree baseline.
+    - C001 confirmed the original smart_city_copilot worktree remains separate on codex/smart-city-product-reality-e2e and was not cleaned, reset, or switched.
+    - C001 discovered the target repo OpenWorkflow surface through AGENTS.md, .openworkflow/, and .agents/skills/ow-*/SKILL.md.
+    - C001 target handoff/readiness checks were intentionally recorded as baseline failures: handoff and strict summaries fail on current-but-thin prototype_evidence, and validate fails on missing M98 source-completeness fields.
+    - C001 scanned the existing target PROTO_PROMPT_PACK.yaml and found directions/screen_prompts present but prototype_brief, screen_manifest, global design prompt, negative prompts, quality_rubric, prompt_pack_integrity_gate, and prototype_reality_gate absent at baseline.
+    - C001 did not run real target replay, provider-backed image generation, visual review, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
+    - C002 is now the next recommended candidate to run the real target-repo M98 prompt-pack source replay.

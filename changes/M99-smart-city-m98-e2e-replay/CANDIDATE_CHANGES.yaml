@@ -73,10 +73,10 @@ scope_control:
         External image calls must be a separate explicitly selected benchmark
         after prompt-pack source quality is proven in the target repo.
       suggested_plan_id: M102-provider-image-generation-benchmark
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Prepare clean smart_city_copilot E2E replay branch
     purpose: >
       Create a clean target-repo test branch and capture baseline trust gates
@@ -111,6 +111,32 @@ changes:
       - Dirty-tree state is captured before replay.
       - No unrelated target artifacts are removed or overwritten.
       - Replay can proceed from a known baseline.
+    selection:
+      selected_change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
+      selected_at: 2026-05-22
+      reason: >
+        C001 is the dependency-free first candidate and establishes the clean
+        target worktree branch/readiness baseline required before C002 runs any
+        real smart_city_copilot replay command.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C001 confirmed /tmp/smart-city-m99-e2e-worktree is on
+          codex/m99-smart-city-m98-e2e-replay at 2b977be with a clean
+          dirty-tree baseline.
+        - >
+          C001 recorded target handoff/readiness as baseline failures: strict
+          handoff and summaries fail on current-but-thin prototype_evidence,
+          and validate fails on missing M98 source-completeness fields.
+        - >
+          C001 scanned the existing target PROTO_PROMPT_PACK.yaml and found it
+          pre-M98 thin: directions and screen_prompts are present, but
+          prototype_brief, screen_manifest, global design prompt, negative
+          prompts, quality_rubric, prompt_pack_integrity_gate, and
+          prototype_reality_gate are absent.
   - id: C002
     status: candidate
     title: Run target-repo M98 prompt-pack source replay
@@ -197,3 +223,32 @@ operations:
     evidence:
       - git commit 2396c13 Replay smart city prompt pack with M98 contract
       - /tmp/openworkflow-archives/m98-c006-smart-city-replay-2396c13.tar.gz
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 first because the queue requires a clean target-repo branch
+      and readiness baseline before any real smart_city_copilot replay runs.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/SELECTED_CHANGE.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/ATOM_TASKS.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete C001 after recording the clean target worktree branch, HEAD,
+      dirty-tree state, OpenWorkflow command surface, readiness baseline, and
+      prompt-pack source-completeness baseline without starting the real replay.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/LOCAL_CHANGE_EVIDENCE.yaml

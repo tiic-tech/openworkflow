@@ -1,0 +1,131 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M99-smart-city-m98-e2e-replay:C001
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C001
+change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
+title: Local evidence for clean smart_city_copilot E2E replay branch baseline
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Recorded the clean smart_city_copilot target worktree, branch, HEAD,
+  OpenWorkflow command surface, readiness failures, and current prompt-pack
+  source-completeness baseline before running any real M98 replay.
+changed_paths:
+  - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/SELECTED_CHANGE.yaml
+  - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/ATOM_TASKS.yaml
+  - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/IMPLEMENTATION_BRIEF.md
+  - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/LOCAL_CHANGE_EVIDENCE.yaml
+  - changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+  - changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.md
+  - changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+target_baseline:
+  original_repo_path: /Users/archy/Projects/StartUp/smart_city_copilot
+  clean_worktree_path: /tmp/smart-city-m99-e2e-worktree
+  original_worktree:
+    branch: codex/smart-city-product-reality-e2e
+    head: 2b977becf8c41de3d7cc3fcf555ce3cf9d50d5ea
+    note: >
+      The original worktree was not cleaned, reset, switched, or otherwise
+      modified because it may contain prior M97 dogfood state.
+  replay_worktree:
+    branch: codex/m99-smart-city-m98-e2e-replay
+    head_short: 2b977be
+    head: 2b977becf8c41de3d7cc3fcf555ce3cf9d50d5ea
+    status_short_branch: "## codex/m99-smart-city-m98-e2e-replay"
+    dirty_tree: false
+    remote_configured: false
+    last_commit: "2b977be Add smart city discovery prototype artifacts"
+  command_surface:
+    agent_guide: AGENTS.md
+    workflow_root: .openworkflow
+    current_state: .openworkflow/CURRENT_STATE.yaml
+    adapter_config: .agents/openworkflow-adapter.yaml
+    repo_local_skills: .agents/skills/ow-*/SKILL.md
+    cli_used: /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js
+  current_state:
+    active_stage: prototype
+    next_command: /ow:tune
+    current_vision: .openworkflow/vision/sessions/vision-001/VISION_SESSION.yaml
+    current_validation: .openworkflow/validation/val-001/VALIDATION.yaml
+    current_prototype: .openworkflow/prototypes/proto-001/EVIDENCE.yaml
+    current_decision: .openworkflow/decisions/dec-001/DECISION.yaml
+readiness_baseline:
+  handoff:
+    command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root . --json
+    ok: false
+    managed_surface_ok: true
+    adapter_ok: true
+    summary_freshness_ok: true
+    summary_quality_ok: false
+    next_command_ready: true
+    next_command: /ow:tune
+    blocking_reasons:
+      - run openworkflow summaries --root . --strict --json before trusting artifact handoff quality
+      - .openworkflow/prototypes/proto-001/EVIDENCE.yaml has empty M98 handoff fields in prototype_brief, product_experience_model, global_design_system_prompt, quality_rubric, prototype_reality_gate, and prompt_pack_integrity_gate
+    stale_surface_warnings:
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+  validate:
+    command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root . --json
+    ok: false
+    reason: >
+      The target prototype EVIDENCE.yaml does not satisfy the M98 contract:
+      prototype_brief, product_experience_model, global_design_system_prompt,
+      quality_rubric, prototype_reality_gate, and prompt_pack_integrity_gate
+      are not valid mappings, and screen_manifest/screen_prompts are missing
+      required source-completeness fields.
+  summaries_strict:
+    command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root . --strict --json
+    ok: false
+    quality_status: current_but_thin
+    reason: >
+      Strict summary quality fails on current-but-thin prototype_evidence with
+      empty M98 handoff fields.
+prompt_pack_source_baseline:
+  path: .openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+  line_count: 97
+  status: ready_for_image_generation
+  present_fields:
+    - directions
+    - directions[].screen_prompts
+  missing_m98_fields:
+    - prototype_brief
+    - screen_manifest
+    - global_design_system_prompt
+    - directions[].screen_prompts[].negative_prompt
+    - directions[].screen_prompts[].example_copy
+    - quality_rubric
+    - prompt_pack_integrity_gate
+    - prototype_reality_gate
+  interpretation: >
+    The existing target prompt-pack source is pre-M98 thin at baseline. C002
+    must run the real replay or refresh path and then verify whether the target
+    PROTO_PROMPT_PACK itself carries the full M98 source-completeness contract.
+behavior_changes:
+  - C001 selects and completes the branch/readiness baseline only.
+  - C002 remains the next recommended candidate for the real replay.
+  - No target repo artifacts were modified.
+  - No provider-backed image generation, visual review, proto2html, storyboard, or motion modeling was run.
+verification:
+  passed:
+    - main repo node dist/cli/src/index.js handoff --root . --json
+    - main repo git status --short --branch
+    - target repo git status --short --branch
+    - target repo git worktree list --porcelain
+    - target repo AGENTS.md and OpenWorkflow surface discovery
+    - target repo PROTO_PROMPT_PACK field scan
+  baseline_failures_recorded:
+    - target repo handoff --root . --json
+    - target repo validate --root . --json
+    - target repo summaries --root . --strict --json
+deferred:
+  - real target repo M98 replay
+  - provider-backed image generation
+  - visual reference parity review
+  - proto2html
+  - storyboard and motion modeling

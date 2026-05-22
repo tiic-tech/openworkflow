@@ -19,14 +19,15 @@ integration, or storyboard/motion modeling.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | ready | medium | Prepare clean smart_city_copilot E2E replay branch | none |
+| C001 | done | medium | Prepare clean smart_city_copilot E2E replay branch | none |
 | C002 | candidate | medium | Run target-repo M98 prompt-pack source replay | C001 |
 | C003 | candidate | medium | Compare real replay against C006 fixture and M97 gap notes | C002 |
 
 ## Next Recommendation
 
-Select `C001` first. It creates the clean target-repo branch/readiness baseline
-needed before any `smart_city_copilot` replay is run.
+Select `C002` next. C001 recorded the clean target-repo branch/readiness
+baseline; the next step is the real `smart_city_copilot` M98 prompt-pack source
+replay.
 
 ## Candidate Details
 
@@ -34,6 +35,12 @@ needed before any `smart_city_copilot` replay is run.
 
 Purpose: isolate the target repo test branch and record baseline trust gates
 before replay.
+
+Outcome: completed. The clean target worktree is
+`/tmp/smart-city-m99-e2e-worktree` on
+`codex/m99-smart-city-m98-e2e-replay` at `2b977be`, with a clean dirty-tree
+baseline. Target handoff/readiness failures were recorded as baseline evidence;
+no real replay or target mutation was performed.
 
 Validation:
 
