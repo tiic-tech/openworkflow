@@ -1,0 +1,73 @@
+schema_version: 0.1.0
+contract_id: summary:M102-selected-change-commit-gate
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M102-selected-change-commit-gate
+title: Summary for selected-change commit gate enforcement
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    User identified a major bug in OpenWorkflow git governance: selected
+    changes that implement file edits are supposed to complete with at least
+    one local commit, but current trust gates do not enforce per-candidate
+    commit evidence.
+  refs:
+    - user_direction:2026-05-23-major-bug-selected-change-commit-gate
+    - references/git-version-control-governance.md
+    - references/planning-artifact-contracts.md
+scope_boundary: >
+  Enforce the selected-change local commit requirement across planning queues
+  and trust gates without changing remote git or GitHub mutation behavior.
+branch_boundary: codex/m102-selected-change-commit-gate
+branch_note: >
+  Queue was created while the working branch was
+  codex/m101-build-proto-prompt-command-split; the intended feat branch is
+  codex/m102-selected-change-commit-gate before implementation begins.
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+high_risk_report: changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+outputs:
+  candidate_changes_yaml: changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.md
+  summary: changes/M102-selected-change-commit-gate/SUMMARY.yaml
+  high_risk_decision_report: changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+key_dependencies:
+  - Existing git governance already states selected changes must not finish without a local commit.
+  - Current enforcement is only inside explicit git-automation commit mode.
+  - Strict trust gates currently do not fail when a queue records done candidates without commit evidence.
+risks:
+  - id: R001
+    level: high
+    description: >
+      Enforcing this rule can make summaries --strict, handoff, or validate fail
+      for historical queues that lack commit evidence.
+    mitigation: C001 must define migration mode and the exact strict gate before implementation.
+  - id: R002
+    level: high
+    description: >
+      Weak enforcement would leave selected-change auditability dependent on
+      agent discipline rather than product gates.
+    mitigation: C002 and C003 must include runtime fixtures for the M101-style batched commit failure mode.
+  - id: R003
+    level: medium
+    description: >
+      Overly aggressive enforcement could block planning-only candidates that
+      correctly changed no implementation files.
+    mitigation: Allow explicit implementation_changed_files false plus commit_not_required_reason.
+unresolved_questions:
+  - Should missing commit evidence fail validate, summaries --strict, handoff, or all three?
+  - What migration mode should apply to existing historical queues without LOCAL_COMMIT_EVIDENCE.yaml?
+  - Should the first enforcement release warn in non-strict mode and fail only in strict mode?
+validation:
+  commands_run:
+    - node dist/cli/src/index.js handoff --root . --json
+    - git status --short --branch
+  notes:
+    - M102 is now the top-priority queue before returning to M101 implementation work.
+    - C001 is high risk because it changes trust-gate semantics and must remain design-only.
