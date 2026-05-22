@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M88-tune-product-system-inheritance:C001
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C001
+change_id: C001-refined-prompt-pack-inheritance-contract
+title: Local commit evidence for refined prompt pack inheritance contract
+status: completed
+completed_at: 2026-05-22
+commit: 9b8ac08
+summary: >
+  Defined native OW refined prompt-pack inheritance contract fields for
+  /ow:tune artifacts. The contract now exposes normalized tune input, baseline
+  screen audit, product system, inheritance and delta rules, screen delta
+  matrix, screen-bound refined prompts, generation order, and acceptance
+  checklist.
+implemented:
+  - Extended prototype evidence template with refined tune contract fields.
+  - Extended prototype evidence and proto prompt-pack schemas.
+  - Added refined_proto_prompt_pack validation rules without affecting strategic prompt packs.
+  - Synced ARTIFACT_CONTRACTS.yaml from source registry.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+next_recommended_candidate_id: C002

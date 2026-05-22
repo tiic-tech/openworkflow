@@ -69,10 +69,10 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after proto
         and tune evidence are reliable.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Define refined prompt pack inheritance contract
     purpose: >
       Encode the native /ow:tune artifact contract for baseline screen audit,
@@ -124,8 +124,14 @@ changes:
         artifact contract required before generated /ow:tune protocol and
         validator fixture work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-refined-prompt-pack-inheritance-contract
+      completed_at: 2026-05-22
+      commit: 9b8ac08
+      evidence:
+        - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: candidate
+    status: ready
     title: Wire reference methodology into /ow:tune protocol
     purpose: >
       Make generated /ow:tune guidance follow the prototype_tune_to_refined_prompt
@@ -297,3 +303,29 @@ operations:
       - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/SELECTED_CHANGE.yaml
       - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/ATOM_TASKS.yaml
       - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 defined refined prompt-pack inheritance fields in artifact templates,
+      schemas, validators, and generated artifact contract surfaces.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Mark C002 ready after C001 completed the refined prompt-pack contract
+      required for generated /ow:tune protocol wiring.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml

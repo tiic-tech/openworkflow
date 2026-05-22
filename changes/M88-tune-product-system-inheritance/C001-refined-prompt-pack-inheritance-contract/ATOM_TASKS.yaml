@@ -6,12 +6,12 @@ plan_id: M88-tune-product-system-inheritance
 candidate_id: C001
 change_id: C001-refined-prompt-pack-inheritance-contract
 title: Atom tasks for refined prompt pack inheritance contract
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect existing prototype evidence contract
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - schemas/prototype-evidence.schema.json
@@ -21,7 +21,7 @@ tasks:
   - id: T002
     title: Add refined prompt inheritance fields
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - schemas/prototype-evidence.schema.json
@@ -31,7 +31,7 @@ tasks:
   - id: T003
     title: Add contract validation rules
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/validators/validateOpenWorkflow.ts
       - packages/core/src/validators/validateRepositoryContracts.ts
@@ -41,7 +41,7 @@ tasks:
   - id: T004
     title: Verify contract shape
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - schemas/
