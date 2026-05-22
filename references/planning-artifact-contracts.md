@@ -138,6 +138,20 @@ quality are separate trust signals. Use `openworkflow summaries --json` or
 handoff/inspect quality fields for summary trust rather than treating
 `validate` alone as proof that a summary is sufficient.
 
+Selected-change commit gate:
+
+- New or actively touched branch-governed queues may opt into
+  `queue_policy.selected_change_commit_gate: strict`.
+- In strict mode, a `done` selected change must set
+  `completion.implementation_changed_files` to `true` or `false`.
+- When `implementation_changed_files: true`, `completion.evidence` must include
+  a repo-relative `LOCAL_COMMIT_EVIDENCE.yaml` path for that selected change.
+- When `implementation_changed_files: false`, completion must include
+  `commit_not_required_reason` explaining why no implementation commit is
+  required.
+- Historical queues without the strict policy remain migration-mode artifacts
+  until they are touched or intentionally opted into the gate.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.
@@ -311,6 +325,38 @@ Required sections:
 
 The brief should be short. It should not duplicate the entire candidate queue or
 long product discussion.
+
+## LOCAL_COMMIT_EVIDENCE.yaml
+
+Purpose: record the local commit evidence for one selected change without
+implying any remote operation.
+
+Required fields for new evidence files:
+
+- `schema_version`
+- `contract_id`
+- `contract_type: planning`
+- `planning_artifact_type: implementation_evidence`
+- `source_plan_id`
+- `source_candidate_id`
+- `selected_change_id`
+- `primary_commit`
+- `validation_evidence`
+
+Historical evidence files may use older field names such as `plan_id`,
+`candidate_id`, `change_id`, and `implementation_commit`; validators accept
+those during migration, but new git-automation evidence should use the source
+field names above.
+
+The owning `CANDIDATE_CHANGES.yaml` completion should reference the file in
+`completion.evidence` using a repo-relative path:
+
+```yaml
+completion:
+  implementation_changed_files: true
+  evidence:
+    - changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml
+```
 
 ## HIGH_RISK_DECISION_REPORT.md
 

@@ -166,5 +166,13 @@ evidence to audit the work later:
 - validation commands
 - commit hash when available
 
-Older queues may not contain all fields. New branch-governed queues should move
-toward explicit branch and commit evidence as validation support is added.
+New strict branch-governed queues should also record whether implementation
+files changed:
+
+- `implementation_changed_files: true` requires repo-relative
+  `LOCAL_COMMIT_EVIDENCE.yaml` in completion evidence.
+- `implementation_changed_files: false` requires `commit_not_required_reason`.
+
+Older queues may not contain all fields. They remain migration-mode artifacts
+until touched or intentionally opted into
+`queue_policy.selected_change_commit_gate: strict`.

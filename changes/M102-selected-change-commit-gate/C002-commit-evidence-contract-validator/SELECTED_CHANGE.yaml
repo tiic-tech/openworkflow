@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:M102-selected-change-commit-gate:C002
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M102-C002-commit-evidence-contract-validator
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C002
+title: Add selected-change commit evidence contract and queue audit validator
+status: completed
+selection_reason:
+  - C001 completed Option 1, so C002 is the next dependency-unlocked implementation step.
+  - C002 turns the policy into a local evidence contract and queue-level validator before handoff and summaries strict gates are wired in C003.
+  - Runtime-surface regression coverage is required to capture the M101-style batched completion failure mode.
+approved_option:
+  id: option_1
+  title: Strict Evidence Gate With Migration Mode
+scope:
+  includes:
+    - LOCAL_COMMIT_EVIDENCE.yaml contract shape
+    - completion.implementation_changed_files and completion.commit_not_required_reason validation
+    - queue-level audit for done selected changes missing required commit evidence
+    - runtime-surface fixtures for implementation and planning-only completion cases
+  excludes:
+    - summaries --strict or handoff wiring
+    - remote git automation
+    - PR-ready summary semantics
+    - generated adapter sync
+owned_paths:
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - packages/core/src/validators/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - schemas/candidate-changes.schema.json
+  - changes/M102-selected-change-commit-gate/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/commands/summaries.ts
+  - packages/cli/src/commands/handoff.ts
+  - packages/core/src/git/
+acceptance:
+  - A done selected change with implementation edits and no commit evidence is reported by strict audit.
+  - A planning-only selected change can pass only with explicit implementation_changed_files false and commit_not_required_reason.
+  - LOCAL_COMMIT_EVIDENCE.yaml files have required plan, candidate, selected-change, primary commit, and validation evidence fields.
+  - Runtime-surface fixtures cover the M101-style missing per-candidate commit evidence failure mode.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  local_commit_evidence: changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23

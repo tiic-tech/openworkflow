@@ -25,6 +25,7 @@ queue_policy:
   source_of_truth: CANDIDATE_CHANGES.yaml
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
   status_values:
     - candidate
     - ready
@@ -61,7 +62,7 @@ scope_control:
     - title: Remote PR mutation governance
       reason: Remote operations require separate approval and are outside this local commit gate bug.
       suggested_plan_id: M103-remote-pr-governance
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -130,7 +131,7 @@ changes:
         - node dist/cli/src/index.js summaries --root . --strict --json
         - git diff --check
   - id: C002
-    status: candidate
+    status: done
     title: Add selected-change commit evidence contract and queue audit validator
     purpose: >
       Make candidate completion auditable by checking that done selected changes
@@ -150,6 +151,7 @@ changes:
       - references/git-version-control-governance.md
       - packages/core/src/validators/
       - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - schemas/candidate-changes.schema.json
       - changes/M102-selected-change-commit-gate/
     dependencies:
       - C001
@@ -168,6 +170,32 @@ changes:
       - A done selected change with implementation edits and no commit evidence is reported by strict audit.
       - A planning-only selected change can pass only with an explicit no-commit reason.
       - Runtime-surface fixtures cover the M101-style failure mode.
+    selection:
+      selected_change_id: M102-C002-commit-evidence-contract-validator
+      selected_at: 2026-05-23
+      approved_option: "Option 1: Strict Evidence Gate With Migration Mode"
+      reason: >
+        C002 is unlocked by completed C001 and is the next required
+        implementation step to turn the selected-change commit policy into a
+        queue-level contract and validator before handoff/summaries wiring.
+      evidence:
+        - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+        - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/SELECTED_CHANGE.yaml
+    completion:
+      completed_by_change_id: M102-C002-commit-evidence-contract-validator
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/SELECTED_CHANGE.yaml
+        - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/ATOM_TASKS.yaml
+        - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/IMPLEMENTATION_BRIEF.md
+        - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/LOCAL_COMMIT_EVIDENCE.yaml
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
   - id: C003
     status: candidate
     title: Wire commit evidence enforcement into handoff and summaries strict trust gates
@@ -301,6 +329,45 @@ operations:
       - changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/ATOM_TASKS.yaml
       - changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/IMPLEMENTATION_BRIEF.md
       - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 completed Option 1. C002 owns the
+      LOCAL_COMMIT_EVIDENCE.yaml contract, selected-change completion fields,
+      queue-level validator, and runtime regression fixture for missing
+      per-candidate commit evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete C002 after adding the selected-change commit evidence contract,
+      queue-level strict validator, migration-compatible evidence shape checks,
+      and runtime-surface regression fixtures.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/IMPLEMENTATION_BRIEF.md
+      - changes/M102-selected-change-commit-gate/C002-commit-evidence-contract-validator/LOCAL_COMMIT_EVIDENCE.yaml
+      - npm run build
+      - npm run verify:runtime-surface
       - node dist/cli/src/index.js validate --root . --json
       - node dist/cli/src/index.js summaries --root . --strict --json
       - git diff --check

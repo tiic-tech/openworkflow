@@ -6,7 +6,7 @@ Status: active
 
 Branch boundary: `codex/m102-selected-change-commit-gate`
 
-Next recommended candidate: `C002`
+Next recommended candidate: `C003`
 
 Selected change: `M102-C001-selected-change-commit-enforcement-policy`
 
@@ -34,7 +34,7 @@ instead of one selected-change commit per completed candidate.
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
 | C001 | done | high | Decide selected-change commit enforcement policy and migration guardrails | none |
-| C002 | candidate | high | Add selected-change commit evidence contract and queue audit validator | C001 |
+| C002 | done | high | Add selected-change commit evidence contract and queue audit validator | C001 |
 | C003 | candidate | high | Wire commit evidence enforcement into handoff and summaries strict trust gates | C001, C002 |
 | C004 | candidate | medium | Integrate git-automation commit evidence into selected-change completion workflow | C001, C002, C003 |
 
@@ -75,10 +75,9 @@ The next actionable work is high risk because it changes trust gates. See:
 
 ## Recommended Path
 
-1. Implement C002.
-2. Implement C003.
-3. Implement C004.
-4. Return to M101 only after the selected-change commit evidence gate exists.
+1. Implement C003.
+2. Implement C004.
+3. Return to M101 only after the selected-change commit evidence gate exists.
 
 ## Out Of Scope
 

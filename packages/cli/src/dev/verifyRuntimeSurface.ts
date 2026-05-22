@@ -1466,12 +1466,14 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
   const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
   const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
+  const selectedCommitGateQueue = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "CANDIDATE_CHANGES.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
   const originalCommandAudit = await read(commandAudit);
   const originalHighRiskReport = await read(highRiskReport);
   const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
+  const originalSelectedCommitGateQueue = await read(selectedCommitGateQueue);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -1502,13 +1504,100 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const malformedBranchBoundary = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(malformedBranchBoundary.code !== 0, "validate passed after branch boundary was malformed");
     assert(malformedBranchBoundary.output.includes("queue_policy.branch_boundary"), "branch boundary validation did not explain malformed branch boundary");
+    await writeFile(skill, original, "utf8");
+    await writeFile(manifest, originalManifest, "utf8");
+    await writeFile(commandAudit, originalCommandAudit, "utf8");
+    await writeFile(highRiskReport, originalHighRiskReport, "utf8");
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: true,
+      evidence: ["validation: npm run build"],
+    }), "utf8");
+    const missingCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingCommitEvidence.code !== 0, "validate passed after completed implementation selected change lacked local commit evidence");
+    assert(missingCommitEvidence.output.includes("implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "missing commit evidence validation did not explain required evidence path");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: false,
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml"],
+    }), "utf8");
+    const missingNoCommitReason = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingNoCommitReason.code !== 0, "validate passed after planning-only selected change lacked no-commit reason");
+    assert(missingNoCommitReason.output.includes("planning-only completion must include commit_not_required_reason"), "planning-only completion validation did not explain missing no-commit reason");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: false,
+      commitNotRequiredReason: "Planning-only fixture changed no implementation files.",
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml"],
+    }), "utf8");
+    const validPlanningOnly = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validPlanningOnly.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid planning-only selected change fixture reported missing no-commit reason");
+    assert(!validPlanningOnly.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid planning-only selected change fixture reported missing commit evidence");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: true,
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/LOCAL_COMMIT_EVIDENCE.yaml"],
+    }), "utf8");
+    const validCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validCommitEvidence.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid local commit evidence fixture reported missing no-commit reason");
+    assert(!validCommitEvidence.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid local commit evidence fixture reported missing commit evidence");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
     await writeFile(commandAudit, originalCommandAudit, "utf8");
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+    await writeFile(selectedCommitGateQueue, originalSelectedCommitGateQueue, "utf8");
   }
+}
+
+function selectedChangeCommitGateFixture(options: {
+  implementationChangedFiles: boolean;
+  commitNotRequiredReason?: string;
+  evidence: string[];
+}): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M102-selected-change-commit-gate-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M102-selected-change-commit-gate-fixture",
+    "title: Candidate changes for selected-change commit gate fixture",
+    "status: active",
+    "queue_policy:",
+    "  branch_boundary: codex/m102-selected-change-commit-gate",
+    "  selected_change_commit_gate: strict",
+    "changes:",
+    "  - id: C900",
+    "    status: done",
+    "    title: Selected change commit gate fixture",
+    "    purpose: Fixture for selected-change commit evidence validation.",
+    "    scope:",
+    "      includes:",
+    "        - fixture validation",
+    "      excludes: []",
+    "    owned_paths:",
+    "      - changes/M102-selected-change-commit-gate/",
+    "    dependencies: []",
+    "    unlocks: []",
+    "    risk: high",
+    "    size: small",
+    "    validation:",
+    "      - node dist/cli/src/index.js validate --root . --json",
+    "    acceptance:",
+    "      - Fixture validates commit evidence gate behavior.",
+    "    selection:",
+    "      selected_change_id: C900-selected-change-commit-gate-fixture",
+    "    completion:",
+    `      implementation_changed_files: ${options.implementationChangedFiles ? "true" : "false"}`,
+    ...(options.commitNotRequiredReason ? [
+      `      commit_not_required_reason: ${options.commitNotRequiredReason}`,
+    ] : []),
+    "      evidence:",
+    ...options.evidence.map((item) => `        - '${item}'`),
+    "",
+  ].join("\n");
 }
 
 async function verifyGitGovernanceDogfoodFixtures(): Promise<void> {

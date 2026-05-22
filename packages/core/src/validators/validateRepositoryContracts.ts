@@ -294,7 +294,8 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
-      validateCandidateChanges(root, path, data, errors);
+      await validateCandidateChanges(root, path, data, errors);
+      validateLocalCommitEvidence(root, path, data, errors);
     }
   }
 }
@@ -531,6 +532,11 @@ function countOccurrences(content: string, needle: string): number {
 function stringField(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function recordField(record: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = record[key];
+  return isRecord(value) ? value : {};
 }
 
 async function validateGeneratedSurfaceParity(root: string, errors: string[]): Promise<void> {
@@ -847,7 +853,7 @@ function validateCurrentState(root: string, path: string, data: Record<string, u
   }
 }
 
-function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+async function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): Promise<void> {
   if (basename(path) !== "CANDIDATE_CHANGES.yaml") {
     return;
   }
@@ -859,6 +865,7 @@ function validateCandidateChanges(root: string, path: string, data: Record<strin
   if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
     validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
   }
+  const strictCommitGate = isRecord(queuePolicy) && queuePolicy.selected_change_commit_gate === "strict";
   if (!Array.isArray(data.changes)) {
     errors.push(`${label} changes must be a list`);
     return;
@@ -868,7 +875,7 @@ function validateCandidateChanges(root: string, path: string, data: Record<strin
       errors.push(`${label} changes entries must be mappings`);
       continue;
     }
-    validateCandidateCompletionEvidence(label, candidate, errors);
+    validateCandidateCompletionEvidence(root, label, candidate, errors, { strictCommitGate });
   }
 }
 
@@ -884,9 +891,11 @@ function validateBranchBoundary(label: string, value: unknown, errors: string[])
 }
 
 function validateCandidateCompletionEvidence(
+  root: string,
   label: string,
   candidate: Record<string, unknown>,
   errors: string[],
+  options: { strictCommitGate: boolean },
 ): void {
   if (candidate.status !== "done") {
     return;
@@ -911,6 +920,98 @@ function validateCandidateCompletionEvidence(
       errors.push(`${label} ${id} completion commit evidence must use 'commit: <7-40 hex chars>'`);
     }
   }
+  const selectedChangeId = stringField(recordField(candidate, "selection"), "selected_change_id");
+  const implementationChangedFiles = completion.implementation_changed_files;
+  if (implementationChangedFiles === false) {
+    if (!nonEmptyString(completion.commit_not_required_reason)) {
+      errors.push(`${label} ${id} planning-only completion must include commit_not_required_reason`);
+    }
+    return;
+  }
+  if (implementationChangedFiles === true) {
+    validateRequiredLocalCommitEvidence(root, label, id, completion, evidence, errors);
+    return;
+  }
+  if (options.strictCommitGate && selectedChangeId) {
+    errors.push(`${label} ${id} strict selected-change completion must set implementation_changed_files true or false`);
+  }
+}
+
+function validateRequiredLocalCommitEvidence(
+  root: string,
+  label: string,
+  candidateId: string,
+  completion: Record<string, unknown>,
+  evidence: unknown[],
+  errors: string[],
+): void {
+  const evidencePath = localCommitEvidencePath(completion, evidence);
+  if (!evidencePath) {
+    errors.push(`${label} ${candidateId} implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml`);
+    return;
+  }
+  if (isExternalRef(evidencePath) || evidencePath.startsWith("commit:")) {
+    errors.push(`${label} ${candidateId} LOCAL_COMMIT_EVIDENCE.yaml path must be repo-relative`);
+    return;
+  }
+  const resolved = resolve(root, evidencePath);
+  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+    errors.push(`${label} ${candidateId} LOCAL_COMMIT_EVIDENCE.yaml path escapes repository root`);
+    return;
+  }
+  if (!existsSyncSafe(resolved)) {
+    errors.push(`${label} ${candidateId} references missing LOCAL_COMMIT_EVIDENCE.yaml ${evidencePath}`);
+  }
+}
+
+function localCommitEvidencePath(completion: Record<string, unknown>, evidence: unknown[]): string | null {
+  const explicit = stringField(completion, "local_commit_evidence_path") ?? stringField(completion, "local_commit_evidence");
+  if (explicit && explicit.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+    return explicit;
+  }
+  for (const item of evidence) {
+    if (typeof item === "string" && item.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+      return item;
+    }
+  }
+  return null;
+}
+
+function validateLocalCommitEvidence(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "LOCAL_COMMIT_EVIDENCE.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  const planId = stringField(data, "source_plan_id") ?? stringField(data, "plan_id");
+  const candidateId = stringField(data, "source_candidate_id") ?? stringField(data, "candidate_id");
+  const selectedChangeId = stringField(data, "selected_change_id") ?? stringField(data, "change_id");
+  const commit = stringField(data, "primary_commit") ?? stringField(data, "implementation_commit") ?? stringField(data, "commit");
+  if (!planId) {
+    errors.push(`${label} missing source_plan_id or plan_id`);
+  }
+  if (!candidateId) {
+    errors.push(`${label} missing source_candidate_id or candidate_id`);
+  }
+  if (!selectedChangeId) {
+    errors.push(`${label} missing selected_change_id or change_id`);
+  }
+  if (!commit || !/^[0-9a-f]{7,40}$/i.test(commit)) {
+    errors.push(`${label} must include primary_commit or implementation_commit with a 7-40 character git hash`);
+  }
+  if (!hasValidationEvidence(data)) {
+    errors.push(`${label} must include validation_evidence, validations, or validation.commands_run`);
+  }
+}
+
+function hasValidationEvidence(data: Record<string, unknown>): boolean {
+  if (Array.isArray(data.validation_evidence) && data.validation_evidence.some((item) => typeof item === "string" && item.trim().length > 0)) {
+    return true;
+  }
+  if (Array.isArray(data.validations) && data.validations.some((item) => typeof item === "string" && item.trim().length > 0)) {
+    return true;
+  }
+  const validation = recordField(data, "validation");
+  return Array.isArray(validation.commands_run) && validation.commands_run.some((item) => typeof item === "string" && item.trim().length > 0);
 }
 
 function validateCommonContract(root: string, path: string, data: unknown, errors: string[]): void {
