@@ -1,0 +1,21 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M102-C004-git-automation-commit-evidence-workflow
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M102-C004-git-automation-commit-evidence-workflow
+status: current
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C004
+selected_change_id: M102-C004-git-automation-commit-evidence-workflow
+primary_commit: 9fb2da8e2815f7922928401ede997ab4fb8911ec
+validation_evidence:
+  - "validation: npm run build"
+  - "validation: node dist/cli/src/index.js sync --root . --json"
+  - "validation: npm run verify:runtime-surface"
+  - "validation: node dist/cli/src/index.js validate --root . --json"
+  - "validation: node dist/cli/src/index.js summaries --root . --strict --json"
+  - "validation: git diff --check"
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
