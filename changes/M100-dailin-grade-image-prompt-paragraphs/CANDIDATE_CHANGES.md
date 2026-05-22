@@ -24,7 +24,10 @@ step-by-step reference files:
 - `06_quality_rubric.md`
 
 `OUTPUT_PROMPT.md` is the concrete output bar; the SKILL and references are the
-method that gets OW there.
+method that gets OW there. The latest DTC clarification adds a stronger
+interpretation: those references are tools, while the real engine is the
+co-founder and senior product-manager perspective that produced the original
+dailin prompts from only a VISION and one high-level instruction.
 
 In scope:
 
@@ -55,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C003`
+Next recommended candidate: `C007`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -68,16 +71,18 @@ review, proto2html, or broad workflow redesign.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Map dailin skill workflow into OW prompt paragraph contract | none |
 | C002 | done | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
-| C003 | ready | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002 |
+| C007 | ready | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
+| C003 | candidate | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
 | C004 | candidate | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
 | C005 | candidate | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
 | C006 | candidate | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001` and `C002` are complete. The next recommended candidate is `C003`, which
-should wire the dailin-grade paragraph contract and validator gate into
-generated `/ow:vision2prompt` command guidance.
+`C001` and `C002` are complete. The next recommended candidate is `C007`, which
+should inject the co-founder plus senior product-manager perspective as the
+engine behind `/ow:vision2prompt` before C003 wires the generated command
+surface.
 
 The key acceptance shift is:
 
@@ -85,6 +90,9 @@ The key acceptance shift is:
 - new pass: `screen_prompts[].prompt` is a full dailin-grade generation brief
   with journey, interaction behavior, system response, concrete copy/data, trust
   controls, anti-goals, visual direction, and desired user feeling
+- stronger pass: each direction carries strategic product judgment,
+  differentiated product imagination, a product thesis, and a reason this
+  prototype should exist for the target user
 
 ## Candidate Details
 
@@ -136,9 +144,28 @@ Acceptance:
 - dailin-style long-form prompt fixture passes
 - validation errors identify missing paragraph-quality dimensions
 
-### C003 - Wire Dailin-Grade Prompt Paragraph Generation Into /ow:vision2prompt
+### C007 - Inject Senior Product-Manager Philosophy Engine Into vision2prompt
 
 Status: ready
+
+Purpose: make the dailin-grade prompt system run on a co-founder and senior
+product-manager perspective rather than a field-completion checklist.
+
+Acceptance:
+
+- generated `ow-vision2prompt` guidance starts from a co-founder plus senior
+  product-manager perspective before executing reference steps
+- dailin-derived references are described as tools used by that perspective,
+  not proof of quality by themselves
+- each direction carries a product thesis, target user transformation,
+  differentiated product form, and reason-to-exist
+- the rubric rejects structurally complete but strategically empty prompt
+  paragraphs
+- C003 remains blocked behind this candidate
+
+### C003 - Wire Dailin-Grade Prompt Paragraph Generation Into /ow:vision2prompt
+
+Status: candidate
 
 Purpose: ensure generated command guidance tells agents to execute the dailin
 skill workflow and write dense high-fidelity prototype prompt paragraphs by

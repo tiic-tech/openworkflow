@@ -16,6 +16,7 @@ source:
     - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
     - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
     - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/reference/
+    - user_direction:2026-05-23-inject-senior-pm-philosophy-engine
   summary: >
     M98 and M99 repaired prompt-pack source completeness, but direct comparison
     against dailin OUTPUT_PROMPT shows the actual image-generation prompt
@@ -24,6 +25,9 @@ source:
     high-fidelity prototype prompt quality. The primary source method is the
     dailin vision_to_strategic_prototype_prompt skill and its step-by-step
     reference instructions, with OUTPUT_PROMPT used as the concrete output bar.
+    The user clarified that those references are tools for a deeper engine: the
+    co-founder perspective and design philosophy of a top product manager, not a
+    checklist to mechanically fill.
 queue_policy:
   branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
   source_of_truth: CANDIDATE_CHANGES.yaml
@@ -81,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C007
 changes:
   - id: C001
     status: done
@@ -115,7 +119,7 @@ changes:
     dependencies: []
     unlocks:
       - C002
-      - C003
+      - C007
     risk: medium
     size: medium
     validation:
@@ -181,7 +185,7 @@ changes:
     dependencies:
       - C001
     unlocks:
-      - C003
+      - C007
       - C004
     risk: medium
     size: medium
@@ -215,8 +219,62 @@ changes:
         - packages/core/src/validators/validateOpenWorkflow.ts
         - packages/core/src/workflow/summaryHealth.ts
         - packages/cli/src/dev/verifyRuntimeSurface.ts
-  - id: C003
+  - id: C007
     status: ready
+    title: Inject senior product-manager philosophy engine into vision2prompt
+    purpose: >
+      Make the dailin-grade prompt system run on a co-founder and top product
+      manager perspective instead of a field-completion checklist. The
+      generated prompt paragraphs should express strategic product judgment,
+      distinct product imagination, design philosophy, and user transformation
+      before they express screen anatomy.
+    scope:
+      includes:
+        - explicit Step 0 perspective engine for /ow:vision2prompt before reference execution
+        - guidance that dailin-derived references are tools used by the senior PM perspective, not the source of taste by themselves
+        - product thesis, strategic hypothesis, user transformation, differentiated product form, and reason-to-exist requirements for each prototype direction
+        - anti-default rules against dashboard/SaaS/screen-inventory outputs when the vision calls for a different form
+        - quality rubric language that fails complete-but-soulless prompt paragraphs
+        - runtime-surface assertions that generated guidance names the perspective engine before paragraph anatomy
+      excludes:
+        - provider image execution
+        - generated image review
+        - proto2html
+        - broad product-management framework redesign outside /ow:vision2prompt prompt text quality
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+      - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C003
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Generated ow-vision2prompt guidance starts from a co-founder plus senior product-manager perspective before executing reference steps.
+      - The protocol states that dailin-derived references are tools of the perspective engine, not a checklist whose completion alone proves quality.
+      - Each generated prototype direction must carry a product thesis, target user transformation, distinct product form, and reason it should exist.
+      - The rubric rejects prompt paragraphs that satisfy structural dimensions but lack strategic judgment, differentiated imagination, or design philosophy.
+      - C003 remains blocked behind this candidate so paragraph wiring cannot proceed without the perspective engine.
+  - id: C003
+    status: candidate
     title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
     purpose: >
       Change generated /ow:vision2prompt guidance so agents write complete
@@ -248,6 +306,7 @@ changes:
     dependencies:
       - C001
       - C002
+      - C007
     unlocks:
       - C004
       - C005
@@ -503,3 +562,23 @@ operations:
     after_status: ready
     evidence:
       - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: add
+    target_candidate_ids:
+      - C007
+      - C003
+    actor: agent
+    reason: >
+      Add a temporary prerequisite candidate from the user's clarification that
+      dailin's OUTPUT_PROMPT quality came from a co-founder plus senior
+      product-manager perspective, with the distilled references acting as that
+      perspective's tools. Reprioritize this engine before C003 so generated
+      /ow:vision2prompt wiring does not become a mechanically complete but
+      soulless checklist.
+    changed_at: 2026-05-23
+    before_status: C003 ready
+    after_status: C007 ready, C003 candidate
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
+      - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml

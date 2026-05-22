@@ -21,19 +21,22 @@ source:
     - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
     - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
     - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/reference/
+    - user_direction:2026-05-23-inject-senior-pm-philosophy-engine
 scope_boundary: >
   One workflow slice: /ow:vision2prompt image-generation prompt paragraph
   quality. The queue upgrades direction-level and screen-level prompt text from
   terse screen-state descriptions into dailin-grade high-fidelity prototype
-  generation briefs.
+  generation briefs. The queue now explicitly treats the dailin references as
+  tools for a co-founder and senior product-manager perspective engine, not as
+  a checklist that alone creates quality.
 branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
-candidate_count: 6
-active_candidate_count: 4
+candidate_count: 7
+active_candidate_count: 5
 completed_candidate_id: C002
 completed_change_id: C002-enforce-long-form-generation-prompt-structure
 selected_candidate_id: C002
 selected_change_id: C002-enforce-long-form-generation-prompt-structure
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C007
 deferred_feature_refs:
   - M101-provider-image-generation-benchmark
   - M102-prototype-visual-reference-parity-gate
@@ -51,7 +54,8 @@ outputs:
 key_dependencies:
   - C001 is complete; the dailin skill workflow and reference instructions are now mapped into an explicit OW prompt paragraph contract before schemas or generated protocols enforce it.
   - C002 is complete; validators now enforce paragraph anatomy and failure dimensions.
-  - C003 is now ready because generated /ow:vision2prompt guidance can point to stable contract and gate fields.
+  - C007 is now ready because C001 mapped the reference contract and C002 added the structural quality gate; it must inject the senior product-manager philosophy engine before generated guidance is wired.
+  - C003 now depends on C007 so generated /ow:vision2prompt wiring cannot proceed as a mechanically complete checklist.
   - C004 depends on C002 and C003 because fixtures should prove the final schema and protocol behavior.
   - C005 depends on C003 and C004 because the real target replay should run only after the command surface and regressions are in place.
   - C006 depends on C005 because downstream visual parity no-go criteria need real replay evidence.
@@ -95,6 +99,9 @@ validation:
     - node dist/cli/src/index.js validate --root . --json
     - node dist/cli/src/index.js summaries --root . --strict --json
     - git diff --check
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
   notes:
     - C001 completed as contract/reference mapping only; no schema, validator, generated adapter, provider image generation, visual review, or target replay was executed.
     - C002 completed deterministic prompt paragraph enforcement only; no generated skill sync, provider image generation, visual review, or target replay was executed.
@@ -104,3 +111,5 @@ validation:
     - M99 smart city target prompt pack is source-complete but its prompt paragraphs are shorter and less journey-rich than dailin OUTPUT_PROMPT.
     - C001 names dailin OUTPUT_PROMPT as the minimum paragraph benchmark and adds long-form prompt anatomy plus thin-prompt failure modes to OW-owned references.
     - C002 adds schema support, validator checks, runtime regressions, and summary-health fields for prompt paragraph quality. The stored M98 smart city replay fixture is now expected to fail M100 paragraph quality until C004 upgrades or duplicates a positive fixture.
+    - DTC OP008 added C007 as a temporary prerequisite before C003 to inject the co-founder and senior product-manager philosophy engine that originally produced dailin OUTPUT_PROMPT from only VISION.md plus a high-level product prompt.
+    - C003 is no longer next-ready until C007 is selected and completed; this prevents generated /ow:vision2prompt wiring from becoming structurally complete but strategically empty.
