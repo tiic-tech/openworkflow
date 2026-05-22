@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C006
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C006
+change_id: C006-smart-city-replay
+title: Atom tasks for smart city prompt-pack replay
+status: completed
+tasks:
+  - id: T001
+    title: Create stored smart city replay prompt pack
+    type: edit
+    status: completed
+    owned_paths:
+      - examples/
+    done_when:
+      - Stored PROTO_PROMPT_PACK includes prototype brief, screen manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+      - Planning, incident, and capacity are modeled as states/modules inside one map-first product shell.
+      - Image generation remains not_started.
+  - id: T002
+    title: Add runtime replay validation
+    type: test
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification reads the stored replay YAML.
+      - Runtime verification checks source completeness structurally before CLI validation.
+      - Runtime verification validates the replay prompt pack through the repo dist CLI in a temporary OpenWorkflow prototype directory.
+  - id: T003
+    title: Record M97 gap comparison
+    type: edit
+    status: completed
+    owned_paths:
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+      - examples/
+    done_when:
+      - Replay audit states that prompt-pack source completeness is now proven for the smart city replay.
+      - Documentation preserves visual reference parity and storyboard/motion gaps as deferred.
+  - id: T004
+    title: Update M98 queue evidence
+    type: edit
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - C006 selection and completion artifacts exist.
+      - CANDIDATE_CHANGES and SUMMARY record C006 completion and evidence.
+  - id: T005
+    title: Verify C006
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or known unrelated failures are documented.
+      - C006 local evidence records behavior, changed paths, and verification results.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.

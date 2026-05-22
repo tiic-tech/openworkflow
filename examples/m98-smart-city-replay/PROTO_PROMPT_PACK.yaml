@@ -1,0 +1,508 @@
+schema_version: 0.1.0
+contract_id: prototype_evidence:m98-smart-city-replay
+contract_type: prototype
+title: M98 smart city replay prompt pack
+status: active
+artifact_type: prototype_evidence
+validation_target: .openworkflow/validation/smart-city-validation/VALIDATION.yaml
+core_question: Can the formal prompt pack carry the full smart city product prototype brief before image generation?
+prototype_mode: image_prompt_pack
+prompt_pack_type: strategic_proto_prompt_pack
+validation_input:
+  mode: validation_present
+  refs:
+    - .openworkflow/validation/smart-city-validation/VALIDATION.yaml
+source:
+  command: /ow:proto
+  internal_stage: /ow:vision2prompt
+  refs:
+    - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    - changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+negative_constraints:
+  - Do not claim visual reference parity; visual reference parity is deferred.
+  - Do not call provider-backed image generation from this replay.
+  - Do not split planning, incident, and capacity into unrelated scenario slides.
+review_plan:
+  method: validate formal prompt-pack source completeness before image generation
+result: pass
+handoff:
+  next_command: /ow:tune
+preflight_quality_gate:
+  vision_status: ready
+  validation_status: ready
+  can_proceed: true
+  blockers: []
+  next_command_when_blocked: /ow:vision
+internal_pipeline:
+  orchestrator_command: /ow:proto
+  user_visible_command: /ow:proto
+  stages:
+    - stage_id: proto-preflight
+      command: /ow:proto
+      visibility: user
+      status: complete
+      outputs:
+        - preflight_quality_gate
+    - stage_id: vision2prompt
+      command: /ow:vision2prompt
+      visibility: internal
+      status: complete
+      outputs:
+        - normalized_input
+        - strategic_core
+        - prototype_brief
+        - screen_manifest
+        - global_design_system_prompt
+        - directions
+        - quality_rubric
+        - prompt_text_manifest
+    - stage_id: prompt2proto
+      command: /ow:prompt2proto
+      visibility: internal
+      status: not_started
+      outputs:
+        - image_generation
+direction_count_policy:
+  source: user_input
+  ask_user_question_required: false
+  ask_user_question: null
+  resolved_count: 1
+normalized_input:
+  product_domain: smart city operations copilot
+  primary_user: City operations lead reviewing planning, incident, and asset capacity workflows
+  usage_context: Synthetic POC digital twin command center used before any production integration claim
+  current_alternative: GIS screenshots, spreadsheet reports, chat threads, manual approval notes, and disconnected BI dashboards
+  core_pain: Spatial context, operational evidence, AI recommendations, and human approval are split across tools
+  desired_behavior_change: Operator evaluates a city object from map context, then confirms or blocks the AI-assisted action
+  strongest_success_signal: Reviewer can identify selected object, data fields, workflow state, HIL boundary, and audit trail from the prompt pack alone
+  core_differentiator: Responsible AI controls are embedded in a map-first city operations shell instead of replacing the operations product
+  emotional_value: The demo feels operationally credible, accountable, and inspectable
+  functional_value: Planning, incident, and capacity are modules inside one map-first product shell.
+  trust_requirements: Synthetic data badge, citations, confidence disclosure, stale-data warning, and human confirmation
+  privacy_requirements: Synthetic POC data only; no real government integration or citizen data claim
+  non_goals: Provider image generation, visual parity scoring, production GIS integration, autonomous government approval
+  future_opportunities: Real GIS connector, RBAC, department workflow integration, storyboard and motion modeling
+  validation_target: Prove the formal YAML prompt pack is sufficient source for downstream smart city screen generation
+strategic_core:
+  target_user: City operations or solution-delivery lead evaluating a responsible AI smart city POC
+  behavior_change: Move from report-style explanation to accountable map-first operational review
+  mechanism: Digital twin map shell with layer controls, selected city object detail, Copilot evidence, HIL action bar, and audit trace
+  differentiator: Product topology is smart city operations first; AI governance appears as workflow controls
+  boundary_conditions: Synthetic POC data only, no autonomous approval, no production integration claim, no visual parity claim
+  central_uncertainty: Whether the prompt source itself carries enough screen-level product detail for downstream generation
+prototype_brief:
+  product_name: CityFlow Copilot
+  positioning: Map-first responsible AI operations dashboard for synthetic smart city POC review
+  target_user: City operations lead reviewing planning, incident, and asset capacity workflows
+  current_alternative: GIS screenshots, spreadsheets, PDFs, chat threads, and manual approval notes
+  core_idea: Keep AI recommendations inside a digital twin map workflow with concrete city objects, citations, human confirmation, and audit trace.
+  primary_loop:
+    - Select a district, parcel, incident, or capacity cluster on the map
+    - Inspect layers, object metrics, evidence quality, and affected departments
+    - Review Copilot recommendation, assumptions, confidence, and citations
+    - Confirm, revise, or block the human-in-the-loop checkpoint
+    - Record audit result and next integration step
+  trust_boundaries:
+    - Synthetic POC data only
+    - AI recommends but cannot autonomously approve government actions
+    - Human confirmation remains visible before dispatch, planning approval, or capacity action
+    - Visual reference parity is deferred to a later review gate
+  non_goals:
+    - provider-backed image generation
+    - visual reference parity claim
+    - production government integration
+    - autonomous approval
+    - compliance-grade audit
+  desired_feeling: Dense, credible, inspectable, and map-first
+product_experience_model:
+  product_archetype: map-first smart city operations dashboard
+  primary_canvas: digital twin city map with operational layers
+  information_architecture:
+    - left city domain rail
+    - layer and scenario controls
+    - central digital twin map
+    - selected object detail drawer
+    - Copilot reasoning and citation panel
+    - human-in-the-loop action bar
+    - audit and POC boundary strip
+  domain_object_model:
+    - district
+    - planning parcel
+    - hospital access incident
+    - parking capacity cluster
+    - PM2.5 sensor
+    - department task
+    - evidence source
+    - map pin
+    - confidence score
+  primary_task_loop:
+    - Select a city object from the map
+    - Compare planning, incident, and capacity layers in the same shell
+    - Inspect selected object metrics and affected departments
+    - Ask Copilot for recommendation and cited evidence
+    - Resolve human confirmation and audit state
+  interaction_state_model:
+    - map object selected
+    - planning review pending
+    - incident response warning
+    - capacity threshold exceeded
+    - data stale warning
+    - pending human confirmation
+    - audit trace expanded
+  data_realism_requirements:
+    - parcel id
+    - incident id
+    - capacity percentage
+    - parking spaces count
+    - PM2.5 and PM10 readings
+    - affected route
+    - department owner
+    - timestamp
+    - confidence score
+  visual_language:
+    - dense GIS command center
+    - map-first operations shell
+    - restrained city operations styling
+    - layer toggles
+    - map pins and alerts
+    - right detail drawer
+    - visible HIL controls
+  anti_generic_constraints:
+    - no white-card AI governance report dashboard
+    - no chatbot-first shell
+    - no disconnected scenario cards
+    - no HIL, audit, or citation controls as the visual main product
+screen_manifest:
+  - target_screen_id: map-shell
+    screen_name: Smart city operations shell
+    journey_stage: orient and select
+    user_goal: Understand city context before trusting an AI recommendation
+    system_state: digital twin map active with planning, incident, and capacity layers available
+    selected_object: Binjiang District operations cluster
+    required_components:
+      - city domain navigation
+      - digital twin map
+      - layer toggles
+      - map pins and alerts
+      - selected object summary drawer
+      - POC boundary badge
+    required_data_fields:
+      - active layer
+      - district name
+      - alert count
+      - department owner
+      - timestamp
+      - risk level
+    primary_actions:
+      - select map object
+      - toggle planning layer
+      - toggle incident layer
+      - toggle capacity layer
+      - run Copilot analysis
+    ai_behavior: Copilot stays dormant until an object is selected, then summarizes visible risk and cites synthetic evidence.
+    trust_controls:
+      - synthetic data badge
+      - source citation count
+      - human confirmation required label
+    example_copy:
+      - Synthetic POC data only
+      - 3 active city workflows need review
+    acceptance_criteria:
+      - Map is the dominant canvas.
+      - Planning, incident, and capacity appear as modules inside one shared product shell.
+      - Governance controls do not replace the city operations surface.
+  - target_screen_id: planning-review
+    screen_name: Planning parcel review
+    journey_stage: review planning object
+    user_goal: Decide whether a planning parcel recommendation is credible
+    system_state: planning layer selected with parcel detail drawer open
+    selected_object: Parcel P-1182 riverfront zoning review
+    required_components:
+      - selected parcel outline
+      - zoning summary
+      - impact metrics
+      - evidence list
+      - Copilot recommendation
+      - HIL approval controls
+    required_data_fields:
+      - parcel id
+      - zoning type
+      - projected traffic impact
+      - affected departments
+      - confidence score
+      - evidence timestamp
+    primary_actions:
+      - approve planning recommendation
+      - request revised assumptions
+      - inspect cited source
+    ai_behavior: Copilot explains assumptions, confidence, and missing evidence before approval is possible.
+    trust_controls:
+      - confidence disclosure
+      - assumption list
+      - approval requires human action
+    example_copy:
+      - Parcel P-1182: mixed-use zoning impact review
+      - Confidence 0.74; traffic model source is 18 hours old
+    acceptance_criteria:
+      - Planning is a state inside the same map shell, not a separate slide.
+      - Parcel data and approval boundary are concrete.
+  - target_screen_id: incident-response
+    screen_name: Hospital access incident response
+    journey_stage: assess and dispatch
+    user_goal: Confirm or block an incident response recommendation
+    system_state: incident alert selected with impacted route and stale-data warning visible
+    selected_object: Incident INC-2047 hospital access route B
+    required_components:
+      - incident map pin
+      - affected route overlay
+      - response recommendation
+      - impacted departments
+      - citation list
+      - dispatch confirmation controls
+    required_data_fields:
+      - incident id
+      - affected route
+      - response ETA
+      - department owner
+      - confidence score
+      - stale feed warning
+    primary_actions:
+      - confirm dispatch
+      - request revision
+      - inspect audit trace
+    ai_behavior: Copilot explains uncertainty and cites traffic, hospital access, and department availability before dispatch.
+    trust_controls:
+      - stale data warning
+      - citation list
+      - dispatch cannot proceed without human confirmation
+    example_copy:
+      - INC-2047 blocks hospital access route B
+      - Traffic feed stale by 11 minutes; confirm before dispatch
+    acceptance_criteria:
+      - Incident state includes route, owner, confidence, and HIL checkpoint.
+      - AI recommendation is visible but bounded by human dispatch control.
+  - target_screen_id: capacity-monitor
+    screen_name: Asset capacity monitor
+    journey_stage: monitor and rebalance
+    user_goal: Evaluate whether a capacity threshold needs operational action
+    system_state: capacity layer active with parking cluster above threshold
+    selected_object: Hospital A parking capacity cluster
+    required_components:
+      - capacity heat layer
+      - asset cluster detail
+      - trend sparkline
+      - recommended mitigation
+      - impacted service list
+      - audit status
+    required_data_fields:
+      - capacity percentage
+      - available spaces
+      - threshold
+      - linked incident
+      - owner department
+      - last updated time
+    primary_actions:
+      - open mitigation plan
+      - assign department owner
+      - defer with audit note
+    ai_behavior: Copilot recommends mitigation only after showing threshold, trend, and affected services.
+    trust_controls:
+      - threshold explanation
+      - source freshness
+      - audit note required for deferral
+    example_copy:
+      - Capacity alert: 87% parking occupancy near Hospital A
+      - Mitigation requires operations lead confirmation
+    acceptance_criteria:
+      - Capacity is connected to map object and operational workflow.
+      - Asset metrics are concrete enough for generation without downstream invention.
+global_design_system_prompt:
+  visual_language: dense GIS command center with restrained operational styling, crisp data labels, and accountable AI controls
+  layout_system: left domain rail, top layer bar, central map canvas, right selected-object drawer, bottom HIL and audit strip
+  component_vocabulary:
+    - city domain rail
+    - layer toggles
+    - map pins
+    - route overlays
+    - risk badges
+    - selected object drawer
+    - evidence list
+    - Copilot recommendation panel
+    - HIL action bar
+    - audit trace
+  information_density: high-density operations dashboard with concrete city data, not a sparse marketing dashboard or report cards
+  copy_tone: concise city-operations language with explicit synthetic POC boundaries
+  responsive_canvas_rules:
+    - desktop 16:9 primary canvas
+    - map remains dominant at all supported sizes
+    - detail drawer must not cover selected map object
+  negative_visual_patterns:
+    - white-card AI governance report dashboard
+    - chatbot shell
+    - disconnected scenario cards
+    - decorative map with no selected object
+quality_rubric:
+  prompt_executability:
+    - Another agent can generate every screen without asking for missing journey, component, state, data, or trust-boundary details.
+    - Screen prompts include concrete copy, negative prompts, and acceptance criteria.
+  strategic_distinctness:
+    - The replay tests one coherent map-first smart city product shell instead of multiple unrelated scenario concepts.
+  product_specificity:
+    - The prompt pack names city assets, incidents, parcels, departments, layers, metrics, confidence, and timestamps.
+  state_coverage:
+    - Covers orientation, planning review, incident response, capacity threshold, selected object, stale data, HIL, and audit states.
+  trust_boundary_coverage:
+    - Shows synthetic data disclosure, citations, stale-data warnings, confidence disclosure, human confirmation, and audit notes.
+prototype_reality_gate:
+  status: pass
+  trigger: before_image_generation
+  required_when_prompt_text_ready: true
+  dimensions:
+    - product_category_fit
+    - primary_canvas_fit
+    - domain_object_realism
+    - task_loop_completeness
+    - interaction_state_coverage
+    - data_realism
+    - anti_generic_constraints
+  failures: []
+  outcome_notes:
+    - Replay preserves map-first smart city operations topology and embeds AI governance as workflow controls.
+    - Planning, incident, and capacity are modules inside one map-first product shell.
+    - This pass does not claim visual reference parity; visual reference parity is deferred.
+  repair_route: /ow:vision2prompt
+prompt_pack_integrity_gate:
+  status: pass
+  trigger: before_image_generation
+  required_when_prompt_text_ready: true
+  dimensions:
+    - direction_count_matches
+    - prompt_text_refs_resolve
+    - generated_image_refs_resolve
+  failures: []
+  outcome_notes:
+    - Direction count resolves to one coherent replay direction.
+    - Prompt text refs resolve to the direction and each screen prompt id before image_generation starts.
+  repair_route: /ow:vision2prompt
+directions:
+  - direction_id: D1
+    name: Map-first city operations replay
+    strategic_hypothesis: A single map-first operations shell can carry planning, incident, and asset capacity workflows without collapsing into a generic AI governance dashboard.
+    validates: Whether the formal YAML prompt pack now contains enough product prototype detail before downstream generation.
+    main_risk: Downstream generation may still overemphasize AI governance controls unless prompt text keeps city objects, layers, and selected states primary.
+    distinctness_rationale: "Strategic difference is product shell completeness: one city operations workflow with modules and states, not scenario-only slides or generic AI report cards."
+    strategic_fingerprint:
+      product_form: map-first smart city operations dashboard
+      trigger: operator selects a city object, incident, parcel, or capacity cluster
+      interaction_model: map selection, layer toggles, selected detail drawer, Copilot recommendation, HIL action bar
+      emotional_driver: operational credibility and accountable control
+      retention_mechanism: audit-ready city operations workflow
+      metric: reviewer can explain the map-to-HIL loop from prompt pack source alone
+      main_risk: generic AI governance report dashboard
+      trust_model: AI recommends while human confirms or blocks operational action
+      privacy_model: synthetic city POC data only
+    prototype_prompt: Desktop 16:9 smart city operations dashboard where a digital twin map is the primary canvas, planning, incident, and capacity modules are available in one shell, selected object details and city metrics are concrete, and Copilot/HIL/audit controls stay embedded in the workflow.
+    screen_prompts:
+      - prompt_id: map-shell
+        target_screen_id: map-shell
+        screen_name: Smart city operations shell
+        image_role: primary product shell screen
+        prompt: Show a dense map-first smart city dashboard with left city domain rail, central digital twin map, planning/incident/capacity layer controls, selected district summary, Copilot recommendation area, HIL action bar, citations, and synthetic POC boundary.
+        negative_prompt: Do not show a white-card AI governance report, chatbot-first shell, or disconnected scenario cards.
+        example_copy:
+          - Synthetic POC data only
+          - 3 active city workflows need review
+        acceptance_criteria:
+          - Map dominates the canvas.
+          - Planning, incident, and capacity are modules inside one map-first product shell.
+          - HIL and citations are controls inside the operations workflow.
+      - prompt_id: planning-review
+        target_screen_id: planning-review
+        screen_name: Planning parcel review
+        image_role: planning workflow state
+        prompt: Show the same map shell with planning layer selected, Parcel P-1182 outlined, zoning and impact metrics in the detail drawer, Copilot assumptions and citations visible, and human approval controls disabled until review.
+        negative_prompt: Do not turn planning into a standalone presentation slide or generic KPI card.
+        example_copy:
+          - Parcel P-1182: mixed-use zoning impact review
+          - Confidence 0.74; traffic model source is 18 hours old
+        acceptance_criteria:
+          - Planning state remains inside the shared product shell.
+          - Parcel data, assumptions, citations, and HIL boundary are visible.
+      - prompt_id: incident-response
+        target_screen_id: incident-response
+        screen_name: Hospital access incident response
+        image_role: incident workflow state
+        prompt: Show the same map shell with incident INC-2047 selected, affected hospital route overlay, response recommendation, stale-data warning, impacted departments, evidence list, and confirm/revise dispatch controls.
+        negative_prompt: Do not show a generic emergency dashboard without selected map object, evidence, or human dispatch boundary.
+        example_copy:
+          - INC-2047 blocks hospital access route B
+          - Traffic feed stale by 11 minutes; confirm before dispatch
+        acceptance_criteria:
+          - Incident id, route, owner, confidence, stale warning, and HIL checkpoint are concrete.
+          - AI recommendation is bounded by human dispatch control.
+      - prompt_id: capacity-monitor
+        target_screen_id: capacity-monitor
+        screen_name: Asset capacity monitor
+        image_role: asset capacity workflow state
+        prompt: Show the same map shell with capacity heat layer active, Hospital A parking cluster selected, 87% occupancy metric, available spaces, trend sparkline, mitigation recommendation, department owner, and audit note requirement.
+        negative_prompt: Do not show a decorative heatmap without asset metrics, selected object, owner, or action controls.
+        example_copy:
+          - Capacity alert: 87% parking occupancy near Hospital A
+          - Mitigation requires operations lead confirmation
+        acceptance_criteria:
+          - Capacity state connects to map object and operational action.
+          - Asset metrics are concrete enough for generation without downstream invention.
+    pm_judgment: Strong enough for prompt-pack source completeness because the formal YAML now contains product brief, screen manifest, global design prompt, screen prompts, negative prompts, rubric, integrity gate, and reality gate before image generation.
+build_recommendation:
+  first_direction_id: D1
+  why_first: It directly replays the M97 smart city gap with the final M98 contract shape and avoids branching into provider generation or visual parity.
+  success_signals:
+    - Reviewer can reconstruct product shell, city modules, screen states, data fields, and trust boundaries from PROTO_PROMPT_PACK alone.
+    - Planning, incident, and capacity appear as workflow modules inside one map-first product.
+    - No downstream EVIDENCE artifact is required to discover missing screen prompts.
+  failure_signals:
+    - Prompt pack reads as a short image prompt.
+    - Prompt pack relies on downstream image generation to invent product states, data fields, or trust controls.
+    - Screen prompts claim visual parity or provider-backed generation.
+  next_test_if_it_works: Hand off to M99 visual reference parity or M100 storyboard/motion modeling; do not fold those into M98.
+prompt_text_manifest:
+  status: ready_for_image_generation
+  directions_ready: true
+  direction_count: 1
+  prompt_text_refs:
+    - D1
+    - map-shell
+    - planning-review
+    - incident-response
+    - capacity-monitor
+post_validate:
+  status: skipped
+  trigger: after_prompt_assets_ready
+  required_when_direction_count_gte: 2
+  skip_when_resolved_count: 1
+  threshold_policy:
+    method: strategic_fingerprint_similarity
+    max_pairwise_similarity: 0.65
+    comparison: pairwise
+  fingerprint_dimensions:
+    - product_form
+    - trigger
+    - interaction_model
+    - emotional_driver
+    - retention_mechanism
+    - metric
+    - main_risk
+    - trust_model
+    - privacy_model
+  comparisons: []
+  failures: []
+  outcome_notes:
+    - Single-direction replay intentionally skips diversity comparison.
+    - C006 verifies source completeness only; visual reference parity is deferred.
+  repair_route: /ow:vision2prompt
+image_generation:
+  status: not_started
+  batch_strategy: Do not generate provider-backed images in C006; use this prompt pack only as source-completeness replay evidence.
+  generated_images: []
+  collection_notes:
+    - C006 stops before /ow:prompt2proto provider image generation.

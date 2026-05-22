@@ -87,7 +87,7 @@ scope_control:
         Proto2html should consume an accepted benchmark after prompt-pack and
         visual-quality gates are trustworthy.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C006
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -435,7 +435,7 @@ changes:
           runtime surface, agent e2e, dist CLI validation, strict summaries,
           and diff check pass.
   - id: C006
-    status: candidate
+    status: done
     title: Replay smart city prompt pack with dailin-grade contract
     purpose: >
       Re-run the smart city prompt-pack source shape through the new M98
@@ -474,6 +474,32 @@ changes:
       - Smart city replay prompt pack has complete prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, and quality rubric.
       - Replay evidence shows the formal PROTO_PROMPT_PACK is no longer thinner than downstream EVIDENCE.yaml.
       - Replay does not claim visual parity; it only proves prompt-pack source completeness.
+    selection:
+      selected_change_id: C006-smart-city-replay
+      selected_at: 2026-05-22
+      reason: >
+        C006 is the final dependency-ready candidate after C003-C005. The
+        screen-bound contract, generated protocol gates, and fixture matrix are
+        complete, so the smart city replay can target the final M98 prompt-pack
+        source shape without entering image generation or visual review.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C006 added a stored smart city replay PROTO_PROMPT_PACK example that
+          includes prototype_brief, screen_manifest, global design prompt,
+          screen prompts, negative prompts, quality rubric, integrity gate, and
+          reality gate before image_generation starts.
+        - >
+          C006 runtime verification now parses the stored replay YAML, asserts
+          planning, incident, and capacity screen coverage inside one map-first
+          product shell, and validates the prompt pack through the repo dist CLI.
+        - >
+          C006 records that prompt-pack source completeness is replayed, while
+          provider-backed image generation, visual reference parity, proto2html,
+          and storyboard/motion modeling remain deferred.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -599,3 +625,33 @@ operations:
     after_status: done
     evidence:
       - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Select C006 after C003-C005 completion because the final M98 prompt-pack
+      contract, generated protocol gates, and fixture matrix are ready for a
+      smart city source-completeness replay.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Complete C006 after adding the stored smart city replay prompt pack,
+      runtime validation, M97 gap comparison, and local evidence without
+      provider-backed generation or visual review.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml

@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C006
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C006
+change_id: C006-smart-city-replay
+title: Local evidence for smart city prompt-pack replay
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added a stored smart city replay prompt pack using the final M98 contract
+  shape and runtime verification that proves the formal YAML source now carries
+  the product prototype brief before image generation.
+changed_paths:
+  - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+  - examples/m98-smart-city-replay/REPLAY_AUDIT.md
+  - examples/m98-dailin-grade-fixtures/README.md
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Runtime verification now reads the stored smart city replay prompt pack, parses it, and asserts required prototype brief, screen manifest, screen prompt, design prompt, quality rubric, and deferral markers.
+  - Runtime verification copies the stored replay YAML into a temporary OpenWorkflow prototype directory and validates it through the repo dist CLI.
+  - The stored replay prompt pack models map shell, planning review, incident response, and asset capacity monitor states inside one coherent map-first smart city product shell.
+  - The replay audit records that the formal PROTO_PROMPT_PACK source is no longer thinner than downstream evidence for the prompt-pack source-completeness gap.
+  - The M97 synthesis report now distinguishes the repaired prompt-pack source-completeness gap from still-deferred visual parity and storyboard/motion gaps.
+verification:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+known_unrelated_failure:
+  command: npm run validate
+  reason: >
+    Repository validation is expected to continue failing on pre-existing M97
+    planning artifacts: two M97 ATOM_TASKS.yaml files missing title and M97
+    C001-C004 done candidates missing completion evidence. These paths are
+    outside C006 owned behavior and were already failing before this candidate.
+deferred:
+  - provider-backed image generation
+  - visual reference parity review
+  - proto2html
+  - storyboard and motion modeling

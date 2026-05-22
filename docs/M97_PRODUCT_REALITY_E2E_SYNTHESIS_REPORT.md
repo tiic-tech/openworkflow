@@ -104,6 +104,14 @@ directions, but the formal YAML direction list is not as complete as the richer
 D1-D3 content later found in `EVIDENCE.yaml`. This means downstream agents may
 consume the wrong source or receive insufficient screen-level instructions.
 
+M98 C006 replay update: `examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml`
+now demonstrates the repaired contract shape for this exact gap. The replay
+stores the smart city product brief, map-first shell, planning review, incident
+response, asset capacity state, screen prompts, negative prompts, quality
+rubric, integrity gate, and reality gate in the formal prompt-pack source before
+image generation. This updates the prompt-pack source-completeness finding, but
+does not change the visual reference parity or storyboard/motion gaps below.
+
 The dailin benchmark shows the expected bar: direction map, product system,
 complete screen groups, interaction states, component vocabulary, trust
 boundaries, global design prompt, screen-specific prompts, negative prompts, and

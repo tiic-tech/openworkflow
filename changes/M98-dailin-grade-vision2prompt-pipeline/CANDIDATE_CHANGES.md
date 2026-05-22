@@ -29,6 +29,8 @@ Completed candidate: `C004`
 
 Completed candidate: `C005`
 
+Completed candidate: `C006`
+
 Select the first dependency-free candidate that most reduces downstream
 prompt-pack ambiguity. Stop for a high-risk decision report if a candidate
 expands beyond `/ow:vision2prompt` prompt-pack behavior into broad workflow
@@ -43,7 +45,7 @@ semantics, release publishing, or remote-impacting changes.
 | C003 | done | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
 | C004 | done | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
 | C005 | done | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
-| C006 | candidate | medium | Replay smart city prompt pack with dailin-grade contract | C003, C004, C005 |
+| C006 | done | medium | Replay smart city prompt pack with dailin-grade contract | C003, C004, C005 |
 
 ## Next Recommendation
 
@@ -52,9 +54,10 @@ downstream generation could proceed from a prompt pack whose manifest,
 directions, and evidence refs diverged. Integrity now fails closed before the
 richer dailin-style structure is added.
 
-`C005` is complete. `C006` is now the next candidate because the full M98
-contract and fixture gates are proven and the smart city replay can target the
-final prompt-pack source shape.
+`C006` is complete. The smart city replay now proves prompt-pack source
+completeness against the final M98 contract shape. Follow-up work remains
+deferred to visual reference parity, storyboard/motion, provider image
+generation, and proto2html queues.
 
 ## Deferred
 
@@ -179,9 +182,18 @@ Purpose: re-run the smart city prompt-pack source shape through the new M98
 contract to prove the formal YAML prompt pack carries the complete product
 prototype brief before image generation.
 
+Selected change artifacts:
+
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/SELECTED_CHANGE.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/ATOM_TASKS.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/IMPLEMENTATION_BRIEF.md`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml`
+
 Validation:
 
 - `npm run build`
 - `npm run verify:runtime-surface`
 - `npm run validate`
 - `node dist/cli/src/index.js validate --root . --json`
+- `node dist/cli/src/index.js summaries --root . --strict --json`
+- `git diff --check`

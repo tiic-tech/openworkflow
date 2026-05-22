@@ -27,12 +27,12 @@ scope_boundary: >
   screen-bound executability before /ow:prompt2proto image generation.
 branch_boundary: codex/m98-dailin-grade-vision2prompt-pipeline
 candidate_count: 6
-active_candidate_count: 1
-completed_candidate_id: C005
-completed_change_id: C005-dailin-grade-fixtures
+active_candidate_count: 0
+completed_candidate_id: C006
+completed_change_id: C006-smart-city-replay
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C006
+next_recommended_candidate_id: null
 deferred_feature_refs:
   - M99-prototype-visual-reference-parity-gate
   - M100-prototype-storyboard-motion-model
@@ -135,3 +135,14 @@ validation:
     - C005 strict summaries passed.
     - C005 git diff --check passed.
     - C005 npm run validate is expected to continue failing on the same pre-existing M97 planning artifact issues unrelated to C005.
+    - C006 was selected after C003-C005 completion to replay the smart city prompt pack against the final M98 contract shape.
+    - C006 added examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml as the formal source-complete smart city replay prompt pack.
+    - C006 added replay audit evidence that the formal prompt pack now carries product brief, map-first shell, planning review, incident response, capacity monitor, screen prompts, negative prompts, rubric, integrity gate, and reality gate before image generation.
+    - C006 updated runtime surface verification to parse and validate the stored replay YAML through the repo dist CLI in a temporary OpenWorkflow prototype directory.
+    - C006 updated the M97 synthesis report to mark the prompt-pack source-completeness gap as replayed while leaving visual parity and storyboard/motion gaps deferred.
+    - C006 npm run build passed.
+    - C006 npm run verify:runtime-surface passed.
+    - C006 dist CLI validate passed.
+    - C006 strict summaries passed.
+    - C006 git diff --check passed.
+    - C006 npm run validate still fails on the same pre-existing M97 planning artifact issues unrelated to C006.
