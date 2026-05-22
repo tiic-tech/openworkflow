@@ -48,7 +48,8 @@ option is:
 C001 updated only queue artifacts, selection artifacts, implementation brief
 artifacts, and the high-risk decision report. It did not edit implementation
 source, generated adapters, or managed `.agents/**` / `.openworkflow/**`
-surfaces. It must receive standalone local commit evidence before C002 begins.
+surfaces. Standalone local commit evidence is recorded under the C001 selected
+change folder.
 
 Strict enforcement targets for follow-up implementation:
 
@@ -74,11 +75,10 @@ The next actionable work is high risk because it changes trust gates. See:
 
 ## Recommended Path
 
-1. Commit C001 as its own local selected-change commit.
-2. Implement C002.
-3. Implement C003.
-4. Implement C004.
-5. Return to M101 only after the selected-change commit evidence gate exists.
+1. Implement C002.
+2. Implement C003.
+3. Implement C004.
+4. Return to M101 only after the selected-change commit evidence gate exists.
 
 ## Out Of Scope
 

@@ -94,4 +94,4 @@ validation:
   notes:
     - M102 is now the top-priority queue before returning to M101 implementation work.
     - C001 is high risk because it changes trust-gate semantics and remained design-only.
-    - C001 completed with implementation_changed_files false and still requires standalone local commit evidence before C002 starts.
+    - C001 completed with implementation_changed_files false and standalone local commit evidence recorded under the C001 selected-change folder.

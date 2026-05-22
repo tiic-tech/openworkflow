@@ -69,11 +69,10 @@ Proceed with Option 1.
 
 Implementation order:
 
-1. Commit C001 as a standalone design-only selected change.
-2. Implement C002 to add the evidence contract and queue audit validator.
-3. Implement C003 to wire the evidence gate into validate, summaries --strict,
+1. Implement C002 to add the evidence contract and queue audit validator.
+2. Implement C003 to wire the evidence gate into validate, summaries --strict,
    and handoff.
-4. Implement C004 to make git-automation commit evidence visible in the
+3. Implement C004 to make git-automation commit evidence visible in the
    selected-change completion workflow.
 
 Do not return to M101 implementation work until the selected-change commit

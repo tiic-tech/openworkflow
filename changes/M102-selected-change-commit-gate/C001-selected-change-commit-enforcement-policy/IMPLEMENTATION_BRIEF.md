@@ -20,14 +20,14 @@ work begins.
 - Preserve the distinction between implementation selected changes and
   planning-only selected changes.
 - Keep historical queue migration behavior explicit.
-- Finish C001 as its own local commit before selecting or implementing C002.
+- Use the recorded C001 local commit evidence before selecting or implementing C002.
 
 ## Do Not
 
 - Do not edit implementation source files.
 - Do not edit generated `.agents/**` or managed `.openworkflow/**` surfaces.
 - Do not change schemas, validators, runtime fixtures, or git automation code.
-- Do not advance into C002, C003, or C004 until C001 is committed separately.
+- Do not advance into C002, C003, or C004 unless C001 local commit evidence is present.
 - Do not perform remote push, PR creation, merge, or GitHub Issue mutation.
 
 ## Owned Paths
