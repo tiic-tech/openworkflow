@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: selected_change:M99-smart-city-m98-e2e-replay:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C002
+change_id: C002-run-target-repo-m98-prompt-pack-source-replay
+title: Run target-repo M98 prompt-pack source replay
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 after C001 because the target worktree branch and baseline are
+  known. The next required evidence is a real smart_city_copilot prompt-pack
+  source replay through the current OpenWorkflow M98 command surface.
+rejected_alternatives:
+  - id: C003
+    reason: C003 depends on the target replay artifact and target commit produced by C002.
+owned_paths:
+  - changes/M99-smart-city-m98-e2e-replay/
+  - /tmp/smart-city-m99-e2e-worktree/.openworkflow/
+  - /tmp/smart-city-m99-e2e-worktree/.agents/
+dependencies:
+  - C001
+scope:
+  includes:
+    - refresh target repo managed OpenWorkflow command surface with the main repo dist CLI
+    - replay the target smart city prompt-pack source through the M98 /ow:vision2prompt contract
+    - preserve updated target PROTO_PROMPT_PACK, EVIDENCE, REVIEW_PLAN, NOTE, and SUMMARY artifacts
+    - verify target validate, strict summaries, and handoff
+    - record target commit and source-completeness field scan
+  excludes:
+    - provider-backed image generation
+    - human visual review
+    - visual reference parity scoring
+    - proto2html
+    - storyboard or motion modeling
+    - OpenWorkflow source code changes
+forbidden_paths:
+  - provider-backed image generation outputs
+  - visual reference parity review artifacts
+  - proto2html artifacts
+  - OpenWorkflow source files in /Users/archy/Projects/StartUp/openworkflow/packages/**
+acceptance:
+  - Real target-repo prompt pack contains prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+  - Planning, incident, and asset capacity are modeled as states/modules inside one coherent map-first product shell.
+  - Replay evidence proves no provider-backed image generation or visual parity claim occurred.
+validation:
+  - target repo git status --short --branch
+  - target repo OpenWorkflow validate/handoff command
+  - grep or structured check for prototype_brief, screen_manifest, screen_prompts, quality_rubric, prompt_pack_integrity_gate
+high_risk:
+  approval_required: false
+  reason: >
+    C002 performs local target worktree replay and local commits only. It does
+    not push, call external image providers, publish artifacts, delete user
+    work, or change OpenWorkflow source code.
+expected_commit_boundary: >
+  Complete C002 as target replay commit plus one main-repo evidence commit.
+completion:
+  completed_at: 2026-05-22
+  target_commit: 9a609cf901217cd1324e589459c90dfcddbad687
+  evidence:
+    - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/LOCAL_CHANGE_EVIDENCE.yaml

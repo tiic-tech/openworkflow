@@ -20,14 +20,14 @@ integration, or storyboard/motion modeling.
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Prepare clean smart_city_copilot E2E replay branch | none |
-| C002 | candidate | medium | Run target-repo M98 prompt-pack source replay | C001 |
+| C002 | done | medium | Run target-repo M98 prompt-pack source replay | C001 |
 | C003 | candidate | medium | Compare real replay against C006 fixture and M97 gap notes | C002 |
 
 ## Next Recommendation
 
-Select `C002` next. C001 recorded the clean target-repo branch/readiness
-baseline; the next step is the real `smart_city_copilot` M98 prompt-pack source
-replay.
+Select `C003` next. C002 produced the real target-repo M98 prompt-pack source
+replay and committed it in the target worktree; the next step is comparison
+against the C006 fixture and M97 gap notes.
 
 ## Candidate Details
 
@@ -60,6 +60,12 @@ Acceptance:
 
 Purpose: execute the real `smart_city_copilot` prompt-pack replay and collect
 formal prompt-pack evidence before image generation.
+
+Outcome: completed. Target commit `9a609cf` refreshed the target managed
+OpenWorkflow surface and updated `proto-001` prompt-pack source artifacts. The
+target prompt pack now contains the M98 source-completeness fields, keeps
+`image_generation.status: not_started`, and target validate/strict
+summaries/handoff pass.
 
 Acceptance:
 

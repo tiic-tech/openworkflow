@@ -73,7 +73,7 @@ scope_control:
         External image calls must be a separate explicitly selected benchmark
         after prompt-pack source quality is proven in the target repo.
       suggested_plan_id: M102-provider-image-generation-benchmark
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -138,7 +138,7 @@ changes:
           prompts, quality_rubric, prompt_pack_integrity_gate, and
           prototype_reality_gate are absent.
   - id: C002
-    status: candidate
+    status: done
     title: Run target-repo M98 prompt-pack source replay
     purpose: >
       Execute the smart_city_copilot prompt-pack replay through the real
@@ -173,6 +173,36 @@ changes:
       - Real target-repo prompt pack contains prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
       - Planning, incident, and asset capacity are modeled as states/modules inside one coherent map-first product shell.
       - Replay evidence proves no provider-backed image generation or visual parity claim occurred.
+    selection:
+      selected_change_id: C002-run-target-repo-m98-prompt-pack-source-replay
+      selected_at: 2026-05-22
+      reason: >
+        C002 is unlocked by C001 and owns the real target-repo replay needed
+        before C003 can compare target output against the M98 C006 fixture and
+        M97 gap notes.
+    completion:
+      completed_at: 2026-05-22
+      target_commit: 9a609cf901217cd1324e589459c90dfcddbad687
+      evidence:
+        - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C002 refreshed the target managed command surface with the current
+          OpenWorkflow dist CLI before replay.
+        - >
+          C002 updated target proto-001 prompt-pack source so it now includes
+          prototype_brief, product_experience_model, screen_manifest,
+          global_design_system_prompt, screen prompts, negative prompts,
+          quality_rubric, prompt_pack_integrity_gate, and
+          prototype_reality_gate.
+        - >
+          C002 kept image_generation.status not_started and did not run
+          provider-backed image generation, visual review, visual parity,
+          proto2html, storyboard/motion modeling, or OpenWorkflow source code
+          changes.
+        - >
+          Target validate, strict summaries, handoff, diff check, and git
+          status all passed after commit 9a609cf.
   - id: C003
     status: candidate
     title: Compare real replay against C006 fixture and M97 gap notes
@@ -252,3 +282,33 @@ operations:
     after_status: done
     evidence:
       - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 because target branch/readiness baseline is known
+      and the queue needs real smart_city_copilot prompt-pack source replay
+      evidence before comparison.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/SELECTED_CHANGE.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/ATOM_TASKS.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete C002 after committing the target replay at 9a609cf, verifying
+      target validate/summaries/handoff, and recording prompt-pack
+      source-completeness evidence without image generation or visual review.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/LOCAL_CHANGE_EVIDENCE.yaml

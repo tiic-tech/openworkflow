@@ -22,12 +22,12 @@ scope_boundary: >
   smart_city_copilot, before downstream image generation or visual parity.
 branch_boundary: codex/m99-smart-city-m98-e2e-replay
 candidate_count: 3
-active_candidate_count: 2
-completed_candidate_id: C001
-completed_change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
+active_candidate_count: 1
+completed_candidate_id: C002
+completed_change_id: C002-run-target-repo-m98-prompt-pack-source-replay
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 deferred_feature_refs:
   - M100-prototype-visual-reference-parity-gate
   - M101-prototype-storyboard-motion-model
@@ -79,3 +79,11 @@ validation:
     - C001 scanned the existing target PROTO_PROMPT_PACK.yaml and found directions/screen_prompts present but prototype_brief, screen_manifest, global design prompt, negative prompts, quality_rubric, prompt_pack_integrity_gate, and prototype_reality_gate absent at baseline.
     - C001 did not run real target replay, provider-backed image generation, visual review, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
     - C002 is now the next recommended candidate to run the real target-repo M98 prompt-pack source replay.
+    - C002 was selected and completed after C001 to replay the real smart_city_copilot prompt-pack source through the current M98 command surface.
+    - C002 refreshed target managed surfaces with the main repo dist CLI so target /ow:vision2prompt, /ow:proto, /ow:prompt2proto, CONTEXT_PACKETS, and ARTIFACT_CONTRACTS carried current M98 gates.
+    - C002 target commit 9a609cf901217cd1324e589459c90dfcddbad687 updates proto-001 PROTO_PROMPT_PACK, EVIDENCE, REVIEW_PLAN, NOTE, SUMMARY, and generated command surfaces.
+    - C002 target PROTO_PROMPT_PACK now contains prototype_brief, product_experience_model, screen_manifest, global_design_system_prompt, screen prompts, negative prompts, quality_rubric, prompt_pack_integrity_gate, and prototype_reality_gate.
+    - C002 models map-shell, planning-review, incident-response, and capacity-monitor as states/modules inside one coherent map-first CityFlow Copilot product shell.
+    - C002 kept image_generation.status not_started and did not run provider-backed image generation, visual review, visual parity scoring, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
+    - C002 target validate, strict summaries, handoff, diff check, and git status passed after the local target commit.
+    - C003 is now the next recommended candidate to compare the real target replay against the M98 C006 fixture and M97 gap notes.
