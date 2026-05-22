@@ -85,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -301,7 +301,7 @@ changes:
         - .openworkflow/audit/CONTEXT_PACKETS.yaml
         - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C003
-    status: ready
+    status: done
     title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
     purpose: >
       Change generated /ow:vision2prompt guidance so agents write complete
@@ -351,8 +351,32 @@ changes:
       - Generated ow-vision2prompt skill requires dailin-grade long-form prompt paragraphs before /ow:prompt2proto handoff.
       - Generated protocol explicitly names journey, interaction behavior, system response, trust controls, anti-goals, visual direction, and desired user feeling as required prompt text.
       - The protocol preserves M98 source-completeness gates and adds paragraph quality rather than replacing them.
+    selection:
+      selected_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+      selected_at: 2026-05-23
+      reason: >
+        Select C003 because C007 completed the perspective engine prerequisite,
+        making generated /ow:vision2prompt guidance wiring the next dependency
+        unlocked candidate.
+    completion:
+      completed_by_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+        - packages/core/src/commands/registry.ts
+        - skills/build-prototype/SKILL.md
+        - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+        - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+        - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+        - .agents/skills/ow-vision2prompt/SKILL.md
+        - .agents/skills/ow-prompt2proto/SKILL.md
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C004
-    status: candidate
+    status: ready
     title: Add dailin-grade prompt fixtures and thin-prompt regressions
     purpose: >
       Prove the new quality gate with both positive and negative runtime
@@ -649,5 +673,47 @@ operations:
       - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
       - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
       - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 after C007 completed the senior product-manager perspective
+      engine prerequisite. C003 is now the first ready candidate and wires the
+      dailin-grade paragraph contract into generated /ow:vision2prompt and
+      prompt2proto handoff guidance.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Completed C003 by wiring dailin-grade paragraph-quality guidance into the
+      generated /ow:vision2prompt protocol and /ow:prompt2proto handoff gate.
+      This satisfies C004's remaining dependency and makes fixture/regression
+      coverage the next ready candidate.
+    changed_at: 2026-05-23
+    before_status: C003 selected, C004 candidate
+    after_status: C003 done, C004 ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - packages/cli/src/dev/verifyRuntimeSurface.ts

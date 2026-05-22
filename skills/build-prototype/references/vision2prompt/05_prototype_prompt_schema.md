@@ -146,6 +146,13 @@ The screen prompt should bind these fields into image-generation text. Merely
 having the fields elsewhere in YAML is not enough when the prompt paragraph
 itself remains terse.
 
+Before handoff, the prompt text must satisfy
+`prompt_text_manifest.paragraph_quality_status: pass`. Required paragraph
+quality dimensions include product context, target user, journey,
+screens/components, interaction or system response, concrete content, trust or
+user control, visual direction, anti-goals, desired user feeling, and the
+senior product-manager perspective engine.
+
 ## AI/System Behavior Rules
 
 If the product involves AI, memory, personalization, recommendation, coaching,

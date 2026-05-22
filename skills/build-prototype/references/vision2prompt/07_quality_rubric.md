@@ -117,6 +117,13 @@ Verify:
 
 - `prompt_pack_integrity_gate.status` is `pass`.
 - `prototype_reality_gate.status` is `pass`.
+- `quality_rubric.prompt_paragraph_quality.status` is `pass` or equivalent
+  prompt paragraph quality evidence is present.
+- `prompt_text_manifest.paragraph_quality_status` is `pass`.
+- `prompt_text_manifest.paragraph_quality_dimensions` records the checked
+  dimensions for product context, target user, journey, screens/components,
+  interaction or system response, concrete content, trust or user control,
+  visual direction, anti-goals, desired user feeling, and perspective engine.
 - `post_validate.status` is `pass` for multi-direction packs or `skipped` for
   explicit single-direction packs.
 - `prompt_text_manifest.direction_count` equals `directions.length`.

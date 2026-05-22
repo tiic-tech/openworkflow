@@ -58,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C003`
+Next recommended candidate: `C004`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -72,17 +72,16 @@ review, proto2html, or broad workflow redesign.
 | C001 | done | medium | Map dailin skill workflow into OW prompt paragraph contract | none |
 | C002 | done | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
 | C007 | done | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
-| C003 | ready | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
-| C004 | candidate | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
+| C003 | done | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
+| C004 | ready | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
 | C005 | candidate | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
 | C006 | candidate | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001`, `C002`, and `C007` are complete. The next recommended candidate is
-`C003`, which should wire the dailin-grade paragraph contract, senior
-product-manager perspective engine, and validator gate into generated
-`/ow:vision2prompt` command guidance.
+`C001`, `C002`, `C007`, and `C003` are complete. The next recommended candidate
+is `C004`, which should add dailin-grade positive fixtures and thin-prompt
+regressions against the final generated guidance and validator gate.
 
 The key acceptance shift is:
 
@@ -172,11 +171,18 @@ Acceptance:
 
 ### C003 - Wire Dailin-Grade Prompt Paragraph Generation Into /ow:vision2prompt
 
-Status: ready
+Status: done
 
 Purpose: ensure generated command guidance tells agents to execute the dailin
 skill workflow and write dense high-fidelity prototype prompt paragraphs by
 default.
+
+Evidence:
+
+- `C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/SELECTED_CHANGE.yaml`
+- `C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/ATOM_TASKS.yaml`
+- `C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_BRIEF.md`
+- `C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md`
 
 Acceptance:
 
@@ -185,6 +191,8 @@ Acceptance:
 - M98 source-completeness gates remain intact
 
 ### C004 - Add Dailin-Grade Prompt Fixtures And Thin-Prompt Regressions
+
+Status: ready
 
 Purpose: prevent future regression to terse state prompts.
 

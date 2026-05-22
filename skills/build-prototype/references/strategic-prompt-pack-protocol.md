@@ -73,6 +73,14 @@ Do not collapse the perspective engine into persona text. "Senior PM" is only
 useful when it changes the output: sharper product thesis, clearer user
 transformation, stronger form choice, and more opinionated anti-defaults.
 
+Do not hand off to `/ow:prompt2proto` until the actual prompt paragraphs pass
+the paragraph-quality gate. `quality_rubric.prompt_paragraph_quality` and
+`prompt_text_manifest.paragraph_quality_status` must prove the text itself
+contains product context, target user, journey, screen/component requirements,
+interaction behavior, system response, concrete content, trust or user-control
+surfaces, visual direction, anti-goals, desired user feeling, and the
+perspective engine.
+
 This pipeline intentionally mirrors dailin
 `vision_to_strategic_prototype_prompt` Steps 1-6:
 
@@ -238,7 +246,8 @@ and include:
 - screen-bound `screen_prompts` tied to `screen_manifest` ids, with standalone
   prompt text, negative prompt, example copy, and acceptance criteria
 - `quality_rubric`: prompt executability, strategic distinctness, product
-  specificity, state coverage, and trust-boundary coverage
+  specificity, state coverage, trust-boundary coverage, and
+  prompt_paragraph_quality
 - `directions`
 - `build_recommendation`
 - `prompt_pack_integrity_gate`
@@ -267,8 +276,8 @@ Each direction needs:
 When `prompt_text_manifest.status` becomes `ready_for_image_generation`, every
 direction screen prompt must resolve to a `screen_manifest.target_screen_id`.
 Do not mark prompt text ready when screen prompts are detached from the product
-journey, missing negative prompts or example copy, or only restate a freeform
-`prototype_prompt`.
+journey, missing negative prompts or example copy, omit paragraph quality
+dimensions, or only restate a freeform `prototype_prompt`.
 
 ## Prototype Prompt Requirements
 

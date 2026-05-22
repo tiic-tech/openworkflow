@@ -157,6 +157,9 @@ packets:
           /ow:proto preflight.
         - Prepare to infer product_experience_model before strategic directions; do not start
           directions from scenario labels or visual style variants.
+        - Prepare to write dailin-grade long-form prompt paragraphs; direction and screen prompt
+          text must include journey, interaction behavior, system response, trust controls,
+          anti-goals, visual direction, desired user feeling, and concrete content.
         - Prepare to run prompt_pack_integrity_gate, prototype_reality_gate,
           quality_rubric.prompt_executability, and post_validate after prompt assets are complete;
           do not hand off to /ow:prompt2proto while any required gate is missing or failing.
@@ -182,9 +185,13 @@ packets:
         - Write complete multi-image prompt text for every selected direction with screen_prompts,
           negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
           target_screen_id values.
+        - Populate quality_rubric.prompt_paragraph_quality and
+          prompt_text_manifest.paragraph_quality_status before handoff; fail closed when
+          paragraph_quality_dimensions are missing.
         - Do not set prompt_text_manifest.status to ready_for_image_generation until
-          prompt_pack_integrity_gate.status, prototype_reality_gate.status, and
-          quality_rubric.prompt_executability.status are pass.
+          prompt_pack_integrity_gate.status, prototype_reality_gate.status,
+          quality_rubric.prompt_executability.status, and
+          prompt_text_manifest.paragraph_quality_status are pass.
         - After prompt text is ready, run the deterministic post_validate gate over
           strategic_fingerprint dimensions when resolved_count is 2 or more.
         - "When the user explicitly requested exactly one strategic direction, set
@@ -197,7 +204,8 @@ packets:
           ready_for_image_generation, and post_validate status.
         - Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and
           prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is
-          pass, and post_validate.status is pass or skipped.
+          pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is
+          pass or skipped.
         - If any readiness gate fails, keep handoff blocked and repair prompt directions through
           /ow:vision2prompt.
         - Record internal_pipeline stage vision2prompt status and outputs.
@@ -223,15 +231,18 @@ packets:
     audit_checkpoints:
       before:
         - Run only as an internal stage after /ow:vision2prompt has written
-          prompt_text_manifest.status ready_for_image_generation and post_validate.status pass or
+          prompt_text_manifest.status ready_for_image_generation,
+          prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or
           skipped.
         - Load prepared prompt text and verify every selected direction has screen_prompts before
           image generation.
         - "Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass,
-          quality_rubric.prompt_executability.status: pass, and screen_manifest linkage before image
-          generation."
+          quality_rubric.prompt_executability.status: pass,
+          prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before
+          image generation."
         - Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt
-          executability, screen_manifest linkage, or post_validate is fail or missing.
+          executability, paragraph quality, screen_manifest linkage, or post_validate is fail or
+          missing.
       during:
         - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
         - Write one metadata record for every generated image with image_id, direction_id,

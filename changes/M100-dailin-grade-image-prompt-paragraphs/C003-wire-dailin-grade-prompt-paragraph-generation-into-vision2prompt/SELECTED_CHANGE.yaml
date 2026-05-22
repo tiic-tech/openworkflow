@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C003
+title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
+status: selected
+selection_reason: >
+  C003 is the next recommended candidate after C007 completed the senior
+  product-manager perspective engine. It wires the mapped dailin workflow,
+  paragraph-quality contract, and C002 validator gate into generated
+  /ow:vision2prompt and downstream prompt2proto handoff guidance.
+scope:
+  includes:
+    - command registry protocol updates for /ow:vision2prompt
+    - generated guidance that loads and executes the mapped OW equivalents of dailin 01-06 references in order
+    - build-prototype skill guidance that forbids terse screen-state prompts
+    - generated .agents/skills/ow-vision2prompt/SKILL.md sync evidence
+    - prompt2proto handoff guidance requiring paragraph-quality gates
+  excludes:
+    - provider image execution
+    - generated image review
+    - proto2html
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+  - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+forbidden_paths:
+  - provider image generation implementation
+  - generated image review artifacts
+  - proto2html artifacts or runtime code
+  - M101 build-proto-prompt command split implementation
+acceptance:
+  - Generated ow-vision2prompt skill requires the dailin SKILL workflow order before writing prompt paragraphs.
+  - Generated ow-vision2prompt skill requires dailin-grade long-form prompt paragraphs before /ow:prompt2proto handoff.
+  - Generated protocol explicitly names journey, interaction behavior, system response, trust controls, anti-goals, visual direction, and desired user feeling as required prompt text.
+  - The protocol preserves M98 source-completeness gates and adds paragraph quality rather than replacing them.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C004
+    reason: C004 depends on C003 generated guidance before fixtures can prove the final behavior.
+  - plan_id: M101-build-proto-prompt-command-split
+    candidate_id: C001
+    reason: M101 is high-risk command-boundary work and must wait until M100 C003 completes.

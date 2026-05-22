@@ -126,7 +126,9 @@ For local runnable prototypes, the legacy artifact shape remains valid:
    `screen_prompts` tied to `screen_manifest.target_screen_id` values.
 11. Set `prompt_text_manifest.status: ready_for_image_generation` only after
     `prompt_pack_integrity_gate.status`, `prototype_reality_gate.status`, and
-    `quality_rubric.prompt_executability.status` are `pass`.
+    `quality_rubric.prompt_executability.status` are `pass`, and after
+    `prompt_text_manifest.paragraph_quality_status` confirms dailin-grade
+    prompt paragraph quality.
 12. Keep `image_generation.status: not_started` and repair through
     `/ow:vision2prompt` when integrity, reality, executability, or
     post-validation gates are missing or failing.
@@ -154,6 +156,8 @@ For local runnable prototypes, the legacy artifact shape remains valid:
 - Prompts must specify screens, journeys, interactions, states, AI/system
   behavior, trust controls, privacy boundaries, visual direction, anti-goals,
   desired user feeling, and concrete sample content.
+- The prompt text itself must pass paragraph quality; adjacent YAML fields do
+  not rescue a terse `screen_prompts[].prompt`.
 - The output is a prompt pack and review plan, not a production spec or task
   backlog.
 
