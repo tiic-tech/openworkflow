@@ -1,0 +1,213 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M101-build-proto-prompt-command-split
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M101-build-proto-prompt-command-split
+title: Candidate changes for build-proto-prompt command split
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - user_direction:2026-05-23-split-build-prototype-into-build-proto-prompt-and-build-prototype
+    - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+    - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+  summary: >
+    User proposed splitting the current build-prototype responsibility into
+    build-proto-prompt, which executes the vision2prompt prompt-pack compiler,
+    and build-prototype, which consumes ready build-proto-prompt artifacts. The
+    goal is clearer capability boundaries and more focused command agents after
+    M100 upgrades prompt paragraph quality.
+queue_policy:
+  branch_boundary: codex/m101-build-proto-prompt-command-split
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Do not select or implement M101 until M100 completes C007 and C003. When
+    M100 is complete, start with the high-risk decision report and select only a
+    bounded design-or-migration candidate with explicit approval.
+  high_risk_rule: >
+    Command boundary changes affect registry, generated skills, handoff order,
+    managed audit packets, runtime verification, and existing /ow:proto
+    semantics. Treat the first implementation candidate as risk: high and stop
+    for HIGH_RISK_DECISION_REPORT.md before selection.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Split the prototype prompt compiler from the prototype consumer command
+    surface: build-proto-prompt owns vision/validation to PROTO_PROMPT_PACK,
+    build-prototype owns consumption of ready prompt-pack artifacts and
+    downstream prototype generation/review evidence.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include command taxonomy, source skill split, generated adapter sync,
+    managed context packets, artifact handoff contracts, runtime-surface
+    verification, migration/deprecation behavior, and docs needed for the split.
+  out_of_scope_rule: >
+    Do not change prompt paragraph quality content, provider image generation,
+    visual review, proto2html, or storyboard/motion modeling in this queue.
+  deferred_features:
+    - title: Provider-backed image quality benchmark
+      reason: >
+        Still belongs after prompt text quality and command split have stable
+        boundaries.
+      suggested_plan_id: M102-provider-image-generation-benchmark
+    - title: Visual reference parity gate
+      reason: >
+        Visual parity requires generated images or rendered prototypes and a
+        separate review method.
+      suggested_plan_id: M103-prototype-visual-reference-parity-gate
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: candidate
+    title: Decide build-proto-prompt split contract and migration guardrails
+    purpose: >
+      Convert the user's proposed command split into an explicit high-risk
+      decision before changing generated command surfaces.
+    scope:
+      includes:
+        - define the new build-proto-prompt command responsibility
+        - define the narrowed build-prototype consumer responsibility
+        - decide whether /ow:vision2prompt remains internal, becomes an alias, or is replaced by /ow:build-proto-prompt
+        - decide artifact handoff between prompt pack readiness and prototype consumption
+        - name compatibility behavior for existing /ow:proto and generated skills
+        - approve a bounded migration option before implementation
+      excludes:
+        - implementation source edits
+        - generated skill sync
+        - provider image generation
+        - M100 prompt paragraph content work
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - M100:C007
+      - M100:C003
+    unlocks:
+      - C002
+      - C003
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The decision report records concrete split options, recommended option, risks, guardrails, go criteria, and stop criteria.
+      - The report explicitly states that M101 must not start until M100 C007 and C003 are complete.
+      - The report defines build-proto-prompt as prompt-pack compiler and build-prototype as ready prompt-pack consumer.
+      - No implementation source, generated skill, or managed audit surface is changed by this candidate.
+  - id: C002
+    status: candidate
+    title: Introduce build-proto-prompt command and source skill boundary
+    purpose: >
+      Add the new prompt-pack compiler command surface after the split contract
+      is approved.
+    scope:
+      includes:
+        - command registry entry for build-proto-prompt or approved trigger name
+        - source skill for build-proto-prompt prompt-pack compilation
+        - generated adapter sync for the new command
+        - context packet and command audit updates
+        - runtime-surface assertions for generated skill presence and boundaries
+      excludes:
+        - provider image generation
+        - prototype consumer migration
+        - visual review
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-proto-prompt/
+      - .agents/skills/ow-build-proto-prompt/
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The new command is generated as an owned skill with a clear prompt-pack compiler boundary.
+      - Generated guidance does not consume provider images or prototype review artifacts.
+      - Runtime-surface verification proves the command exists and is ordered before build-prototype consumption.
+  - id: C003
+    status: candidate
+    title: Narrow build-prototype to consume ready prompt-pack artifacts
+    purpose: >
+      Move build-prototype away from vision2prompt compilation and make it
+      consume only build-proto-prompt artifacts that pass readiness gates.
+    scope:
+      includes:
+        - update build-prototype source skill responsibility
+        - update /ow:proto orchestration and handoff semantics as approved
+        - preserve backwards compatibility or explicit migration behavior
+        - runtime-surface tests that build-prototype refuses thin or missing prompt packs
+      excludes:
+        - changing M100 prompt quality rubric
+        - provider image generation implementation
+        - proto2html
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - C001
+      - C002
+    unlocks: []
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - build-prototype guidance consumes ready prompt-pack artifacts rather than compiling prompt packs from vision.
+      - Existing /ow:proto behavior is either preserved through orchestration or given an explicit migration path.
+      - Runtime-surface checks fail if build-prototype silently skips prompt-pack readiness.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+    actor: agent
+    reason: >
+      Create a new queue for the user's requested split between
+      build-proto-prompt and build-prototype. This is recorded separately from
+      M100 because it changes command boundaries rather than prompt paragraph
+      content quality.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
+      - changes/M101-build-proto-prompt-command-split/SUMMARY.yaml
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md

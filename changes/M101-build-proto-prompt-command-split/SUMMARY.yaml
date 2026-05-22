@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: summary:M101-build-proto-prompt-command-split
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M101-build-proto-prompt-command-split
+title: Summary for build-proto-prompt command split
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    User proposed splitting build-prototype into build-proto-prompt and
+    build-prototype so vision2prompt prompt-pack compilation and prototype
+    artifact consumption have clearer responsibilities and more focused agents.
+  refs:
+    - user_direction:2026-05-23-split-build-prototype-into-build-proto-prompt-and-build-prototype
+    - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+scope_boundary: >
+  One command-surface split: build-proto-prompt owns vision/validation to
+  prompt-pack compilation; build-prototype owns consumption of ready prompt-pack
+  artifacts and downstream prototype generation/review evidence.
+branch_boundary: codex/m101-build-proto-prompt-command-split
+candidate_count: 3
+active_candidate_count: 3
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+high_risk_report: changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+outputs:
+  candidate_changes_yaml: changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
+  summary: changes/M101-build-proto-prompt-command-split/SUMMARY.yaml
+  high_risk_decision_report: changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+key_dependencies:
+  - M100 C007 should complete first so the senior PM perspective engine is stable before command boundaries move.
+  - M100 C003 should complete first so current generated vision2prompt guidance is strong before it is split into a new command surface.
+  - M101 C001 is high risk and should not be selected without explicit approval of a concrete split option.
+risks:
+  - id: R001
+    level: high
+    description: >
+      Splitting commands can break generated skill triggers, handoff ordering,
+      context packets, runtime-surface assertions, and compatibility for
+      existing /ow:proto usage.
+    mitigation: Start with a high-risk decision report and migrate in bounded candidates after M100 completes.
+  - id: R002
+    level: medium
+    description: >
+      The split could distract from M100 prompt paragraph quality work.
+    mitigation: Keep M101 unselected until M100 C007 and C003 are done.
+unresolved_questions:
+  - Should /ow:vision2prompt remain an internal command, become an alias of build-proto-prompt, or be replaced by /ow:build-proto-prompt?
+  - Should user-facing /ow:proto orchestrate both commands, or should users explicitly run build-proto-prompt before build-prototype?
+validation:
+  commands_run:
+    - node dist/cli/src/index.js handoff --root . --json
+    - git status --short --branch
+    - sed -n '1,220p' skills/decompose-to-changes/references/decomposition-protocol.md
+  notes:
+    - Created on branch codex/m100-dailin-grade-image-prompt-paragraphs while M100 C007 work was in progress, per user request to record M101 before returning to M100.
+    - Intended implementation branch is codex/m101-build-proto-prompt-command-split; no M101 implementation should start on the M100 branch.
