@@ -1,0 +1,276 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M88-tune-product-system-inheritance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M88-tune-product-system-inheritance
+title: Candidate changes for tune product-system inheritance
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+    - user_direction:2026-05-22-continue-after-m87
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes /ow:tune preserve product-system continuity across prototype refinement
+    - absorbs prototype_tune_to_refined_prompt as native OW contracts and protocol
+    - keeps refined prompt output text-first and screen-bound
+    - records inheritance and delta rules for downstream generation agents
+    - preserves internal decision audit behavior
+  avoid:
+    - generating prototype images or calling external generation APIs
+    - changing /ow:proto strategic prompt generation
+    - adding async subagent execution
+    - creating proto2html, html2spec, or production implementation artifacts
+    - broadening into full discovery-loop E2E dogfood
+scope_control:
+  current_boundary: >
+    Align /ow:tune around product-system inheritance and screen-bound refined
+    prompt packs after prototype image or prompt-pack evidence exists.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include only candidates needed for /ow:tune to normalize tune inputs, audit
+    baseline screens, extract product-system constants, express inheritance and
+    delta rules, bind refined prompts to target screens, and verify that
+    product drift is caught before downstream generation.
+  out_of_scope_rule: >
+    Record async built-in agent team execution, proto2html, html2spec,
+    production design/spec work, and full discovery-loop E2E dogfood as
+    deferred refs. Do not include them in M88.
+  deferred_features:
+    - title: Map internal commands to built-in subagents
+      reason: >
+        Async subagent execution should wait until synchronous discovery-loop
+        command contracts are stable.
+      suggested_plan_id: M89-built-in-agent-team-internal-stages
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        Full dogfood should wait until tune inheritance contracts and validators
+        are stable.
+      suggested_plan_id: M90-discovery-loop-e2e-dogfood
+    - title: Rebuild proto2html around benchmark prototype input
+      reason: >
+        Proto2html should consume the selected benchmark prototype after proto
+        and tune evidence are reliable.
+      suggested_plan_id: M91-proto2html-benchmark-input
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define refined prompt pack inheritance contract
+    purpose: >
+      Encode the native /ow:tune artifact contract for baseline screen audit,
+      product-system extraction, inheritance and delta rules, screen mapping,
+      refined prompt manifest, generation order, and acceptance checklist.
+    scope:
+      includes:
+        - refined prompt pack template fields
+        - baseline input normalization fields
+        - product_system stable constants and adaptable variables
+        - MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules
+        - screen-level source-to-target mapping
+        - screen-bound refined prompt fields and acceptance criteria
+      excludes:
+        - generated /ow:tune skill updates
+        - validator stress fixtures
+        - image generation
+        - multi-round latest-baseline resolution
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M88-tune-product-system-inheritance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Refined prompt-pack artifacts can record normalized tuning input and baseline source references.
+      - Refined prompt-pack artifacts can record baseline_screen_audit for every source screen.
+      - Refined prompt-pack artifacts can record product_system constants and adaptable variables.
+      - Delta rules include MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets.
+      - Screen prompts are bound to target_screen_id and source_screen_ids with acceptance criteria.
+  - id: C002
+    status: candidate
+    title: Wire reference methodology into /ow:tune protocol
+    purpose: >
+      Make generated /ow:tune guidance follow the prototype_tune_to_refined_prompt
+      workflow: normalize inputs, audit baseline, extract product system,
+      interpret tune request, build delta matrix, and output screen-bound
+      refined prompts.
+    scope:
+      includes:
+        - command registry protocol updates
+        - generated ow-tune skill guidance through sync
+        - context packet drift checks
+        - explicit no-image/no-html boundaries
+        - internal decision audit preservation
+      excludes:
+        - schema or validator design
+        - external image generation
+        - async subagent execution
+        - /ow:proto prompt compiler behavior
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-tune/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M88-tune-product-system-inheritance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated /ow:tune includes input normalization before baseline audit.
+      - Generated /ow:tune includes product-system extraction before refined prompts.
+      - Generated /ow:tune includes tune request interpretation and conflict handling.
+      - Generated /ow:tune includes screen-level delta matrix requirements.
+      - Generated /ow:tune keeps image generation, HTML, and implementation out of scope.
+  - id: C003
+    status: candidate
+    title: Add refined prompt pack validator stress fixtures
+    purpose: >
+      Pressure-test /ow:tune artifacts so validators reject product-system drift,
+      missing baseline audits, orphan screen prompts, and unbound target screens.
+    scope:
+      includes:
+        - valid refined prompt-pack fixture
+        - missing baseline audit fixture
+        - orphan target screen fixture
+        - missing MUST_INHERIT or MUST_REMOVE fixture
+        - validator messages useful for repair
+      excludes:
+        - generated prototype images
+        - browser visual review
+        - async agent execution
+        - production design/spec artifacts
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M88-tune-product-system-inheritance/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests pass a complete refined prompt pack with baseline audit, product system, delta rules, and screen-bound prompts.
+      - Tests reject refined prompt packs without baseline_screen_audit.
+      - Tests reject target screen prompts not represented in screen_manifest.
+      - Tests reject tune artifacts that omit required inheritance or removal rules when changes are requested.
+      - Failure output points back to the missing tune repair artifact section.
+  - id: C004
+    status: candidate
+    title: Support multi-round tune baseline inheritance
+    purpose: >
+      Make /ow:tune preserve the latest approved prototype group and locked
+      elements across repeated tune passes without silently reverting to stale
+      source screens.
+    scope:
+      includes:
+        - latest baseline resolution guidance
+        - locked element carry-forward fields
+        - accepted improvement preservation
+        - cumulative drift guard
+        - generated-surface verification for multi-round tune behavior
+      excludes:
+        - async subagent runtime
+        - image generation execution
+        - visual diff tooling
+        - production design/spec work
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M88-tune-product-system-inheritance/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M89-built-in-agent-team-internal-stages
+      - M90-discovery-loop-e2e-dogfood
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tune artifacts can identify the latest approved baseline group.
+      - Locked screens or elements carry forward unless explicitly unlocked.
+      - Accepted improvements from prior tune passes are preserved.
+      - Multi-round tune guidance forbids cumulative product drift.
+      - Generated /ow:tune surfaces expose the latest-baseline rule.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for /ow:tune product-system inheritance after
+      M87 completed prompt asset post-validation and the discovery-loop plan
+      identified prototype_tune_to_refined_prompt absorption as the next
+      deferred command-surface upgrade.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+      - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.md
+      - changes/M88-tune-product-system-inheritance/SUMMARY.yaml

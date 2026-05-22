@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: summary:M88-tune-product-system-inheritance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M88-tune-product-system-inheritance
+title: Summary for tune product-system inheritance
+status: active
+source:
+  kind: mixed
+  summary: >
+    Tracks the bounded /ow:tune product-system inheritance upgrade. The queue
+    absorbs prototype_tune_to_refined_prompt into native OW contracts, generated
+    command protocol, validators, and multi-round tune inheritance without
+    broadening into image generation or downstream production work.
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+scope_boundary:
+  current_boundary: >
+    /ow:tune refined prompt-pack product-system inheritance only.
+  boundary_type: command_surface
+  note: >
+    This queue handles baseline screen audit, product-system extraction, delta
+    inheritance rules, screen-bound refined prompt packs, validator fixtures,
+    and multi-round latest-baseline behavior.
+deferred_feature_refs:
+  - M89-built-in-agent-team-internal-stages
+  - M90-discovery-loop-e2e-dogfood
+  - M91-proto2html-benchmark-input
+outputs:
+  candidate_changes_yaml: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.md
+  summary: changes/M88-tune-product-system-inheritance/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+key_dependencies:
+  - M87 completed prompt asset post-validation before image generation.
+  - DISCOVER_LOOP_UPGRATE_PLAN identifies /ow:tune product-system inheritance as a deferred discovery-loop upgrade.
+  - prototype_tune_to_refined_prompt reference skill defines baseline audit, product-system extraction, delta matrix, and screen-bound refined prompts.
+risks:
+  - id: R001
+    level: medium
+    description: Tune can drift into a new product when the baseline system is not audited.
+    mitigation: Require baseline_screen_audit and product_system before refined prompts.
+  - id: R002
+    level: medium
+    description: Screen prompts can become anonymous and unusable by downstream generation agents.
+    mitigation: Require target_screen_id, source_screen_ids, prompt_id, and acceptance criteria.
+  - id: R003
+    level: medium
+    description: Repeated tune passes can lose locked elements or accepted improvements.
+    mitigation: Add latest-baseline and locked-element carry-forward behavior in a later candidate.
+unresolved_questions:
+  - Whether M88 should add a dedicated refined prompt-pack artifact_type or continue using prototype_evidence with prompt_pack_type.
+validation:
+  commands_run:
+    - git status --short
+    - unzip -l /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+    - unzip -p /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip '*SKILL.md'
+  notes:
+    - OP001 created the M88 queue with scope limited to /ow:tune product-system inheritance.
+    - C001 is the next recommended candidate because artifact contract fields should precede generated protocol and validator fixture work.
