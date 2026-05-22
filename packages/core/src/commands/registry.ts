@@ -741,8 +741,9 @@ function prototypeProtocol(): CommandProtocol {
         "Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.",
         "Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
         "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
+        "Do not internally trigger /ow:prompt2proto until prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.",
         "Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.",
-        "If post_validate.status is fail, route back through /ow:vision2prompt prompt repair instead of starting image generation.",
+        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.",
         "Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
@@ -817,7 +818,18 @@ function prototypeProtocol(): CommandProtocol {
         items: [
           "Write complete prompt text for every selected direction before invoking image generation.",
           "Each direction should include multi-image screen prompt text with prompt_id, screen_name, image_role, prompt, and acceptance_criteria.",
-          "Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text.",
+          "Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text and screen-bound prompt refs.",
+          "Do not set prompt_text_manifest.status: ready_for_image_generation when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or quality_rubric.prompt_executability is missing or failing.",
+        ],
+      },
+      {
+        tag: "prompt_pack_handoff_gate",
+        items: [
+          "Before /ow:prompt2proto, require prompt_pack_integrity_gate.status: pass.",
+          "Before /ow:prompt2proto, require prototype_reality_gate.status: pass.",
+          "Before /ow:prompt2proto, require screen_manifest entries and direction screen_prompts to resolve by target_screen_id.",
+          "Before /ow:prompt2proto, require quality_rubric.prompt_executability.status: pass.",
+          "If any required gate fails or is missing, keep image_generation.status: not_started and repair inside /ow:vision2prompt.",
         ],
       },
       {
@@ -903,24 +915,27 @@ function vision2PromptProtocol(): CommandProtocol {
       before: [
         "Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.",
         "Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.",
+        "Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before writing PROTO_PROMPT_PACK.",
         "Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.",
         "Prepare to infer product_experience_model before strategic directions; do not start directions from scenario labels or visual style variants.",
-        "Prepare to run post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto without pass or skipped status.",
+        "Prepare to run prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, and post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto while any required gate is missing or failing.",
       ],
       during: [
-        "Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.",
+        "Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.",
+        "Record the intermediate pipeline outputs: normalized input contract, vision decomposition, candidate strategic hypotheses, product experience model, screen_manifest, prototype prompt schema, output manifest, and quality rubric.",
         "Infer product_experience_model from VISION and VALIDATION: product archetype, primary canvas, information architecture, domain object model, primary task loop, interaction state model, data realism requirements, visual language, anti-generic constraints, and category quality bar.",
         "Decide whether scenario names are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.",
         "Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.",
         "Only select directions that differ by product form, product loop, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.",
-        "Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.",
+        "Write complete multi-image prompt text for every selected direction with screen_prompts, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest target_screen_id values.",
+        "Do not set prompt_text_manifest.status to ready_for_image_generation until prompt_pack_integrity_gate.status, prototype_reality_gate.status, and quality_rubric.prompt_executability.status are pass.",
         "After prompt text is ready, run the deterministic post_validate gate over strategic_fingerprint dimensions when resolved_count is 2 or more.",
         "When the user explicitly requested exactly one strategic direction, set post_validate.status: skipped and record the skip reason instead of running diversity comparison.",
       ],
       after: [
-        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with product_experience_model, prompt_text_manifest.status ready_for_image_generation, and post_validate status.",
-        "Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.",
-        "If post_validate.status is fail, keep handoff blocked and repair prompt directions through /ow:vision2prompt.",
+        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with product_experience_model, screen_manifest, screen_prompts, prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric, prompt_text_manifest.status ready_for_image_generation, and post_validate status.",
+        "Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is pass, and post_validate.status is pass or skipped.",
+        "If any readiness gate fails, keep handoff blocked and repair prompt directions through /ow:vision2prompt.",
         "Record internal_pipeline stage vision2prompt status and outputs.",
         "Do not generate images; hand internally to /ow:prompt2proto.",
       ],
@@ -930,6 +945,7 @@ function vision2PromptProtocol(): CommandProtocol {
       "Do not generate prototype images from this stage.",
       "Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.",
       "Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.",
+      "Do not hand off to /ow:prompt2proto when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or prompt executability is missing or failing.",
       "Do not create HTML, specs, changes, or runtime artifacts.",
     ],
     internalSections: [
@@ -942,12 +958,35 @@ function vision2PromptProtocol(): CommandProtocol {
         ],
       },
       {
+        tag: "vision2prompt_reference_pipeline",
+        items: [
+          "Run skills/build-prototype/references/strategic-prompt-pack-protocol.md as the governing protocol.",
+          "Load references/vision2prompt/01_input_contract.md to normalize vision, validation, direction count, target tool, fidelity, constraints, and missing inputs.",
+          "Load references/vision2prompt/02_vision_decomposition.md before strategic hypotheses.",
+          "Load references/vision2prompt/03_strategy_hypothesis_generation.md to create 5-8 candidates and select materially distinct directions.",
+          "Load references/vision2prompt/04_product_system_extraction.md before writing screen_manifest or product_experience_model.",
+          "Load references/vision2prompt/05_prototype_prompt_schema.md before writing direction screen_prompts.",
+          "Load references/vision2prompt/06_output_templates.md so YAML remains source of truth and Markdown remains a readable view.",
+          "Load references/vision2prompt/07_quality_rubric.md before marking prompt_text_manifest ready.",
+        ],
+      },
+      {
         tag: "product_experience_model",
         items: [
           "Before directions, write product_experience_model with product_archetype, primary_canvas, information_architecture, domain_object_model, primary_task_loop, interaction_state_model, data_realism_requirements, visual_language, anti_generic_constraints, and category_quality_bar.",
           "Use the model to preserve target product category reality from VISION-only input.",
           "Do not treat modules, scenarios, layers, workflows, or interaction states as separate strategic directions unless they imply different product forms or loops.",
           "Block generic AI dashboard, report-screen, or card-wall drift through anti_generic_constraints and negative_constraints.",
+        ],
+      },
+      {
+        tag: "prompt_pack_readiness_gate",
+        items: [
+          "prompt_text_manifest.status cannot become ready_for_image_generation until prompt_pack_integrity_gate.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until prototype_reality_gate.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until quality_rubric.prompt_executability.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until every direction screen_prompt target_screen_id resolves to screen_manifest.",
+          "When a gate fails or is missing, set image_generation.status: not_started and repair through /ow:vision2prompt before handoff.",
         ],
       },
       {
@@ -999,7 +1038,8 @@ function prompt2ProtoProtocol(): CommandProtocol {
       before: [
         "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation and post_validate.status pass or skipped.",
         "Load prepared prompt text and verify every selected direction has screen_prompts before image generation.",
-        "Block image generation when post_validate.status is fail or missing for multi-direction prompt packs.",
+        "Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, and screen_manifest linkage before image generation.",
+        "Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, screen_manifest linkage, or post_validate is fail or missing.",
       ],
       during: [
         "Batch-generate high-fidelity prototype images by direction_id and prompt_id.",
@@ -1015,10 +1055,22 @@ function prompt2ProtoProtocol(): CommandProtocol {
     antiPatterns: [
       "Do not expose /ow:prompt2proto as a user-facing workflow step.",
       "Do not start image generation when prompt text is not ready.",
+      "Do not start image generation when prompt_pack_integrity_gate or prototype_reality_gate is missing or failing.",
+      "Do not start image generation when screen prompts are detached from screen_manifest or prompt executability has not passed.",
       "Do not create HTML, specs, changes, or runtime artifacts.",
       "Do not allow generated images without per-image metadata.",
     ],
     internalSections: [
+      {
+        tag: "prompt_pack_readiness_gate",
+        items: [
+          "Refuse prompt packs whose prompt_pack_integrity_gate.status is not pass.",
+          "Refuse prompt packs whose prototype_reality_gate.status is not pass.",
+          "Refuse prompt packs whose quality_rubric.prompt_executability.status is not pass.",
+          "Refuse prompt packs whose direction screen_prompts do not resolve to screen_manifest target_screen_id values.",
+          "When a prompt pack is refused, keep image_generation.status: not_started and hand back to /ow:vision2prompt repair.",
+        ],
+      },
       {
         tag: "image_metadata_contract",
         items: [

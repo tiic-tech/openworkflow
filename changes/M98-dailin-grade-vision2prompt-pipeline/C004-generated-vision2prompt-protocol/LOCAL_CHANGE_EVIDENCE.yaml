@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C004
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C004
+change_id: C004-generated-vision2prompt-protocol
+title: Local evidence for generated vision2prompt protocol
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Wired the dailin-grade vision2prompt reference pipeline into the generated
+  /ow:vision2prompt protocol and tightened the generated /ow:proto and
+  /ow:prompt2proto handoff rules so prompt packs cannot proceed to image
+  generation while integrity, reality, screen linkage, prompt executability, or
+  post-validation gates are missing or failing.
+changed_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - skills/build-prototype/SKILL.md
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Generated /ow:vision2prompt now tells agents to load strategic-prompt-pack-protocol.md and run references/vision2prompt/01_input_contract.md through 07_quality_rubric.md before writing PROTO_PROMPT_PACK.
+  - Generated /ow:vision2prompt now requires compact intermediate outputs for normalized input, vision decomposition, candidate hypotheses, product experience model, screen_manifest, prompt schema, output manifest, and quality rubric.
+  - Generated /ow:vision2prompt now blocks prompt_text_manifest.status ready_for_image_generation until prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, and screen_manifest linkage pass.
+  - Generated /ow:prompt2proto now refuses prompt packs whose integrity, reality, prompt executability, or screen linkage gates fail or are missing.
+  - Generated /ow:proto now repeats the same internal handoff gate before triggering /ow:prompt2proto.
+  - skills/build-prototype/SKILL.md now points strategic mode at the numbered vision2prompt reference pipeline and the same gate requirements.
+  - verifyAgentE2E's temporary validation fixture now satisfies current /ow:proto readiness fields while preserving the strict thin-summary handoff regression.
+generated_by_sync:
+  command: node dist/cli/src/index.js sync --root . --tools codex --json
+  written:
+    - .agents/skills/ow-vision2prompt/SKILL.md
+    - .agents/skills/ow-prompt2proto/SKILL.md
+    - .agents/skills/ow-proto/SKILL.md
+  updated:
+    - .openworkflow/audit/CONTEXT_PACKETS.yaml
+verification:
+  passed:
+    - npm run build
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - npm run verify:agent-e2e
+    - rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    command: npm run validate
+    reason: >
+      Repository validation still fails on pre-existing M97 planning artifacts:
+      C003 and C004 ATOM_TASKS.yaml missing title, and M97 C001-C004 done
+      candidates missing completion evidence. These paths are outside C004
+      owned behavior and were already failing before this candidate.
+next_recommended_candidate_id: C005

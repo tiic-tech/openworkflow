@@ -25,6 +25,8 @@ Completed candidate: `C002`
 
 Completed candidate: `C003`
 
+Completed candidate: `C004`
+
 Select the first dependency-free candidate that most reduces downstream
 prompt-pack ambiguity. Stop for a high-risk decision report if a candidate
 expands beyond `/ow:vision2prompt` prompt-pack behavior into broad workflow
@@ -37,7 +39,7 @@ semantics, release publishing, or remote-impacting changes.
 | C001 | done | medium | Add prompt-pack integrity gate | none |
 | C002 | done | medium | Migrate dailin reference pipeline into OW vision2prompt references | none |
 | C003 | done | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
-| C004 | candidate | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
+| C004 | done | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
 | C005 | candidate | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
 | C006 | candidate | medium | Replay smart city prompt pack with dailin-grade contract | C003, C004, C005 |
 
@@ -48,9 +50,8 @@ downstream generation could proceed from a prompt pack whose manifest,
 directions, and evidence refs diverged. Integrity now fails closed before the
 richer dailin-style structure is added.
 
-`C003` is complete. `C004` is now the next candidate because generated
-`/ow:vision2prompt` protocol guidance can reference stable integrity and
-screen-bound executability contract fields.
+`C004` is complete. `C005` is now the next candidate because fixtures can assert
+the full contract plus generated protocol behavior.
 
 ## Deferred
 
@@ -128,6 +129,13 @@ Purpose: make generated `/ow:vision2prompt` guidance execute the OW reference
 pipeline and block handoff to `/ow:prompt2proto` until prompt-pack integrity and
 executability gates pass.
 
+Selected change artifacts:
+
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/SELECTED_CHANGE.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/ATOM_TASKS.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/IMPLEMENTATION_BRIEF.md`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/LOCAL_CHANGE_EVIDENCE.yaml`
+
 Validation:
 
 - `npm run build`
@@ -135,6 +143,9 @@ Validation:
 - `npm run validate`
 - `npm run verify:agent-e2e`
 - `rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype`
+- `node dist/cli/src/index.js validate --root . --json`
+- `node dist/cli/src/index.js summaries --root . --strict --json`
+- `git diff --check`
 
 ### C005 - Add Dailin-Grade Prompt-Pack Fixtures And Thin-Prompt Regressions
 

@@ -83,7 +83,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation and post_validate.status pass or skipped.
 - Load prepared prompt text and verify every selected direction has screen_prompts before image generation.
-- Block image generation when post_validate.status is fail or missing for multi-direction prompt packs.
+- Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, and screen_manifest linkage before image generation.
+- Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, screen_manifest linkage, or post_validate is fail or missing.
 </before>
 <during>
 - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
@@ -114,6 +115,14 @@ When a downstream stage supersedes an older question or draft, update lifecycle 
 Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
 
+<prompt_pack_readiness_gate>
+- Refuse prompt packs whose prompt_pack_integrity_gate.status is not pass.
+- Refuse prompt packs whose prototype_reality_gate.status is not pass.
+- Refuse prompt packs whose quality_rubric.prompt_executability.status is not pass.
+- Refuse prompt packs whose direction screen_prompts do not resolve to screen_manifest target_screen_id values.
+- When a prompt pack is refused, keep image_generation.status: not_started and hand back to /ow:vision2prompt repair.
+</prompt_pack_readiness_gate>
+
 <image_metadata_contract>
 - Every generated image must record image_id, direction_id, prompt_id, screen_name, path, and metadata.
 - metadata must include source_prompt_ref, generated_at, generator, generation_status, and review_status.
@@ -123,6 +132,8 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 <anti_patterns>
 - Do not expose /ow:prompt2proto as a user-facing workflow step.
 - Do not start image generation when prompt text is not ready.
+- Do not start image generation when prompt_pack_integrity_gate or prototype_reality_gate is missing or failing.
+- Do not start image generation when screen prompts are detached from screen_manifest or prompt executability has not passed.
 - Do not create HTML, specs, changes, or runtime artifacts.
 - Do not allow generated images without per-image metadata.
 </anti_patterns>

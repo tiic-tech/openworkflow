@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C004
+change_id: C004-generated-vision2prompt-protocol
+title: Wire dailin-grade pipeline into generated vision2prompt protocol
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 after C002 and C003 completion. The OW-owned dailin-grade
+  reference pipeline and screen-bound executability contract are stable, so the
+  next dependency-ready slice is generated protocol wiring for /ow:vision2prompt
+  and /ow:prompt2proto handoff gates.
+rejected_alternatives:
+  - id: C005
+    reason: Depends on C004 so fixtures can assert generated protocol behavior.
+  - id: C006
+    reason: Depends on C004-C005 so the smart city replay targets the final prompt-pack pipeline.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/generateSkills.ts
+  - packages/adapters/codex/src/templates.ts
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies:
+  - C002
+  - C003
+scope:
+  includes:
+    - source registry or template changes that generate .agents/skills/ow-vision2prompt/SKILL.md
+    - generated guidance for reference load order and required intermediate reasoning outputs
+    - post-validate handoff rules updated to include prompt_pack_integrity_gate and prompt executability requirements
+    - sync drift verification for generated adapter files
+    - e2e verification fixture alignment with current validation readiness fields
+  excludes:
+    - hand-editing generated .agents/skills/ow-vision2prompt/SKILL.md as the durable fix
+    - changing unrelated /ow commands
+    - image generation logic
+forbidden_paths:
+  - provider-backed image generation code
+  - visual quality review artifacts
+  - proto2html artifacts
+acceptance:
+  - Generated /ow:vision2prompt says to run the OW vision2prompt reference pipeline before writing PROTO_PROMPT_PACK.
+  - Generated /ow:vision2prompt says prompt_text_manifest cannot become ready when integrity or executability gates fail.
+  - Generated /ow:prompt2proto refuses prompt packs whose integrity or reality gates fail.
+  - Generated files are produced through sync or source templates, not manual managed-surface patching.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run validate
+  - npm run verify:agent-e2e
+  - rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 changes local registry guidance, local source skill text, generated
+    adapter files, managed context packet output from sync, and a local e2e
+    fixture. It does not call external services, publish releases, mutate
+    remotes, add provider image generation, or broaden workflow semantics beyond
+    the existing /ow:proto -> /ow:vision2prompt -> /ow:prompt2proto chain.
+expected_commit_boundary: >
+  Complete C004 as one coherent commit after source registry guidance, source
+  skill guidance, generated adapter output, e2e fixture alignment, queue status,
+  and local evidence are updated.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/LOCAL_CHANGE_EVIDENCE.yaml

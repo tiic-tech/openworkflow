@@ -84,24 +84,27 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.
 - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.
+- Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before writing PROTO_PROMPT_PACK.
 - Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.
 - Prepare to infer product_experience_model before strategic directions; do not start directions from scenario labels or visual style variants.
-- Prepare to run post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto without pass or skipped status.
+- Prepare to run prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, and post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto while any required gate is missing or failing.
 </before>
 <during>
-- Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.
+- Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
+- Record the intermediate pipeline outputs: normalized input contract, vision decomposition, candidate strategic hypotheses, product experience model, screen_manifest, prototype prompt schema, output manifest, and quality rubric.
 - Infer product_experience_model from VISION and VALIDATION: product archetype, primary canvas, information architecture, domain object model, primary task loop, interaction state model, data realism requirements, visual language, anti-generic constraints, and category quality bar.
 - Decide whether scenario names are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.
 - Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.
 - Only select directions that differ by product form, product loop, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.
-- Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.
+- Write complete multi-image prompt text for every selected direction with screen_prompts, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest target_screen_id values.
+- Do not set prompt_text_manifest.status to ready_for_image_generation until prompt_pack_integrity_gate.status, prototype_reality_gate.status, and quality_rubric.prompt_executability.status are pass.
 - After prompt text is ready, run the deterministic post_validate gate over strategic_fingerprint dimensions when resolved_count is 2 or more.
 - When the user explicitly requested exactly one strategic direction, set post_validate.status: skipped and record the skip reason instead of running diversity comparison.
 </during>
 <after>
-- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with product_experience_model, prompt_text_manifest.status ready_for_image_generation, and post_validate status.
-- Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.
-- If post_validate.status is fail, keep handoff blocked and repair prompt directions through /ow:vision2prompt.
+- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with product_experience_model, screen_manifest, screen_prompts, prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric, prompt_text_manifest.status ready_for_image_generation, and post_validate status.
+- Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is pass, and post_validate.status is pass or skipped.
+- If any readiness gate fails, keep handoff blocked and repair prompt directions through /ow:vision2prompt.
 - Record internal_pipeline stage vision2prompt status and outputs.
 - Do not generate images; hand internally to /ow:prompt2proto.
 </after>
@@ -130,12 +133,31 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Its output must be ready for /ow:prompt2proto consumption.
 </internal_command_boundary>
 
+<vision2prompt_reference_pipeline>
+- Run skills/build-prototype/references/strategic-prompt-pack-protocol.md as the governing protocol.
+- Load references/vision2prompt/01_input_contract.md to normalize vision, validation, direction count, target tool, fidelity, constraints, and missing inputs.
+- Load references/vision2prompt/02_vision_decomposition.md before strategic hypotheses.
+- Load references/vision2prompt/03_strategy_hypothesis_generation.md to create 5-8 candidates and select materially distinct directions.
+- Load references/vision2prompt/04_product_system_extraction.md before writing screen_manifest or product_experience_model.
+- Load references/vision2prompt/05_prototype_prompt_schema.md before writing direction screen_prompts.
+- Load references/vision2prompt/06_output_templates.md so YAML remains source of truth and Markdown remains a readable view.
+- Load references/vision2prompt/07_quality_rubric.md before marking prompt_text_manifest ready.
+</vision2prompt_reference_pipeline>
+
 <product_experience_model>
 - Before directions, write product_experience_model with product_archetype, primary_canvas, information_architecture, domain_object_model, primary_task_loop, interaction_state_model, data_realism_requirements, visual_language, anti_generic_constraints, and category_quality_bar.
 - Use the model to preserve target product category reality from VISION-only input.
 - Do not treat modules, scenarios, layers, workflows, or interaction states as separate strategic directions unless they imply different product forms or loops.
 - Block generic AI dashboard, report-screen, or card-wall drift through anti_generic_constraints and negative_constraints.
 </product_experience_model>
+
+<prompt_pack_readiness_gate>
+- prompt_text_manifest.status cannot become ready_for_image_generation until prompt_pack_integrity_gate.status is pass.
+- prompt_text_manifest.status cannot become ready_for_image_generation until prototype_reality_gate.status is pass.
+- prompt_text_manifest.status cannot become ready_for_image_generation until quality_rubric.prompt_executability.status is pass.
+- prompt_text_manifest.status cannot become ready_for_image_generation until every direction screen_prompt target_screen_id resolves to screen_manifest.
+- When a gate fails or is missing, set image_generation.status: not_started and repair through /ow:vision2prompt before handoff.
+</prompt_pack_readiness_gate>
 
 <post_validate_gate>
 - Run post_validate after prompt assets are ready and before /ow:prompt2proto handoff.
@@ -149,6 +171,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not generate prototype images from this stage.
 - Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.
 - Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.
+- Do not hand off to /ow:prompt2proto when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or prompt executability is missing or failing.
 - Do not create HTML, specs, changes, or runtime artifacts.
 </anti_patterns>
 

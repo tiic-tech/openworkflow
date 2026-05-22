@@ -103,8 +103,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.
 - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
 - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
+- Do not internally trigger /ow:prompt2proto until prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
 - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
-- If post_validate.status is fail, route back through /ow:vision2prompt prompt repair instead of starting image generation.
+- If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.
 - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
 - Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.
 </during>
@@ -176,8 +177,17 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 <prompt_text_manifest>
 - Write complete prompt text for every selected direction before invoking image generation.
 - Each direction should include multi-image screen prompt text with prompt_id, screen_name, image_role, prompt, and acceptance_criteria.
-- Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text.
+- Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text and screen-bound prompt refs.
+- Do not set prompt_text_manifest.status: ready_for_image_generation when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or quality_rubric.prompt_executability is missing or failing.
 </prompt_text_manifest>
+
+<prompt_pack_handoff_gate>
+- Before /ow:prompt2proto, require prompt_pack_integrity_gate.status: pass.
+- Before /ow:prompt2proto, require prototype_reality_gate.status: pass.
+- Before /ow:prompt2proto, require screen_manifest entries and direction screen_prompts to resolve by target_screen_id.
+- Before /ow:prompt2proto, require quality_rubric.prompt_executability.status: pass.
+- If any required gate fails or is missing, keep image_generation.status: not_started and repair inside /ow:vision2prompt.
+</prompt_pack_handoff_gate>
 
 <post_validate_gate>
 - Run prompt asset post-validation after prompt_text_manifest.status is ready_for_image_generation and before /ow:prompt2proto.

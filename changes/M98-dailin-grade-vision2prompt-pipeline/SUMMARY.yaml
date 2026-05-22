@@ -27,12 +27,12 @@ scope_boundary: >
   screen-bound executability before /ow:prompt2proto image generation.
 branch_boundary: codex/m98-dailin-grade-vision2prompt-pipeline
 candidate_count: 6
-active_candidate_count: 3
-completed_candidate_id: C003
-completed_change_id: C003-screen-bound-executability-contract
+active_candidate_count: 2
+completed_candidate_id: C004
+completed_change_id: C004-generated-vision2prompt-protocol
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 deferred_feature_refs:
   - M99-prototype-visual-reference-parity-gate
   - M100-prototype-storyboard-motion-model
@@ -110,3 +110,16 @@ validation:
     - C003 strict summaries passed.
     - C003 git diff --check passed.
     - C003 npm run validate still fails on the same pre-existing M97 planning artifact issues unrelated to C003.
+    - C004 was selected after C002 and C003 completion to wire the dailin-grade reference pipeline into generated /ow:vision2prompt protocol guidance.
+    - C004 completed registry protocol and build-prototype source guidance updates for the numbered OW vision2prompt reference pipeline and required intermediate outputs.
+    - C004 regenerated /ow:vision2prompt, /ow:prompt2proto, /ow:proto, and CONTEXT_PACKETS through dist CLI sync.
+    - C004 added generated readiness guidance that blocks prompt_text_manifest readiness and /ow:prompt2proto handoff until prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, screen_manifest linkage, and post_validate pass.
+    - C004 aligned verifyAgentE2E's validation fixture with current /ow:proto readiness fields so agent e2e validation passes.
+    - C004 npm run build passed.
+    - C004 dist CLI sync passed.
+    - C004 npm run verify:agent-e2e passed.
+    - C004 grep check for prompt_pack_integrity_gate, screen_manifest, and vision2prompt reference pipeline passed.
+    - C004 dist CLI validate passed.
+    - C004 strict summaries passed.
+    - C004 git diff --check passed.
+    - C004 npm run validate still fails on the same pre-existing M97 planning artifact issues unrelated to C004.

@@ -148,14 +148,22 @@ packets:
           validation are ready.
         - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or
           generate images.
+        - Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run
+          references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before
+          writing PROTO_PROMPT_PACK.
         - Resolve direction_count_policy before writing prompt text; use resolved_count from
           /ow:proto preflight.
         - Prepare to infer product_experience_model before strategic directions; do not start
           directions from scenario labels or visual style variants.
-        - Prepare to run post_validate after prompt assets are complete; do not hand off to
-          /ow:prompt2proto without pass or skipped status.
+        - Prepare to run prompt_pack_integrity_gate, prototype_reality_gate,
+          quality_rubric.prompt_executability, and post_validate after prompt assets are complete;
+          do not hand off to /ow:prompt2proto while any required gate is missing or failing.
       during:
-        - Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.
+        - Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate
+          reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
+        - "Record the intermediate pipeline outputs: normalized input contract, vision
+          decomposition, candidate strategic hypotheses, product experience model, screen_manifest,
+          prototype prompt schema, output manifest, and quality rubric."
         - "Infer product_experience_model from VISION and VALIDATION: product archetype, primary
           canvas, information architecture, domain object model, primary task loop, interaction
           state model, data realism requirements, visual language, anti-generic constraints, and
@@ -167,8 +175,12 @@ packets:
           maximum strategic diversity.
         - Only select directions that differ by product form, product loop, initiation trigger,
           interaction model, emotional driver, retention mechanism, validation metric, or main risk.
-        - Write complete multi-image prompt text for every selected direction with screen_prompts
-          and acceptance criteria.
+        - Write complete multi-image prompt text for every selected direction with screen_prompts,
+          negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
+          target_screen_id values.
+        - Do not set prompt_text_manifest.status to ready_for_image_generation until
+          prompt_pack_integrity_gate.status, prototype_reality_gate.status, and
+          quality_rubric.prompt_executability.status are pass.
         - After prompt text is ready, run the deterministic post_validate gate over
           strategic_fingerprint dimensions when resolved_count is 2 or more.
         - "When the user explicitly requested exactly one strategic direction, set
@@ -176,10 +188,13 @@ packets:
           comparison."
       after:
         - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
-          product_experience_model, prompt_text_manifest.status ready_for_image_generation, and
-          post_validate status.
-        - Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.
-        - If post_validate.status is fail, keep handoff blocked and repair prompt directions through
+          product_experience_model, screen_manifest, screen_prompts, prompt_pack_integrity_gate,
+          prototype_reality_gate, quality_rubric, prompt_text_manifest.status
+          ready_for_image_generation, and post_validate status.
+        - Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and
+          prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is
+          pass, and post_validate.status is pass or skipped.
+        - If any readiness gate fails, keep handoff blocked and repair prompt directions through
           /ow:vision2prompt.
         - Record internal_pipeline stage vision2prompt status and outputs.
         - Do not generate images; hand internally to /ow:prompt2proto.
@@ -208,8 +223,11 @@ packets:
           skipped.
         - Load prepared prompt text and verify every selected direction has screen_prompts before
           image generation.
-        - Block image generation when post_validate.status is fail or missing for multi-direction
-          prompt packs.
+        - "Verify prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass,
+          quality_rubric.prompt_executability.status: pass, and screen_manifest linkage before image
+          generation."
+        - Block image generation when prompt_pack_integrity_gate, prototype_reality_gate, prompt
+          executability, screen_manifest linkage, or post_validate is fail or missing.
       during:
         - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
         - Write one metadata record for every generated image with image_id, direction_id,
@@ -274,11 +292,14 @@ packets:
           text.
         - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is
           ready_for_image_generation and every selected direction has concrete screen prompts.
+        - Do not internally trigger /ow:prompt2proto until prompt_pack_integrity_gate.status and
+          prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
         - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for
           resolved_count 2 or more, or skipped when the user explicitly requested exactly one
           strategic direction.
-        - If post_validate.status is fail, route back through /ow:vision2prompt prompt repair
-          instead of starting image generation.
+        - If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt
+          executability fails, route back through /ow:vision2prompt prompt repair instead of
+          starting image generation.
         - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared
           prompt text and collect generated image paths, direction ids, prompt ids, metadata, and
           notes into EVIDENCE.yaml.

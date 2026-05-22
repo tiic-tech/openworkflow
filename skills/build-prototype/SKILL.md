@@ -41,6 +41,8 @@ Optional:
   language, platform, brand, or acceptance bar
 - `references/proto-redesign-artifact-contracts.md`
 - `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
+- `skills/build-prototype/references/vision2prompt/01_input_contract.md`
+  through `skills/build-prototype/references/vision2prompt/07_quality_rubric.md`
 
 Do not load unrelated specs, changes, runtime state, reviews, archives, or
 implementation history unless the prototype question explicitly depends on
@@ -81,7 +83,9 @@ For local runnable prototypes, the legacy artifact shape remains valid:
      validation question requires interaction
 2. Load the mode-specific inputs.
 3. For `strategic` mode, use
-   `skills/build-prototype/references/strategic-prompt-pack-protocol.md`.
+   `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
+   and run the `references/vision2prompt/` files in numeric order before
+   marking prompt text ready for image generation.
 4. If the user asks to tune accepted baseline screens or an accepted prompt
    pack, hand off to `skills/tune-prototype/SKILL.md`.
 5. Run `npm run validate` when the repository validator exists.
@@ -108,10 +112,17 @@ For local runnable prototypes, the legacy artifact shape remains valid:
    scenarios, layers, workflows, or states inside one product shell.
 7. Generate 5-8 candidate strategic hypotheses.
 8. Select the requested number of directions, defaulting to 3.
-9. Write each direction as a concrete high-fidelity prototype prompt.
-10. Recommend the first direction to generate based on risk reduction,
+9. Write each direction as a concrete high-fidelity prototype prompt with
+   `screen_prompts` tied to `screen_manifest.target_screen_id` values.
+10. Set `prompt_text_manifest.status: ready_for_image_generation` only after
+    `prompt_pack_integrity_gate.status`, `prototype_reality_gate.status`, and
+    `quality_rubric.prompt_executability.status` are `pass`.
+11. Keep `image_generation.status: not_started` and repair through
+    `/ow:vision2prompt` when integrity, reality, executability, or
+    post-validation gates are missing or failing.
+12. Recommend the first direction to generate based on risk reduction,
    observability, feasibility, and closeness to the success signal.
-9. Record review evidence and next action guidance.
+13. Record review evidence and next action guidance.
 
 ## Strategic Direction Rules
 
