@@ -2362,12 +2362,25 @@ async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.Proce
   const proto = await readFile(join(protoDir, "EVIDENCE.yaml"), "utf8");
   const tune = await readFile(join(tuneDir, "REFINED_PROTO_PROMPT_PACK.yaml"), "utf8");
   const decision = await readFile(join(decisionDir, "DECISION.yaml"), "utf8");
+  const commandAudit = await readFile(join(root, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"), "utf8");
+  const contextPackets = await readFile(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"), "utf8");
   assert(proto.includes(".openworkflow/validation/dogfood-validation/VALIDATION.yaml"), "dogfood proto fixture should reference validation fixture");
   assert(proto.includes("image_id: IMG_D1_01"), "dogfood proto fixture should include generated image metadata");
   assert(tune.includes(".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml"), "dogfood tune fixture should reference proto fixture");
   assert(tune.includes("latest_approved_baseline_group_id: dogfood-proto-accepted-v1"), "dogfood tune fixture should include latest baseline id");
   assert(decision.includes(".openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml"), "dogfood decision fixture should reference tune fixture");
   assert(decision.includes("accepted benchmark prototype image metadata"), "dogfood decision fixture should name benchmark readiness");
+  assert(commandAudit.indexOf("trigger: /ow:vision") < commandAudit.indexOf("trigger: /ow:validation"), "command audit should order vision before validation");
+  assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should order validation before internal prompt compilation");
+  assert(commandAudit.indexOf("trigger: /ow:vision2prompt") < commandAudit.indexOf("trigger: /ow:prompt2proto"), "command audit should order vision2prompt before prompt2proto");
+  assert(commandAudit.indexOf("trigger: /ow:prompt2proto") < commandAudit.indexOf("trigger: /ow:proto"), "command audit should expose internal prompt2proto before user proto orchestration handoff");
+  assert(commandAudit.indexOf("trigger: /ow:proto") < commandAudit.indexOf("trigger: /ow:tune"), "command audit should order proto before tune");
+  assert(commandAudit.indexOf("trigger: /ow:tune") < commandAudit.indexOf("trigger: /ow:decision"), "command audit should order tune before internal decision audit");
+  assert(extractBlock(commandAudit.split("trigger: /ow:tune", 2)[1] ?? "", "handoff_commands").includes("/ow:design"), "tune handoff should reach design after benchmark decision");
+  assert(!commandAudit.includes("trigger: /ow:proto2html"), "happy-path dogfood should not enter proto2html");
+  assert(contextPackets.includes("packet_id: context:vision2prompt"), "context packets should include internal vision2prompt stage");
+  assert(contextPackets.includes("packet_id: context:prompt2proto"), "context packets should include internal prompt2proto stage");
+  assert(extractBlock(contextPackets.split("packet_id: context:tune", 2)[1] ?? "", "optional").includes(".openworkflow/prototypes/PROTOTYPE_INDEX.yaml"), "tune context should allow prototype index handoff");
 }
 
 type RefinedPromptPackFixtureKind = "ready" | "missing-baseline-audit" | "orphan-screen-prompt" | "missing-must-inherit" | "missing-must-remove";
