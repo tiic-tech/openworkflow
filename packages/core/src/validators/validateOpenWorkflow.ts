@@ -788,6 +788,12 @@ const PROTOTYPE_REALITY_GATE_DIMENSIONS = [
   "anti_generic_constraints",
 ];
 
+const PROMPT_PACK_INTEGRITY_GATE_DIMENSIONS = [
+  "direction_count_matches",
+  "prompt_text_refs_resolve",
+  "generated_image_refs_resolve",
+];
+
 const STRATEGIC_DIRECTION_FIELDS = [
   "direction_id",
   "name",
@@ -853,6 +859,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
   validateProductExperienceModel(label, data.product_experience_model, data, errors);
   validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
+  validatePromptPackIntegrityGate(label, data.prompt_pack_integrity_gate, data, errors);
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
@@ -1027,6 +1034,150 @@ function validatePrototypeRealityGate(label: string, value: unknown, data: Recor
   if (status === "fail" && typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started") {
     errors.push(`${label} prototype_reality_gate failed gates must not start image_generation`);
   }
+}
+
+function validatePromptPackIntegrityGate(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prompt_pack_integrity_gate" in data && !isRecord(value)) {
+      errors.push(`${label} prompt_pack_integrity_gate must be a mapping when present`);
+    }
+    return;
+  }
+  if (!isRecord(value)) {
+    errors.push(`${label} prompt_pack_integrity_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_prompt_text_ready", "dimensions", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prompt_pack_integrity_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail"].includes(status)) {
+    errors.push(`${label} prompt_pack_integrity_gate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "before_image_generation") {
+    errors.push(`${label} prompt_pack_integrity_gate.trigger must be before_image_generation`);
+  }
+  if (value.required_when_prompt_text_ready !== true) {
+    errors.push(`${label} prompt_pack_integrity_gate.required_when_prompt_text_ready must be true`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} prompt_pack_integrity_gate.repair_route must be /ow:vision2prompt`);
+  }
+  if (!Array.isArray(value.dimensions)) {
+    errors.push(`${label} prompt_pack_integrity_gate.dimensions must be an array`);
+  } else {
+    for (const dimension of PROMPT_PACK_INTEGRITY_GATE_DIMENSIONS) {
+      if (!value.dimensions.includes(dimension)) {
+        errors.push(`${label} prompt_pack_integrity_gate.dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} prompt_pack_integrity_gate.${key} must be an array`);
+    }
+  }
+
+  validatePromptPackIntegrity(label, data, errors);
+
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  if (promptTextReady && status !== "pass") {
+    errors.push(`${label} prompt_pack_integrity_gate.status must be pass before image generation`);
+  }
+  if (status === "pass" && Array.isArray(value.failures) && value.failures.length > 0) {
+    errors.push(`${label} prompt_pack_integrity_gate.failures must be empty when status is pass`);
+  }
+  if (status === "fail" && typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started") {
+    errors.push(`${label} prompt_pack_integrity_gate failed gates must not start image_generation`);
+  }
+}
+
+function validatePromptPackIntegrity(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const directions = Array.isArray(data.directions) ? data.directions.filter(isRecord) : [];
+  const directionIds = new Set<string>();
+  const promptIds = new Set<string>();
+  for (const direction of directions) {
+    if (nonEmptyString(direction.direction_id)) {
+      directionIds.add(String(direction.direction_id));
+    }
+    if (Array.isArray(direction.screen_prompts)) {
+      for (const prompt of direction.screen_prompts) {
+        if (isRecord(prompt) && nonEmptyString(prompt.prompt_id)) {
+          promptIds.add(String(prompt.prompt_id));
+        }
+      }
+    }
+  }
+
+  const countPolicy = isRecord(data.direction_count_policy) ? data.direction_count_policy : {};
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  const resolvedCount = typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  if (promptTextReady && resolvedCount !== null && directions.length !== resolvedCount) {
+    errors.push(`${label} directions length must equal direction_count_policy.resolved_count before image generation`);
+  }
+  if (promptTextReady && typeof promptTextManifest.direction_count !== "number") {
+    errors.push(`${label} prompt_text_manifest.direction_count must be a number before image generation`);
+  }
+  if (typeof promptTextManifest.direction_count === "number" && directions.length > 0 && promptTextManifest.direction_count !== directions.length) {
+    errors.push(`${label} prompt_text_manifest.direction_count must equal directions length`);
+  }
+
+  if (promptTextReady) {
+    const refs = Array.isArray(promptTextManifest.prompt_text_refs) ? promptTextManifest.prompt_text_refs : [];
+    if (refs.length === 0) {
+      errors.push(`${label} prompt_text_manifest.prompt_text_refs must include prompt refs before image generation`);
+    }
+    refs.forEach((ref, index) => {
+      if (!stringReferencesKnownPrompt(String(ref), directionIds, promptIds)) {
+        errors.push(`${label} prompt_text_manifest.prompt_text_refs[${index}] must reference an existing direction_id or prompt_id`);
+      }
+    });
+  }
+
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const generatedImages = Array.isArray(imageGeneration.generated_images) ? imageGeneration.generated_images : [];
+  generatedImages.forEach((image, index) => {
+    if (!isRecord(image)) {
+      return;
+    }
+    const directionId = String(image.direction_id ?? "");
+    const promptId = String(image.prompt_id ?? "");
+    if (directionId && !directionIds.has(directionId)) {
+      errors.push(`${label} image_generation.generated_images[${index}].direction_id must exist in directions`);
+    }
+    if (promptId && !promptIds.has(promptId)) {
+      errors.push(`${label} image_generation.generated_images[${index}].prompt_id must exist in directions[].screen_prompts`);
+    }
+    const metadata = isRecord(image.metadata) ? image.metadata : {};
+    const sourcePromptRef = String(metadata.source_prompt_ref ?? "");
+    if (sourcePromptRef && !stringReferencesKnownPrompt(sourcePromptRef, directionIds, promptIds)) {
+      errors.push(`${label} image_generation.generated_images[${index}].metadata.source_prompt_ref must reference an existing direction_id or prompt_id`);
+    }
+  });
+}
+
+function stringReferencesKnownPrompt(value: string, directionIds: Set<string>, promptIds: Set<string>): boolean {
+  const normalized = normalizePromptRef(value);
+  if (normalized.length === 0) {
+    return false;
+  }
+  for (const id of [...directionIds, ...promptIds]) {
+    const token = normalizePromptRef(id);
+    if (token.length > 0 && normalized.includes(token)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function normalizePromptRef(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
 function validateStrategicDirections(label: string, value: unknown, countPolicy: unknown, errors: string[]): void {

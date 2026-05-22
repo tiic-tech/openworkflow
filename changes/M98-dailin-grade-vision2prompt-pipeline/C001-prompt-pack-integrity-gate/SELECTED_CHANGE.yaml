@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C001
+change_id: C001-prompt-pack-integrity-gate
+title: Add prompt-pack integrity gate
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 through ow-select-change single-queue ranking. It is the
+  recommended ready candidate, has no dependencies, and closes the M97 source
+  integrity gap before richer dailin-grade screen contracts are added.
+rejected_alternatives:
+  - id: C002
+    reason: >
+      Also ready and dependency-free, but reference migration is less useful
+      until prompt-pack refs and generation readiness fail closed.
+  - id: C003
+    reason: Depends on C001 and C002.
+  - id: C004
+    reason: Depends on C002 and C003.
+  - id: C005
+    reason: Depends on C001-C004.
+  - id: C006
+    reason: Depends on C003-C005.
+owned_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies: []
+scope:
+  includes:
+    - prompt_pack_integrity_gate contract fields for strategic prompt packs
+    - JSON schema coverage for integrity gate status, dimensions, failures, and repair route
+    - validator checks for direction_count_policy.resolved_count versus directions length
+    - validator checks that prompt_text_manifest refs resolve to existing direction and screen prompt ids
+    - validator checks that image_generation generated_images source refs point to existing prompts when generation has started
+    - summary or handoff health exposure for integrity failures when current prototype artifacts are invalid
+  excludes:
+    - dailin reference pipeline migration
+    - broad screen manifest schema expansion
+    - provider image generation
+    - visual quality scoring
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - provider-backed image generation code
+  - visual quality review artifacts
+  - proto2html artifacts
+acceptance:
+  - Validator fails when prompt_text_manifest.direction_count advertises more directions than PROTO_PROMPT_PACK.directions contains.
+  - Validator fails when generated image metadata references a missing direction_id or prompt_id.
+  - Validator fails when a generation-ready strategic prompt pack omits prompt_pack_integrity_gate or records a failing gate while image_generation has started.
+  - Existing valid M93/M97 strategic prompt-pack fixtures can be updated to pass without weakening the new gate.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 is a local schema, validator, summary-health, and runtime-fixture
+    change. It does not call external services, publish releases, mutate remote
+    repositories, generate provider images, or broaden workflow semantics beyond
+    prompt-pack integrity.
+expected_commit_boundary: >
+  Complete C001 as one coherent commit after updating source contracts,
+  validators, fixtures, queue status, and local evidence.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/LOCAL_CHANGE_EVIDENCE.yaml

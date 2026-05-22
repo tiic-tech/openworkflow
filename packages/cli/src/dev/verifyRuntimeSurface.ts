@@ -2299,6 +2299,52 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   assert(ready.code === 0, `proto-ready strategic prompt-pack fixture should pass validation: ${ready.output}`);
   await unlink(readyPath);
 
+  const missingIntegrityGatePath = join(fixtureDir, "MISSING_INTEGRITY_GATE_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingIntegrityGatePath, withoutPromptPackIntegrityGate(strategicPromptPackFixture("ready")), "utf8");
+  const missingIntegrityGate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingIntegrityGate.code !== 0, "missing integrity gate fixture should fail validation");
+  assert(
+    missingIntegrityGate.output.includes("prompt_pack_integrity_gate must be a mapping"),
+    "missing integrity gate failure should name prompt_pack_integrity_gate",
+  );
+  await unlink(missingIntegrityGatePath);
+
+  const directionCountMismatchPath = join(fixtureDir, "DIRECTION_COUNT_MISMATCH_PROTO_PROMPT_PACK.yaml");
+  await writeFile(directionCountMismatchPath, strategicPromptPackFixture("ready").replace("  direction_count: 3", "  direction_count: 4"), "utf8");
+  const directionCountMismatch = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(directionCountMismatch.code !== 0, "direction count mismatch fixture should fail validation");
+  assert(
+    directionCountMismatch.output.includes("prompt_text_manifest.direction_count must equal directions length"),
+    "direction count mismatch failure should name prompt_text_manifest.direction_count",
+  );
+  await unlink(directionCountMismatchPath);
+
+  const missingPromptRefPath = join(fixtureDir, "MISSING_PROMPT_REF_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingPromptRefPath, strategicPromptPackFixture("ready").replace("prompts/D3.md", "prompts/DX.md"), "utf8");
+  const missingPromptRef = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingPromptRef.code !== 0, "missing prompt ref fixture should fail validation");
+  assert(
+    missingPromptRef.output.includes("prompt_text_manifest.prompt_text_refs[2] must reference an existing direction_id or prompt_id"),
+    "missing prompt ref failure should name the missing prompt text ref",
+  );
+  await unlink(missingPromptRefPath);
+
+  const failedIntegrityStartedPath = join(fixtureDir, "FAILED_INTEGRITY_STARTED_IMAGE_GENERATION_PROTO_PROMPT_PACK.yaml");
+  await writeFile(
+    failedIntegrityStartedPath,
+    strategicPromptPackFixture("ready")
+      .replace("prompt_pack_integrity_gate:\n  status: pass", "prompt_pack_integrity_gate:\n  status: fail")
+      .replace("image_generation:\n  status: not_started", "image_generation:\n  status: queued"),
+    "utf8",
+  );
+  const failedIntegrityStarted = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(failedIntegrityStarted.code !== 0, "failed integrity gate with queued image generation should fail validation");
+  assert(
+    failedIntegrityStarted.output.includes("prompt_pack_integrity_gate failed gates must not start image_generation"),
+    "failed integrity gate should block image generation",
+  );
+  await unlink(failedIntegrityStartedPath);
+
   const duplicatePath = join(fixtureDir, "DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK.yaml");
   await writeFile(duplicatePath, strategicPromptPackFixture("duplicate-fingerprint"), "utf8");
   const duplicate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
@@ -2321,6 +2367,15 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   const single = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(single.code === 0, `single-direction strategic prompt-pack fixture should skip post-validation and pass: ${single.output}`);
   await unlink(singlePath);
+}
+
+function withoutPromptPackIntegrityGate(fixture: string): string {
+  const start = fixture.indexOf("prompt_pack_integrity_gate:\n");
+  const end = fixture.indexOf("directions:\n", start);
+  if (start === -1 || end === -1) {
+    return fixture;
+  }
+  return `${fixture.slice(0, start)}${fixture.slice(end)}`;
 }
 
 async function verifyRefinedPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -2964,6 +3019,18 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "  outcome_notes:",
     `    - Smart city product reality fixture status is ${gateStatus}.`,
     "  repair_route: /ow:vision2prompt",
+    "prompt_pack_integrity_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - direction_count_matches",
+    "    - prompt_text_refs_resolve",
+    "    - generated_image_refs_resolve",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Prompt-pack direction count and prompt refs resolve to source directions.",
+    "  repair_route: /ow:vision2prompt",
     "directions:",
     "  - direction_id: D1",
     "    name: Map-first operations shell",
@@ -3227,6 +3294,18 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "  outcome_notes:",
     `    - Fixture prototype reality gate status is ${realityGateStatus}.`,
     "  repair_route: /ow:vision2prompt",
+    "prompt_pack_integrity_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - direction_count_matches",
+    "    - prompt_text_refs_resolve",
+    "    - generated_image_refs_resolve",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Prompt-pack direction count and prompt refs resolve to source directions.",
+    "  repair_route: /ow:vision2prompt",
     "directions:",
     ...directionRows,
     "build_recommendation:",
@@ -3242,6 +3321,7 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "prompt_text_manifest:",
     "  status: ready_for_image_generation",
     "  directions_ready: true",
+    `  direction_count: ${directionCount}`,
     "  prompt_text_refs:",
     ...promptRefs,
     "post_validate:",

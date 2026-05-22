@@ -428,6 +428,8 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
       "product_experience_model.anti_generic_constraints",
       "prototype_reality_gate.status",
       "prototype_reality_gate.dimensions",
+      "prompt_pack_integrity_gate.status",
+      "prompt_pack_integrity_gate.dimensions",
       "directions",
       "build_recommendation.first_direction_id",
       "prompt_text_manifest.status",

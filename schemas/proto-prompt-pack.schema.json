@@ -408,6 +408,61 @@
       },
       "additionalProperties": true
     },
+    "prompt_pack_integrity_gate": {
+      "type": "object",
+      "required": [
+        "status",
+        "trigger",
+        "required_when_prompt_text_ready",
+        "dimensions",
+        "failures",
+        "outcome_notes",
+        "repair_route"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "pass",
+            "fail"
+          ]
+        },
+        "trigger": {
+          "const": "before_image_generation"
+        },
+        "required_when_prompt_text_ready": {
+          "type": "boolean"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "direction_count_matches",
+              "prompt_text_refs_resolve",
+              "generated_image_refs_resolve"
+            ]
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outcome_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_route": {
+          "const": "/ow:vision2prompt"
+        }
+      },
+      "additionalProperties": true
+    },
     "directions": {
       "type": "array",
       "items": {
