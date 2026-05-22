@@ -1,0 +1,21 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C007-narrow-build-prototype-to-prompt2proto
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C007-narrow-build-prototype-to-prompt2proto
+status: current
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C007
+selected_change_id: C007-narrow-build-prototype-to-prompt2proto
+primary_commit: 8aee3c7047112bc8f32ec702e8c48953ec47d89b
+validation_evidence:
+  - "validation: npm run build"
+  - "validation: node dist/cli/src/index.js sync --root . --json"
+  - "validation: npm run verify:runtime-surface"
+  - "validation: node dist/cli/src/index.js validate --root . --json"
+  - "validation: node dist/cli/src/index.js summaries --root . --strict --json"
+  - "validation: git diff --check"
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
