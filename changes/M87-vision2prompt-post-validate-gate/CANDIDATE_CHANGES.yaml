@@ -68,10 +68,10 @@ scope_control:
         End-to-end pressure testing should wait until vision, validation,
         proto, post-validate, and tune contracts are stable.
       suggested_plan_id: M90-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Define prompt asset post-validate contract
     purpose: >
       Define the artifact fields and source command expectations for a
@@ -122,8 +122,14 @@ changes:
         next recommended ready candidate, has no dependencies, and defines the
         artifact contract required before evaluator or generated protocol work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-post-validate-contract
+      completed_at: 2026-05-22
+      commit: 0f451ce
+      evidence:
+        - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: candidate
+    status: ready
     title: Implement deterministic strategic fingerprint evaluator
     purpose: >
       Add a deterministic dry-run evaluator that extracts normalized strategic
@@ -290,3 +296,30 @@ operations:
       - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/SELECTED_CHANGE.yaml
       - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/ATOM_TASKS.yaml
       - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 defined the post_validate artifact contract, schema fields,
+      validator rules, and generated artifact contract surface for prompt asset
+      post-validation before image generation.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Mark C002 ready after C001 completed the contract dependency required by
+      the deterministic strategic fingerprint evaluator.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml

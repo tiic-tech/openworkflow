@@ -6,7 +6,7 @@ plan_id: M87-vision2prompt-post-validate-gate
 candidate_id: C001
 change_id: C001-post-validate-contract
 title: Define prompt asset post-validate contract
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
