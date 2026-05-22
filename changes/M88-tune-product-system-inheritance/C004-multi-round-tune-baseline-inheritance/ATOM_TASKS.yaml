@@ -6,12 +6,12 @@ plan_id: M88-tune-product-system-inheritance
 candidate_id: C004
 change_id: C004-multi-round-tune-baseline-inheritance
 title: Atom tasks for multi-round tune baseline inheritance
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect refined prompt-pack baseline fields and tune protocol
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - packages/core/src/commands/registry.ts
@@ -22,7 +22,7 @@ tasks:
   - id: T002
     title: Add latest-baseline and carry-forward contract fields
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - packages/core/src/validators/validateOpenWorkflow.ts
@@ -32,7 +32,7 @@ tasks:
   - id: T003
     title: Wire multi-round inheritance into generated /ow:tune protocol
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/commands/registry.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -42,7 +42,7 @@ tasks:
   - id: T004
     title: Verify generated and validator surfaces
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/artifacts/registry.ts
       - packages/core/src/commands/registry.ts
@@ -57,3 +57,8 @@ verification:
   - npm run verify:runtime-surface
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  commit: cdc0114
+  evidence:
+    - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/LOCAL_COMMIT_EVIDENCE.yaml

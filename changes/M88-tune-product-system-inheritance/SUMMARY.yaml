@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M88-tune-product-system-inheritance
 title: Summary for tune product-system inheritance
-status: active
+status: completed
 source:
   kind: mixed
   summary: >
@@ -34,11 +34,11 @@ outputs:
   summary: changes/M88-tune-product-system-inheritance/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 1
-completed_candidate_id: C003
-completed_change_id: C003-refined-prompt-pack-validator-fixtures
-selected_candidate_id: C004
-selected_change_id: C004-multi-round-tune-baseline-inheritance
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-multi-round-tune-baseline-inheritance
+selected_candidate_id: null
+selected_change_id: null
 next_recommended_candidate_id: null
 key_dependencies:
   - M87 completed prompt asset post-validation before image generation.
@@ -54,9 +54,9 @@ risks:
     description: Screen prompts can become anonymous and unusable by downstream generation agents.
     mitigation: Require target_screen_id, source_screen_ids, prompt_id, and acceptance criteria.
   - id: R003
-    level: medium
+    level: resolved
     description: Repeated tune passes can lose locked elements or accepted improvements.
-    mitigation: Add latest-baseline and locked-element carry-forward behavior in a later candidate.
+    mitigation: C004 added latest-baseline and locked-element carry-forward behavior.
 unresolved_questions:
   - Whether M88 should add a dedicated refined prompt-pack artifact_type or continue using prototype_evidence with prompt_pack_type.
 validation:
@@ -77,3 +77,4 @@ validation:
     - OP009 completed C003 in commit abc656b.
     - OP010 marked C004 ready after refined prompt-pack validator stress fixtures landed.
     - OP011 selected C004 through ow-select-change single-queue ranking.
+    - OP012 completed C004 in commit cdc0114.

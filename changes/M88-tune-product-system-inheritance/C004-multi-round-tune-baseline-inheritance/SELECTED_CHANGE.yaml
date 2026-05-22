@@ -6,7 +6,7 @@ plan_id: M88-tune-product-system-inheritance
 candidate_id: C004
 change_id: C004-multi-round-tune-baseline-inheritance
 title: Support multi-round tune baseline inheritance
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -64,3 +64,8 @@ high_risk:
     C004 is medium risk because it extends local artifact fields, command
     guidance, and generated-surface verification only. It does not call
     external generation services or introduce async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: cdc0114
+  evidence:
+    - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/LOCAL_COMMIT_EVIDENCE.yaml

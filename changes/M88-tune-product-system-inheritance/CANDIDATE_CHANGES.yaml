@@ -248,7 +248,7 @@ changes:
       evidence:
         - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: selected
+    status: done
     title: Support multi-round tune baseline inheritance
     purpose: >
       Make /ow:tune preserve the latest approved prototype group and locked
@@ -302,6 +302,12 @@ changes:
         multi-round latest-baseline inheritance completes the bounded /ow:tune
         product-system inheritance queue before later async or dogfood work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-multi-round-tune-baseline-inheritance
+      completed_at: 2026-05-22
+      commit: cdc0114
+      evidence:
+        - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add
@@ -466,3 +472,18 @@ operations:
       - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/SELECTED_CHANGE.yaml
       - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/ATOM_TASKS.yaml
       - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added latest-baseline resolution and carry-forward inheritance fields
+      to refined prompt packs, wired the generated /ow:tune protocol, refreshed
+      managed surfaces through sync, and verified generated E2E/runtime surface
+      behavior.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/LOCAL_COMMIT_EVIDENCE.yaml
