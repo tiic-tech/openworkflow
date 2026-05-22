@@ -68,10 +68,10 @@ scope_control:
         End-to-end pressure testing should wait until vision, validation,
         proto, post-validate, and tune contracts are stable.
       suggested_plan_id: M90-discovery-loop-e2e-dogfood
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: ready
+    status: selected
     title: Define prompt asset post-validate contract
     purpose: >
       Define the artifact fields and source command expectations for a
@@ -115,6 +115,13 @@ changes:
       - The contract requires post_validate to be skipped when the user requested exactly one strategic direction.
       - The contract requires post_validate before /ow:prompt2proto when resolved direction count is 2 or more.
       - Failed diversity gates route back to /ow:vision2prompt instead of starting image generation.
+    selection:
+      selected_change_id: C001-post-validate-contract
+      reason: >
+        Select C001 through ow-select-change single-queue ranking. It is the
+        next recommended ready candidate, has no dependencies, and defines the
+        artifact contract required before evaluator or generated protocol work.
+      selected_at: 2026-05-22
   - id: C002
     status: candidate
     title: Implement deterministic strategic fingerprint evaluator
@@ -268,3 +275,18 @@ operations:
       - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
       - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.md
       - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the next recommended ready candidate in the single active
+      M87 queue; no analyze-changes run is needed for single-queue selection.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/SELECTED_CHANGE.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/ATOM_TASKS.yaml
+      - changes/M87-vision2prompt-post-validate-gate/C001-post-validate-contract/IMPLEMENTATION_BRIEF.md

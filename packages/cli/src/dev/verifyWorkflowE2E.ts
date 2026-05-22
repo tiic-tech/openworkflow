@@ -275,6 +275,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertPhase(phase, "directions" in template, "prototype template missing directions");
   assertPhase(phase, "build_recommendation" in template, "prototype template missing build recommendation");
   assertPhase(phase, "prompt_text_manifest" in template, "prototype template missing prompt text manifest");
+  assertPhase(phase, "post_validate" in template, "prototype template missing post-validate gate");
   assertPhase(phase, "image_generation" in template, "prototype template missing image generation state");
   assertPhase(phase, "negative_constraints" in template, "prototype template missing negative constraints");
   assertPhase(phase, "review_plan" in template, "prototype template missing review plan");

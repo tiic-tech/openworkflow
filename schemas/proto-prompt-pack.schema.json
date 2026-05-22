@@ -20,6 +20,7 @@
     "directions",
     "build_recommendation",
     "prompt_text_manifest",
+    "post_validate",
     "image_generation",
     "negative_constraints",
     "review_plan"
@@ -508,6 +509,106 @@
           "items": {
             "type": "string"
           }
+        }
+      },
+      "additionalProperties": true
+    },
+    "post_validate": {
+      "type": "object",
+      "required": [
+        "status",
+        "trigger",
+        "required_when_direction_count_gte",
+        "skip_when_resolved_count",
+        "threshold_policy",
+        "fingerprint_dimensions",
+        "comparisons",
+        "failures",
+        "outcome_notes",
+        "repair_route"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "pass",
+            "fail",
+            "skipped"
+          ]
+        },
+        "trigger": {
+          "const": "after_prompt_assets_ready"
+        },
+        "required_when_direction_count_gte": {
+          "type": "number",
+          "minimum": 2
+        },
+        "skip_when_resolved_count": {
+          "type": "number",
+          "const": 1
+        },
+        "threshold_policy": {
+          "type": "object",
+          "required": [
+            "method",
+            "max_pairwise_similarity",
+            "comparison"
+          ],
+          "properties": {
+            "method": {
+              "const": "strategic_fingerprint_similarity"
+            },
+            "max_pairwise_similarity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "comparison": {
+              "const": "pairwise"
+            }
+          },
+          "additionalProperties": true
+        },
+        "fingerprint_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "product_form",
+              "trigger",
+              "interaction_model",
+              "emotional_driver",
+              "retention_mechanism",
+              "metric",
+              "main_risk",
+              "trust_model",
+              "privacy_model"
+            ]
+          }
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "outcome_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_route": {
+          "const": "/ow:vision2prompt"
         }
       },
       "additionalProperties": true

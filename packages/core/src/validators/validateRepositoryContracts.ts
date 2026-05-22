@@ -1535,6 +1535,18 @@ const STRATEGIC_DISTINCTNESS_SIGNALS = [
   "privacy",
 ];
 
+const STRATEGIC_FINGERPRINT_DIMENSIONS = [
+  "product_form",
+  "trigger",
+  "interaction_model",
+  "emotional_driver",
+  "retention_mechanism",
+  "metric",
+  "main_risk",
+  "trust_model",
+  "privacy_model",
+];
+
 function validatePrototypeValidationInput(label: string, value: unknown, errors: string[]): void {
   if (!isRecord(value)) {
     return;
@@ -1562,6 +1574,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
+  validatePostValidate(label, data.post_validate, data.direction_count_policy, data.prompt_text_manifest, data.image_generation, errors);
   validateImageGeneration(label, data.image_generation, errors);
 }
 
@@ -1703,6 +1716,81 @@ function validatePromptTextManifest(label: string, value: unknown, errors: strin
   }
   if (!Array.isArray(value.prompt_text_refs)) {
     errors.push(`${label} prompt_text_manifest.prompt_text_refs must be an array`);
+  }
+}
+
+function validatePostValidate(label: string, value: unknown, countPolicy: unknown, promptTextManifest: unknown, imageGeneration: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} post_validate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_direction_count_gte", "skip_when_resolved_count", "threshold_policy", "fingerprint_dimensions", "comparisons", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} post_validate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail", "skipped"].includes(status)) {
+    errors.push(`${label} post_validate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "after_prompt_assets_ready") {
+    errors.push(`${label} post_validate.trigger must be after_prompt_assets_ready`);
+  }
+  if (value.required_when_direction_count_gte !== 2) {
+    errors.push(`${label} post_validate.required_when_direction_count_gte must be 2`);
+  }
+  if (value.skip_when_resolved_count !== 1) {
+    errors.push(`${label} post_validate.skip_when_resolved_count must be 1`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} post_validate.repair_route must be /ow:vision2prompt`);
+  }
+  const thresholdPolicy = value.threshold_policy;
+  if (!isRecord(thresholdPolicy)) {
+    errors.push(`${label} post_validate.threshold_policy must be a mapping`);
+  } else {
+    if (thresholdPolicy.method !== "strategic_fingerprint_similarity") {
+      errors.push(`${label} post_validate.threshold_policy.method must be strategic_fingerprint_similarity`);
+    }
+    if (thresholdPolicy.comparison !== "pairwise") {
+      errors.push(`${label} post_validate.threshold_policy.comparison must be pairwise`);
+    }
+    if (typeof thresholdPolicy.max_pairwise_similarity !== "number" || thresholdPolicy.max_pairwise_similarity <= 0 || thresholdPolicy.max_pairwise_similarity >= 1) {
+      errors.push(`${label} post_validate.threshold_policy.max_pairwise_similarity must be between 0 and 1`);
+    }
+  }
+  if (!Array.isArray(value.fingerprint_dimensions)) {
+    errors.push(`${label} post_validate.fingerprint_dimensions must be an array`);
+  } else {
+    for (const dimension of STRATEGIC_FINGERPRINT_DIMENSIONS) {
+      if (!value.fingerprint_dimensions.includes(dimension)) {
+        errors.push(`${label} post_validate.fingerprint_dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["comparisons", "failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} post_validate.${key} must be an array`);
+    }
+  }
+
+  const resolvedCount = isRecord(countPolicy) && typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  const promptStatus = isRecord(promptTextManifest) ? String(promptTextManifest.status ?? "") : "";
+  const promptReady = promptStatus === "ready_for_image_generation" || promptStatus === "generated";
+  if (resolvedCount === 1 && status !== "skipped") {
+    errors.push(`${label} post_validate.status must be skipped when direction_count_policy.resolved_count is 1`);
+  }
+  if (promptReady && resolvedCount !== null && resolvedCount >= 2 && !["pass", "fail"].includes(status)) {
+    errors.push(`${label} post_validate.status must be pass or fail before /ow:prompt2proto when resolved_count is 2 or more`);
+  }
+  if (status === "skipped" && resolvedCount !== 1) {
+    errors.push(`${label} post_validate.status can be skipped only when resolved_count is 1`);
+  }
+  if (status === "fail") {
+    const imageStatus = isRecord(imageGeneration) ? String(imageGeneration.status ?? "") : "";
+    if (["queued", "in_progress", "complete"].includes(imageStatus)) {
+      errors.push(`${label} post_validate failed gates must not start image_generation`);
+    }
   }
 }
 

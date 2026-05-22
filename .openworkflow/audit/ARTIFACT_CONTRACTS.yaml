@@ -298,6 +298,7 @@ artifacts:
       - directions
       - build_recommendation
       - prompt_text_manifest
+      - post_validate
       - image_generation
       - negative_constraints
       - review_plan
@@ -461,6 +462,32 @@ artifacts:
         direction_count: 0
         prompt_text_refs:
           []
+      post_validate:
+        status: pending
+        trigger: after_prompt_assets_ready
+        required_when_direction_count_gte: 2
+        skip_when_resolved_count: 1
+        threshold_policy:
+          method: strategic_fingerprint_similarity
+          max_pairwise_similarity: 0.65
+          comparison: pairwise
+        fingerprint_dimensions:
+          - product_form
+          - trigger
+          - interaction_model
+          - emotional_driver
+          - retention_mechanism
+          - metric
+          - main_risk
+          - trust_model
+          - privacy_model
+        comparisons:
+          []
+        failures:
+          []
+        outcome_notes:
+          []
+        repair_route: /ow:vision2prompt
       image_generation:
         status: not_started
         batch_strategy: Generate each selected direction as a coherent multi-image screen group after

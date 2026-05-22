@@ -2165,6 +2165,7 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("internal_pipeline:"), "artifact contracts missing proto internal pipeline");
   assert(artifacts.includes("direction_count_policy:"), "artifact contracts missing proto direction count policy");
   assert(artifacts.includes("prompt_text_manifest:"), "artifact contracts missing proto prompt text manifest");
+  assert(artifacts.includes("post_validate:"), "artifact contracts missing proto post-validate gate");
   assert(artifacts.includes("image_generation:"), "artifact contracts missing proto image generation state");
   assert(artifacts.includes("generated_images:"), "artifact contracts missing generated image metadata container");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
@@ -2398,6 +2399,30 @@ function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
     "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md",
     "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D2.md",
     "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D3.md",
+    "post_validate:",
+    "  status: pass",
+    "  trigger: after_prompt_assets_ready",
+    "  required_when_direction_count_gte: 2",
+    "  skip_when_resolved_count: 1",
+    "  threshold_policy:",
+    "    method: strategic_fingerprint_similarity",
+    "    max_pairwise_similarity: 0.65",
+    "    comparison: pairwise",
+    "  fingerprint_dimensions:",
+    "    - product_form",
+    "    - trigger",
+    "    - interaction_model",
+    "    - emotional_driver",
+    "    - retention_mechanism",
+    "    - metric",
+    "    - main_risk",
+    "    - trust_model",
+    "    - privacy_model",
+    "  comparisons: []",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Fixture assumes post-validation passed so style-only checks remain isolated.",
+    "  repair_route: /ow:vision2prompt",
     "image_generation:",
     "  status: not_started",
     "  batch_strategy: Generate each direction as two mobile screens with consistent product system metadata.",
