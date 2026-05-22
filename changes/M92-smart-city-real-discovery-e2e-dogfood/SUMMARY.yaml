@@ -18,11 +18,11 @@ source:
 target_repo: /Users/archy/Projects/StartUp/smart_city_copilot
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 2
-active_candidate_count: 2
-completed_candidate_id: null
-completed_change_id: null
-selected_candidate_id: C001
-selected_change_id: C001-run-smart-city-discovery-e2e
+active_candidate_count: 0
+completed_candidate_id: C002
+completed_change_id: C002-audit-smart-city-discovery-artifacts
+selected_candidate_id: null
+selected_change_id: null
 next_recommended_candidate_id: null
 deferred_feature_refs:
   - M91-proto2html-benchmark-input
@@ -31,6 +31,13 @@ outputs:
   candidate_changes_yaml: changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.md
   summary: changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+  target_repo_commit: 2b977be
+  target_repo_branch: codex/smart-city-copilot-discovery-e2e
+  audit_report: /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+  prototype_images:
+    - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-01-planning-approval.png
+    - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-02-incident-response.png
+    - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-03-asset-capacity.png
 risks:
   - id: R001
     level: medium
@@ -53,3 +60,6 @@ validation:
   notes:
     - OP001 created the M92 queue for real smart city discovery E2E dogfood.
     - OP002 selected C001 through single-queue select-change ranking.
+    - OP003 completed C001 with target repo commit 2b977be and three prototype images.
+    - OP004 selected C002 for first-consumer artifact audit.
+    - OP005 completed C002 with the KANO audit report in the target repo.

@@ -52,7 +52,7 @@ scope_control:
 next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: selected
+    status: done
     title: Run smart city discovery E2E dogfood
     purpose: >
       Execute the real target-repo test from OpenWorkflow initialization and
@@ -98,8 +98,16 @@ changes:
         It performs the real target-repo dogfood requested by the user and
         unlocks the artifact audit.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-run-smart-city-discovery-e2e
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/LOCAL_COMMIT_EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-01-planning-approval.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-02-incident-response.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-03-asset-capacity.png
   - id: C002
-    status: candidate
+    status: done
     title: Audit real discovery loop artifacts
     purpose: >
       Review all target repo artifacts as OW's first Agent consumer and produce
@@ -133,6 +141,18 @@ changes:
       - Report identifies advantage, weakness, danger, and defect categories.
       - Report maps findings to KANO categories.
       - Report recommends concrete next DTC candidates without entering M91.
+    selection:
+      selected_change_id: C002-audit-smart-city-discovery-artifacts
+      reason: >
+        Select C002 after C001 completed the real discovery loop and generated
+        the target repo artifacts required for audit.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-audit-smart-city-discovery-artifacts
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
 operations:
   - operation_id: OP001
     operation_type: add
@@ -165,3 +185,47 @@ operations:
       - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/SELECTED_CHANGE.yaml
       - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/ATOM_TASKS.yaml
       - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed target repo initialization, raw concept ingestion, vision,
+      validation, proto prompt pack, first high-fidelity image batch, and local
+      target repo commit.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/LOCAL_COMMIT_EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 produced the concrete artifacts needed for a real
+      first-consumer audit.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/SELECTED_CHANGE.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/ATOM_TASKS.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed the OW discovery loop capability audit and recorded KANO
+      findings, git evidence, dangerous behaviors, and next DTC candidates.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md

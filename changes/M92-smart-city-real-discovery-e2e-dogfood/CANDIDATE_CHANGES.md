@@ -15,12 +15,13 @@ prototype image batch. Stop before `/ow:tune` and before M91/proto2html.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | selected | medium | Run smart city discovery E2E dogfood | none |
-| C002 | candidate | medium | Audit real discovery loop artifacts | C001 |
+| C001 | done | medium | Run smart city discovery E2E dogfood | none |
+| C002 | done | medium | Audit real discovery loop artifacts | C001 |
 
 ## Next Recommendation
 
-`C001` is selected. It creates the target repo workflow artifacts and image batch.
+No active candidate remains. C001 generated the target repo discovery artifacts
+and first image batch; C002 produced the KANO capability audit.
 
 ## Deferred
 
