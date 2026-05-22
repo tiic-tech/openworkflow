@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M90-discovery-loop-e2e-dogfood:C003
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C003
+change_id: C003-discovery-loop-failure-routing
+title: Local commit evidence for discovery-loop failure routing
+status: completed
+completed_at: 2026-05-22
+commit: 986727d
+summary: >
+  Added negative runtime-surface assertions proving prompt post-validation
+  failures block /ow:prompt2proto handoff and missing tune baseline resolution
+  blocks downstream tune handoff with a repair-oriented artifact section.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+acceptance_results:
+  - acceptance: Thin vision cannot silently proceed to proto.
+    result: pass
+    evidence: existing runtime-surface vision summary and proto check gates
+  - acceptance: Blocked validation cannot silently proceed to prompt generation.
+    result: pass
+    evidence: existing runtime-surface blocked validation proto check gate
+  - acceptance: Failed prompt post-validation cannot silently proceed to image generation.
+    result: pass
+    evidence: failed post_validate fixture assertion
+  - acceptance: Tune artifacts missing inheritance or latest-baseline data cannot silently proceed.
+    result: pass
+    evidence: missing baseline_resolution fixture assertion
+  - acceptance: Each failure reports the repair command or artifact section.
+    result: pass
+    evidence: assertions for /ow:prompt2proto gate and baseline_resolution repair section
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C003 is medium risk and required no high-risk approval.
+  - C004 is now ready as the final M90 candidate.

@@ -6,12 +6,12 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C003
 change_id: C003-discovery-loop-failure-routing
 title: Atom tasks for discovery-loop failure routing
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Map existing negative fixtures
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/core/src/validators/validateOpenWorkflow.ts
@@ -21,7 +21,7 @@ tasks:
   - id: T002
     title: Add discovery-loop failure routing assertions
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/core/src/validators/validateOpenWorkflow.ts
@@ -31,7 +31,7 @@ tasks:
   - id: T003
     title: Verify negative route coverage
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/core/src/validators/
@@ -43,3 +43,8 @@ verification:
   - npm run verify:runtime-surface
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
+completion:
+  completed_at: 2026-05-22
+  commit: 986727d
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml

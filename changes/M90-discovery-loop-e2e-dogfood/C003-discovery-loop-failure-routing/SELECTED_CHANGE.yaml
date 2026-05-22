@@ -6,7 +6,7 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C003
 change_id: C003-discovery-loop-failure-routing
 title: Verify discovery-loop failure routing
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -60,3 +60,8 @@ high_risk:
     C003 is medium risk because it adds local negative verification fixtures and
     repair-route assertions only. It does not call external services or alter
     runtime execution.
+completion:
+  completed_at: 2026-05-22
+  commit: 986727d
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml

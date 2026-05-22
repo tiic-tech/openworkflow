@@ -22,13 +22,13 @@ tooling, proto2html, html2spec, build, or archive.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Create canonical discovery-loop dogfood fixture | none |
 | C002 | done | medium | Verify happy-path discovery-loop command handoff | C001 |
-| C003 | selected | medium | Verify discovery-loop failure routing | C001, C002 |
-| C004 | candidate | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
+| C003 | done | medium | Verify discovery-loop failure routing | C001, C002 |
+| C004 | ready | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C003` is selected. It verifies negative discovery-loop failure routing using the
-canonical fixture chain and generated command gates.
+`C004` is ready. It records benchmark-selection readiness evidence without
+creating proto2html artifacts.
 
 ## Deferred
 
