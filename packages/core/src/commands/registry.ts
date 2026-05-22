@@ -741,7 +741,7 @@ function prototypeProtocol(): CommandProtocol {
     ],
     auditCheckpoints: {
       before: [
-        "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.",
+        "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.",
         "Load vision and current validation context; validation is required before prototype generation.",
         "If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.",
         "Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.",
@@ -750,15 +750,15 @@ function prototypeProtocol(): CommandProtocol {
         "Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.",
       ],
       during: [
-        "Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.",
+        "Before strategic directions, require /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.",
         "Before /ow:prompt2proto, require prototype_system_contract so stable app shell, navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed deltas are explicit.",
         "Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.",
-        "Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
+        "Internally trigger /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
         "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
         "Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.",
         "Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.",
-        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.",
-        "Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.",
+        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, prototype_system_contract, paragraph quality, or philosophy readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt repair instead of starting image generation.",
+        "Internally trigger /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist; build-prototype consumes the ready pack and must not recompile vision into prompt text.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
       after: [
@@ -780,10 +780,10 @@ function prototypeProtocol(): CommandProtocol {
       {
         tag: "internal_proto_pipeline",
         items: [
-          "/ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.",
-          "Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.",
-          "Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.",
-          "Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.",
+          "/ow:proto is the only user-facing command in this chain; /ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands.",
+          "Run proto-preflight first, then /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.",
+          "Record internal_pipeline.stages with stage ids proto-preflight, build-proto-prompt or vision2prompt-compatible compiler, and prompt2proto in EVIDENCE.yaml.",
+          "Do not expose /ow:build-proto-prompt, /ow:vision2prompt, or /ow:prompt2proto as normal user-facing handoffs.",
         ],
       },
       {
@@ -1224,6 +1224,7 @@ function prompt2ProtoProtocol(): CommandProtocol {
     auditCheckpoints: {
       before: [
         "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation, prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or skipped.",
+        "Treat prompt2proto as the internal build-prototype consumption boundary: consume ready PROTO_PROMPT_PACK artifacts and do not recompile vision or validation into prompt text.",
         "Load prepared prompt text and verify every selected direction has screen_prompts before image generation.",
         "Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.",
         "Apply the build-prototype philosophy engine before image generation: Chief PM plus Principal UI/UX judgment must set product intent, information hierarchy, density calibration, affordance clarity, and UI/UX credibility boundaries.",
@@ -1232,6 +1233,7 @@ function prompt2ProtoProtocol(): CommandProtocol {
       during: [
         "Batch-generate high-fidelity prototype images by direction_id and prompt_id.",
         "Calibrate prototype instructions so information is visible, grouped, collapsed, delayed, or drilled into based on industry, user role, task risk, screen size, task frequency, and the user's next decision.",
+        "If the prompt pack is missing, thin, stale, incoherent, or lacks prompt2proto philosophy readiness, refuse and route repair back to /ow:build-proto-prompt or compatible /ow:vision2prompt.",
         "Write one metadata record for every generated image with image_id, direction_id, prompt_id, screen_name, path, source_prompt_ref, generator, and status.",
         "Do not revise product strategy or prompt text during image generation.",
       ],
@@ -1252,6 +1254,15 @@ function prompt2ProtoProtocol(): CommandProtocol {
       "Do not allow generated images without per-image metadata.",
     ],
     internalSections: [
+      {
+        tag: "build_prototype_consumption_boundary",
+        items: [
+          "build-prototype consumes ready prompt-pack artifacts through prompt2proto.",
+          "build-prototype must not compile prompt packs from vision or validation.",
+          "Missing or incoherent prompt packs repair through /ow:build-proto-prompt or compatible /ow:vision2prompt, not inside prompt2proto.",
+          "Refuse thin, missing, or incoherent prompt packs before image generation.",
+        ],
+      },
       {
         tag: "prompt_pack_readiness_gate",
         items: [

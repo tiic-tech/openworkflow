@@ -82,6 +82,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <audit_checkpoints>
 <before>
 - Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation, prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or skipped.
+- Treat prompt2proto as the internal build-prototype consumption boundary: consume ready PROTO_PROMPT_PACK artifacts and do not recompile vision or validation into prompt text.
 - Load prepared prompt text and verify every selected direction has screen_prompts before image generation.
 - Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.
 - Apply the build-prototype philosophy engine before image generation: Chief PM plus Principal UI/UX judgment must set product intent, information hierarchy, density calibration, affordance clarity, and UI/UX credibility boundaries.
@@ -90,6 +91,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <during>
 - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
 - Calibrate prototype instructions so information is visible, grouped, collapsed, delayed, or drilled into based on industry, user role, task risk, screen size, task frequency, and the user's next decision.
+- If the prompt pack is missing, thin, stale, incoherent, or lacks prompt2proto philosophy readiness, refuse and route repair back to /ow:build-proto-prompt or compatible /ow:vision2prompt.
 - Write one metadata record for every generated image with image_id, direction_id, prompt_id, screen_name, path, source_prompt_ref, generator, and status.
 - Do not revise product strategy or prompt text during image generation.
 </during>
@@ -116,6 +118,13 @@ Do not treat artifact writing as the opening move for conversation-first command
 When a downstream stage supersedes an older question or draft, update lifecycle status and clear stale current_question values in the affected artifacts.
 Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
+
+<build_prototype_consumption_boundary>
+- build-prototype consumes ready prompt-pack artifacts through prompt2proto.
+- build-prototype must not compile prompt packs from vision or validation.
+- Missing or incoherent prompt packs repair through /ow:build-proto-prompt or compatible /ow:vision2prompt, not inside prompt2proto.
+- Refuse thin, missing, or incoherent prompt packs before image generation.
+</build_prototype_consumption_boundary>
 
 <prompt_pack_readiness_gate>
 - Refuse prompt packs whose prompt_pack_integrity_gate.status is not pass.

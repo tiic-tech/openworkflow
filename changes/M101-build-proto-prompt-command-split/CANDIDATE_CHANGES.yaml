@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M101-build-proto-prompt-command-split
 title: Candidate changes for build-proto-prompt command split
-status: active
+status: completed
 source:
   kind: planning_discussion
   refs:
@@ -76,7 +76,7 @@ scope_control:
         Visual parity requires generated images or rendered prototypes and a
         separate review method.
       suggested_plan_id: M103-prototype-visual-reference-parity-gate
-next_recommended_candidate_id: C006
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -447,7 +447,7 @@ changes:
         - node dist/cli/src/index.js summaries --root . --strict --json
         - git diff --check
   - id: C007
-    status: ready
+    status: done
     title: Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto
     purpose: >
       Complete the command split by moving build-prototype away from
@@ -469,6 +469,8 @@ changes:
       - skills/build-prototype/SKILL.md
       - skills/prompt2proto/
       - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M101-build-proto-prompt-command-split/
@@ -492,6 +494,35 @@ changes:
       - build-prototype guidance consumes ready prompt-pack artifacts rather than compiling prompt packs from vision.
       - Existing /ow:proto behavior is either preserved through orchestration or given an explicit migration path.
       - Runtime-surface checks fail if build-prototype silently skips prompt-pack readiness, coherence, or prompt2proto philosophy gates.
+    selection:
+      selected_change_id: C007-narrow-build-prototype-to-prompt2proto
+      selected_at: 2026-05-23
+      approved_option: "Option 1: Internal split preserving /ow:proto while build-prototype consumes prompt2proto through ready prompt packs"
+      reason: >
+        C007 is the next recommended ready candidate after C006 completed the
+        build-prototype philosophy engine. It completes the approved M101
+        Option 1 split by narrowing build-prototype to ready prompt-pack
+        consumption while preserving /ow:proto as the user-facing orchestration
+        surface.
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+        - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/SELECTED_CHANGE.yaml
+    completion:
+      completed_change_id: C007-narrow-build-prototype-to-prompt2proto
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/SELECTED_CHANGE.yaml
+        - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/ATOM_TASKS.yaml
+        - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/IMPLEMENTATION_BRIEF.md
+        - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/LOCAL_COMMIT_EVIDENCE.yaml
+      validation:
+        - npm run build
+        - node dist/cli/src/index.js sync --root . --json
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -703,3 +734,40 @@ operations:
       - .agents/skills/ow-prompt2proto/SKILL.md
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Select C007 after C006 completed the philosophy engine and unlocked the
+      final build-prototype narrowing candidate under approved M101 Option 1.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/SELECTED_CHANGE.yaml
+      - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/ATOM_TASKS.yaml
+      - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Complete C007 by narrowing build-prototype to ready prompt-pack
+      consumption through prompt2proto, preserving /ow:proto orchestration, and
+      adding runtime-surface assertions for readiness, coherence, and
+      prompt2proto philosophy gates.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/prompt2proto/SKILL.md
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/LOCAL_COMMIT_EVIDENCE.yaml

@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M101-build-proto-prompt-command-split:C007
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C007-narrow-build-prototype-to-prompt2proto
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C007
+title: Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto
+status: completed
+selection_reason:
+  - C007 is the next recommended ready candidate after C006 completed the build-prototype philosophy engine.
+  - All C007 dependencies are done: C001, C003, C004, C005, and C006.
+  - C007 completes approved M101 Option 1 by preserving /ow:proto as the user-facing orchestration path while narrowing build-prototype to prompt2proto consumption.
+approved_option:
+  id: option_1
+  title: Internal split preserving /ow:proto while build-prototype consumes prompt2proto through ready prompt packs
+scope:
+  includes:
+    - update build-prototype source skill responsibility
+    - update /ow:proto orchestration and handoff semantics as approved
+    - preserve backwards compatibility or explicit migration behavior
+    - runtime-surface tests that build-prototype refuses thin, missing, or incoherent prompt packs
+  excludes:
+    - changing M100 prompt quality rubric
+    - provider image generation implementation
+    - proto2html
+    - storyboard/motion modeling
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/build-prototype/SKILL.md
+  - skills/prompt2proto/
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - provider image generation implementation
+  - proto2html
+  - storyboard or motion modeling
+  - specs or production changes
+acceptance:
+  - build-prototype guidance consumes ready prompt-pack artifacts rather than compiling prompt packs from vision.
+  - Existing /ow:proto behavior is either preserved through orchestration or given an explicit migration path.
+  - Runtime-surface checks fail if build-prototype silently skips prompt-pack readiness, coherence, or prompt2proto philosophy gates.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion_requirements:
+  implementation_changed_files: true
+  local_commit_evidence: changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/LOCAL_COMMIT_EVIDENCE.yaml
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  local_commit_evidence: changes/M101-build-proto-prompt-command-split/C007-narrow-build-prototype-to-prompt2proto/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23

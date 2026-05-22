@@ -90,7 +90,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.
+- Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.
 - Load vision and current validation context; validation is required before prototype generation.
 - If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.
 - Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.
@@ -99,15 +99,15 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.
 </before>
 <during>
-- Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.
+- Before strategic directions, require /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.
 - Before /ow:prompt2proto, require prototype_system_contract so stable app shell, navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed deltas are explicit.
 - Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.
-- Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
+- Internally trigger /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
 - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
 - Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
 - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
-- If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.
-- Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
+- If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, prototype_system_contract, paragraph quality, or philosophy readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt repair instead of starting image generation.
+- Internally trigger /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist; build-prototype consumes the ready pack and must not recompile vision into prompt text.
 - Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.
 </during>
 <after>
@@ -136,10 +136,10 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 </artifact_checkpoint>
 
 <internal_proto_pipeline>
-- /ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.
-- Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.
-- Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.
-- Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.
+- /ow:proto is the only user-facing command in this chain; /ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands.
+- Run proto-preflight first, then /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.
+- Record internal_pipeline.stages with stage ids proto-preflight, build-proto-prompt or vision2prompt-compatible compiler, and prompt2proto in EVIDENCE.yaml.
+- Do not expose /ow:build-proto-prompt, /ow:vision2prompt, or /ow:prompt2proto as normal user-facing handoffs.
 </internal_proto_pipeline>
 
 <validation_consumption>

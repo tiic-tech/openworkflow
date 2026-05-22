@@ -2238,7 +2238,9 @@ function verifyProtoSkill(content: string): void {
   for (const required of [
     "image-first-strategic-proto-prompt-pack",
     "<internal_proto_pipeline>",
-    "/ow:vision2prompt and /ow:prompt2proto are internal commands",
+    "/ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands",
+    "/ow:build-proto-prompt",
+    "build-prototype consumes the ready pack and must not recompile vision into prompt text",
     "<validation_consumption>",
     "trigger.mode: agent_auto",
     "missing_current_validation",
@@ -2341,6 +2343,10 @@ function verifyPrompt2ProtoSkill(content: string): void {
     "Every generated image must record image_id",
     "source_prompt_ref",
     "Do not expose /ow:prompt2proto as a user-facing workflow step",
+    "<build_prototype_consumption_boundary>",
+    "build-prototype consumes ready prompt-pack artifacts through prompt2proto",
+    "build-prototype must not compile prompt packs from vision or validation",
+    "Refuse thin, missing, or incoherent prompt packs before image generation",
   ]) {
     assert(content.includes(required), `ow-prompt2proto missing internal image guidance: ${required}`);
   }

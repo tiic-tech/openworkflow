@@ -12,10 +12,11 @@ prototype instructions and evidence records. This skill is the source method
 behind the internal `/ow:prompt2proto` stage, but it does not by itself call an
 image provider or claim visual quality.
 
-`prompt2proto` starts where `vision2prompt` ends. It consumes a ready
-`PROTO_PROMPT_PACK`, preserves the product strategy and screen coherence
-contracts, and turns them into a concrete prototype translation plan that a
-design or image-generation stage can execute without inventing product intent.
+`prompt2proto` starts where build-proto-prompt or its compatible vision2prompt
+compiler path ends. It consumes a ready `PROTO_PROMPT_PACK`, preserves the
+product strategy and screen coherence contracts, and turns them into a concrete
+prototype translation plan that build-prototype can use without inventing
+product intent.
 
 ## Role Engine
 
@@ -117,6 +118,14 @@ translation and evidence contract; it does not start provider generation.
 9. Stop before provider-backed generation, human visual review, visual parity,
    proto2html, storyboard, motion, specs, changes, or runtime work unless a
    later selected candidate explicitly authorizes that surface.
+
+## Build-Prototype Consumption Boundary
+
+`build-prototype` consumes prompt2proto; it must not re-run vision-to-prompt
+compilation, invent strategic directions, or repair prompt paragraphs. When a
+prompt pack is not ready, route repair back to `/ow:build-proto-prompt` or the
+compatible `/ow:vision2prompt` compiler path and keep image generation or
+visual acceptance evidence out of scope.
 
 ## Refusal Rules
 
