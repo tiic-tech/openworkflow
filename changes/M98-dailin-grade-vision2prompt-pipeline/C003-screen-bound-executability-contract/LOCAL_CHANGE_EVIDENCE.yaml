@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C003
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C003
+change_id: C003-screen-bound-executability-contract
+title: Local evidence for screen-bound executability contract
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Extended the strategic proto prompt-pack contract so generation-ready
+  `/ow:vision2prompt` prompt packs must carry structured prototype brief,
+  screen manifest, global design system prompt, screen-bound prompts, and
+  quality rubric fields before downstream image generation can proceed.
+changed_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Added schema fields for prototype_brief, direction_map, richer screen_manifest entries, global_design_system_prompt, top-level quality_rubric, and richer screen prompt metadata.
+  - Added strategic prompt-pack validator checks that require screen-bound executability only when prompt text is ready for image generation or image generation has started.
+  - Enforced that generation-ready screen prompts resolve to screen_manifest.target_screen_id and include negative prompts, example copy, acceptance criteria, and executable prompt text.
+  - Enforced that each generation-ready screen_manifest entry includes components, data/state, actions, AI behavior or explicit non-AI rationale, trust controls, example copy, and acceptance criteria.
+  - Added summary-health handoff fields for prototype_brief, screen_manifest, global_design_system_prompt, and quality_rubric.
+  - Updated strategic prompt-pack protocol guidance to name the screen-bound executability contract before prompt_text_manifest can become ready_for_image_generation.
+  - Extended runtime stress fixtures with positive dailin-grade and smart-city screen-bound prompt packs plus negative missing-manifest and orphan-screen-prompt regressions.
+verification:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    command: npm run validate
+    reason: >
+      Repository validation still fails on pre-existing M97 planning artifacts:
+      C003 and C004 ATOM_TASKS.yaml missing title, and M97 C001-C004 done
+      candidates missing completion evidence. These paths are outside C003
+      owned paths and were already failing before this candidate.
+next_recommended_candidate_id: C004

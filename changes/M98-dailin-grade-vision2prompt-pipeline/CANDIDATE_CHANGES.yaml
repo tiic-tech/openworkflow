@@ -87,7 +87,7 @@ scope_control:
         Proto2html should consume an accepted benchmark after prompt-pack and
         visual-quality gates are trustworthy.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -210,7 +210,7 @@ changes:
           issues unrelated to C002; build, dist CLI validation, grep check, and
           diff check pass.
   - id: C003
-    status: candidate
+    status: done
     title: Extend strategic prompt-pack contract for screen-bound executability
     purpose: >
       Expand PROTO_PROMPT_PACK so dailin-grade product prototype instructions
@@ -232,6 +232,7 @@ changes:
       - packages/core/src/validators/validateRepositoryContracts.ts
       - packages/core/src/validators/validateOpenWorkflow.ts
       - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
       - skills/build-prototype/references/strategic-prompt-pack-protocol.md
       - changes/M98-dailin-grade-vision2prompt-pipeline/
     dependencies:
@@ -254,6 +255,31 @@ changes:
       - Every screen prompt resolves to a screen_manifest entry.
       - Every screen_manifest entry includes components, states/data, actions, system behavior or explicit non-AI rationale, and acceptance criteria.
       - The schema still supports refined prompt-pack fields used by /ow:tune.
+    selection:
+      selected_change_id: C003-screen-bound-executability-contract
+      selected_at: 2026-05-22
+      reason: >
+        C003 is the next ready candidate after C001 and C002. The integrity
+        gate and OW-owned dailin reference pipeline are complete, so the next
+        dependency-ready slice is to make screen-bound executability a
+        schema-backed and validator-enforced prompt-pack contract.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C003 added structured prototype brief, screen manifest, design-system
+          prompt, screen prompt, and quality rubric contract fields for
+          generation-ready strategic prompt packs.
+        - >
+          C003 added validator and runtime stress coverage for missing
+          screen-bound manifest fields and orphan screen prompt refs while
+          preserving refined prompt-pack compatibility.
+        - >
+          npm run validate still fails on pre-existing M97 planning artifact
+          issues unrelated to C003; build, runtime surface, dist CLI validation,
+          strict summaries, and diff check pass.
   - id: C004
     status: candidate
     title: Wire dailin-grade pipeline into generated vision2prompt protocol
@@ -475,3 +501,33 @@ operations:
     after_status: done
     evidence:
       - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 after C001 and C002 completion because the queue now has both
+      the prompt-pack integrity gate and the dailin-grade reference pipeline
+      needed to define a concrete screen-bound executability contract.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Complete C003 after extending the strategic prompt-pack schema,
+      validators, summary-health fields, protocol reference, and runtime stress
+      fixtures for screen-bound executability.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml

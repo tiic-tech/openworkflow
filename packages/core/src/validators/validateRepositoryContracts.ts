@@ -1712,6 +1712,60 @@ const PROMPT_PACK_INTEGRITY_GATE_DIMENSIONS = [
   "generated_image_refs_resolve",
 ];
 
+const STRATEGIC_PROTOTYPE_BRIEF_FIELDS = [
+  "product_name",
+  "positioning",
+  "target_user",
+  "current_alternative",
+  "core_idea",
+  "primary_loop",
+  "trust_boundaries",
+  "non_goals",
+  "desired_feeling",
+];
+
+const STRATEGIC_SCREEN_MANIFEST_FIELDS = [
+  "target_screen_id",
+  "screen_name",
+  "journey_stage",
+  "user_goal",
+  "system_state",
+  "required_components",
+  "required_data_fields",
+  "primary_actions",
+  "trust_controls",
+  "example_copy",
+  "acceptance_criteria",
+];
+
+const STRATEGIC_GLOBAL_DESIGN_SYSTEM_PROMPT_FIELDS = [
+  "visual_language",
+  "layout_system",
+  "component_vocabulary",
+  "information_density",
+  "copy_tone",
+  "responsive_canvas_rules",
+  "negative_visual_patterns",
+];
+
+const STRATEGIC_SCREEN_PROMPT_FIELDS = [
+  "prompt_id",
+  "target_screen_id",
+  "screen_name",
+  "image_role",
+  "negative_prompt",
+  "example_copy",
+  "acceptance_criteria",
+];
+
+const STRATEGIC_QUALITY_RUBRIC_FIELDS = [
+  "prompt_executability",
+  "strategic_distinctness",
+  "product_specificity",
+  "state_coverage",
+  "trust_boundary_coverage",
+];
+
 const STRATEGIC_DIRECTION_FIELDS = [
   "direction_id",
   "name",
@@ -1778,6 +1832,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateProductExperienceModel(label, data.product_experience_model, data, errors);
   validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
   validatePromptPackIntegrityGate(label, data.prompt_pack_integrity_gate, data, errors);
+  validateScreenBoundExecutability(label, data, errors);
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
@@ -2077,6 +2132,77 @@ function validatePromptPackIntegrity(label: string, data: Record<string, unknown
     if (sourcePromptRef && !stringReferencesKnownPrompt(sourcePromptRef, directionIds, promptIds)) {
       errors.push(`${label} image_generation.generated_images[${index}].metadata.source_prompt_ref must reference an existing direction_id or prompt_id`);
     }
+  });
+}
+
+function validateScreenBoundExecutability(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (!strategicPromptPackRequiresScreenExecutability(data)) {
+    return;
+  }
+  validateRequiredObjectFields(label, "prototype_brief", data.prototype_brief, STRATEGIC_PROTOTYPE_BRIEF_FIELDS, errors);
+  validateRequiredObjectFields(label, "global_design_system_prompt", data.global_design_system_prompt, STRATEGIC_GLOBAL_DESIGN_SYSTEM_PROMPT_FIELDS, errors);
+  validateRequiredObjectFields(label, "quality_rubric", data.quality_rubric, STRATEGIC_QUALITY_RUBRIC_FIELDS, errors);
+  const manifestIds = validateStrategicScreenManifest(label, data.screen_manifest, errors);
+  validateStrategicDirectionScreenPrompts(label, data.directions, manifestIds, errors);
+}
+
+function strategicPromptPackRequiresScreenExecutability(data: Record<string, unknown>): boolean {
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  return (
+    promptTextManifest.status === "ready_for_image_generation" ||
+    promptTextManifest.status === "generated" ||
+    (typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started")
+  );
+}
+
+function validateStrategicScreenManifest(label: string, value: unknown, errors: string[]): Set<string> {
+  const ids = new Set<string>();
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_manifest must contain screen-bound product states before image generation`);
+    return ids;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_manifest[${index}]`, item, STRATEGIC_SCREEN_MANIFEST_FIELDS, errors);
+    if (!isRecord(item)) {
+      return;
+    }
+    if (nonEmptyString(item.target_screen_id)) {
+      ids.add(String(item.target_screen_id));
+    }
+    if (!hasUsefulValue(item.ai_behavior) && !hasUsefulValue(item.non_ai_rationale)) {
+      errors.push(`${label} screen_manifest[${index}] must include ai_behavior or non_ai_rationale`);
+    }
+  });
+  return ids;
+}
+
+function validateStrategicDirectionScreenPrompts(label: string, directions: unknown, manifestIds: Set<string>, errors: string[]): void {
+  if (!Array.isArray(directions)) {
+    return;
+  }
+  directions.forEach((direction, directionIndex) => {
+    if (!isRecord(direction)) {
+      return;
+    }
+    const screenPrompts = direction.screen_prompts;
+    if (!Array.isArray(screenPrompts) || screenPrompts.length === 0) {
+      errors.push(`${label} directions[${directionIndex}].screen_prompts must contain screen-bound prompt text before image generation`);
+      return;
+    }
+    screenPrompts.forEach((prompt, promptIndex) => {
+      const fieldLabel = `directions[${directionIndex}].screen_prompts[${promptIndex}]`;
+      validateRequiredObjectFields(label, fieldLabel, prompt, STRATEGIC_SCREEN_PROMPT_FIELDS, errors);
+      if (!isRecord(prompt)) {
+        return;
+      }
+      if (!hasUsefulValue(prompt.prompt) && !hasUsefulValue(prompt.standalone_prompt)) {
+        errors.push(`${label} ${fieldLabel} must include prompt or standalone_prompt`);
+      }
+      if (nonEmptyString(prompt.target_screen_id) && manifestIds.size > 0 && !manifestIds.has(String(prompt.target_screen_id))) {
+        errors.push(`${label} ${fieldLabel}.target_screen_id must exist in screen_manifest`);
+      }
+    });
   });
 }
 

@@ -23,6 +23,8 @@ Completed candidate: `C001`
 
 Completed candidate: `C002`
 
+Completed candidate: `C003`
+
 Select the first dependency-free candidate that most reduces downstream
 prompt-pack ambiguity. Stop for a high-risk decision report if a candidate
 expands beyond `/ow:vision2prompt` prompt-pack behavior into broad workflow
@@ -34,7 +36,7 @@ semantics, release publishing, or remote-impacting changes.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Add prompt-pack integrity gate | none |
 | C002 | done | medium | Migrate dailin reference pipeline into OW vision2prompt references | none |
-| C003 | candidate | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
+| C003 | done | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
 | C004 | candidate | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
 | C005 | candidate | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
 | C006 | candidate | medium | Replay smart city prompt pack with dailin-grade contract | C003, C004, C005 |
@@ -46,8 +48,9 @@ downstream generation could proceed from a prompt pack whose manifest,
 directions, and evidence refs diverged. Integrity now fails closed before the
 richer dailin-style structure is added.
 
-`C002` is complete. `C003` is now the next candidate, but it is a larger schema
-and validator change that should be treated as the next implementation commit.
+`C003` is complete. `C004` is now the next candidate because generated
+`/ow:vision2prompt` protocol guidance can reference stable integrity and
+screen-bound executability contract fields.
 
 ## Deferred
 
@@ -103,6 +106,13 @@ Validation:
 Purpose: expand `PROTO_PROMPT_PACK` so dailin-grade product prototype
 instructions are structured in YAML, not hidden only in prose or downstream
 evidence.
+
+Selected change artifacts:
+
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/SELECTED_CHANGE.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/ATOM_TASKS.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/IMPLEMENTATION_BRIEF.md`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml`
 
 Validation:
 

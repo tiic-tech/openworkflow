@@ -174,10 +174,21 @@ and include:
 - `validation_input`
 - `normalized_input`
 - `strategic_core`
+- `prototype_brief`: product name, positioning, target user, current
+  alternative, core idea, primary loop, trust boundaries, non-goals, and desired
+  feeling
 - `product_experience_model`
-- screen-bound product system fields when available, such as `screen_manifest`,
-  `global_design_system_prompt`, `screen_prompts`, `generation_order`, and
-  `acceptance_checklist`
+- `screen_manifest` with target screen ids, journey stages, user goals, system
+  states, required components, required data fields, primary actions, AI
+  behavior or explicit non-AI rationale, trust controls, example copy, and
+  acceptance criteria
+- `global_design_system_prompt`: visual language, layout system, component
+  vocabulary, information density, copy tone, responsive/canvas rules, and
+  negative visual patterns
+- screen-bound `screen_prompts` tied to `screen_manifest` ids, with standalone
+  prompt text, negative prompt, example copy, and acceptance criteria
+- `quality_rubric`: prompt executability, strategic distinctness, product
+  specificity, state coverage, and trust-boundary coverage
 - `directions`
 - `build_recommendation`
 - `prompt_pack_integrity_gate`
@@ -199,6 +210,12 @@ Each direction needs:
 - `prototype_prompt`
 - `screen_prompts`
 - `pm_judgment`
+
+When `prompt_text_manifest.status` becomes `ready_for_image_generation`, every
+direction screen prompt must resolve to a `screen_manifest.target_screen_id`.
+Do not mark prompt text ready when screen prompts are detached from the product
+journey, missing negative prompts or example copy, or only restate a freeform
+`prototype_prompt`.
 
 ## Prototype Prompt Requirements
 

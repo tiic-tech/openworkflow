@@ -27,12 +27,12 @@ scope_boundary: >
   screen-bound executability before /ow:prompt2proto image generation.
 branch_boundary: codex/m98-dailin-grade-vision2prompt-pipeline
 candidate_count: 6
-active_candidate_count: 4
-completed_candidate_id: C002
-completed_change_id: C002-dailin-reference-pipeline
+active_candidate_count: 3
+completed_candidate_id: C003
+completed_change_id: C003-screen-bound-executability-contract
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 deferred_feature_refs:
   - M99-prototype-visual-reference-parity-gate
   - M100-prototype-storyboard-motion-model
@@ -49,7 +49,7 @@ key_dependencies:
   - C003 depends on C001 and C002 so the expanded schema reflects both integrity and the reference pipeline.
   - C004 depends on C002 and C003 so generated protocol guidance can reference stable contract fields.
   - C005 depends on C001-C004 so fixtures prove the full gate and protocol surface.
-    - C006 depends on C003-C005 so the smart city replay targets the final M98 contract shape.
+  - C006 depends on C003-C005 so the smart city replay targets the final M98 contract shape.
 risks:
   - id: R001
     level: medium
@@ -102,3 +102,11 @@ validation:
     - C002 grep check for vision2prompt, dailin-grade, screen_manifest, and quality_rubric passed.
     - C002 git diff --check passed.
     - C002 npm run validate still fails on the same pre-existing M97 planning artifact issues unrelated to C002.
+    - C003 was selected after C001 and C002 completion to extend the strategic prompt-pack screen-bound executability contract.
+    - C003 completed schema, validator, summary-health, protocol reference, and runtime stress fixture coverage for generation-ready screen-bound executability.
+    - C003 npm run build passed.
+    - C003 npm run verify:runtime-surface passed.
+    - C003 dist CLI validate passed.
+    - C003 strict summaries passed.
+    - C003 git diff --check passed.
+    - C003 npm run validate still fails on the same pre-existing M97 planning artifact issues unrelated to C003.

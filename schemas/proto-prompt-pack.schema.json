@@ -278,6 +278,55 @@
       ],
       "additionalProperties": true
     },
+    "prototype_brief": {
+      "type": "object",
+      "properties": {
+        "product_name": {
+          "type": "string"
+        },
+        "positioning": {
+          "type": "string"
+        },
+        "target_user": {
+          "type": "string"
+        },
+        "current_alternative": {
+          "type": "string"
+        },
+        "core_idea": {
+          "type": "string"
+        },
+        "primary_loop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trust_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_goals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "desired_feeling": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "direction_map": {
+      "type": [
+        "array",
+        "object"
+      ],
+      "additionalProperties": true
+    },
     "product_experience_model": {
       "type": "object",
       "required": [
@@ -515,6 +564,9 @@
                 "prompt_id": {
                   "type": "string"
                 },
+                "target_screen_id": {
+                  "type": "string"
+                },
                 "screen_name": {
                   "type": "string"
                 },
@@ -523,6 +575,18 @@
                 },
                 "prompt": {
                   "type": "string"
+                },
+                "standalone_prompt": {
+                  "type": "string"
+                },
+                "negative_prompt": {
+                  "type": "string"
+                },
+                "example_copy": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "acceptance_criteria": {
                   "type": "array",
@@ -731,6 +795,69 @@
               "type": "string"
             }
           },
+          "journey_stage": {
+            "type": "string"
+          },
+          "user_goal": {
+            "type": "string"
+          },
+          "system_state": {
+            "type": "string"
+          },
+          "selected_object": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "required_components": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_data_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "primary_actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ai_behavior": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "non_ai_rationale": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trust_controls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "example_copy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "generation_order": {
             "type": "number"
           }
@@ -740,6 +867,78 @@
     },
     "global_design_prompt": {
       "type": "string"
+    },
+    "global_design_system_prompt": {
+      "type": "object",
+      "properties": {
+        "visual_language": {
+          "type": "string"
+        },
+        "layout_system": {
+          "type": "string"
+        },
+        "component_vocabulary": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "information_density": {
+          "type": "string"
+        },
+        "copy_tone": {
+          "type": "string"
+        },
+        "responsive_canvas_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "negative_visual_patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "quality_rubric": {
+      "type": "object",
+      "properties": {
+        "prompt_executability": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategic_distinctness": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "product_specificity": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "state_coverage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "trust_boundary_coverage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
     },
     "screen_prompts": {
       "type": "array",
@@ -767,6 +966,18 @@
           },
           "prompt": {
             "type": "string"
+          },
+          "standalone_prompt": {
+            "type": "string"
+          },
+          "negative_prompt": {
+            "type": "string"
+          },
+          "example_copy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "acceptance_criteria": {
             "type": "array",

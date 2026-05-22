@@ -1,0 +1,84 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C003
+change_id: C003-screen-bound-executability-contract
+title: Extend strategic prompt-pack contract for screen-bound executability
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: large
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 after C001 and C002 completion. The integrity gate and dailin
+  reference pipeline are now in place, so the next dependency-ready slice is to
+  make screen-bound executability part of the strategic prompt-pack contract
+  instead of leaving it as prose-only guidance.
+rejected_alternatives:
+  - id: C004
+    reason: Depends on C003's stable executability contract.
+  - id: C005
+    reason: Depends on C001-C004 so fixtures can cover both contract and generated protocol behavior.
+  - id: C006
+    reason: Depends on C003-C005 so the smart city replay targets the final M98 contract shape.
+owned_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - direction_map or equivalent direction-level strategic overview
+    - prototype_brief fields for product name, positioning, target user, current alternative, core idea, primary loop, trust boundaries, non-goals, and desired feeling
+    - screen_manifest fields for journey_stage, user_goal, system_state, selected_object, required_components, required_data_fields, primary_actions, ai_behavior, trust_controls, example_copy, and acceptance_criteria
+    - global_design_system_prompt fields for visual language, layout system, component vocabulary, information density, copy tone, responsive/canvas rules, and negative visual patterns
+    - screen_prompts fields for standalone prompt, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest ids
+    - quality_rubric fields for prompt executability, strategic distinctness, product specificity, state coverage, and trust boundary coverage
+  excludes:
+    - refined tune prompt-pack redesign unless a field must stay compatible
+    - provider-backed generation
+    - visual parity scoring
+    - generated skill protocol rewrites owned by C004
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - provider-backed image generation code
+  - visual quality review artifacts
+  - proto2html artifacts
+acceptance:
+  - Generation-ready strategic prompt packs require screen-bound manifest and prompt fields rather than only freeform prototype_prompt text.
+  - Every screen prompt resolves to a screen_manifest entry.
+  - Every screen_manifest entry includes components, states/data, actions, system behavior or explicit non-AI rationale, and acceptance criteria.
+  - The schema still supports refined prompt-pack fields used by /ow:tune.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 is a local schema, validator, summary-health, reference, and fixture
+    change. It does not call external services, publish releases, mutate remote
+    repositories, generate provider images, delete generated adapters, or broaden
+    workflow semantics beyond strategic prompt-pack executability.
+expected_commit_boundary: >
+  Complete C003 as one coherent commit after updating the strategic prompt-pack
+  contract, validators, protocol reference text, queue status, and local
+  evidence.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml
