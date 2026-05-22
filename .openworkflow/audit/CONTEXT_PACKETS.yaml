@@ -123,6 +123,70 @@ packets:
           command.
         - Mark superseded validation targets accordingly when a new validation target replaces them.
         - Confirm no prototype, spec, change, or runtime artifacts were created.
+  - packet_id: context:build-proto-prompt
+    command: /ow:build-proto-prompt
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/**/VALIDATION.yaml
+    optional:
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - skills/build-proto-prompt/SKILL.md
+      - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+      - skills/build-proto-prompt/references/output-boundary.md
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal prompt-pack compiler stage after /ow:proto preflight has confirmed
+          vision and validation are ready.
+        - Load skills/build-proto-prompt/SKILL.md and its references before compiling
+          PROTO_PROMPT_PACK.
+        - Adopt the Co-Founder plus Chief PM / senior product strategist perspective engine before
+          generating directions.
+        - Resolve direction_count_policy before writing prompt text; do not silently default the
+          direction count.
+        - Prepare to infer product_experience_model before strategic directions, including product
+          archetype, primary canvas, information architecture, domain objects, state model, data
+          realism, visual language, anti-generic constraints, and category quality bar.
+        - Prepare to write dailin-grade long-form prompt paragraphs; prompt text must include
+          journey, interaction behavior, system response, trust controls, anti-goals, visual
+          direction, desired user feeling, and concrete content.
+      during:
+        - Compile durable vision and validation into strategic_core, prototype_brief,
+          product_experience_model, screen_manifest, global_design_system_prompt, directions,
+          screen_prompts, review_plan, and readiness gates.
+        - Each selected direction must carry product_thesis, user_transformation, differentiated
+          product form, reason_to_exist, and pm_judgment before screen prompt anatomy.
+        - Decide whether source concepts are separate strategic product forms or modules, layers,
+          workflows, or states inside one product shell; do not split directions by scenario labels
+          alone.
+        - Write complete multi-image prompt text for every selected direction with screen_prompts,
+          negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
+          target_screen_id values.
+        - Populate prompt_pack_integrity_gate, prototype_reality_gate,
+          quality_rubric.prompt_executability, quality_rubric.prompt_paragraph_quality,
+          prompt_text_manifest.paragraph_quality_status, and post_validate before handoff.
+        - "Keep image_generation.status: not_started while this compiler stage runs."
+      after:
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
+          prompt_text_manifest.status ready_for_image_generation only when all readiness gates pass.
+        - Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and
+          prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is
+          pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is
+          pass or skipped.
+        - If any readiness gate fails, keep handoff blocked and repair prompt directions through
+          /ow:build-proto-prompt.
+        - Do not generate images; do not consume provider image output or prototype review artifacts.
   - packet_id: context:vision2prompt
     command: /ow:vision2prompt
     visibility: internal

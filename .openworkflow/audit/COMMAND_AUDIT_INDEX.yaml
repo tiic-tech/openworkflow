@@ -78,6 +78,29 @@ commands:
     handoff_commands:
       - /ow:proto
       - /ow:vision
+  - id: build-proto-prompt
+    trigger: /ow:build-proto-prompt
+    stage: prototype
+    visibility: internal
+    depth: deep
+    context_packet: context:build-proto-prompt
+    allowed_outputs:
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.md
+      - .openworkflow/prototypes/<id>/REVIEW_PLAN.md
+      - .openworkflow/prototypes/<id>/EVIDENCE.yaml
+      - .openworkflow/prototypes/<id>/NOTE.md
+    conditional_outputs:
+      []
+    forbidden_outputs:
+      - .openworkflow/prototypes/<id>/images/**
+      - .openworkflow/prototypes/<id>/review.html
+      - .openworkflow/specs/**
+      - .openworkflow/changes/**
+      - .openworkflow/runtime/**
+    handoff_commands:
+      - /ow:prompt2proto
   - id: vision2prompt
     trigger: /ow:vision2prompt
     stage: prototype

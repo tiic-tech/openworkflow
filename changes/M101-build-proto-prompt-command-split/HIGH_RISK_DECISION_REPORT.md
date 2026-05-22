@@ -8,6 +8,14 @@ and the prompt2proto skill architecture.
 M100 is complete, so M101 can start. The first selected candidate must remain
 design-only.
 
+C001 approves a design-only internal split as the M101 migration direction:
+keep `/ow:proto` as the user-facing prototype workflow while introducing
+`build-proto-prompt` as the prompt-pack compiler stage and narrowing
+`build-prototype` only after prompt2proto has a real skill contract and source
+foundation. This approval does not authorize registry edits, generated adapter
+sync, source skill implementation, provider-backed generation, visual parity,
+proto2html, storyboard, or motion work.
+
 ## Why High Risk
 
 The split changes command boundaries, generated skills, context packets,
@@ -59,12 +67,51 @@ It owns:
 
 ## Recommended Option
 
-Start with option 1. It gives clearer agent responsibilities while preserving
-the existing user-facing `/ow:proto` workflow. Evaluate option 3 only if
-generated adapters or existing artifacts need a compatibility bridge.
+Approve option 1 for C001. It gives clearer agent responsibilities while
+preserving the existing user-facing `/ow:proto` workflow. Evaluate option 3
+only if generated adapters or existing artifacts need a compatibility bridge.
 
 Do not attempt option 1 until prompt2proto design exists. The command split and
 the skill architecture are coupled.
+
+## Prompt2Proto Architecture Direction
+
+prompt2proto must be designed before it is implemented. Its source skill should
+be comparable to vision2prompt in depth, but with a different responsibility:
+consume a ready `PROTO_PROMPT_PACK` and translate it into credible UI/UX
+prototype instructions, review-ready evidence, and downstream handoff facts.
+
+The prompt2proto method should start from:
+
+- Chief PM perspective for product intent, user decision context, workflow
+  priority, domain fit, and outcome credibility.
+- Principal UI/UX / product design lead perspective for visual hierarchy,
+  density calibration, layout anatomy, affordance clarity, interaction
+  believability, and prototype inspection quality.
+
+It should explicitly separate:
+
+- technical multi-screen consistency, which belongs in the
+  `build-proto-prompt` prototype system or screen coherence contract; from
+- information density calibration, which belongs in `build-prototype` through
+  Chief PM plus Principal UI/UX design judgment.
+
+prompt2proto must not claim provider image quality, human visual review, visual
+reference parity, proto2html readiness, storyboard coverage, or motion modeling.
+
+## Migration Guardrails
+
+- Treat `/ow:proto` as the compatibility-preserving orchestration surface unless
+  a later candidate proves a separate user-visible split is safer.
+- Introduce `build-proto-prompt` before requiring `build-prototype` to consume
+  ready prompt packs.
+- Design prompt2proto in C002 before creating its source skill foundation in
+  C004.
+- Add coherence contracts to prompt-pack outputs before final build-prototype
+  narrowing.
+- Keep generated `.agents/**` and `.openworkflow/**` changes out of C001.
+- Do not update command registry, validators, runtime-surface assertions, or
+  generated adapters until the relevant implementation candidates are selected.
 
 ## Guardrails
 

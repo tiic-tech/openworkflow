@@ -16,6 +16,7 @@ const SKILL_NAMES = [
   "ow-context",
   "ow-vision",
   "ow-validation",
+  "ow-build-proto-prompt",
   "ow-vision2prompt",
   "ow-prompt2proto",
   "ow-proto",
@@ -1414,6 +1415,9 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-vision2prompt") {
       verifyVision2PromptSkill(skillContent);
     }
+    if (name === "ow-build-proto-prompt") {
+      verifyBuildProtoPromptSkill(skillContent);
+    }
     if (name === "ow-prompt2proto") {
       verifyPrompt2ProtoSkill(skillContent);
     }
@@ -2108,6 +2112,24 @@ function verifyVision2PromptSkill(content: string): void {
   }
 }
 
+function verifyBuildProtoPromptSkill(content: string): void {
+  for (const required of [
+    "internal-build-proto-prompt-pack-compiler",
+    "<command_visibility>internal</command_visibility>",
+    "Co-Founder plus Chief PM",
+    "skills/build-proto-prompt/SKILL.md",
+    "prompt-pack compiler",
+    "prompt_text_manifest.status ready_for_image_generation",
+    "prompt_text_manifest.paragraph_quality_status is pass",
+    "repair through /ow:build-proto-prompt",
+    "Do not generate images",
+    "Do not consume provider image output",
+    "Do not narrow build-prototype behavior",
+  ]) {
+    assert(content.includes(required), `ow-build-proto-prompt missing compiler guidance: ${required}`);
+  }
+}
+
 function verifyPrompt2ProtoSkill(content: string): void {
   for (const required of [
     "internal-prompt-text-to-prototype-images",
@@ -2222,6 +2244,7 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const protoSection = commandIndex.split("trigger: /ow:proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const tuneSection = commandIndex.split("trigger: /ow:tune", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const buildProtoPromptSection = commandIndex.split("trigger: /ow:build-proto-prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const vision2PromptSection = commandIndex.split("trigger: /ow:vision2prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const prompt2ProtoSection = commandIndex.split("trigger: /ow:prompt2proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
@@ -2233,6 +2256,7 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(extractBlock(tuneSection, "forbidden_outputs").includes("review.html"), "tune forbidden outputs missing HTML review surface");
   assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
+  assert(buildProtoPromptSection.includes("visibility: internal"), "build-proto-prompt command is not internal");
   assert(vision2PromptSection.includes("visibility: internal"), "vision2prompt command is not internal");
   assert(prompt2ProtoSection.includes("visibility: internal"), "prompt2proto command is not internal");
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:vision2prompt"), "proto exposes vision2prompt as user-facing handoff");
@@ -2611,6 +2635,8 @@ async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.Proce
   assert(!(await exists(join(root, ".openworkflow", "html-prototypes"))), "dogfood benchmark readiness must not create proto2html artifacts");
   assert(!(await exists(join(root, ".openworkflow", "html2spec"))), "dogfood benchmark readiness must not create html2spec artifacts");
   assert(commandAudit.indexOf("trigger: /ow:vision") < commandAudit.indexOf("trigger: /ow:validation"), "command audit should order vision before validation");
+  assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:build-proto-prompt"), "command audit should order validation before build-proto-prompt compilation");
+  assert(commandAudit.indexOf("trigger: /ow:build-proto-prompt") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should expose build-proto-prompt before legacy vision2prompt compatibility");
   assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should order validation before internal prompt compilation");
   assert(commandAudit.indexOf("trigger: /ow:vision2prompt") < commandAudit.indexOf("trigger: /ow:prompt2proto"), "command audit should order vision2prompt before prompt2proto");
   assert(commandAudit.indexOf("trigger: /ow:prompt2proto") < commandAudit.indexOf("trigger: /ow:proto"), "command audit should expose internal prompt2proto before user proto orchestration handoff");
@@ -2618,6 +2644,7 @@ async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.Proce
   assert(commandAudit.indexOf("trigger: /ow:tune") < commandAudit.indexOf("trigger: /ow:decision"), "command audit should order tune before internal decision audit");
   assert(extractBlock(commandAudit.split("trigger: /ow:tune", 2)[1] ?? "", "handoff_commands").includes("/ow:design"), "tune handoff should reach design after benchmark decision");
   assert(!commandAudit.includes("trigger: /ow:proto2html"), "happy-path dogfood should not enter proto2html");
+  assert(contextPackets.includes("packet_id: context:build-proto-prompt"), "context packets should include internal build-proto-prompt stage");
   assert(contextPackets.includes("packet_id: context:vision2prompt"), "context packets should include internal vision2prompt stage");
   assert(contextPackets.includes("packet_id: context:prompt2proto"), "context packets should include internal prompt2proto stage");
   assert(extractBlock(contextPackets.split("packet_id: context:tune", 2)[1] ?? "", "optional").includes(".openworkflow/prototypes/PROTOTYPE_INDEX.yaml"), "tune context should allow prototype index handoff");

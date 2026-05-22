@@ -25,24 +25,42 @@ scope_boundary: >
   visual prototype instructions, evidence, and review-ready outputs.
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 7
-active_candidate_count: 7
-completed_candidate_id: null
-completed_change_id: null
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C001
+active_candidate_count: 3
+completed_candidate_id: C003
+completed_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+selected_candidate_id: C003
+selected_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+next_recommended_candidate_id: C005
 high_risk_report: changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
 outputs:
   candidate_changes_yaml: changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
   summary: changes/M101-build-proto-prompt-command-split/SUMMARY.yaml
   high_risk_decision_report: changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  c001_selected_change: changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/SELECTED_CHANGE.yaml
+  c001_atom_tasks: changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml
+  c001_implementation_brief: changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/IMPLEMENTATION_BRIEF.md
+  c002_selected_change: changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/IMPLEMENTATION_BRIEF.md
+  c002_skill_design: changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/PROMPT2PROTO_SKILL_DESIGN.md
+  c003_selected_change: changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/SELECTED_CHANGE.yaml
+  c003_atom_tasks: changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/ATOM_TASKS.yaml
+  c003_implementation_brief: changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_BRIEF.md
+  c003_implementation_evidence: changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md
+  c004_selected_change: changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_BRIEF.md
+  c004_implementation_evidence: changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md
+  build_proto_prompt_skill: skills/build-proto-prompt/SKILL.md
+  prompt2proto_skill: skills/prompt2proto/SKILL.md
 key_dependencies:
-  - M100 is complete; M101 C001 is now eligible for selection.
-  - C001 must approve command split option, prompt2proto skill architecture, and migration guardrails before source edits.
-  - C002 designs prompt2proto before C004 creates the skill foundation.
-  - C003 introduces build-proto-prompt before C005 adds cross-screen coherence contracts.
-  - C004 and C006 must exist before C007 narrows build-prototype to prompt2proto consumption.
+  - M100 is complete.
+  - C001 is complete; option 1 is approved as the internal split direction preserving /ow:proto as the user-facing orchestration surface.
+  - C002 is complete; prompt2proto role engine, input contract, reference architecture, output evidence shape, and no-go boundaries are designed.
+  - C004 is complete; source prompt2proto skill foundation exists under skills/prompt2proto using the user-requested skill_generator method.
+  - C003 is complete; /ow:build-proto-prompt exists as an internal command while /ow:vision2prompt remains compatible for later migration.
+  - C005 and C006 are now ready; C004 and C006 must exist before C007 narrows build-prototype to prompt2proto consumption.
 risks:
   - id: R001
     level: high
@@ -75,7 +93,19 @@ validation:
     - node dist/cli/src/index.js validate --root . --json
     - node dist/cli/src/index.js summaries --root . --strict --json
     - git diff --check
+    - ruby -e 'require "yaml"; %w[changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/SELECTED_CHANGE.yaml changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml].each { |p| YAML.load_file(p); puts "ok #{p}" }'
+    - rg -n "prompt2proto|Chief PM|Principal UI|visual hierarchy|density|coherence" skills/prompt2proto skills/build-prototype
+    - npm run build
+    - node dist/cli/src/index.js sync --root . --json
+    - npm run verify:runtime-surface
   notes:
     - Created originally on codex/m100-dailin-grade-image-prompt-paragraphs while M100 C007 work was in progress, per user request to record M101 before returning to M100.
     - Current implementation branch is codex/m101-build-proto-prompt-command-split.
     - M101 planning now treats prompt2proto skill design as a prerequisite for command split implementation.
+    - C001 selected the design-only high-risk gate and approved option 1: preserve /ow:proto as the user-facing orchestration surface, introduce build-proto-prompt as the prompt-pack compiler stage, and narrow build-prototype only after prompt2proto is designed and founded.
+    - C002 completed prompt2proto contract design before C004 source skill creation.
+    - C004 created skills/prompt2proto with a lean SKILL.md, UI metadata, role engine, input contract, readiness checks, visual translation workflow, output contract, and quality rubric.
+    - The user-requested skill_generator path /Users/archy/Documents/Codex/2026-05-22/files-mentioned-by-the-user-skill/skill_generator was used as the role-engine and reference-architecture method for C002/C004.
+    - No command registry, generated adapter, .agents/**, or .openworkflow/** surface was changed by C004.
+    - C003 added /ow:build-proto-prompt as an internal compiler command and generated ow-build-proto-prompt while preserving /ow:vision2prompt compatibility.
+    - C003 deliberately did not narrow build-prototype or remove the legacy internal vision2prompt command; that remains for later migration candidates.

@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-create-prompt2proto-source-skill-foundation
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C004
+selected_change_id: C004-create-prompt2proto-source-skill-foundation
+status: completed
+tasks:
+  - task_id: T001
+    title: Create prompt2proto source skill shell
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/prompt2proto/SKILL.md
+      - skills/prompt2proto/agents/openai.yaml
+    done_when: Source skill has metadata, lean workflow guidance, input/output boundaries, and UI metadata.
+  - task_id: T002
+    title: Create prompt2proto reference toolkit
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/prompt2proto/references/
+    done_when: Numbered references cover role engine, input contract, readiness checks, visual translation, output contract, and quality rubric.
+  - task_id: T003
+    title: Validate prompt2proto foundation
+    status: completed
+    type: verify
+    owned_paths:
+      - skills/prompt2proto/
+      - changes/M101-build-proto-prompt-command-split/
+    done_when: Search checks and OpenWorkflow validation pass without generated adapter or managed audit surface edits.

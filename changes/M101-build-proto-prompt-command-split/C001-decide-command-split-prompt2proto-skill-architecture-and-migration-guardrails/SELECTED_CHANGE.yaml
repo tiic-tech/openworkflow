@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C001
+title: Decide command split, prompt2proto skill architecture, and migration guardrails
+status: completed
+selection_reason: >
+  C001 is the queue's ready high-risk gate and the user explicitly approved the
+  design-only option. The approved migration direction is option 1 from the
+  high-risk report: preserve /ow:proto as the user-facing orchestration surface,
+  introduce build-proto-prompt as the prompt-pack compiler stage, and narrow
+  build-prototype only after prompt2proto has a comparable skill contract and
+  foundation. This selection authorizes planning artifacts and the high-risk
+  decision report only, not source skill, registry, generated adapter, managed
+  audit surface, provider, visual parity, proto2html, storyboard, or motion work.
+scope:
+  includes:
+    - define the new build-proto-prompt command responsibility
+    - define the narrowed build-prototype prompt2proto responsibility
+    - decide whether /ow:vision2prompt remains internal, becomes an alias, or is replaced by /ow:build-proto-prompt
+    - decide whether /ow:proto orchestrates both stages or exposes separate user steps
+    - define prompt2proto skill architecture before implementation
+    - define migration guardrails for existing /ow:proto and generated skills
+  excludes:
+    - implementation source edits
+    - generated skill sync
+    - provider image generation
+    - M100 prompt paragraph content work
+owned_paths:
+  - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - skills/build-proto-prompt/
+  - skills/build-prototype/
+  - skills/prompt2proto/
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/**
+  - .openworkflow/**
+  - provider-backed image generation implementation
+  - human visual review artifacts
+  - visual reference parity scoring
+  - proto2html implementation
+  - storyboard or motion modeling
+acceptance:
+  - The decision report records concrete split options, recommended option, risks, guardrails, go criteria, and stop criteria.
+  - The report states M100 is complete and M101 is now eligible for C001 selection only.
+  - The report defines build-proto-prompt as prompt-pack compiler and build-prototype as prompt2proto visual prototype consumer.
+  - The report records that prompt2proto skill design is a prerequisite, not an implementation detail.
+  - No implementation source, generated skill, or managed audit surface is changed by this candidate.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C002
+    reason: prompt2proto contract design depends on the C001 high-risk split decision.
+  - id: C003
+    reason: build-proto-prompt command implementation is forbidden until the C001 decision gate is recorded.
+  - id: C004
+    reason: prompt2proto source skill creation requires C001 and C002 first.

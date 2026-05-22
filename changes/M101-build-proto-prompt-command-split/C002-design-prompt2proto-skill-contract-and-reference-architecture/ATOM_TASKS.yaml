@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-design-prompt2proto-skill-contract-and-reference-architecture
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C002
+selected_change_id: C002-design-prompt2proto-skill-contract-and-reference-architecture
+status: completed
+tasks:
+  - task_id: T001
+    title: Define prompt2proto role engine and input contract
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/
+    done_when: Design states Chief PM plus Principal UI/UX roles and requires ready PROTO_PROMPT_PACK gates before translation.
+  - task_id: T002
+    title: Define reference architecture
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/
+    done_when: Design maps role engine, input readiness, coherence checks, visual translation, output contract, and quality rubric.
+  - task_id: T003
+    title: Preserve downstream boundaries
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/
+    done_when: Design excludes provider generation, human visual review, visual parity, proto2html, storyboard, and motion.

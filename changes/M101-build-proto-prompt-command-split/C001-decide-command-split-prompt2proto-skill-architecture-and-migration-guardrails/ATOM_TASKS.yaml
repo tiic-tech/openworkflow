@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C001
+selected_change_id: C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+status: completed
+tasks:
+  - task_id: T001
+    title: Confirm high-risk split decision
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+    done_when: The report records the approved design-only split option, prompt2proto architecture direction, migration guardrails, go criteria, and stop criteria.
+  - task_id: T002
+    title: Preserve C001 selection boundary
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
+    done_when: Selection artifacts and queue operation logs show C001 is selected and remains design-only.
+  - task_id: T003
+    title: Validate planning-only artifacts
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/
+    done_when: validate, strict summaries, and diff checks pass without source, generated adapter, or managed audit surface changes.

@@ -303,15 +303,20 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
 
 async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void> {
   const phase = "internal-proto-pipeline";
+  const buildProtoPrompt = command("build-proto-prompt", phase);
   const vision2Prompt = command("vision2prompt", phase);
   const prompt2Proto = command("prompt2proto", phase);
+  assertPhase(phase, buildProtoPrompt.visibility === "internal", "source build-proto-prompt command is not internal");
   assertPhase(phase, vision2Prompt.visibility === "internal", "source vision2prompt command is not internal");
   assertPhase(phase, prompt2Proto.visibility === "internal", "source prompt2proto command is not internal");
+  assertPhase(phase, protocolFor(buildProtoPrompt, phase).interactionMode === "internal-build-proto-prompt-pack-compiler", "build-proto-prompt source protocol mismatch");
   assertPhase(phase, protocolFor(vision2Prompt, phase).interactionMode === "internal-vision-to-strategic-prompt-text", "vision2prompt source protocol mismatch");
   assertPhase(phase, protocolFor(prompt2Proto, phase).interactionMode === "internal-prompt-text-to-prototype-images", "prompt2proto source protocol mismatch");
 
+  const generatedBuildProtoPrompt = commandRecord(runtime, "build-proto-prompt", phase);
   const generatedVision2Prompt = commandRecord(runtime, "vision2prompt", phase);
   const generatedPrompt2Proto = commandRecord(runtime, "prompt2proto", phase);
+  assertPhase(phase, stringField(generatedBuildProtoPrompt, "visibility", phase) === "internal", "generated build-proto-prompt command is not internal");
   assertPhase(phase, stringField(generatedVision2Prompt, "visibility", phase) === "internal", "generated vision2prompt command is not internal");
   assertPhase(phase, stringField(generatedPrompt2Proto, "visibility", phase) === "internal", "generated prompt2proto command is not internal");
 
@@ -319,8 +324,12 @@ async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void>
   assertListExcludes(phase, protoHandoffs, "/ow:vision2prompt", "proto exposes vision2prompt as user handoff");
   assertListExcludes(phase, protoHandoffs, "/ow:prompt2proto", "proto exposes prompt2proto as user handoff");
 
+  const buildProtoPromptSkill = await readSkill(runtime, "ow-build-proto-prompt");
   const vision2PromptSkill = await readSkill(runtime, "ow-vision2prompt");
   const prompt2ProtoSkill = await readSkill(runtime, "ow-prompt2proto");
+  assertIncludes(phase, buildProtoPromptSkill, "<command_visibility>internal</command_visibility>", "build-proto-prompt skill is not internal");
+  assertIncludes(phase, buildProtoPromptSkill, "internal-build-proto-prompt-pack-compiler", "build-proto-prompt skill missing compiler mode");
+  assertIncludes(phase, buildProtoPromptSkill, "Do not generate images", "build-proto-prompt skill missing image boundary");
   assertIncludes(phase, vision2PromptSkill, "<command_visibility>internal</command_visibility>", "vision2prompt skill is not internal");
   assertIncludes(phase, vision2PromptSkill, "ready_for_image_generation", "vision2prompt skill missing prompt readiness output");
   assertIncludes(phase, vision2PromptSkill, "product_experience_model", "vision2prompt skill missing product experience model output");

@@ -76,10 +76,10 @@ scope_control:
         Visual parity requires generated images or rendered prototypes and a
         separate review method.
       suggested_plan_id: M103-prototype-visual-reference-parity-gate
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C005
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Decide command split, prompt2proto skill architecture, and migration guardrails
     purpose: >
       Convert the command split and newly identified prompt2proto skill gap
@@ -117,8 +117,17 @@ changes:
       - The report defines build-proto-prompt as prompt-pack compiler and build-prototype as prompt2proto visual prototype consumer.
       - The report records that prompt2proto skill design is a prerequisite, not an implementation detail.
       - No implementation source, generated skill, or managed audit surface is changed by this candidate.
+    selection:
+      selected_change_id: C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+      selected_at: 2026-05-23
+      reason: >
+        User approved the high-risk design-only option for C001. Selection
+        records option 1 as the migration direction: preserve /ow:proto as the
+        user-facing orchestration surface, introduce build-proto-prompt as the
+        prompt-pack compiler stage, and narrow build-prototype only after
+        prompt2proto has a comparable skill contract and foundation.
   - id: C002
-    status: candidate
+    status: done
     title: Design prompt2proto skill contract and reference architecture
     purpose: >
       Design a prompt2proto skill comparable in quality to the M100
@@ -156,8 +165,23 @@ changes:
       - The design explicitly separates technical multi-screen consistency from design judgment about density and information hierarchy.
       - The design names Chief PM and Principal UI/UX perspectives as the build-prototype philosophy engine.
       - The design does not claim provider image quality, human visual review, visual parity, proto2html, storyboard, or motion modeling.
+    selection:
+      selected_change_id: C002-design-prompt2proto-skill-contract-and-reference-architecture
+      selected_at: 2026-05-23
+      reason: >
+        C002 became eligible after C001 completed the high-risk design-only
+        split decision. It was selected and completed to define prompt2proto's
+        role engine, input contract, reference architecture, output evidence
+        shape, and no-go boundaries before source skill creation.
+    completion:
+      completed_change_id: C002-design-prompt2proto-skill-contract-and-reference-architecture
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/PROMPT2PROTO_SKILL_DESIGN.md
+        - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/SELECTED_CHANGE.yaml
+        - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/ATOM_TASKS.yaml
   - id: C003
-    status: candidate
+    status: done
     title: Introduce build-proto-prompt command and source skill boundary
     purpose: >
       Add the new prompt-pack compiler command surface after the split contract
@@ -200,8 +224,29 @@ changes:
       - The new command is generated as an owned skill with a clear prompt-pack compiler boundary.
       - Generated guidance does not consume provider images or prototype review artifacts.
       - Runtime-surface verification proves the command exists and is ordered before build-prototype consumption.
+    selection:
+      selected_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+      selected_at: 2026-05-23
+      reason: >
+        C003 was the next recommended ready candidate after C001 approved the
+        internal split and C002/C004 closed the prompt2proto skill gap. The
+        selected migration adds /ow:build-proto-prompt while preserving
+        /ow:vision2prompt compatibility for later narrowing.
+    completion:
+      completed_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+      completed_at: 2026-05-23
+      evidence:
+        - packages/core/src/commands/registry.ts
+        - skills/build-proto-prompt/SKILL.md
+        - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+        - skills/build-proto-prompt/references/output-boundary.md
+        - .agents/skills/ow-build-proto-prompt/SKILL.md
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md
   - id: C004
-    status: candidate
+    status: done
     title: Create prompt2proto source skill foundation
     purpose: >
       Build the missing prompt2proto skill foundation so build-prototype has a
@@ -238,8 +283,27 @@ changes:
       - A prompt2proto source skill exists with reference quality comparable to vision2prompt.
       - The skill starts from a Chief PM plus Principal UI/UX philosophy engine.
       - The skill consumes ready prompt packs and translates them into visual prototype instructions and evidence without claiming generated image quality.
+    selection:
+      selected_change_id: C004-create-prompt2proto-source-skill-foundation
+      selected_at: 2026-05-23
+      reason: >
+        User explicitly approved implementation focused on prompt2proto SKILL
+        creation and required the user-provided skill_generator to be part of
+        tool selection. C004 became eligible after C001 and C002 completed.
+    completion:
+      completed_change_id: C004-create-prompt2proto-source-skill-foundation
+      completed_at: 2026-05-23
+      evidence:
+        - skills/prompt2proto/SKILL.md
+        - skills/prompt2proto/references/00_role_philosophy_engine.md
+        - skills/prompt2proto/references/01_input_contract.md
+        - skills/prompt2proto/references/02_prompt_pack_readiness.md
+        - skills/prompt2proto/references/03_visual_translation_workflow.md
+        - skills/prompt2proto/references/04_output_contract.md
+        - skills/prompt2proto/references/05_quality_rubric.md
+        - changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md
   - id: C005
-    status: candidate
+    status: ready
     title: Add prototype system coherence contract to build-proto-prompt
     purpose: >
       Address multi-screen drift as a technical prompt-pack consistency
@@ -280,7 +344,7 @@ changes:
       - build-prototype guidance consumes those invariants instead of inventing consistency after the fact.
       - The contract treats drift as a technical consistency issue, not as visual parity proof.
   - id: C006
-    status: candidate
+    status: ready
     title: Inject Chief PM and Principal UI/UX philosophy engine into build-prototype
     purpose: >
       Address density calibration and visual information judgment as a design
@@ -415,3 +479,101 @@ operations:
       - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
       - changes/M101-build-proto-prompt-command-split/SUMMARY.yaml
       - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 after explicit user approval of the design-only high-risk
+      gate. The selection approves option 1 as the M101 migration direction
+      while forbidding source skill, registry, generated adapter, managed audit
+      surface, provider, visual parity, proto2html, storyboard, and motion work.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+      - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/SELECTED_CHANGE.yaml
+      - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml
+      - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete the design-only high-risk split decision after validation passed
+      and no source skill, registry, generated adapter, or managed audit
+      surface was changed by C001.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+      - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select and complete C002 to record the prompt2proto skill contract and
+      reference architecture before source skill creation.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/PROMPT2PROTO_SKILL_DESIGN.md
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/SELECTED_CHANGE.yaml
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/ATOM_TASKS.yaml
+      - changes/M101-build-proto-prompt-command-split/C002-design-prompt2proto-skill-contract-and-reference-architecture/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+      - C003
+      - C006
+    actor: agent
+    reason: >
+      Complete C004 by creating the source prompt2proto skill foundation using
+      skill_generator-informed role and reference structure. Mark C003 and C006
+      ready because their dependencies are now satisfied.
+    changed_at: 2026-05-23
+    before_status: C004 candidate; C003 candidate; C006 candidate
+    after_status: C004 done; C003 ready; C006 ready
+    evidence:
+      - skills/prompt2proto/SKILL.md
+      - skills/prompt2proto/agents/openai.yaml
+      - skills/prompt2proto/references/00_role_philosophy_engine.md
+      - skills/prompt2proto/references/01_input_contract.md
+      - skills/prompt2proto/references/02_prompt_pack_readiness.md
+      - skills/prompt2proto/references/03_visual_translation_workflow.md
+      - skills/prompt2proto/references/04_output_contract.md
+      - skills/prompt2proto/references/05_quality_rubric.md
+      - changes/M101-build-proto-prompt-command-split/C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+      - C005
+    actor: agent
+    reason: >
+      Complete C003 by adding the internal /ow:build-proto-prompt source
+      command, source skill, generated Codex skill, command audit/context
+      packets, and runtime-surface assertions. Mark C005 ready because the
+      build-proto-prompt compiler boundary now exists.
+    changed_at: 2026-05-23
+    before_status: C003 ready; C005 candidate
+    after_status: C003 done; C005 ready
+    evidence:
+      - packages/core/src/commands/registry.ts
+      - skills/build-proto-prompt/SKILL.md
+      - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+      - skills/build-proto-prompt/references/output-boundary.md
+      - .agents/skills/ow-build-proto-prompt/SKILL.md
+      - .agents/skills/ow-build-proto-prompt/agents/openai.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md

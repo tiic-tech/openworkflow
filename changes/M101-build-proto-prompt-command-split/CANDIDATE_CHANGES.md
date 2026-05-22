@@ -52,20 +52,51 @@ quality comparable to the M100 vision2prompt skill.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | ready | high | Decide command split, prompt2proto skill architecture, and migration guardrails | none |
-| C002 | candidate | high | Design prompt2proto skill contract and reference architecture | C001 |
-| C003 | candidate | high | Introduce build-proto-prompt command and source skill boundary | C001 |
-| C004 | candidate | high | Create prompt2proto source skill foundation | C001, C002 |
-| C005 | candidate | high | Add prototype system coherence contract to build-proto-prompt | C001, C003 |
-| C006 | candidate | high | Inject Chief PM and Principal UI/UX philosophy engine into build-prototype | C001, C002, C004 |
+| C001 | done | high | Decide command split, prompt2proto skill architecture, and migration guardrails | none |
+| C002 | done | high | Design prompt2proto skill contract and reference architecture | C001 |
+| C003 | done | high | Introduce build-proto-prompt command and source skill boundary | C001 |
+| C004 | done | high | Create prompt2proto source skill foundation | C001, C002 |
+| C005 | ready | high | Add prototype system coherence contract to build-proto-prompt | C001, C003 |
+| C006 | ready | high | Inject Chief PM and Principal UI/UX philosophy engine into build-prototype | C001, C002, C004 |
 | C007 | candidate | high | Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto | C001, C003, C004, C005, C006 |
+
+## Current Status
+
+M100 is complete and `C001` is done as the high-risk design-only gate.
+The approved migration direction remains option 1 from the decision report:
+preserve `/ow:proto` as the user-facing orchestration surface, introduce
+`build-proto-prompt` as the prompt-pack compiler stage, and narrow
+`build-prototype` only after prompt2proto has a comparable skill contract and
+foundation.
+
+`C002` is done with a prompt2proto skill contract and reference architecture.
+`C004` is done with a new source skill foundation under `skills/prompt2proto/`,
+created using the user-requested `skill_generator` method: role engine first,
+lean skill shell, numbered references, and internal validation boundaries.
+`C003` is done with a new internal `/ow:build-proto-prompt` command, source
+skill boundary, generated Codex skill, command audit/context packet updates,
+and runtime-surface assertions.
+
+Current completed artifacts:
+
+- `C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/SELECTED_CHANGE.yaml`
+- `C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml`
+- `C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/IMPLEMENTATION_BRIEF.md`
+- `C002-design-prompt2proto-skill-contract-and-reference-architecture/PROMPT2PROTO_SKILL_DESIGN.md`
+- `C003-introduce-build-proto-prompt-command-and-source-skill-boundary/IMPLEMENTATION_EVIDENCE.md`
+- `C004-create-prompt2proto-source-skill-foundation/IMPLEMENTATION_EVIDENCE.md`
+- `skills/build-proto-prompt/SKILL.md`
+- `skills/prompt2proto/SKILL.md`
+
+No command registry, generated adapter, `.agents/**`, or `.openworkflow/**`
+managed audit surface changes were made.
 
 ## Next Recommendation
 
-M100 is complete. Select `C001` next, but keep it design-only. C001 should
-approve the command split option, the prompt2proto skill architecture, and the
-migration guardrails before any source skill, registry, generated adapter, or
-managed audit surface changes.
+Select `C005` next if the goal is to add the prototype system coherence
+contract to the new prompt compiler before final narrowing. Select `C006` next
+if the goal is to wire the new prompt2proto philosophy engine into existing
+`build-prototype` guidance first.
 
 ## Key Split
 

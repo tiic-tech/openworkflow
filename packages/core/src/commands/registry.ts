@@ -62,6 +62,15 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     validationProtocol(),
   ),
   command(
+    "build-proto-prompt",
+    ["build-prototype-prompt"],
+    "Internally compile ready vision and validation into ready prototype prompt packs.",
+    "prototype",
+    [".openworkflow/prototypes/"],
+    buildProtoPromptProtocol(),
+    "internal",
+  ),
+  command(
     "vision2prompt",
     ["vision-to-strategic-prototype-prompt"],
     "Internally compile ready vision and validation into strategic prototype prompt text.",
@@ -1023,6 +1032,128 @@ function vision2PromptProtocol(): CommandProtocol {
           "For resolved_count 2 or more, require post_validate.status: pass before image generation.",
           "For resolved_count 1 from explicit user input, set post_validate.status: skipped and record why the diversity gate did not run.",
           "For post_validate.status: fail, repair strategic prompt directions inside /ow:vision2prompt instead of invoking /ow:prompt2proto.",
+        ],
+      },
+    ],
+    handoffCommands: ["/ow:prompt2proto"],
+  };
+}
+
+function buildProtoPromptProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "internal-build-proto-prompt-pack-compiler",
+    requiredContext: [
+      ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
+      ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
+      ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/vision/VISION.md",
+      ".openworkflow/validation/**/VALIDATION.yaml",
+    ],
+    optionalContext: [
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      "skills/build-proto-prompt/SKILL.md",
+      "skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md",
+      "skills/build-proto-prompt/references/output-boundary.md",
+    ],
+    forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
+    allowedOutputs: [
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.md",
+      ".openworkflow/prototypes/<id>/REVIEW_PLAN.md",
+      ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
+      ".openworkflow/prototypes/<id>/NOTE.md",
+    ],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/<id>/images/**",
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Run only as an internal prompt-pack compiler stage after /ow:proto preflight has confirmed vision and validation are ready.",
+        "Load skills/build-proto-prompt/SKILL.md and its references before compiling PROTO_PROMPT_PACK.",
+        "Adopt the Co-Founder plus Chief PM / senior product strategist perspective engine before generating directions.",
+        "Resolve direction_count_policy before writing prompt text; do not silently default the direction count.",
+        "Prepare to infer product_experience_model before strategic directions, including product archetype, primary canvas, information architecture, domain objects, state model, data realism, visual language, anti-generic constraints, and category quality bar.",
+        "Prepare to write dailin-grade long-form prompt paragraphs; prompt text must include journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling, and concrete content.",
+      ],
+      during: [
+        "Compile durable vision and validation into strategic_core, prototype_brief, product_experience_model, screen_manifest, global_design_system_prompt, directions, screen_prompts, review_plan, and readiness gates.",
+        "Each selected direction must carry product_thesis, user_transformation, differentiated product form, reason_to_exist, and pm_judgment before screen prompt anatomy.",
+        "Decide whether source concepts are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.",
+        "Write complete multi-image prompt text for every selected direction with screen_prompts, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest target_screen_id values.",
+        "Populate prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric.prompt_executability, quality_rubric.prompt_paragraph_quality, prompt_text_manifest.paragraph_quality_status, and post_validate before handoff.",
+        "Keep image_generation.status: not_started while this compiler stage runs.",
+      ],
+      after: [
+        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation only when all readiness gates pass.",
+        "Hand internally to /ow:prompt2proto only when prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass, quality_rubric.prompt_executability.status is pass, prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or skipped.",
+        "If any readiness gate fails, keep handoff blocked and repair prompt directions through /ow:build-proto-prompt.",
+        "Do not generate images; do not consume provider image output or prototype review artifacts.",
+      ],
+    },
+    antiPatterns: [
+      "Do not expose /ow:build-proto-prompt as a user-facing workflow step.",
+      "Do not generate prototype images from this stage.",
+      "Do not consume provider image output, human visual review, visual parity scores, proto2html artifacts, specs, changes, or runtime state.",
+      "Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.",
+      "Do not treat YAML field completion as quality when the prompt lacks product thesis, user transformation, reason-to-exist, or design philosophy.",
+      "Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.",
+      "Do not hand off to /ow:prompt2proto when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, paragraph quality, or prompt executability is missing or failing.",
+    ],
+    internalSections: [
+      {
+        tag: "internal_command_boundary",
+        items: [
+          "/ow:build-proto-prompt is internal and is invoked by /ow:proto orchestration, not by the user.",
+          "Its only job is prompt-pack compilation from ready vision and validation artifacts.",
+          "Its output must be ready for prompt2proto consumption.",
+          "Keep /ow:vision2prompt compatibility until a later migration candidate explicitly removes or aliases it.",
+        ],
+      },
+      {
+        tag: "prompt_pack_compiler_role",
+        items: [
+          "Start from a Co-Founder plus Chief PM / senior product strategist perspective before executing the prompt-pack compiler references.",
+          "Ask what product should exist, why this prototype matters, which form best expresses the vision, and what user transformation should become visible.",
+          "Every selected direction must include product_thesis, user_transformation, differentiated product form, reason_to_exist, and pm_judgment.",
+          "Reject complete-but-soulless prompt paragraphs that list screens but do not make a product argument.",
+        ],
+      },
+      {
+        tag: "source_skill_reference",
+        items: [
+          "Load skills/build-proto-prompt/SKILL.md as the source behavior for this command.",
+          "Load skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md before writing prompt-pack outputs.",
+          "Load skills/build-proto-prompt/references/output-boundary.md before handoff.",
+          "The legacy vision2prompt references may be reused as detailed prompt-generation tools until the compiler references are fully split.",
+        ],
+      },
+      {
+        tag: "prompt_pack_readiness_gate",
+        items: [
+          "prompt_text_manifest.status cannot become ready_for_image_generation until prompt_pack_integrity_gate.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until prototype_reality_gate.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until quality_rubric.prompt_executability.status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until prompt_text_manifest.paragraph_quality_status is pass.",
+          "prompt_text_manifest.status cannot become ready_for_image_generation until every direction screen_prompt target_screen_id resolves to screen_manifest.",
+          "When a gate fails or is missing, set image_generation.status: not_started and repair through /ow:build-proto-prompt before handoff.",
+        ],
+      },
+      {
+        tag: "downstream_boundary",
+        items: [
+          "Do not generate images.",
+          "Do not perform human visual review.",
+          "Do not claim visual reference parity.",
+          "Do not create proto2html, specs, changes, or runtime artifacts.",
+          "Do not narrow build-prototype behavior in this command-boundary candidate.",
         ],
       },
     ],
