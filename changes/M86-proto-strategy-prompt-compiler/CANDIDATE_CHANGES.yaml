@@ -73,7 +73,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after prompt
         generation and tuning stabilize.
       suggested_plan_id: M90-proto2html-benchmark-input
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -257,7 +257,7 @@ changes:
       evidence:
         - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: candidate
+    status: selected
     title: Add strategic prompt-pack stress fixtures
     purpose: >
       Pressure-test /ow:proto against weak, style-only, and high-quality
@@ -297,6 +297,13 @@ changes:
       - Tests reject directions that only differ by visual style.
       - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
       - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+    selection:
+      selected_change_id: C004-strategic-prompt-pack-stress-fixtures
+      reason: >
+        Select C004 directly inside the current M86 queue because it is the
+        only active candidate, all dependencies are complete, and it pressure
+        tests the decomposed proto pipeline before tune work begins.
+      selected_at: 2026-05-22
   - id: C005
     status: done
     title: Define internal proto pipeline and image metadata
@@ -511,3 +518,19 @@ operations:
     after_status: done
     evidence:
       - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the only active remaining M86 candidate after C005
+      completed; no cross-queue analyze-changes run is needed for a single
+      active queue.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/IMPLEMENTATION_BRIEF.md

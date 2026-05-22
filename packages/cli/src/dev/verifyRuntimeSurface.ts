@@ -56,6 +56,7 @@ async function main(): Promise<number> {
     await verifyNoDefaultPrompts(codexHome);
     await verifyDesignContract(target);
     await verifyTuneDecisionSurface(target);
+    await verifyStrategicPromptPackStressFixtures(target, env);
     await verifyNoDefaultCodexCommands(target);
     await verifyNonDestructiveSyncMigration(tempRoot, env);
   } finally {
@@ -2213,6 +2214,216 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   ]) {
     assert(!(await exists(join(root, forbiddenPath))), `init eagerly created stage path: ${forbiddenPath}`);
   }
+}
+
+async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const fixtureDir = join(root, ".openworkflow", "prototypes", "proto-stress-fixtures");
+  await mkdir(fixtureDir, { recursive: true });
+
+  const thinPath = join(fixtureDir, "THIN_PROTO_PROMPT_PACK.yaml");
+  await writeFile(thinPath, thinStrategicPromptPackFixture(), "utf8");
+  const thin = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(thin.code !== 0, "thin strategic prompt-pack fixture should fail validation");
+  assert(thin.output.includes("normalized_input must be a mapping"), "thin strategic prompt-pack failure should name missing normalized input");
+  assert(thin.output.includes("directions must contain strategic prompt directions"), "thin strategic prompt-pack failure should name missing directions");
+  await unlink(thinPath);
+
+  const styleOnlyPath = join(fixtureDir, "STYLE_ONLY_PROTO_PROMPT_PACK.yaml");
+  await writeFile(styleOnlyPath, strategicPromptPackFixture("style-only"), "utf8");
+  const styleOnly = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(styleOnly.code !== 0, "style-only strategic prompt-pack fixture should fail validation");
+  assert(
+    styleOnly.output.includes("distinctness_rationale must name a strategic difference, not only visual style"),
+    "style-only strategic prompt-pack failure should name strategic distinctness",
+  );
+  await unlink(styleOnlyPath);
+
+  const readyPath = join(fixtureDir, "READY_PROTO_PROMPT_PACK.yaml");
+  await writeFile(readyPath, strategicPromptPackFixture("ready"), "utf8");
+  const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(ready.code === 0, `proto-ready strategic prompt-pack fixture should pass validation: ${ready.output}`);
+  await unlink(readyPath);
+}
+
+function thinStrategicPromptPackFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: prototype_evidence:thin-proto-prompt-pack",
+    "contract_type: prototype",
+    "title: Thin strategic prompt-pack fixture",
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can thin prompt packs be rejected?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "negative_constraints: []",
+    "review_plan:",
+    "  method: validate required strategic prompt-pack fields",
+    "result: not_reviewed",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "direction_count_policy:",
+    "  source: agent_default_after_user_delegation",
+    "  resolved_count: 3",
+    "directions: []",
+  ].join("\n");
+}
+
+function strategicPromptPackFixture(kind: "ready" | "style-only"): string {
+  const rationales =
+    kind === "style-only"
+      ? [
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+        ]
+      : [
+          "Strategic difference: product form shifts from open chat to guided daily mission workflow.",
+          "Strategic difference: trigger changes from user-initiated practice to calendar-based social rehearsal.",
+          "Strategic difference: main risk and metric focus move to trust calibration before free speaking.",
+        ];
+  return [
+    "schema_version: 0.1.0",
+    `contract_id: prototype_evidence:${kind}-proto-prompt-pack`,
+    "contract_type: prototype",
+    `title: ${kind} strategic prompt-pack fixture`,
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can the validated strategy produce distinct prototype prompt packs?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "  internal_stage: /ow:vision2prompt",
+    "negative_constraints:",
+    "  - Do not generate HTML.",
+    "  - Do not collapse directions into visual skins.",
+    "review_plan:",
+    "  method: Compare strategic difference, screen specificity, and downstream image readiness.",
+    "result: pass",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "internal_pipeline:",
+    "  orchestrator_command: /ow:proto",
+    "  user_visible_command: /ow:proto",
+    "  stages:",
+    "    - stage_id: proto-preflight",
+    "      command: /ow:proto",
+    "      visibility: user",
+    "      status: complete",
+    "      outputs:",
+    "        - preflight_quality_gate",
+    "    - stage_id: vision2prompt",
+    "      command: /ow:vision2prompt",
+    "      visibility: internal",
+    "      status: complete",
+    "      outputs:",
+    "        - prompt_text_manifest",
+    "    - stage_id: prompt2proto",
+    "      command: /ow:prompt2proto",
+    "      visibility: internal",
+    "      status: not_started",
+    "      outputs:",
+    "        - image_generation",
+    "direction_count_policy:",
+    "  source: agent_default_after_user_delegation",
+    "  ask_user_question_required: true",
+    "  ask_user_question: How many strategically different prototype directions should be generated?",
+    "  resolved_count: 3",
+    "normalized_input:",
+    "  product_domain: AI conversation practice",
+    "  primary_user: Adult English learner who avoids real social conversations",
+    "  usage_context: Daily mobile practice before or after real social moments",
+    "  current_alternative: Generic chatbots, phrase books, and short video lessons",
+    "  core_pain: Learners cannot transfer passive English knowledge into relaxed speaking",
+    "  desired_behavior_change: User starts short real conversations with less fear",
+    "  strongest_success_signal: User voluntarily returns after a real conversation and reports progress",
+    "  core_differentiator: AI companion remembers emotional state and turns practice into personal rehearsal",
+    "  emotional_value: User feels seen, encouraged, and gently stretched",
+    "  functional_value: User gets scenario prompts, corrective feedback, and next-step practice",
+    "  trust_requirements: Clear correction boundaries and transparent progress memory",
+    "  privacy_requirements: Private conversation history and opt-out memory controls",
+    "  non_goals: Exam prep, grammar textbook replacement, and corporate LMS",
+    "  future_opportunities: Travel mode, workplace mode, and relationship-specific practice",
+    "  validation_target: Test whether emotional companionship improves speaking practice retention",
+    "strategic_core:",
+    "  target_user: English learner who knows words but freezes in real conversation",
+    "  behavior_change: Move from passive learning to repeated spoken practice",
+    "  mechanism: Personal AI companion pairs emotional memory with scenario rehearsal",
+    "  differentiator: Progress feedback is relational and concrete, not generic scoring",
+    "  boundary_conditions: Must avoid feeling like an exam or scripted grammar lesson",
+    "  central_uncertainty: Whether companionship creates enough trust to increase speaking frequency",
+    "directions:",
+    ...directionLines("D1", "Daily Mission Companion", rationales[0] ?? ""),
+    ...directionLines("D2", "Calendar Rehearsal Coach", rationales[1] ?? ""),
+    ...directionLines("D3", "Trust Calibration Lab", rationales[2] ?? ""),
+    "build_recommendation:",
+    "  first_direction_id: D1",
+    "  why_first: It tests the central retention hypothesis with the shortest daily loop.",
+    "  success_signals:",
+    "    - User records or types one practice answer for three consecutive days.",
+    "    - User can name one real conversation they feel ready to try.",
+    "  failure_signals:",
+    "    - User treats the flow like another lesson and skips emotional check-ins.",
+    "    - User cannot connect practice to a real social moment.",
+    "  next_test_if_it_works: Expand from daily missions into calendar-triggered rehearsal.",
+    "prompt_text_manifest:",
+    "  status: ready_for_image_generation",
+    "  directions_ready: true",
+    "  prompt_text_refs:",
+    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md",
+    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D2.md",
+    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D3.md",
+    "image_generation:",
+    "  status: not_started",
+    "  batch_strategy: Generate each direction as two mobile screens with consistent product system metadata.",
+    "  generated_images: []",
+    "  collection_notes: []",
+  ].join("\n");
+}
+
+function directionLines(id: string, name: string, distinctness: string): string[] {
+  return [
+    `  - direction_id: ${id}`,
+    `    name: ${name}`,
+    `    strategic_hypothesis: ${name} can turn validated emotional trust into repeat practice behavior.`,
+    "    validates: Whether this product strategy changes speaking practice frequency.",
+    "    main_risk: The user may like the concept but avoid actual speaking.",
+    `    distinctness_rationale: "${distinctness}"`,
+    "    prototype_prompt: Mobile app prototype with a concrete daily scenario, emotional check-in, AI response, correction moment, and progress recap.",
+    "    screen_prompts:",
+    "      - prompt_id: screen-1",
+    "        screen_name: Today practice entry",
+    "        prompt_text: Show a mobile screen where the user sees a real-life scenario, a remembered emotional note, sample phrase suggestions, and a primary speaking action.",
+    "      - prompt_id: screen-2",
+    "        screen_name: Progress recap",
+    "        prompt_text: Show a mobile screen where the AI gives warm feedback, highlights one new phrase, records confidence progress, and suggests a next real-world conversation.",
+    "    pm_judgment: Strong enough for image prototype generation because it names user behavior, system response, trust control, and sample content.",
+  ];
 }
 
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {

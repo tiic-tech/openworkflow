@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M86-proto-strategy-prompt-compiler:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C004
+change_id: C004-strategic-prompt-pack-stress-fixtures
+title: Atom tasks for strategic prompt-pack stress fixtures
+status: ready
+tasks:
+  - id: T001
+    title: Inspect existing proto quality verification
+    type: read
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+    done_when:
+      - Existing proto artifact validation and runtime assertions are mapped.
+      - The smallest fixture location is identified.
+  - id: T002
+    title: Add weak and strong prompt-pack fixtures
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - Thin prompt-pack fixture is rejected.
+      - Style-only direction fixture is rejected.
+      - Proto-ready prompt-pack fixture passes.
+  - id: T003
+    title: Verify decomposed proto pipeline quality gates
+    type: verify
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+      - Full required validation commands pass.
+  - id: T004
+    title: Record completion evidence
+    type: document
+    status: pending
+    owned_paths:
+      - changes/M86-proto-strategy-prompt-compiler/
+    done_when:
+      - C004 status and completion evidence are recorded after implementation commit.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

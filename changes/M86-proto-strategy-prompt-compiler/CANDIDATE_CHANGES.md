@@ -19,13 +19,13 @@ prototype images, full discovery-loop read models, or E2E dogfood.
 | C001 | done | medium | Align native build-prototype strategy compiler contract | none |
 | C002 | done | medium | Strengthen strategic prototype prompt-pack artifacts | C001 |
 | C003 | done | medium | Upgrade generated `/ow:proto` protocol for strategy-to-prompt compilation | C001, C002 |
-| C004 | candidate | medium | Add strategic prompt-pack stress fixtures | C001, C002, C003, C005 |
+| C004 | selected | medium | Add strategic prompt-pack stress fixtures | C001, C002, C003, C005 |
 | C005 | done | medium | Define internal proto pipeline and image metadata | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C004` is next. C005 has defined the internal proto pipeline and per-image
-metadata, so C004 can test the decomposed command shape rather than the older
+`C004` is selected. C005 has defined the internal proto pipeline and per-image
+metadata, so C004 will test the decomposed command shape rather than the older
 monolithic `/ow:proto` behavior.
 
 ## Deferred

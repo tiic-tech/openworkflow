@@ -1520,6 +1520,21 @@ const STRATEGIC_DIRECTION_FIELDS = [
   "pm_judgment",
 ];
 
+const STRATEGIC_DISTINCTNESS_SIGNALS = [
+  "product form",
+  "trigger",
+  "interaction model",
+  "emotional driver",
+  "retention mechanism",
+  "metric",
+  "main risk",
+  "risk",
+  "user behavior",
+  "workflow",
+  "trust",
+  "privacy",
+];
+
 function validatePrototypeValidationInput(label: string, value: unknown, errors: string[]): void {
   if (!isRecord(value)) {
     return;
@@ -1662,6 +1677,10 @@ function validateStrategicDirections(label: string, value: unknown, countPolicy:
     const screenPrompts = item.screen_prompts;
     if (Array.isArray(screenPrompts) && screenPrompts.length < 2) {
       errors.push(`${label} directions[${index}].screen_prompts must include multi-image prompt text`);
+    }
+    const distinctness = String(item.distinctness_rationale ?? "").toLowerCase();
+    if (!STRATEGIC_DISTINCTNESS_SIGNALS.some((signal) => distinctness.includes(signal))) {
+      errors.push(`${label} directions[${index}].distinctness_rationale must name a strategic difference, not only visual style`);
     }
   });
 }
