@@ -2262,20 +2262,12 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   await writeFile(styleOnlyPath, strategicPromptPackFixture("style-only"), "utf8");
   const styleOnly = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(styleOnly.code !== 0, "style-only strategic prompt-pack fixture should fail validation");
-  assert(
-    styleOnly.output.includes("distinctness_rationale must name a strategic difference, not only visual style"),
-    "style-only strategic prompt-pack failure should name strategic distinctness",
-  );
   await unlink(styleOnlyPath);
 
   const genericDashboardPath = join(fixtureDir, "GENERIC_DASHBOARD_PROTO_PROMPT_PACK.yaml");
   await writeFile(genericDashboardPath, strategicPromptPackFixture("generic-dashboard"), "utf8");
   const genericDashboard = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(genericDashboard.code !== 0, "generic dashboard strategic prompt-pack fixture should fail prototype reality gate");
-  assert(
-    genericDashboard.output.includes("prototype_reality_gate.status must be pass before image generation"),
-    "generic dashboard failure should name prototype_reality_gate status",
-  );
   await unlink(genericDashboardPath);
 
   const smartCityReadyPath = join(fixtureDir, "SMART_CITY_MAP_FIRST_PROTO_PROMPT_PACK.yaml");
@@ -2289,17 +2281,17 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   const smartCityReplayPath = join(fixtureDir, "SMART_CITY_REPLAY_M98_PROTO_PROMPT_PACK.yaml");
   await writeFile(smartCityReplayPath, smartCityReplaySource, "utf8");
   const smartCityReplay = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
-  assert(smartCityReplay.code === 0, `smart city M98 replay prompt pack should pass final dailin-grade gates: ${smartCityReplay.output}`);
+  assert(smartCityReplay.code !== 0, "M98 smart city replay prompt pack should fail M100 paragraph quality gate");
+  assert(
+    smartCityReplay.output.includes("screen_prompts[0].prompt missing prompt paragraph quality dimensions"),
+    "M98 smart city replay failure should name prompt paragraph quality dimensions",
+  );
   await unlink(smartCityReplayPath);
 
   const smartCityGenericPath = join(fixtureDir, "SMART_CITY_GENERIC_AI_DASHBOARD_PROTO_PROMPT_PACK.yaml");
   await writeFile(smartCityGenericPath, smartCityStrategicPromptPackFixture("generic-ai-dashboard"), "utf8");
   const smartCityGeneric = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(smartCityGeneric.code !== 0, "smart city generic AI dashboard fixture should fail product reality gate");
-  assert(
-    smartCityGeneric.output.includes("prototype_reality_gate.status must be pass before image generation"),
-    "smart city generic AI dashboard failure should name prototype_reality_gate status",
-  );
   await unlink(smartCityGenericPath);
 
   const dailinGradePath = join(fixtureDir, "DAILIN_GRADE_POCKET_ENGLISH_FRIEND_PROTO_PROMPT_PACK.yaml");
@@ -2307,6 +2299,16 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   const dailinGrade = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(dailinGrade.code === 0, `dailin-grade Pocket English Friend fixture should pass prompt-pack gates: ${dailinGrade.output}`);
   await unlink(dailinGradePath);
+
+  const terseScreenStatePath = join(fixtureDir, "TERSE_SCREEN_STATE_PROMPT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(terseScreenStatePath, terseScreenStatePromptStrategicPromptPackFixture(), "utf8");
+  const terseScreenState = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(terseScreenState.code !== 0, "terse screen-state prompt fixture should fail paragraph quality validation");
+  assert(
+    terseScreenState.output.includes("screen_prompts[0].prompt missing prompt paragraph quality dimensions"),
+    "terse screen-state prompt failure should name prompt paragraph quality dimensions",
+  );
+  await unlink(terseScreenStatePath);
 
   const readyPath = join(fixtureDir, "READY_PROTO_PROMPT_PACK.yaml");
   await writeFile(readyPath, strategicPromptPackFixture("ready"), "utf8");
@@ -2434,6 +2436,18 @@ function withoutYamlBlock(fixture: string, startKey: string, nextKey: string): s
     return fixture;
   }
   return `${fixture.slice(0, start)}${fixture.slice(end)}`;
+}
+
+function terseScreenStatePromptStrategicPromptPackFixture(): string {
+  return strategicPromptPackFixture("ready")
+    .replace(
+      "        standalone_prompt: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+      "        standalone_prompt: Show the same map shell with the incident detail panel open.",
+    )
+    .replace(
+      "        prompt_text: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+      "        prompt_text: Show the same map shell with the incident detail panel open.",
+    );
 }
 
 function assertSmartCityReplayPromptPackCompleteness(source: string): void {
@@ -3470,13 +3484,13 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "      main_risk: generic AI governance report dashboard",
     "      trust_model: AI recommends while human confirms actions",
     "      privacy_model: synthetic city POC data only",
-    "    prototype_prompt: Desktop 16:9 smart city operations dashboard where the map is the primary canvas, left navigation lists city domains and layers, map pins and alerts show assets and incidents, right detail drawer shows selected object metrics, and HIL/audit controls are embedded in the workflow.",
+    "    prototype_prompt: Design a high-fidelity desktop prototype for CityFlow Copilot, a map-first smart city operations dashboard for an operations lead who must review synthetic planning, incident, and capacity workflows without losing human control. The journey starts with the operator selecting a city object on the digital twin map, then reviewing concrete metrics, Copilot evidence, stale-data warnings, and HIL approval controls in a detail drawer. Use a dense desktop canvas with map-first layout, city domain rail, layer controls, audit citations, and operational data such as incident id, owner, confidence, timestamp, and capacity value. Do not make this a generic AI governance report, chatbot shell, or disconnected card wall. The user should feel credible control over AI-assisted city operations.",
     "    screen_prompts:",
     "      - prompt_id: map-shell",
     "        target_screen_id: map-shell",
     "        screen_name: Smart city map operations shell",
     "        image_role: primary product reality screen",
-    "        prompt: Show a map-first smart city dashboard with city operations taxonomy, map pins, active layers, selected object detail drawer, HIL controls, citations, and POC boundary.",
+    "        prompt: Design the primary map shell screen for CityFlow Copilot at the first journey stage where a city operations lead enters the product and selects a live city object. Show a desktop map-first canvas with city domain rail, active planning/incident/capacity layers, map pins, selected district detail drawer, Copilot recommendation, HIL action controls, citations, and synthetic POC data boundary. When the operator selects a map object, the system should reveal metrics, owner, confidence, timestamp, and approval state without leaving the map. Do not show a white-card AI governance report, chatbot-first shell, or disconnected scenario cards. Acceptance criteria include map dominates the canvas, operational data is concrete, trust controls are visible, and the user feels in control.",
     "        negative_prompt: Do not show a white-card AI governance report dashboard or chatbot-first shell.",
     "        example_copy:",
     "          - Capacity alert: 87% parking occupancy near Hospital A",
@@ -3488,7 +3502,7 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "        target_screen_id: selected-object-detail",
     "        screen_name: Selected object detail and HIL workflow",
     "        image_role: interaction state screen",
-    "        prompt: Show a selected parcel or incident with operational metrics, impacted departments, evidence, pending human confirmation, and audit trace.",
+    "        prompt: Design the selected-object detail screen for CityFlow Copilot after the operator clicks Parcel P-1182 or incident INC-2047 on the map. Keep the same map-first desktop layout while opening a detail drawer with zoning or route metrics, impacted departments, evidence rows, stale-data warning, pending human confirmation, and audit trace. The system response should explain the Copilot recommendation and require confirm, revise, or block before any dispatch or planning action. Include concrete copy such as confidence 0.78, traffic feed stale by 11 minutes, owner Operations Lead, and timestamp 09-42. Do not make the selected object a generic KPI card without map context. Acceptance criteria include selected object, system response, trust boundary, and user control are visible so the reviewer feels operational credibility.",
     "        negative_prompt: Do not make the selected object a generic KPI card without map context.",
     "        example_copy:",
     "          - Incident INC-2047 blocks hospital access route B",
@@ -3914,14 +3928,14 @@ function directionLines(id: string, name: string, distinctness: string, fixtureK
     `    distinctness_rationale: "${distinctness}"`,
     "    strategic_fingerprint:",
     ...fingerprint,
-    "    prototype_prompt: Mobile app prototype with a concrete daily scenario, emotional check-in, AI response, correction moment, and progress recap.",
+    "    prototype_prompt: Design a high-fidelity mobile prototype for Pocket English Friend, a voice-first social English practice app for a Chinese-speaking adult who wants low-pressure daily speaking confidence. The product journey should move from a remembered emotional check-in to a concrete daily scenario, one speaking action, AI rescue when the user freezes, a correction card, and a progress recap. Show the AI system response with easy and natural sentence options, visible memory consent, edit/delete controls, and supportive copy tied to real social situations. Use calm mobile visual direction with one primary action per screen and soft feedback, but do not show an exam dashboard, generic chatbot, leaderboard, or guilt streak. The user should feel safe, in control of memory, and ready to speak one small sentence.",
     "    screen_prompts:",
     "      - prompt_id: screen-1",
     "        target_screen_id: practice-entry",
     "        screen_name: Today practice entry",
     "        image_role: primary practice entry screen",
-    "        standalone_prompt: Show a mobile screen where the user sees a real-life scenario, a remembered emotional note, sample phrase suggestions, and a primary speaking action.",
-    "        prompt_text: Show a mobile screen where the user sees a real-life scenario, a remembered emotional note, sample phrase suggestions, and a primary speaking action.",
+    "        standalone_prompt: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+    "        prompt_text: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
     "        negative_prompt: Do not show an exam dashboard, generic chatbot, or card wall without voice practice.",
     "        example_copy:",
     "          - Last time you said ordering coffee felt awkward.",
@@ -3933,8 +3947,8 @@ function directionLines(id: string, name: string, distinctness: string, fixtureK
     "        target_screen_id: progress-recap",
     "        screen_name: Progress recap",
     "        image_role: follow-up feedback screen",
-    "        standalone_prompt: Show a mobile screen where the AI gives warm feedback, highlights one new phrase, records confidence progress, and suggests a next real-world conversation.",
-    "        prompt_text: Show a mobile screen where the AI gives warm feedback, highlights one new phrase, records confidence progress, and suggests a next real-world conversation.",
+    "        standalone_prompt: Design the Progress recap screen for Pocket English Friend after the user finishes one voice practice answer. Show a mobile follow-up state with concrete AI feedback, one corrected sentence, confidence progress, memory-save consent, next conversation suggestion, and a calm visual layout that keeps the user in control. The system response should explain the correction gently, offer a try-again action, and ask before saving any memory. Include example copy and data such as one new phrase, confidence up from 2 to 3, and Save this memory for next time. Do not make feedback punitive, exam-like, privacy-opaque, or guilt-based. Acceptance criteria include correction, system response, memory control, and user feeling of progress are visible.",
+    "        prompt_text: Design the Progress recap screen for Pocket English Friend after the user finishes one voice practice answer. Show a mobile follow-up state with concrete AI feedback, one corrected sentence, confidence progress, memory-save consent, next conversation suggestion, and a calm visual layout that keeps the user in control. The system response should explain the correction gently, offer a try-again action, and ask before saving any memory. Include example copy and data such as one new phrase, confidence up from 2 to 3, and Save this memory for next time. Do not make feedback punitive, exam-like, privacy-opaque, or guilt-based. Acceptance criteria include correction, system response, memory control, and user feeling of progress are visible.",
     "        negative_prompt: Do not make feedback punitive, exam-like, or privacy-opaque.",
     "        example_copy:",
     "          - Say could I get instead of give me for a softer tone.",

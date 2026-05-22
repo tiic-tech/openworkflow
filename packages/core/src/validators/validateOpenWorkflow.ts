@@ -887,6 +887,30 @@ const STRATEGIC_FINGERPRINT_DIMENSIONS = [
   "privacy_model",
 ];
 
+const PROTOTYPE_PROMPT_PARAGRAPH_DIMENSIONS = [
+  "product_context",
+  "target_user",
+  "journey",
+  "screens_or_components",
+  "interaction_or_system_response",
+  "concrete_content",
+  "trust_or_user_control",
+  "visual_direction",
+  "anti_goals",
+  "desired_user_feeling",
+] as const;
+
+const SCREEN_PROMPT_PARAGRAPH_DIMENSIONS = [
+  "journey_or_screen_purpose",
+  "user_goal_or_system_state",
+  "components_or_domain_objects",
+  "actions_or_system_response",
+  "concrete_content",
+  "trust_or_user_control",
+  "negative_constraints",
+  "acceptance_or_user_feeling",
+] as const;
+
 function validatePrototypeValidationInput(label: string, value: unknown, errors: string[]): void {
   if (!isRecord(value)) {
     return;
@@ -915,6 +939,7 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
   validatePromptPackIntegrityGate(label, data.prompt_pack_integrity_gate, data, errors);
   validateScreenBoundExecutability(label, data, errors);
+  validatePromptParagraphQuality(label, data, errors);
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
@@ -1286,6 +1311,90 @@ function validateStrategicDirectionScreenPrompts(label: string, directions: unkn
       }
     });
   });
+}
+
+function validatePromptParagraphQuality(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (!strategicPromptPackRequiresScreenExecutability(data)) {
+    return;
+  }
+  const directions = Array.isArray(data.directions) ? data.directions : [];
+  directions.forEach((direction, directionIndex) => {
+    if (!isRecord(direction)) {
+      return;
+    }
+    const prototypePrompt = String(direction.prototype_prompt ?? "");
+    const missingPrototypeDimensions = promptParagraphMissingDimensions(
+      prototypePrompt,
+      PROTOTYPE_PROMPT_PARAGRAPH_DIMENSIONS,
+      70,
+    );
+    if (missingPrototypeDimensions.length > 0) {
+      errors.push(
+        `${label} directions[${directionIndex}].prototype_prompt missing prompt paragraph quality dimensions: ${missingPrototypeDimensions.join(", ")}`,
+      );
+    }
+    const screenPrompts = Array.isArray(direction.screen_prompts) ? direction.screen_prompts : [];
+    screenPrompts.forEach((prompt, promptIndex) => {
+      if (!isRecord(prompt)) {
+        return;
+      }
+      const text = String(prompt.prompt ?? prompt.standalone_prompt ?? prompt.prompt_text ?? "");
+      const missingScreenDimensions = promptParagraphMissingDimensions(
+        text,
+        SCREEN_PROMPT_PARAGRAPH_DIMENSIONS,
+        55,
+      );
+      if (missingScreenDimensions.length > 0) {
+        errors.push(
+          `${label} directions[${directionIndex}].screen_prompts[${promptIndex}].prompt missing prompt paragraph quality dimensions: ${missingScreenDimensions.join(", ")}`,
+        );
+      }
+    });
+  });
+}
+
+function promptParagraphMissingDimensions(text: string, dimensions: readonly string[], minimumWords: number): string[] {
+  const normalized = normalizePromptParagraphText(text);
+  const missing: string[] = [];
+  if (wordCount(normalized) < minimumWords) {
+    missing.push("minimum_substance");
+  }
+  for (const dimension of dimensions) {
+    if (!promptTextCoversDimension(normalized, dimension)) {
+      missing.push(dimension);
+    }
+  }
+  return missing;
+}
+
+function normalizePromptParagraphText(text: string): string {
+  return text.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function wordCount(text: string): number {
+  return text.length === 0 ? 0 : text.split(/\s+/).filter(Boolean).length;
+}
+
+function promptTextCoversDimension(text: string, dimension: string): boolean {
+  const groups: Record<string, string[]> = {
+    product_context: ["product", "called", "positioning", "prototype", "dashboard", "app", "workflow", "platform"],
+    target_user: ["target user", "user", "operator", "reviewer", "adult", "lead", "planner", "coordinator"],
+    journey: ["journey", "flow", "step", "screen", "stage", "loop", "from", "then", "after"],
+    screens_or_components: ["screen", "component", "panel", "drawer", "card", "button", "control", "map", "list", "navigation"],
+    interaction_or_system_response: ["action", "respond", "response", "when the user", "after the user", "system", "ai", "copilot", "confirm", "revise"],
+    concrete_content: ["example", "copy", "metric", "data", "id", "timestamp", "owner", "confidence", "message", "label"],
+    trust_or_user_control: ["trust", "privacy", "control", "approval", "consent", "delete", "edit", "human", "audit", "citation"],
+    visual_direction: ["visual", "layout", "canvas", "density", "style", "component vocabulary", "map first", "voice first", "mobile", "desktop"],
+    anti_goals: ["do not", "avoid", "must not", "not a", "not an", "anti goal", "negative"],
+    desired_user_feeling: ["feel", "feeling", "confidence", "safe", "credible", "calm", "control", "trust", "relief"],
+    journey_or_screen_purpose: ["journey", "purpose", "screen", "stage", "flow", "entry", "recap", "review", "response", "monitor"],
+    user_goal_or_system_state: ["goal", "user", "operator", "state", "selected", "pending", "stale", "blocked", "ready", "active"],
+    components_or_domain_objects: ["component", "panel", "drawer", "card", "button", "control", "map", "object", "incident", "parcel", "route", "memory"],
+    actions_or_system_response: ["action", "tap", "select", "confirm", "revise", "respond", "response", "system", "ai", "copilot"],
+    negative_constraints: ["do not", "avoid", "must not", "negative", "not show", "not turn"],
+    acceptance_or_user_feeling: ["acceptance", "must show", "should make", "feel", "confidence", "credible", "safe", "control"],
+  };
+  return (groups[dimension] ?? []).some((token) => text.includes(token));
 }
 
 function stringReferencesKnownPrompt(value: string, directionIds: Set<string>, promptIds: Set<string>): boolean {

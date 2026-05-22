@@ -81,7 +81,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -154,7 +154,7 @@ changes:
         - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
         - skills/build-prototype/references/strategic-prompt-pack-protocol.md
   - id: C002
-    status: ready
+    status: done
     title: Enforce long-form generation prompt structure in schemas and validators
     purpose: >
       Make dailin-grade prompt text quality fail closed by extending the formal
@@ -195,8 +195,28 @@ changes:
       - A prompt pack with M99-style one-sentence screen_prompts cannot be marked ready_for_image_generation.
       - A dailin-style long-form prompt fixture passes without weakening prompt_pack_integrity_gate or prototype_reality_gate.
       - Validation errors name the missing paragraph-quality dimensions instead of only generic prompt presence.
+    selection:
+      selected_change_id: C002-enforce-long-form-generation-prompt-structure
+      selected_at: 2026-05-23
+      reason: >
+        C002 was the first ready candidate after C001 and turns the mapped
+        prompt paragraph contract into deterministic schema, validator,
+        summary-health, and runtime-surface behavior.
+    completion:
+      completed_by_change_id: C002-enforce-long-form-generation-prompt-structure
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_EVIDENCE.md
+        - schemas/proto-prompt-pack.schema.json
+        - schemas/prototype-evidence.schema.json
+        - packages/core/src/validators/validateOpenWorkflow.ts
+        - packages/core/src/workflow/summaryHealth.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C003
-    status: candidate
+    status: ready
     title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
     purpose: >
       Change generated /ow:vision2prompt guidance so agents write complete
@@ -430,6 +450,54 @@ operations:
     reason: >
       C001 completion satisfies C002's only dependency, making validator/schema
       enforcement the next ready queue candidate.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 because C001 completed the prompt paragraph contract and C002
+      is the next dependency-unlocked ready candidate for deterministic
+      enforcement.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed C002 by adding schema support, validator paragraph-quality
+      checks, runtime regressions, and summary-health exposure for dailin-grade
+      long-form prompt text.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_EVIDENCE.md
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completion satisfies C003's remaining dependency, making generated
+      /ow:vision2prompt guidance wiring the next ready candidate.
     changed_at: 2026-05-23
     before_status: candidate
     after_status: ready

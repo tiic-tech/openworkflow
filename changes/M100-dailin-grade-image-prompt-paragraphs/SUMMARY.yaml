@@ -28,12 +28,12 @@ scope_boundary: >
   generation briefs.
 branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
 candidate_count: 6
-active_candidate_count: 5
-completed_candidate_id: C001
-completed_change_id: C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract
-selected_candidate_id: C001
-selected_change_id: C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract
-next_recommended_candidate_id: C002
+active_candidate_count: 4
+completed_candidate_id: C002
+completed_change_id: C002-enforce-long-form-generation-prompt-structure
+selected_candidate_id: C002
+selected_change_id: C002-enforce-long-form-generation-prompt-structure
+next_recommended_candidate_id: C003
 deferred_feature_refs:
   - M101-provider-image-generation-benchmark
   - M102-prototype-visual-reference-parity-gate
@@ -42,14 +42,16 @@ outputs:
   candidate_changes_yaml: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
   summary: changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
-  selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml
-  atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/ATOM_TASKS.yaml
-  implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/IMPLEMENTATION_BRIEF.md
-  mapping_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md
+  c001_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml
+  c001_mapping_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md
+  c002_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_BRIEF.md
+  c002_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_EVIDENCE.md
 key_dependencies:
   - C001 is complete; the dailin skill workflow and reference instructions are now mapped into an explicit OW prompt paragraph contract before schemas or generated protocols enforce it.
-  - C002 depends on C001 because validators need the paragraph anatomy and failure dimensions.
-  - C003 depends on C001 and C002 because generated /ow:vision2prompt guidance should point to stable contract and gate fields.
+  - C002 is complete; validators now enforce paragraph anatomy and failure dimensions.
+  - C003 is now ready because generated /ow:vision2prompt guidance can point to stable contract and gate fields.
   - C004 depends on C002 and C003 because fixtures should prove the final schema and protocol behavior.
   - C005 depends on C003 and C004 because the real target replay should run only after the command surface and regressions are in place.
   - C006 depends on C005 because downstream visual parity no-go criteria need real replay evidence.
@@ -88,13 +90,17 @@ validation:
     - sed -n '1,260p' references/planning-artifact-contracts.md
     - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
     - rg -n "dailin-grade image prompt|paragraph anatomy|journey|system response|vision_to_strategic_prototype_prompt" skills/build-prototype/references
+    - npm run build
+    - npm run verify:runtime-surface
     - node dist/cli/src/index.js validate --root . --json
     - node dist/cli/src/index.js summaries --root . --strict --json
     - git diff --check
   notes:
     - C001 completed as contract/reference mapping only; no schema, validator, generated adapter, provider image generation, visual review, or target replay was executed.
+    - C002 completed deterministic prompt paragraph enforcement only; no generated skill sync, provider image generation, visual review, or target replay was executed.
     - Current implementation branch is codex/m100-dailin-grade-image-prompt-paragraphs, matching the queue branch boundary.
     - Direct quality target is prompt paragraph quality, not source completeness.
     - User clarified that dailin vision_to_strategic_prototype_prompt SKILL and its detailed reference instructions are the foundation for raising /ow:vision2prompt quality.
     - M99 smart city target prompt pack is source-complete but its prompt paragraphs are shorter and less journey-rich than dailin OUTPUT_PROMPT.
     - C001 names dailin OUTPUT_PROMPT as the minimum paragraph benchmark and adds long-form prompt anatomy plus thin-prompt failure modes to OW-owned references.
+    - C002 adds schema support, validator checks, runtime regressions, and summary-health fields for prompt paragraph quality. The stored M98 smart city replay fixture is now expected to fail M100 paragraph quality until C004 upgrades or duplicates a positive fixture.

@@ -936,6 +936,12 @@
           "items": {
             "type": "string"
           }
+        },
+        "prompt_paragraph_quality": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "additionalProperties": true
@@ -1035,6 +1041,38 @@
           "type": "array",
           "items": {
             "type": "string"
+          }
+        },
+        "paragraph_quality_status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "pass",
+            "fail"
+          ]
+        },
+        "paragraph_quality_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "product_context",
+              "target_user",
+              "journey",
+              "screens_or_components",
+              "interaction_or_system_response",
+              "concrete_content",
+              "trust_or_user_control",
+              "visual_direction",
+              "anti_goals",
+              "desired_user_feeling",
+              "journey_or_screen_purpose",
+              "user_goal_or_system_state",
+              "components_or_domain_objects",
+              "actions_or_system_response",
+              "negative_constraints",
+              "acceptance_or_user_feeling"
+            ]
           }
         }
       },

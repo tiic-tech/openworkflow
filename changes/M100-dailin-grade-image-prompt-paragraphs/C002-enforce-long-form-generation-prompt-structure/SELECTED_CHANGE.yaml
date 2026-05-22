@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: selected_change:M100-dailin-grade-image-prompt-paragraphs:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M100-dailin-grade-image-prompt-paragraphs
+candidate_id: C002
+change_id: C002-enforce-long-form-generation-prompt-structure
+title: Enforce long-form generation prompt structure in schemas and validators
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 because C001 completed the OW-owned prompt paragraph contract and
+  C002 is now the first ready dependency-unlocked candidate. It turns the
+  contract into deterministic schema support, validator checks, runtime
+  regressions, and summary-health exposure without entering provider image
+  generation or visual review.
+rejected_alternatives:
+  - id: C003
+    reason: Depends on C002's schema and validator gate before generated command guidance changes.
+  - id: C004
+    reason: Depends on C002 and C003.
+  - id: C005
+    reason: Depends on generated guidance and fixture evidence.
+  - id: C006
+    reason: Depends on target replay evidence.
+owned_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+dependencies:
+  - C001
+scope:
+  includes:
+    - schema support for prompt paragraph quality status and dimensions
+    - validator checks for long-form direction-level and screen-level prompt paragraph anatomy
+    - validator rejection of short state-only prompt text before ready_for_image_generation
+    - runtime surface fixtures for dailin-density passing prompts and terse screen-state failures
+    - summary-health exposure for prompt paragraph quality status and dimensions
+  excludes:
+    - subjective visual scoring
+    - provider-backed image generation
+    - generated skill sync
+    - target repo replay
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/core/src/commands/registry.ts
+  - skills/build-prototype/SKILL.md
+  - examples/**
+acceptance:
+  - A prompt pack with M99-style one-sentence screen_prompts cannot be marked ready_for_image_generation.
+  - A dailin-style long-form prompt fixture passes without weakening prompt_pack_integrity_gate or prototype_reality_gate.
+  - Validation errors name the missing paragraph-quality dimensions instead of only generic prompt presence.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 adds deterministic local validation and schema support only. It does
+    not run image providers, score generated images, sync generated adapters,
+    mutate target repos, or create remote operations.
+expected_commit_boundary: >
+  Complete C002 as one coherent commit after validator/schema/runtime-surface
+  changes, queue artifacts, and validation evidence.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_EVIDENCE.md

@@ -604,6 +604,22 @@
         "direction_count",
         "prompt_text_refs"
       ],
+      "properties": {
+        "paragraph_quality_status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "pass",
+            "fail"
+          ]
+        },
+        "paragraph_quality_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
       "additionalProperties": true
     },
     "post_validate": {
