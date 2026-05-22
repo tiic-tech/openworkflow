@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M88-tune-product-system-inheritance:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C003
+change_id: C003-refined-prompt-pack-validator-fixtures
+title: Atom tasks for refined prompt pack validator stress fixtures
+status: ready
+tasks:
+  - id: T001
+    title: Inspect current refined validator rules
+    type: read
+    status: pending
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Refined prompt-pack validator rules and runtime fixture patterns are mapped.
+  - id: T002
+    title: Add refined prompt pack stress fixtures
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers valid, missing baseline audit, orphan target screen, and missing inheritance/removal rules.
+  - id: T003
+    title: Tighten validator messages if needed
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Failure output names the missing tune repair artifact section clearly.
+  - id: T004
+    title: Verify fixture matrix
+    type: verify
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

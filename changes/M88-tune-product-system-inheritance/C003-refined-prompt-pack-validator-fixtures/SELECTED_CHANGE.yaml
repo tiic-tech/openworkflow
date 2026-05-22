@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M88-tune-product-system-inheritance:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C003
+change_id: C003-refined-prompt-pack-validator-fixtures
+title: Add refined prompt pack validator stress fixtures
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 through ow-select-change single-queue ranking. C001 and C002 are
+  complete, C003 is the next ready candidate, and validator stress fixtures are
+  required before multi-round tune inheritance work.
+owned_paths:
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M88-tune-product-system-inheritance/
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - valid refined prompt-pack fixture
+    - missing baseline audit fixture
+    - orphan target screen fixture
+    - missing MUST_INHERIT or MUST_REMOVE fixture
+    - validator messages useful for repair
+  excludes:
+    - generated prototype images
+    - browser visual review
+    - async agent execution
+    - production design/spec artifacts
+forbidden_paths:
+  - generated prototype image assets
+  - browser visual review fixtures
+  - async subagent runtime behavior
+  - production design/spec artifacts
+acceptance:
+  - Tests pass a complete refined prompt pack with baseline audit, product system, delta rules, and screen-bound prompts.
+  - Tests reject refined prompt packs without baseline_screen_audit.
+  - Tests reject target screen prompts not represented in screen_manifest.
+  - Tests reject tune artifacts that omit required inheritance or removal rules when changes are requested.
+  - Failure output points back to the missing tune repair artifact section.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 is local validator and runtime fixture coverage for the refined prompt
+    pack contract. It does not generate images, call external services, or alter
+    async runtime behavior.
