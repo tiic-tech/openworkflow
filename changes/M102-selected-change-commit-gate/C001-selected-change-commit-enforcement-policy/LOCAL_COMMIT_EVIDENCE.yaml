@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M102-C001-selected-change-commit-enforcement-policy
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M102-C001-selected-change-commit-enforcement-policy
+status: current
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C001
+selected_change_id: M102-C001-selected-change-commit-enforcement-policy
+primary_commit: 87b9d7682f5633f88806ab703dcfbd6cc68a46b2
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
