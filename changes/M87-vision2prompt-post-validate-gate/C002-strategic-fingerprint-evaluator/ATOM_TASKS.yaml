@@ -6,12 +6,12 @@ plan_id: M87-vision2prompt-post-validate-gate
 candidate_id: C002
 change_id: C002-strategic-fingerprint-evaluator
 title: Atom tasks for strategic fingerprint evaluator
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect validator duplication points
     type: read
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/validators/validateOpenWorkflow.ts
       - packages/core/src/validators/validateRepositoryContracts.ts
@@ -20,7 +20,7 @@ tasks:
   - id: T002
     title: Implement deterministic pairwise evaluator
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/validators/validateOpenWorkflow.ts
       - packages/core/src/validators/validateRepositoryContracts.ts
@@ -31,7 +31,7 @@ tasks:
   - id: T003
     title: Add runtime evaluator fixtures
     type: edit
-    status: pending
+    status: completed
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
     done_when:
@@ -39,7 +39,7 @@ tasks:
   - id: T004
     title: Verify evaluator behavior
     type: verify
-    status: pending
+    status: completed
     owned_paths:
       - packages/core/src/validators/validateOpenWorkflow.ts
       - packages/core/src/validators/validateRepositoryContracts.ts

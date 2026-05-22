@@ -25,14 +25,15 @@ run before `/ow:prompt2proto`.
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Define prompt asset post-validate contract | none |
-| C002 | selected | medium | Implement deterministic strategic fingerprint evaluator | C001 |
-| C003 | candidate | medium | Wire post-validate gate into generated vision2prompt protocol | C001, C002 |
+| C002 | done | medium | Implement deterministic strategic fingerprint evaluator | C001 |
+| C003 | ready | medium | Wire post-validate gate into generated vision2prompt protocol | C001, C002 |
 | C004 | candidate | medium | Add post-validate stress fixtures | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C002` is selected. C001 defined the artifact contract and skip/pass/fail
-semantics needed before algorithm or generated protocol work.
+`C003` is ready. C002 implemented the deterministic strategic fingerprint
+evaluator, including duplicate-fingerprint failure and single-direction skip
+coverage.
 
 ## Deferred
 
