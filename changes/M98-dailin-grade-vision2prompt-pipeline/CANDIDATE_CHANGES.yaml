@@ -87,7 +87,7 @@ scope_control:
         Proto2html should consume an accepted benchmark after prompt-pack and
         visual-quality gates are trustworthy.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -154,7 +154,7 @@ changes:
           issues unrelated to C001; dist CLI validation and runtime surface
           verification pass.
   - id: C002
-    status: ready
+    status: done
     title: Migrate dailin reference pipeline into OW vision2prompt references
     purpose: >
       Bring the proven dailin vision_to_strategic_prototype_prompt method into
@@ -189,6 +189,26 @@ changes:
       - OW references expose the same pipeline density as dailin's 01-06 reference set without binding to Pocket English Friend.
       - The strategic prompt-pack protocol tells agents to run the reference pipeline in order before prompt text is marked ready.
       - The protocol explicitly forbids collapsing vision into a single image prompt when a product prototype prompt pack is required.
+    selection:
+      selected_change_id: C002-dailin-reference-pipeline
+      selected_at: 2026-05-22
+      reason: >
+        C002 is the next ready candidate after C001. It migrates the proven
+        dailin method into OW-owned reference files so C003 can extend the
+        schema against a concrete execution pipeline rather than loose prose.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C002 added OW-owned vision2prompt references and updated the strategic
+          prompt-pack protocol to require the dailin-grade reference pipeline
+          before prompt text can be marked ready.
+        - >
+          npm run validate still fails on pre-existing M97 planning artifact
+          issues unrelated to C002; build, dist CLI validation, grep check, and
+          diff check pass.
   - id: C003
     status: candidate
     title: Extend strategic prompt-pack contract for screen-bound executability
@@ -425,3 +445,33 @@ operations:
     after_status: done
     evidence:
       - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 completion because dailin reference migration is
+      the next dependency-free slice and unlocks the screen-bound schema and
+      generated protocol candidates.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete C002 after migrating the dailin-grade reference pipeline into
+      OW-owned build-prototype references and updating the strategic prompt-pack
+      protocol.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml

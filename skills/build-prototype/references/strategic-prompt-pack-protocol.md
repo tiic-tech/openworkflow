@@ -7,6 +7,35 @@ prompt directions from proto-ready vision and a durable validation target.
 turns validation uncertainty into prototype directions, and writes prompts that
 an image-generation or design agent can execute without inventing strategy.
 
+## Vision2Prompt Reference Pipeline
+
+Before writing `PROTO_PROMPT_PACK.yaml` or `PROTO_PROMPT_PACK.md`, run the
+OW-owned dailin-grade pipeline under `references/vision2prompt/` in order:
+
+1. `01_input_contract.md`: normalize durable vision, validation, direction
+   count policy, target tool, fidelity, constraints, and missing-input rules.
+2. `02_vision_decomposition.md`: extract target user, current alternative,
+   behavior change, success signal, differentiator, trust/privacy requirements,
+   non-goals, and central uncertainty.
+3. `03_strategy_hypothesis_generation.md`: generate 5 to 8 candidate strategic
+   hypotheses and select only materially distinct directions.
+4. `04_product_system_extraction.md`: infer product experience model,
+   product-system constants, screen_manifest, domain object model, state model,
+   required data fields, trust controls, and anti-generic constraints.
+5. `05_prototype_prompt_schema.md`: write directly executable prototype prompts
+   with screen groups, states, actions, system behavior, example content,
+   negative prompts, and acceptance criteria.
+6. `06_output_templates.md`: keep YAML as source of truth and Markdown as the
+   readable view.
+7. `07_quality_rubric.md`: verify strategic distinctness, prompt
+   executability, product specificity, trust/safety, and integrity gates before
+   `prompt_text_manifest.status` becomes `ready_for_image_generation`.
+
+Do not collapse this pipeline into a short image prompt. A valid strategic
+prompt pack describes a product prototype system: product thesis, target user,
+primary loop, strategic directions, screen groups, state behavior, concrete
+data/copy, trust boundaries, negative constraints, and acceptance checks.
+
 ## Validation Consumption
 
 Validation is required before prototype generation.
@@ -146,8 +175,14 @@ and include:
 - `normalized_input`
 - `strategic_core`
 - `product_experience_model`
+- screen-bound product system fields when available, such as `screen_manifest`,
+  `global_design_system_prompt`, `screen_prompts`, `generation_order`, and
+  `acceptance_checklist`
 - `directions`
 - `build_recommendation`
+- `prompt_pack_integrity_gate`
+- `prototype_reality_gate`
+- `post_validate`
 - `negative_constraints`
 - `review_plan`
 
@@ -162,6 +197,7 @@ Each direction needs:
 - `main_risk`
 - `distinctness_rationale`
 - `prototype_prompt`
+- `screen_prompts`
 - `pm_judgment`
 
 ## Prototype Prompt Requirements
@@ -181,6 +217,11 @@ Each prompt must include:
 - anti-goals
 - desired user feeling
 - concrete sample content
+
+Each screen prompt should be able to stand alone. It should name the journey
+stage, user goal, system state, selected object when relevant, required
+components, data fields, actions, AI/system behavior, trust controls, negative
+prompt, and acceptance criteria.
 
 The prompt should be specific enough that another agent can generate the first
 screen group without asking what the product is, who it serves, what behavior
@@ -205,9 +246,17 @@ Revise before finishing if:
 
 - directions are mostly visual variations
 - prompts are too abstract for a design tool
+- prompt text reads like a single screenshot description instead of a product
+  prototype brief
+- `screen_manifest` or screen-bound prompt content is missing for a
+  multi-screen prototype
+- concrete domain objects, data fields, example copy, actions, and state
+  behavior are absent
 - non-goals are not converted into anti-goals
 - AI/system behavior is missing for an AI-mediated product
 - trust/privacy controls are absent when memory, personalization, or sensitive
   user data is involved
+- prompt pack integrity, prototype reality, or post-validate gates are missing
+  or failing while image generation is queued or complete
 - output drifts into implementation backlog or production spec
 - validation is missing, stale, or represented only as ephemeral context

@@ -19,7 +19,9 @@ proto2html.
 
 ## Selection Policy
 
-Completed candidate: `C001`.
+Completed candidate: `C001`
+
+Completed candidate: `C002`
 
 Select the first dependency-free candidate that most reduces downstream
 prompt-pack ambiguity. Stop for a high-risk decision report if a candidate
@@ -31,7 +33,7 @@ semantics, release publishing, or remote-impacting changes.
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Add prompt-pack integrity gate | none |
-| C002 | ready | medium | Migrate dailin reference pipeline into OW vision2prompt references | none |
+| C002 | done | medium | Migrate dailin reference pipeline into OW vision2prompt references | none |
 | C003 | candidate | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
 | C004 | candidate | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
 | C005 | candidate | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
@@ -44,8 +46,8 @@ downstream generation could proceed from a prompt pack whose manifest,
 directions, and evidence refs diverged. Integrity now fails closed before the
 richer dailin-style structure is added.
 
-`C002` is the next ready candidate. `C003` should wait until both C001 and C002
-are complete.
+`C002` is complete. `C003` is now the next candidate, but it is a larger schema
+and validator change that should be treated as the next implementation commit.
 
 ## Deferred
 
@@ -82,6 +84,13 @@ Validation:
 Purpose: bring the proven dailin `vision_to_strategic_prototype_prompt` method
 into OpenWorkflow as OW-owned references that agents must execute before writing
 strategic prompt packs.
+
+Selected change artifacts:
+
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/SELECTED_CHANGE.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/ATOM_TASKS.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/IMPLEMENTATION_BRIEF.md`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml`
 
 Validation:
 

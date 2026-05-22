@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C002
+change_id: C002-dailin-reference-pipeline
+title: Atom tasks for dailin reference pipeline migration
+status: completed
+tasks:
+  - id: T001
+    title: Inspect dailin reference source
+    type: read
+    status: completed
+    owned_paths:
+      - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    done_when:
+      - Dailin pipeline structure and OW protocol gaps are mapped.
+  - id: T002
+    title: Add OW vision2prompt reference pipeline files
+    type: document
+    status: completed
+    owned_paths:
+      - skills/build-prototype/references/vision2prompt/
+    done_when:
+      - OW references cover input contract, vision decomposition, hypothesis generation, product system extraction, prompt schema, output templates, and quality rubric.
+  - id: T003
+    title: Update strategic prompt-pack protocol
+    type: document
+    status: completed
+    owned_paths:
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    done_when:
+      - Protocol tells agents to run the vision2prompt reference pipeline before marking prompt text ready.
+      - Protocol explicitly rejects short image-prompt collapse for prototype prompt packs.
+  - id: T004
+    title: Verify C002 and record evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or unrelated known failures are documented.
+      - C002 local evidence records migrated references and verification results.
+verification:
+  - npm run build
+  - npm run validate
+  - rg -n "vision2prompt|dailin-grade|screen_manifest|quality_rubric" skills/build-prototype/references
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - node dist/cli/src/index.js validate --root . --json
+    - rg -n "vision2prompt|dailin-grade|screen_manifest|quality_rubric" skills/build-prototype/references
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.
