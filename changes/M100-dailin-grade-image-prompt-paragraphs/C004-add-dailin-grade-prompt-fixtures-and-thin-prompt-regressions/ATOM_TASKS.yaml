@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C004
+selected_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+status: ready
+tasks:
+  - task_id: T001
+    title: Inspect current strategic prompt-pack fixture matrix
+    status: completed
+    type: read
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - examples/
+    done_when: Current positive and negative prompt-pack fixtures are identified.
+  - task_id: T002
+    title: Add paragraph-quality evidence to positive fixtures
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - examples/
+    done_when: Dailin-density and smart city positive fixtures demonstrate paragraph-quality manifest/rubric evidence.
+  - task_id: T003
+    title: Add strategyless long-form negative regression
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: Runtime verification rejects a long prompt pack that skips strategic core or build recommendation.
+  - task_id: T004
+    title: Validate and record C004 completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: Build, runtime-surface, validate, summaries --strict, and diff-check pass; C005 is ready.

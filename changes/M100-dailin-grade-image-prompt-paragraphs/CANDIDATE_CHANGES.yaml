@@ -85,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -376,7 +376,7 @@ changes:
         - .openworkflow/audit/CONTEXT_PACKETS.yaml
         - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C004
-    status: ready
+    status: done
     title: Add dailin-grade prompt fixtures and thin-prompt regressions
     purpose: >
       Prove the new quality gate with both positive and negative runtime
@@ -416,8 +416,25 @@ changes:
       - Runtime verification fails a prompt pack that omits strategic core, distinct hypothesis, or build recommendation evidence required by the dailin SKILL workflow.
       - Runtime verification passes a dailin-density prompt pack with full screen purpose, actions, system responses, trust controls, anti-goals, visual direction, and user feeling.
       - Existing smart city fixture is upgraded or duplicated so it demonstrates the new paragraph bar.
+    selection:
+      selected_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+      selected_at: 2026-05-23
+      reason: >
+        Select C004 because C003 completed the generated prompt paragraph
+        wiring and C004 is the next ready candidate for proving the final
+        validator and runtime-surface behavior.
+    completion:
+      completed_by_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - examples/m98-dailin-grade-fixtures/README.md
   - id: C005
-    status: candidate
+    status: ready
     title: Replay smart_city_copilot with dailin-grade prompt paragraphs
     purpose: >
       Run a clean target-repo replay that proves real /ow:vision2prompt output
@@ -717,3 +734,36 @@ operations:
       - .agents/skills/ow-prompt2proto/SKILL.md
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the next ready candidate after C003 completed generated
+      prompt paragraph wiring.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Completed C004 by adding explicit paragraph-quality positive fixture
+      evidence, preserving M98 smart city replay as a paragraph-thin negative,
+      and adding a long-but-strategyless negative regression. This satisfies
+      C005 dependencies and makes target replay the next ready candidate.
+    changed_at: 2026-05-23
+    before_status: C004 selected, C005 candidate
+    after_status: C004 done, C005 ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - examples/m98-dailin-grade-fixtures/README.md

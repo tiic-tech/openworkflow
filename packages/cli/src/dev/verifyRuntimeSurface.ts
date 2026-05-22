@@ -2324,6 +2324,20 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   );
   await unlink(terseScreenStatePath);
 
+  const longButStrategylessPath = join(fixtureDir, "LONG_BUT_STRATEGYLESS_PROTO_PROMPT_PACK.yaml");
+  await writeFile(longButStrategylessPath, longButStrategylessPromptPackFixture(), "utf8");
+  const longButStrategyless = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(longButStrategyless.code !== 0, "long but strategyless prompt fixture should fail strategic workflow validation");
+  assert(
+    longButStrategyless.output.includes("strategic_core must be a mapping"),
+    "long but strategyless failure should name missing strategic_core",
+  );
+  assert(
+    longButStrategyless.output.includes("build_recommendation must be a mapping"),
+    "long but strategyless failure should name missing build_recommendation",
+  );
+  await unlink(longButStrategylessPath);
+
   const readyPath = join(fixtureDir, "READY_PROTO_PROMPT_PACK.yaml");
   await writeFile(readyPath, strategicPromptPackFixture("ready"), "utf8");
   const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
@@ -2462,6 +2476,11 @@ function terseScreenStatePromptStrategicPromptPackFixture(): string {
       "        prompt_text: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
       "        prompt_text: Show the same map shell with the incident detail panel open.",
     );
+}
+
+function longButStrategylessPromptPackFixture(): string {
+  const withoutStrategicCore = withoutYamlBlock(strategicPromptPackFixture("ready"), "strategic_core", "prototype_brief");
+  return withoutYamlBlock(withoutStrategicCore, "build_recommendation", "prompt_text_manifest");
 }
 
 function assertSmartCityReplayPromptPackCompleteness(source: string): void {
@@ -3447,6 +3466,8 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "    - Covers selected object, active layer, alert, pending confirmation, and audit states.",
     "  trust_boundary_coverage:",
     "    - Shows citations, synthetic data disclosure, and human confirmation.",
+    "  prompt_paragraph_quality:",
+    "    - Direction and screen prompts include product context, target user, journey, interaction behavior, system response, concrete city data, trust controls, anti-goals, visual direction, and desired user feeling.",
     "prototype_reality_gate:",
     `  status: ${gateStatus}`,
     "  trigger: before_image_generation",
@@ -3488,6 +3509,9 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "    validates: Whether the product feels like a smart city dashboard rather than an AI governance report.",
     "    main_risk: The screen may still overemphasize governance controls over the city operations surface.",
     "    distinctness_rationale: Strategic difference is product form as a map-first operations dashboard with a city workflow loop, not a scenario-only AI report workflow.",
+    "    product_thesis: A smart city Copilot must prove trust inside the map-first operational loop instead of presenting detached AI governance cards.",
+    "    user_transformation: The operations lead moves from reading static reports to controlling AI-assisted decisions from selected city objects.",
+    "    reason_to_exist: This direction is worth prototyping because it tests whether map context, HIL controls, and audit trace can coexist in one credible product shell.",
     "    strategic_fingerprint:",
     "      product_form: map-first smart city operations dashboard",
     "      trigger: operator selects a city object or active incident",
@@ -3539,6 +3563,24 @@ function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string
     "  status: ready_for_image_generation",
     "  directions_ready: true",
     "  direction_count: 1",
+    "  paragraph_quality_status: pass",
+    "  paragraph_quality_dimensions:",
+    "    - product_context",
+    "    - target_user",
+    "    - journey",
+    "    - screens_or_components",
+    "    - interaction_or_system_response",
+    "    - concrete_content",
+    "    - trust_or_user_control",
+    "    - visual_direction",
+    "    - anti_goals",
+    "    - desired_user_feeling",
+    "    - journey_or_screen_purpose",
+    "    - user_goal_or_system_state",
+    "    - components_or_domain_objects",
+    "    - actions_or_system_response",
+    "    - negative_constraints",
+    "    - acceptance_or_user_feeling",
     "  prompt_text_refs:",
     "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/smart-city-map-shell.md",
     "post_validate:",
@@ -3847,6 +3889,8 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "    - Covers returning user, practice entry, answer submitted, correction, and memory consent states.",
     "  trust_boundary_coverage:",
     "    - Memory controls and correction boundaries are visible.",
+    "  prompt_paragraph_quality:",
+    "    - Direction and screen prompts include product context, target user, journey, screen purpose, interaction behavior, AI system response, concrete copy, memory controls, visual direction, anti-goals, and desired user feeling.",
     "prototype_reality_gate:",
     `  status: ${realityGateStatus}`,
     "  trigger: before_image_generation",
@@ -3897,6 +3941,24 @@ function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): strin
     "  status: ready_for_image_generation",
     "  directions_ready: true",
     `  direction_count: ${directionCount}`,
+    "  paragraph_quality_status: pass",
+    "  paragraph_quality_dimensions:",
+    "    - product_context",
+    "    - target_user",
+    "    - journey",
+    "    - screens_or_components",
+    "    - interaction_or_system_response",
+    "    - concrete_content",
+    "    - trust_or_user_control",
+    "    - visual_direction",
+    "    - anti_goals",
+    "    - desired_user_feeling",
+    "    - journey_or_screen_purpose",
+    "    - user_goal_or_system_state",
+    "    - components_or_domain_objects",
+    "    - actions_or_system_response",
+    "    - negative_constraints",
+    "    - acceptance_or_user_feeling",
     "  prompt_text_refs:",
     ...promptRefs,
     "post_validate:",
@@ -3940,6 +4002,9 @@ function directionLines(id: string, name: string, distinctness: string, fixtureK
     "    validates: Whether this product strategy changes speaking practice frequency.",
     "    main_risk: The user may like the concept but avoid actual speaking.",
     `    distinctness_rationale: "${distinctness}"`,
+    "    product_thesis: A voice-first companion should make one safe speaking action easier than another passive lesson.",
+    "    user_transformation: The learner moves from freezing in imagined conversations to speaking one small sentence with consent-based memory support.",
+    "    reason_to_exist: This direction deserves a prototype because it tests whether emotional memory and concrete correction can create repeat practice.",
     "    strategic_fingerprint:",
     ...fingerprint,
     "    prototype_prompt: Design a high-fidelity mobile prototype for Pocket English Friend, a voice-first social English practice app for a Chinese-speaking adult who wants low-pressure daily speaking confidence. The product journey should move from a remembered emotional check-in to a concrete daily scenario, one speaking action, AI rescue when the user freezes, a correction card, and a progress recap. Show the AI system response with easy and natural sentence options, visible memory consent, edit/delete controls, and supportive copy tied to real social situations. Use calm mobile visual direction with one primary action per screen and soft feedback, but do not show an exam dashboard, generic chatbot, leaderboard, or guilt streak. The user should feel safe, in control of memory, and ready to speak one small sentence.",

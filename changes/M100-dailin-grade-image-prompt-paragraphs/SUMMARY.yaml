@@ -31,12 +31,12 @@ scope_boundary: >
   a checklist that alone creates quality.
 branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
 candidate_count: 7
-active_candidate_count: 3
-completed_candidate_id: C003
-completed_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
-selected_candidate_id: C003
-selected_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
-next_recommended_candidate_id: C004
+active_candidate_count: 2
+completed_candidate_id: C004
+completed_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+selected_candidate_id: C004
+selected_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+next_recommended_candidate_id: C005
 deferred_feature_refs:
   - M101-provider-image-generation-benchmark
   - M102-prototype-visual-reference-parity-gate
@@ -59,13 +59,17 @@ outputs:
   c003_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/ATOM_TASKS.yaml
   c003_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_BRIEF.md
   c003_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+  c004_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_BRIEF.md
+  c004_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md
 key_dependencies:
   - C001 is complete; the dailin skill workflow and reference instructions are now mapped into an explicit OW prompt paragraph contract before schemas or generated protocols enforce it.
   - C002 is complete; validators now enforce paragraph anatomy and failure dimensions.
   - C007 is complete; the senior product-manager perspective engine is now in source guidance, generated /ow:vision2prompt protocol, and runtime-surface assertions.
   - C003 is complete; generated /ow:vision2prompt and /ow:prompt2proto guidance now require paragraph-quality gates before image handoff.
-  - C004 is ready because fixtures can now prove the final schema, validator, generated guidance, and handoff behavior.
-  - C005 depends on C003 and C004 because the real target replay should run only after the command surface and regressions are in place.
+  - C004 is complete; runtime fixtures now prove positive dailin-grade paragraph quality and negative terse/strategyless prompt behavior.
+  - C005 is ready because the command surface, validator gates, and regressions are in place for target replay.
   - C006 depends on C005 because downstream visual parity no-go criteria need real replay evidence.
 risks:
   - id: R001
@@ -125,4 +129,6 @@ validation:
     - C007 completed the perspective engine injection and re-unlocked C003 as the next recommended candidate.
     - Select-change OP011 selected C003 and created implementation-ready artifacts.
     - C003 completed generated guidance wiring for dailin-grade prompt paragraph quality and re-unlocked C004 as the next recommended candidate.
+    - Select-change OP013 selected C004 and created implementation-ready artifacts.
+    - C004 completed fixture/regression evidence and made C005 the next recommended candidate.
     - M101-build-proto-prompt-command-split was created as a separate high-risk command-boundary queue and must not be implemented until M100 C007 and C003 are complete.

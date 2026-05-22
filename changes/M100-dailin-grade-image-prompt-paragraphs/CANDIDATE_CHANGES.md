@@ -58,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C004`
+Next recommended candidate: `C005`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -73,15 +73,15 @@ review, proto2html, or broad workflow redesign.
 | C002 | done | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
 | C007 | done | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
 | C003 | done | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
-| C004 | ready | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
-| C005 | candidate | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
+| C004 | done | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
+| C005 | ready | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
 | C006 | candidate | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001`, `C002`, `C007`, and `C003` are complete. The next recommended candidate
-is `C004`, which should add dailin-grade positive fixtures and thin-prompt
-regressions against the final generated guidance and validator gate.
+`C001`, `C002`, `C007`, `C003`, and `C004` are complete. The next recommended
+candidate is `C005`, which should run the real smart_city_copilot replay with
+dailin-grade prompt paragraphs.
 
 The key acceptance shift is:
 
@@ -192,9 +192,16 @@ Acceptance:
 
 ### C004 - Add Dailin-Grade Prompt Fixtures And Thin-Prompt Regressions
 
-Status: ready
+Status: done
 
 Purpose: prevent future regression to terse state prompts.
+
+Evidence:
+
+- `C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/SELECTED_CHANGE.yaml`
+- `C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/ATOM_TASKS.yaml`
+- `C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_BRIEF.md`
+- `C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md`
 
 Acceptance:
 
@@ -205,6 +212,8 @@ Acceptance:
 - smart city fixture demonstrates the new bar
 
 ### C005 - Replay smart_city_copilot With Dailin-Grade Prompt Paragraphs
+
+Status: ready
 
 Purpose: prove the real target repo now emits prompt text comparable to dailin
 `OUTPUT_PROMPT.md`.
