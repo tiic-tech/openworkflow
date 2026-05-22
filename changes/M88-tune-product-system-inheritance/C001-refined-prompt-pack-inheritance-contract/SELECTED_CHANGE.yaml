@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: selected_change:M88-tune-product-system-inheritance:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C001
+change_id: C001-refined-prompt-pack-inheritance-contract
+title: Define refined prompt pack inheritance contract
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 through ow-select-change single-queue ranking. It is the next
+  recommended ready candidate, has no dependencies, and defines the artifact
+  contract required before generated /ow:tune protocol and validator fixture
+  work.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M88-tune-product-system-inheritance/
+dependencies: []
+scope:
+  includes:
+    - refined prompt pack template fields
+    - baseline input normalization fields
+    - product_system stable constants and adaptable variables
+    - MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules
+    - screen-level source-to-target mapping
+    - screen-bound refined prompt fields and acceptance criteria
+  excludes:
+    - generated /ow:tune skill updates
+    - validator stress fixtures
+    - image generation
+    - multi-round latest-baseline resolution
+forbidden_paths:
+  - external image generation calls
+  - generated prototype image assets
+  - generated .agents skills except through later selected protocol work
+  - async subagent runtime behavior
+acceptance:
+  - Refined prompt-pack artifacts can record normalized tuning input and baseline source references.
+  - Refined prompt-pack artifacts can record baseline_screen_audit for every source screen.
+  - Refined prompt-pack artifacts can record product_system constants and adaptable variables.
+  - Delta rules include MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets.
+  - Screen prompts are bound to target_screen_id and source_screen_ids with acceptance criteria.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 is a local artifact contract and schema/validator preparation change.
+    It does not call external services, generate images, or alter asynchronous
+    runtime behavior.

@@ -69,10 +69,10 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after proto
         and tune evidence are reliable.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: ready
+    status: selected
     title: Define refined prompt pack inheritance contract
     purpose: >
       Encode the native /ow:tune artifact contract for baseline screen audit,
@@ -116,6 +116,14 @@ changes:
       - Refined prompt-pack artifacts can record product_system constants and adaptable variables.
       - Delta rules include MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets.
       - Screen prompts are bound to target_screen_id and source_screen_ids with acceptance criteria.
+    selection:
+      selected_change_id: C001-refined-prompt-pack-inheritance-contract
+      reason: >
+        Select C001 through ow-select-change single-queue ranking. It is the
+        next recommended ready candidate, has no dependencies, and defines the
+        artifact contract required before generated /ow:tune protocol and
+        validator fixture work.
+      selected_at: 2026-05-22
   - id: C002
     status: candidate
     title: Wire reference methodology into /ow:tune protocol
@@ -274,3 +282,18 @@ operations:
       - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
       - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.md
       - changes/M88-tune-product-system-inheritance/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the next recommended ready candidate in the single active
+      M88 queue; no analyze-changes run is needed for single-queue selection.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/SELECTED_CHANGE.yaml
+      - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/ATOM_TASKS.yaml
+      - changes/M88-tune-product-system-inheritance/C001-refined-prompt-pack-inheritance-contract/IMPLEMENTATION_BRIEF.md

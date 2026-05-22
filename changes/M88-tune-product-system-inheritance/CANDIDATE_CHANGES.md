@@ -20,16 +20,16 @@ design/spec work, or full discovery-loop E2E dogfood.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | ready | medium | Define refined prompt pack inheritance contract | none |
+| C001 | selected | medium | Define refined prompt pack inheritance contract | none |
 | C002 | candidate | medium | Wire reference methodology into `/ow:tune` protocol | C001 |
 | C003 | candidate | medium | Add refined prompt pack validator stress fixtures | C001, C002 |
 | C004 | candidate | medium | Support multi-round tune baseline inheritance | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C001` is ready. It defines the refined prompt pack artifact contract required
-before generated `/ow:tune` protocol and validator stress fixtures can be made
-precise.
+`C001` is selected. It defines the refined prompt pack artifact contract
+required before generated `/ow:tune` protocol and validator stress fixtures can
+be made precise.
 
 ## Deferred
 

@@ -37,9 +37,9 @@ candidate_count: 4
 active_candidate_count: 4
 completed_candidate_id: null
 completed_change_id: null
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C001
+selected_candidate_id: C001
+selected_change_id: C001-refined-prompt-pack-inheritance-contract
+next_recommended_candidate_id: null
 key_dependencies:
   - M87 completed prompt asset post-validation before image generation.
   - DISCOVER_LOOP_UPGRATE_PLAN identifies /ow:tune product-system inheritance as a deferred discovery-loop upgrade.
@@ -67,3 +67,4 @@ validation:
   notes:
     - OP001 created the M88 queue with scope limited to /ow:tune product-system inheritance.
     - C001 is the next recommended candidate because artifact contract fields should precede generated protocol and validator fixture work.
+    - OP002 selected C001 through ow-select-change single-queue ranking.

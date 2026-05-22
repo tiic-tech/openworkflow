@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M88-tune-product-system-inheritance:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C001
+change_id: C001-refined-prompt-pack-inheritance-contract
+title: Atom tasks for refined prompt pack inheritance contract
+status: ready
+tasks:
+  - id: T001
+    title: Inspect existing prototype evidence contract
+    type: read
+    status: pending
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/prototype-evidence.schema.json
+      - schemas/proto-prompt-pack.schema.json
+    done_when:
+      - Existing tune-related template fields and schema flexibility are mapped.
+  - id: T002
+    title: Add refined prompt inheritance fields
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/prototype-evidence.schema.json
+      - schemas/proto-prompt-pack.schema.json
+    done_when:
+      - Templates and schemas expose normalized tune input, baseline audit, product system, delta matrix, screen manifest, refined prompts, generation order, and acceptance checklist.
+  - id: T003
+    title: Add contract validation rules
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Validators recognize refined prompt-pack structure without rejecting existing proto prompt packs.
+      - Validators flag obviously malformed refined tune structures.
+  - id: T004
+    title: Verify contract shape
+    type: verify
+    status: pending
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/
+      - packages/core/src/validators/
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
