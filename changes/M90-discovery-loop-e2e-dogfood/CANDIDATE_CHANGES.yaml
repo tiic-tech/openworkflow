@@ -71,10 +71,10 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: ready
+    status: selected
     title: Create canonical discovery-loop dogfood fixture
     purpose: >
       Establish one maintainable text-first dogfood case that contains
@@ -115,6 +115,14 @@ changes:
       - Fixture artifact ids and refs make the chain traceable without reading unrelated repository state.
       - The fixture remains text-first and does not require external image generation.
       - Validation failures identify the artifact section that needs repair.
+    selection:
+      selected_change_id: C001-canonical-discovery-loop-dogfood-fixture
+      reason: >
+        Select C001 through ow-select-change single-queue ranking. It is the
+        next recommended ready candidate, has no dependencies, and creates the
+        canonical fixture chain required before M90 can verify happy-path or
+        negative discovery-loop routing.
+      selected_at: 2026-05-22
   - id: C002
     status: candidate
     title: Verify happy-path discovery-loop command handoff
@@ -262,3 +270,18 @@ operations:
       - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
       - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.md
       - changes/M90-discovery-loop-e2e-dogfood/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the next recommended ready candidate in the single active
+      M90 queue; no analyze-changes run is needed for single-queue selection.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/IMPLEMENTATION_BRIEF.md

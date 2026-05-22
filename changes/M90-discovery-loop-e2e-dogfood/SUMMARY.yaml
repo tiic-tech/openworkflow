@@ -41,9 +41,9 @@ candidate_count: 4
 active_candidate_count: 4
 completed_candidate_id: null
 completed_change_id: null
-selected_candidate_id: null
-selected_change_id: null
-next_recommended_candidate_id: C001
+selected_candidate_id: C001
+selected_change_id: C001-canonical-discovery-loop-dogfood-fixture
+next_recommended_candidate_id: null
 key_dependencies:
   - M84 made /ow:vision delayed-compile and proto-ready.
   - M85 upgraded validation as a proto target compiler.
@@ -71,3 +71,4 @@ validation:
   notes:
     - OP001 created the M90 queue with scope limited to synchronous text-first discovery-loop E2E dogfood.
     - C001 is next because all later E2E checks need one canonical, maintainable fixture chain.
+    - OP002 selected C001 through ow-select-change single-queue ranking.
