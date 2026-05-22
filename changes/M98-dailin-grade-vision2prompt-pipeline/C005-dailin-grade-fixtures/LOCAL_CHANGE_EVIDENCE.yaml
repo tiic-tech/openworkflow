@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C005
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C005
+change_id: C005-dailin-grade-fixtures
+title: Local evidence for dailin-grade prompt-pack fixtures
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added explicit runtime-surface fixture coverage for a dailin-grade Pocket
+  English Friend positive prompt pack, a thin D1 image-prompt regression that
+  fails screen-bound executability, and the existing direction-count and missing
+  prompt-ref integrity regressions required by C005.
+changed_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - examples/m98-dailin-grade-fixtures/README.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Runtime verification now writes DAILIN_GRADE_POCKET_ENGLISH_FRIEND_PROTO_PROMPT_PACK.yaml and asserts it passes prompt-pack schema and validator gates.
+  - Runtime verification now writes THIN_IMAGE_PROMPT_D1_PROTO_PROMPT_PACK.yaml and asserts it fails with errors naming missing screen_manifest and missing screen-bound prompt text.
+  - Existing runtime verification continues to assert direction-count mismatch failures name prompt_text_manifest.direction_count.
+  - Existing runtime verification continues to assert missing prompt-ref failures name the unresolved prompt_text_refs entry.
+  - Examples documentation records the fixture matrix without committing intentionally invalid YAML fixtures into repo-wide validation scope.
+verification:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - npm run verify:agent-e2e
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    command: npm run validate
+    reason: >
+      Repository validation still fails on pre-existing M97 planning artifacts:
+      C003 and C004 ATOM_TASKS.yaml missing title, and M97 C001-C004 done
+      candidates missing completion evidence. These paths are outside C005
+      owned behavior and were already failing before this candidate.
+next_recommended_candidate_id: C006

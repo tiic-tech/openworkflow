@@ -1,0 +1,83 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C005
+change_id: C005-dailin-grade-fixtures
+title: Atom tasks for dailin-grade prompt-pack fixtures
+status: completed
+tasks:
+  - id: T001
+    title: Inspect existing prompt-pack stress fixtures
+    type: read
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+    done_when:
+      - Existing strategic prompt-pack positive and negative fixture coverage is mapped.
+      - Fixture gaps for explicit dailin-grade positive and thin D1 prompt regressions are identified.
+  - id: T002
+    title: Add explicit dailin-grade positive fixture
+    type: test
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification writes a named dailin-grade Pocket English Friend fixture.
+      - The positive fixture passes schema and validator gates.
+  - id: T003
+    title: Add thin image-prompt regression fixture
+    type: test
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification writes a short D1 image-prompt fixture with consistent refs but missing screen-bound fields.
+      - The negative fixture fails with errors naming missing screen_manifest and screen-bound prompt text.
+  - id: T004
+    title: Preserve integrity mismatch regressions
+    type: test
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Direction-count mismatch failure names prompt_text_manifest.direction_count.
+      - Missing prompt-ref failure names the unresolved prompt_text_refs entry.
+  - id: T005
+    title: Add fixture matrix notes
+    type: docs
+    status: completed
+    owned_paths:
+      - examples/
+    done_when:
+      - Examples documentation records the fixture matrix without storing invalid YAML under repo-wide validation.
+      - Notes explain why the positive fixture is dailin-grade and not domain-specific overfitting.
+  - id: T006
+    title: Verify C005 and record evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or known unrelated failures are documented.
+      - C005 local evidence records behavior, changed paths, and verification results.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - npm run verify:agent-e2e
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate continues to fail on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.

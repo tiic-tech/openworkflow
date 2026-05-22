@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C005
+change_id: C005-dailin-grade-fixtures
+title: Add dailin-grade prompt-pack fixtures and thin-prompt regressions
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C005 after C001-C004 completion. Prompt-pack integrity, dailin-grade
+  references, screen-bound executability, and generated protocol handoff gates
+  are in place, so fixture coverage can now prove positive and negative prompt
+  pack behavior without changing schema or generated protocol semantics.
+rejected_alternatives:
+  - id: C006
+    reason: Depends on C005 fixture proof before replaying the smart city prompt pack.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - examples/
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies:
+  - C001
+  - C002
+  - C003
+  - C004
+scope:
+  includes:
+    - positive fixture modeled on dailin's Pocket English Friend output
+    - negative fixture for current smart-city-style short D1 prompt that lacks screen-bound prototype brief fields
+    - negative fixture for direction_count and prompt ref mismatch
+    - runtime-surface or repository-contract verification coverage
+    - fixture notes explaining why the positive example is not domain-specific overfitting
+  excludes:
+    - provider image calls
+    - frontend prototype generation
+    - human visual review
+forbidden_paths:
+  - provider-backed image generation code
+  - visual quality review artifacts
+  - proto2html artifacts
+acceptance:
+  - Positive dailin-grade fixture passes schema and validator gates.
+  - Thin image-prompt fixture fails on prompt executability or missing screen-bound fields.
+  - Direction-count mismatch fixture fails with an error naming the inconsistency.
+  - Missing prompt-ref fixture fails with an error naming the missing direction or prompt id.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C005 changes local verification fixtures, fixture notes, and planning
+    evidence only. It does not call providers, publish releases, mutate remote
+    repositories, add image generation, or change generated protocol semantics.
+expected_commit_boundary: >
+  Complete C005 as one coherent commit after fixture coverage, examples notes,
+  queue status, and local evidence are updated.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/LOCAL_CHANGE_EVIDENCE.yaml

@@ -27,6 +27,8 @@ Completed candidate: `C003`
 
 Completed candidate: `C004`
 
+Completed candidate: `C005`
+
 Select the first dependency-free candidate that most reduces downstream
 prompt-pack ambiguity. Stop for a high-risk decision report if a candidate
 expands beyond `/ow:vision2prompt` prompt-pack behavior into broad workflow
@@ -40,7 +42,7 @@ semantics, release publishing, or remote-impacting changes.
 | C002 | done | medium | Migrate dailin reference pipeline into OW vision2prompt references | none |
 | C003 | done | medium | Extend strategic prompt-pack contract for screen-bound executability | C001, C002 |
 | C004 | done | medium | Wire dailin-grade pipeline into generated vision2prompt protocol | C002, C003 |
-| C005 | candidate | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
+| C005 | done | medium | Add dailin-grade prompt-pack fixtures and thin-prompt regressions | C001, C002, C003, C004 |
 | C006 | candidate | medium | Replay smart city prompt pack with dailin-grade contract | C003, C004, C005 |
 
 ## Next Recommendation
@@ -50,8 +52,9 @@ downstream generation could proceed from a prompt pack whose manifest,
 directions, and evidence refs diverged. Integrity now fails closed before the
 richer dailin-style structure is added.
 
-`C004` is complete. `C005` is now the next candidate because fixtures can assert
-the full contract plus generated protocol behavior.
+`C005` is complete. `C006` is now the next candidate because the full M98
+contract and fixture gates are proven and the smart city replay can target the
+final prompt-pack source shape.
 
 ## Deferred
 
@@ -153,12 +156,22 @@ Purpose: prove the new contract and validators distinguish executable product
 prototype briefs from short image prompts and internally inconsistent prompt
 packs.
 
+Selected change artifacts:
+
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/SELECTED_CHANGE.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/ATOM_TASKS.yaml`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/IMPLEMENTATION_BRIEF.md`
+- `changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/LOCAL_CHANGE_EVIDENCE.yaml`
+
 Validation:
 
 - `npm run build`
 - `npm run verify:runtime-surface`
 - `npm run verify:agent-e2e`
 - `npm run validate`
+- `node dist/cli/src/index.js validate --root . --json`
+- `node dist/cli/src/index.js summaries --root . --strict --json`
+- `git diff --check`
 
 ### C006 - Replay Smart City Prompt Pack With Dailin-Grade Contract
 

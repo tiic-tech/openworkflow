@@ -87,7 +87,7 @@ scope_control:
         Proto2html should consume an accepted benchmark after prompt-pack and
         visual-quality gates are trustworthy.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -361,7 +361,7 @@ changes:
           artifact issues unrelated to C004; build, sync, agent e2e, dist CLI
           validation, strict summaries, grep check, and diff check pass.
   - id: C005
-    status: candidate
+    status: done
     title: Add dailin-grade prompt-pack fixtures and thin-prompt regressions
     purpose: >
       Prove the new contract and validators distinguish executable product
@@ -402,6 +402,38 @@ changes:
       - Thin image-prompt fixture fails on prompt executability or missing screen-bound fields.
       - Direction-count mismatch fixture fails with an error naming the inconsistency.
       - Missing prompt-ref fixture fails with an error naming the missing direction or prompt id.
+    selection:
+      selected_change_id: C005-dailin-grade-fixtures
+      selected_at: 2026-05-22
+      reason: >
+        C005 is the next ready candidate after C001-C004. The schema,
+        validators, OW-owned references, screen-bound executability contract,
+        and generated protocol gates are complete, so fixture coverage can now
+        prove positive dailin-grade prompt packs and negative thin prompt
+        regressions without changing workflow semantics.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C005 added an explicit dailin-grade Pocket English Friend positive
+          runtime fixture and asserted it passes schema and validator gates.
+        - >
+          C005 added a thin D1 image-prompt regression that keeps refs
+          consistent but fails on missing screen_manifest and missing
+          screen-bound prompt text before image generation.
+        - >
+          C005 preserved direction-count mismatch and missing prompt-ref
+          regressions that name the relevant manifest inconsistency.
+        - >
+          C005 added examples documentation for the fixture matrix without
+          storing intentionally invalid YAML in repo-wide validation scope.
+        - >
+          npm run validate is expected to continue failing on the same
+          pre-existing M97 planning artifact issues unrelated to C005; build,
+          runtime surface, agent e2e, dist CLI validation, strict summaries,
+          and diff check pass.
   - id: C006
     status: candidate
     title: Replay smart city prompt pack with dailin-grade contract
