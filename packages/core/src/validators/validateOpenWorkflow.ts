@@ -573,7 +573,7 @@ function validateRefinedPrototypePromptPack(label: string, data: Record<string, 
   validateRequiredObjectFields(label, "tune_input", data.tune_input, ["baseline_source_type", "baseline_refs", "tune_request", "regeneration_scope"], errors);
   validateRefinedBaselineAudit(label, data.baseline_audit, errors);
   validateRequiredObjectFields(label, "product_system", data.product_system, REFINED_PRODUCT_SYSTEM_FIELDS, errors);
-  validateRefinedDeltaRules(label, data.delta_rules, errors);
+  validateRefinedDeltaRules(label, data.delta_rules, data.tune_input, errors);
   validateRefinedScreenDeltaMatrix(label, data.screen_delta_matrix, errors);
   const manifestIds = validateRefinedScreenManifest(label, data.screen_manifest, errors);
   validateRefinedScreenPrompts(label, data.screen_prompts, manifestIds, errors);
@@ -631,7 +631,7 @@ function validateRefinedBaselineAudit(label: string, value: unknown, errors: str
   });
 }
 
-function validateRefinedDeltaRules(label: string, value: unknown, errors: string[]): void {
+function validateRefinedDeltaRules(label: string, value: unknown, tuneInput: unknown, errors: string[]): void {
   if (!isRecord(value)) {
     errors.push(`${label} delta_rules must be a mapping`);
     return;
@@ -643,6 +643,10 @@ function validateRefinedDeltaRules(label: string, value: unknown, errors: string
   }
   if (Array.isArray(value.must_inherit) && value.must_inherit.length === 0) {
     errors.push(`${label} delta_rules.must_inherit must preserve baseline product-system constants`);
+  }
+  const tuneRequest = isRecord(tuneInput) ? String(tuneInput.tune_request ?? "").toLowerCase() : "";
+  if (/\b(remove|delete|drop|eliminate|hide)\b/.test(tuneRequest) && Array.isArray(value.must_remove) && value.must_remove.length === 0) {
+    errors.push(`${label} delta_rules.must_remove must name requested removals from tune_input.tune_request`);
   }
 }
 

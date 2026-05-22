@@ -57,6 +57,7 @@ async function main(): Promise<number> {
     await verifyDesignContract(target);
     await verifyTuneDecisionSurface(target);
     await verifyStrategicPromptPackStressFixtures(target, env);
+    await verifyRefinedPromptPackStressFixtures(target, env);
     await verifyNoDefaultCodexCommands(target);
     await verifyNonDestructiveSyncMigration(tempRoot, env);
   } finally {
@@ -2285,6 +2286,218 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   const single = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
   assert(single.code === 0, `single-direction strategic prompt-pack fixture should skip post-validation and pass: ${single.output}`);
   await unlink(singlePath);
+}
+
+async function verifyRefinedPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const fixtureDir = join(root, ".openworkflow", "prototypes", "tune-stress-fixtures");
+  await mkdir(fixtureDir, { recursive: true });
+
+  const readyPath = join(fixtureDir, "READY_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(readyPath, refinedPromptPackFixture("ready"), "utf8");
+  const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(ready.code === 0, `ready refined prompt-pack fixture should pass validation: ${ready.output}`);
+  await unlink(readyPath);
+
+  const missingBaselinePath = join(fixtureDir, "MISSING_BASELINE_AUDIT_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingBaselinePath, refinedPromptPackFixture("missing-baseline-audit"), "utf8");
+  const missingBaseline = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingBaseline.code !== 0, "missing baseline audit refined prompt-pack fixture should fail validation");
+  assert(missingBaseline.output.includes("baseline_audit must contain source screen audits"), "missing baseline audit failure should name baseline_audit");
+  await unlink(missingBaselinePath);
+
+  const orphanPath = join(fixtureDir, "ORPHAN_SCREEN_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(orphanPath, refinedPromptPackFixture("orphan-screen-prompt"), "utf8");
+  const orphan = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(orphan.code !== 0, "orphan target screen refined prompt-pack fixture should fail validation");
+  assert(orphan.output.includes("screen_prompts[0].target_screen_id must exist in screen_manifest"), "orphan target screen failure should name screen_manifest linkage");
+  await unlink(orphanPath);
+
+  const missingInheritPath = join(fixtureDir, "MISSING_MUST_INHERIT_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingInheritPath, refinedPromptPackFixture("missing-must-inherit"), "utf8");
+  const missingInherit = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingInherit.code !== 0, "missing must_inherit refined prompt-pack fixture should fail validation");
+  assert(missingInherit.output.includes("delta_rules.must_inherit must preserve baseline product-system constants"), "missing must_inherit failure should name delta_rules.must_inherit");
+  await unlink(missingInheritPath);
+
+  const missingRemovePath = join(fixtureDir, "MISSING_MUST_REMOVE_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingRemovePath, refinedPromptPackFixture("missing-must-remove"), "utf8");
+  const missingRemove = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingRemove.code !== 0, "missing must_remove refined prompt-pack fixture should fail validation when tune request removes elements");
+  assert(missingRemove.output.includes("delta_rules.must_remove must name requested removals"), "missing must_remove failure should name delta_rules.must_remove");
+  await unlink(missingRemovePath);
+}
+
+type RefinedPromptPackFixtureKind = "ready" | "missing-baseline-audit" | "orphan-screen-prompt" | "missing-must-inherit" | "missing-must-remove";
+
+function refinedPromptPackFixture(kind: RefinedPromptPackFixtureKind): string {
+  const baselineAudit =
+    kind === "missing-baseline-audit"
+      ? ["baseline_audit: []"]
+      : [
+          "baseline_audit:",
+          "  - source_screen_id: SRC_M01",
+          "    screen_name: Daily mission entry",
+          "    journey_stage: practice_start",
+          "    user_goal: Begin a low-pressure speaking practice session.",
+          "    system_state: AI remembers yesterday confidence and offers one scenario.",
+          "    components:",
+          "      - scenario card",
+          "      - remembered confidence note",
+          "      - speaking action",
+          "    copy_tone: warm, concise, encouraging",
+          "    represented_feature: remembered daily speaking mission",
+          "    ai_or_system_behavior: remembers emotional state and suggests concrete phrase options",
+          "    trust_controls:",
+          "      - memory visibility",
+          "      - correction boundary",
+          "    visual_cues:",
+          "      - calm mobile layout",
+          "      - progress marker",
+          "    must_preserve:",
+          "      - emotional memory note",
+          "      - primary speaking action",
+          "    transform_or_remove:",
+          "      - remove decorative badge clutter",
+          "    assumptions: []",
+        ];
+  const mustInherit = kind === "missing-must-inherit" ? [] : ["product thesis", "daily mission loop", "memory trust controls"];
+  const mustRemove = kind === "missing-must-remove" ? [] : ["decorative badge clutter"];
+  const promptTarget = kind === "orphan-screen-prompt" ? "WEB_S99" : "WEB_S01";
+  return [
+    "schema_version: 0.1.0",
+    `contract_id: prototype_evidence:${kind}-refined-prompt-pack`,
+    "contract_type: prototype",
+    `title: ${kind} refined prompt-pack fixture`,
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can tune preserve product system while refining screen prompts?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: refined_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:tune",
+    "  refs:",
+    "    - .openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+    "tune_input:",
+    "  baseline_source_type: images",
+    "  baseline_refs:",
+    "    - .openworkflow/prototypes/proto-1/images/daily-entry.png",
+    "  tune_request: Remove decorative badge clutter and convert the accepted mobile screen into a desktop web screen.",
+    "  target_form_factor: desktop_web",
+    "  regeneration_scope: selected_screens",
+    "  target_screen_count: 1",
+    "  locked_screens:",
+    "    - SRC_M01",
+    "  locked_elements:",
+    "    - emotional memory note",
+    "    - primary speaking action",
+    "  constraints:",
+    "    - keep privacy and memory controls visible",
+    ...baselineAudit,
+    "product_system:",
+    "  product_thesis: AI companion turns emotional memory into repeated spoken practice.",
+    "  target_user: English learner who freezes in real conversation.",
+    "  primary_loop: remember state, rehearse scenario, give warm correction, suggest real-world action",
+    "  brand_promise: speaking practice feels personal and safe",
+    "  interaction_model: guided companion rehearsal",
+    "  information_architecture:",
+    "    - mission entry",
+    "    - phrase practice",
+    "    - recap",
+    "  design_language:",
+    "    - calm",
+    "    - trust-forward",
+    "  component_vocabulary:",
+    "    - scenario card",
+    "    - confidence note",
+    "    - speaking action",
+    "  copywriting_style: warm and concrete",
+    "  feature_system:",
+    "    - emotional memory",
+    "    - scenario rehearsal",
+    "  trust_and_boundary_system:",
+    "    - visible memory controls",
+    "    - correction boundary",
+    "  anti_goals:",
+    "    - exam prep dashboard",
+    "  stable_constants:",
+    "    - companion memory",
+    "    - daily speaking loop",
+    "  adaptable_variables:",
+    "    - layout density",
+    "    - desktop navigation",
+    "delta_rules:",
+    "  must_inherit:",
+    ...yamlStringList(mustInherit, 4),
+    "  must_add:",
+    "    - desktop information hierarchy",
+    "  must_remove:",
+    ...yamlStringList(mustRemove, 4),
+    "  flexible_change:",
+    "    - visual spacing",
+    "    - secondary card order",
+    "screen_delta_matrix:",
+    "  - target_screen_id: WEB_S01",
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    preserve:",
+    "      - emotional memory note",
+    "      - primary speaking action",
+    "    add:",
+    "      - desktop side panel",
+    "    remove:",
+    "      - decorative badge clutter",
+    "    transform:",
+    "      - mobile stacked cards into desktop two-column layout",
+    "    flexible:",
+    "      - secondary metric placement",
+    "    acceptance_criteria:",
+    "      - Product thesis remains visible.",
+    "      - Removed clutter does not reappear.",
+    "screen_manifest:",
+    "  - target_screen_id: WEB_S01",
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    screen_name: Desktop daily mission entry",
+    "    target_form_factor: desktop_web",
+    "    generation_scope: selected_screen_regeneration",
+    "    dependencies:",
+    "      - baseline product system",
+    "global_design_prompt: Preserve the calm companion product system while adapting the screen to desktop web.",
+    "screen_prompts:",
+    "  - prompt_id: WEB_S01_PROMPT",
+    `    target_screen_id: ${promptTarget}`,
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    screen_name: Desktop daily mission entry",
+    "    image_role: refined desktop web screen",
+    "    prompt: Create a desktop web screen that preserves the remembered emotional note, scenario rehearsal, speaking action, and privacy controls while removing decorative badge clutter.",
+    "    negative_prompt: Do not add exam dashboards, generic LMS navigation, or decorative badge clutter.",
+    "    acceptance_criteria:",
+    "      - target screen maps back to SRC_M01",
+    "      - primary speaking action remains prominent",
+    "generation_order:",
+    "  - WEB_S01",
+    "acceptance_checklist:",
+    "  - Baseline product thesis is preserved.",
+    "  - Requested removals are absent.",
+    "negative_constraints:",
+    "  - Do not generate HTML.",
+    "review_plan:",
+    "  method: validate tune inheritance and screen binding",
+    "result: pass",
+    "handoff:",
+    "  next_command: /ow:tune",
+  ].join("\n");
+}
+
+function yamlStringList(values: string[], indent: number): string[] {
+  const spaces = " ".repeat(indent);
+  return values.length === 0 ? [`${spaces}[]`] : values.map((value) => `${spaces}- ${value}`);
 }
 
 function thinStrategicPromptPackFixture(): string {
