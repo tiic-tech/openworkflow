@@ -6,7 +6,7 @@ plan_id: M90-discovery-loop-e2e-dogfood
 candidate_id: C002
 change_id: C002-happy-path-discovery-loop-handoff
 title: Verify happy-path discovery-loop command handoff
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium
@@ -58,3 +58,8 @@ high_risk:
     C002 is medium risk because it adds local generated-surface and fixture
     handoff verification only. It does not run external image generation or
     introduce async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: c524446
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml

@@ -71,7 +71,7 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -130,7 +130,7 @@ changes:
       evidence:
         - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: selected
+    status: done
     title: Verify happy-path discovery-loop command handoff
     purpose: >
       Add E2E checks proving the generated command surfaces and context packets
@@ -179,8 +179,14 @@ changes:
         candidate to prove generated command surfaces and context packets can
         guide an agent through the happy-path discovery loop.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-happy-path-discovery-loop-handoff
+      completed_at: 2026-05-22
+      commit: c524446
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: candidate
+    status: ready
     title: Verify discovery-loop failure routing
     purpose: >
       Add negative dogfood cases for thin vision, blocked validation, failed
@@ -342,3 +348,30 @@ operations:
       - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/SELECTED_CHANGE.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/ATOM_TASKS.yaml
       - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 added generated command audit and context packet assertions proving
+      the happy-path discovery-loop order reaches benchmark-selection readiness
+      without entering proto2html.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Mark C003 ready after C002 completed happy-path handoff checks, enabling
+      negative discovery-loop failure routing verification.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml

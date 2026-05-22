@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M90-discovery-loop-e2e-dogfood:C002
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C002
+change_id: C002-happy-path-discovery-loop-handoff
+title: Local commit evidence for happy-path discovery-loop handoff
+status: completed
+completed_at: 2026-05-22
+commit: c524446
+summary: >
+  Added runtime-surface assertions that the generated command audit and context
+  packets expose the happy-path discovery-loop order from vision through
+  validation, internal prompt compilation, prompt2proto metadata, tune, and
+  internal decision audit without entering proto2html.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+acceptance_results:
+  - acceptance: Generated command surfaces expose the expected discovery-loop order.
+    result: pass
+    evidence: command audit ordering assertions in npm run verify:runtime-surface
+  - acceptance: Context packets contain enough optional/required context for agents to consume the next artifact.
+    result: pass
+    evidence: context packet assertions for vision2prompt, prompt2proto, and tune
+  - acceptance: Happy-path fixture handoff reaches benchmark-selection readiness without entering proto2html.
+    result: pass
+    evidence: decision fixture refs and no proto2html command audit assertion
+  - acceptance: The checks fail if a command loses its generated handoff or artifact boundary.
+    result: pass
+    evidence: generated command audit and context packet string assertions
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C002 is medium risk and required no high-risk approval.
+  - C003 is now ready to verify negative discovery-loop failure routing.
