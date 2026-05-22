@@ -1,0 +1,90 @@
+schema_version: 0.1.0
+contract_id: summary:M100-dailin-grade-image-prompt-paragraphs
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M100-dailin-grade-image-prompt-paragraphs
+title: Summary for dailin-grade image prompt paragraphs
+status: active
+source:
+  kind: mixed
+  summary: >
+    User requires /ow:vision2prompt generated image prompt paragraphs to match
+    or exceed dailin OUTPUT_PROMPT quality. M98/M99 source completeness is not
+    enough: the actual prompt text must become full high-fidelity prototype
+    generation briefs.
+  refs:
+    - user_direction:2026-05-23-require-vision2prompt-image-prompts-match-dailin-output
+    - changes/M98-dailin-grade-vision2prompt-pipeline/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md
+    - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/reference/
+scope_boundary: >
+  One workflow slice: /ow:vision2prompt image-generation prompt paragraph
+  quality. The queue upgrades direction-level and screen-level prompt text from
+  terse screen-state descriptions into dailin-grade high-fidelity prototype
+  generation briefs.
+branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
+candidate_count: 6
+active_candidate_count: 6
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+deferred_feature_refs:
+  - M101-provider-image-generation-benchmark
+  - M102-prototype-visual-reference-parity-gate
+  - M103-prototype-storyboard-motion-model
+outputs:
+  candidate_changes_yaml: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
+  summary: changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+key_dependencies:
+  - C001 comes first because the dailin skill workflow and reference instructions must become an explicit OW prompt paragraph contract before schemas or generated protocols can enforce it.
+  - C002 depends on C001 because validators need the paragraph anatomy and failure dimensions.
+  - C003 depends on C001 and C002 because generated /ow:vision2prompt guidance should point to stable contract and gate fields.
+  - C004 depends on C002 and C003 because fixtures should prove the final schema and protocol behavior.
+  - C005 depends on C003 and C004 because the real target replay should run only after the command surface and regressions are in place.
+  - C006 depends on C005 because downstream visual parity no-go criteria need real replay evidence.
+risks:
+  - id: R001
+    level: medium
+    description: >
+      The queue could accidentally drift back into visual reference parity or
+      provider image generation.
+    mitigation: Keep provider generation, visual review, proto2html, and storyboard/motion explicitly out of scope.
+  - id: R002
+    level: medium
+    description: >
+      Text-quality validation could become too subjective for deterministic
+      runtime checks.
+    mitigation: Enforce structural paragraph anatomy and required dimensions, then record direct dailin comparison as evidence.
+  - id: R003
+    level: medium
+    description: >
+      Requiring longer prompt text could break existing prompt-pack fixtures or
+      refined prompt-pack compatibility.
+    mitigation: Add fixtures incrementally, preserve M98 gates, and keep /ow:tune compatibility checks in runtime verification where touched.
+  - id: R004
+    level: medium
+    description: >
+      Current planning branch is codex/m99-smart-city-m98-e2e-replay while this
+      queue's intended branch boundary is codex/m100-dailin-grade-image-prompt-paragraphs.
+    mitigation: Select or implement candidates only after switching to the M100 branch or explicitly recording why branch-boundary maintenance is acceptable.
+unresolved_questions: []
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
+  notes:
+    - Created planning artifacts only; no SELECTED_CHANGE, ATOM_TASKS, IMPLEMENTATION_BRIEF, source code, generated adapter, provider image generation, or target replay was executed.
+    - Current branch is codex/m99-smart-city-m98-e2e-replay; the planned queue branch boundary is codex/m100-dailin-grade-image-prompt-paragraphs.
+    - Direct quality target is prompt paragraph quality, not source completeness.
+    - User clarified that dailin vision_to_strategic_prototype_prompt SKILL and its detailed reference instructions are the foundation for raising /ow:vision2prompt quality.
+    - M99 smart city target prompt pack is source-complete but its prompt paragraphs are shorter and less journey-rich than dailin OUTPUT_PROMPT.

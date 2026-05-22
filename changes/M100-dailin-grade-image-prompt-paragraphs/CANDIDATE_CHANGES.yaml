@@ -1,0 +1,360 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M100-dailin-grade-image-prompt-paragraphs
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M100-dailin-grade-image-prompt-paragraphs
+title: Candidate changes for dailin-grade image prompt paragraphs
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_direction:2026-05-23-require-vision2prompt-image-prompts-match-dailin-output
+    - changes/M98-dailin-grade-vision2prompt-pipeline/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md
+    - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/reference/
+  summary: >
+    M98 and M99 repaired prompt-pack source completeness, but direct comparison
+    against dailin OUTPUT_PROMPT shows the actual image-generation prompt
+    paragraphs remain too short and state-like. This queue upgrades
+    /ow:vision2prompt so generated prompt text itself matches or exceeds dailin's
+    high-fidelity prototype prompt quality. The primary source method is the
+    dailin vision_to_strategic_prototype_prompt skill and its step-by-step
+    reference instructions, with OUTPUT_PROMPT used as the concrete output bar.
+queue_policy:
+  branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select the first dependency-free candidate that most directly turns the
+    qualitative dailin benchmark into enforceable OpenWorkflow prompt-generation
+    behavior. Do not start provider image generation or visual review in this
+    queue.
+  high_risk_rule: >
+    If a candidate expands into provider-backed generation, visual scoring,
+    proto2html, or broad workflow redesign outside /ow:vision2prompt prompt
+    text quality, stop and write HIGH_RISK_DECISION_REPORT.md before selection.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Upgrade only the image-generation prompt paragraphs produced by
+    /ow:vision2prompt, especially direction-level prototype prompts and
+    screen_prompts[].prompt, so they become dailin-grade high-fidelity prototype
+    prompts rather than terse screen-state image instructions.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include prompt paragraph quality contract, schema/validator gates,
+    generated /ow:vision2prompt protocol guidance, runtime fixtures, and
+    smart_city_copilot replay evidence needed to prove the generated prompt
+    text quality.
+  out_of_scope_rule: >
+    Do not run provider-backed image generation, human visual review,
+    visual-reference parity scoring, proto2html, storyboard/motion modeling, or
+    unrelated OpenWorkflow source changes in this queue.
+  deferred_features:
+    - title: Provider-backed image quality benchmark
+      reason: >
+        This queue stops at prompt text quality. Provider output quality needs a
+        later queue after prompt paragraphs are strong enough to test.
+      suggested_plan_id: M101-provider-image-generation-benchmark
+    - title: Visual reference parity gate
+      reason: >
+        Reference parity requires generated images or rendered prototypes and a
+        visual review method, not just prompt text.
+      suggested_plan_id: M102-prototype-visual-reference-parity-gate
+    - title: Storyboard and motion progression
+      reason: >
+        Dailin-level static prompt quality is necessary first, but video-like
+        state progression should remain a separate artifact family.
+      suggested_plan_id: M103-prototype-storyboard-motion-model
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Map dailin skill workflow into OW prompt paragraph contract
+    purpose: >
+      Use the dailin vision_to_strategic_prototype_prompt SKILL as the base
+      method and map each step/reference into an explicit OpenWorkflow contract:
+      generated prompt paragraphs must follow the same normalize, decompose,
+      hypothesize, select, write, recommend, and rubric-check flow before they
+      can be treated as image-generation-ready.
+    scope:
+      includes:
+        - step-by-step mapping from dailin SKILL execution workflow to OW vision2prompt references
+        - mapping for reference/01_input_contract.md through reference/06_quality_rubric.md
+        - direct quality comparison notes between M99 smart_city prompt text and dailin OUTPUT_PROMPT
+        - a required paragraph anatomy for image-generation prompts
+        - a scoring rubric that treats dailin OUTPUT_PROMPT as the minimum bar
+        - failure examples for short state-only prompts
+        - explicit boundary that this queue verifies prompt text, not generated image quality
+      excludes:
+        - JSON schema changes
+        - validator implementation
+        - generated skill sync
+        - target repo replay
+    owned_paths:
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+    risk: medium
+    size: medium
+    validation:
+      - rg -n "dailin-grade image prompt|paragraph anatomy|journey|system response|vision_to_strategic_prototype_prompt" skills/build-prototype/references
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The OW reference pipeline explicitly mirrors dailin SKILL steps 1-6: normalize inputs, extract strategic core, generate candidate hypotheses, select N directions, write each prototype prompt, and recommend build order.
+      - The OW reference protocol names dailin OUTPUT_PROMPT as the minimum paragraph quality benchmark, not merely an example.
+      - Each dailin reference file from 01_input_contract through 06_quality_rubric has an OW-owned equivalent instruction or explicit mapped subsection.
+      - The prompt schema reference requires long-form generation prompt paragraphs with product context, target user, screen purpose, components, states, interactions, system response, example copy, trust controls, visual direction, anti-goals, journey linkage, and desired user feeling.
+      - The quality rubric fails terse one-sentence screen prompts even when YAML fields are present.
+      - The queue remains scoped to prompt text quality and does not claim visual parity.
+  - id: C002
+    status: candidate
+    title: Enforce long-form generation prompt structure in schemas and validators
+    purpose: >
+      Make dailin-grade prompt text quality fail closed by extending the formal
+      prompt-pack contract beyond field presence into paragraph anatomy and
+      minimum prompt substance.
+    scope:
+      includes:
+        - schema support for long-form direction and screen generation prompts
+        - validator checks for required prompt sections or equivalent structured fields
+        - validator rejection of short state-only prompts before ready_for_image_generation
+        - summary-health exposure when prompt paragraphs are structurally thin
+      excludes:
+        - subjective visual scoring
+        - provider-backed image generation
+        - target repo replay
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - A prompt pack with M99-style one-sentence screen_prompts cannot be marked ready_for_image_generation.
+      - A dailin-style long-form prompt fixture passes without weakening prompt_pack_integrity_gate or prototype_reality_gate.
+      - Validation errors name the missing paragraph-quality dimensions instead of only generic prompt presence.
+  - id: C003
+    status: candidate
+    title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
+    purpose: >
+      Change generated /ow:vision2prompt guidance so agents write complete
+      high-fidelity prototype prompt paragraphs directly in PROTO_PROMPT_PACK,
+      with dailin SKILL workflow fidelity and dailin-level density by default.
+    scope:
+      includes:
+        - command registry protocol updates for /ow:vision2prompt
+        - generated guidance that loads and executes the mapped OW equivalents of dailin 01-06 references in order
+        - build-prototype skill guidance that forbids terse screen-state prompts
+        - generated .agents/skills/ow-vision2prompt/SKILL.md sync evidence
+        - prompt2proto handoff guidance requiring paragraph-quality gates
+      excludes:
+        - provider image execution
+        - generated image review
+        - proto2html
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Generated ow-vision2prompt skill requires the dailin SKILL workflow order before writing prompt paragraphs.
+      - Generated ow-vision2prompt skill requires dailin-grade long-form prompt paragraphs before /ow:prompt2proto handoff.
+      - Generated protocol explicitly names journey, interaction behavior, system response, trust controls, anti-goals, visual direction, and desired user feeling as required prompt text.
+      - The protocol preserves M98 source-completeness gates and adds paragraph quality rather than replacing them.
+  - id: C004
+    status: candidate
+    title: Add dailin-grade prompt fixtures and thin-prompt regressions
+    purpose: >
+      Prove the new quality gate with both positive and negative runtime
+      examples so future agents cannot skip the dailin SKILL steps or regress
+      to M99-style terse prompts.
+    scope:
+      includes:
+        - positive fixture modeled after dailin SKILL workflow and OUTPUT_PROMPT paragraph density
+        - smart city positive fixture with complete long-form generation prompts
+        - negative fixture representing the current M99 short prompt style
+        - negative fixture that has long wording but skips strategic hypothesis or build recommendation structure
+        - runtime verification assertions for pass/fail behavior
+      excludes:
+        - provider-backed image generation
+        - visual quality review
+        - target repo mutation
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+      - examples/
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Runtime verification fails a short prompt that only says "Show the same map shell..." without full journey/system-response content.
+      - Runtime verification fails a prompt pack that omits strategic core, distinct hypothesis, or build recommendation evidence required by the dailin SKILL workflow.
+      - Runtime verification passes a dailin-density prompt pack with full screen purpose, actions, system responses, trust controls, anti-goals, visual direction, and user feeling.
+      - Existing smart city fixture is upgraded or duplicated so it demonstrates the new paragraph bar.
+  - id: C005
+    status: candidate
+    title: Replay smart_city_copilot with dailin-grade prompt paragraphs
+    purpose: >
+      Run a clean target-repo replay that proves real /ow:vision2prompt output
+      now generates prompt paragraphs comparable to dailin OUTPUT_PROMPT, not
+      just source-complete YAML.
+    scope:
+      includes:
+        - clean smart_city_copilot target replay using the updated command surface
+        - comparison of generated prompt paragraphs against dailin OUTPUT_PROMPT
+        - evidence that prompt_text_manifest readiness depends on paragraph quality
+        - target commit/status/handoff evidence
+      excludes:
+        - provider-backed image generation
+        - human visual review
+        - proto2html
+        - storyboard/motion modeling
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/SUMMARY.yaml
+    dependencies:
+      - C003
+      - C004
+    unlocks:
+      - C006
+    risk: medium
+    size: medium
+    validation:
+      - node dist/cli/src/index.js handoff --root . --json
+      - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /tmp/smart-city-m99-e2e-worktree --json
+      - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /tmp/smart-city-m99-e2e-worktree --strict --json
+      - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /tmp/smart-city-m99-e2e-worktree --json
+      - git diff --check
+    acceptance:
+      - Target prompt paragraphs include complete product context, journey step, screen purpose, components, user actions, system response, concrete copy/data, trust controls, anti-goals, visual direction, and desired user feeling.
+      - Direct comparison records the new smart city prompt text as at least dailin-grade on prompt paragraph density and generation usefulness.
+      - Target image_generation.status remains not_started unless a later queue explicitly authorizes provider-backed generation.
+  - id: C006
+    status: candidate
+    title: Record no-go criteria for future visual parity work
+    purpose: >
+      Prevent visual parity, provider benchmarks, or proto2html from starting
+      until prompt paragraphs satisfy the dailin-grade bar in real target replay.
+    scope:
+      includes:
+        - a concise downstream handoff report
+        - explicit go/no-go facts for visual reference parity
+        - update to synthesis notes distinguishing prompt text quality from image output quality
+      excludes:
+        - visual review artifacts
+        - image generation
+        - implementation beyond planning/evidence docs
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    dependencies:
+      - C005
+    unlocks:
+      - M102-prototype-visual-reference-parity-gate
+      - M101-provider-image-generation-benchmark
+    risk: low
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The handoff report states whether prompt paragraph quality is dailin-grade or still blocked.
+      - Downstream visual parity work is allowed only after C005 evidence passes.
+      - No image-generation or visual-review claims are made in this queue.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    actor: agent
+    reason: >
+      Create a new queue for the user's direct requirement that
+      /ow:vision2prompt generated image prompt paragraphs match or exceed
+      dailin OUTPUT_PROMPT quality.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
+      - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
