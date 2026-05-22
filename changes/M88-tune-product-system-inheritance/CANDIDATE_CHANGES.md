@@ -22,14 +22,14 @@ design/spec work, or full discovery-loop E2E dogfood.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Define refined prompt pack inheritance contract | none |
 | C002 | done | medium | Wire reference methodology into `/ow:tune` protocol | C001 |
-| C003 | selected | medium | Add refined prompt pack validator stress fixtures | C001, C002 |
-| C004 | candidate | medium | Support multi-round tune baseline inheritance | C001, C002, C003 |
+| C003 | done | medium | Add refined prompt pack validator stress fixtures | C001, C002 |
+| C004 | ready | medium | Support multi-round tune baseline inheritance | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C003` is selected. It adds validator stress fixtures for complete, missing
-baseline audit, orphan target screen, and missing inheritance/removal rule
-refined prompt packs.
+`C004` is ready. It adds latest-baseline and locked-element carry-forward
+behavior so repeated `/ow:tune` passes preserve accepted improvements instead
+of silently reverting to stale source screens.
 
 ## Deferred
 

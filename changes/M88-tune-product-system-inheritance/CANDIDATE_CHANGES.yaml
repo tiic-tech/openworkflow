@@ -69,7 +69,7 @@ scope_control:
         Proto2html should consume the selected benchmark prototype after proto
         and tune evidence are reliable.
       suggested_plan_id: M91-proto2html-benchmark-input
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -193,7 +193,7 @@ changes:
       evidence:
         - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: selected
+    status: done
     title: Add refined prompt pack validator stress fixtures
     purpose: >
       Pressure-test /ow:tune artifacts so validators reject product-system drift,
@@ -241,8 +241,14 @@ changes:
         C002 are complete, C003 is the next ready candidate, and validator
         stress fixtures are required before multi-round tune inheritance work.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-refined-prompt-pack-validator-fixtures
+      completed_at: 2026-05-22
+      commit: abc656b
+      evidence:
+        - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: candidate
+    status: ready
     title: Support multi-round tune baseline inheritance
     purpose: >
       Make /ow:tune preserve the latest approved prototype group and locked
@@ -409,3 +415,30 @@ operations:
       - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/SELECTED_CHANGE.yaml
       - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/ATOM_TASKS.yaml
       - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 added refined prompt-pack runtime stress fixtures and validator
+      repair messages for complete packs, missing baseline audits, orphan screen
+      prompts, missing inheritance rules, and missing requested-removal rules.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M88-tune-product-system-inheritance/C003-refined-prompt-pack-validator-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Mark C004 ready after C003 completed validator stress fixtures needed
+      before multi-round tune baseline inheritance work.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml

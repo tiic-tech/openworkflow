@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M88-tune-product-system-inheritance:C003
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C003
+change_id: C003-refined-prompt-pack-validator-fixtures
+title: Local commit evidence for refined prompt pack validator fixtures
+status: completed
+completed_at: 2026-05-22
+commit: abc656b
+summary: >
+  Added refined prompt-pack runtime stress fixtures and tightened validator
+  repair messages so /ow:tune artifacts must include baseline audits,
+  screen-bound prompts, inherited product-system constants, and requested
+  removal rules.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+acceptance_results:
+  - acceptance: Complete refined prompt pack passes validation.
+    result: pass
+    evidence: npm run verify:runtime-surface
+  - acceptance: Missing baseline audit fails validation.
+    result: pass
+    evidence: npm run verify:runtime-surface
+  - acceptance: Orphan target screen prompt fails validation.
+    result: pass
+    evidence: npm run verify:runtime-surface
+  - acceptance: Missing inheritance or requested-removal rules fail validation.
+    result: pass
+    evidence: npm run verify:runtime-surface
+  - acceptance: Failure output points to the missing repair section.
+    result: pass
+    evidence: npm run verify:runtime-surface
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C003 is medium risk and required no high-risk approval.
+  - Runtime-surface verification exercises both generated CLI validation and repair-oriented failure messages.
