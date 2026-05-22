@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M99-smart-city-m98-e2e-replay:C003
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C003
+change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
+title: Local evidence for real replay comparison
+status: completed
+completed_at: 2026-05-23
+summary: >
+  Compared the real target replay against the M98 C006 fixture, M97 prompt-pack
+  source gap notes, and the dailin output prompt quality reference. The real
+  target replay proves M98 prompt-pack source completeness; remaining gaps are
+  visual reference parity and storyboard/motion richness, not a
+  /ow:vision2prompt source-completeness repair.
+comparison_sources:
+  target_replay:
+    path: /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+    commit: 9a609cf901217cd1324e589459c90dfcddbad687
+  c006_fixture: examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+  m97_gap_report: docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+  dailin_prompt_quality_reference: /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+findings:
+  source_complete: true
+  target_matches_c006_contract: true
+  m97_source_gap_repaired_in_real_target: true
+  dailin_quality_alignment:
+    aligned:
+      - coherent product hypothesis
+      - screen-bound product states
+      - direct generatability
+      - concrete components, data fields, actions, copy, and trust controls
+      - negative constraints
+      - privacy and trust boundaries
+    intentionally_deferred:
+      - full end-to-end journey richness
+      - storyboard and motion progression
+      - visual reference parity
+      - provider-backed image quality
+recommendation:
+  next_step: proceed_to_visual_reference_parity_gate
+  repair_vision2prompt_source_completeness: false
+  rationale: >
+    The target prompt pack now carries the M98 source-completeness fields in
+    the formal source artifact. Dailin comparison shows remaining quality work
+    is journey/storyboard/reference-parity richness, not a missing prompt-pack
+    source contract.
+scope_controls:
+  provider_backed_image_generation: not_run
+  human_visual_review: not_run
+  visual_reference_parity: not_scored
+  proto2html: not_run
+  storyboard_motion_modeling: not_run
+  openworkflow_source_code_changes: none
+changed_paths:
+  - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/SELECTED_CHANGE.yaml
+  - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/ATOM_TASKS.yaml
+  - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/IMPLEMENTATION_BRIEF.md
+  - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md
+  - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/LOCAL_CHANGE_EVIDENCE.yaml
+  - changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+  - changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.md
+  - changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+  - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+verification:
+  passed:
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

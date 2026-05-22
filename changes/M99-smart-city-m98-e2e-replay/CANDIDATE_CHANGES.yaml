@@ -73,7 +73,7 @@ scope_control:
         External image calls must be a separate explicitly selected benchmark
         after prompt-pack source quality is proven in the target repo.
       suggested_plan_id: M102-provider-image-generation-benchmark
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -204,7 +204,7 @@ changes:
           Target validate, strict summaries, handoff, diff check, and git
           status all passed after commit 9a609cf.
   - id: C003
-    status: candidate
+    status: done
     title: Compare real replay against C006 fixture and M97 gap notes
     purpose: >
       Decide whether the real target-repo replay proves M98 source completeness
@@ -238,6 +238,35 @@ changes:
       - Evidence states whether the real replay prompt pack is source-complete.
       - Evidence distinguishes topology/source completeness from visual reference parity.
       - Next recommendation is either proceed to visual parity gate or repair /ow:vision2prompt generation.
+    selection:
+      selected_change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
+      selected_at: 2026-05-23
+      reason: >
+        C003 is unlocked by C002 and owns the required comparison before the
+        queue can recommend visual reference parity or /ow:vision2prompt repair.
+    completion:
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/LOCAL_CHANGE_EVIDENCE.yaml
+        - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md
+      notes:
+        - >
+          C003 found the real target replay source-complete for M98 and
+          equivalent to the C006 fixture on required prompt-pack contract shape.
+        - >
+          C003 found the M97 formal prompt-pack source gap repaired in the real
+          target repo at target commit 9a609cf901217cd1324e589459c90dfcddbad687.
+        - >
+          C003 compared against the dailin OUTPUT_PROMPT quality bar and found
+          alignment on coherent product hypothesis, screen-bound product
+          states, direct generatability, concrete copy/data/trust controls, and
+          negative constraints.
+        - >
+          Remaining dailin-style full journey richness, visual reference
+          parity, and storyboard/motion progression are downstream queue work,
+          not /ow:vision2prompt source-completeness repair.
+        - >
+          Recommendation: proceed to a dedicated visual reference parity gate.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -312,3 +341,34 @@ operations:
     after_status: done
     evidence:
       - changes/M99-smart-city-m98-e2e-replay/C002-run-target-repo-m98-prompt-pack-source-replay/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 after C002 because the real target replay exists and the
+      queue needs comparison against C006, M97 gap notes, and the dailin prompt
+      quality reference before recommending the next workflow.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/SELECTED_CHANGE.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/ATOM_TASKS.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Complete C003 after comparison proves target replay source completeness,
+      records dailin prompt-quality alignment and deferred gaps, and recommends
+      visual reference parity rather than /ow:vision2prompt source repair.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/LOCAL_CHANGE_EVIDENCE.yaml
+      - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md

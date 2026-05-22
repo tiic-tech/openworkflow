@@ -112,6 +112,18 @@ rubric, integrity gate, and reality gate in the formal prompt-pack source before
 image generation. This updates the prompt-pack source-completeness finding, but
 does not change the visual reference parity or storyboard/motion gaps below.
 
+M99 target replay update: the same source-completeness repair has now been
+replayed in the real `smart_city_copilot` target repo at target commit
+`9a609cf901217cd1324e589459c90dfcddbad687`. The target
+`PROTO_PROMPT_PACK.yaml` carries `prototype_brief`, `product_experience_model`,
+`screen_manifest`, `global_design_system_prompt`, screen prompts, negative
+prompts, `quality_rubric`, `prompt_pack_integrity_gate`, and
+`prototype_reality_gate`, while keeping `image_generation.status:
+not_started`. This closes the M97 prompt-pack source-completeness gap in the
+real target repo. It still does not claim visual reference parity,
+provider-backed image quality, proto2html readiness, or storyboard/motion
+coverage.
+
 The dailin benchmark shows the expected bar: direction map, product system,
 complete screen groups, interaction states, component vocabulary, trust
 boundaries, global design prompt, screen-specific prompts, negative prompts, and

@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M99-smart-city-m98-e2e-replay:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C003
+change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
+title: Atom tasks for real replay comparison
+status: completed
+tasks:
+  - id: T001
+    title: Compare target replay with M98 C006 fixture
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+      - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+    done_when:
+      - Required M98 source-completeness fields are present in both artifacts.
+      - Differences are classified as acceptable target-context differences or repair gaps.
+  - id: T002
+    title: Compare with M97 source gap notes
+    type: verify
+    status: completed
+    owned_paths:
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    done_when:
+      - Evidence states whether M97's formal prompt-pack source gap is repaired in the real target repo.
+      - Remaining visual/reference/storyboard gaps stay separate from prompt-pack source completeness.
+  - id: T003
+    title: Compare with dailin output prompt quality
+    type: verify
+    status: completed
+    owned_paths:
+      - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    done_when:
+      - Comparison covers journey completeness, screen groups, direct generatability, negative constraints, interaction states, copy/data specificity, and trust/privacy boundaries.
+      - Evidence distinguishes dailin-grade prompt quality from later storyboard/motion needs.
+  - id: T004
+    title: Record go/no-go recommendation
+    type: edit
+    status: completed
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    done_when:
+      - C003 comparison report and local evidence exist.
+      - M99 queue records C003 completion and recommendation.
+      - M97 report has a target-replay update.
+  - id: T005
+    title: Verify C003
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+    done_when:
+      - Main repo validate passes.
+      - Main repo strict summaries pass.
+      - git diff --check passes.
+verification:
+  passed:
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+results:
+  recommendation: proceed_to_visual_reference_parity_gate
+  repair_route_needed: false

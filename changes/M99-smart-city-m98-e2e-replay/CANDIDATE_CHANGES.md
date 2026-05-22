@@ -21,13 +21,13 @@ integration, or storyboard/motion modeling.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Prepare clean smart_city_copilot E2E replay branch | none |
 | C002 | done | medium | Run target-repo M98 prompt-pack source replay | C001 |
-| C003 | candidate | medium | Compare real replay against C006 fixture and M97 gap notes | C002 |
+| C003 | done | medium | Compare real replay against C006 fixture and M97 gap notes | C002 |
 
 ## Next Recommendation
 
-Select `C003` next. C002 produced the real target-repo M98 prompt-pack source
-replay and committed it in the target worktree; the next step is comparison
-against the C006 fixture and M97 gap notes.
+The M99 queue is complete. C003 recommends proceeding to a dedicated visual
+reference parity gate, not repairing `/ow:vision2prompt` for M98 source
+completeness.
 
 ## Candidate Details
 
@@ -80,6 +80,12 @@ Acceptance:
 
 Purpose: decide whether M98 source completeness holds in the real target repo
 or whether `/ow:vision2prompt` generation still needs repair.
+
+Outcome: completed. The real target replay is source-complete against the M98
+contract and matches the C006 fixture on required prompt-pack shape. Compared
+with dailin's `OUTPUT_PROMPT.md`, the target replay aligns on direct
+generatability and screen-bound product detail; remaining full-journey,
+storyboard, and visual-parity richness are downstream queues.
 
 Acceptance:
 

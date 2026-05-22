@@ -22,12 +22,12 @@ scope_boundary: >
   smart_city_copilot, before downstream image generation or visual parity.
 branch_boundary: codex/m99-smart-city-m98-e2e-replay
 candidate_count: 3
-active_candidate_count: 1
-completed_candidate_id: C002
-completed_change_id: C002-run-target-repo-m98-prompt-pack-source-replay
+active_candidate_count: 0
+completed_candidate_id: C003
+completed_change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 deferred_feature_refs:
   - M100-prototype-visual-reference-parity-gate
   - M101-prototype-storyboard-motion-model
@@ -87,3 +87,9 @@ validation:
     - C002 kept image_generation.status not_started and did not run provider-backed image generation, visual review, visual parity scoring, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
     - C002 target validate, strict summaries, handoff, diff check, and git status passed after the local target commit.
     - C003 is now the next recommended candidate to compare the real target replay against the M98 C006 fixture and M97 gap notes.
+    - C003 was selected and completed on 2026-05-23 to compare the real target replay against the M98 C006 fixture, M97 gap notes, and /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md.
+    - C003 found the real target replay source-complete for M98: the target prompt pack includes product brief, product experience model, screen manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+    - C003 found the M97 formal prompt-pack source gap repaired in the real target repo at target commit 9a609cf901217cd1324e589459c90dfcddbad687.
+    - C003 found dailin-quality alignment for coherent product hypothesis, screen-bound product states, direct generatability, concrete copy/data/trust controls, and negative constraints.
+    - C003 kept remaining dailin-style full journey richness, visual reference parity, and storyboard/motion progression as downstream work rather than /ow:vision2prompt source-completeness repair.
+    - C003 recommendation: proceed to a dedicated visual reference parity gate; do not repair /ow:vision2prompt for M98 source completeness based on this evidence.
