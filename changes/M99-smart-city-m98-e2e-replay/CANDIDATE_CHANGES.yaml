@@ -1,0 +1,199 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M99-smart-city-m98-e2e-replay
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M99-smart-city-m98-e2e-replay
+title: Candidate changes for smart city M98 E2E replay
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_direction:2026-05-22-create-e2e-branch-before-smart-city-copilot-test
+    - changes/M98-dailin-grade-vision2prompt-pipeline/SUMMARY.yaml
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml
+    - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+    - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+  summary: >
+    M98 C006 proved prompt-pack source completeness with a stored smart city
+    replay fixture. This queue owns the next clean E2E step: use the actual
+    smart_city_copilot repository to replay the M98 contract through the real
+    workflow surface before starting visual reference parity work.
+queue_policy:
+  branch_boundary: codex/m99-smart-city-m98-e2e-replay
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select the first dependency-free candidate that creates the cleanest real
+    target-repo replay path without broadening into provider image generation,
+    visual review, proto2html, or motion/storyboard modeling.
+  high_risk_rule: >
+    If a candidate would mutate remote repositories, publish artifacts, call
+    external image providers, delete target evidence, or change production
+    workflow semantics beyond replay validation, stop and write
+    HIGH_RISK_DECISION_REPORT.md before selection.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Clean target-repo E2E replay of the M98 prompt-pack contract in
+    smart_city_copilot, limited to source-completeness verification before image
+    generation.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only branch setup, target-repo replay execution, replay evidence,
+    prompt-pack source comparison, and go/no-go recommendation for later visual
+    parity work.
+  out_of_scope_rule: >
+    Do not implement provider-backed image generation, human visual review,
+    proto2html, storyboard/motion modeling, production GIS integration, or
+    visual reference parity scoring in this queue.
+  deferred_features:
+    - title: Visual reference parity gate
+      reason: >
+        Needs a separate artifact contract and visual review method after real
+        target-repo prompt-pack source completeness is confirmed.
+      suggested_plan_id: M100-prototype-visual-reference-parity-gate
+    - title: Storyboard and motion modeling
+      reason: >
+        The dashboard reference is a state progression and should not be folded
+        into prompt-pack source replay.
+      suggested_plan_id: M101-prototype-storyboard-motion-model
+    - title: Provider-backed image generation benchmark
+      reason: >
+        External image calls must be a separate explicitly selected benchmark
+        after prompt-pack source quality is proven in the target repo.
+      suggested_plan_id: M102-provider-image-generation-benchmark
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Prepare clean smart_city_copilot E2E replay branch
+    purpose: >
+      Create a clean target-repo test branch and capture baseline trust gates
+      before running any replay so the E2E environment is isolated from older
+      artifacts and parallel work.
+    scope:
+      includes:
+        - inspect smart_city_copilot git branch and dirty-tree state
+        - create or switch to a dedicated target-repo E2E branch
+        - run target-repo handoff/readiness commands with the repo dist CLI or documented local command surface
+        - record baseline paths, branch, known pre-existing state, and rollback notes
+      excludes:
+        - modifying OpenWorkflow source code
+        - running provider-backed image generation
+        - changing target active artifacts beyond branch/readiness setup
+        - deleting target repo user work
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+      - /Users/archy/Projects/StartUp/smart_city_copilot/
+    dependencies: []
+    unlocks:
+      - C002
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - node dist/cli/src/index.js handoff --root . --json
+      - target repo git status --short --branch
+      - target repo handoff or equivalent readiness command
+    acceptance:
+      - Target repo E2E branch is named and recorded.
+      - Dirty-tree state is captured before replay.
+      - No unrelated target artifacts are removed or overwritten.
+      - Replay can proceed from a known baseline.
+  - id: C002
+    status: candidate
+    title: Run target-repo M98 prompt-pack source replay
+    purpose: >
+      Execute the smart_city_copilot prompt-pack replay through the real
+      workflow surface and collect the generated or updated formal prompt-pack
+      artifact without entering downstream image generation.
+    scope:
+      includes:
+        - run the target repo workflow path needed to produce or refresh the smart city PROTO_PROMPT_PACK
+        - preserve prompt-pack source artifacts and command outputs as local evidence
+        - verify image_generation remains not_started or no provider-backed generation was called
+        - capture any generator/protocol gaps that make the real prompt pack thinner than the C006 fixture
+      excludes:
+        - provider-backed images
+        - visual reference parity review
+        - proto2html
+        - storyboard/motion modeling
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+    risk: medium
+    size: medium
+    validation:
+      - target repo git status --short --branch
+      - target repo OpenWorkflow validate/handoff command
+      - grep or structured check for prototype_brief, screen_manifest, screen_prompts, quality_rubric, prompt_pack_integrity_gate
+    acceptance:
+      - Real target-repo prompt pack contains prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+      - Planning, incident, and asset capacity are modeled as states/modules inside one coherent map-first product shell.
+      - Replay evidence proves no provider-backed image generation or visual parity claim occurred.
+  - id: C003
+    status: candidate
+    title: Compare real replay against C006 fixture and M97 gap notes
+    purpose: >
+      Decide whether the real target-repo replay proves M98 source completeness
+      or exposes a remaining /ow:vision2prompt generation gap that must be
+      fixed before visual parity work starts.
+    scope:
+      includes:
+        - compare target PROTO_PROMPT_PACK against examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+        - compare outcome against M97 prompt-pack source gap findings
+        - record go/no-go recommendation for visual reference parity queue
+        - document repair route if the target prompt pack is still thin
+      excludes:
+        - implementing the repair if generator output is thin
+        - starting visual parity artifact design
+        - image generation
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    dependencies:
+      - C002
+    unlocks:
+      - M100-prototype-visual-reference-parity-gate
+      - follow-up-vision2prompt-generator-repair-if-needed
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Evidence states whether the real replay prompt pack is source-complete.
+      - Evidence distinguishes topology/source completeness from visual reference parity.
+      - Next recommendation is either proceed to visual parity gate or repair /ow:vision2prompt generation.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+    actor: agent
+    reason: >
+      Create the clean E2E replay queue after M98 C006 completion and before
+      entering smart_city_copilot for real target-repo verification.
+    changed_at: 2026-05-22
+    evidence:
+      - git commit 2396c13 Replay smart city prompt pack with M98 contract
+      - /tmp/openworkflow-archives/m98-c006-smart-city-replay-2396c13.tar.gz

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { parse as parseYaml } from "yaml";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 
@@ -2283,6 +2284,14 @@ async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS
   assert(smartCityReady.code === 0, `smart city map-first fixture should pass product reality gate: ${smartCityReady.output}`);
   await unlink(smartCityReadyPath);
 
+  const smartCityReplaySource = await read(join(REPO_ROOT, "examples", "m98-smart-city-replay", "PROTO_PROMPT_PACK.yaml"));
+  assertSmartCityReplayPromptPackCompleteness(smartCityReplaySource);
+  const smartCityReplayPath = join(fixtureDir, "SMART_CITY_REPLAY_M98_PROTO_PROMPT_PACK.yaml");
+  await writeFile(smartCityReplayPath, smartCityReplaySource, "utf8");
+  const smartCityReplay = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(smartCityReplay.code === 0, `smart city M98 replay prompt pack should pass final dailin-grade gates: ${smartCityReplay.output}`);
+  await unlink(smartCityReplayPath);
+
   const smartCityGenericPath = join(fixtureDir, "SMART_CITY_GENERIC_AI_DASHBOARD_PROTO_PROMPT_PACK.yaml");
   await writeFile(smartCityGenericPath, smartCityStrategicPromptPackFixture("generic-ai-dashboard"), "utf8");
   const smartCityGeneric = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
@@ -2425,6 +2434,52 @@ function withoutYamlBlock(fixture: string, startKey: string, nextKey: string): s
     return fixture;
   }
   return `${fixture.slice(0, start)}${fixture.slice(end)}`;
+}
+
+function assertSmartCityReplayPromptPackCompleteness(source: string): void {
+  const document = parseYaml(source) as Record<string, unknown>;
+  const prototypeBrief = asRecord(document.prototype_brief, "smart city replay prototype_brief");
+  assert(prototypeBrief.product_name === "CityFlow Copilot", "smart city replay should name the product in prototype_brief");
+
+  const screenManifest = asArray(document.screen_manifest, "smart city replay screen_manifest");
+  const screenIds = new Set(
+    screenManifest.map((screen, index) => String(asRecord(screen, `smart city replay screen_manifest[${index}]`).target_screen_id ?? "")),
+  );
+  for (const requiredScreen of ["map-shell", "planning-review", "incident-response", "capacity-monitor"]) {
+    assert(screenIds.has(requiredScreen), `smart city replay screen_manifest missing ${requiredScreen}`);
+  }
+
+  const screenPrompts = asArray(asRecord(asArray(document.directions, "smart city replay directions")[0], "smart city replay directions[0]").screen_prompts, "smart city replay screen_prompts");
+  const promptTargets = new Set(
+    screenPrompts.map((prompt, index) => String(asRecord(prompt, `smart city replay screen_prompts[${index}]`).target_screen_id ?? "")),
+  );
+  for (const requiredScreen of screenIds) {
+    assert(promptTargets.has(requiredScreen), `smart city replay screen prompt missing target ${requiredScreen}`);
+  }
+
+  const designPrompt = asRecord(document.global_design_system_prompt, "smart city replay global_design_system_prompt");
+  assert(String(designPrompt.layout_system ?? "").includes("map canvas"), "smart city replay design prompt should keep map canvas primary");
+
+  const qualityRubric = asRecord(document.quality_rubric, "smart city replay quality_rubric");
+  for (const requiredRubric of ["prompt_executability", "product_specificity", "state_coverage", "trust_boundary_coverage"]) {
+    assert(Array.isArray(qualityRubric[requiredRubric]), `smart city replay quality_rubric missing ${requiredRubric}`);
+  }
+
+  assert(
+    source.includes("Planning, incident, and capacity are modules inside one map-first product shell."),
+    "smart city replay should explicitly model planning, incident, and capacity inside one product shell",
+  );
+  assert(source.includes("visual reference parity is deferred"), "smart city replay should avoid claiming visual parity");
+}
+
+function asRecord(value: unknown, label: string): Record<string, unknown> {
+  assert(typeof value === "object" && value !== null && !Array.isArray(value), `${label} must be a mapping`);
+  return value as Record<string, unknown>;
+}
+
+function asArray(value: unknown, label: string): unknown[] {
+  assert(Array.isArray(value), `${label} must be a sequence`);
+  return value;
 }
 
 async function verifyRefinedPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {

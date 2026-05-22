@@ -1,0 +1,78 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C006
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C006
+change_id: C006-smart-city-replay
+title: Replay smart city prompt pack with dailin-grade contract
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C006 after C003-C005 completion. The final M98 screen-bound
+  executability contract, generated protocol gates, and positive/negative
+  fixture matrix are stable, so the smart city replay can prove source
+  completeness without entering downstream image generation.
+rejected_alternatives:
+  - id: M99-prototype-visual-reference-parity-gate
+    reason: Visual parity needs a separate visual review artifact and is out of scope for C006.
+  - id: M100-prototype-storyboard-motion-model
+    reason: Motion/storyboard continuity is deferred beyond prompt-pack source completeness.
+owned_paths:
+  - examples/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies:
+  - C003
+  - C004
+  - C005
+scope:
+  includes:
+    - stored smart city replay prompt pack using the final M98 contract shape
+    - runtime verification that parses and validates the stored replay YAML
+    - comparison against M97 prompt-pack source-completeness gap notes
+    - audit note about prompt-pack sufficiency before image generation
+  excludes:
+    - provider-backed image generation
+    - human visual review
+    - visual reference parity scoring
+    - proto2html
+    - storyboard or motion modeling
+    - smart_city_copilot active artifact mutation
+forbidden_paths:
+  - provider-backed image generation code
+  - visual quality review artifacts
+  - proto2html artifacts
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/**
+acceptance:
+  - Smart city replay prompt pack has complete prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, and quality rubric.
+  - Replay evidence shows the formal PROTO_PROMPT_PACK is no longer thinner than downstream EVIDENCE.yaml for the prompt-pack source-completeness gap.
+  - Replay does not claim visual parity; it only proves prompt-pack source completeness.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C006 changes local examples, local runtime verification, M98 planning
+    evidence, and M97 documentation. It does not call external providers,
+    generate images, publish releases, mutate remotes, or change the
+    smart_city_copilot target repository.
+expected_commit_boundary: >
+  Complete C006 as one coherent commit after the stored replay prompt pack,
+  runtime verification, replay audit, report update, queue status, and local
+  evidence are updated.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml
