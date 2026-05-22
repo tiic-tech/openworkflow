@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: summary:M87-vision2prompt-post-validate-gate
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M87-vision2prompt-post-validate-gate
+title: Summary for vision2prompt post-validate gate
+status: active
+source:
+  kind: mixed
+  summary: >
+    Tracks the bounded post-validate gate after M86. The gate should compare
+    prompt assets by normalized strategic fingerprint before /ow:prompt2proto
+    starts image generation, while skipping diversity validation when the user
+    explicitly requested one strategic direction.
+  refs:
+    - changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+scope_boundary:
+  current_boundary: >
+    /ow:vision2prompt prompt asset post-validate gate only.
+  boundary_type: workflow_slice
+  note: >
+    This queue handles the quality gate between prompt text generation and
+    prototype image generation: fingerprint contract, deterministic comparison,
+    generated command guidance, and stress fixtures.
+deferred_feature_refs:
+  - M88-tune-product-system-inheritance
+  - M89-built-in-agent-team-internal-stages
+  - M90-discovery-loop-e2e-dogfood
+outputs:
+  candidate_changes_yaml: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.md
+  summary: changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+key_dependencies:
+  - M86 completed /ow:proto as a user-facing orchestrator over internal /ow:vision2prompt and /ow:prompt2proto stages.
+  - M86 completed basic strategic prompt-pack stress fixtures for thin and style-only directions.
+  - The new gate should run after prompt assets exist, not before prompt compilation.
+  - The gate should skip diversity validation when the user explicitly requests one strategic direction.
+risks:
+  - id: R001
+    level: medium
+    description: Raw prompt text hashing can miss near-duplicate strategic directions.
+    mitigation: Use normalized strategic fingerprint dimensions rather than raw prompt hash alone.
+  - id: R002
+    level: medium
+    description: The gate could block legitimate one-direction prototype requests.
+    mitigation: Require skip behavior when the user requested or resolved exactly one direction.
+  - id: R003
+    level: medium
+    description: The gate could become an expensive LLM judging step.
+    mitigation: Keep the first implementation deterministic, dry-run friendly, and auditable.
+unresolved_questions:
+  - Whether the first threshold should be fixed in source or configurable through artifact policy.
+validation:
+  commands_run:
+    - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
+    - node dist/cli/src/index.js sync --root . --json
+    - git status --short --branch
+  notes:
+    - OP001 created the M87 queue with scope limited to /ow:vision2prompt prompt asset post-validation.
+    - /ow:tune product-system inheritance remains deferred and should be decomposed after prompt generation gates are stable.

@@ -1,0 +1,270 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M87-vision2prompt-post-validate-gate
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M87-vision2prompt-post-validate-gate
+title: Candidate changes for vision2prompt post-validate gate
+status: active
+source:
+  kind: mixed
+  refs:
+    - changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
+    - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - user_direction:2026-05-22-prompt-assets-post-validate-gate
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes prompt asset post-validation deterministic and cheap before image generation
+    - preserves /ow:vision2prompt as the internal prompt compiler stage
+    - bypasses strategic diversity validation when the user explicitly requests one direction
+    - records post-validate outcome for audit before /ow:prompt2proto
+    - keeps the first implementation local and dry-run friendly
+  avoid:
+    - generating images or calling external image APIs
+    - implementing /ow:tune inheritance in this queue
+    - adding async subagent runtime behavior in this queue
+    - using raw prompt text hashes as the only diversity signal
+    - broadening into full discovery-loop E2E dogfood
+scope_control:
+  current_boundary: >
+    Add a post-validate gate for prompt assets produced by internal
+    /ow:vision2prompt before handoff to /ow:prompt2proto.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only candidates needed to define, encode, run, and verify a
+    strategic fingerprint diversity gate for prompt assets after prompt text is
+    generated and before prototype image generation begins.
+  out_of_scope_rule: >
+    Record tune inheritance, async built-in agent team execution, external
+    image generation, proto2html, and full discovery-loop E2E dogfood as
+    deferred refs. Do not include them in M87.
+  deferred_features:
+    - title: Align /ow:tune with product-system inheritance
+      reason: >
+        Tune should consume accepted prompt packs and prototype image groups
+        after prompt generation gates are stable.
+      suggested_plan_id: M88-tune-product-system-inheritance
+    - title: Map internal commands to built-in subagents
+      reason: >
+        Async subagent execution depends on stable internal command contracts
+        and should be introduced after synchronous gates are reliable.
+      suggested_plan_id: M89-built-in-agent-team-internal-stages
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        End-to-end pressure testing should wait until vision, validation,
+        proto, post-validate, and tune contracts are stable.
+      suggested_plan_id: M90-discovery-loop-e2e-dogfood
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define prompt asset post-validate contract
+    purpose: >
+      Define the artifact fields and source command expectations for a
+      post-validate gate that compares generated prompt assets by strategic
+      fingerprint before /ow:prompt2proto runs.
+    scope:
+      includes:
+        - post_validate prompt asset contract shape
+        - strategic fingerprint dimensions
+        - diversity threshold policy
+        - bypass rule when resolved direction count is 1
+        - failure routing back to /ow:vision2prompt
+        - audit fields for pass, fail, and skipped outcomes
+      excludes:
+        - implementing the comparison algorithm
+        - generated /ow:vision2prompt skill updates
+        - image generation
+        - tune behavior
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M87-vision2prompt-post-validate-gate/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Prompt-pack artifacts can record post_validate.status as pass, fail, or skipped.
+      - The contract defines fingerprint dimensions such as product form, trigger, interaction model, emotional driver, retention mechanism, metric, main risk, trust model, and privacy model.
+      - The contract requires post_validate to be skipped when the user requested exactly one strategic direction.
+      - The contract requires post_validate before /ow:prompt2proto when resolved direction count is 2 or more.
+      - Failed diversity gates route back to /ow:vision2prompt instead of starting image generation.
+  - id: C002
+    status: candidate
+    title: Implement deterministic strategic fingerprint evaluator
+    purpose: >
+      Add a deterministic dry-run evaluator that extracts normalized strategic
+      fingerprints from prompt assets and flags over-similar direction sets.
+    scope:
+      includes:
+        - fingerprint normalization helper
+        - pairwise similarity calculation
+        - configurable max similarity threshold
+        - skip behavior for resolved_count 1
+        - structured validation errors and audit output
+      excludes:
+        - embedding model calls
+        - LLM judging
+        - image generation
+        - changing user-facing /ow:proto command behavior beyond the gate
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M87-vision2prompt-post-validate-gate/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The evaluator detects prompt directions whose strategic fingerprints exceed the configured similarity threshold.
+      - The evaluator does not treat raw prompt wording changes as sufficient strategic difference.
+      - The evaluator passes direction sets with materially different fingerprints.
+      - The evaluator skips diversity comparison when resolved_count is 1 and records a skipped outcome.
+      - Error messages identify the over-similar direction pair and the shared fingerprint dimensions.
+  - id: C003
+    status: candidate
+    title: Wire post-validate gate into generated vision2prompt protocol
+    purpose: >
+      Make generated /ow:vision2prompt guidance require post-validation before
+      /ow:prompt2proto handoff when multiple strategic directions are requested.
+    scope:
+      includes:
+        - command registry protocol updates
+        - generated ow-vision2prompt skill guidance through sync
+        - context packet drift checks
+        - /ow:proto orchestration guidance that respects post_validate status
+        - bypass guidance when user asks for one direction
+      excludes:
+        - artifact schema design
+        - evaluator algorithm changes
+        - tune behavior
+        - external image API integration
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M87-vision2prompt-post-validate-gate/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated /ow:vision2prompt says post_validate is required when resolved_count is 2 or more.
+      - Generated /ow:vision2prompt says post_validate is skipped when the user explicitly requests exactly one direction.
+      - Generated /ow:vision2prompt does not hand off to /ow:prompt2proto when post_validate fails.
+      - Generated /ow:proto orchestration waits for post_validate pass or skipped before image generation.
+      - Verification catches generated-surface drift.
+  - id: C004
+    status: candidate
+    title: Add post-validate stress fixtures
+    purpose: >
+      Pressure-test the post-validate gate against duplicated, near-duplicate,
+      strategically distinct, and single-direction prompt asset sets.
+    scope:
+      includes:
+        - duplicate fingerprint fixture
+        - near-duplicate strategic direction fixture
+        - strategically distinct multi-direction fixture
+        - single-direction skip fixture
+        - runtime or E2E assertions for pass, fail, and skipped outcomes
+      excludes:
+        - generated prototype images
+        - browser or visual inspection
+        - tune refined prompt pack fixtures
+        - async subagent execution
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M87-vision2prompt-post-validate-gate/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M88-tune-product-system-inheritance
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests reject exact duplicate strategic fingerprints.
+      - Tests reject near-duplicate directions that only rephrase the same strategic model.
+      - Tests pass multi-direction prompt assets with distinct strategic fingerprints.
+      - Tests skip diversity comparison when resolved_count is 1.
+      - Test output makes the gate reason clear enough for /ow:vision2prompt repair.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for the prompt asset post-validate gate after
+      M86 completed the internal proto pipeline and basic prompt-pack stress
+      fixtures.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+      - changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.md
+      - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
