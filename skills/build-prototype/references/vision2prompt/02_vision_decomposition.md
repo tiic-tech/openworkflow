@@ -23,6 +23,21 @@ If these elements are absent, a long prompt will still be strategically thin.
 Do not compensate by adding generic screen inventory, generic AI language, or
 visual style.
 
+## Perspective Engine
+
+Decomposition starts from a co-founder plus senior product-manager stance. Do
+not ask only "what screens are implied?" Ask:
+
+- what product should exist if this vision is true;
+- why the user would switch from the current alternative;
+- what transformation the product should create in the user's behavior,
+  confidence, control, or progress;
+- what form would make the thesis most legible;
+- what should be deliberately excluded so the product does not become generic.
+
+Carry this judgment forward as source material for prompts. The later reference
+files are tools that organize the judgment; they do not replace it.
+
 ## Extraction Schema
 
 - `target_user`: who has the problem.
@@ -41,6 +56,11 @@ visual style.
 - `non_goals`: what the prototype must not imply or include.
 - `future_opportunities`: adjacent features intentionally deferred.
 - `validation_target`: what the next prototype should prove or disprove.
+- `product_thesis`: the strongest argument for why this product should exist.
+- `user_transformation`: the change in behavior, confidence, control, or
+  progress that the prototype should make visible.
+- `form_point_of_view`: the PM judgment about the product form that best serves
+  the thesis, including why common defaults may be wrong.
 
 ## Strategic Core Formula
 
@@ -77,6 +97,9 @@ When writing the prompt pack, carry forward at least:
 - behavior change
 - strongest success signal
 - differentiator
+- product thesis
+- user transformation
+- form point of view
 - validation target
 - trust/privacy requirements
 - non-goals and anti-goals

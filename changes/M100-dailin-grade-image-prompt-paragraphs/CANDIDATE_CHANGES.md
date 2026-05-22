@@ -58,7 +58,7 @@ anti-goals, visual direction, and user feeling.
 
 ## Selection Policy
 
-Next recommended candidate: `C007`
+Next recommended candidate: `C003`
 
 Select the first dependency-free candidate that most directly turns the dailin
 quality target into enforceable OpenWorkflow prompt-generation behavior. Stop
@@ -71,18 +71,18 @@ review, proto2html, or broad workflow redesign.
 | --- | --- | --- | --- | --- |
 | C001 | done | medium | Map dailin skill workflow into OW prompt paragraph contract | none |
 | C002 | done | medium | Enforce long-form generation prompt structure in schemas and validators | C001 |
-| C007 | ready | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
-| C003 | candidate | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
+| C007 | done | medium | Inject senior product-manager philosophy engine into vision2prompt | C001, C002 |
+| C003 | ready | medium | Wire dailin-grade prompt paragraph generation into /ow:vision2prompt | C001, C002, C007 |
 | C004 | candidate | medium | Add dailin-grade prompt fixtures and thin-prompt regressions | C002, C003 |
 | C005 | candidate | medium | Replay smart_city_copilot with dailin-grade prompt paragraphs | C003, C004 |
 | C006 | candidate | low | Record no-go criteria for future visual parity work | C005 |
 
 ## Next Recommendation
 
-`C001` and `C002` are complete. The next recommended candidate is `C007`, which
-should inject the co-founder plus senior product-manager perspective as the
-engine behind `/ow:vision2prompt` before C003 wires the generated command
-surface.
+`C001`, `C002`, and `C007` are complete. The next recommended candidate is
+`C003`, which should wire the dailin-grade paragraph contract, senior
+product-manager perspective engine, and validator gate into generated
+`/ow:vision2prompt` command guidance.
 
 The key acceptance shift is:
 
@@ -146,10 +146,17 @@ Acceptance:
 
 ### C007 - Inject Senior Product-Manager Philosophy Engine Into vision2prompt
 
-Status: ready
+Status: done
 
 Purpose: make the dailin-grade prompt system run on a co-founder and senior
 product-manager perspective rather than a field-completion checklist.
+
+Evidence:
+
+- `C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/SELECTED_CHANGE.yaml`
+- `C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/ATOM_TASKS.yaml`
+- `C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_BRIEF.md`
+- `C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md`
 
 Acceptance:
 
@@ -165,7 +172,7 @@ Acceptance:
 
 ### C003 - Wire Dailin-Grade Prompt Paragraph Generation Into /ow:vision2prompt
 
-Status: candidate
+Status: ready
 
 Purpose: ensure generated command guidance tells agents to execute the dailin
 skill workflow and write dense high-fidelity prototype prompt paragraphs by

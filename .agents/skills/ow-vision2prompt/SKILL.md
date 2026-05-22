@@ -84,6 +84,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.
 - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.
+- Adopt the co-founder plus senior product-manager perspective engine before running references; the references are tools, not a checklist that proves quality by itself.
 - Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before writing PROTO_PROMPT_PACK.
 - Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.
 - Prepare to infer product_experience_model before strategic directions; do not start directions from scenario labels or visual style variants.
@@ -91,7 +92,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </before>
 <during>
 - Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
-- Record the intermediate pipeline outputs: normalized input contract, vision decomposition, candidate strategic hypotheses, product experience model, screen_manifest, prototype prompt schema, output manifest, and quality rubric.
+- Record the intermediate pipeline outputs: perspective engine, normalized input contract, vision decomposition, candidate strategic hypotheses, product experience model, screen_manifest, prototype prompt schema, output manifest, and quality rubric.
+- Each selected direction must carry product_thesis, user_transformation, reason_to_exist, differentiated product form, and pm_judgment before screen prompt anatomy.
 - Infer product_experience_model from VISION and VALIDATION: product archetype, primary canvas, information architecture, domain object model, primary task loop, interaction state model, data realism requirements, visual language, anti-generic constraints, and category quality bar.
 - Decide whether scenario names are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.
 - Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.
@@ -133,6 +135,14 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Its output must be ready for /ow:prompt2proto consumption.
 </internal_command_boundary>
 
+<perspective_engine>
+- Start from a co-founder plus 15-year senior product-manager perspective before executing the reference pipeline.
+- Treat dailin-derived references as tools for judgment, not a checklist whose completion alone proves quality.
+- Ask what product should exist, why this prototype matters, which form best expresses the vision, and what user transformation should become visible.
+- Every selected direction must include product_thesis, user_transformation, differentiated product form, reason_to_exist, and pm_judgment.
+- Reject complete-but-soulless prompt paragraphs that list screens but do not make a product argument.
+</perspective_engine>
+
 <vision2prompt_reference_pipeline>
 - Run skills/build-prototype/references/strategic-prompt-pack-protocol.md as the governing protocol.
 - Load references/vision2prompt/01_input_contract.md to normalize vision, validation, direction count, target tool, fidelity, constraints, and missing inputs.
@@ -170,6 +180,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Do not expose /ow:vision2prompt as a user-facing workflow step.
 - Do not generate prototype images from this stage.
 - Do not invent strategy when vision or validation is thin; return control to /ow:proto preflight.
+- Do not treat dailin-derived references or YAML field completion as quality when the prompt lacks product thesis, user transformation, reason-to-exist, or design philosophy.
 - Do not hand off to /ow:prompt2proto when post_validate.status is fail or missing for multi-direction prompt packs.
 - Do not hand off to /ow:prompt2proto when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or prompt executability is missing or failing.
 - Do not create HTML, specs, changes, or runtime artifacts.

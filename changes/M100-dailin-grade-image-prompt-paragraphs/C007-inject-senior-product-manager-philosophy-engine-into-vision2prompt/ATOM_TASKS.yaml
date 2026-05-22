@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C007
+selected_change_id: C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+status: ready
+tasks:
+  - task_id: T001
+    title: Read existing vision2prompt source guidance and runtime assertions
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      The implementation points that generate /ow:vision2prompt guidance,
+      build-prototype references, and runtime-surface assertions are identified.
+  - task_id: T002
+    title: Add Step 0 senior PM perspective engine to source guidance
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+      - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+    done_when: >
+      Source guidance frames dailin-derived references as tools of a co-founder
+      and senior product-manager perspective, with product thesis, user
+      transformation, differentiated form, reason-to-exist, and anti-default
+      rules required before paragraph anatomy.
+  - task_id: T003
+    title: Regenerate and assert generated command guidance
+    status: completed
+    type: verify
+    owned_paths:
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      openworkflow sync regenerates the managed surfaces and runtime-surface
+      verification asserts that generated guidance names the perspective engine
+      before structural paragraph requirements.
+  - task_id: T004
+    title: Validate and record completion evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: >
+      Build, sync, runtime-surface verification, validate, summaries --strict,
+      and diff-check have run; queue artifacts record C007 completion and C003
+      readiness.

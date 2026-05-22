@@ -15,6 +15,11 @@ The selected directions must justify different prompt paragraphs. A direction
 does not deserve its own `prototype_prompt` merely because it has a different
 screen title, scenario label, module name, layout, or visual mood.
 
+The hypothesis engine must behave like a senior product manager, not a prompt
+formatting script. Each candidate should make a product argument: what form it
+takes, why that form should exist, what user transformation it seeks, and what
+risk or learning it exposes.
+
 ## Hypothesis Template
 
 ```text
@@ -30,6 +35,7 @@ because [emotional or functional reason].
 A direction is strategically distinct only when it differs from other selected
 directions on at least two dimensions:
 
+- product thesis
 - product form
 - user initiation trigger
 - interaction model
@@ -40,6 +46,7 @@ directions on at least two dimensions:
 - main risk
 - trust model
 - privacy model
+- reason-to-exist
 
 ## Candidate Pool
 
@@ -60,10 +67,12 @@ patterns like these only as seeds:
 
 1. Score each candidate on vision alignment, distinctiveness, testability,
    prototypeability, and risk reduction.
-2. Select the top `direction_count_policy.resolved_count` directions with
+2. Penalize candidates that only arrange screens without a clear product
+   thesis, user transformation, differentiated form, or reason-to-exist.
+3. Select the top `direction_count_policy.resolved_count` directions with
    maximum diversity.
-3. Merge or replace directions that share the same product form and trigger.
-4. Decide whether scenario labels are true directions or screens/states inside
+4. Merge or replace directions that share the same product form and trigger.
+5. Decide whether scenario labels are true directions or screens/states inside
    one product shell.
 
 ## Rejection Rules
@@ -76,4 +85,5 @@ Reject a direction when it:
 - violates non-goals or trust boundaries;
 - is too broad to prototype as screens and states;
 - cannot produce observable validation signals;
-- recreates the named current alternative.
+- recreates the named current alternative;
+- is complete as a screen inventory but empty as a product thesis.

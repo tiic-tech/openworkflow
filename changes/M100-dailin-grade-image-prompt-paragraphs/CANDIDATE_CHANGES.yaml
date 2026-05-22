@@ -85,7 +85,7 @@ scope_control:
         Dailin-level static prompt quality is necessary first, but video-like
         state progression should remain a separate artifact family.
       suggested_plan_id: M103-prototype-storyboard-motion-model
-next_recommended_candidate_id: C007
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -220,7 +220,7 @@ changes:
         - packages/core/src/workflow/summaryHealth.ts
         - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C007
-    status: ready
+    status: done
     title: Inject senior product-manager philosophy engine into vision2prompt
     purpose: >
       Make the dailin-grade prompt system run on a co-founder and top product
@@ -273,8 +273,35 @@ changes:
       - Each generated prototype direction must carry a product thesis, target user transformation, distinct product form, and reason it should exist.
       - The rubric rejects prompt paragraphs that satisfy structural dimensions but lack strategic judgment, differentiated imagination, or design philosophy.
       - C003 remains blocked behind this candidate so paragraph wiring cannot proceed without the perspective engine.
+    selection:
+      selected_change_id: C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+      selected_at: 2026-05-23
+      reason: >
+        Select C007 because the user clarified that dailin OUTPUT_PROMPT quality
+        came from a co-founder plus senior product-manager perspective, while
+        the distilled references are only that perspective's tools. This must
+        precede C003 so generated /ow:vision2prompt guidance has judgment and
+        design philosophy before paragraph anatomy.
+    completion:
+      completed_by_change_id: C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/SELECTED_CHANGE.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/ATOM_TASKS.yaml
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+        - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+        - packages/core/src/commands/registry.ts
+        - skills/build-prototype/SKILL.md
+        - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+        - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+        - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+        - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+        - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+        - .agents/skills/ow-vision2prompt/SKILL.md
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
   - id: C003
-    status: candidate
+    status: ready
     title: Wire dailin-grade prompt paragraph generation into /ow:vision2prompt
     purpose: >
       Change generated /ow:vision2prompt guidance so agents write complete
@@ -582,3 +609,45 @@ operations:
       - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
       - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
       - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Select C007 as the next implementable candidate because it is ready,
+      dependency-satisfied, medium risk, and now the queue's required precursor
+      to C003 generated guidance wiring.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/SELECTED_CHANGE.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/ATOM_TASKS.yaml
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+      - C003
+    actor: agent
+    reason: >
+      Completed C007 by injecting the co-founder plus senior product-manager
+      perspective engine into source guidance, generated /ow:vision2prompt
+      protocol, and runtime-surface assertions. This satisfies C003's new
+      prerequisite and makes C003 ready again.
+    changed_at: 2026-05-23
+    before_status: C007 selected, C003 candidate
+    after_status: C007 done, C003 ready
+    evidence:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+      - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts

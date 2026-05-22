@@ -15,6 +15,31 @@ interaction behavior, system response, trust controls, anti-goals, visual
 direction, and desired user feeling. Short screen-state image instructions do
 not pass this protocol.
 
+## Perspective Engine
+
+Before running the reference pipeline, adopt a co-founder plus 15-year senior
+product-manager perspective. Treat the vision as a product opportunity, not as
+a request to fill screen fields. The job is to decide what product should
+exist, why it should exist, which form best expresses it, and what user
+transformation the prototype should make visible.
+
+The dailin-derived references are tools for this perspective engine. They help
+normalize, decompose, hypothesize, write, and check. They are not a substitute
+for taste, product judgment, or design philosophy. A prompt pack can satisfy
+all structural sections and still fail if it lacks a product thesis,
+reason-to-exist, differentiated product imagination, and clear PM judgment.
+
+Every selected direction must therefore include:
+
+- product thesis: the strongest argument for this product form;
+- user transformation: how the target user's behavior, confidence, control, or
+  progress changes;
+- differentiated form: why this is not just a dashboard, chatbot, card wall,
+  report screen, or visual skin unless that form is strategically necessary;
+- reason-to-exist: why this direction deserves prototype generation now;
+- PM judgment: what assumption it tests, what risk it exposes, and why the
+  reviewer should look at it first or later.
+
 ## Vision2Prompt Reference Pipeline
 
 Before writing `PROTO_PROMPT_PACK.yaml` or `PROTO_PROMPT_PACK.md`, run the
@@ -43,6 +68,10 @@ Do not collapse this pipeline into a short image prompt. A valid strategic
 prompt pack describes a product prototype system: product thesis, target user,
 primary loop, strategic directions, screen groups, state behavior, concrete
 data/copy, trust boundaries, negative constraints, and acceptance checks.
+
+Do not collapse the perspective engine into persona text. "Senior PM" is only
+useful when it changes the output: sharper product thesis, clearer user
+transformation, stronger form choice, and more opinionated anti-defaults.
 
 This pipeline intentionally mirrors dailin
 `vision_to_strategic_prototype_prompt` Steps 1-6:
@@ -182,6 +211,9 @@ Each selected direction should name why it deserves prototype generation:
 what it tests, what it risks, what the user should feel, and which validation
 signal it can make observable.
 
+Reject directions that are structurally complete but strategically empty: they
+list screens and prompt anatomy, but do not make a product argument.
+
 ## Prompt Pack Structure
 
 `PROTO_PROMPT_PACK.yaml` should follow `schemas/proto-prompt-pack.schema.json`
@@ -228,6 +260,9 @@ Each direction needs:
 - `prototype_prompt`
 - `screen_prompts`
 - `pm_judgment`
+- `product_thesis`
+- `user_transformation`
+- `reason_to_exist`
 
 When `prompt_text_manifest.status` becomes `ready_for_image_generation`, every
 direction screen prompt must resolve to a `screen_manifest.target_screen_id`.

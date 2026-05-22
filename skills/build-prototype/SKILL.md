@@ -21,6 +21,12 @@ screen or create visual variants. Its job is to preserve the product intent
 from vision and validation, create strategically distinct prototype directions,
 and write prompts concrete enough for high-quality image prototype generation.
 
+The engine behind strategic prompt generation is a co-founder plus senior
+product-manager perspective: interpret the vision with product judgment, design
+philosophy, and willingness to imagine materially different product forms. The
+references are tools for that perspective, not a checklist whose completion
+alone proves quality.
+
 ## Inputs
 
 Required:
@@ -102,33 +108,40 @@ For local runnable prototypes, the legacy artifact shape remains valid:
    context, current alternative, core pain, desired behavior change, success
    signal, differentiator, emotional value, functional value, trust and privacy
    requirements, non-goals, future opportunities, and validation target.
-4. Represent the strategic core as target user plus behavior change plus
+4. Adopt the perspective engine before generating directions: act as a
+   co-founder and 15-year senior product manager who asks what product should
+   exist, why this prototype matters, what user transformation it should create,
+   and what form best expresses the vision.
+5. Represent the strategic core as target user plus behavior change plus
    mechanism plus differentiator plus boundary conditions.
-5. Infer the product experience model before directions: product archetype,
+6. Infer the product experience model before directions: product archetype,
    primary canvas, information architecture, domain objects, task loop,
    interaction states, data realism, visual language, and anti-generic
    constraints.
-6. Decide whether source concepts are distinct product forms or modules,
+7. Decide whether source concepts are distinct product forms or modules,
    scenarios, layers, workflows, or states inside one product shell.
-7. Generate 5-8 candidate strategic hypotheses.
-8. Select the requested number of directions, defaulting to 3.
-9. Write each direction as a concrete high-fidelity prototype prompt with
+8. Generate 5-8 candidate strategic hypotheses.
+9. Select the requested number of directions, defaulting to 3.
+10. Write each direction as a concrete high-fidelity prototype prompt with
    `screen_prompts` tied to `screen_manifest.target_screen_id` values.
-10. Set `prompt_text_manifest.status: ready_for_image_generation` only after
+11. Set `prompt_text_manifest.status: ready_for_image_generation` only after
     `prompt_pack_integrity_gate.status`, `prototype_reality_gate.status`, and
     `quality_rubric.prompt_executability.status` are `pass`.
-11. Keep `image_generation.status: not_started` and repair through
+12. Keep `image_generation.status: not_started` and repair through
     `/ow:vision2prompt` when integrity, reality, executability, or
     post-validation gates are missing or failing.
-12. Recommend the first direction to generate based on risk reduction,
+13. Recommend the first direction to generate based on risk reduction,
    observability, feasibility, and closeness to the success signal.
-13. Record review evidence and next action guidance.
+14. Record review evidence and next action guidance.
 
 ## Strategic Direction Rules
 
 - Directions must differ by product form, initiation trigger, interaction
   model, emotional driver, retention mechanism, validation metric, or main
   risk.
+- Every direction must include a product thesis, target user transformation,
+  reason-to-exist, and explicit PM judgment about why this form deserves a
+  prototype.
 - Source scenarios, modules, layers, workflows, and interaction states are not
   strategic directions by themselves; keep them inside one product shell unless
   they imply materially different product forms or product loops.

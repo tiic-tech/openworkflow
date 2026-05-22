@@ -18,6 +18,11 @@ journey, interaction behavior, system response, trust controls, visual
 direction, anti-goals, and desired user feeling. OW prompt text must meet or
 exceed that level before it can be treated as image-generation-ready.
 
+Prompt text must also carry a senior product-manager point of view. The
+paragraph should not merely enumerate UI. It should express the product thesis,
+why the chosen form deserves to exist, how the user should transform, and what
+design philosophy governs the prototype.
+
 ## Required Prompt Structure
 
 ```text
@@ -31,6 +36,11 @@ Target user:
 
 Core product idea:
 [Main mechanism, differentiator, and trust boundary.]
+
+Product thesis and reason-to-exist:
+[Why this product form should exist, what it tests, and why it is not a
+generic dashboard, chatbot, card wall, report screen, or visual skin unless
+that form is strategically necessary.]
 
 Design the following screens:
 
@@ -84,6 +94,7 @@ natural prompt text or clearly equivalent structured sections:
 - product name and product positioning, including what the product is not;
 - target user, usage context, pain, motivation, and behavior change;
 - core product idea, mechanism, differentiator, and trust boundary;
+- product thesis, reason-to-exist, and target user transformation;
 - required screen group with journey stages, not unrelated screenshots;
 - interaction requirements, including user actions and critical state changes;
 - system, AI, workflow, or automation response after meaningful user actions;
@@ -113,6 +124,11 @@ A dailin-grade screen prompt instead explains why the screen exists, what the
 operator or user is trying to do, what data and controls are visible, what the
 system does next, what must not be implied, and what feeling or behavior the
 image should create.
+
+The prompt should also be opinionated enough that another agent understands why
+this prototype is worth generating. If the paragraph can be moved to a
+different product by swapping names and labels, it has not carried the
+co-founder/senior-PM engine forward.
 
 ## Screen Specification Rules
 
@@ -153,6 +169,11 @@ timestamps, selected objects, and sample copy as appropriate for the domain.
 Visual direction must encode product strategy. Avoid vague prompts like
 "modern and beautiful." Name the layout system, component vocabulary,
 information density, primary canvas, and anti-generic patterns.
+
+When the obvious default would be a dashboard, chatbot, card wall, report page,
+or SaaS shell, state whether that default is strategically correct. If it is
+not, name the alternative product form and why it better serves the user
+transformation.
 
 ## Anti-Goals as Constraints
 

@@ -14,11 +14,33 @@ paragraph density and generation usefulness. Passing means the prompt text is a
 complete high-fidelity prototype-generation brief, not merely a valid YAML
 record with present fields.
 
+The senior product-manager perspective is also part of readiness. Passing
+prompt text must show judgment: a product thesis, reason-to-exist,
+differentiated product form, target user transformation, and design philosophy.
+References and schema fields are tools, not proof that the prompt has taste or
+strategic force.
+
+## Perspective And Product Judgment
+
+Verify:
+
+- Each direction has a product thesis, not just a screen list.
+- Each direction names the target user transformation it is trying to make
+  visible.
+- Each direction explains why its product form deserves to exist now.
+- The prompt avoids reflexively choosing a dashboard, chatbot, card wall,
+  report screen, or SaaS shell unless that form is strategically justified.
+- `pm_judgment` states what assumption the direction tests, what risk it
+  exposes, and why it should be generated first or later.
+- The design philosophy is legible in the prompt: what the product should feel
+  like, what it refuses to become, and what user control it protects.
+
 ## Strategic Differentiation
 
 Verify:
 
 - Each direction has a distinct strategic hypothesis.
+- Each direction has a distinct product thesis or product-form point of view.
 - Each direction changes product form, trigger, interaction model, emotional
   driver, retention mechanism, validation metric, trust model, privacy model,
   or main risk.
@@ -57,7 +79,8 @@ Verify:
 - Acceptance criteria are screen-bound and checkable.
 - Direction-level `prototype_prompt` text includes product context, target
   user, journey, screens, interactions, system response, trust controls,
-  visual direction, anti-goals, and desired user feeling.
+  visual direction, anti-goals, desired user feeling, product thesis,
+  reason-to-exist, and user transformation.
 - Screen-level `screen_prompts[].prompt` text is standalone enough to generate
   the screen and includes purpose, components, state, concrete data or copy,
   actions, system response, trust controls, negative constraints, and
@@ -104,6 +127,9 @@ Verify:
 ## Common Failure Modes
 
 - Strategy collapsed into UI style.
+- Structural completeness without product judgment.
+- Persona language such as "senior PM" appears, but the prompt still lacks a
+  product thesis, user transformation, or reason-to-exist.
 - Prompt is too abstract for a design tool.
 - Prompt is a short screen-state instruction instead of a full
   prototype-generation brief.

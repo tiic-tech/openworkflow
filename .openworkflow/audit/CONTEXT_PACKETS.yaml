@@ -148,6 +148,8 @@ packets:
           validation are ready.
         - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or
           generate images.
+        - Adopt the co-founder plus senior product-manager perspective engine before running
+          references; the references are tools, not a checklist that proves quality by itself.
         - Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run
           references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before
           writing PROTO_PROMPT_PACK.
@@ -161,9 +163,11 @@ packets:
       during:
         - Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate
           reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
-        - "Record the intermediate pipeline outputs: normalized input contract, vision
-          decomposition, candidate strategic hypotheses, product experience model, screen_manifest,
-          prototype prompt schema, output manifest, and quality rubric."
+        - "Record the intermediate pipeline outputs: perspective engine, normalized input contract,
+          vision decomposition, candidate strategic hypotheses, product experience model,
+          screen_manifest, prototype prompt schema, output manifest, and quality rubric."
+        - Each selected direction must carry product_thesis, user_transformation, reason_to_exist,
+          differentiated product form, and pm_judgment before screen prompt anatomy.
         - "Infer product_experience_model from VISION and VALIDATION: product archetype, primary
           canvas, information architecture, domain object model, primary task loop, interaction
           state model, data realism requirements, visual language, anti-generic constraints, and
