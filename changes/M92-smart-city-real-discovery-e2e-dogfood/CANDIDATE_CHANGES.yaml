@@ -49,10 +49,10 @@ scope_control:
     - title: product changes based on audit findings
       reason: Findings should become later DTC queues after the real audit.
       suggested_plan_id: M93-discovery-loop-audit-followups
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: null
 changes:
   - id: C001
-    status: ready
+    status: selected
     title: Run smart city discovery E2E dogfood
     purpose: >
       Execute the real target-repo test from OpenWorkflow initialization and
@@ -91,6 +91,13 @@ changes:
       - Discovery artifacts exist for vision, validation, and proto.
       - First high-fidelity prototype image batch exists as local PNG files with metadata.
       - Target git history contains sensible local commits on a feat branch.
+    selection:
+      selected_change_id: C001-run-smart-city-discovery-e2e
+      reason: >
+        Select C001 as the next ready candidate in the single active M92 queue.
+        It performs the real target-repo dogfood requested by the user and
+        unlocks the artifact audit.
+      selected_at: 2026-05-22
   - id: C002
     status: candidate
     title: Audit real discovery loop artifacts
@@ -143,3 +150,18 @@ operations:
       - changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.yaml
       - changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.md
       - changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 through single-queue select-change ranking; no analyze-changes
+      run is needed.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/SELECTED_CHANGE.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/ATOM_TASKS.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/IMPLEMENTATION_BRIEF.md

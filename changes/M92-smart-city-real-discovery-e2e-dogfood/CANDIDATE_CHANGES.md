@@ -15,12 +15,12 @@ prototype image batch. Stop before `/ow:tune` and before M91/proto2html.
 
 | ID | Status | Risk | Title | Dependencies |
 | --- | --- | --- | --- | --- |
-| C001 | ready | medium | Run smart city discovery E2E dogfood | none |
+| C001 | selected | medium | Run smart city discovery E2E dogfood | none |
 | C002 | candidate | medium | Audit real discovery loop artifacts | C001 |
 
 ## Next Recommendation
 
-`C001` is ready. It creates the target repo workflow artifacts and image batch.
+`C001` is selected. It creates the target repo workflow artifacts and image batch.
 
 ## Deferred
 
