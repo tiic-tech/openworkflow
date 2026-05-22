@@ -71,7 +71,7 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -186,7 +186,7 @@ changes:
       evidence:
         - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: ready
+    status: selected
     title: Verify discovery-loop failure routing
     purpose: >
       Add negative dogfood cases for thin vision, blocked validation, failed
@@ -227,6 +227,14 @@ changes:
       - Failed prompt post-validation cannot silently proceed to image generation.
       - Tune artifacts missing inheritance or latest-baseline data cannot silently proceed.
       - Each failure reports the repair command or artifact section.
+    selection:
+      selected_change_id: C003-discovery-loop-failure-routing
+      reason: >
+        Select C003 through ow-select-change single-queue ranking. C001 and
+        C002 proved the canonical fixture and happy path; C003 is the next ready
+        candidate to prove bad discovery-loop artifacts stop at the correct
+        repair route instead of continuing downstream.
+      selected_at: 2026-05-22
   - id: C004
     status: candidate
     title: Record benchmark-selection readiness evidence
@@ -375,3 +383,19 @@ operations:
     after_status: ready
     evidence:
       - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 as the next ready M90 candidate after C002 completed
+      happy-path handoff verification; no analyze-changes run is needed for
+      this single active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/IMPLEMENTATION_BRIEF.md

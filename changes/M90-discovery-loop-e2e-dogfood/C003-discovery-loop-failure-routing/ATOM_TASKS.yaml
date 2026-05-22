@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M90-discovery-loop-e2e-dogfood:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C003
+change_id: C003-discovery-loop-failure-routing
+title: Atom tasks for discovery-loop failure routing
+status: ready
+tasks:
+  - id: T001
+    title: Map existing negative fixtures
+    type: read
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Existing thin vision, blocked validation, post-validation, and tune drift failure checks are mapped.
+  - id: T002
+    title: Add discovery-loop failure routing assertions
+    type: edit
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Negative fixtures prove bad artifacts stop with a repair command or artifact section.
+  - id: T003
+    title: Verify negative route coverage
+    type: verify
+    status: pending
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
