@@ -83,7 +83,7 @@ export function buildInspectModel(brief: BriefModel, nextCommandCheck: Readiness
     strict_quality: qualityGate,
     next_command_check: nextCommandCheck,
     read_order: readOrderFor(brief, nextCommandCheck),
-    recommended_next_actions: recommendedNextActions(brief, nextCommandCheck),
+    recommended_next_actions: recommendedNextActions(brief, nextCommandCheck, qualityGate),
   };
 }
 
@@ -116,7 +116,7 @@ function readOrderFor(brief: BriefModel, nextCommandCheck: ReadinessModel | null
   };
 }
 
-function recommendedNextActions(brief: BriefModel, nextCommandCheck: ReadinessModel | null): string[] {
+function recommendedNextActions(brief: BriefModel, nextCommandCheck: ReadinessModel | null, qualityGate: SummaryQualityGate): string[] {
   if (!brief.health.summaries.initialized) {
     return ["run openworkflow init <folder> --tools codex, or run openworkflow sync on an initialized project"];
   }
@@ -126,6 +126,10 @@ function recommendedNextActions(brief: BriefModel, nextCommandCheck: ReadinessMo
   }
   if (brief.health.summaries.ok && brief.health.summaries.warnings.length > 0) {
     actions.push("run openworkflow summaries --root . --strict --json before trusting thin summaries");
+  }
+  if (!qualityGate.ok) {
+    actions.push(...qualityGate.health_errors);
+    actions.push("repair selected-change commit evidence before trusting handoff");
   }
   if (nextCommandCheck) {
     actions.push(...nextCommandCheck.next_actions);

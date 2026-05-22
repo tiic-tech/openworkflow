@@ -1518,6 +1518,25 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     assert(missingCommitEvidence.code !== 0, "validate passed after completed implementation selected change lacked local commit evidence");
     assert(missingCommitEvidence.output.includes("implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "missing commit evidence validation did not explain required evidence path");
 
+    const nonStrictSummaries = await runCaptureStatus(["node", CLI, "summaries", "--root", REPO_ROOT, "--json"], process.env);
+    assert(nonStrictSummaries.code === 0, `non-strict summaries should not fail selected-change commit evidence audit: ${nonStrictSummaries.output}`);
+
+    const strictSummaries = await runCaptureStatus(["node", CLI, "summaries", "--root", REPO_ROOT, "--strict", "--json"], process.env);
+    assert(strictSummaries.code !== 0, "summaries --strict passed with missing selected-change commit evidence");
+    assert(strictSummaries.output.includes("selected-change commit evidence"), "summaries --strict missing selected-change commit evidence error");
+
+    const handoff = await runCaptureStatus(["node", CLI, "handoff", "--root", REPO_ROOT, "--json"], process.env);
+    assert(handoff.code !== 0, "handoff passed with missing selected-change commit evidence");
+    assert(handoff.output.includes("selected-change commit evidence"), "handoff missing selected-change commit evidence error");
+
+    const inspect = await runCaptureStatus(["node", CLI, "inspect", "--root", REPO_ROOT, "--strict", "--json"], process.env);
+    assert(inspect.code !== 0, "inspect --strict passed with missing selected-change commit evidence");
+    assert(inspect.output.includes("repair selected-change commit evidence"), "inspect --strict missing selected-change remediation guidance");
+
+    const context = await runCaptureStatus(["node", CLI, "context", "--root", REPO_ROOT, "--for", "/ow:vision", "--handoff", "--json"], process.env);
+    assert(context.code !== 0, "context --handoff passed with missing selected-change commit evidence");
+    assert(context.output.includes("selected-change commit evidence"), "context --handoff missing selected-change commit evidence error");
+
     await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
       implementationChangedFiles: false,
       evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml"],

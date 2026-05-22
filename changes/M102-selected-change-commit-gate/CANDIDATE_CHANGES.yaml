@@ -62,7 +62,7 @@ scope_control:
     - title: Remote PR mutation governance
       reason: Remote operations require separate approval and are outside this local commit gate bug.
       suggested_plan_id: M103-remote-pr-governance
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -197,7 +197,7 @@ changes:
         - node dist/cli/src/index.js summaries --root . --strict --json
         - git diff --check
   - id: C003
-    status: candidate
+    status: done
     title: Wire commit evidence enforcement into handoff and summaries strict trust gates
     purpose: >
       Ensure agent trust gates surface missing selected-change commit evidence
@@ -234,6 +234,34 @@ changes:
       - handoff cannot remain trusted when an active queue has a completed implementation selected change without required commit evidence.
       - summaries --strict reports a clear remediation path.
       - Historical queues do not break without an intentional migration decision from C001.
+    selection:
+      selected_change_id: M102-C003-commit-evidence-trust-gates
+      selected_at: 2026-05-23
+      approved_option: "Option 1: Strict Evidence Gate With Migration Mode"
+      reason: >
+        C003 is unlocked by completed C001 and C002. It wires the
+        selected-change commit evidence audit into summaries --strict,
+        handoff, inspect, and context trust surfaces without changing remote
+        git behavior.
+      evidence:
+        - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+        - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/SELECTED_CHANGE.yaml
+    completion:
+      completed_by_change_id: M102-C003-commit-evidence-trust-gates
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/SELECTED_CHANGE.yaml
+        - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/ATOM_TASKS.yaml
+        - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/IMPLEMENTATION_BRIEF.md
+        - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/LOCAL_COMMIT_EVIDENCE.yaml
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
   - id: C004
     status: candidate
     title: Integrate git-automation commit evidence into selected-change completion workflow
@@ -370,4 +398,43 @@ operations:
       - npm run verify:runtime-surface
       - node dist/cli/src/index.js validate --root . --json
       - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 after C002 completed the queue audit validator. C003 owns the
+      trust-gate wiring so summaries --strict, handoff, inspect, and context
+      surface missing selected-change commit evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Complete C003 after wiring selected-change commit evidence audit into
+      summaries --strict, handoff, inspect, and context trust surfaces with
+      runtime regression fixtures.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/SELECTED_CHANGE.yaml
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/ATOM_TASKS.yaml
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/IMPLEMENTATION_BRIEF.md
+      - changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/LOCAL_COMMIT_EVIDENCE.yaml
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - node dist/cli/src/index.js handoff --root . --json
       - git diff --check
