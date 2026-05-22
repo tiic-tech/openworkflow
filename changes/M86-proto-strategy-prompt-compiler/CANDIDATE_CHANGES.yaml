@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M86-proto-strategy-prompt-compiler
 title: Candidate changes for proto strategy prompt compiler
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -257,7 +257,7 @@ changes:
       evidence:
         - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: selected
+    status: done
     title: Add strategic prompt-pack stress fixtures
     purpose: >
       Pressure-test /ow:proto against weak, style-only, and high-quality
@@ -304,6 +304,12 @@ changes:
         only active candidate, all dependencies are complete, and it pressure
         tests the decomposed proto pipeline before tune work begins.
       selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-strategic-prompt-pack-stress-fixtures
+      completed_at: 2026-05-22
+      commit: 18bd294
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
     status: done
     title: Define internal proto pipeline and image metadata
@@ -534,3 +540,18 @@ operations:
       - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/SELECTED_CHANGE.yaml
       - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/ATOM_TASKS.yaml
       - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added strategic prompt-pack stress fixtures and validator coverage
+      for thin packs, style-only directions, and proto-ready packs with
+      concrete screens, interactions, AI behavior, trust controls, and sample
+      content.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

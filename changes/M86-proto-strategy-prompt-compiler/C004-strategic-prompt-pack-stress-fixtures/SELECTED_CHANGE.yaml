@@ -6,7 +6,7 @@ plan_id: M86-proto-strategy-prompt-compiler
 candidate_id: C004
 change_id: C004-strategic-prompt-pack-stress-fixtures
 title: Add strategic prompt-pack stress fixtures
-status: selected
+status: completed
 selected_at: 2026-05-22
 selected_by: agent
 risk: medium

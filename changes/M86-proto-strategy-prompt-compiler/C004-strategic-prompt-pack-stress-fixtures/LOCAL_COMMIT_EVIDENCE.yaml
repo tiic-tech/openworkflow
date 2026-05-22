@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M86-proto-strategy-prompt-compiler:C004
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C004
+change_id: C004-strategic-prompt-pack-stress-fixtures
+title: Local commit evidence for strategic prompt-pack stress fixtures
+status: complete
+implemented_at: 2026-05-22
+implementation_commit: 18bd294
+evidence_commit: pending
+branch: codex/m73-workflow-blueprint-runtime-alignment
+files_changed:
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M86-proto-strategy-prompt-compiler/
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+acceptance:
+  - criterion: Tests cover prompt packs that are too thin for downstream generation.
+    status: pass
+  - criterion: Tests reject directions that only differ by visual style.
+    status: pass
+  - criterion: Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
+    status: pass
+  - criterion: Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+    status: pass
+notes:
+  - C004 added runtime stress fixtures for thin, style-only, and proto-ready strategic prompt packs.
+  - The style-only rejection currently uses a deterministic strategic distinctness signal check.
+  - Post-generation strategic fingerprint comparison is viable as a future post-validate gate, but was not included in C004.
+  - No high-risk approval was required.

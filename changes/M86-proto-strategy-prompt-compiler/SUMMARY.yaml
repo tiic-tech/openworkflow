@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M86-proto-strategy-prompt-compiler
 title: Summary for proto strategy prompt compiler
-status: active
+status: completed
 source:
   kind: mixed
   summary: >
@@ -33,11 +33,11 @@ outputs:
   summary: changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
 branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
 candidate_count: 4
-active_candidate_count: 1
-completed_candidate_id: C005
-completed_change_id: C005-internal-proto-pipeline-image-metadata
-selected_candidate_id: C004
-selected_change_id: C004-strategic-prompt-pack-stress-fixtures
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-strategic-prompt-pack-stress-fixtures
+selected_candidate_id: null
+selected_change_id: null
 next_recommended_candidate_id: null
 key_dependencies:
   - M84 completed proto-ready vision structures and generated /ow:vision guidance.
@@ -49,6 +49,8 @@ key_dependencies:
   - C005 was added before C004 so stress fixtures target the internal command pipeline instead of a monolithic proto command.
   - C005 completed the internal /ow:vision2prompt and /ow:prompt2proto split while keeping /ow:proto user-facing.
   - docs/OW_DEVELOP_PLAN_Phase2.md records the future direction of mapping internal command stages to built-in subagents after the synchronous command chain is stable.
+  - C004 completed stress fixtures for thin prompt packs, style-only directions, and proto-ready strategic prompt packs.
+  - Post-generation strategic fingerprint comparison is a plausible future post-validate gate, but was kept out of C004 to preserve scope.
 risks:
   - id: R001
     level: medium
@@ -78,3 +80,4 @@ validation:
     - OP008 added and selected C005 to define the internal proto pipeline and image metadata before C004 stress fixtures.
     - OP009 completed C005 in commit c766f8f.
     - OP010 selected C004 via select-change single-queue ranking; analyze-changes was not used because there is only one active queue.
+    - OP011 completed C004 in commit 18bd294 and closed the M86 queue.

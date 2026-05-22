@@ -6,12 +6,12 @@ plan_id: M86-proto-strategy-prompt-compiler
 candidate_id: C004
 change_id: C004-strategic-prompt-pack-stress-fixtures
 title: Atom tasks for strategic prompt-pack stress fixtures
-status: ready
+status: completed
 tasks:
   - id: T001
     title: Inspect existing proto quality verification
     type: read
-    status: pending
+    status: done
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -23,7 +23,7 @@ tasks:
   - id: T002
     title: Add weak and strong prompt-pack fixtures
     type: edit
-    status: pending
+    status: done
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -34,7 +34,7 @@ tasks:
   - id: T003
     title: Verify decomposed proto pipeline quality gates
     type: verify
-    status: pending
+    status: done
     owned_paths:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/cli/src/dev/verifyWorkflowE2E.ts
@@ -44,7 +44,7 @@ tasks:
   - id: T004
     title: Record completion evidence
     type: document
-    status: pending
+    status: done
     owned_paths:
       - changes/M86-proto-strategy-prompt-compiler/
     done_when:
