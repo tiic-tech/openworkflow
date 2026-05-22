@@ -9,14 +9,19 @@ source:
   kind: planning_discussion
   refs:
     - user_direction:2026-05-23-split-build-prototype-into-build-proto-prompt-and-build-prototype
+    - user_direction:2026-05-23-prompt2proto-skill-must-be-designed-before-command-split
     - changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
     - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+    - changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md
   summary: >
     User proposed splitting the current build-prototype responsibility into
     build-proto-prompt, which executes the vision2prompt prompt-pack compiler,
     and build-prototype, which consumes ready build-proto-prompt artifacts. The
-    goal is clearer capability boundaries and more focused command agents after
-    M100 upgrades prompt paragraph quality.
+    follow-up clarification is that build-prototype cannot be an empty
+    consumer: the current build-prototype skill embeds vision2prompt depth, but
+    an equivalent prompt2proto skill does not yet exist. M101 must therefore
+    design and build a prompt2proto skill with its own Chief PM plus Principal
+    UI/UX philosophy engine before narrowing build-prototype.
 queue_policy:
   branch_boundary: codex/m101-build-proto-prompt-command-split
   source_of_truth: CANDIDATE_CHANGES.yaml
@@ -33,34 +38,38 @@ queue_policy:
     - superseded
 selection_policy:
   next_selection_rule: >
-    Do not select or implement M101 until M100 completes C007 and C003. When
-    M100 is complete, start with the high-risk decision report and select only a
-    bounded design-or-migration candidate with explicit approval.
+    M100 is complete, so select C001 first. C001 must approve the split option,
+    prompt2proto skill architecture, migration guardrails, and stop criteria
+    before any source skill or generated command surface changes.
   high_risk_rule: >
     Command boundary changes affect registry, generated skills, handoff order,
     managed audit packets, runtime verification, and existing /ow:proto
-    semantics. Treat the first implementation candidate as risk: high and stop
-    for HIGH_RISK_DECISION_REPORT.md before selection.
+    semantics. Treat M101 as high risk and keep implementation split into
+    design, prompt compiler, prompt2proto skill, and final migration candidates.
   recommended_first_candidate_id: C001
 scope_control:
   current_boundary: >
     Split the prototype prompt compiler from the prototype consumer command
     surface: build-proto-prompt owns vision/validation to PROTO_PROMPT_PACK,
-    build-prototype owns consumption of ready prompt-pack artifacts and
-    downstream prototype generation/review evidence.
-  boundary_type: command_surface
+    while build-prototype owns prompt2proto: consuming ready prompt-pack
+    artifacts and translating them into visual prototype instructions,
+    evidence, and review-ready outputs.
+  boundary_type: command_surface_plus_skill_architecture
   in_scope_rule: >
-    Include command taxonomy, source skill split, generated adapter sync,
-    managed context packets, artifact handoff contracts, runtime-surface
-    verification, migration/deprecation behavior, and docs needed for the split.
+    Include command taxonomy, source skill split, prompt2proto skill design,
+    generated adapter sync, managed context packets, artifact handoff
+    contracts, runtime-surface verification, migration/deprecation behavior,
+    multi-screen coherence contracts, and design-density philosophy needed for
+    the split.
   out_of_scope_rule: >
-    Do not change prompt paragraph quality content, provider image generation,
-    visual review, proto2html, or storyboard/motion modeling in this queue.
+    Do not change M100 prompt paragraph quality content, provider image
+    generation implementation, human visual review, proto2html, or
+    storyboard/motion modeling in this queue.
   deferred_features:
     - title: Provider-backed image quality benchmark
       reason: >
-        Still belongs after prompt text quality and command split have stable
-        boundaries.
+        Belongs after prompt text quality, prompt2proto skill design, and
+        command split have stable boundaries.
       suggested_plan_id: M102-provider-image-generation-benchmark
     - title: Visual reference parity gate
       reason: >
@@ -70,19 +79,20 @@ scope_control:
 next_recommended_candidate_id: C001
 changes:
   - id: C001
-    status: candidate
-    title: Decide build-proto-prompt split contract and migration guardrails
+    status: ready
+    title: Decide command split, prompt2proto skill architecture, and migration guardrails
     purpose: >
-      Convert the user's proposed command split into an explicit high-risk
-      decision before changing generated command surfaces.
+      Convert the command split and newly identified prompt2proto skill gap
+      into an explicit high-risk decision before changing generated command
+      surfaces or source skills.
     scope:
       includes:
         - define the new build-proto-prompt command responsibility
-        - define the narrowed build-prototype consumer responsibility
+        - define the narrowed build-prototype prompt2proto responsibility
         - decide whether /ow:vision2prompt remains internal, becomes an alias, or is replaced by /ow:build-proto-prompt
-        - decide artifact handoff between prompt pack readiness and prototype consumption
-        - name compatibility behavior for existing /ow:proto and generated skills
-        - approve a bounded migration option before implementation
+        - decide whether /ow:proto orchestrates both stages or exposes separate user steps
+        - define prompt2proto skill architecture before implementation
+        - define migration guardrails for existing /ow:proto and generated skills
       excludes:
         - implementation source edits
         - generated skill sync
@@ -91,9 +101,7 @@ changes:
     owned_paths:
       - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
       - changes/M101-build-proto-prompt-command-split/
-    dependencies:
-      - M100:C007
-      - M100:C003
+    dependencies: []
     unlocks:
       - C002
       - C003
@@ -105,15 +113,56 @@ changes:
       - git diff --check
     acceptance:
       - The decision report records concrete split options, recommended option, risks, guardrails, go criteria, and stop criteria.
-      - The report explicitly states that M101 must not start until M100 C007 and C003 are complete.
-      - The report defines build-proto-prompt as prompt-pack compiler and build-prototype as ready prompt-pack consumer.
+      - The report states M100 is complete and M101 is now eligible for C001 selection only.
+      - The report defines build-proto-prompt as prompt-pack compiler and build-prototype as prompt2proto visual prototype consumer.
+      - The report records that prompt2proto skill design is a prerequisite, not an implementation detail.
       - No implementation source, generated skill, or managed audit surface is changed by this candidate.
   - id: C002
+    status: candidate
+    title: Design prompt2proto skill contract and reference architecture
+    purpose: >
+      Design a prompt2proto skill comparable in quality to the M100
+      vision2prompt skill before build-prototype is narrowed to consume it.
+    scope:
+      includes:
+        - define prompt2proto input contract from ready PROTO_PROMPT_PACK artifacts
+        - define visual decomposition steps for product system, screen states, UI hierarchy, density, and interaction affordances
+        - define Chief PM plus Principal UI/UX philosophy engine for visual translation
+        - define output artifacts and handoff evidence expected from build-prototype
+        - define quality rubric for realistic UI/UX prototype translation without claiming visual parity
+      excludes:
+        - command registry edits
+        - generated adapter sync
+        - provider-backed image generation
+        - human visual review
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/
+      - skills/build-prototype/references/
+      - skills/prompt2proto/
+    dependencies:
+      - C001
+    unlocks:
+      - C004
+      - C006
+    risk: high
+    size: medium
+    validation:
+      - rg -n "prompt2proto|Principal UI|Chief PM|density|coherence" skills changes/M101-build-proto-prompt-command-split
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The prompt2proto design maps ready prompt-pack inputs into UI/UX prototype translation steps.
+      - The design explicitly separates technical multi-screen consistency from design judgment about density and information hierarchy.
+      - The design names Chief PM and Principal UI/UX perspectives as the build-prototype philosophy engine.
+      - The design does not claim provider image quality, human visual review, visual parity, proto2html, storyboard, or motion modeling.
+  - id: C003
     status: candidate
     title: Introduce build-proto-prompt command and source skill boundary
     purpose: >
       Add the new prompt-pack compiler command surface after the split contract
-      is approved.
+      is approved, preserving the Co-Founder plus Chief PM vision2prompt
+      philosophy engine.
     scope:
       includes:
         - command registry entry for build-proto-prompt or approved trigger name
@@ -122,8 +171,8 @@ changes:
         - context packet and command audit updates
         - runtime-surface assertions for generated skill presence and boundaries
       excludes:
+        - prompt2proto visual translation skill implementation
         - provider image generation
-        - prototype consumer migration
         - visual review
     owned_paths:
       - packages/core/src/commands/registry.ts
@@ -136,7 +185,8 @@ changes:
     dependencies:
       - C001
     unlocks:
-      - C003
+      - C005
+      - C007
     risk: high
     size: medium
     validation:
@@ -150,32 +200,162 @@ changes:
       - The new command is generated as an owned skill with a clear prompt-pack compiler boundary.
       - Generated guidance does not consume provider images or prototype review artifacts.
       - Runtime-surface verification proves the command exists and is ordered before build-prototype consumption.
-  - id: C003
+  - id: C004
     status: candidate
-    title: Narrow build-prototype to consume ready prompt-pack artifacts
+    title: Create prompt2proto source skill foundation
     purpose: >
-      Move build-prototype away from vision2prompt compilation and make it
-      consume only build-proto-prompt artifacts that pass readiness gates.
+      Build the missing prompt2proto skill foundation so build-prototype has a
+      real visual translation method rather than a hollow command shell.
+    scope:
+      includes:
+        - source prompt2proto SKILL.md
+        - references for input contract, visual decomposition, prototype system extraction, UI/UX translation, output template, and quality rubric
+        - explicit boundary between prompt2proto, provider generation, visual review, proto2html, and storyboard work
+        - local guidance reusable by build-prototype
+      excludes:
+        - generated command adapter sync unless required by approved command wiring
+        - provider-backed image generation
+        - visual parity scoring
+        - proto2html
+    owned_paths:
+      - skills/prompt2proto/
+      - skills/build-prototype/
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C006
+      - C007
+    risk: high
+    size: large
+    validation:
+      - rg -n "prompt2proto|Chief PM|Principal UI|visual hierarchy|density|coherence" skills/prompt2proto skills/build-prototype
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - A prompt2proto source skill exists with reference quality comparable to vision2prompt.
+      - The skill starts from a Chief PM plus Principal UI/UX philosophy engine.
+      - The skill consumes ready prompt packs and translates them into visual prototype instructions and evidence without claiming generated image quality.
+  - id: C005
+    status: candidate
+    title: Add prototype system coherence contract to build-proto-prompt
+    purpose: >
+      Address multi-screen drift as a technical prompt-pack consistency
+      problem: the prompt compiler must say what stays stable across screens
+      and what is allowed to change by workflow state.
+    scope:
+      includes:
+        - prototype_system_contract or screen_coherence_contract in build-proto-prompt outputs
+        - stable app shell, navigation taxonomy, data vocabulary, object drawer anatomy, action bar, audit pattern, and copy tone constraints
+        - validator or runtime-surface checks that ready prompt packs expose coherence constraints before build-prototype consumes them
+      excludes:
+        - density philosophy
+        - provider image generation
+        - visual review
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/
+      - skills/build-proto-prompt/
+      - skills/build-prototype/references/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - C001
+      - C003
+    unlocks:
+      - C007
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Prompt packs can state cross-screen invariants separately from screen-specific state deltas.
+      - build-prototype guidance consumes those invariants instead of inventing consistency after the fact.
+      - The contract treats drift as a technical consistency issue, not as visual parity proof.
+  - id: C006
+    status: candidate
+    title: Inject Chief PM and Principal UI/UX philosophy engine into build-prototype
+    purpose: >
+      Address density calibration and visual information judgment as a design
+      philosophy problem inside build-prototype, not as a prompt wording
+      checklist.
+    scope:
+      includes:
+        - Chief PM perspective for product intent, user decision context, and industry fit
+        - Principal UI/UX perspective for visual hierarchy, density calibration, affordance clarity, and prototype credibility
+        - density strategy guidance by industry, role, risk, screen size, and task frequency
+        - rules for visible, grouped, collapsed, delayed, and drill-down information
+        - rubric that rejects both under-specified mockups and overstuffed concept posters
+      excludes:
+        - changing M100 paragraph anatomy
+        - provider-backed image generation
+        - human visual review
+        - visual reference parity scoring
+    owned_paths:
+      - skills/prompt2proto/
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M101-build-proto-prompt-command-split/
+    dependencies:
+      - C001
+      - C002
+      - C004
+    unlocks:
+      - C007
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - build-prototype guidance starts from Chief PM plus Principal UI/UX judgment before visual translation.
+      - Density calibration is treated as industry/product/design judgment, not a mechanical prompt dimension.
+      - Runtime-surface assertions prove build-prototype names density, information hierarchy, and UI/UX credibility boundaries.
+  - id: C007
+    status: candidate
+    title: Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto
+    purpose: >
+      Complete the command split by moving build-prototype away from
+      vision2prompt compilation and making it consume ready build-proto-prompt
+      artifacts through the new prompt2proto skill.
     scope:
       includes:
         - update build-prototype source skill responsibility
         - update /ow:proto orchestration and handoff semantics as approved
         - preserve backwards compatibility or explicit migration behavior
-        - runtime-surface tests that build-prototype refuses thin or missing prompt packs
+        - runtime-surface tests that build-prototype refuses thin, missing, or incoherent prompt packs
       excludes:
         - changing M100 prompt quality rubric
         - provider image generation implementation
         - proto2html
+        - storyboard/motion modeling
     owned_paths:
       - packages/core/src/commands/registry.ts
       - skills/build-prototype/SKILL.md
+      - skills/prompt2proto/
       - .agents/skills/ow-proto/SKILL.md
       - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M101-build-proto-prompt-command-split/
     dependencies:
       - C001
-      - C002
+      - C003
+      - C004
+      - C005
+      - C006
     unlocks: []
     risk: high
     size: medium
@@ -189,7 +369,7 @@ changes:
     acceptance:
       - build-prototype guidance consumes ready prompt-pack artifacts rather than compiling prompt packs from vision.
       - Existing /ow:proto behavior is either preserved through orchestration or given an explicit migration path.
-      - Runtime-surface checks fail if build-prototype silently skips prompt-pack readiness.
+      - Runtime-surface checks fail if build-prototype silently skips prompt-pack readiness, coherence, or prompt2proto philosophy gates.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -206,6 +386,30 @@ operations:
     changed_at: 2026-05-23
     before_status: null
     after_status: active
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
+      - changes/M101-build-proto-prompt-command-split/SUMMARY.yaml
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP002
+    operation_type: revise
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+    actor: agent
+    reason: >
+      Expand M101 after user clarified that build-prototype needs a new
+      prompt2proto skill comparable to vision2prompt before command splitting.
+      The queue now separates prompt2proto skill design, skill foundation,
+      multi-screen coherence, density philosophy, and final command migration.
+    changed_at: 2026-05-23
+    before_status: three coarse command-split candidates
+    after_status: seven candidates with C001 ready
     evidence:
       - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
       - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.md
