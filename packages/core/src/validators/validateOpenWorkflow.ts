@@ -571,6 +571,8 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
 
 function validateRefinedPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
   validateRequiredObjectFields(label, "tune_input", data.tune_input, ["baseline_source_type", "baseline_refs", "tune_request", "regeneration_scope"], errors);
+  validateRefinedBaselineResolution(label, data.baseline_resolution, errors);
+  validateRefinedCarryForward(label, data.carry_forward, errors);
   validateRefinedBaselineAudit(label, data.baseline_audit, errors);
   validateRequiredObjectFields(label, "product_system", data.product_system, REFINED_PRODUCT_SYSTEM_FIELDS, errors);
   validateRefinedDeltaRules(label, data.delta_rules, data.tune_input, errors);
@@ -593,6 +595,22 @@ const REFINED_BASELINE_AUDIT_FIELDS = [
   "system_state",
   "components",
   "must_preserve",
+];
+
+const REFINED_BASELINE_RESOLUTION_FIELDS = [
+  "latest_approved_baseline_group_id",
+  "latest_approved_baseline_ref",
+  "baseline_lineage",
+  "resolution_rule",
+  "stale_source_guard",
+];
+
+const REFINED_CARRY_FORWARD_FIELDS = [
+  "locked_screens",
+  "locked_elements",
+  "preserved_improvements",
+  "explicit_unlocks",
+  "cumulative_drift_guard",
 ];
 
 const REFINED_PRODUCT_SYSTEM_FIELDS = [
@@ -629,6 +647,39 @@ function validateRefinedBaselineAudit(label: string, value: unknown, errors: str
   value.forEach((item, index) => {
     validateRequiredObjectFields(label, `baseline_audit[${index}]`, item, REFINED_BASELINE_AUDIT_FIELDS, errors);
   });
+}
+
+function validateRefinedBaselineResolution(label: string, value: unknown, errors: string[]): void {
+  validateRequiredObjectFields(label, "baseline_resolution", value, REFINED_BASELINE_RESOLUTION_FIELDS, errors);
+  if (!isRecord(value)) {
+    return;
+  }
+  if (!Array.isArray(value.baseline_lineage)) {
+    errors.push(`${label} baseline_resolution.baseline_lineage must be an array`);
+  }
+  if (String(value.stale_source_guard ?? "").trim().length === 0) {
+    errors.push(`${label} baseline_resolution.stale_source_guard must forbid stale source-screen fallback`);
+  }
+}
+
+function validateRefinedCarryForward(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} carry_forward must be a mapping`);
+    return;
+  }
+  for (const key of REFINED_CARRY_FORWARD_FIELDS) {
+    if (!Object.hasOwn(value, key)) {
+      errors.push(`${label} carry_forward.${key} must be present`);
+    }
+  }
+  for (const key of ["locked_screens", "locked_elements", "preserved_improvements", "explicit_unlocks"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} carry_forward.${key} must be an array`);
+    }
+  }
+  if (String(value.cumulative_drift_guard ?? "").trim().length === 0) {
+    errors.push(`${label} carry_forward.cumulative_drift_guard must forbid cumulative tune drift`);
+  }
 }
 
 function validateRefinedDeltaRules(label: string, value: unknown, tuneInput: unknown, errors: string[]): void {

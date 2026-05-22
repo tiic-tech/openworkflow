@@ -377,6 +377,77 @@
       ],
       "additionalProperties": true
     },
+    "baseline_resolution": {
+      "type": "object",
+      "required": [
+        "latest_approved_baseline_group_id",
+        "latest_approved_baseline_ref",
+        "baseline_lineage",
+        "resolution_rule",
+        "stale_source_guard"
+      ],
+      "properties": {
+        "latest_approved_baseline_group_id": {
+          "type": "string"
+        },
+        "latest_approved_baseline_ref": {
+          "type": "string"
+        },
+        "baseline_lineage": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "resolution_rule": {
+          "type": "string"
+        },
+        "stale_source_guard": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "carry_forward": {
+      "type": "object",
+      "required": [
+        "locked_screens",
+        "locked_elements",
+        "preserved_improvements",
+        "explicit_unlocks",
+        "cumulative_drift_guard"
+      ],
+      "properties": {
+        "locked_screens": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locked_elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preserved_improvements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "explicit_unlocks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cumulative_drift_guard": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
     "baseline_audit": {
       "type": "array",
       "items": {

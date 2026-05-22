@@ -538,6 +538,20 @@ export const DISCOVERY_ARTIFACT_CONTRACTS: readonly DiscoveryArtifactContract[] 
         locked_elements: [],
         constraints: [],
       },
+      baseline_resolution: {
+        latest_approved_baseline_group_id: "",
+        latest_approved_baseline_ref: "",
+        baseline_lineage: [],
+        resolution_rule: "Use the latest approved prototype group or refined prompt pack unless the user explicitly selects an older baseline.",
+        stale_source_guard: "Do not silently revert to an earlier source screen group during repeated tune passes.",
+      },
+      carry_forward: {
+        locked_screens: [],
+        locked_elements: [],
+        preserved_improvements: [],
+        explicit_unlocks: [],
+        cumulative_drift_guard: "Carry forward accepted improvements and locked elements unless the tune request explicitly unlocks or removes them.",
+      },
       baseline_audit: [
         {
           source_screen_id: "",

@@ -300,19 +300,23 @@ packets:
       []
     audit_checkpoints:
       before:
-        - "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted
-          baseline screen group."
+        - "Resolve tune target: /ow:tune defaults to the latest approved prototype prompt pack,
+          refined prompt pack, or accepted baseline screen group."
         - Require baseline screens, screenshots, screen descriptions, generated images, or an
           accepted PROTO_PROMPT_PACK plus a tune request.
         - "Normalize tune inputs before baseline audit: baseline source type, baseline refs, tune
           request, target form factor, regeneration scope, screen count, locked screens, locked
           elements, and constraints."
+        - "Record baseline_resolution before auditing: latest approved baseline group id, latest
+          approved baseline ref, lineage, resolution rule, and stale source guard."
         - Assign stable source screen ids and target screen ids when the baseline or request does
           not provide them.
         - Load only the baseline prompt pack, current prototype evidence, relevant validation or
           vision context, and latest decision audit context.
       during:
         - Audit the full baseline screen group before writing refined prompts.
+        - Carry forward locked screens, locked elements, and accepted improvements from previous
+          tune passes unless the current user request explicitly unlocks them.
         - Extract the product system and preserve product thesis, primary loop, component
           vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
         - Interpret the tune request as visual refinement, brand alignment, screen-specific

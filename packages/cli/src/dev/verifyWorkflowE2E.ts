@@ -335,8 +335,10 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "tune cannot write decision audit");
   assertListExcludes(phase, protocol.requiredContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune requires prototype index and cannot bootstrap from validation");
   assertListIncludes(phase, protocol.optionalContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune optional context missing prototype index");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "accepted baseline screen group", "tune does not require baseline screens");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "latest approved", "tune does not resolve latest baseline");
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Normalize tune inputs", "tune does not normalize inputs before audit");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "baseline_resolution", "tune does not record baseline resolution");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Carry forward locked screens", "tune does not carry forward locked elements");
   assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Assign stable source screen ids", "tune does not assign stable source ids");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Interpret the tune request", "tune does not interpret tune request modes");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Detect conflicts", "tune does not detect tune conflicts");
@@ -358,6 +360,7 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   const skill = await readSkill(runtime, "ow-tune");
   for (const tag of [
     "target_resolution",
+    "multi_round_baseline_inheritance",
     "input_normalization",
     "baseline_screen_audit",
     "product_system_extraction",
@@ -369,7 +372,11 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   ]) {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
-  assertIncludes(phase, skill, "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.", "skill lost default target behavior");
+  assertIncludes(phase, skill, "/ow:tune resolves to the latest approved prototype prompt pack", "skill lost default target behavior");
+  assertIncludes(phase, skill, "<multi_round_baseline_inheritance>", "skill lost multi-round inheritance block");
+  assertIncludes(phase, skill, "baseline_resolution with latest_approved_baseline_group_id", "skill lost baseline resolution rule");
+  assertIncludes(phase, skill, "carry_forward with locked_screens", "skill lost carry-forward rule");
+  assertIncludes(phase, skill, "Never silently regenerate from stale source screens", "skill permits stale source fallback");
   assertIncludes(phase, skill, "Normalize baseline_source_type", "skill lost input normalization rule");
   assertIncludes(phase, skill, "Extract product thesis", "skill lost product system extraction rule");
   assertIncludes(phase, skill, "Classify the request", "skill lost tune request interpretation rule");

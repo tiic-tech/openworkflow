@@ -1055,14 +1055,16 @@ function tuneProtocol(): CommandProtocol {
     ],
     auditCheckpoints: {
       before: [
-        "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted baseline screen group.",
+        "Resolve tune target: /ow:tune defaults to the latest approved prototype prompt pack, refined prompt pack, or accepted baseline screen group.",
         "Require baseline screens, screenshots, screen descriptions, generated images, or an accepted PROTO_PROMPT_PACK plus a tune request.",
         "Normalize tune inputs before baseline audit: baseline source type, baseline refs, tune request, target form factor, regeneration scope, screen count, locked screens, locked elements, and constraints.",
+        "Record baseline_resolution before auditing: latest approved baseline group id, latest approved baseline ref, lineage, resolution rule, and stale source guard.",
         "Assign stable source screen ids and target screen ids when the baseline or request does not provide them.",
         "Load only the baseline prompt pack, current prototype evidence, relevant validation or vision context, and latest decision audit context.",
       ],
       during: [
         "Audit the full baseline screen group before writing refined prompts.",
+        "Carry forward locked screens, locked elements, and accepted improvements from previous tune passes unless the current user request explicitly unlocks them.",
         "Extract the product system and preserve product thesis, primary loop, component vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.",
         "Interpret the tune request as visual refinement, brand alignment, screen-specific correction, feature addition, feature removal, form-factor transformation, group expansion, group compression, IA adaptation, copy/localization adjustment, interaction-state coverage, design-system pass, or selected-screen regeneration.",
         "Detect conflicts between the tune request, locked elements, product boundaries, non-goals, privacy controls, safety boundaries, and accepted prototype evidence before prompt writing.",
@@ -1092,9 +1094,19 @@ function tuneProtocol(): CommandProtocol {
       {
         tag: "target_resolution",
         items: [
-          "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.",
+          "/ow:tune resolves to the latest approved prototype prompt pack, refined prompt pack, or accepted baseline screen group by default.",
           "/ow:tune:proto is an explicit alias for tuning the current prototype.",
           "If no baseline prototype exists, return to /ow:proto instead of inventing refinement context.",
+        ],
+      },
+      {
+        tag: "multi_round_baseline_inheritance",
+        items: [
+          "Before baseline audit, write baseline_resolution with latest_approved_baseline_group_id, latest_approved_baseline_ref, baseline_lineage, resolution_rule, and stale_source_guard.",
+          "Use the latest approved baseline group by default; only use an older source screen group when the user explicitly names it.",
+          "Write carry_forward with locked_screens, locked_elements, preserved_improvements, explicit_unlocks, and cumulative_drift_guard.",
+          "Carry forward accepted improvements and locked elements across tune rounds unless the tune request explicitly unlocks or removes them.",
+          "Never silently regenerate from stale source screens when a newer accepted tune pass exists.",
         ],
       },
       {
