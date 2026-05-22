@@ -85,17 +85,21 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Run only as an internal stage after /ow:proto preflight has confirmed vision and validation are ready.
 - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or generate images.
 - Resolve direction_count_policy before writing prompt text; use resolved_count from /ow:proto preflight.
+- Prepare to infer product_experience_model before strategic directions; do not start directions from scenario labels or visual style variants.
 - Prepare to run post_validate after prompt assets are complete; do not hand off to /ow:prompt2proto without pass or skipped status.
 </before>
 <during>
 - Apply the vision_to_strategic_prototype_prompt method inside OW artifacts.
+- Infer product_experience_model from VISION and VALIDATION: product archetype, primary canvas, information architecture, domain object model, primary task loop, interaction state model, data realism requirements, visual language, anti-generic constraints, and category quality bar.
+- Decide whether scenario names are separate strategic product forms or modules, layers, workflows, or states inside one product shell; do not split directions by scenario labels alone.
 - Generate more candidate hypotheses than needed and select the resolved direction count for maximum strategic diversity.
+- Only select directions that differ by product form, product loop, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.
 - Write complete multi-image prompt text for every selected direction with screen_prompts and acceptance criteria.
 - After prompt text is ready, run the deterministic post_validate gate over strategic_fingerprint dimensions when resolved_count is 2 or more.
 - When the user explicitly requested exactly one strategic direction, set post_validate.status: skipped and record the skip reason instead of running diversity comparison.
 </during>
 <after>
-- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with prompt_text_manifest.status ready_for_image_generation and post_validate status.
+- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with product_experience_model, prompt_text_manifest.status ready_for_image_generation, and post_validate status.
 - Hand internally to /ow:prompt2proto only when post_validate.status is pass or skipped.
 - If post_validate.status is fail, keep handoff blocked and repair prompt directions through /ow:vision2prompt.
 - Record internal_pipeline stage vision2prompt status and outputs.
@@ -125,6 +129,13 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Its only job is strategic prompt text generation from ready vision and validation artifacts.
 - Its output must be ready for /ow:prompt2proto consumption.
 </internal_command_boundary>
+
+<product_experience_model>
+- Before directions, write product_experience_model with product_archetype, primary_canvas, information_architecture, domain_object_model, primary_task_loop, interaction_state_model, data_realism_requirements, visual_language, anti_generic_constraints, and category_quality_bar.
+- Use the model to preserve target product category reality from VISION-only input.
+- Do not treat modules, scenarios, layers, workflows, or interaction states as separate strategic directions unless they imply different product forms or loops.
+- Block generic AI dashboard, report-screen, or card-wall drift through anti_generic_constraints and negative_constraints.
+</product_experience_model>
 
 <post_validate_gate>
 - Run post_validate after prompt assets are ready and before /ow:prompt2proto handoff.

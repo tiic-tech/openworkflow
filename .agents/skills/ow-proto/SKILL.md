@@ -99,6 +99,8 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.
 </before>
 <during>
+- Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.
+- Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.
 - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
 - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
 - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
@@ -164,6 +166,9 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Write prompt_pack_type: strategic_proto_prompt_pack.
 - Normalize product domain, primary user, usage context, current alternative, core pain, desired behavior change, strongest success signal, core differentiator, emotional value, functional value, trust requirements, privacy requirements, non-goals, future opportunities, and validation target.
 - Represent strategic_core as target user plus behavior change plus mechanism plus differentiator plus boundary conditions.
+- Write product_experience_model before directions: product_archetype, primary_canvas, information_architecture, domain_object_model, primary_task_loop, interaction_state_model, data_realism_requirements, visual_language, anti_generic_constraints, and category_quality_bar.
+- Use product_experience_model to decide whether source concepts are separate strategic directions or modules, scenarios, layers, states, or workflows inside one product shell.
+- Convert non-goals and category anti-patterns into negative_constraints; explicitly block generic AI dashboards, consulting-report layouts, and card walls when the target product category implies a richer product shell.
 - Generate more candidate hypotheses than needed, then select the resolved direction count with maximum strategic diversity.
 - Each direction must include direction_id, name, strategic_hypothesis, validates, main_risk, distinctness_rationale, prototype_prompt, screen_prompts, and pm_judgment.
 </strategic_prompt_pack>

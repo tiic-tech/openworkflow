@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: summary:M97-smart-city-product-reality-dogfood
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M97-smart-city-product-reality-dogfood
+title: Summary for smart city product-reality dogfood
+status: complete
+source:
+  kind: mixed
+  summary: >
+    Tracks the post-M93 return to smart_city_copilot to pressure test whether
+    the repaired discovery-to-prototype chain now produces map-first smart city
+    product artifacts instead of generic AI governance dashboard artifacts.
+  refs:
+    - user_direction:2026-05-22-run-dtc-after-M93-smart-city-e2e-stress
+    - changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+    - changes/M93-proto-product-archetype-reality-gate/SUMMARY.yaml
+    - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+target_repo: /Users/archy/Projects/StartUp/smart_city_copilot
+target_branch: codex/smart-city-product-reality-e2e
+scope_boundary: >
+  One workflow slice: target-repo smart city discovery/proto dogfood after M93,
+  from baseline reconciliation through product-reality gate, optional local
+  deterministic prototype batch, and first-consumer audit.
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-audit-dogfood-outcome
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+deferred_feature_refs:
+  - M98-smart-city-dogfood-followups
+  - M96-prototype-visual-quality-review-gate
+  - M91-proto2html-benchmark-input
+outputs:
+  candidate_changes_yaml: changes/M97-smart-city-product-reality-dogfood/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M97-smart-city-product-reality-dogfood/CANDIDATE_CHANGES.md
+  summary: changes/M97-smart-city-product-reality-dogfood/SUMMARY.yaml
+key_dependencies:
+  - M92 produced the original smart city discovery artifacts and first image batch.
+  - M93 added product_experience_model, generated prompt guidance, prototype_reality_gate, and smart city regression fixtures.
+  - C001 archived old active M92 artifacts and established a clean M97 handoff baseline.
+  - C002 produced the map-first prompt pack with prototype_reality_gate.status pass before image generation.
+  - C003 produced local deterministic D1-D3 image evidence and reviewed it as product-real enough to continue.
+  - C004 wrote the audit report and stopped the E2E run at first image generation per user boundary.
+risks:
+  - id: R001
+    level: medium
+    description: The dogfood can drift into OpenWorkflow source fixes before evidence is complete.
+    mitigation: Keep source fixes out of M97 and record them as M98 follow-ups.
+  - id: R002
+    level: medium
+    description: Reusing old M92 artifacts could hide whether the repaired discovery chain works from a fresh run.
+    mitigation: C001 must explicitly decide repair versus fresh run; C002 owns a fresh or clearly repaired prompt-pack gate path.
+  - id: R003
+    level: medium
+    description: Prototype images may still be visually weak even when prompt-pack reality gates pass.
+    mitigation: Treat C003 visual review as first-consumer evidence and defer automated visual-quality governance to M96.
+unresolved_questions:
+  - How the user wants to consume `docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md`.
+validation:
+  commands_run:
+    - git status --short --branch
+    - git -C /Users/archy/Projects/StartUp/smart_city_copilot status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js context --root . --for /ow:decompose-to-changes --handoff --json
+    - node dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - node dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - node dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+    - node dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - git -C /Users/archy/Projects/StartUp/smart_city_copilot diff --check
+    - git diff --check
+  notes:
+    - OpenWorkflow repo is dirty with completed M93 changes; M97 is a new DTC queue layered after that work.
+    - smart_city_copilot is on codex/smart-city-product-reality-e2e with active M97 artifacts.
+    - C003 generated local deterministic SVG/PNG evidence for D1 planning, D2 incident, and D3 asset capacity.
+    - Target repo strict handoff passes and remains inside prototype flow with /ow:tune; the E2E slice stops at first image generation.
+    - C004 audit report is written at /Users/archy/Projects/StartUp/smart_city_copilot/docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md.

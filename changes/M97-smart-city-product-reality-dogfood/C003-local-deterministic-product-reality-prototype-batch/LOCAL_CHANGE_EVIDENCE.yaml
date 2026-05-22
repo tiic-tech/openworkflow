@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M97-smart-city-product-reality-dogfood:C003
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M97-smart-city-product-reality-dogfood
+candidate_id: C003
+change_id: C003-local-deterministic-product-reality-prototype-batch
+title: Local change evidence for deterministic smart city prototype batch
+status: complete
+summary: >
+  Generated local deterministic D1-D3 SVG/PNG prototype screens in the target
+  repo, updated proto-m97 image_generation metadata and review evidence, and
+  recorded an internal decision outcome of continue.
+outputs:
+  target_repo:
+    root: /Users/archy/Projects/StartUp/smart_city_copilot
+    branch: codex/smart-city-product-reality-e2e
+    artifacts:
+      - .openworkflow/prototypes/proto-m97/images/d1-planning-approval-shell.svg
+      - .openworkflow/prototypes/proto-m97/images/d1-planning-approval-shell.png
+      - .openworkflow/prototypes/proto-m97/images/d2-incident-response-state.svg
+      - .openworkflow/prototypes/proto-m97/images/d2-incident-response-state.png
+      - .openworkflow/prototypes/proto-m97/images/d3-asset-capacity-layer.svg
+      - .openworkflow/prototypes/proto-m97/images/d3-asset-capacity-layer.png
+      - .openworkflow/prototypes/proto-m97/EVIDENCE.yaml
+      - .openworkflow/decisions/dec-m97-c003/DECISION.yaml
+product_reality_review:
+  result: pass
+  findings:
+    - D1 shows map-first planning approval with selected parcel, operational layers, HIL approval, and audit trace.
+    - D2 shows incident response as a selected map state with route impact, owners, HIL notification, and audit trace.
+    - D3 shows capacity review as a selected asset layer with concrete metrics, data gap, owner, HIL review, and audit timeline.
+    - The batch does not reproduce the rejected M92 generic AI governance dashboard pattern.
+limits:
+  - Deterministic local SVG/PNG evidence only.
+  - No provider-backed image generation.
+  - No automated visual quality classifier.
+validation:
+  commands:
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      result: pass
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+      result: pass
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      result: pass
+    - command: git -C /Users/archy/Projects/StartUp/smart_city_copilot diff --check
+      result: pass
+next:
+  recommended_candidate_id: C004
+  reason: First-consumer audit should close M97 and decompose follow-ups.

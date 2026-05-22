@@ -1,0 +1,448 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M93-proto-product-archetype-reality-gate
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M93-proto-product-archetype-reality-gate
+title: Candidate changes for proto product-archetype reality gate
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_direction:2026-05-22-approve-M93-after-smart-city-proto-rejection
+    - /Users/archy/Projects/StartUp/dailin/docs/RAW_INPUT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/TUNE_PROTO_PROMPT_BY_USING_DISTILLED_PROTOTYPE_TUNE_SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/prototype_tune_to_refined_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+    - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.md
+    - changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes /ow:vision2prompt infer a product experience model before prompt directions
+    - prevents artifact-valid but human-invalid prototype prompt packs
+    - preserves the dailin pattern of strategy hypothesis plus product-system concreteness
+    - forces target-category reality checks before /ow:prompt2proto starts image generation
+    - keeps product quality gates deterministic and inspectable inside OW artifacts
+  avoid:
+    - reference-image copying or requiring external benchmark screenshots
+    - provider-specific image generation changes
+    - proto2html, html2spec, or production implementation work
+    - broad UI design-system libraries unrelated to prototype discovery
+    - replacing human prototype review with an overclaiming automated visual judge
+scope_control:
+  current_boundary: >
+    Upgrade the first-pass /ow:proto internal prompt compiler so VISION-only
+    discovery derives a product-category-aware experience model and blocks
+    generic prompt packs before image generation.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only source contracts, generated command protocols, validators, and
+    deterministic fixtures needed for /ow:vision2prompt to infer product
+    archetype, experience topology, domain objects, task loop, state model,
+    data realism, visual language, and anti-generic constraints before
+    /ow:prompt2proto.
+  out_of_scope_rule: >
+    Record visual reference ingestion, external image-quality classifiers,
+    provider-backed image generation, proto2html, tune inheritance, and full
+    end-to-end dogfood reruns as deferred refs unless a later DTC queue selects
+    them explicitly.
+  deferred_features:
+    - title: Reference image or demo pattern ingestion
+      reason: >
+        The approved M93 goal is VISION-only autonomous prototype quality, not
+        copying or analyzing supplied benchmark images.
+      suggested_plan_id: M94-reference-pattern-input-gate
+    - title: Provider-backed image generation quality benchmark
+      reason: >
+        M93 should improve prompt thinking and gates before changing image
+        generation providers or runtime execution.
+      suggested_plan_id: M95-provider-image-generation-benchmark
+    - title: Visual inspection or screenshot classifier gate
+      reason: >
+        Automated visual judgment is higher risk and should follow deterministic
+        product-experience contracts.
+      suggested_plan_id: M96-prototype-visual-quality-review-gate
+    - title: Re-run smart city full E2E after M93
+      reason: >
+        A new dogfood run should happen after the contract, protocol, and
+        validator candidates land.
+      suggested_plan_id: M97-smart-city-product-reality-dogfood
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: done
+    title: Define product experience model prompt-pack contract
+    purpose: >
+      Add first-pass prototype fields that make product-category reasoning
+      durable before directions are generated: archetype, primary canvas,
+      information architecture, domain object model, task loop, interaction
+      states, data realism, visual language, and anti-generic patterns.
+    scope:
+      includes:
+        - product_experience_model template fields for strategic prompt packs
+        - product_category_quality fields for target-category reality checks
+        - schema coverage for product_experience_model in prompt pack and evidence artifacts
+        - validator requirements for non-empty model fields before generation-ready status
+        - summary health/current-slice signals for thin product experience models
+      excludes:
+        - generated skill protocol text
+        - smart city fixture assertions
+        - image generation or visual review logic
+        - tune refined prompt-pack fields
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - changes/M93-proto-product-archetype-reality-gate/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Strategic prompt-pack templates expose a product_experience_model section.
+      - The model records product archetype, primary canvas, IA, domain objects, task loop, state model, data realism, visual language, and anti-generic constraints.
+      - Validators reject generation-ready strategic prompt packs with missing or thin product_experience_model fields.
+      - Summary quality reports can identify thin product_experience_model fields for low-context Agents.
+    selection:
+      selected_change_id: C001-product-experience-model-contract
+      reason: >
+        Select C001 through ow-select-change single-queue ranking. It is the
+        next recommended ready candidate, has no dependencies, and defines the
+        artifact contract required before protocol wiring, reality-gate
+        validation, and smart city regression fixtures.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-product-experience-model-contract
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/LOCAL_CHANGE_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Wire product-archetype inference into /ow:vision2prompt
+    purpose: >
+      Make generated /ow:vision2prompt and /ow:proto protocols explicitly run
+      product archetype and experience-topology inference before strategic
+      directions, using the dailin VISION-only method as the source behavior.
+    scope:
+      includes:
+        - command registry protocol updates for /ow:proto and /ow:vision2prompt
+        - generated ow-proto and ow-vision2prompt skill guidance through sync
+        - strategic prompt-pack protocol reference updates
+        - explicit rule that scenarios may be modules/states inside one product shell, not always separate directions
+        - generic AI dashboard anti-pattern rules
+      excludes:
+        - schema design already owned by C001
+        - deterministic gate implementation owned by C003
+        - smart city fixture assertions owned by C004
+        - external references or image input
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M93-proto-product-archetype-reality-gate/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated /ow:vision2prompt requires product_experience_model before directions.
+      - Generated /ow:proto explains that VISION-only input must infer target product category and product loop before image prompt text.
+      - Protocol guidance separates strategic directions from modules, scenarios, and interaction states inside one product shell.
+      - The protocol converts non-goals and category anti-patterns into negative prompt constraints.
+      - Runtime-surface verification catches loss of product-archetype inference guidance.
+    selection:
+      selected_change_id: C002-product-archetype-inference-protocol
+      reason: >
+        Select C002 after C001 completed the product_experience_model contract.
+        C002 is the next dependency-satisfied medium-risk candidate and wires
+        that contract into generated /ow:proto and /ow:vision2prompt behavior.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-product-archetype-inference-protocol
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/LOCAL_CHANGE_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Add prototype reality gate and deterministic validator fixtures
+    purpose: >
+      Add a product-facing gate after prompt text is ready and before image
+      generation so OW can fail prompt packs that are structurally valid but
+      too generic, category-mismatched, or missing executable product loops.
+    scope:
+      includes:
+        - prototype_reality_gate artifact fields
+        - deterministic checks for product category fit, primary canvas, domain object realism, task loop, state coverage, and anti-generic constraints
+        - validator stress fixtures for pass, missing model, generic AI dashboard, and scenario-as-direction misuse
+        - repair route back to /ow:vision2prompt when the gate fails
+      excludes:
+        - ML or image-based visual quality scoring
+        - provider-specific image generation
+        - broad human review workflow
+        - smart city target fixture specifics beyond generic stress cases
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M93-proto-product-archetype-reality-gate/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:e2e-workflow
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Strategic prompt packs record prototype_reality_gate status, dimensions, failures, and repair route.
+      - Validators block image_generation when prototype_reality_gate fails or is missing for generation-ready prompt packs.
+      - Fixtures prove generic AI dashboard prompt packs fail even when schema fields are otherwise present.
+      - Fixtures prove product-category-specific prompt packs can pass without requiring external images.
+    selection:
+      selected_change_id: C003-prototype-reality-gate-validator
+      reason: >
+        Select C003 after C001 and C002 completed the contract and protocol
+        foundation. It is the next dependency-satisfied medium-risk candidate
+        and adds the deterministic pre-image-generation reality gate.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-prototype-reality-gate-validator
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/LOCAL_CHANGE_EVIDENCE.yaml
+  - id: C004
+    status: done
+    title: Add smart city product-reality regression fixture
+    purpose: >
+      Encode the smart city failure as a deterministic regression so future
+      /ow:vision2prompt changes must produce map-first operations dashboard
+      constraints instead of an AI governance report dashboard.
+    scope:
+      includes:
+        - smart city fixture source derived from M92 and the rejected first image batch
+        - expected product_experience_model assertions for map-first smart city operations dashboard
+        - expected prompt constraints for city operations taxonomy, map pins, layers, detail panel, selected state, operational metrics, and HIL as a workflow control
+        - negative assertions against white-card generic AI governance dashboards and scenario-only directions
+      excludes:
+        - generating new images
+        - modifying smart_city_copilot repo artifacts
+        - full M97 dogfood rerun
+        - proto2html or runnable prototype work
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M93-proto-product-archetype-reality-gate/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:e2e-workflow
+      - git diff --check
+    acceptance:
+      - Smart city fixture expects a map-first operations dashboard archetype.
+      - Fixture expects planning, incident, and capacity to be represented as modules, layers, states, or workflows inside the same product shell unless a prompt explicitly justifies separate product forms.
+      - Fixture requires concrete city operations domain objects and sample operational data.
+      - Fixture fails when the prompt pack centers generic HIL/audit/citation cards without a credible smart city dashboard topology.
+    selection:
+      selected_change_id: C004-smart-city-product-reality-fixture
+      reason: >
+        Select C004 after C001-C003 completed the contract, protocol, and gate.
+        It is the final dependency-satisfied medium-risk candidate and encodes
+        the smart city failure as a deterministic regression fixture.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-smart-city-product-reality-fixture
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M93-proto-product-archetype-reality-gate/C004-smart-city-product-reality-fixture/LOCAL_CHANGE_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create the approved M93 DTC queue after the human rejected the smart city
+      first prototype as product-invalid and clarified that OW must improve
+      VISION-only prototype thinking rather than reference-image copying.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+      - changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.md
+      - changes/M93-proto-product-archetype-reality-gate/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the dependency-free contract foundation for the approved
+      M93 workflow slice before generated protocol and validator work.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/SELECTED_CHANGE.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/ATOM_TASKS.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed the product_experience_model contract, schemas, validators,
+      summary-health fields, and targeted smart-city validation check.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 as the next dependency-satisfied medium-risk change after
+      C001 completed the product_experience_model contract.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/SELECTED_CHANGE.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/ATOM_TASKS.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed product-archetype inference protocol wiring, generated skill
+      sync, and runtime/e2e drift checks.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 as the next dependency-satisfied medium-risk change after
+      product_experience_model contract and protocol guidance landed.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/SELECTED_CHANGE.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/ATOM_TASKS.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Completed prototype_reality_gate contract, deterministic validators, and
+      runtime/e2e stress fixture coverage.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the final medium-risk M93 candidate after product reality
+      gate support landed.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C004-smart-city-product-reality-fixture/SELECTED_CHANGE.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C004-smart-city-product-reality-fixture/ATOM_TASKS.yaml
+      - changes/M93-proto-product-archetype-reality-gate/C004-smart-city-product-reality-fixture/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Completed smart city map-first and generic AI dashboard product-reality
+      regression fixtures with runtime/e2e verification.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M93-proto-product-archetype-reality-gate/C004-smart-city-product-reality-fixture/LOCAL_CHANGE_EVIDENCE.yaml

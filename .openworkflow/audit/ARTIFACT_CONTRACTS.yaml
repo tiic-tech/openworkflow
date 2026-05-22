@@ -295,6 +295,8 @@ artifacts:
       - direction_count_policy
       - normalized_input
       - strategic_core
+      - product_experience_model
+      - prototype_reality_gate
       - directions
       - build_recommendation
       - prompt_text_manifest
@@ -414,6 +416,42 @@ artifacts:
         boundary_conditions:
           []
         central_uncertainty: ""
+      product_experience_model:
+        product_archetype: ""
+        primary_canvas: ""
+        information_architecture:
+          []
+        domain_object_model:
+          []
+        primary_task_loop:
+          []
+        interaction_state_model:
+          []
+        data_realism_requirements:
+          []
+        visual_language:
+          []
+        anti_generic_constraints:
+          []
+        category_quality_bar:
+          []
+      prototype_reality_gate:
+        status: pending
+        trigger: before_image_generation
+        required_when_prompt_text_ready: true
+        dimensions:
+          - product_category_fit
+          - primary_canvas_fit
+          - domain_object_realism
+          - task_loop_completeness
+          - interaction_state_coverage
+          - data_realism
+          - anti_generic_constraints
+        failures:
+          []
+        outcome_notes:
+          []
+        repair_route: /ow:vision2prompt
       directions:
         - direction_id: ""
           name: ""

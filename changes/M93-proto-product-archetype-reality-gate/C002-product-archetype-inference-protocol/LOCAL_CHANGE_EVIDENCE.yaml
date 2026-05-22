@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M93-proto-product-archetype-reality-gate:C002
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C002
+change_id: C002-product-archetype-inference-protocol
+title: Local change evidence for product-archetype inference protocol
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Wired product_experience_model into /ow:proto and /ow:vision2prompt protocol
+  guidance so VISION-only proto work must infer product archetype, primary
+  canvas, IA, domain objects, task loop, interaction states, data realism,
+  visual language, and anti-generic constraints before strategic directions.
+implemented:
+  - Updated command registry guidance for /ow:proto and /ow:vision2prompt.
+  - Updated build-prototype skill and strategic prompt-pack protocol reference.
+  - Added workflow and runtime drift checks for product_experience_model and anti_generic_constraints.
+  - Synced generated ow-proto and ow-vision2prompt skills plus managed audit packets/contracts.
+verification:
+  commands:
+    - npm run build
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+known_unrelated_failure:
+  command: npm run validate
+  notes:
+    - Still fails on pre-existing M92 planning artifacts that set artifact_type to local_commit_evidence, atom_tasks, and selected_change.
+next_recommended_candidate_id: C003

@@ -100,10 +100,16 @@ For local runnable prototypes, the legacy artifact shape remains valid:
    requirements, non-goals, future opportunities, and validation target.
 4. Represent the strategic core as target user plus behavior change plus
    mechanism plus differentiator plus boundary conditions.
-5. Generate 5-8 candidate strategic hypotheses.
-6. Select the requested number of directions, defaulting to 3.
-7. Write each direction as a concrete high-fidelity prototype prompt.
-8. Recommend the first direction to generate based on risk reduction,
+5. Infer the product experience model before directions: product archetype,
+   primary canvas, information architecture, domain objects, task loop,
+   interaction states, data realism, visual language, and anti-generic
+   constraints.
+6. Decide whether source concepts are distinct product forms or modules,
+   scenarios, layers, workflows, or states inside one product shell.
+7. Generate 5-8 candidate strategic hypotheses.
+8. Select the requested number of directions, defaulting to 3.
+9. Write each direction as a concrete high-fidelity prototype prompt.
+10. Recommend the first direction to generate based on risk reduction,
    observability, feasibility, and closeness to the success signal.
 9. Record review evidence and next action guidance.
 
@@ -112,9 +118,15 @@ For local runnable prototypes, the legacy artifact shape remains valid:
 - Directions must differ by product form, initiation trigger, interaction
   model, emotional driver, retention mechanism, validation metric, or main
   risk.
+- Source scenarios, modules, layers, workflows, and interaction states are not
+  strategic directions by themselves; keep them inside one product shell unless
+  they imply materially different product forms or product loops.
 - Do not create variants that differ only by visual style.
 - Preserve explicit non-goals, trust boundaries, privacy requirements, and user
   controls.
+- Convert category anti-patterns into negative constraints, especially generic
+  AI dashboards, consulting-report screens, or card walls when the product
+  category calls for a richer operational shell.
 - Prompts must specify screens, journeys, interactions, states, AI/system
   behavior, trust controls, privacy boundaries, visual direction, anti-goals,
   desired user feeling, and concrete sample content.

@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M93-proto-product-archetype-reality-gate:C001
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C001
+change_id: C001-product-experience-model-contract
+title: Local change evidence for product experience model prompt-pack contract
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added the product_experience_model contract to strategic prototype prompt
+  artifacts so first-pass proto evidence can carry product archetype, primary
+  canvas, information architecture, domain objects, task loop, state model,
+  data realism, visual language, and anti-generic constraints before image
+  generation.
+implemented:
+  - Extended the prototype evidence template in the source registry.
+  - Added product_experience_model schema coverage to proto-prompt-pack and prototype-evidence schemas.
+  - Added validator checks that require non-draft or generation-ready strategic prompt packs to provide a non-thin product_experience_model.
+  - Added summary-health fields so low-context Agents can detect thin product experience models.
+verification:
+  commands:
+    - node -e JSON.parse schemas/proto-prompt-pack.schema.json and schemas/prototype-evidence.schema.json
+    - npm run build
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - git diff --check
+  result: partial_pass_with_known_unrelated_failure
+  passed:
+    - JSON schemas parse cleanly.
+    - TypeScript build passes.
+    - Repo-local OpenWorkflow validate passes for this repo.
+    - git diff --check passes.
+    - smart_city_copilot validation now fails on missing product_experience_model, proving the new gate catches the old proto evidence shape.
+  known_unrelated_failure:
+    command: npm run validate
+    notes:
+      - Fails on pre-existing M92 planning artifacts that set artifact_type to local_commit_evidence, atom_tasks, and selected_change.
+      - No new npm validate errors were observed from C001.
+next_recommended_candidate_id: C002

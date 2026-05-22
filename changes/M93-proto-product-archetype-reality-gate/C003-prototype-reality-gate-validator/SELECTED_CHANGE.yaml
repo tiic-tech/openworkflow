@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: selected_change:M93-proto-product-archetype-reality-gate:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C003
+change_id: C003-prototype-reality-gate-validator
+title: Add prototype reality gate and deterministic validator fixtures
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 after C001 and C002 completed the contract and protocol
+  foundation. It is the next dependency-satisfied medium-risk candidate and
+  adds the deterministic pre-image-generation reality gate.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M93-proto-product-archetype-reality-gate/
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - prototype_reality_gate artifact fields
+    - deterministic checks for product category fit, primary canvas, domain object realism, task loop, state coverage, and anti-generic constraints
+    - validator stress fixtures for pass, missing model, generic AI dashboard, and scenario-as-direction misuse
+    - repair route back to /ow:vision2prompt when the gate fails
+  excludes:
+    - ML or image-based visual quality scoring
+    - provider-specific image generation
+    - broad human review workflow
+    - smart city target fixture specifics beyond generic stress cases
+forbidden_paths:
+  - external image generation calls
+  - generated prototype image assets
+  - provider-specific runtime code
+  - proto2html or production implementation artifacts
+acceptance:
+  - Strategic prompt packs record prototype_reality_gate status, dimensions, failures, and repair route.
+  - Validators block image_generation when prototype_reality_gate fails or is missing for generation-ready prompt packs.
+  - Fixtures prove generic AI dashboard prompt packs fail even when schema fields are otherwise present.
+  - Fixtures prove product-category-specific prompt packs can pass without requiring external images.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 adds deterministic local artifact validation. It does not call external
+    services, inspect generated images, or change image generation providers.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M93-proto-product-archetype-reality-gate/C003-prototype-reality-gate-validator/LOCAL_CHANGE_EVIDENCE.yaml

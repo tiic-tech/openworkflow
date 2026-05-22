@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M93-proto-product-archetype-reality-gate:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C004
+change_id: C004-smart-city-product-reality-fixture
+title: Atom tasks for smart city product-reality fixture
+status: completed
+tasks:
+  - id: T001
+    title: Add smart city passing fixture
+    type: edit
+    status: done
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Fixture includes map-first operations dashboard product_experience_model.
+      - Fixture includes city operations taxonomy, map canvas, domain objects, task loop, states, and operational data realism.
+  - id: T002
+    title: Add generic smart city failure fixture
+    type: edit
+    status: done
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Fixture fails when smart city prompt pack centers generic HIL/audit/citation cards without dashboard topology.
+  - id: T003
+    title: Verify smart city regression
+    type: verify
+    status: done
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - Runtime/e2e verification passes or unrelated existing failures are documented.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - git diff --check

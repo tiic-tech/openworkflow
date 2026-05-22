@@ -62,6 +62,41 @@ Find the central uncertainty:
 - what makes the user switch from the current alternative
 - what must be true for the product to feel meaningfully different
 
+## Product Experience Model
+
+Before generating strategic directions, infer the product category and product
+shell that the vision implies. Record it as `product_experience_model`.
+
+Required dimensions:
+
+- `product_archetype`: the target product category, such as map-first smart city
+  operations dashboard, daily voice-call ritual, memory-centered companion room,
+  scenario playground, inbox, workspace, board, editor, or console.
+- `primary_canvas`: the main surface that should dominate the prototype, such
+  as map, call console, conversation room, timeline, board, editor, inbox, or
+  dashboard.
+- `information_architecture`: navigation model, major domains, hierarchy, and
+  product areas.
+- `domain_object_model`: concrete user-visible objects, records, entities, and
+  business data.
+- `primary_task_loop`: the end-to-end user workflow the screen group must make
+  understandable.
+- `interaction_state_model`: selected, expanded, hover, empty, loading,
+  warning, blocked, pending human confirmation, and other category-relevant
+  states.
+- `data_realism_requirements`: sample fields, labels, metrics, values, and
+  operational details that make the prototype feel like real product work.
+- `visual_language`: category-specific layout and component expectations.
+- `anti_generic_constraints`: forbidden generic patterns such as AI governance
+  report dashboards, consulting slide layouts, card walls, or chatbot shells
+  when they do not match the target category.
+
+Use this model to decide whether concepts from the vision are separate product
+directions or modules, scenarios, layers, workflows, or states inside one
+product shell. For example, planning approval, incident response, and asset
+capacity may be modules inside one smart-city operations dashboard rather than
+three separate prototype directions.
+
 ## Hypothesis Generation
 
 Generate 5-8 candidate hypotheses, then choose the strongest directions.
@@ -88,6 +123,11 @@ dimensions:
 - validation metric
 - main risk
 
+Do not split directions by scenario labels alone. A scenario is a product
+direction only when it changes product form, product loop, trigger,
+interaction model, emotional driver, retention mechanism, validation metric, or
+main risk.
+
 Reject directions that only change colors, layout, visual tone, or component
 style.
 
@@ -105,6 +145,7 @@ and include:
 - `validation_input`
 - `normalized_input`
 - `strategic_core`
+- `product_experience_model`
 - `directions`
 - `build_recommendation`
 - `negative_constraints`

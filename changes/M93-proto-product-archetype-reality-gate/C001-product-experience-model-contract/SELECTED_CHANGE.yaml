@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M93-proto-product-archetype-reality-gate:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C001
+change_id: C001-product-experience-model-contract
+title: Define product experience model prompt-pack contract
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 through ow-select-change single-queue ranking. It is the next
+  recommended ready candidate, has no dependencies, and defines the artifact
+  contract required before protocol wiring, reality-gate validation, and smart
+  city regression fixtures.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - changes/M93-proto-product-archetype-reality-gate/
+dependencies: []
+scope:
+  includes:
+    - product_experience_model template fields for strategic prompt packs
+    - product_category_quality fields for target-category reality checks
+    - schema coverage for product_experience_model in prompt pack and evidence artifacts
+    - validator requirements for non-empty model fields before generation-ready status
+    - summary health/current-slice signals for thin product experience models
+  excludes:
+    - generated skill protocol text
+    - smart city fixture assertions
+    - image generation or visual review logic
+    - tune refined prompt-pack fields
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/audit/**
+  - external image generation calls
+  - generated prototype image assets
+  - provider-specific runtime code
+acceptance:
+  - Strategic prompt-pack templates expose a product_experience_model section.
+  - The model records product archetype, primary canvas, IA, domain objects, task loop, state model, data realism, visual language, and anti-generic constraints.
+  - Validators reject generation-ready strategic prompt packs with missing or thin product_experience_model fields.
+  - Summary quality reports can identify thin product_experience_model fields for low-context Agents.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 is a local artifact contract, schema, validator, and summary-health
+    change. It does not call external services, generate images, or alter
+    runtime execution.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M93-proto-product-archetype-reality-gate/C001-product-experience-model-contract/LOCAL_CHANGE_EVIDENCE.yaml

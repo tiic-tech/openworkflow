@@ -766,6 +766,28 @@ const STRATEGIC_CORE_FIELDS = [
   "central_uncertainty",
 ];
 
+const PRODUCT_EXPERIENCE_MODEL_FIELDS = [
+  "product_archetype",
+  "primary_canvas",
+  "information_architecture",
+  "domain_object_model",
+  "primary_task_loop",
+  "interaction_state_model",
+  "data_realism_requirements",
+  "visual_language",
+  "anti_generic_constraints",
+];
+
+const PROTOTYPE_REALITY_GATE_DIMENSIONS = [
+  "product_category_fit",
+  "primary_canvas_fit",
+  "domain_object_realism",
+  "task_loop_completeness",
+  "interaction_state_coverage",
+  "data_realism",
+  "anti_generic_constraints",
+];
+
 const STRATEGIC_DIRECTION_FIELDS = [
   "direction_id",
   "name",
@@ -829,6 +851,8 @@ function validateStrategicPrototypePromptPack(label: string, data: Record<string
   validateDirectionCountPolicy(label, data.direction_count_policy, errors);
   validateRequiredObjectFields(label, "normalized_input", data.normalized_input, STRATEGIC_NORMALIZED_FIELDS, errors);
   validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
+  validateProductExperienceModel(label, data.product_experience_model, data, errors);
+  validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
   validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
   validateBuildRecommendation(label, data.build_recommendation, errors);
   validatePromptTextManifest(label, data.prompt_text_manifest, errors);
@@ -923,6 +947,85 @@ function validateRequiredObjectFields(label: string, field: string, value: unkno
     if (!hasUsefulValue(value[key])) {
       errors.push(`${label} ${field}.${key} must be non-empty`);
     }
+  }
+}
+
+function validateProductExperienceModel(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  if (!strategicPromptPackRequiresProductExperienceModel(data)) {
+    if ("product_experience_model" in data && !isRecord(value)) {
+      errors.push(`${label} product_experience_model must be a mapping when present`);
+    }
+    return;
+  }
+  validateRequiredObjectFields(label, "product_experience_model", value, PRODUCT_EXPERIENCE_MODEL_FIELDS, errors);
+}
+
+function strategicPromptPackRequiresProductExperienceModel(data: Record<string, unknown>): boolean {
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  return (
+    data.status !== "draft" ||
+    promptTextManifest.status === "ready_for_image_generation" ||
+    promptTextManifest.status === "generated" ||
+    (typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started")
+  );
+}
+
+function validatePrototypeRealityGate(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prototype_reality_gate" in data && !isRecord(value)) {
+      errors.push(`${label} prototype_reality_gate must be a mapping when present`);
+    }
+    return;
+  }
+  if (!isRecord(value)) {
+    errors.push(`${label} prototype_reality_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_prompt_text_ready", "dimensions", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prototype_reality_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail"].includes(status)) {
+    errors.push(`${label} prototype_reality_gate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "before_image_generation") {
+    errors.push(`${label} prototype_reality_gate.trigger must be before_image_generation`);
+  }
+  if (value.required_when_prompt_text_ready !== true) {
+    errors.push(`${label} prototype_reality_gate.required_when_prompt_text_ready must be true`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} prototype_reality_gate.repair_route must be /ow:vision2prompt`);
+  }
+  if (!Array.isArray(value.dimensions)) {
+    errors.push(`${label} prototype_reality_gate.dimensions must be an array`);
+  } else {
+    for (const dimension of PROTOTYPE_REALITY_GATE_DIMENSIONS) {
+      if (!value.dimensions.includes(dimension)) {
+        errors.push(`${label} prototype_reality_gate.dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} prototype_reality_gate.${key} must be an array`);
+    }
+  }
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  if (promptTextReady && status !== "pass") {
+    errors.push(`${label} prototype_reality_gate.status must be pass before image generation`);
+  }
+  if (status === "pass" && Array.isArray(value.failures) && value.failures.length > 0) {
+    errors.push(`${label} prototype_reality_gate.failures must be empty when status is pass`);
+  }
+  if (status === "fail" && typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started") {
+    errors.push(`${label} prototype_reality_gate failed gates must not start image_generation`);
   }
 }
 

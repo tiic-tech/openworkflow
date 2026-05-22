@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M97-smart-city-product-reality-dogfood:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M97-smart-city-product-reality-dogfood
+change_id: C003-local-deterministic-product-reality-prototype-batch
+status: done
+tasks:
+  - id: T001
+    title: Generate deterministic D1-D3 image files
+    status: done
+    evidence:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d1-planning-approval-shell.png
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d2-incident-response-state.png
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d3-asset-capacity-layer.png
+  - id: T002
+    title: Record image generation metadata and review evidence
+    status: done
+    evidence:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/NOTE.md
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/REVIEW_PLAN.md
+  - id: T003
+    title: Record internal decision and handoff
+    status: done
+    evidence:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/decisions/dec-m97-c003/DECISION.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/CURRENT_STATE.yaml
+  - id: T004
+    title: Re-run OW trust gates
+    status: done
+    evidence:
+      - validate ok
+      - summaries --strict ok
+      - handoff ok with next_command /ow:tune
+      - git diff --check ok

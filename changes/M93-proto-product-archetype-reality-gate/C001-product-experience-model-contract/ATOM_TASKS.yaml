@@ -1,0 +1,75 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M93-proto-product-archetype-reality-gate:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C001
+change_id: C001-product-experience-model-contract
+title: Atom tasks for product experience model prompt-pack contract
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current strategic prompt-pack contract
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/
+    done_when:
+      - Existing strategic prompt-pack required fields and generation-ready gates are mapped.
+  - id: T002
+    title: Add product experience model template and schemas
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+    done_when:
+      - Strategic prompt-pack and prototype evidence schemas allow and template product_experience_model.
+      - The model includes archetype, canvas, IA, domain objects, task loop, state model, data realism, visual language, and anti-generic constraints.
+  - id: T003
+    title: Validate thin product experience models
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Generation-ready strategic prompt packs fail validation when product_experience_model is missing or thin.
+      - Draft prompt packs remain authorable while the model is still being filled.
+  - id: T004
+    title: Surface model thinness in summary health
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when:
+      - Low-context summary quality can report empty or thin product_experience_model fields.
+  - id: T005
+    title: Verify contract implementation
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/
+      - packages/core/src/validators/
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when:
+      - Required validation commands pass or unrelated existing failures are documented.
+verification:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+results:
+  passed:
+    - JSON schemas parse cleanly.
+    - npm run build
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+    - node dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json fails on missing product_experience_model as expected.
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M92 planning files with artifact_type local_commit_evidence, atom_tasks, and selected_change.

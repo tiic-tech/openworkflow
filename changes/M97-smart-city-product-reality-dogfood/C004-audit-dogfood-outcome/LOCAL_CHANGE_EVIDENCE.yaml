@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M97-smart-city-product-reality-dogfood:C004
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M97-smart-city-product-reality-dogfood
+candidate_id: C004
+change_id: C004-audit-dogfood-outcome
+title: Local change evidence for M97 audit closure
+status: complete
+summary: >
+  Wrote the M97 product-reality E2E audit report in the smart_city_copilot
+  target repo and recorded queue closure evidence. The audit confirms the run
+  stops at first local deterministic image generation and does not advance into
+  product design.
+audit_report: /Users/archy/Projects/StartUp/smart_city_copilot/docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md
+verdict: pass
+boundary:
+  starts_at: vision
+  ends_at: first local deterministic prototype image batch
+  next_command: /ow:tune
+deferred_followups:
+  - summary writer header mismatch after summarize --write
+  - automated visual quality governance
+  - provider-backed image generation benchmark
+  - proto2html consumption after user instruction
+validation:
+  commands:
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      result: pass
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+      result: pass
+    - command: node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      result: pass
+    - command: git -C /Users/archy/Projects/StartUp/smart_city_copilot diff --check
+      result: pass
+next: wait for user instruction on audit report consumption

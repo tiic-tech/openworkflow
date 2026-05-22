@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M97-smart-city-product-reality-dogfood:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M97-smart-city-product-reality-dogfood
+change_id: C004-audit-dogfood-outcome
+status: done
+tasks:
+  - id: T001
+    title: Audit target repo M97 artifacts
+    status: done
+    evidence:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/decisions/dec-m97-c003/DECISION.yaml
+  - id: T002
+    title: Write audit report
+    status: done
+    evidence:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md
+  - id: T003
+    title: Record deferred follow-ups
+    status: done
+    evidence:
+      - summary writer header mismatch
+      - visual quality governance deferred
+      - provider-backed image benchmark deferred
+      - proto2html consumption deferred pending user instruction
+  - id: T004
+    title: Verify target handoff remains inside prototype flow
+    status: done
+    evidence:
+      - target handoff ok
+      - target next_command /ow:tune

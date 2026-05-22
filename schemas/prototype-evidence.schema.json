@@ -181,6 +181,136 @@
       ],
       "additionalProperties": true
     },
+    "product_experience_model": {
+      "type": "object",
+      "required": [
+        "product_archetype",
+        "primary_canvas",
+        "information_architecture",
+        "domain_object_model",
+        "primary_task_loop",
+        "interaction_state_model",
+        "data_realism_requirements",
+        "visual_language",
+        "anti_generic_constraints"
+      ],
+      "properties": {
+        "product_archetype": {
+          "type": "string"
+        },
+        "primary_canvas": {
+          "type": "string"
+        },
+        "information_architecture": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domain_object_model": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "primary_task_loop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "interaction_state_model": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_realism_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visual_language": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "anti_generic_constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category_quality_bar": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "prototype_reality_gate": {
+      "type": "object",
+      "required": [
+        "status",
+        "trigger",
+        "required_when_prompt_text_ready",
+        "dimensions",
+        "failures",
+        "outcome_notes",
+        "repair_route"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "pass",
+            "fail"
+          ]
+        },
+        "trigger": {
+          "const": "before_image_generation"
+        },
+        "required_when_prompt_text_ready": {
+          "type": "boolean"
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "product_category_fit",
+              "primary_canvas_fit",
+              "domain_object_realism",
+              "task_loop_completeness",
+              "interaction_state_coverage",
+              "data_realism",
+              "anti_generic_constraints"
+            ]
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outcome_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repair_route": {
+          "const": "/ow:vision2prompt"
+        }
+      },
+      "additionalProperties": true
+    },
     "directions": {
       "type": "array",
       "items": {

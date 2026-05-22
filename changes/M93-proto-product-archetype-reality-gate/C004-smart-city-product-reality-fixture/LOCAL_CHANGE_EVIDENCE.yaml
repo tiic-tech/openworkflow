@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M93-proto-product-archetype-reality-gate:C004
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C004
+change_id: C004-smart-city-product-reality-fixture
+title: Local change evidence for smart city product-reality fixture
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added deterministic smart city product-reality regression coverage to the
+  runtime-surface verifier: a map-first operations dashboard fixture passes the
+  prototype_reality_gate, while a generic AI governance dashboard fixture fails
+  before image generation.
+implemented:
+  - Added a smart city strategic prompt-pack fixture with product_experience_model fields for map-first dashboard archetype, digital-twin map canvas, city operations IA, domain objects, task loop, states, data realism, and anti-generic constraints.
+  - Added a negative smart city fixture that records a failed prototype_reality_gate when the prompt pack centers generic HIL, audit, and citation cards without shared dashboard topology.
+  - Fixed the discovery-loop failed post-validate fixture replacement so it mutates post_validate.status without accidentally mutating prototype_reality_gate.status.
+  - Kept the change local to OpenWorkflow fixtures and validators; no images were generated and smart_city_copilot was not modified.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - node dist/cli/src/index.js validate --root . --json
+    - npm run verify:runtime-surface
+    - npm run verify:e2e-workflow
+    - git diff --check
+  result: passed
+next_recommended_candidate_id: null

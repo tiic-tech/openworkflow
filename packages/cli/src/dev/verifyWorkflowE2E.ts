@@ -233,6 +233,7 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
 
   const packet = packetRecord(runtime, "/ow:proto", phase);
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "askUserQuestion", "context packet lost direction-count question behavior");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "product_experience_model", "context packet lost product experience model behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "post_validate.status is pass", "context packet lost post_validate pass gate");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Batch-generate prototype images", "context packet lost image generation behavior");
@@ -255,6 +256,8 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
   assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
+  assertIncludes(phase, skill, "product_experience_model", "skill lost product experience model rule");
+  assertIncludes(phase, skill, "anti_generic_constraints", "skill lost anti-generic constraints rule");
   assertIncludes(phase, skill, "/ow:vision2prompt and /ow:prompt2proto are internal commands", "skill lost internal proto pipeline rule");
   assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
   assertIncludes(phase, skill, "askUserQuestion", "skill lost direction-count question rule");
@@ -279,6 +282,8 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertPhase(phase, "direction_count_policy" in template, "prototype template missing direction count policy");
   assertPhase(phase, "normalized_input" in template, "prototype template missing normalized input");
   assertPhase(phase, "strategic_core" in template, "prototype template missing strategic core");
+  assertPhase(phase, "product_experience_model" in template, "prototype template missing product experience model");
+  assertPhase(phase, "prototype_reality_gate" in template, "prototype template missing prototype reality gate");
   assertPhase(phase, "directions" in template, "prototype template missing directions");
   assertPhase(phase, "build_recommendation" in template, "prototype template missing build recommendation");
   assertPhase(phase, "prompt_text_manifest" in template, "prototype template missing prompt text manifest");
@@ -318,6 +323,8 @@ async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void>
   const prompt2ProtoSkill = await readSkill(runtime, "ow-prompt2proto");
   assertIncludes(phase, vision2PromptSkill, "<command_visibility>internal</command_visibility>", "vision2prompt skill is not internal");
   assertIncludes(phase, vision2PromptSkill, "ready_for_image_generation", "vision2prompt skill missing prompt readiness output");
+  assertIncludes(phase, vision2PromptSkill, "product_experience_model", "vision2prompt skill missing product experience model output");
+  assertIncludes(phase, vision2PromptSkill, "anti_generic_constraints", "vision2prompt skill missing anti-generic constraints output");
   assertIncludes(phase, vision2PromptSkill, "post_validate.status: pass", "vision2prompt skill missing post_validate pass requirement");
   assertIncludes(phase, vision2PromptSkill, "post_validate.status: skipped", "vision2prompt skill missing single-direction skip requirement");
   assertIncludes(phase, vision2PromptSkill, "post_validate.status: fail", "vision2prompt skill missing post_validate failure repair route");
