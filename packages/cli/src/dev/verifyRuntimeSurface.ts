@@ -58,6 +58,7 @@ async function main(): Promise<number> {
     await verifyTuneDecisionSurface(target);
     await verifyStrategicPromptPackStressFixtures(target, env);
     await verifyRefinedPromptPackStressFixtures(target, env);
+    await verifyDiscoveryLoopDogfoodFixture(target, env);
     await verifyNoDefaultCodexCommands(target);
     await verifyNonDestructiveSyncMigration(tempRoot, env);
   } finally {
@@ -2331,7 +2332,187 @@ async function verifyRefinedPromptPackStressFixtures(root: string, env: NodeJS.P
   await unlink(missingRemovePath);
 }
 
+async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const visionDir = join(root, ".openworkflow", "vision", "sessions", "dogfood-english-companion");
+  const validationDir = join(root, ".openworkflow", "validation", "dogfood-validation");
+  const protoDir = join(root, ".openworkflow", "prototypes", "dogfood-proto");
+  const tuneDir = join(root, ".openworkflow", "prototypes", "dogfood-tune");
+  const decisionDir = join(root, ".openworkflow", "decisions", "dogfood-benchmark");
+  await mkdir(visionDir, { recursive: true });
+  await mkdir(validationDir, { recursive: true });
+  await mkdir(protoDir, { recursive: true });
+  await mkdir(tuneDir, { recursive: true });
+  await mkdir(decisionDir, { recursive: true });
+
+  await writeFile(join(visionDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "dogfood-english-companion",
+    status: "active",
+    oneSentence: "AI companion helps English learners turn emotional memory into daily spoken practice.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+  await writeFile(join(validationDir, "VALIDATION.yaml"), discoveryLoopValidationFixture(), "utf8");
+  await writeFile(join(protoDir, "EVIDENCE.yaml"), discoveryLoopStrategicPromptPackFixture(), "utf8");
+  await writeFile(join(tuneDir, "REFINED_PROTO_PROMPT_PACK.yaml"), discoveryLoopRefinedPromptPackFixture(), "utf8");
+  await writeFile(join(decisionDir, "DECISION.yaml"), discoveryLoopDecisionFixture(), "utf8");
+
+  const validation = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(validation.code === 0, `canonical discovery-loop dogfood fixture should pass validation: ${validation.output}`);
+
+  const proto = await readFile(join(protoDir, "EVIDENCE.yaml"), "utf8");
+  const tune = await readFile(join(tuneDir, "REFINED_PROTO_PROMPT_PACK.yaml"), "utf8");
+  const decision = await readFile(join(decisionDir, "DECISION.yaml"), "utf8");
+  assert(proto.includes(".openworkflow/validation/dogfood-validation/VALIDATION.yaml"), "dogfood proto fixture should reference validation fixture");
+  assert(proto.includes("image_id: IMG_D1_01"), "dogfood proto fixture should include generated image metadata");
+  assert(tune.includes(".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml"), "dogfood tune fixture should reference proto fixture");
+  assert(tune.includes("latest_approved_baseline_group_id: dogfood-proto-accepted-v1"), "dogfood tune fixture should include latest baseline id");
+  assert(decision.includes(".openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml"), "dogfood decision fixture should reference tune fixture");
+  assert(decision.includes("accepted benchmark prototype image metadata"), "dogfood decision fixture should name benchmark readiness");
+}
+
 type RefinedPromptPackFixtureKind = "ready" | "missing-baseline-audit" | "orphan-screen-prompt" | "missing-must-inherit" | "missing-must-remove";
+
+function discoveryLoopValidationFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: validation:dogfood-validation",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Dogfood discovery-loop validation",
+    "status: active",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: dogfood_fixture",
+    "core_question: Does emotional memory increase repeat spoken practice?",
+    "central_uncertainty: Whether companionship creates enough trust for daily English speaking.",
+    "hypothesis: Learners return when the AI remembers emotional context and gives one concrete social rehearsal.",
+    "target_behavior: User completes one short speaking mission and can name a real conversation to try.",
+    "feature_classification:",
+    "  existential:",
+    "    - emotional memory note",
+    "    - daily speaking mission",
+    "  supporting:",
+    "    - warm correction recap",
+    "  later:",
+    "    - travel mode",
+    "  out_of_scope:",
+    "    - exam preparation",
+    "critical_assumptions:",
+    "  - Emotional memory feels supportive rather than invasive.",
+    "  - Daily missions are short enough to repeat.",
+    "prototype_scope:",
+    "  include:",
+    "    - daily mission entry",
+    "    - warm correction recap",
+    "  exclude:",
+    "    - exam preparation",
+    "    - corporate learning dashboard",
+    "prototype_experiment:",
+    "  scenario: Learner opens the app before a casual social conversation.",
+    "  must_show:",
+    "    - remembered emotional note",
+    "    - concrete scenario rehearsal",
+    "    - privacy or memory control",
+    "  must_not_show:",
+    "    - grammar textbook lesson",
+    "    - generic score dashboard",
+    "observable_signals:",
+    "  pass:",
+    "    - User starts the daily mission.",
+    "    - User completes a spoken or typed response.",
+    "  fail:",
+    "    - User cannot connect practice to a real social moment.",
+    "  ambiguous:",
+    "    - User likes the tone but does not return.",
+    "acceptance:",
+    "  - Prototype makes the daily speaking mission concrete.",
+    "  - Prototype keeps memory controls visible.",
+    "decision_rules:",
+    "  continue:",
+    "    - User can identify the next real conversation.",
+    "  revise:",
+    "    - Product thesis is visible but screen flow is too dense.",
+    "  pivot:",
+    "    - Emotional memory feels unsafe or irrelevant.",
+    "  stop:",
+    "    - Prototype reinforces exam-prep behavior.",
+    "  needs_more_evidence:",
+    "    - User reaction to memory is unclear.",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+  ].join("\n");
+}
+
+function discoveryLoopStrategicPromptPackFixture(): string {
+  return strategicPromptPackFixture("ready")
+    .replaceAll("ready-proto-prompt-pack", "dogfood-strategic-prompt-pack")
+    .replace("title: ready strategic prompt-pack fixture", "title: Dogfood strategic prompt pack")
+    .replaceAll(".openworkflow/validation/validation-1/VALIDATION.yaml", ".openworkflow/validation/dogfood-validation/VALIDATION.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-stress-fixtures/prompts/", ".openworkflow/prototypes/dogfood-proto/prompts/")
+    .replace("  status: not_started", "  status: complete")
+    .replace("  generated_images: []", [
+      "  generated_images:",
+      "    - image_id: IMG_D1_01",
+      "      direction_id: D1",
+      "      prompt_id: screen-1",
+      "      screen_name: Today practice entry",
+      "      path: .openworkflow/prototypes/dogfood-proto/images/IMG_D1_01.png",
+      "      metadata:",
+      "        source_prompt_ref: .openworkflow/prototypes/dogfood-proto/prompts/D1.md",
+      "        generated_at: 2026-05-22T00:00:00Z",
+      "        generator: fixture",
+      "        generation_status: complete",
+      "        review_status: accepted_for_tune",
+    ].join("\n"));
+}
+
+function discoveryLoopRefinedPromptPackFixture(): string {
+  return refinedPromptPackFixture("ready")
+    .replaceAll("ready-refined-prompt-pack", "dogfood-refined-prompt-pack")
+    .replace("title: ready refined prompt-pack fixture", "title: Dogfood refined prompt pack")
+    .replaceAll(".openworkflow/validation/validation-1/VALIDATION.yaml", ".openworkflow/validation/dogfood-validation/VALIDATION.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-1/EVIDENCE.yaml", ".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-1/images/daily-entry.png", ".openworkflow/prototypes/dogfood-proto/images/IMG_D1_01.png")
+    .replace("latest_approved_baseline_group_id: proto-1-accepted-v1", "latest_approved_baseline_group_id: dogfood-proto-accepted-v1");
+}
+
+function discoveryLoopDecisionFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: decision:dogfood-benchmark",
+    "contract_type: decision",
+    "artifact_type: decision_record",
+    "title: Dogfood benchmark prototype decision",
+    "status: active",
+    "reviewed_evidence:",
+    "  - .openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml",
+    "  - .openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml",
+    "outcome: continue",
+    "rationale: The tuned prompt pack preserves the emotional-memory product system and has accepted benchmark prototype image metadata.",
+    "accepted_scope:",
+    "  - accepted benchmark prototype image metadata",
+    "  - daily mission entry screen",
+    "  - memory trust control",
+    "rejected_scope:",
+    "  - exam dashboard",
+    "  - grammar textbook flow",
+    "revision_scope: []",
+    "next_command: /ow:design",
+    "follow_up_questions: []",
+    "updated_at: 2026-05-22T00:00:00Z",
+  ].join("\n");
+}
 
 function refinedPromptPackFixture(kind: RefinedPromptPackFixtureKind): string {
   const baselineAudit =
