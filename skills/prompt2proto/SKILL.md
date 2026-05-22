@@ -34,6 +34,12 @@ The role engine is required. A structurally complete translation still fails if
 it reads like a generic image prompt, a decorative dashboard, a card wall, or a
 concept poster rather than a plausible product interface.
 
+Use this role engine as the build-prototype philosophy engine: Chief PM plus
+Principal UI/UX judgment must come before visual translation. The Chief PM
+decides product intent, domain fit, user decision context, and evidence value;
+the Principal UI/UX lead decides information hierarchy, density calibration,
+affordance clarity, interaction believability, and UI/UX credibility.
+
 ## Inputs
 
 Required:
@@ -96,16 +102,19 @@ translation and evidence contract; it does not start provider generation.
 4. Preserve technical screen coherence from the prompt pack: app shell,
    navigation taxonomy, domain objects, screen ids, state model, data
    vocabulary, and allowed screen-specific deltas.
-5. Translate each selected direction into a prototype system plan: screen
+5. Apply the philosophy engine before translating screens: decide what must be
+   visible, grouped, collapsed, delayed, or drilled into based on industry,
+   role, risk, screen size, task frequency, and the user's next decision.
+6. Translate each selected direction into a prototype system plan: screen
    sequence, hierarchy, density, component anatomy, state behavior,
    interaction affordances, sample data, trust controls, and negative visual
    constraints.
-6. Calibrate information density as design judgment, not prompt length:
+7. Calibrate information density as design judgment, not prompt length:
    decide what is visible, grouped, collapsed, delayed, or drilled into based
    on industry, role, risk, screen size, task frequency, and user attention.
-7. Write translation evidence that names accepted inputs, refusals, output
+8. Write translation evidence that names accepted inputs, refusals, output
    refs, limitations, and the next authorized handoff.
-8. Stop before provider-backed generation, human visual review, visual parity,
+9. Stop before provider-backed generation, human visual review, visual parity,
    proto2html, storyboard, motion, specs, changes, or runtime work unless a
    later selected candidate explicitly authorizes that surface.
 

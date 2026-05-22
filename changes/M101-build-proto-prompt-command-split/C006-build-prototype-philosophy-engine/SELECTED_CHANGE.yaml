@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M101-build-proto-prompt-command-split:C006
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C006-build-prototype-philosophy-engine
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C006
+title: Inject Chief PM and Principal UI/UX philosophy engine into build-prototype
+status: completed
+selection_reason:
+  - C005 is already done and should not be selected again.
+  - C006 is the next recommended ready candidate after C004 created prompt2proto and C005 added the technical coherence contract.
+  - C006 unlocks C007 by adding the density calibration and visual information judgment layer before build-prototype is narrowed.
+approved_option:
+  id: option_1
+  title: Internal split preserving /ow:proto while build-prototype consumes prompt2proto through ready prompt packs
+scope:
+  includes:
+    - Chief PM perspective for product intent, user decision context, and industry fit
+    - Principal UI/UX perspective for visual hierarchy, density calibration, affordance clarity, and prototype credibility
+    - density strategy guidance by industry, role, risk, screen size, and task frequency
+    - rules for visible, grouped, collapsed, delayed, and drill-down information
+    - rubric that rejects both under-specified mockups and overstuffed concept posters
+  excludes:
+    - changing M100 paragraph anatomy
+    - provider-backed image generation
+    - human visual review
+    - visual reference parity scoring
+owned_paths:
+  - skills/prompt2proto/
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - provider-backed image generation
+  - proto2html
+  - storyboard or motion modeling
+acceptance:
+  - build-prototype guidance starts from Chief PM plus Principal UI/UX judgment before visual translation.
+  - Density calibration is treated as industry/product/design judgment, not a mechanical prompt dimension.
+  - Runtime-surface assertions prove build-prototype names density, information hierarchy, and UI/UX credibility boundaries.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion_requirements:
+  implementation_changed_files: true
+  local_commit_evidence: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  local_commit_evidence: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23

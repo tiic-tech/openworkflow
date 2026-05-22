@@ -25,12 +25,12 @@ scope_boundary: >
   visual prototype instructions, evidence, and review-ready outputs.
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 7
-active_candidate_count: 2
-completed_candidate_id: C005
-completed_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
-selected_candidate_id: C005
-selected_change_id: C005-add-prototype-system-coherence-contract-to-build-proto-prompt
-next_recommended_candidate_id: C006
+active_candidate_count: 1
+completed_candidate_id: C006
+completed_change_id: C006-build-prototype-philosophy-engine
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C007
 high_risk_report: changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
 outputs:
   candidate_changes_yaml: changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
@@ -56,6 +56,10 @@ outputs:
   c005_atom_tasks: changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/ATOM_TASKS.yaml
   c005_implementation_brief: changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_BRIEF.md
   c005_implementation_evidence: changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md
+  c006_selected_change: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/SELECTED_CHANGE.yaml
+  c006_atom_tasks: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/ATOM_TASKS.yaml
+  c006_implementation_brief: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/IMPLEMENTATION_BRIEF.md
+  c006_local_commit_evidence: changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
   build_proto_prompt_skill: skills/build-proto-prompt/SKILL.md
   prompt2proto_skill: skills/prompt2proto/SKILL.md
 key_dependencies:
@@ -65,7 +69,7 @@ key_dependencies:
   - C004 is complete; source prompt2proto skill foundation exists under skills/prompt2proto using the user-requested skill_generator method.
   - C003 is complete; /ow:build-proto-prompt exists as an internal command while /ow:vision2prompt remains compatible for later migration.
   - C005 is complete; ready strategic prompt packs now require prototype_system_contract for technical multi-screen coherence.
-  - C006 is ready; C004 and C006 must exist before C007 narrows build-prototype to prompt2proto consumption.
+  - C006 is complete; C007 is ready to narrow build-prototype to prompt2proto consumption.
 risks:
   - id: R001
     level: high
@@ -118,4 +122,4 @@ validation:
     - C003 added /ow:build-proto-prompt as an internal compiler command and generated ow-build-proto-prompt while preserving /ow:vision2prompt compatibility.
     - C003 deliberately did not narrow build-prototype or remove the legacy internal vision2prompt command; that remains for later migration candidates.
     - C005 added prototype_system_contract as a required ready prompt-pack coherence field and regenerated affected generated skills and audit packets from source.
-    - C005 keeps density calibration out of scope; C006 owns that as Chief PM plus Principal UI/UX design judgment.
+    - C006 added the Chief PM plus Principal UI/UX philosophy engine, density calibration guidance, generated prompt2proto guidance, and runtime-surface assertions.

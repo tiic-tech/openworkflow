@@ -84,10 +84,12 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 - Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation, prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or skipped.
 - Load prepared prompt text and verify every selected direction has screen_prompts before image generation.
 - Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.
+- Apply the build-prototype philosophy engine before image generation: Chief PM plus Principal UI/UX judgment must set product intent, information hierarchy, density calibration, affordance clarity, and UI/UX credibility boundaries.
 - Block image generation when prototype_system_contract, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage, or post_validate is fail or missing.
 </before>
 <during>
 - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
+- Calibrate prototype instructions so information is visible, grouped, collapsed, delayed, or drilled into based on industry, user role, task risk, screen size, task frequency, and the user's next decision.
 - Write one metadata record for every generated image with image_id, direction_id, prompt_id, screen_name, path, source_prompt_ref, generator, and status.
 - Do not revise product strategy or prompt text during image generation.
 </during>
@@ -125,6 +127,15 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Refuse prompt packs whose direction screen_prompts do not resolve to screen_manifest target_screen_id values.
 - When a prompt pack is refused, keep image_generation.status: not_started and hand back to /ow:vision2prompt repair.
 </prompt_pack_readiness_gate>
+
+<build_prototype_philosophy_engine>
+- Chief PM plus Principal UI/UX judgment must run before visual translation.
+- The Chief PM protects product intent, user decision context, domain fit, workflow priority, and evidence value.
+- The Principal UI/UX lead protects information hierarchy, density calibration, layout anatomy, affordance clarity, interaction believability, and UI/UX credibility.
+- Density calibration is product and design judgment, not a mechanical prompt dimension or paragraph length target.
+- Use prototype_system_contract for technical screen coherence; use this philosophy engine for visual information judgment.
+- Reject under-specified mockups that hide operational decisions and overstuffed concept posters that make every element equally important.
+</build_prototype_philosophy_engine>
 
 <image_metadata_contract>
 - Every generated image must record image_id, direction_id, prompt_id, screen_name, path, and metadata.

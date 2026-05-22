@@ -320,11 +320,17 @@ packets:
           prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass,
           prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before
           image generation."
+        - "Apply the build-prototype philosophy engine before image generation: Chief PM plus
+          Principal UI/UX judgment must set product intent, information hierarchy, density
+          calibration, affordance clarity, and UI/UX credibility boundaries."
         - Block image generation when prototype_system_contract, prompt_pack_integrity_gate,
           prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage,
           or post_validate is fail or missing.
       during:
         - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
+        - Calibrate prototype instructions so information is visible, grouped, collapsed, delayed,
+          or drilled into based on industry, user role, task risk, screen size, task frequency, and
+          the user's next decision.
         - Write one metadata record for every generated image with image_id, direction_id,
           prompt_id, screen_name, path, source_prompt_ref, generator, and status.
         - Do not revise product strategy or prompt text during image generation.

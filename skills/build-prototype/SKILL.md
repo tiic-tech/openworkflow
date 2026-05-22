@@ -27,6 +27,16 @@ philosophy, and willingness to imagine materially different product forms. The
 references are tools for that perspective, not a checklist whose completion
 alone proves quality.
 
+Before any downstream prompt2proto handoff or visual prototype translation,
+switch from prompt-pack strategy generation into the build-prototype philosophy
+engine: Chief PM plus Principal UI/UX judgment. The Chief PM protects product
+intent, user decision context, domain fit, and evidence value. The Principal
+UI/UX lead protects visual hierarchy, density calibration, affordance clarity,
+interaction believability, and prototype credibility. This judgment layer
+decides what information is visible, grouped, collapsed, delayed, or drilled
+into based on industry, user role, task risk, screen size, task frequency, and
+reviewer attention.
+
 ## Inputs
 
 Required:
@@ -47,6 +57,7 @@ Optional:
   language, platform, brand, or acceptance bar
 - `references/proto-redesign-artifact-contracts.md`
 - `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
+- `skills/build-prototype/references/philosophy-engine.md`
 - `skills/build-prototype/references/vision2prompt/01_input_contract.md`
   through `skills/build-prototype/references/vision2prompt/07_quality_rubric.md`
 
@@ -92,9 +103,13 @@ For local runnable prototypes, the legacy artifact shape remains valid:
    `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
    and run the `references/vision2prompt/` files in numeric order before
    marking prompt text ready for image generation.
-4. If the user asks to tune accepted baseline screens or an accepted prompt
+4. Before handing to prompt2proto or reviewing prototype instructions, use
+   `skills/build-prototype/references/philosophy-engine.md` to calibrate
+   density, information hierarchy, domain object emphasis, trust controls, and
+   UI/UX credibility.
+5. If the user asks to tune accepted baseline screens or an accepted prompt
    pack, hand off to `skills/tune-prototype/SKILL.md`.
-5. Run `npm run validate` when the repository validator exists.
+6. Run `npm run validate` when the repository validator exists.
 
 ## Strategic Workflow
 
@@ -135,6 +150,25 @@ For local runnable prototypes, the legacy artifact shape remains valid:
 13. Recommend the first direction to generate based on risk reduction,
    observability, feasibility, and closeness to the success signal.
 14. Record review evidence and next action guidance.
+
+## Build-Prototype Philosophy Engine
+
+Use this engine after strategic prompt assets are ready and before downstream
+visual translation is accepted:
+
+- Chief PM lens: decide what the prototype must prove, what user decision is at
+  stake, which domain objects matter, what trust boundary must be visible, and
+  what information would change the next action.
+- Principal UI/UX lens: decide the screen's hierarchy, density, layout anatomy,
+  scan path, affordance clarity, interaction feedback, and inspection quality.
+- Density is not a prompt length target. It is a product/design decision:
+  operational users may need dense comparison surfaces, while sensitive or
+  consumer flows may need fewer visible choices and stronger reassurance.
+- Use `prototype_system_contract` for technical screen coherence. Use this
+  philosophy engine for density and visual information judgment.
+
+Reject both sparse mockups that hide the operating decision and overstuffed
+concept posters that make everything equally important.
 
 ## Strategic Direction Rules
 

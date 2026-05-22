@@ -370,7 +370,7 @@ changes:
         - packages/cli/src/dev/verifyRuntimeSurface.ts
         - changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md
   - id: C006
-    status: ready
+    status: done
     title: Inject Chief PM and Principal UI/UX philosophy engine into build-prototype
     purpose: >
       Address density calibration and visual information judgment as a design
@@ -394,6 +394,9 @@ changes:
       - skills/build-prototype/references/
       - packages/core/src/commands/registry.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
       - changes/M101-build-proto-prompt-command-split/
     dependencies:
       - C001
@@ -414,8 +417,37 @@ changes:
       - build-prototype guidance starts from Chief PM plus Principal UI/UX judgment before visual translation.
       - Density calibration is treated as industry/product/design judgment, not a mechanical prompt dimension.
       - Runtime-surface assertions prove build-prototype names density, information hierarchy, and UI/UX credibility boundaries.
+    selection:
+      selected_change_id: C006-build-prototype-philosophy-engine
+      selected_at: 2026-05-23
+      approved_option: "Option 1: Internal split preserving /ow:proto while build-prototype consumes prompt2proto through ready prompt packs"
+      reason: >
+        C005 is already complete, while C006 is the next recommended ready
+        candidate after C004 created prompt2proto and C005 added technical
+        prototype system coherence. C006 adds the Chief PM plus Principal
+        UI/UX philosophy engine before C007 narrows build-prototype to ready
+        prompt-pack consumption.
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+        - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/SELECTED_CHANGE.yaml
+    completion:
+      completed_change_id: C006-build-prototype-philosophy-engine
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/SELECTED_CHANGE.yaml
+        - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/ATOM_TASKS.yaml
+        - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/IMPLEMENTATION_BRIEF.md
+        - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
+      validation:
+        - npm run build
+        - node dist/cli/src/index.js sync --root . --json
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
   - id: C007
-    status: candidate
+    status: ready
     title: Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto
     purpose: >
       Complete the command split by moving build-prototype away from
@@ -629,3 +661,45 @@ operations:
       - skills/prompt2proto/references/02_prompt_pack_readiness.md
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M101-build-proto-prompt-command-split/C005-add-prototype-system-coherence-contract-to-build-proto-prompt/IMPLEMENTATION_EVIDENCE.md
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Select C006 after merging the completed M102 selected-change commit gate.
+      C005 is already done; C006 is the next recommended ready candidate and
+      is required before C007 can narrow build-prototype to prompt2proto
+      consumption.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/SELECTED_CHANGE.yaml
+      - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/ATOM_TASKS.yaml
+      - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+      - C007
+    actor: agent
+    reason: >
+      Complete C006 by adding the build-prototype Chief PM plus Principal
+      UI/UX philosophy engine, density calibration guidance, generated
+      prompt2proto guidance, and runtime-surface assertions. Mark C007 ready
+      because all dependencies are now satisfied.
+    changed_at: 2026-05-23
+    before_status: C006 selected; C007 candidate
+    after_status: C006 done; C007 ready
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/philosophy-engine.md
+      - skills/prompt2proto/SKILL.md
+      - skills/prompt2proto/references/00_role_philosophy_engine.md
+      - skills/prompt2proto/references/03_visual_translation_workflow.md
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M101-build-proto-prompt-command-split/C006-build-prototype-philosophy-engine/LOCAL_COMMIT_EVIDENCE.yaml
