@@ -71,7 +71,7 @@ scope_control:
         Visual verification requires generated assets and provider/runtime
         decisions outside this text-first synchronous dogfood slice.
       suggested_plan_id: M92-visual-generation-dogfood-harness
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -242,7 +242,7 @@ changes:
       evidence:
         - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: ready
+    status: selected
     title: Record benchmark-selection readiness evidence
     purpose: >
       Close the synchronous dogfood slice by proving tuned prototype evidence
@@ -284,6 +284,14 @@ changes:
       - The handoff is ready for a future proto2html queue but does not create proto2html artifacts.
       - Generated /ow:tune still records decision audit internally instead of asking the user to run /ow:decision.
       - M90 summary names the benchmark-selection evidence and remaining deferred work.
+    selection:
+      selected_change_id: C004-benchmark-selection-readiness-evidence
+      reason: >
+        Select C004 through ow-select-change single-queue ranking. C001-C003
+        completed the canonical fixture, happy path, and failure routes; C004 is
+        the final ready M90 candidate and records the benchmark-selection
+        handoff evidence without implementing proto2html.
+      selected_at: 2026-05-22
 operations:
   - operation_id: OP001
     operation_type: add
@@ -432,3 +440,19 @@ operations:
     after_status: ready
     evidence:
       - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the final ready M90 candidate after negative failure
+      routing landed; no analyze-changes run is needed for this single active
+      queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/IMPLEMENTATION_BRIEF.md

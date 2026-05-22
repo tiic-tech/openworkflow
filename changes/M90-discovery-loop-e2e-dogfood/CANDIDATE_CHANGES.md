@@ -23,11 +23,11 @@ tooling, proto2html, html2spec, build, or archive.
 | C001 | done | medium | Create canonical discovery-loop dogfood fixture | none |
 | C002 | done | medium | Verify happy-path discovery-loop command handoff | C001 |
 | C003 | done | medium | Verify discovery-loop failure routing | C001, C002 |
-| C004 | ready | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
+| C004 | selected | medium | Record benchmark-selection readiness evidence | C001, C002, C003 |
 
 ## Next Recommendation
 
-`C004` is ready. It records benchmark-selection readiness evidence without
+`C004` is selected. It records benchmark-selection readiness evidence without
 creating proto2html artifacts.
 
 ## Deferred
