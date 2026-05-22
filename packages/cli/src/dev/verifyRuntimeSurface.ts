@@ -2381,6 +2381,20 @@ async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.Proce
   assert(contextPackets.includes("packet_id: context:vision2prompt"), "context packets should include internal vision2prompt stage");
   assert(contextPackets.includes("packet_id: context:prompt2proto"), "context packets should include internal prompt2proto stage");
   assert(extractBlock(contextPackets.split("packet_id: context:tune", 2)[1] ?? "", "optional").includes(".openworkflow/prototypes/PROTOTYPE_INDEX.yaml"), "tune context should allow prototype index handoff");
+
+  const failedPostValidatePath = join(protoDir, "FAILED_POST_VALIDATE.yaml");
+  await writeFile(failedPostValidatePath, discoveryLoopStrategicPromptPackFixture().replace("  status: pass", "  status: pending"), "utf8");
+  const failedPostValidate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(failedPostValidate.code !== 0, "failed post-validation dogfood fixture should block image handoff");
+  assert(failedPostValidate.output.includes("post_validate.status must be pass or fail before /ow:prompt2proto"), "failed post-validation should name prompt2proto gate");
+  await unlink(failedPostValidatePath);
+
+  const missingBaselineResolutionPath = join(tuneDir, "MISSING_BASELINE_RESOLUTION.yaml");
+  await writeFile(missingBaselineResolutionPath, discoveryLoopRefinedPromptPackFixture().replace("baseline_resolution:", "baseline_resolution_missing:"), "utf8");
+  const missingBaselineResolution = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingBaselineResolution.code !== 0, "missing baseline resolution dogfood fixture should block tune handoff");
+  assert(missingBaselineResolution.output.includes("baseline_resolution must be a mapping"), "missing baseline resolution should name repair section");
+  await unlink(missingBaselineResolutionPath);
 }
 
 type RefinedPromptPackFixtureKind = "ready" | "missing-baseline-audit" | "orphan-screen-prompt" | "missing-must-inherit" | "missing-must-remove";
