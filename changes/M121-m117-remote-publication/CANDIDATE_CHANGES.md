@@ -77,6 +77,17 @@ Risk: high
 Outcome: create `HIGH_RISK_DECISION_REPORT.md` for exactly one M117 push
 operation. The report is evidence, not approval.
 
+High-risk report:
+
+- `changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md`
+
+Recommended option: run a narrow isolated-worktree preflight spike before asking
+for exact push approval. The future push command remains unapproved:
+
+```bash
+git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+```
+
 Owned paths:
 
 - `changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md`

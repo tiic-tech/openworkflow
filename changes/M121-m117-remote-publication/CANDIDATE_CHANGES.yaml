@@ -144,6 +144,13 @@ c001_preflight_result:
     - current branch codex/m121-m117-remote-publication does not match branch boundary codex/m117-git-automation-remote-readiness
   chosen_execution_model: isolated_m117_worktree
   recommended_next: C002
+c002_high_risk_report:
+  path: changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+  status: present
+  decision_boundary: exact M117 branch push to origin
+  recommended_option: narrow spike before push approval
+  exact_push_command_unapproved: git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+  report_is_approval: false
 next_recommended_candidate_id: C002
 changes:
   - id: C001
@@ -399,3 +406,14 @@ operations:
     after_status: done
     evidence:
       - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md
+  - operation_id: OP004
+    operation_type: query
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: High-risk stop converted into a decision report before any M117 push implementation.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
