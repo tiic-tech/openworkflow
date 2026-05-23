@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M119-C004-post-publication-audit
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M119-C004-post-publication-audit
+title: Atom tasks for post-publication audit closure
+status: done
+tasks:
+  - task_id: T001
+    title: Verify published branch and draft PR state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The M102 remote branch ref is still readable.
+      - PR #4 is still open and draft with base main and head codex/m102-selected-change-commit-gate.
+  - task_id: T002
+    title: Inspect remaining publication candidates
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - Remaining PR-ready summaries and local branch candidates are listed.
+      - M117 remote-plan blockers are captured.
+      - Branch ownership issues for stacked queues are recorded.
+  - task_id: T003
+    title: Write post-publication audit and recommendation
+    status: done
+    type: document
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - M119 can be reconstructed from local evidence.
+      - The next recommendation separates M120 branch repair from any later publication pilot.
+  - task_id: T004
+    title: Validate and commit C004 evidence
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - YAML parse, OpenWorkflow validate, and diff checks pass.
+      - M119 queue records C004 completion.

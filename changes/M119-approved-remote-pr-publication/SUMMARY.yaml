@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M119-approved-remote-pr-publication
 title: Summary for remote PR publication governance
-status: active
+status: done
 source:
   kind: mixed
   summary: >
@@ -27,9 +27,9 @@ branch_note: >
   Queue creation happened on codex/m118-repo-branch-pr-governance after commit 34708e0 with a clean
   working tree.
 candidate_count: 4
-completed_candidate_id: C003
-completed_change_id: M119-C003-create-approved-draft-pr
-next_recommended_candidate_id: C004
+completed_candidate_id: C004
+completed_change_id: M119-C004-post-publication-audit
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -49,6 +49,10 @@ outputs:
   c003_atom_tasks: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/ATOM_TASKS.yaml
   c003_implementation_brief: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/IMPLEMENTATION_BRIEF.md
   draft_pr_audit: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md
+  c004_selected_change: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/IMPLEMENTATION_BRIEF.md
+  post_publication_audit: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
 preflight_result:
   mutation_performed: false
   first_pilot_ready: false
@@ -87,7 +91,23 @@ key_dependencies:
   - C001 must refresh current remote readiness before any push or PR operation can be selected.
   - C002 completed one explicitly approved push for codex/m102-selected-change-commit-gate.
   - C003 completed one explicitly approved draft PR for codex/m102-selected-change-commit-gate.
-  - C004 can now summarize publication results and recommend the next publication or repair action.
+  - C004 completed the post-publication audit and next-step recommendation.
+post_publication_result:
+  completed_pilot: M102-selected-change-commit-gate
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/4
+  pr_state: OPEN
+  pr_is_draft: true
+  additional_remote_mutation_recommended_now: false
+  next_recommended_queue: M120-historical-branch-repair
+  next_publication_candidate_after_repair: M117-git-automation-remote-readiness
+  blockers:
+    - M117 remote-plan still reports missing simulator evidence.
+    - M117 remote-plan reports its branch-local PR_READY_SUMMARY.md is missing.
+    - M105, M106, and M115 summaries point at codex/m101-build-proto-prompt-command-split, not
+      independent queue branches.
+    - M71 is older and includes a long historical stack with early commits that predate strict
+      commit evidence.
+  audit: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
 risks:
   - id: R001
     level: high
@@ -103,8 +123,8 @@ risks:
     description: Remote base visibility and simulator evidence were missing in M118 read-only probes.
     mitigation: C001 must refresh remote-plan evidence before any mutation candidate proceeds.
 unresolved_questions:
-  - Should the next publication action continue with another branch or defer to M120 historical branch repair?
-  - Should PR #4 remain draft until branch-stack review is complete?
+  - Should M120 split stacked historical branch work or accept selected stacks as intentionally coupled review branches?
+  - When should PR #4 be marked ready for review?
 deferred_features:
   - M120-historical-branch-repair
 validation:
@@ -156,6 +176,11 @@ validation:
     - 'gh pr list --repo tiic-tech/openworkflow --head codex/m102-selected-change-commit-gate --base main --json number,url,state,isDraft,title,headRefName,baseRefName'
     - 'gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md'
     - 'gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number'
+    - git ls-remote --heads origin 'codex/*'
+    - 'gh pr list --repo tiic-tech/openworkflow --state all --json number,url,state,isDraft,title,headRefName,baseRefName --limit 20'
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
   notes: |
     - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision; the user explicitly requested DTC creation for M119.
     - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, implementation source edits, branch creation, push, or PR operation was performed.
@@ -168,3 +193,4 @@ validation:
     - C002 pushed exactly codex/m102-selected-change-commit-gate to origin and verified the remote ref. No draft PR, Issue mutation, merge, force-push, or history rewrite was performed.
     - User approval was received for the exact `gh pr create --draft` command.
     - C003 created draft PR #4 from codex/m102-selected-change-commit-gate into main and verified it is open and draft. No merge, ready-for-review transition, Issue mutation, or broad PR edit was performed.
+    - C004 records M119 as complete after one approved push and one approved draft PR. It recommends stopping further remote mutation and opening M120 historical branch repair before publishing additional branch stacks.

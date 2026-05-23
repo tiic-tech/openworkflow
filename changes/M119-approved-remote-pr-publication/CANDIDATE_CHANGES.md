@@ -4,7 +4,7 @@ Source of truth: `CANDIDATE_CHANGES.yaml`.
 
 ## Boundary
 
-M119 owns remote publication governance for the first reviewable OpenWorkflow feat branches after M118. It starts with a read-only preflight and does not approve or perform remote mutation during queue creation.
+M119 owns remote publication governance for the first reviewable OpenWorkflow feat branches after M118. It completed one approved narrow pilot: M102 branch push plus draft PR creation.
 
 Branch boundary: `codex/m119-approved-remote-pr-publication`
 
@@ -14,7 +14,7 @@ Current branch after selection setup: `codex/m119-approved-remote-pr-publication
 
 Select C001 first. Push and draft PR candidates are high risk and require a green C001 preflight, a high-risk decision report for the exact operation boundary, and explicit user approval for the concrete command.
 
-Completed candidate: C003
+Completed candidate: C004
 
 High-risk report: `changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md`
 
@@ -108,11 +108,17 @@ Unlocks: C004
 
 ### C004 - Record post-publication audit and next publication recommendation
 
-Status: candidate
+Status: done
 
 Risk: medium
 
 Purpose: summarize the completed pilot, refresh local evidence, and recommend either another publication pilot or M120 branch repair.
+
+Audit evidence:
+
+- `changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md`
+
+Recommendation: stop additional M119 remote mutation after PR #4 and defer further publication to M120 historical branch repair or a fresh high-risk queue.
 
 Excludes: additional push, additional PR creation, merge, release, and historical branch repair.
 

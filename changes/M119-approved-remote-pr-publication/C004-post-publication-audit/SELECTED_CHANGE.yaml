@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:M119-C004-post-publication-audit
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M119-C004-post-publication-audit
+source_plan_id: M119-approved-remote-pr-publication
+source_candidate_id: C004
+title: Record post-publication audit and next publication recommendation
+status: selected
+selection_reason: >
+  C004 was selected after C002 pushed the M102 pilot branch and C003 created the matching draft PR.
+  The remaining M119 work is local audit closure and a recommendation for whether to continue
+  publication or defer to historical branch repair.
+scope:
+  includes:
+    - record branch push and draft PR evidence from C002 and C003
+    - refresh M119 summary and local review notes
+    - identify remaining publication candidates and blockers
+    - recommend the next queue or stop condition
+  excludes:
+    - additional push or PR creation
+    - merge or release operations
+    - historical branch repair
+owned_paths:
+  - changes/M119-approved-remote-pr-publication/
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - M119 local audit evidence is complete enough to reconstruct the remote operation.
+  - Remaining branch and PR work is not implied as approved.
+  - The next recommendation separates another publication pilot from historical branch repair.
+validation:
+  - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
+  - git ls-remote --heads origin codex/m102-selected-change-commit-gate
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - ruby YAML parse for M119 C004 artifacts
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rejected_alternatives:
+  - id: continue_remote_publication_immediately
+    reason: Remaining candidates have branch or evidence blockers and need a fresh approval gate.
+  - id: merge_or_ready_pr
+    reason: Marking ready, merging, or editing PR #4 is outside M119 C004.

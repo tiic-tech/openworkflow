@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M119-approved-remote-pr-publication
 title: Candidate changes for remote PR publication governance
-status: active
+status: done
 source:
   kind: mixed
   refs:
@@ -89,7 +89,7 @@ observed_state:
     - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
     - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
     - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -295,7 +295,7 @@ changes:
         - gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
         - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
   - id: C004
-    status: candidate
+    status: done
     title: Record post-publication audit and next publication recommendation
     purpose: >
       Summarize the completed remote publication pilot, update local planning evidence, and recommend
@@ -327,6 +327,35 @@ changes:
       - M119 local audit evidence is complete enough to reconstruct the remote operation.
       - Remaining branch and PR work is not implied as approved.
       - The next recommendation separates another publication pilot from historical branch repair.
+    selection:
+      selected_change_id: M119-C004-post-publication-audit
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C002 and C003 completed the approved M102 remote publication pilot. C004
+        closes M119 with local audit evidence and a next-step recommendation.
+      artifacts:
+        selected_change: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/ATOM_TASKS.yaml
+        implementation_brief: changes/M119-approved-remote-pr-publication/C004-post-publication-audit/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 produced local governance closure evidence only. It did not change product source,
+        generated surfaces, runtime behavior, remote branches, PR state, Issues, or local branch
+        pointers.
+      evidence:
+        - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
+      recommendation: >
+        Stop M119 remote mutation after the M102 pilot PR. Defer additional branch publication to
+        M120 historical branch repair or a fresh high-risk queue with branch-local PR-ready evidence.
+      validation:
+        - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
+        - git ls-remote --heads origin codex/m102-selected-change-commit-gate
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - ruby YAML parse for M119 C004 artifacts
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -378,3 +407,36 @@ operations:
     after_status: candidate
     evidence:
       - changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Execute exactly one user-approved pilot branch push and record local audit evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: Execute exactly one user-approved draft PR creation and record local audit evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: Close M119 with post-publication audit and next publication recommendation.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
