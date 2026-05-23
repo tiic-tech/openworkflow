@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M120-historical-branch-repair
 title: Summary for historical branch repair
-status: active
+status: done
 source:
   kind: mixed
   summary: >
@@ -26,9 +26,9 @@ branch_note: >
   creation was intentionally not performed during DTC queue creation. The local boundary branch was
   later created with git-automation before C001 selection.
 candidate_count: 5
-completed_candidate_id: C003
-completed_change_id: M120-C003-restore-branch-local-pr-ready-evidence
-next_recommended_candidate_id: C005
+completed_candidate_id: C005
+completed_change_id: M120-C005-repaired-publication-order
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -47,6 +47,10 @@ outputs:
   c003_atom_tasks: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
   c003_implementation_brief: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
   c003_m117_evidence_repair: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md
+  c005_selected_change: changes/M120-historical-branch-repair/C005-repaired-publication-order/SELECTED_CHANGE.yaml
+  c005_atom_tasks: changes/M120-historical-branch-repair/C005-repaired-publication-order/ATOM_TASKS.yaml
+  c005_implementation_brief: changes/M120-historical-branch-repair/C005-repaired-publication-order/IMPLEMENTATION_BRIEF.md
+  c005_publication_order: changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
 inventory_result:
   current_branch: codex/m120-historical-branch-repair
   remote_codex_branches:
@@ -96,12 +100,34 @@ evidence_repair_result:
   remaining_remote_plan_blockers:
     - simulator evidence is missing
   recommended_next: C005 repaired publication order
+publication_order_result:
+  recommended_next_queue: M121-m117-remote-publication
+  first_publication_candidate: M117-git-automation-remote-readiness
+  second_publication_candidate: M71-git-version-control-governance
+  deferred_shared_branch_group:
+    - M105-m104-direct-trust-gate-fixes
+    - M106-agent-resume-cockpit
+    - M115-internal-coder-quality-governance
+  c004_status: deferred
+  m117_remote_readiness:
+    remote_plan_missing_summary_blocker_cleared: true
+    simulator_ok: true
+    remaining_remote_plan_blocker: simulator evidence is missing
+    merge_readiness: fast_forward_clean
+    existing_pr: none
+  m71_remote_readiness:
+    remote_plan_ok: true
+    simulator_ok: true
+    merge_readiness: fast_forward_clean
+    existing_pr: none
+    caveat: older 66-commit historical stack
+  no_remote_mutation_performed: true
 key_dependencies:
   - C001 completed the branch ownership and PR-ready evidence inventory.
   - C002 completed the repair policy and stop boundaries.
   - C003 restored M117 branch-local PR-ready evidence.
-  - C004 remains available only if high-risk history surgery is needed.
-  - C005 depends on repaired evidence before recommending the next publication queue.
+  - C004 deferred because no high-risk history surgery is currently needed.
+  - C005 completed repaired publication ordering and recommends M121.
 risks:
   - id: R001
     level: high
@@ -116,9 +142,8 @@ risks:
     description: Several PR-ready summaries point at shared or old branch boundaries.
     mitigation: C001 must map branch ownership before C003 restores evidence or C005 recommends publication order.
 unresolved_questions:
-  - Should M120 accept some older stacked branches as intentionally coupled review branches?
-  - Should M117 be repaired first because it has clean branch identity and merge readiness?
-  - Should PR #4 remain draft until M120 finishes branch-stack review?
+  - Should M121 accept the known simulator-evidence binding gap for M117 based on green simulator evidence?
+  - When should PR #4 be marked ready for review?
 deferred_features:
   - M121-m117-remote-publication
   - M122-pr4-ready-review-governance
@@ -148,6 +173,17 @@ validation:
     - node dist/cli/src/index.js git-automation remote-plan --root .
       --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
       --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation simulate --root .
+      --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+    - node dist/cli/src/index.js git-automation remote-plan --root .
+      --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation simulate --root .
+      --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base main --json
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness
+      --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base main
+      --json number,url,state,isDraft,title,headRefName,baseRefName
   notes:
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly requested M120 CC creation.
@@ -164,3 +200,6 @@ validation:
     - C003 restored and committed M117 branch-local PR_READY_SUMMARY.md on
       codex/m117-git-automation-remote-readiness at commit 898f0152. The missing-summary blocker is
       cleared; simulator evidence remains the only remote-plan blocker.
+    - C005 recommends M121-m117-remote-publication as the next approval-gated publication queue.
+      C004 is deferred because no history surgery is currently needed. No remote mutation was
+      performed.

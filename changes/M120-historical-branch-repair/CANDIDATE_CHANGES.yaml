@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M120-historical-branch-repair
 title: Candidate changes for historical branch repair
-status: active
+status: done
 source:
   kind: mixed
   refs:
@@ -103,7 +103,7 @@ observed_state:
       of independent queue branches.
     - M71 is older and includes a long historical stack with early commits that predate strict
       commit evidence.
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -299,7 +299,7 @@ changes:
         - node dist/cli/src/index.js validate --root . --json
         - git diff --check
   - id: C004
-    status: candidate
+    status: deferred
     title: Prepare high-risk decision report for history surgery if needed
     purpose: >
       If C001/C002 show that branch pointer changes are required, create the high-risk report that
@@ -332,8 +332,12 @@ changes:
       - The report exists if any branch repair requires history surgery.
       - The report does not execute or approve destructive or remote commands.
       - Exact operation-level approval remains required for any high-risk command.
+    defer_reason: >
+      C001-C003 did not identify a current need for cherry-pick, rebase, reset, branch deletion,
+      force-push, remote mutation, PR mutation, or other history surgery. C004 remains the required
+      path if such an operation becomes necessary later.
   - id: C005
-    status: candidate
+    status: done
     title: Produce repaired publication order and remote readiness plan
     purpose: >
       Turn the repaired branch inventory into a publication order that separates ready candidates,
@@ -366,6 +370,36 @@ changes:
       - The next publication recommendation is explicit and evidence-backed.
       - Remaining blockers are separated by candidate branch.
       - No remote mutation is implied as approved.
+    selection:
+      selected_change_id: M120-C005-repaired-publication-order
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C003 restored M117 branch-local PR-ready evidence. C005 closes M120 by
+        ranking repaired publication candidates and recommending the next approval-gated queue.
+      artifacts:
+        selected_change: changes/M120-historical-branch-repair/C005-repaired-publication-order/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M120-historical-branch-repair/C005-repaired-publication-order/ATOM_TASKS.yaml
+        implementation_brief: changes/M120-historical-branch-repair/C005-repaired-publication-order/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C005 produced local governance planning evidence only. It did not change product source,
+        generated surfaces, runtime behavior, branch pointers, remote refs, PR state, or Issues.
+      evidence:
+        - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+      recommendation: >
+        Create M121-m117-remote-publication for the next approval-gated publication pass. M117 is
+        the first candidate; M71 is second after explicit historical-stack acceptance; M101-derived
+        queues remain deferred pending shared-branch policy.
+      validation:
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base main --json
+        - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -466,3 +500,38 @@ operations:
     after_status: done
     evidence:
       - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: Defer high-risk history surgery report because no current operation requires history surgery.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: deferred
+    evidence:
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: Select repaired publication ordering after M117 evidence repair.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/SELECTED_CHANGE.yaml
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/ATOM_TASKS.yaml
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: Complete repaired publication order and next queue recommendation.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md

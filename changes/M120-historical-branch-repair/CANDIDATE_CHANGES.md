@@ -18,7 +18,7 @@ Select C001 first. M120 must produce a read-only branch ownership inventory befo
 
 High-risk operations such as rebase, reset, force-push, remote deletion, PR edit, merge, or ready-for-review transition require a dedicated high-risk report and exact operation-level approval.
 
-Next recommended candidate: C005
+Next recommended candidate: none; M120 is complete.
 
 ## Candidates
 
@@ -82,7 +82,7 @@ Unlocks: C005
 
 ### C004 - Prepare high-risk decision report for history surgery if needed
 
-Status: candidate
+Status: deferred
 
 Risk: high
 
@@ -96,9 +96,11 @@ Excludes: executing cherry-pick, rebase, reset, force-push, branch deletion, rem
 
 Unlocks: C005
 
+Deferred reason: current M120 work did not require history surgery. Restore C004 only if a concrete rebase, reset, cherry-pick split, destructive delete, force-push, or PR mutation is needed.
+
 ### C005 - Produce repaired publication order and remote readiness plan
 
-Status: candidate
+Status: done
 
 Risk: medium
 
@@ -107,6 +109,12 @@ Purpose: turn repaired branch inventory into a publication order that separates 
 Depends on: C001, C002, C003
 
 Unlocks: M121-m117-remote-publication
+
+Completion evidence:
+
+- `changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md`
+
+Result: M120 recommends `M121-m117-remote-publication` as the next approval-gated queue. M117 ranks first; M71 ranks second after explicit historical-stack acceptance; M101-derived queues remain deferred.
 
 ## Deferred
 

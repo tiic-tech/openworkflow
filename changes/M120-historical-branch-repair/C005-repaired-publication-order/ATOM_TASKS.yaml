@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M120-C005-repaired-publication-order
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M120-C005-repaired-publication-order
+title: Atom tasks for repaired publication order
+status: done
+tasks:
+  - task_id: T001
+    title: Compare M117 and M71 readiness evidence
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - M117 and M71 remote-plan and simulator outcomes are captured.
+  - task_id: T002
+    title: Classify M101-derived queues and C004 status
+    status: done
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - Shared M101-derived queues remain outside immediate publication.
+      - C004 is deferred because no history surgery is currently required.
+  - task_id: T003
+    title: Write publication order and next queue recommendation
+    status: done
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - PUBLICATION_ORDER.md names the next recommended publication queue and stop gates.
+  - task_id: T004
+    title: Validate and close M120
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - YAML parse, OpenWorkflow validate, and diff checks pass.
+      - M120 records C005 completion.

@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: selected_change:M120-C005-repaired-publication-order
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M120-C005-repaired-publication-order
+source_plan_id: M120-historical-branch-repair
+source_candidate_id: C005
+title: Produce repaired publication order and remote readiness plan
+status: selected
+selection_reason: >
+  C005 is selected after C001 inventory, C002 repair policy, and C003 M117 branch-local evidence
+  repair. The remaining M120 outcome is a publication order and explicit approval-gated next queue
+  recommendation.
+scope:
+  includes:
+    - rank M117, M71, and any repaired M101-derived queues for publication readiness
+    - record remote-plan blockers for each candidate
+    - recommend the next approval-gated publication queue
+    - define stop conditions for PR #4 ready-for-review and merge decisions
+  excludes:
+    - pushing branches
+    - creating, editing, closing, marking ready, or merging PRs
+    - mutating Issues
+owned_paths:
+  - changes/M120-historical-branch-repair/
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - The next publication recommendation is explicit and evidence-backed.
+  - Remaining blockers are separated by candidate branch.
+  - No remote mutation is implied as approved.
+validation:
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml --base main --json
+  - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rejected_alternatives:
+  - id: C004
+    reason: No current M120 finding requires history surgery; C004 is deferred until such a need appears.
