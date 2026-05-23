@@ -1,0 +1,21 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C004-wire-coder-governance-into-change-and-team-protocols
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C004-wire-coder-governance-into-change-and-team-protocols
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C004
+selected_change_id: C004-wire-coder-governance-into-change-and-team-protocols
+primary_commit: 323e415db54bac535b7a1290c6e4f58623a634c2
+validation_evidence:
+  - node generated change/team coder governance assertion
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - ruby -ryaml C004 planning artifacts
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
