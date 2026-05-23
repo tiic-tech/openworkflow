@@ -61,21 +61,34 @@ Completion evidence:
 
 ### C002 - Prepare exact PR #5 ready-for-review decision
 
-Status: ready
+Status: done
 
 Risk: high
 
 Outcome: convert C001 facts into an exact high-risk approval packet for
 `gh pr ready 5 --repo tiic-tech/openworkflow`.
 
+Selection: `C002-pr5-ready-review-decision`
+
+Completion evidence:
+
+- `changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml`
+- `changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md`
+
 ### C003 - Execute approved PR #5 ready-for-review transition
 
-Status: candidate
+Status: ready
 
 Risk: high
 
 Outcome: after exact approval, mark only PR #5 ready for review and record local
 audit evidence.
+
+Blocked until the user approves exactly:
+
+```bash
+gh pr ready 5 --repo tiic-tech/openworkflow
+```
 
 ### C004 - Prepare PR #4 ready-for-review decision
 

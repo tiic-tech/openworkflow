@@ -110,6 +110,23 @@ Reasoning:
 - PR #4 should remain separate unless fresh preflight shows it is still aligned
   with the current review strategy.
 
+## Prepared PR #5 Approval Packet
+
+C001 completed the read-only preflight. C002 prepared the exact PR #5
+ready-for-review decision packet:
+
+- `changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md`
+- `changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md`
+
+The only prepared command is:
+
+```bash
+gh pr ready 5 --repo tiic-tech/openworkflow
+```
+
+This packet is still evidence, not approval. C003 must stop unless the user
+approves the exact command above.
+
 ## Guardrails
 
 - Do not mark any PR ready for review without exact operation-level approval.

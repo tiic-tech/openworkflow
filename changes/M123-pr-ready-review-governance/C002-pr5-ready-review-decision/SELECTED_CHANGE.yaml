@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-pr5-ready-review-decision
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-pr5-ready-review-decision
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C002
+title: Prepare exact PR #5 ready-for-review decision
+status: done
+selection_reason: >
+  C002 follows the completed C001 preflight and prepares the exact approval packet for PR #5
+  without mutating GitHub state. Execution remains blocked until the user approves the exact
+  ready-for-review command.
+rejected_alternatives:
+  - candidate_ref: C003
+    reason: executing PR #5 ready-for-review requires exact user approval after this packet exists.
+  - candidate_ref: C004
+    reason: PR #4 should wait until PR #5 has an explicit decision packet or review outcome.
+scope:
+  includes:
+    - state exact ready command for PR #5
+    - record current draft state, head/base refs, mergeability, status checks, and rollback guidance
+    - require exact user approval before any PR mutation
+  excludes:
+    - executing ready-for-review
+    - changing PR #4
+    - merge, PR edit, PR close, or Issue mutation
+owned_paths:
+  - changes/M123-pr-ready-review-governance/
+  - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - The decision packet names exactly one PR #5 ready-for-review command.
+  - The packet states that it is evidence, not approval.
+  - The packet blocks execution until exact user approval is received.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
+    - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+    - "validation: node dist/cli/src/index.js validate --root . --json"
+    - "validation: git diff --check"

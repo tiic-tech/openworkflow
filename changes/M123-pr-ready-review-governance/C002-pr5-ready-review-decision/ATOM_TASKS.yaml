@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-pr5-ready-review-decision
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-pr5-ready-review-decision
+title: Atom tasks for PR #5 ready-for-review decision packet
+status: done
+tasks:
+  - task_id: T001
+    title: Select C002 in M123
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - C002 has selected-change, atom-task, and implementation-brief artifacts.
+      - M123 queue records C002 selection.
+  - task_id: T002
+    title: Refresh PR #5 decision facts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - PR #5 is confirmed open and draft.
+      - PR #5 remote head matches the PR head OID.
+  - task_id: T003
+    title: Write exact approval packet
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/
+      - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - The packet names exactly one ready-for-review command.
+      - The packet states the approval phrase required for C003.
+      - Stop and rollback guidance are explicit.
+  - task_id: T004
+    title: Update queue handoff state
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - C002 completion evidence is recorded.
+      - C003 is unlocked but remains blocked on exact user approval.

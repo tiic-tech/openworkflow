@@ -113,7 +113,7 @@ high_risk_report:
   decision_boundary: draft PR ready-for-review transition
   recommended_first_target: PR #5
   report_is_approval: false
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -169,7 +169,7 @@ changes:
         - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
         - "validation: git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate"
   - id: C002
-    status: ready
+    status: done
     title: Prepare exact PR #5 ready-for-review decision
     purpose: >
       Convert C001 facts into an exact high-risk approval packet for marking PR #5 ready for review.
@@ -199,8 +199,28 @@ changes:
       - The decision packet names exactly one PR #5 ready-for-review command.
       - The packet states that it is evidence, not approval.
       - The packet blocks execution until exact user approval is received.
+    selection:
+      selected_change_id: C002-pr5-ready-review-decision
+      reason: >
+        C002 converts the completed C001 preflight into an exact PR #5 ready-for-review approval
+        packet while keeping execution blocked until the user approves the exact command.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/SELECTED_CHANGE.yaml
+        - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/ATOM_TASKS.yaml
+        - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_by_change_id: C002-pr5-ready-review-decision
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
+        - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
   - id: C003
-    status: candidate
+    status: ready
     title: Execute approved PR #5 ready-for-review transition
     purpose: >
       After C002 exists and the user approves the exact command, mark PR #5 ready for review and
@@ -349,3 +369,39 @@ operations:
     after_status: ready
     evidence:
       - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: C002 is the next M123 candidate after C001 refreshed PR readiness facts.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/SELECTED_CHANGE.yaml
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/ATOM_TASKS.yaml
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Exact PR #5 ready-for-review approval packet is recorded without mutating GitHub state.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: C002 completed the exact PR #5 approval packet dependency; execution still requires exact user approval.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
