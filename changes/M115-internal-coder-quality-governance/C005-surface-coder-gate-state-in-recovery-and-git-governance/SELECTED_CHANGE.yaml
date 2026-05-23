@@ -1,0 +1,86 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C005
+change_id: C005-surface-coder-gate-state-in-recovery-and-git-governance
+title: Surface coder gate state in recovery and git governance
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: high
+size: medium
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  The user explicitly asked to continue M115 and prioritize full `/ow:coder`
+  adaptation. Select C005 with the conservative guidance-only high-risk option
+  so recovery and git evidence can expose coder gate state before any hard
+  enforcement or new mandatory evidence artifact exists.
+high_risk_approval:
+  approved_option: guidance_only_read_model_and_commit_evidence_binding
+  approved_at: 2026-05-23
+  approved_by: user
+  guardrails:
+    - do not enforce mandatory CODER_EVIDENCE.yaml
+    - do not fail handoff on missing coder gates
+    - do not change remote git or PR behavior
+    - preserve resume read-only semantics
+rejected_alternatives:
+  - id: C006
+    reason: Depends on C005 and should not define a persistent evidence contract before read-model fields are proven.
+  - id: M70-G005
+    reason: Resume recommended M70 by rank, but the user explicitly prioritized M115.
+owned_paths:
+  - packages/cli/src/commands/resume.ts
+  - packages/core/src/workflow/
+  - packages/core/src/git/
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - schemas/**
+  - packages/core/src/artifacts/**
+  - remote git or GitHub mutation surfaces
+dependencies:
+  - C003
+  - C004
+scope:
+  includes:
+    - define optional coder gate status in resume/context/handoff read models
+    - define how git-automation commit evidence can reference coder validation evidence
+    - report missing coder gates as guidance before hard enforcement
+    - preserve read-only semantics for resume
+  excludes:
+    - mandatory CODER_EVIDENCE.yaml enforcement
+    - remote git or PR behavior
+    - broad public JSON breaking changes
+acceptance:
+  - Recovery surfaces can report coder gate state without mutating artifacts.
+  - Git commit evidence has a clear optional binding point for coder validation.
+  - Missing coder gates are visible guidance, not a sudden hard failure.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  Complete C005 as one implementation commit plus local commit evidence. Keep
+  the read model additive and guidance-only.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - packages/core/src/workflow/planningQueueResume.ts
+    - packages/core/src/workflow/summaryHealth.ts
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+    - git diff --check

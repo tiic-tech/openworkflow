@@ -37,6 +37,7 @@ export interface SummaryHealthModel {
   counts: Record<SummaryHealthStatus, number>;
   entries: SummaryHealthEntry[];
   planning_queue_health_errors: string[];
+  planning_queue_guidance: string[];
   warnings: string[];
   next_actions: string[];
 }
@@ -90,13 +91,17 @@ export async function evaluateSummaryHealth(root: string): Promise<SummaryHealth
       counts: emptyCounts(),
       entries: [],
       planning_queue_health_errors: [],
+      planning_queue_guidance: [],
       warnings: ["missing OpenWorkflow artifact contracts: .openworkflow/audit/ARTIFACT_CONTRACTS.yaml"],
       next_actions: ["run openworkflow init <folder> --tools codex, or run openworkflow sync on an initialized project"],
     };
   }
   const entries = await Promise.all(contracts.map((contract) => evaluateContract(root, contract)));
   const planningQueueAudit = await evaluatePlanningQueueCommitEvidence(root);
-  const warnings = entries.flatMap((entry) => entry.warnings);
+  const warnings = unique([
+    ...entries.flatMap((entry) => entry.warnings),
+    ...planningQueueAudit.guidance,
+  ]);
   const nextActions = unique([
     ...entries.flatMap((entry) => entry.next_actions),
     ...planningQueueAudit.next_actions,
@@ -108,6 +113,7 @@ export async function evaluateSummaryHealth(root: string): Promise<SummaryHealth
     counts: countStatuses(entries),
     entries,
     planning_queue_health_errors: planningQueueAudit.health_errors,
+    planning_queue_guidance: planningQueueAudit.guidance,
     warnings,
     next_actions: nextActions,
   };
@@ -531,16 +537,18 @@ async function findFilesNamed(root: string, fileName: string): Promise<string[]>
 
 interface PlanningQueueAudit {
   health_errors: string[];
+  guidance: string[];
   next_actions: string[];
 }
 
 async function evaluatePlanningQueueCommitEvidence(root: string): Promise<PlanningQueueAudit> {
   const changesRoot = join(root, "changes");
   if (!(await statOptional(changesRoot))) {
-    return { health_errors: [], next_actions: [] };
+    return { health_errors: [], guidance: [], next_actions: [] };
   }
   const queuePaths = await findFilesNamed(changesRoot, "CANDIDATE_CHANGES.yaml");
   const healthErrors: string[] = [];
+  const guidance: string[] = [];
   for (const queuePath of queuePaths) {
     const queue = await readYamlRecord(queuePath);
     if (!queue || queue.planning_artifact_type !== "candidate_changes") {
@@ -551,13 +559,47 @@ async function evaluatePlanningQueueCommitEvidence(root: string): Promise<Planni
       continue;
     }
     healthErrors.push(...(await strictQueueCommitEvidenceErrors(root, queuePath, queue)));
+    guidance.push(...coderGateGuidance(root, queuePath, queue));
   }
   return {
     health_errors: unique(healthErrors),
+    guidance: unique(guidance),
     next_actions: healthErrors.length > 0
       ? ["repair selected-change commit evidence before trusting handoff; run openworkflow git-automation commit for the affected candidate"]
       : [],
   };
+}
+
+function coderGateGuidance(root: string, queuePath: string, queue: Record<string, unknown>): string[] {
+  const label = relative(root, queuePath);
+  const changes = Array.isArray(queue.changes) ? queue.changes : [];
+  const guidance: string[] = [];
+  for (const candidate of changes) {
+    if (!isRecord(candidate) || candidate.status !== "selected") {
+      continue;
+    }
+    const candidateId = stringValue(candidate.id) ?? "<unknown>";
+    if (!sourceEditLikely(stringList(candidate.owned_paths))) {
+      continue;
+    }
+    guidance.push(`coder gate guidance ${label} ${candidateId}: source-edit candidate should bind coder gate status in LOCAL_COMMIT_EVIDENCE.yaml; guidance only, not a handoff blocker`);
+  }
+  return guidance;
+}
+
+function sourceEditLikely(ownedPaths: string[]): boolean {
+  return ownedPaths.some((path) => {
+    const normalized = path.replace(/^\.?\//, "");
+    if (normalized.length === 0 || normalized.startsWith("changes/")) {
+      return false;
+    }
+    return normalized.startsWith("packages/")
+      || normalized.startsWith("skills/")
+      || normalized.startsWith("references/")
+      || normalized.startsWith("schemas/")
+      || normalized.startsWith(".agents/")
+      || normalized.startsWith(".openworkflow/audit/");
+  });
 }
 
 async function strictQueueCommitEvidenceErrors(root: string, queuePath: string, queue: Record<string, unknown>): Promise<string[]> {
@@ -747,4 +789,8 @@ function unique(values: string[]): string[] {
 
 function stringValue(value: unknown): string | null {
   return typeof value === "string" ? value : null;
+}
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }

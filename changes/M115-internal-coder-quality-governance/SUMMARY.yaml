@@ -17,7 +17,7 @@ priority:
   priority_rank: above_M114
   preempts:
     - M114-engineering-quality-foundation
-  next_action: Prepare a high-risk decision before selecting M115 C005, or return to M114 C002 if M115 pauses.
+  next_action: Continue with M115 C006 only if the optional evidence artifact contract remains narrow and non-enforcing.
 source:
   kind: planning_discussion
   refs:
@@ -43,24 +43,27 @@ outputs:
   selected_change_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/SELECTED_CHANGE.yaml
   atom_tasks_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/ATOM_TASKS.yaml
   implementation_brief_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/IMPLEMENTATION_BRIEF.md
+  selected_change_c005: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml
+  atom_tasks_c005: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+  implementation_brief_c005: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/IMPLEMENTATION_BRIEF.md
   selected_change_c007: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml
   atom_tasks_c007: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
   implementation_brief_c007: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/IMPLEMENTATION_BRIEF.md
   coder_growth_loop: references/coder-continuous-growth-loop.md
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 7
-completed_candidate_id: C007
-completed_change_id: C007-add-coder-continuous-growth-loop-for-reusable-lessons
+completed_candidate_id: C005
+completed_change_id: C005-surface-coder-gate-state-in-recovery-and-git-governance
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 completed_candidate:
-  id: C007
-  title: Add coder continuous growth loop for reusable lessons
-  risk: medium
+  id: C005
+  title: Surface coder gate state in recovery and git governance
+  risk: high
   reason: >
-    C007 defined auditable promotion criteria for reusable coder lessons and
-    separated durable OW source policy from future project-local SOUL/MEMORY.
+    C005 added guidance-only coder gate state to resume/read models and local
+    commit evidence without hard enforcement or remote git behavior changes.
 selected_candidate: null
 key_dependencies:
   - C001 unlocks source skill migration, registry work, protocol wiring, and read-model integration.

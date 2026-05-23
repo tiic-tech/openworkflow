@@ -97,7 +97,7 @@ scope_control:
         policies should wait until CODER_EVIDENCE or commit evidence binding is
         proven on real queues.
       suggested_plan_id: M117-coder-evidence-enforcement
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -402,7 +402,7 @@ changes:
       - Team execution references RED/GREEN/self-check without replacing team runtime.
       - Generated skills remain source-driven and aligned with registry protocol.
   - id: C005
-    status: candidate
+    status: done
     title: Surface coder gate state in recovery and git governance
     purpose: >
       Let Agents see whether coder governance was required, completed,
@@ -433,6 +433,51 @@ changes:
       - C007
     risk: high
     size: medium
+    high_risk_decision:
+      status: approved
+      approved_at: 2026-05-23
+      approved_by: user
+      approved_option: guidance_only_read_model_and_commit_evidence_binding
+      guardrails:
+        - do not enforce mandatory CODER_EVIDENCE.yaml
+        - do not fail handoff on missing coder gates
+        - do not change remote git or PR behavior
+        - preserve resume read-only semantics
+    selection:
+      selected_change_id: C005-surface-coder-gate-state-in-recovery-and-git-governance
+      reason: >
+        Select C005 because the user explicitly asked to continue M115 and
+        prioritize complete `/ow:coder` adaptation. Use the conservative
+        guidance-only option: expose coder gate state in recovery/read models
+        and local commit evidence without hard enforcement or new mandatory
+        evidence artifacts.
+      selected_at: 2026-05-23
+      selected_by: agent
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/core/src/workflow/planningQueueResume.ts
+        - packages/core/src/workflow/summaryHealth.ts
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Added guidance-only coder gate state to resume current work items,
+        summary/handoff warnings for selected source-edit candidates, and
+        optional coder_gate metadata in local commit evidence without hard
+        enforcement or remote git behavior changes.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+        - git diff --check
     validation:
       - npm run build
       - npm run verify:runtime-surface
@@ -724,3 +769,37 @@ operations:
       - references/coder-continuous-growth-loop.md
       - skills/coder/SKILL.md
       - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Selected C005 under the user-approved M115 priority using a conservative
+      guidance-only high-risk option: expose coder gate state without hard
+      enforcement, remote mutation changes, or mandatory CODER_EVIDENCE.yaml.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Completed guidance-only coder gate read-model and commit-evidence
+      binding. Missing coder gates are visible guidance, not handoff blockers
+      or mandatory evidence enforcement.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/LOCAL_COMMIT_EVIDENCE.yaml

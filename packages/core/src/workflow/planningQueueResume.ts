@@ -60,6 +60,7 @@ export interface CurrentWorkItem {
     required: boolean;
     expected_path: string | null;
   };
+  coder_gate: CoderGateState;
   git_governance: string[];
   selected_change_path: string | null;
   atom_tasks_path: string | null;
@@ -69,6 +70,17 @@ export interface CurrentWorkItem {
   missing_evidence: MissingCommitEvidence[];
   next_action: string | null;
   stop_if: string[];
+}
+
+export interface CoderGateState {
+  required: boolean;
+  status: "not_applicable" | "pending" | "recorded" | "missing" | "skipped";
+  enforcement: "guidance_only";
+  evidence_path: string | null;
+  summary: string;
+  validation_evidence: string[];
+  warnings: string[];
+  next_actions: string[];
 }
 
 export interface UnknownCurrentWorkItem {
@@ -221,6 +233,7 @@ async function workItemForCandidate(
   const atomTasks = atomTasksPath ? await readAtomTasks(root, atomTasksPath) : { status: null, incomplete: [] };
   const selectedChange = selectedChangePath ? await readYamlRecord(join(root, selectedChangePath)) : null;
   const boundary = boundaryForCandidate(candidate, selectedChange);
+  const coderGate = await coderGateForCandidate(root, queue, candidate, boundary.ownedPaths);
   return {
     status,
     plan_id: queue.plan_id,
@@ -237,6 +250,7 @@ async function workItemForCandidate(
       required: candidate.status === "selected" || candidate.completion.implementation_changed_files === true,
       expected_path: defaultEvidencePath(queue.queue_path, candidate),
     },
+    coder_gate: coderGate,
     git_governance: gitGovernanceFor(queue, candidate),
     selected_change_path: selectedChangePath,
     atom_tasks_path: atomTasksPath,
@@ -287,6 +301,16 @@ function emptyWorkItem(queue: QueueInfo, status: CurrentWorkItem["status"], next
       required: false,
       expected_path: null,
     },
+    coder_gate: {
+      required: false,
+      status: "not_applicable",
+      enforcement: "guidance_only",
+      evidence_path: null,
+      summary: "No active source-edit work item was found.",
+      validation_evidence: [],
+      warnings: [],
+      next_actions: [],
+    },
     git_governance: stopConditionsFor(queue),
     selected_change_path: null,
     atom_tasks_path: null,
@@ -297,6 +321,99 @@ function emptyWorkItem(queue: QueueInfo, status: CurrentWorkItem["status"], next
     next_action: nextAction,
     stop_if: stopConditionsFor(queue),
   };
+}
+
+async function coderGateForCandidate(
+  root: string,
+  queue: QueueInfo,
+  candidate: QueueCandidate,
+  ownedPaths: string[],
+): Promise<CoderGateState> {
+  const required = sourceEditLikely(ownedPaths);
+  const evidencePath = defaultEvidencePath(queue.queue_path, candidate);
+  if (!required) {
+    return {
+      required: false,
+      status: "not_applicable",
+      enforcement: "guidance_only",
+      evidence_path: evidencePath,
+      summary: "Coder governance is not required for this work item because no source-edit owned path was detected.",
+      validation_evidence: [],
+      warnings: [],
+      next_actions: [],
+    };
+  }
+
+  if (candidate.completion.implementation_changed_files === false) {
+    return {
+      required: true,
+      status: "skipped",
+      enforcement: "guidance_only",
+      evidence_path: evidencePath,
+      summary: "Coder governance was skipped because the selected change records no implementation file changes.",
+      validation_evidence: [],
+      warnings: [],
+      next_actions: [],
+    };
+  }
+
+  const recordedEvidencePath = localCommitEvidencePath(candidate.completion);
+  const effectiveEvidencePath = recordedEvidencePath ?? evidencePath;
+  const evidence = effectiveEvidencePath ? await readYamlRecord(join(root, effectiveEvidencePath)) : null;
+  const validationEvidence = stringList(evidence?.validation_evidence);
+  const explicitGate = recordValue(evidence?.coder_gate);
+  if (evidence) {
+    return {
+      required: true,
+      status: "recorded",
+      enforcement: "guidance_only",
+      evidence_path: effectiveEvidencePath,
+      summary: stringValue(explicitGate.summary)
+        ?? "Coder governance is bound to local commit evidence through validation_evidence and coder_gate metadata.",
+      validation_evidence: validationEvidence,
+      warnings: [],
+      next_actions: [],
+    };
+  }
+
+  if (candidate.status === "done") {
+    return {
+      required: true,
+      status: "missing",
+      enforcement: "guidance_only",
+      evidence_path: effectiveEvidencePath,
+      summary: "Coder governance evidence is missing from the completed source-edit work item.",
+      validation_evidence: [],
+      warnings: ["missing coder gate evidence is guidance-only until a later enforcement candidate defines a hard gate"],
+      next_actions: ["record coder gate status in LOCAL_COMMIT_EVIDENCE.yaml through openworkflow git-automation commit"],
+    };
+  }
+
+  return {
+    required: true,
+    status: "pending",
+    enforcement: "guidance_only",
+    evidence_path: effectiveEvidencePath,
+    summary: "Coder governance is required for this source-edit work item and should be bound during local commit evidence.",
+    validation_evidence: [],
+    warnings: ["coder gate is pending; this is guidance, not a handoff blocker"],
+    next_actions: ["run coder preflight and bind the result in local commit evidence before completion"],
+  };
+}
+
+function sourceEditLikely(ownedPaths: string[]): boolean {
+  return ownedPaths.some((path) => {
+    const normalized = path.replace(/^\.?\//, "");
+    if (normalized.length === 0 || normalized.startsWith("changes/")) {
+      return false;
+    }
+    return normalized.startsWith("packages/")
+      || normalized.startsWith("skills/")
+      || normalized.startsWith("references/")
+      || normalized.startsWith("schemas/")
+      || normalized.startsWith(".agents/")
+      || normalized.startsWith(".openworkflow/audit/");
+  });
 }
 
 function boundaryForCandidate(candidate: QueueCandidate, selectedChange: Record<string, unknown> | null): {

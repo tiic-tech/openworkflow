@@ -370,6 +370,13 @@ function buildCommitEvidence(options: CommitSelectedChangeOptions, primaryCommit
     selected_change_id: options.selectedChangeId,
     primary_commit: primaryCommit,
     validation_evidence: options.validationEvidence,
+    coder_gate: {
+      status: "recorded",
+      enforcement: "guidance_only",
+      evidence_binding: "LOCAL_COMMIT_EVIDENCE.yaml",
+      validation_evidence_ref: "validation_evidence",
+      summary: "Coder governance evidence is bound to this local commit evidence record when the selected change involves source edits.",
+    },
     audit_notes: [
       "Selected changes must have at least one local commit.",
       "Additional evidence commits are allowed when they preserve selected-change traceability.",

@@ -547,6 +547,10 @@ async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.
   assert(Array.isArray(selectedWorkItem.validation_commands) && selectedWorkItem.validation_commands.includes("npm run build"), "resume should expose validation commands");
   assert(Array.isArray(selectedWorkItem.acceptance) && selectedWorkItem.acceptance.length === 1, "resume should expose acceptance checks");
   assert(record(selectedWorkItem.commit_evidence, "selected commit evidence").expected_path === "changes/M900-resume-queue-fixture/C001-active-selection/LOCAL_COMMIT_EVIDENCE.yaml", "resume should expose expected local commit evidence path");
+  const selectedCoderGate = record(selectedWorkItem.coder_gate, "selected coder gate");
+  assert(selectedCoderGate.status === "pending", "resume should expose pending coder gate state for selected source-edit work");
+  assert(selectedCoderGate.enforcement === "guidance_only", "coder gate state should be guidance-only before enforcement is defined");
+  assert(selectedCoderGate.evidence_path === "changes/M900-resume-queue-fixture/C001-active-selection/LOCAL_COMMIT_EVIDENCE.yaml", "coder gate should point at local commit evidence binding");
   assert(Array.isArray(selectedWorkItem.incomplete_atom_tasks) && selectedWorkItem.incomplete_atom_tasks.length === 1, "resume should expose incomplete atom tasks");
   assert(Array.isArray(selectedActions.allowed_actions) && selectedActions.allowed_actions.some((item) => String(item).includes("continue selected change C001")), "resume should classify allowed actions");
   assert(Array.isArray(selectedActions.forbidden_actions) && selectedActions.forbidden_actions.some((item) => String(item).includes(".openworkflow/**")), "resume should classify forbidden actions");
@@ -601,6 +605,7 @@ async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.
   const missingCommitEvidence = record(missingQueue.commit_evidence, "commit evidence").missing;
   assert(record(missingQueue.breakpoint, "missing evidence breakpoint").status === "missing_commit_evidence", "resume should expose missing commit evidence breakpoint");
   assert(missingWorkItem.status === "missing_evidence", "resume current work item should point at missing evidence");
+  assert(record(missingWorkItem.coder_gate, "missing evidence coder gate").status === "missing", "resume should expose missing coder gate guidance on completed source-edit work without evidence");
   assert(Array.isArray(missingCommitEvidence) && missingCommitEvidence.length === 1, "resume should list missing commit evidence");
   assert(Array.isArray(missingEvidenceResume.health_errors) && missingEvidenceResume.health_errors.some((item) => String(item).includes("LOCAL_COMMIT_EVIDENCE.yaml")), "resume should preserve commit evidence health error");
 }
@@ -2054,6 +2059,8 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
 
     const evidence = await read(join(gitRoot, "changes", "G013", "LOCAL_COMMIT_EVIDENCE.yaml"));
     assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
+    assert(evidence.includes("coder_gate:"), "commit evidence missing coder gate binding point");
+    assert(evidence.includes("enforcement: guidance_only"), "commit evidence coder gate should be guidance-only");
     const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
     assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
 
@@ -2131,6 +2138,7 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(cliResult.evidencePath === "changes/M102-cli-fixture/C004-git-automation/LOCAL_COMMIT_EVIDENCE.yaml", "git-automation commit did not infer selected-change evidence path");
     const cliEvidence = await read(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "LOCAL_COMMIT_EVIDENCE.yaml"));
     assert(cliEvidence.includes("source_candidate_id: C004"), "CLI commit evidence missing source candidate id");
+    assert(cliEvidence.includes("coder_gate:"), "CLI commit evidence missing coder gate binding point");
     const cliCleanStatus = await runCaptureInCwd(cliRoot, ["git", "status", "--porcelain"]);
     assert(cliCleanStatus.trim().length === 0, "CLI commit evidence fixture should finish clean");
 

@@ -42,9 +42,9 @@ Out of scope:
 
 `C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
 internal command protocol with source-driven generated surfaces. `C004` and
-`C007` are complete. The remaining forward path is the high-risk C005/C006
-evidence/read-model sequence, which should not be selected without an explicit
-high-risk decision.
+`C005` and `C007` are complete. The remaining forward path is C006, which can
+introduce an optional evidence artifact contract only after the C005
+guidance-only fields prove stable.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -120,7 +120,7 @@ as internal-only and behavior-compatible.
 
 ### C005: Surface coder gate state in recovery and git governance
 
-- Status: `ready`
+- Status: `done`
 - Risk: `high`
 - Size: `medium`
 - Purpose: expose whether coder gates were required, completed, skipped, or
@@ -131,6 +131,10 @@ as internal-only and behavior-compatible.
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C003`, `C004`
 - Unlocks: `C006`, `C007`
+- Selection:
+  `C005-surface-coder-gate-state-in-recovery-and-git-governance`
+- Completion: guidance-only `coder_gate` state in resume/read models and local
+  commit evidence
 
 ### C006: Introduce optional coder evidence artifact contract
 

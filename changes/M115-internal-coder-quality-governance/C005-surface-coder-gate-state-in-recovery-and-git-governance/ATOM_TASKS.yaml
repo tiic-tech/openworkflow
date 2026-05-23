@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C005
+change_id: C005-surface-coder-gate-state-in-recovery-and-git-governance
+title: Atom tasks for coder gate recovery and git guidance
+status: completed
+tasks:
+  - id: T001
+    title: Add coder gate state to planning queue resume model
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/cli/src/commands/resume.ts
+    done_when:
+      - Current work item reports guidance-only coder gate state.
+      - Resume remains read-only and does not mutate artifacts.
+  - id: T002
+    title: Surface coder gate guidance in summary and handoff quality
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when:
+      - Missing coder gates are warnings or guidance, not health errors.
+      - Strict handoff remains passable unless existing hard health errors exist.
+  - id: T003
+    title: Bind coder gate metadata into local commit evidence
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+    done_when:
+      - LOCAL_COMMIT_EVIDENCE.yaml has an optional coder_gate binding point.
+      - Remote git behavior is unchanged.
+  - id: T004
+    title: Add runtime-surface coverage and complete C005
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Runtime verifier covers resume coder gate state and commit evidence binding.
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/ATOM_TASKS.yaml
+    - git diff --check
+  failed: []
