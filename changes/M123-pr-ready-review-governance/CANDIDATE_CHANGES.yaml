@@ -113,7 +113,7 @@ high_risk_report:
   decision_boundary: draft PR ready-for-review transition
   recommended_first_target: PR #5
   report_is_approval: false
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -220,7 +220,7 @@ changes:
         - "validation: node dist/cli/src/index.js validate --root . --json"
         - "validation: git diff --check"
   - id: C003
-    status: ready
+    status: done
     title: Execute approved PR #5 ready-for-review transition
     purpose: >
       After C002 exists and the user approves the exact command, mark PR #5 ready for review and
@@ -249,6 +249,26 @@ changes:
       - PR #5 is no longer draft and remains open.
       - Local audit evidence records approval, command, result, and rollback guidance.
       - No merge, PR edit, PR close, Issue mutation, or unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C003-pr5-ready-review-transition
+      reason: >
+        The user approved the exact command from C002. Preflight matched the recorded PR #5 facts,
+        so C003 executed only the approved ready-for-review transition.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/SELECTED_CHANGE.yaml
+        - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/ATOM_TASKS.yaml
+        - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_by_change_id: C003-pr5-ready-review-transition
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
+        - "remote: gh pr ready 5 --repo tiic-tech/openworkflow"
+        - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: git diff --check"
   - id: C004
     status: ready
     title: Prepare PR #4 ready-for-review decision
@@ -405,3 +425,29 @@ operations:
     after_status: ready
     evidence:
       - changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: User approved the exact PR #5 ready-for-review command from C002.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/SELECTED_CHANGE.yaml
+      - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/ATOM_TASKS.yaml
+      - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: PR #5 was marked ready for review using the exact approved command.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
+      - "remote: gh pr ready 5 --repo tiic-tech/openworkflow"

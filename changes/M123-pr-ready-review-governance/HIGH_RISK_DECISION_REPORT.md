@@ -127,6 +127,27 @@ gh pr ready 5 --repo tiic-tech/openworkflow
 This packet is still evidence, not approval. C003 must stop unless the user
 approves the exact command above.
 
+## Executed PR #5 Transition
+
+The user approved the exact C003 command:
+
+```text
+Approve M123 C003 ready using: gh pr ready 5 --repo tiic-tech/openworkflow
+```
+
+C003 executed:
+
+```bash
+gh pr ready 5 --repo tiic-tech/openworkflow
+```
+
+Audit evidence:
+
+- `changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md`
+
+Result: PR #5 is open and no longer draft. This does not approve merge and does
+not authorize any PR #4 transition.
+
 ## Guardrails
 
 - Do not mark any PR ready for review without exact operation-level approval.

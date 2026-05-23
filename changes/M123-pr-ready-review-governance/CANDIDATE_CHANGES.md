@@ -17,7 +17,7 @@ Branch boundary for this queue: `codex/m123-pr-ready-review-governance`.
 
 ## Current State
 
-- PR #5 is open, draft, mergeable, and points from
+- PR #5 is open, no longer draft, mergeable, and points from
   `codex/m117-git-automation-remote-readiness` at
   `898f0152a4e3e026ee5dcc78d4ef585c722a37b7` into `main`.
 - PR #4 is open, draft, mergeable, and points from
@@ -25,10 +25,9 @@ Branch boundary for this queue: `codex/m123-pr-ready-review-governance`.
   `bd2780b1d5b117b2734e5b732164e5d299bd521a` into `main`.
 - Both remote branch heads match their PR head OIDs.
 - Both queried PRs have empty status check rollups.
-- Ready-for-review commands remain unapproved:
+- Remaining ready-for-review command is unapproved:
 
 ```bash
-gh pr ready 5 --repo tiic-tech/openworkflow
 gh pr ready 4 --repo tiic-tech/openworkflow
 ```
 
@@ -77,18 +76,25 @@ Completion evidence:
 
 ### C003 - Execute approved PR #5 ready-for-review transition
 
-Status: ready
+Status: done
 
 Risk: high
 
 Outcome: after exact approval, mark only PR #5 ready for review and record local
 audit evidence.
 
-Blocked until the user approves exactly:
+Executed after the user approved exactly:
 
 ```bash
 gh pr ready 5 --repo tiic-tech/openworkflow
 ```
+
+Completion evidence:
+
+- `changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml`
+- `changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md`
+
+Result: PR #5 is open and no longer draft.
 
 ### C004 - Prepare PR #4 ready-for-review decision
 
@@ -110,7 +116,6 @@ governance queues.
 
 ## Stop Gates
 
-- Do not mark PR #5 ready without exact approval.
 - Do not mark PR #4 ready without exact approval.
 - Do not merge, close, or edit any PR.
 - Do not mutate Issues.

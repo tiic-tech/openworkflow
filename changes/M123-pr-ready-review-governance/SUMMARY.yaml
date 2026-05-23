@@ -27,9 +27,9 @@ branch_note: >
   Proposed while on codex/m121-m117-remote-publication. Branch creation was intentionally not
   performed during DTC queue creation.
 candidate_count: 5
-completed_candidate_id: C002
-completed_change_id: C002-pr5-ready-review-decision
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: C003-pr5-ready-review-transition
+next_recommended_candidate_id: C004
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -41,6 +41,8 @@ outputs:
   c001_commit_evidence: changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/LOCAL_COMMIT_EVIDENCE.yaml
   c002_pr5_decision: changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/PR5_READY_REVIEW_DECISION.md
   c002_commit_evidence: changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml
+  c003_pr5_audit: changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
+  c003_commit_evidence: changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
 observed_state:
   captured_at: 2026-05-23T20:39:29+08:00
   current_branch: codex/m123-pr-ready-review-governance
@@ -49,7 +51,7 @@ observed_state:
     number: 5
     url: https://github.com/tiic-tech/openworkflow/pull/5
     state: OPEN
-    is_draft: true
+    is_draft: false
     title: "M117: Git automation remote readiness governance"
     head_ref: codex/m117-git-automation-remote-readiness
     head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
@@ -79,7 +81,7 @@ high_risk_report:
   report_is_approval: false
 key_dependencies:
   - M121 completed M117 branch publication and draft PR creation.
-  - PR #5 remains draft and open until separate exact ready-for-review approval.
+  - PR #5 was marked ready for review after exact C003 approval.
   - PR #4 remains draft and open until separate exact ready-for-review approval.
 risks:
   - id: R001
@@ -95,7 +97,6 @@ risks:
     description: PR #4 belongs to an older M102 publication flow and may need separate review context.
     mitigation: C004 must decide whether PR #4 stays in M123 or is deferred.
 unresolved_questions:
-  - Should PR #5 be marked ready using the exact C003 command?
   - Should PR #4 remain deferred until PR #5 review is underway?
 deferred_features:
   - M122-m71-historical-stack-publication
@@ -116,11 +117,13 @@ validation:
   notes: |
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly approved creating this git governance CC.
-    - C001 refreshed current read-only PR readiness facts. PR #5 and PR #4 remain open draft PRs,
-      both are mergeable, both have empty status check rollups, and both remote branch heads match
-      their PR head OIDs.
+    - C001 refreshed current read-only PR readiness facts. At that point PR #5 and PR #4 were open
+      draft PRs, both were mergeable, both had empty status check rollups, and both remote branch
+      heads matched their PR head OIDs.
     - C002 prepared an exact PR #5 ready-for-review decision packet. It is evidence, not approval.
-      C003 remains blocked until the user approves: gh pr ready 5 --repo tiic-tech/openworkflow
-    - No ready-for-review transition, PR edit, merge, Issue mutation, push, force-push, branch
+      C003 was blocked until the user approved: gh pr ready 5 --repo tiic-tech/openworkflow
+    - C003 executed the exact approved command: gh pr ready 5 --repo tiic-tech/openworkflow.
+      PR #5 is now open and no longer draft.
+    - No PR #4 transition, PR edit, merge, Issue mutation, push, force-push, branch
       deletion, rebase, reset, or product source edit was performed.
     - The high-risk decision report is a stop packet and does not approve any PR mutation.

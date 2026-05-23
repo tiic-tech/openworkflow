@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-pr5-ready-review-transition
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-pr5-ready-review-transition
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C003
+title: Execute approved PR #5 ready-for-review transition
+status: done
+selection_reason: >
+  The user explicitly approved the exact C003 command from the C002 decision packet:
+  gh pr ready 5 --repo tiic-tech/openworkflow. Preflight confirmed PR #5 was still open,
+  draft, and matched the recorded head/base refs before execution.
+approval:
+  approved_at: 2026-05-23T21:00:13+08:00
+  approved_text: "Approve M123 C003 ready using: gh pr ready 5 --repo tiic-tech/openworkflow"
+  exact_command: gh pr ready 5 --repo tiic-tech/openworkflow
+scope:
+  includes:
+    - verify exact approval text for PR #5
+    - verify PR #5 is still open and draft immediately before mutation
+    - execute one approved ready-for-review transition for PR #5
+    - record resulting PR state and rollback guidance
+  excludes:
+    - PR #4 transition
+    - merge, PR edit, PR close, or Issue mutation
+owned_paths:
+  - changes/M123-pr-ready-review-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - PR #5 is no longer draft and remains open.
+  - Local audit evidence records approval, command, result, and rollback guidance.
+  - No merge, PR edit, PR close, Issue mutation, or unrelated remote mutation occurs.
+validation:
+  - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
+    - "remote: gh pr ready 5 --repo tiic-tech/openworkflow"
+    - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+    - "validation: git diff --check"
