@@ -127,3 +127,18 @@ C002 narrow pilot was approved and executed on 2026-05-23.
 - Audit evidence: `changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md`
 
 This outcome does not approve or perform draft PR creation.
+
+## Draft PR Outcome
+
+C003 draft PR creation was approved and executed on 2026-05-23.
+
+- Executed command: `gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md`
+- PR URL: `https://github.com/tiic-tech/openworkflow/pull/4`
+- State: `OPEN`
+- Draft: `true`
+- Base: `main`
+- Head: `codex/m102-selected-change-commit-gate`
+- Audit evidence: `changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md`
+
+This outcome does not approve marking the PR ready, editing unrelated PRs, merging, closing, or
+mutating Issues.

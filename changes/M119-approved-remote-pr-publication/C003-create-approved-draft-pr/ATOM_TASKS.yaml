@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M119-C003-create-approved-draft-pr
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M119-C003-create-approved-draft-pr
+title: Atom tasks for approved draft PR creation
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm draft PR approval and exact command
+    status: done
+    type: governance
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The exact gh pr create command is recorded.
+      - The user approval source for the exact command is recorded.
+  - task_id: T002
+    title: Verify branch and PR preconditions
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The remote head branch exists.
+      - No matching head/base PR exists before creation.
+      - The PR body file is the matching M102 PR_READY_SUMMARY.md.
+  - task_id: T003
+    title: Create exactly one draft PR
+    status: done
+    type: remote_mutation
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - "gh pr create --draft succeeds for the approved head and base."
+      - No ready-for-review transition, merge, close, Issue mutation, or unrelated PR edit is performed.
+  - task_id: T004
+    title: Record PR metadata and local audit evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The PR URL, number, draft state, base, head, and body source are recorded.
+      - Rollback guidance and next gate are recorded.

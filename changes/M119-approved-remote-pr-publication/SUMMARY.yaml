@@ -27,9 +27,9 @@ branch_note: >
   Queue creation happened on codex/m118-repo-branch-pr-governance after commit 34708e0 with a clean
   working tree.
 candidate_count: 4
-completed_candidate_id: C002
-completed_change_id: M119-C002-execute-approved-pilot-branch-push
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: M119-C003-create-approved-draft-pr
+next_recommended_candidate_id: C004
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -45,6 +45,10 @@ outputs:
   c002_atom_tasks: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/ATOM_TASKS.yaml
   c002_implementation_brief: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/IMPLEMENTATION_BRIEF.md
   remote_push_audit: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
+  c003_selected_change: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/SELECTED_CHANGE.yaml
+  c003_atom_tasks: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/ATOM_TASKS.yaml
+  c003_implementation_brief: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/IMPLEMENTATION_BRIEF.md
+  draft_pr_audit: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md
 preflight_result:
   mutation_performed: false
   first_pilot_ready: false
@@ -67,11 +71,23 @@ push_result:
   remote_ref_verified: true
   draft_pr_created: false
   audit: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
+draft_pr_result:
+  mutation_performed: true
+  approved_operation: gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+  approval_source: user_input:2026-05-23-approved-exact-draft-pr-command
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/4
+  pr_number: 4
+  pr_state: OPEN
+  pr_is_draft: true
+  base_ref: main
+  head_ref: codex/m102-selected-change-commit-gate
+  body_source: changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+  audit: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md
 key_dependencies:
   - C001 must refresh current remote readiness before any push or PR operation can be selected.
   - C002 completed one explicitly approved push for codex/m102-selected-change-commit-gate.
-  - C003 requires explicit approval for one exact draft PR command.
-  - C004 requires C002 and C003 evidence before it can summarize publication results.
+  - C003 completed one explicitly approved draft PR for codex/m102-selected-change-commit-gate.
+  - C004 can now summarize publication results and recommend the next publication or repair action.
 risks:
   - id: R001
     level: high
@@ -87,8 +103,8 @@ risks:
     description: Remote base visibility and simulator evidence were missing in M118 read-only probes.
     mitigation: C001 must refresh remote-plan evidence before any mutation candidate proceeds.
 unresolved_questions:
-  - What exact user approval text should be captured before draft PR creation for C003?
-  - Should C003 use the GitHub-suggested PR URL flow or an explicit `gh pr create --draft` command?
+  - Should the next publication action continue with another branch or defer to M120 historical branch repair?
+  - Should PR #4 remain draft until branch-stack review is complete?
 deferred_features:
   - M120-historical-branch-repair
 validation:
@@ -137,21 +153,18 @@ validation:
       --remote origin --target-base main --json
     - git push origin codex/m102-selected-change-commit-gate
     - git ls-remote --heads origin codex/m102-selected-change-commit-gate
-  notes:
-    - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is
-      /ow:vision; the user explicitly requested DTC creation for M119.
-    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, implementation source edits, branch creation, push,
-      or PR operation was performed.
-    - After DTC queue creation, local branch codex/m119-approved-remote-pr-publication was created
-      and C001 was selected.
-    - C001 completed a read-only preflight and recorded that no branch is ready for immediate push
-      until M119 evidence is committed and remote-plan is rerun from a clean tree.
-    - Clean-tree reruns removed the dirty-tree blocker but still reported branch mismatch, unknown
-      remote base head, missing simulator evidence, and absent or unreadable remote branch heads.
-    - After proxy correction, M102 rerun from its branch boundary cleared branch mismatch, dirty tree,
-      remote base head, and PR-ready summary blockers. The remaining remote-plan blocker is the
-      simulator evidence binding rule, despite simulate returning ok:true.
+    - 'gh pr list --repo tiic-tech/openworkflow --head codex/m102-selected-change-commit-gate --base main --json number,url,state,isDraft,title,headRefName,baseRefName'
+    - 'gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md'
+    - 'gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number'
+  notes: |
+    - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision; the user explicitly requested DTC creation for M119.
+    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, implementation source edits, branch creation, push, or PR operation was performed.
+    - After DTC queue creation, local branch codex/m119-approved-remote-pr-publication was created and C001 was selected.
+    - C001 completed a read-only preflight and recorded that no branch is ready for immediate push until M119 evidence is committed and remote-plan is rerun from a clean tree.
+    - Clean-tree reruns removed the dirty-tree blocker but still reported branch mismatch, unknown remote base head, missing simulator evidence, and absent or unreadable remote branch heads.
+    - After proxy correction, M102 rerun from its branch boundary cleared branch mismatch, dirty tree, remote base head, and PR-ready summary blockers. The remaining remote-plan blocker is the simulator evidence binding rule, despite simulate returning ok:true.
     - HIGH_RISK_DECISION_REPORT.md records the exact C002 push approval boundary and stop criteria.
     - User approval was received for `git push origin codex/m102-selected-change-commit-gate`.
-    - C002 pushed exactly codex/m102-selected-change-commit-gate to origin and verified the remote
-      ref. No draft PR, Issue mutation, merge, force-push, or history rewrite was performed.
+    - C002 pushed exactly codex/m102-selected-change-commit-gate to origin and verified the remote ref. No draft PR, Issue mutation, merge, force-push, or history rewrite was performed.
+    - User approval was received for the exact `gh pr create --draft` command.
+    - C003 created draft PR #4 from codex/m102-selected-change-commit-gate into main and verified it is open and draft. No merge, ready-for-review transition, Issue mutation, or broad PR edit was performed.

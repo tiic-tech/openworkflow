@@ -89,7 +89,7 @@ observed_state:
     - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
     - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
     - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -228,7 +228,7 @@ changes:
         - git push origin codex/m102-selected-change-commit-gate
         - git ls-remote --heads origin codex/m102-selected-change-commit-gate
   - id: C003
-    status: candidate
+    status: done
     title: Create an explicitly approved draft PR for the pushed pilot branch
     purpose: >
       After C002 pushes the approved branch and the user approves the exact gh command, create one
@@ -261,6 +261,39 @@ changes:
       - Exactly one draft PR is created from the approved pushed branch.
       - Local audit evidence records the PR URL and body source.
       - No merge, ready-for-review transition, Issue mutation, or broad PR edit occurs.
+    selection:
+      selected_change_id: M119-C003-create-approved-draft-pr
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C002 verified the remote M102 branch, no matching PR existed, and the user
+        explicitly approved the exact draft PR creation command.
+      artifacts:
+        selected_change: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/ATOM_TASKS.yaml
+        implementation_brief: changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 performed one approved draft PR creation and then produced local governance evidence
+        only. It did not change product source, generated surfaces, runtime behavior, merge state,
+        ready-for-review state, or additional remote branches.
+      approval_source: user_input:2026-05-23-approved-exact-draft-pr-command
+      pr_url: https://github.com/tiic-tech/openworkflow/pull/4
+      pr_number: 4
+      pr_state: OPEN
+      pr_is_draft: true
+      base_ref: main
+      head_ref: codex/m102-selected-change-commit-gate
+      body_source: changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+      evidence:
+        - changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md
+      validation:
+        - git status --short --branch
+        - git ls-remote --heads origin main codex/m102-selected-change-commit-gate
+        - gh pr list --repo tiic-tech/openworkflow --head codex/m102-selected-change-commit-gate --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+        - gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+        - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
   - id: C004
     status: candidate
     title: Record post-publication audit and next publication recommendation

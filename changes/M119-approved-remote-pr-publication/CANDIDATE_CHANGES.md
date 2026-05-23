@@ -14,7 +14,7 @@ Current branch after selection setup: `codex/m119-approved-remote-pr-publication
 
 Select C001 first. Push and draft PR candidates are high risk and require a green C001 preflight, a high-risk decision report for the exact operation boundary, and explicit user approval for the concrete command.
 
-Completed candidate: C002
+Completed candidate: C003
 
 High-risk report: `changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md`
 
@@ -78,13 +78,29 @@ Unlocks: C003, C004
 
 ### C003 - Create an explicitly approved draft PR for the pushed pilot branch
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Purpose: after C002 and exact user approval, create one draft PR using the matching local `PR_READY_SUMMARY.md` as the body.
 
-Approval required: yes
+Approval required: satisfied for one exact draft PR command
+
+Approved and executed command:
+
+```bash
+gh pr create --draft --repo tiic-tech/openworkflow --base main --head codex/m102-selected-change-commit-gate --title "OpenWorkflow M102-selected-change-commit-gate" --body-file changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+```
+
+PR URL: `https://github.com/tiic-tech/openworkflow/pull/4`
+
+PR state: `OPEN`, draft `true`
+
+Body source: `changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md`
+
+Audit evidence:
+
+- `changes/M119-approved-remote-pr-publication/C003-create-approved-draft-pr/DRAFT_PR_AUDIT.md`
 
 Excludes: marking ready for review, editing unrelated PRs, merging, closing PRs, and Issue or label mutation.
 
