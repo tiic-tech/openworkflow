@@ -1,0 +1,117 @@
+schema_version: 0.1.0
+contract_id: summary:M119-approved-remote-pr-publication
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M119-approved-remote-pr-publication
+title: Summary for remote PR publication governance
+status: active
+source:
+  kind: mixed
+  summary: >
+    M119 was created by DTC after M118 committed the local branch and PR governance packet. It owns
+    the next remote publication governance slice: read-only preflight first, then exact
+    approval-gated push and draft PR candidates.
+  refs:
+    - user_input:2026-05-23-use-dtc-create-m119
+    - changes/M118-repo-branch-pr-governance/SUMMARY.yaml
+    - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+scope_boundary: >
+  Remote publication governance only. The first candidate is read-only/local evidence preflight.
+  Push and draft PR creation remain high-risk candidates that require explicit operation-level user
+  approval before selection or execution.
+branch_boundary: codex/m119-approved-remote-pr-publication
+branch_note: >
+  Proposed by DTC and then created locally before C001 selection. The branch has not been pushed.
+  Queue creation happened on codex/m118-repo-branch-pr-governance after commit 34708e0 with a clean
+  working tree.
+candidate_count: 4
+completed_candidate_id: C001
+completed_change_id: M119-C001-refresh-remote-publication-preflight
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M119-approved-remote-pr-publication/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M119-approved-remote-pr-publication/CANDIDATE_CHANGES.md
+  summary: changes/M119-approved-remote-pr-publication/SUMMARY.yaml
+  selected_change: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/SELECTED_CHANGE.yaml
+  atom_tasks: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/ATOM_TASKS.yaml
+  implementation_brief: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/IMPLEMENTATION_BRIEF.md
+  remote_publication_preflight: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/REMOTE_PUBLICATION_PREFLIGHT.md
+preflight_result:
+  mutation_performed: false
+  first_pilot_ready: false
+  preferred_next_pilot_after_clean_tree: M102-selected-change-commit-gate
+  blockers:
+    - M119 planning and preflight evidence are currently uncommitted.
+    - M102 and M117 remote-plan probes were run from M119, not from their target branch boundaries.
+    - remote-plan still reports unknown remote base head for origin/main.
+    - simulator evidence is missing.
+    - direct git ls-remote was blocked by local proxy connection to 127.0.0.1:7897.
+key_dependencies:
+  - C001 must refresh current remote readiness before any push or PR operation can be selected.
+  - C002 requires a clean-tree remote-plan rerun, a high-risk report, and explicit approval for one
+    exact push command.
+  - C003 requires C002 plus explicit approval for one exact draft PR command.
+  - C004 requires C002 and C003 evidence before it can summarize publication results.
+risks:
+  - id: R001
+    level: high
+    description: Push and draft PR creation mutate authenticated remote GitHub state.
+    mitigation: Keep C002 and C003 unselected until C001 is green, a high-risk report exists, and
+      the user approves the exact command.
+  - id: R002
+    level: high
+    description: Existing branches are stacked and may not map cleanly to independent PRs.
+    mitigation: C001 must choose one pilot branch from current evidence or stop with blockers.
+  - id: R003
+    level: medium
+    description: Remote base visibility and simulator evidence were missing in M118 read-only probes.
+    mitigation: C001 must refresh remote-plan evidence before any mutation candidate proceeds.
+unresolved_questions:
+  - Which branch should become the first remote publication pilot after C001 refreshes current
+    remote state?
+  - Should M119 publish a governance/meta branch first, or start with M102 or M117 as originally
+    ordered by M118?
+  - What exact user approval text should be captured before the first push and draft PR commands?
+deferred_features:
+  - M120-historical-branch-repair
+validation:
+  commands_run:
+    - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '260,620p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
+    - sed -n '1,260p' changes/M118-repo-branch-pr-governance/SUMMARY.yaml
+    - sed -n '1,260p' changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+    - sed -n '1,220p' references/gh-operation-governance.md
+    - sed -n '1,220p' references/git-version-control-governance.md
+    - git status --short --branch
+    - git switch -c codex/m119-approved-remote-pr-publication
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+    - ruby YAML parse for M119 DTC artifacts
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+    - sed -n '1,260p' skills/select-change/references/selection-protocol.md
+    - git remote -v
+    - gh auth status
+    - git show-ref --verify refs/remotes/origin/main
+    - git ls-remote --heads origin main codex/m102-selected-change-commit-gate codex/m117-git-automation-remote-readiness codex/m119-approved-remote-pr-publication
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+  notes:
+    - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is
+      /ow:vision; the user explicitly requested DTC creation for M119.
+    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, implementation source edits, branch creation, push,
+      or PR operation was performed.
+    - After DTC queue creation, local branch codex/m119-approved-remote-pr-publication was created
+      and C001 was selected.
+    - C001 completed a read-only preflight and recorded that no branch is ready for immediate push
+      until M119 evidence is committed and remote-plan is rerun from a clean tree.

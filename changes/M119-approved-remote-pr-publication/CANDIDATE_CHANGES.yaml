@@ -1,0 +1,305 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M119-approved-remote-pr-publication
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M119-approved-remote-pr-publication
+title: Candidate changes for remote PR publication governance
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-use-dtc-create-m119
+    - changes/M118-repo-branch-pr-governance/SUMMARY.yaml
+    - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+    - changes/M118-repo-branch-pr-governance/LOCAL_GIT_CHECKPOINT.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - git status --short --branch
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+  summary: >
+    M118 finished the local branch and PR governance packet and committed the pending local
+    planning artifacts. M119 opens the next feature boundary for remote publication readiness:
+    refresh read-only remote facts, choose the first safe publication pilot, and prepare exact
+    approval-gated push and draft PR operations with local audit evidence. This queue does not
+    itself approve or perform remote mutation.
+queue_policy:
+  branch_boundary: codex/m119-approved-remote-pr-publication
+  branch_note: >
+    Proposed by DTC, then created locally before selecting C001. The branch has not been pushed.
+    Queue creation happened while the repository was on codex/m118-repo-branch-pr-governance with
+    a clean working tree after local commit 34708e0.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. Before any push or remote PR command is allowed, M119 needs a fresh
+    read-only publication preflight that confirms current branch state, remote base visibility,
+    branch presence, gh authentication, simulator evidence, and the first publication pilot.
+  high_risk_rule: >
+    C002 and C003 are high-risk remote mutation candidates. They must not be selected or executed
+    until C001 produces a green preflight packet, a HIGH_RISK_DECISION_REPORT.md exists for the
+    exact operation boundary, and the user explicitly approves the concrete push or draft PR command.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Remote publication governance for the first reviewable OpenWorkflow feat branches after M118.
+  boundary_type: gh_remote_publication_workflow_slice
+  in_scope_rule: >
+    Include read-only remote readiness refresh, first-pilot ordering, exact push and draft PR
+    operation gates, local audit evidence requirements, rollback notes, and post-publication local
+    reporting.
+  out_of_scope_rule: >
+    Do not push, create or edit GitHub PRs, mutate Issues, merge, rebase, reset, force-push, delete
+    branches, or rewrite historical commits during DTC queue creation. Historical branch surgery
+    remains a separate queue.
+  deferred_features:
+    - title: Historical branch rewrite or cherry-pick repair
+      reason: >
+        Splitting old stacked branches can change collaboration semantics and needs a dedicated
+        high-risk branch repair queue.
+      suggested_plan_id: M120-historical-branch-repair
+observed_state:
+  captured_at: 2026-05-23
+  current_branch: codex/m118-repo-branch-pr-governance
+  working_tree_clean_before_queue_creation: true
+  latest_local_commit: 34708e0
+  latest_local_commit_subject: M118-repo-branch-pr-governance Record local PR governance plan
+  remote: origin
+  remote_url: https://github.com/tiic-tech/openworkflow.git
+  m118_branch_boundary: codex/m118-repo-branch-pr-governance
+  m118_remote_mutation_performed: false
+  m118_deferred_publication_plan: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+  local_pr_ready_summaries_available:
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+    - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+    - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+    - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Refresh remote publication preflight and choose the first pilot
+    purpose: >
+      Convert the M118 read-only remote publication plan into a current, exact preflight packet for
+      the first branch that can safely be pushed and opened as a draft PR after explicit approval.
+    scope:
+      includes:
+        - verify the working tree and current branch state before any remote operation planning
+        - refresh remote visibility for origin/main and candidate branch refs
+        - verify gh authentication and repository target
+        - rerun git-automation remote-plan for the candidate queues under consideration
+        - record the first pilot branch, target base, blockers, and exact operation approval text
+      excludes:
+        - pushing branches
+        - creating, editing, or merging PRs
+        - mutating GitHub Issues
+        - moving branch pointers or rewriting history
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+      - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+      - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git remote -v
+      - gh auth status
+      - node dist/cli/src/index.js git-automation remote-plan --root . --queue <target-queue> --base origin/main --remote origin --target-base main --json
+      - git diff --check
+    acceptance:
+      - A current preflight packet names one first pilot branch or records why no branch is ready.
+      - Every blocker is specific enough to resolve before push or draft PR creation.
+      - The packet names exact commands that still require user approval.
+      - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: M119-C001-refresh-remote-publication-preflight
+      selected_at: 2026-05-23
+      reason: >
+        Selected first because M119 must refresh current remote, branch, gh authentication, and
+        remote-plan evidence before any high-risk push or draft PR candidate can be considered.
+      artifacts:
+        selected_change: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/ATOM_TASKS.yaml
+        implementation_brief: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced planning and preflight evidence only under changes/M119-approved-remote-pr-publication
+        and did not change product source, generated surfaces, runtime behavior, branch pointers, or
+        remote state.
+      evidence:
+        - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/REMOTE_PUBLICATION_PREFLIGHT.md
+      validation:
+        - git status --short --branch
+        - git remote -v
+        - gh auth status
+        - git show-ref --verify refs/remotes/origin/main
+        - git ls-remote --heads origin main codex/m102-selected-change-commit-gate codex/m117-git-automation-remote-readiness codex/m119-approved-remote-pr-publication
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - id: C002
+    status: candidate
+    title: Execute an explicitly approved pilot branch push
+    purpose: >
+      After C001 is green and the user approves the exact command, push exactly one pilot branch to
+      origin and record local audit evidence, previous remote state, and rollback guidance.
+    scope:
+      includes:
+        - confirm the current branch matches the approved pilot branch boundary
+        - confirm remote-plan is green immediately before push
+        - execute one approved git push command
+        - record the remote ref, local commit hash, timestamp, approval source, and rollback notes
+      excludes:
+        - draft PR creation
+        - pushing more than one branch
+        - force-push
+        - rebasing, resetting, cherry-picking, or deleting branches
+        - editing remote Issues or PRs
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: high
+    size: small
+    approval_required: true
+    validation:
+      - git status --short --branch
+      - node dist/cli/src/index.js git-automation remote-plan --root . --queue <approved-queue> --base origin/main --remote origin --target-base main --json
+      - git push origin <approved-branch>
+      - git ls-remote --heads origin <approved-branch>
+    acceptance:
+      - Exactly one user-approved branch is pushed.
+      - Local audit evidence records the approval source, branch, base, commit hash, remote ref, and result.
+      - No PR, Issue, merge, force-push, or history rewrite occurs.
+  - id: C003
+    status: candidate
+    title: Create an explicitly approved draft PR for the pushed pilot branch
+    purpose: >
+      After C002 pushes the approved branch and the user approves the exact gh command, create one
+      draft PR using the local PR-ready summary as the review body and record the remote URL.
+    scope:
+      includes:
+        - verify the pushed remote branch exists
+        - verify the PR body source is the matching local PR_READY_SUMMARY.md
+        - execute one approved gh pr create --draft command
+        - record the PR URL, base branch, head branch, body source, approval source, and rollback notes
+      excludes:
+        - marking the PR ready for review
+        - editing unrelated PRs
+        - merging or closing PRs
+        - mutating Issues or labels
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+      - changes/*/PR_READY_SUMMARY.md
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+    risk: high
+    size: small
+    approval_required: true
+    validation:
+      - gh pr create --draft --base <target-base> --head <approved-branch> --title <title> --body-file <summary>
+      - gh pr view <created-pr-url> --json url,state,isDraft,baseRefName,headRefName
+    acceptance:
+      - Exactly one draft PR is created from the approved pushed branch.
+      - Local audit evidence records the PR URL and body source.
+      - No merge, ready-for-review transition, Issue mutation, or broad PR edit occurs.
+  - id: C004
+    status: candidate
+    title: Record post-publication audit and next publication recommendation
+    purpose: >
+      Summarize the completed remote publication pilot, update local planning evidence, and recommend
+      whether the next queue should publish another branch or defer to M120 branch repair.
+    scope:
+      includes:
+        - record branch push and draft PR evidence from C002 and C003
+        - refresh M119 summary and local review notes
+        - identify remaining publication candidates and blockers
+        - recommend the next queue or stop condition
+      excludes:
+        - additional push or PR creation
+        - merge or release operations
+        - historical branch repair
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - M120-historical-branch-repair
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+      - gh pr view <created-pr-url> --json url,state,isDraft,baseRefName,headRefName
+    acceptance:
+      - M119 local audit evidence is complete enough to reconstruct the remote operation.
+      - Remaining branch and PR work is not implied as approved.
+      - The next recommendation separates another publication pilot from historical branch repair.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: Create M119 remote publication governance queue from M118 deferred feature.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M118-repo-branch-pr-governance/SUMMARY.yaml
+      - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Select the read-only remote publication preflight before any high-risk remote mutation.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/SELECTED_CHANGE.yaml
+      - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/ATOM_TASKS.yaml
+      - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Complete read-only remote publication preflight and record that no branch is ready for immediate push.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/REMOTE_PUBLICATION_PREFLIGHT.md

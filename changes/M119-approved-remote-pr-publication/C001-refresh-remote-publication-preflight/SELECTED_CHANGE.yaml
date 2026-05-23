@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:M119-C001-refresh-remote-publication-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M119-C001-refresh-remote-publication-preflight
+source_plan_id: M119-approved-remote-pr-publication
+source_candidate_id: C001
+title: Refresh remote publication preflight and choose the first pilot
+status: selected
+selection_reason: >
+  C001 is the only ready low-risk candidate in M119. It produces the read-only evidence needed
+  before any high-risk branch push or draft PR creation can be considered.
+scope:
+  includes:
+    - verify the working tree and current branch state before any remote operation planning
+    - refresh remote visibility for origin/main and candidate branch refs
+    - verify gh authentication and repository target
+    - rerun git-automation remote-plan for the candidate queues under consideration
+    - record the first pilot branch, target base, blockers, and exact operation approval text
+  excludes:
+    - pushing branches
+    - creating, editing, or merging PRs
+    - mutating GitHub Issues
+    - moving branch pointers or rewriting history
+owned_paths:
+  - changes/M119-approved-remote-pr-publication/
+  - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+  - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - A current preflight packet names one first pilot branch or records why no branch is ready.
+  - Every blocker is specific enough to resolve before push or draft PR creation.
+  - The packet names exact commands that still require user approval.
+  - No remote or destructive git mutation occurs.
+validation:
+  - git status --short --branch
+  - git remote -v
+  - gh auth status
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue <target-queue> --base origin/main --remote origin --target-base main --json
+  - git diff --check
+rejected_alternatives:
+  - id: C002
+    reason: High-risk push candidate depends on a green C001 preflight and explicit operation-level approval.
+  - id: C003
+    reason: High-risk draft PR creation depends on pushed branch evidence and explicit operation-level approval.
+  - id: C004
+    reason: Post-publication audit depends on push and draft PR evidence from C002 and C003.

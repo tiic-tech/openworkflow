@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M119-C001-refresh-remote-publication-preflight
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M119-C001-refresh-remote-publication-preflight
+title: Atom tasks for remote publication preflight
+status: ready
+tasks:
+  - task_id: T001
+    title: Inspect current branch, dirty tree, remote, and gh authentication
+    status: done
+    type: read
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - Current branch, dirty paths, remote URL, and gh auth status are recorded.
+  - task_id: T002
+    title: Run read-only remote-plan probes for pilot candidates
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - M102 and M117 remote-plan results are captured without push or PR mutation.
+      - Any remote-plan blockers are recorded exactly.
+  - task_id: T003
+    title: Write publication preflight packet and pilot recommendation
+    status: done
+    type: document
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The preflight packet names the first pilot branch or states why no pilot is ready.
+      - Exact approval-gated commands are listed as blocked until user approval.
+  - task_id: T004
+    title: Validate and refresh queue evidence
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - YAML parse, OpenWorkflow validate, and diff checks pass.
+      - The queue records completion or blockers for C001.
