@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: summary:M120-historical-branch-repair
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M120-historical-branch-repair
+title: Summary for historical branch repair
+status: active
+source:
+  kind: mixed
+  summary: >
+    M120 was created by DTC after M119 completed one approved M102 remote publication pilot and
+    recommended stopping further remote mutation until historical branch ownership is repaired.
+  refs:
+    - user_input:2026-05-23-create-m120-cc-with-dtc
+    - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
+    - changes/M119-approved-remote-pr-publication/SUMMARY.yaml
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+scope_boundary: >
+  Historical branch repair only. M120 may inventory branch ownership, define repair policy, restore
+  branch-local PR-ready evidence, and prepare high-risk stop gates. It does not approve or perform
+  remote mutation, destructive branch operations, PR mutation, or merge.
+branch_boundary: codex/m120-historical-branch-repair
+branch_note: >
+  Proposed by DTC while on codex/m119-approved-remote-pr-publication after commit 27a267a. Branch
+  creation was intentionally not performed during DTC queue creation.
+candidate_count: 5
+completed_candidate_id: null
+completed_change_id: null
+next_recommended_candidate_id: C001
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.md
+  summary: changes/M120-historical-branch-repair/SUMMARY.yaml
+key_dependencies:
+  - C001 must inventory branches and PR-ready evidence before repair policy or restoration.
+  - C002 must define repair policy before any branch-local evidence restoration.
+  - C003 can restore low-risk branch-local summaries only after C001 and C002.
+  - C004 must create a high-risk report before any history surgery is selected or executed.
+  - C005 depends on repaired evidence before recommending the next publication queue.
+risks:
+  - id: R001
+    level: high
+    description: Historical branch surgery can rewrite collaboration boundaries or lose review context.
+    mitigation: Keep surgery out of scope until a high-risk report and exact approval exist.
+  - id: R002
+    level: high
+    description: Remote publication and PR edits mutate authenticated GitHub state.
+    mitigation: Defer all push, PR creation, PR edits, ready-for-review, merge, and Issue mutation to later approval-gated queues.
+  - id: R003
+    level: medium
+    description: Several PR-ready summaries point at shared or old branch boundaries.
+    mitigation: C001 must map branch ownership before C003 restores evidence or C005 recommends publication order.
+unresolved_questions:
+  - Should M120 accept some older stacked branches as intentionally coupled review branches?
+  - Should M117 be repaired first because it has clean branch identity and merge readiness?
+  - Should PR #4 remain draft until M120 finishes branch-stack review?
+deferred_features:
+  - M121-m117-remote-publication
+  - M122-pr4-ready-review-governance
+validation:
+  commands_run:
+    - sed -n '1,200p' .openworkflow/CURRENT_STATE.yaml
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
+    - sed -n '1,260p' changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
+    - git status --short --branch
+    - git branch --list 'codex/m120-historical-branch-repair'
+  notes:
+    - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
+      the user explicitly requested M120 CC creation.
+    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, implementation source edits, branch creation, branch
+      repair, push, PR operation, Issue mutation, or history rewrite was performed.

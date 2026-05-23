@@ -1,0 +1,304 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M120-historical-branch-repair
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M120-historical-branch-repair
+title: Candidate changes for historical branch repair
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-create-m120-cc-with-dtc
+    - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
+    - changes/M119-approved-remote-pr-publication/SUMMARY.yaml
+    - changes/M119-approved-remote-pr-publication/CANDIDATE_CHANGES.yaml
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - git status --short --branch
+    - git branch --list codex/m*
+    - git ls-remote --heads origin codex/*
+    - gh pr list --repo tiic-tech/openworkflow --state all
+  summary: >
+    M119 completed a narrow remote publication pilot for M102 and recommended stopping further
+    remote mutation until historical branch ownership is repaired. M120 owns the local planning and
+    evidence work needed to classify stacked branches, decide repair policy, and prepare branch-local
+    PR-ready candidates for future approval-gated publication.
+queue_policy:
+  branch_boundary: codex/m120-historical-branch-repair
+  branch_note: >
+    Proposed by DTC while the repository was on codex/m119-approved-remote-pr-publication after
+    local commit 27a267a. Per DTC protocol, branch creation is not performed by this queue creation
+    step; a later git-automation branch action should create or switch to the boundary branch before
+    selecting implementation candidates.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. M120 must produce a read-only branch ownership inventory before any local
+    branch repair, PR-ready summary regeneration, or high-risk history operation can be considered.
+  high_risk_rule: >
+    Any rebase, reset, cherry-pick sequence that rewrites branch meaning, force-push, remote branch
+    deletion, PR edit, merge, or ready-for-review transition is high risk and requires a dedicated
+    HIGH_RISK_DECISION_REPORT.md plus exact operation-level user approval before execution.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Historical local branch and PR-ready evidence repair after the M102 remote publication pilot.
+  boundary_type: git_branch_governance_workflow_slice
+  in_scope_rule: >
+    Include read-only branch ownership inventory, repair policy, branch-local PR-ready summary
+    restoration, publication ordering, and high-risk decision gates for branch pointer changes.
+  out_of_scope_rule: >
+    Do not push, create or edit PRs, mutate Issues, merge, release, force-push, delete remote
+    branches, or rewrite historical commits during DTC queue creation. Product feature work remains
+    outside this queue unless needed solely to repair branch/PR evidence.
+  deferred_features:
+    - title: Publish the repaired M117 branch
+      reason: >
+        M117 is the best next publication candidate after repair, but push and draft PR creation are
+        remote mutations that need a fresh approval-gated publication queue.
+      suggested_plan_id: M121-m117-remote-publication
+    - title: Mark PR #4 ready for review
+      reason: >
+        Ready-for-review is a GitHub PR state mutation and should only happen after branch-stack
+        review and exact approval.
+      suggested_plan_id: M122-pr4-ready-review-governance
+observed_state:
+  captured_at: 2026-05-23
+  current_branch: codex/m119-approved-remote-pr-publication
+  working_tree_clean_before_queue_creation: true
+  latest_local_commit: 27a267a
+  latest_local_commit_subject: M119-approved-remote-pr-publication/C004 Record post-publication audit
+  current_open_publication_pr: https://github.com/tiic-tech/openworkflow/pull/4
+  current_open_publication_pr_state: OPEN
+  current_open_publication_pr_is_draft: true
+  published_pilot_branch: codex/m102-selected-change-commit-gate
+  published_pilot_commit: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  remote_codex_branches_observed:
+    - codex/m102-selected-change-commit-gate
+    - codex/m51-agent-first-e2e-suite
+  local_pr_ready_summaries_observed:
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+    - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+    - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+    - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  known_blockers:
+    - M117 remote-plan reports missing simulator evidence.
+    - M117 remote-plan reports branch-local PR_READY_SUMMARY.md is missing.
+    - M105, M106, and M115 summaries point at codex/m101-build-proto-prompt-command-split instead
+      of independent queue branches.
+    - M71 is older and includes a long historical stack with early commits that predate strict
+      commit evidence.
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Inventory historical branch ownership and PR-ready evidence
+    purpose: >
+      Build a read-only inventory that maps local branches, remote branches, queue branch boundaries,
+      PR-ready summaries, existing PRs, and known blockers into one repair baseline.
+    scope:
+      includes:
+        - list local codex branches and remote codex branches
+        - map PR_READY_SUMMARY.md artifacts to their recorded branch boundaries
+        - identify queues whose summaries are not present on their owning branches
+        - identify queues that share a historical branch boundary
+        - record existing PRs and their head/base relationships
+      excludes:
+        - branch creation or deletion
+        - checkout-based repair
+        - cherry-pick, rebase, reset, force-push, or remote mutation
+        - PR creation, edit, close, merge, or ready-for-review transition
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git branch --list 'codex/m*' --format='%(refname:short)'
+      - git ls-remote --heads origin 'codex/*'
+      - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,state,isDraft,title,headRefName,baseRefName --limit 50
+      - find changes -maxdepth 2 -name PR_READY_SUMMARY.md
+      - git diff --check
+    acceptance:
+      - A durable inventory names every currently known publication candidate and blocker.
+      - Shared or mismatched branch boundaries are called out explicitly.
+      - No branch pointer, remote, PR, or Issue state is mutated.
+  - id: C002
+    status: candidate
+    title: Decide historical branch repair policy and stop boundaries
+    purpose: >
+      Convert the C001 inventory into a repair policy that distinguishes acceptable stacked review
+      branches from branches that need local evidence restoration or high-risk history surgery.
+    scope:
+      includes:
+        - define criteria for accepting a stacked branch as intentional
+        - define criteria for requiring a new independent branch boundary
+        - define when branch-local PR-ready summaries are sufficient repair
+        - define when a high-risk decision report is required before branch pointer changes
+      excludes:
+        - executing branch repair
+        - moving commits between branches
+        - remote mutation
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The repair policy separates low-risk evidence repair from high-risk history rewriting.
+      - The policy states when stacked branches may remain coupled.
+      - Remote publication remains approval-gated and out of scope.
+  - id: C003
+    status: candidate
+    title: Restore branch-local PR-ready evidence for low-risk candidates
+    purpose: >
+      For candidates that do not require history rewriting, ensure the owning local branch contains
+      the matching PR_READY_SUMMARY.md and enough queue evidence for future remote-plan checks.
+    scope:
+      includes:
+        - identify low-risk branch-local summary restoration targets
+        - regenerate or copy PR_READY_SUMMARY.md through git-automation summary when appropriate
+        - record before/after branch and file evidence
+        - keep each restoration scoped to its owning branch
+      excludes:
+        - publishing restored branches
+        - creating PRs
+        - rewriting commit history
+        - repairing branches classified as high risk by C002
+    owned_paths:
+      - changes/*/PR_READY_SUMMARY.md
+      - changes/M120-historical-branch-repair/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C005
+      - C006
+    risk: medium
+    size: medium
+    validation:
+      - node dist/cli/src/index.js git-automation summary --root . --queue <queue> --json
+      - node dist/cli/src/index.js git-automation remote-plan --root . --queue <queue> --base origin/main --remote origin --target-base main --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Each repaired branch has a branch-local PR_READY_SUMMARY.md or a recorded blocker.
+      - No branch pointer rewrite or remote mutation occurs.
+      - Future publication candidates have explicit remaining blockers.
+  - id: C004
+    status: candidate
+    title: Prepare high-risk decision report for history surgery if needed
+    purpose: >
+      If C001/C002 show that branch pointer changes are required, create the high-risk report that
+      names exact options, risks, commands, rollback limits, and approval text before any surgery.
+    scope:
+      includes:
+        - identify candidate branches that would require cherry-pick, rebase, reset, or deletion
+        - record decision options such as defer, evidence-only repair, new branch from main, or
+          explicit history surgery
+        - name exact commands that remain unapproved
+        - define stop criteria and validation expectations
+      excludes:
+        - executing cherry-pick, rebase, reset, force-push, branch deletion, or remote mutation
+        - selecting a surgery option without user approval
+    owned_paths:
+      - changes/M120-historical-branch-repair/HIGH_RISK_DECISION_REPORT.md
+      - changes/M120-historical-branch-repair/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    approval_required: true
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The report exists if any branch repair requires history surgery.
+      - The report does not execute or approve destructive or remote commands.
+      - Exact operation-level approval remains required for any high-risk command.
+  - id: C005
+    status: candidate
+    title: Produce repaired publication order and remote readiness plan
+    purpose: >
+      Turn the repaired branch inventory into a publication order that separates ready candidates,
+      candidates needing fresh summaries, and candidates needing high-risk repair.
+    scope:
+      includes:
+        - rank M117, M71, and any repaired M101-derived queues for publication readiness
+        - record remote-plan blockers for each candidate
+        - recommend the next approval-gated publication queue
+        - define stop conditions for PR #4 ready-for-review and merge decisions
+      excludes:
+        - pushing branches
+        - creating, editing, closing, marking ready, or merging PRs
+        - mutating Issues
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M121-m117-remote-publication
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+      - gh pr view https://github.com/tiic-tech/openworkflow/pull/4 --json url,state,isDraft,baseRefName,headRefName,title,number
+    acceptance:
+      - The next publication recommendation is explicit and evidence-backed.
+      - Remaining blockers are separated by candidate branch.
+      - No remote mutation is implied as approved.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: Create M120 historical branch repair queue from M119 post-publication audit.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
+      - changes/M119-approved-remote-pr-publication/SUMMARY.yaml
