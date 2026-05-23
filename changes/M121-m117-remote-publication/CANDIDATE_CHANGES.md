@@ -21,7 +21,8 @@ Select C001 first. C002, C003, and C004 are high-risk remote publication
 boundaries. A high-risk report and exact operation-level user approval are
 required before any push or PR mutation.
 
-Next recommended candidate: C005, to record the M117 publication audit and next governance handoff.
+Next recommended candidate: none. M121 is complete; further remote state changes
+belong to separate approval-gated queues.
 
 ## Observed State
 
@@ -169,12 +170,21 @@ Unlocks: C005
 
 ### C005 - Record M117 publication audit and next governance handoff
 
-Status: candidate
+Status: done
 
 Risk: medium
 
 Outcome: close M121 with a local audit and name the next queue for M71, PR #4,
 or the shared M101 branch group.
+
+Publication audit:
+
+- `changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md`
+
+Result: M121 is closed locally. PR #5 is open and draft, the remote M117 branch
+remains at `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`, and GitHub reported
+`MERGEABLE` at audit time. Ready-for-review, merge, PR close/edit, M71
+publication, and shared M101-derived branch strategy remain outside M121.
 
 Owned paths:
 
@@ -186,7 +196,6 @@ Unlocks: M122, M123, M124
 
 ## Stop Gates
 
-- Do not create a draft PR without separate exact approval.
 - Do not mark PR #5 ready for review without separate exact approval.
 - Do not mark any PR ready for review from M121.
 - Do not merge.

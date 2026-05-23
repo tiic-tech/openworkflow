@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M121-m117-remote-publication
 title: Candidate changes for M117 remote publication
-status: active
+status: done
 source:
   kind: mixed
   refs:
@@ -208,7 +208,22 @@ c004_draft_pr_result:
   unauthorized_operations_performed:
     - none
   rollback_preference: close PR only after separate exact approval; do not force-push or delete remote branch without new approval
-next_recommended_candidate_id: C005
+c005_publication_audit:
+  path: changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
+  completed_at: 2026-05-23T20:23:44+08:00
+  remote_branch_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  pr_number: 5
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/5
+  pr_state: OPEN
+  is_draft: true
+  mergeability_signal: MERGEABLE
+  unauthorized_operations_performed:
+    - none
+  next_governance_handoff:
+    - M122-m71-historical-stack-publication
+    - M123-pr-ready-review-governance
+    - M124-shared-branch-publication-strategy
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -435,7 +450,7 @@ changes:
         C005 should record the M117 publication audit and next governance handoff. Ready-for-review
         remains out of scope without separate approval.
   - id: C005
-    status: candidate
+    status: done
     title: Record M117 publication audit and next governance handoff
     purpose: >
       Close the M121 publication queue with a local post-publication audit that captures what
@@ -469,6 +484,17 @@ changes:
       - A local audit names each authorized and unauthorized operation boundary.
       - The next publication governance target is explicit.
       - M121 can be handed off without requiring raw session context.
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C005 records local publication audit and handoff evidence only. It did not change product
+        source, generated runtime behavior, PR state, remote refs, Issues, or merge state.
+      evidence:
+        - changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
+      recommendation: >
+        Stop M121 after local audit. Use a separate queue and exact approval for PR #5
+        ready-for-review, M71 publication, or shared M101-derived branch strategy.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -567,3 +593,14 @@ operations:
     evidence:
       - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md
       - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_EVIDENCE.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: Record M117 publication audit and next governance handoff.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
