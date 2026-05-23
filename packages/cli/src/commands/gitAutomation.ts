@@ -238,13 +238,15 @@ async function gitAutomationDraftPr(root: string, flags: Map<string, string | bo
     prSummaryPath: stringFlag(flags, "pr-summary"),
     title: stringFlag(flags, "title"),
     allowDraftPr: booleanFlag(flags, "allow-draft-pr"),
+    approvalEvidence: stringFlag(flags, "approval-evidence"),
+    auditEvidencePath: stringFlag(flags, "audit-evidence"),
     dryRun: !write,
   });
   return finishGitAutomationResult(root, json, "git-automation draft-pr", result.ok, {
     mode: "draft-pr-pilot",
     action: "draft-pr",
     result,
-  }, result.ok ? [write ? "record draft PR URL and rollback evidence" : "rerun with --write --allow-draft-pr only after reviewing the payload preview"] : ["resolve draft-pr blockers before mutation"]);
+  }, result.ok ? [write ? "review local draft PR audit evidence before any follow-up" : "rerun with --write --allow-draft-pr --approval-evidence <source> only after reviewing the payload preview"] : ["resolve draft-pr blockers before mutation"]);
 }
 
 async function loadQueue(root: string, queuePath: string): Promise<Record<string, unknown>> {

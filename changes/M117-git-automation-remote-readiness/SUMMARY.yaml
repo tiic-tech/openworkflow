@@ -33,29 +33,30 @@ scope_boundary: >
   rebase, force-push, ready-for-review PR mutation, or Issue mutation.
 branch_boundary: codex/m117-git-automation-remote-readiness
 candidate_count: 5
-completed_candidate_id: C002
-completed_change_id: M117-C002-apply-branch-identity-governance-across-git-automation-modes
+completed_candidate_id: C003
+completed_change_id: M117-C003-harden-draft-pr-pilot-approval-and-local-audit-evidence
+next_recommended_candidate_id: C004
+high_risk_decision_status: approved
+high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+high_risk_approved_option: Option D
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C003
-high_risk_decision_status: pending_user_decision
-high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
-high_risk_recommended_option: Option D
 outputs:
   candidate_changes_yaml: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.md
   summary: changes/M117-git-automation-remote-readiness/SUMMARY.yaml
   high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  latest_selected_change: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/SELECTED_CHANGE.yaml
+  latest_atom_tasks: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/ATOM_TASKS.yaml
+  latest_implementation_brief: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/IMPLEMENTATION_BRIEF.md
   selected_change: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml
   atom_tasks: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml
   implementation_brief: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md
-  latest_selected_change: changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/SELECTED_CHANGE.yaml
-  latest_atom_tasks: changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/ATOM_TASKS.yaml
-  latest_implementation_brief: changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/IMPLEMENTATION_BRIEF.md
 key_dependencies:
   - C001 is complete; PR summaries, remote-plan, and simulator now share modern LOCAL_COMMIT_EVIDENCE.yaml reader coverage.
   - C002 is complete; branch identity reports are now attached to branch, remote-plan, simulate, and draft-pr readiness packets.
-  - C003 and C004 are high-risk and require a decision report before selection.
+  - C003 is complete; draft-pr write mode now requires explicit approval evidence and writes local audit evidence on approved fake-gh write coverage.
+  - C004 remains the next approved Option D local/read-only hardening candidate.
   - C005 depends on the prior candidates to verify the full non-mutating remote-readiness story.
 risks:
   - id: R001
@@ -75,7 +76,6 @@ risks:
     description: The queue was created on the existing M101 continuation branch.
     mitigation: Branch boundary is recorded as codex/m117-git-automation-remote-readiness; branch automation or explicit continuation approval is required before implementation.
 unresolved_questions:
-  - Should draft PR write-mode approval be expressed as a high-risk report path, a CLI flag naming approval evidence, or both?
   - Should merge conflict probes use `git merge-tree`, an isolated temporary worktree, or both?
   - Should future autonomous execution be one queue after C005, or split into push/PR/merge queues?
 deferred_features:
@@ -85,6 +85,8 @@ validation:
   commands_run:
     - node dist/cli/src/index.js resume --root . --json
     - git status --short --branch
+    - npm run build
+    - node dist/cli/src/dev/verifyRuntimeSurface.js
   notes:
-    - Current repo trust is green and working tree was clean before creating the planning queue.
-    - No implementation code, generated .agents surface, .openworkflow surface, git push, PR mutation, or merge was performed.
+    - C003 runtime-surface coverage uses fake gh and does not execute real remote PR creation or editing.
+    - No generated .agents surface, .openworkflow surface, git push, real PR mutation, Issue mutation, or merge was performed.

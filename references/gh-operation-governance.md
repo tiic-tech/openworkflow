@@ -55,9 +55,11 @@ Examples:
 - add a non-destructive label that marks decomposition state
 - update a draft PR body with OW-generated summary text
 
-These operations require explicit user approval for the specific action. The
-local OW artifact remains the audit record and should capture the remote URL,
-timestamp, operation kind, and summary of the mutation.
+These operations require explicit user approval for the specific action. A CLI
+boolean such as `--allow-draft-pr` is never approval by itself; write-mode draft
+PR pilots must also name explicit local approval evidence with
+`--approval-evidence`. The local OW artifact remains the audit record and should
+capture the remote URL, timestamp, operation kind, and summary of the mutation.
 
 ### High-Risk Mutation
 
@@ -88,9 +90,12 @@ For any evidence-writing or high-risk mutation, record locally:
 - user approval source
 - local plan id and candidate id
 - branch name when relevant
+- base branch when relevant
+- body or checkpoint digest when relevant
 - commit hash when relevant
 - timestamp
 - result or remote URL after mutation
+- rollback guidance
 
 Do not rely on remote comments alone as the OW audit record.
 

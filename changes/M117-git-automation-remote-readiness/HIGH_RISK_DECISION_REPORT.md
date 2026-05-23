@@ -8,9 +8,9 @@ they affect future remote PR and merge readiness:
 - `C003` hardens draft PR pilot approval and local audit evidence.
 - `C004` defines structured merge-conflict readiness checkpoints.
 
-This report is a decision artifact for discussion. It is not approval to push,
-create or edit a remote PR, mutate Issues, merge, rebase, reset, force-push, or
-run destructive git operations.
+This report records the approved local/read-only hardening path. It is not
+approval to push, create or edit a remote PR, mutate Issues, merge, rebase,
+reset, force-push, or run destructive git operations.
 
 ## Current State
 
@@ -127,23 +127,24 @@ Reason:
   autonomous merge queue exists.
 - Both can be implemented without executing remote mutation.
 
-## Pending Decision
+## Approved Decision
 
-Status: `pending_user_decision`
+Status: `approved`
 
-The user should approve exactly one option before C003 or C004 is selected:
+Approved on 2026-05-23: **Option D - approve C003 then C004 as
+local/read-only hardening only**.
 
-- `Approve Option A`
-- `Approve Option B`
-- `Approve Option C`
-- `Approve Option D`
-- `Approve Option E` with exact remote, branch, base, PR operation, payload
-  source, and rollback guardrails
+This approval authorizes selecting and implementing:
 
-Ambiguous instructions such as "continue" are not enough to approve C003, C004,
-or any remote-impacting operation.
+- C003 as draft PR pilot approval/audit gate hardening, without real PR create
+  or edit execution.
+- C004 as structured merge-conflict readiness checkpointing, without merge,
+  rebase, reset, force-push, or working-tree conflict resolution.
 
-## Guardrails If Option B, C, Or D Is Approved
+This approval does not authorize Option E or any concrete remote-impacting
+operation.
+
+## Guardrails For Approved Option D
 
 - No `git push`.
 - No `gh pr create`, `gh pr edit`, `gh pr merge`, or ready-for-review mutation.

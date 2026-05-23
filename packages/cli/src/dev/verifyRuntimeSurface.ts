@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdir, mkdtemp, readdir, readFile, rm, stat, unlink, utimes, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readdir, readFile, rm, stat, unlink, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -2507,6 +2507,25 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert(Array.isArray(remotePlanResult.readOnlyPlan), "remote-plan missing read-only plan");
     assert(remotePlan.output.includes("did not push"), "remote-plan should state non-mutation boundary");
 
+    const fakeBin = join(remoteRoot, "..", "openworkflow-fake-gh-bin");
+    await mkdir(fakeBin, { recursive: true });
+    await writeFile(join(fakeBin, "gh"), [
+      "#!/bin/sh",
+      "if [ \"$1\" = \"pr\" ] && [ \"$2\" = \"list\" ]; then",
+      "  echo '[]'",
+      "  exit 0",
+      "fi",
+      "if [ \"$1\" = \"pr\" ] && { [ \"$2\" = \"create\" ] || [ \"$2\" = \"edit\" ]; }; then",
+      "  echo 'https://example.invalid/openworkflow/pull/1'",
+      "  exit 0",
+      "fi",
+      "echo 'unexpected fake gh invocation' >&2",
+      "exit 43",
+      "",
+    ].join("\n"), "utf8");
+    await chmod(join(fakeBin, "gh"), 0o755);
+    const noGhMutationEnv = { ...process.env, PATH: `${fakeBin}:${process.env.PATH ?? ""}` };
+
     const draftPreview = await runCaptureStatus([
       "node",
       CLI,
@@ -2523,7 +2542,7 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
       "--target-base",
       "master",
       "--json",
-    ], process.env);
+    ], noGhMutationEnv);
     assert(draftPreview.code === 0, `draft-pr preview should succeed without mutation: ${draftPreview.output}`);
     const draftPreviewReport = parseJsonReport(draftPreview.output, "git-automation draft-pr");
     const draftPreviewData = record(draftPreviewReport.data, "git-automation draft-pr data");
@@ -2551,9 +2570,69 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
       "master",
       "--write",
       "--json",
-    ], process.env);
+    ], noGhMutationEnv);
     assert(draftWriteBlocked.code !== 0, "draft-pr write should be blocked without --allow-draft-pr");
     assert(draftWriteBlocked.output.includes("requires --allow-draft-pr"), "draft-pr write blocker should name allow flag");
+
+    const draftWriteApprovalBlocked = await runCaptureStatus([
+      process.execPath,
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--write",
+      "--allow-draft-pr",
+      "--json",
+    ], noGhMutationEnv);
+    assert(draftWriteApprovalBlocked.code !== 0, "draft-pr write should be blocked without explicit approval evidence");
+    assert(draftWriteApprovalBlocked.output.includes("requires --approval-evidence"), "draft-pr approval blocker should name approval evidence");
+    assert(!draftWriteApprovalBlocked.output.includes("https://example.invalid/openworkflow/pull/1"), "draft-pr approval blocker must stop before gh mutation");
+
+    const draftWriteApproved = await runCaptureStatus([
+      process.execPath,
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--write",
+      "--allow-draft-pr",
+      "--approval-evidence",
+      "user_input:fixture-draft-pr-approval",
+      "--audit-evidence",
+      "changes/M71-shell/DRAFT_PR_OPERATION_EVIDENCE.yaml",
+      "--json",
+    ], noGhMutationEnv);
+    assert(draftWriteApproved.code === 0, `draft-pr approved write should succeed against fake gh and write local audit evidence: ${draftWriteApproved.output}`);
+    const draftWriteApprovedReport = parseJsonReport(draftWriteApproved.output, "git-automation draft-pr");
+    const draftWriteApprovedData = record(draftWriteApprovedReport.data, "approved git-automation draft-pr data");
+    const draftWriteApprovedResult = record(draftWriteApprovedData.result, "approved git-automation draft-pr result");
+    const draftWriteApprovedOperation = record(draftWriteApprovedResult.operation, "approved draft-pr operation");
+    assert(draftWriteApprovedResult.mutation_performed === true, "approved draft-pr fixture should report mutation through fake gh");
+    assert(draftWriteApprovedOperation.kind === "create", "approved draft-pr fixture should distinguish create operation");
+    assert(draftWriteApprovedOperation.outcome === "created", "approved draft-pr fixture should distinguish created outcome");
+    assert(draftWriteApprovedOperation.auditEvidencePath === "changes/M71-shell/DRAFT_PR_OPERATION_EVIDENCE.yaml", "approved draft-pr fixture missing audit evidence path");
+    const draftPrAuditEvidence = await read(join(tempRoot, "changes", "M71-shell", "DRAFT_PR_OPERATION_EVIDENCE.yaml"));
+    assert(draftPrAuditEvidence.includes("operation_kind: create"), "draft PR audit evidence missing operation kind");
+    assert(draftPrAuditEvidence.includes("approval_source: user_input:fixture-draft-pr-approval"), "draft PR audit evidence missing approval source");
+    assert(draftPrAuditEvidence.includes("https://example.invalid/openworkflow/pull/1"), "draft PR audit evidence missing target PR URL");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
     await rm(remoteRoot, { recursive: true, force: true });

@@ -59,10 +59,12 @@ selection_policy:
     explicitly enables that mode.
   recommended_first_candidate_id: C001
 high_risk_decision:
-  status: pending_user_decision
+  status: approved
   report_path: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
-  recommended_option: Option D
-  recommended_option_summary: >
+  approved_option: Option D
+  approved_at: 2026-05-23
+  approved_by: user
+  approval_summary: >
     Approve C003 then C004 as local/read-only hardening only. Do not authorize
     push, PR mutation, Issue mutation, merge, rebase, reset, force-push, or
     working-tree conflict resolution.
@@ -305,7 +307,7 @@ changes:
         - node dist/cli/src/index.js resume --root . --json
         - git diff --check
   - id: C003
-    status: candidate
+    status: done
     title: Harden draft PR pilot approval and local audit evidence
     purpose: >
       Make the existing draft PR pilot match gh-operation governance before any future remote PR
@@ -345,6 +347,41 @@ changes:
       - Successful draft PR mutation writes local audit evidence.
       - Missing approval fails closed with an actionable error.
       - Preview mode remains read-only.
+    selection:
+      selected_change_id: M117-C003-harden-draft-pr-pilot-approval-and-local-audit-evidence
+      selected_at: 2026-05-23
+      reason: >
+        Selected after the user approved high-risk Option D. C003 is the first
+        approved high-risk hardening step because draft PR write-mode approval
+        must fail closed before future PR automation relies on it.
+      approved_high_risk_option: Option D
+      artifacts:
+        selected_change: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/ATOM_TASKS.yaml
+        implementation_brief: changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/gh-operation-governance.md
+        - packages/core/src/git/draftPrPilot.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Draft PR pilot write mode now requires --approval-evidence beyond
+        --write --allow-draft-pr, reports operation kind/outcome in JSON, and
+        writes local draft PR operation audit evidence after approved write-mode
+        paths. Runtime-surface coverage uses fake gh and does not execute real
+        PR create or edit.
+      validation:
+        - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because draft-pr approval blocker did not name approval evidence"
+        - npm run build
+        - "GREEN: node dist/cli/src/dev/verifyRuntimeSurface.js covered blocked --write --allow-draft-pr without --approval-evidence and fake-gh approved audit evidence"
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
   - id: C004
     status: candidate
     title: Define structured merge-conflict readiness checkpoint
@@ -531,3 +568,47 @@ operations:
     changed_at: 2026-05-23
     evidence:
       - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP007
+    operation_type: high_risk_approval
+    target_candidate_ids:
+      - C003
+      - C004
+    actor: user
+    reason: >
+      User approved Option D: proceed with C003 then C004 as local/read-only
+      hardening only. Approval does not authorize push, PR mutation, Issue
+      mutation, merge, rebase, reset, force-push, or working-tree conflict
+      resolution.
+    changed_at: 2026-05-23
+    evidence:
+      - user_input:2026-05-23-approve-option-d
+      - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Selected C003 as the first approved Option D implementation candidate.
+      Scope is limited to local approval/audit hardening and must not execute
+      real draft PR creation or editing.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/SELECTED_CHANGE.yaml
+      - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/ATOM_TASKS.yaml
+      - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Completed draft PR pilot local approval and audit hardening without
+      executing real remote PR creation or editing.
+    changed_at: 2026-05-23
+    evidence:
+      - references/gh-operation-governance.md
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/LOCAL_COMMIT_EVIDENCE.yaml

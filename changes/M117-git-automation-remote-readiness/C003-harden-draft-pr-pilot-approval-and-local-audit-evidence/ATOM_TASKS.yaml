@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M117-git-automation-remote-readiness:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M117-C003-harden-draft-pr-pilot-approval-and-local-audit-evidence
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C003
+title: Atom tasks for M117 C003 draft PR approval and audit hardening
+status: completed
+tasks:
+  - task_id: T001
+    title: Map draft PR pilot write path and approval inputs
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - references/gh-operation-governance.md
+    done_when: >
+      The current write-mode path, preview path, blockers, rollback plan, and
+      missing approval/audit fields are mapped.
+  - task_id: T002
+    title: Add RED draft PR approval fixture
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      A targeted fixture fails because --write --allow-draft-pr can proceed
+      without explicit approval evidence or local audit output.
+  - task_id: T003
+    title: Implement approval evidence requirement
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      Write-mode draft PR pilot requires explicit approval evidence beyond
+      --allow-draft-pr and fails closed with actionable blockers when missing.
+  - task_id: T004
+    title: Implement local audit evidence shape
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - references/gh-operation-governance.md
+    done_when: >
+      Successful approved write-mode paths record operation kind, target, branch,
+      base, body digest, approval source, timestamp, result, and rollback
+      guidance locally without enabling real remote mutation in this candidate.
+  - task_id: T005
+    title: Run GREEN validation and record completion evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      RED fixture is green, runtime validation passes, queue completion evidence
+      references LOCAL_COMMIT_EVIDENCE.yaml, and git diff check is clean.
+verification:
+  red:
+    - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because draft-pr approval blocker did not name approval evidence"
+  green:
+    - npm run build
+    - "GREEN: node dist/cli/src/dev/verifyRuntimeSurface.js covered blocked --write --allow-draft-pr without --approval-evidence and fake-gh approved audit evidence"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

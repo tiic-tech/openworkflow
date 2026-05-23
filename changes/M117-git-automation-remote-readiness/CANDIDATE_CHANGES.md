@@ -15,11 +15,13 @@ Next recommended target: C003 high-risk decision before selection.
 High-risk decision report:
 `HIGH_RISK_DECISION_REPORT.md`
 
-Decision status: pending user decision.
+Decision status: approved Option D on 2026-05-23.
 
 Recommended option: Option D, approve C003 then C004 as local/read-only
 hardening only. This does not authorize push, PR mutation, Issue mutation,
 merge, rebase, reset, force-push, or working-tree conflict resolution.
+
+Selected candidate: C003.
 
 ## Scope
 
@@ -120,7 +122,7 @@ temporary continuation exception applies.
 
 ### C003 - Harden Draft PR Pilot Approval And Local Audit Evidence
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -136,6 +138,18 @@ Acceptance focus:
 - Successful draft PR mutation writes local audit evidence.
 - Missing approval fails closed.
 - Preview mode remains read-only.
+
+Selection artifacts:
+
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/SELECTED_CHANGE.yaml`
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/ATOM_TASKS.yaml`
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/IMPLEMENTATION_BRIEF.md`
+
+Completion: draft PR pilot write mode now requires `--approval-evidence` in
+addition to `--write --allow-draft-pr`, reports operation kind/outcome in JSON,
+and writes local draft PR operation audit evidence for approved write-mode paths.
+Runtime-surface coverage uses fake `gh` and did not execute real PR create or
+edit.
 
 ### C004 - Define Structured Merge-Conflict Readiness Checkpoint
 
