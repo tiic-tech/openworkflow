@@ -1,0 +1,82 @@
+schema_version: 0.1.0
+contract_id: selected_change:M114-engineering-quality-foundation:C001
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M114-C001-define-validation-trust-domains-and-report-taxonomy
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C001
+title: Define validation trust domains and report taxonomy
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected first because all later engineering-quality work depends on knowing
+  which trust domain each command owns and how Agents should interpret narrower
+  green trust signals when broad repository validation is red.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Define taxonomy and baseline evidence only. Do not change public CLI JSON
+    shape, validator pass/fail behavior, generated surfaces, or historical
+    artifacts in this slice.
+scope:
+  includes:
+    - define trust domains for entry commands, strict handoff, summary health, source contract validation, generated adapter parity, active queue health, historical archive health, fixture corpus, and release readiness
+    - define report taxonomy for failures, warnings, residual historical debt, and newly introduced defects
+    - map current commands to their intended domains and non-domains
+    - document how Agents should interpret narrower green signals when broader domains are red
+    - record the current npm validate red classes as baseline, not as accepted health
+  excludes:
+    - changing public CLI JSON shape
+    - changing validate pass/fail behavior
+    - refactoring validators
+    - editing generated surfaces
+    - fixing historical planning artifacts directly
+owned_paths:
+  - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
+  - references/validation-trust-domains.md
+  - changes/M114-engineering-quality-foundation/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/core/src/validators/**
+  - packages/cli/src/commands/**
+  - packages/cli/src/dev/**
+  - packages/core/src/commands/**
+  - packages/core/src/artifacts/**
+acceptance:
+  - The taxonomy names each validation and trust domain.
+  - Each Agent-facing trust command has an explicit intended domain and non-domain.
+  - The current npm validate red classes are recorded as baseline historical/release-readiness debt, not hidden.
+  - The taxonomy defines how future commands should expose narrower green signals when broader validation domains are red.
+  - No runtime behavior, generated surface, or validator pass/fail behavior changes.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js handoff --root . --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - "npm run validate (expected fail: baseline repository quality debt only; no M114 errors)"
+  - git diff --check
+expected_commit_boundary: >
+  C001 should complete as one local commit containing the quality report source,
+  M114 queue artifacts, the trust-domain taxonomy reference, selected-change
+  artifacts, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
+    - references/validation-trust-domains.md
+    - changes/M114-engineering-quality-foundation/C001-define-validation-trust-domains-and-report-taxonomy/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Created the validation trust-domain taxonomy that separates entry trust,
+    summary health, managed surface health, source contract validation, active
+    queue health, historical archive health, fixture corpus health, and release
+    readiness. Recorded current npm validate failures as baseline red quality
+    debt without changing runtime behavior or validator pass/fail semantics.
+  validation:
+    - npm run build
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - "npm run validate (expected fail: baseline repository quality debt only; no M114 errors)"
+    - git diff --check
