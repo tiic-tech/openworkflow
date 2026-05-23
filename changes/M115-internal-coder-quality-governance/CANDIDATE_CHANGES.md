@@ -40,9 +40,9 @@ Out of scope:
 
 ## Selection Policy
 
-`C001` and `C002` are complete. OW now has the internal coder protocol contract
-and a repo-owned source skill. Continue with `C003` to register the internal
-command protocol before change/team/git integration or evidence artifact work.
+`C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
+internal command protocol with source-driven generated surfaces. Continue with
+`C004` to wire coder governance into change and team protocols.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -81,7 +81,7 @@ as internal-only and behavior-compatible.
 
 ### C003: Register internal `/ow:coder` command protocol
 
-- Status: `ready`
+- Status: `done`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: add an internal registry command with `visibility: internal` and no
@@ -92,6 +92,8 @@ as internal-only and behavior-compatible.
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C001`, `C002`
 - Unlocks: `C004`, `C005`
+- Selection: `C003-register-internal-ow-coder-command-protocol`
+- Completion: internal registry command plus generated `ow-coder` skill
 
 ### C004: Wire coder governance into change and team protocols
 
@@ -108,7 +110,7 @@ as internal-only and behavior-compatible.
 
 ### C005: Surface coder gate state in recovery and git governance
 
-- Status: `candidate`
+- Status: `ready`
 - Risk: `high`
 - Size: `medium`
 - Purpose: expose whether coder gates were required, completed, skipped, or

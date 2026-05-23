@@ -187,6 +187,16 @@ commands:
     interface_path: .agents/skills/ow-git-automation/agents/openai.yaml
     legacy_triggers:
       []
+  - id: coder
+    trigger: /ow:coder
+    visibility: internal
+    skill_name: ow-coder
+    explicit_invocation: $ow-coder
+    skill_path: .agents/skills/ow-coder/SKILL.md
+    interface_path: .agents/skills/ow-coder/agents/openai.yaml
+    legacy_triggers:
+      - /code-quality-governor
+      - /engineering-quality
 generated_files:
   - .agents/skills/ow-workflow/SKILL.md
   - .agents/skills/ow-workflow/agents/openai.yaml
@@ -224,4 +234,6 @@ generated_files:
   - .agents/skills/ow-select-change/agents/openai.yaml
   - .agents/skills/ow-git-automation/SKILL.md
   - .agents/skills/ow-git-automation/agents/openai.yaml
+  - .agents/skills/ow-coder/SKILL.md
+  - .agents/skills/ow-coder/agents/openai.yaml
 sync_command: openworkflow sync --tools codex

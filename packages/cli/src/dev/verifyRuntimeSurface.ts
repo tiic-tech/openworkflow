@@ -30,6 +30,7 @@ const SKILL_NAMES = [
   "ow-analyze-changes",
   "ow-select-change",
   "ow-git-automation",
+  "ow-coder",
 ] as const;
 
 async function main(): Promise<number> {
@@ -1737,6 +1738,9 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-git-automation") {
       verifyGitAutomationSkill(skillContent);
     }
+    if (name === "ow-coder") {
+      verifyCoderSkill(skillContent);
+    }
     const semanticCommand = `/${name.replace("ow-", "ow:")}`;
     const displayName = semanticCommand.slice(1);
     assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
@@ -2546,6 +2550,29 @@ function verifyGitAutomationSkill(content: string): void {
   }
 }
 
+function verifyCoderSkill(content: string): void {
+  for (const required of [
+    "internal-agent-code-execution-governance",
+    "<command_visibility>internal</command_visibility>",
+    "<internal_command_boundary>",
+    "/ow:coder is internal and Agent-only.",
+    "not a normal user-facing coding command",
+    "skills/coder/SKILL.md",
+    "references/internal-coder-protocol.md",
+    "<preflight_owner_map>",
+    "Identify source truth before edits",
+    "<red_green_evidence>",
+    "prefer RED evidence before production edits",
+    "<validation_ladder>",
+    "narrowest honest validation ladder",
+    "<evidence_binding>",
+    "LOCAL_COMMIT_EVIDENCE.yaml",
+    "Do not batch multiple completed selected changes into one checkpoint commit.",
+  ]) {
+    assert(content.includes(required), `ow-coder missing internal coder guidance: ${required}`);
+  }
+}
+
 function verifyDecomposeToChangesSkill(content: string): void {
   for (const required of [
     "Create, update, query, or maintain an OpenWorkflow candidate change queue.",
@@ -2850,6 +2877,7 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const buildProtoPromptSection = commandIndex.split("trigger: /ow:build-proto-prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const vision2PromptSection = commandIndex.split("trigger: /ow:vision2prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const prompt2ProtoSection = commandIndex.split("trigger: /ow:prompt2proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const coderSection = commandIndex.split("trigger: /ow:coder", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
   assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
@@ -2862,6 +2890,8 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(buildProtoPromptSection.includes("visibility: internal"), "build-proto-prompt command is not internal");
   assert(vision2PromptSection.includes("visibility: internal"), "vision2prompt command is not internal");
   assert(prompt2ProtoSection.includes("visibility: internal"), "prompt2proto command is not internal");
+  assert(coderSection.includes("visibility: internal"), "coder command is not internal");
+  assert(extractBlock(coderSection, "handoff_commands").includes("- []") || !extractBlock(coderSection, "handoff_commands").includes("/ow:coder"), "coder exposes itself as a handoff");
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:vision2prompt"), "proto exposes vision2prompt as user-facing handoff");
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:prompt2proto"), "proto exposes prompt2proto as user-facing handoff");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
@@ -2869,8 +2899,11 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
   const buildProtoPromptPacket = contextPackets.split("command: /ow:build-proto-prompt", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   const prompt2ProtoPacket = contextPackets.split("command: /ow:prompt2proto", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  const coderPacket = contextPackets.split("command: /ow:coder", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(buildProtoPromptPacket.includes("prototype_system_contract"), "build-proto-prompt context packet missing prototype system contract guidance");
   assert(prompt2ProtoPacket.includes("prototype_system_contract"), "prompt2proto context packet missing prototype system contract readiness gate");
+  assert(coderPacket.includes("skills/coder/SKILL.md"), "coder context packet missing source skill context");
+  assert(coderPacket.includes("references/internal-coder-protocol.md"), "coder context packet missing protocol reference");
   const tunePacket = contextPackets.split("command: /ow:tune", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(!extractBlock(tunePacket, "required").includes("PROTOTYPE_INDEX.yaml"), "tune requires prototype index");
   assert(extractBlock(tunePacket, "optional").includes("PROTOTYPE_INDEX.yaml"), "tune optional context missing prototype index");

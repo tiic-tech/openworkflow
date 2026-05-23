@@ -185,6 +185,15 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     ["changes/<plan_id>/CANDIDATE_CHANGES.yaml", "changes/<plan_id>/PR_READY_SUMMARY.md"],
     gitAutomationProtocol(),
   ),
+  command(
+    "coder",
+    ["code-quality-governor", "engineering-quality"],
+    "Govern source edits with internal Agent-only code quality preflight, RED/GREEN evidence, self-check, validation, and evidence binding.",
+    "execution",
+    [],
+    coderProtocol(),
+    "internal",
+  ),
 ] as const;
 
 export function getWorkflowCommands(): readonly WorkflowCommand[] {
@@ -491,6 +500,127 @@ function gitAutomationProtocol(): CommandProtocol {
         ],
       },
     ],
+  };
+}
+
+function coderProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "internal-agent-code-execution-governance",
+    requiredContext: [
+      "references/internal-coder-protocol.md",
+      "skills/coder/SKILL.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml when queue-driven",
+      "changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml when selected-change-driven",
+      "git status --short --branch",
+    ],
+    optionalContext: [
+      "references/validation-trust-domains.md",
+      "references/skill-system-lifecycle.md",
+      "references/git-version-control-governance.md",
+      "changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md",
+      "changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml",
+    ],
+    forbiddenContext: [
+      ".openworkflow/runtime/** unless the active task is /ow:team execution",
+      "generated .agents/** as source truth",
+    ],
+    allowedOutputs: [
+      "source edits already allowed by the current selected change",
+      "test, fixture, verifier, or reference edits already allowed by the current selected change",
+      "selected-change evidence updates under changes/<plan_id>/<candidate-id>-<slug>/",
+      "source-driven generated surfaces only after sync when the selected change owns them",
+    ],
+    conditionalOutputs: [
+      "LOCAL_COMMIT_EVIDENCE.yaml through openworkflow git-automation commit when implementation files changed",
+      "future optional CODER_EVIDENCE.yaml only after a later selected change defines the artifact contract",
+    ],
+    forbiddenOutputs: [
+      "user-facing command handoff to /ow:coder",
+      "new mandatory CODER_EVIDENCE.yaml",
+      "generated .agents/** hand edits",
+      ".openworkflow/** mutation unless the active user-facing command owns that output",
+      "git push, PR creation, Issue mutation, merge, reset, rebase, force-push, or destructive branch operations",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Recover trust with repo-local resume, handoff, inspect --strict, and git status before source edits.",
+        "Identify selected plan id, candidate id, selected-change artifact, owned paths, forbidden paths, and validation commands when queue-driven.",
+        "Build an owner/file/dependency map that names source truth, derived surfaces, validators, tests or fixtures, public report surfaces, and docs or skills.",
+        "Decide whether RED evidence is required for the change type; for docs-only or contract-only work, record why RED is not applicable.",
+      ],
+      during: [
+        "Change the source owner first and regenerate derived surfaces only through the repo-local sync path when generated surfaces are in scope.",
+        "For behavior, validator, CLI report, generated-surface, path-safety, summary, queue, or git-evidence changes, produce RED evidence before production edits when practical.",
+        "After edits, rerun the RED evidence or nearest equivalent and record GREEN evidence for the touched trust domain.",
+        "Keep /ow:change responsible for selected-change boundaries and /ow:team responsible for managed execution; coder governance constrains source edits but does not replace either command.",
+      ],
+      after: [
+        "Run the post-write self-check from skills/coder/SKILL.md before final validation.",
+        "Run the narrowest honest validation ladder for the touched trust domain.",
+        "Bind validation evidence to SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, IMPLEMENTATION_BRIEF.md, or LOCAL_COMMIT_EVIDENCE.yaml as appropriate.",
+        "Report generated surfaces as source-driven or intentionally untouched; do not present /ow:coder as a normal user-facing next step.",
+      ],
+    },
+    antiPatterns: [
+      "Do not expose /ow:coder as a normal user-facing workflow entrypoint.",
+      "Do not use /ow:coder to bypass /ow:change selected-change boundaries or /ow:team execution governance.",
+      "Do not patch generated .agents surfaces as the durable fix.",
+      "Do not require CODER_EVIDENCE.yaml before a later candidate defines and proves the evidence contract.",
+      "Do not treat npm run build alone as sufficient validation for behavior, validator, generated-surface, summary, or git-evidence changes.",
+      "Do not hide historical validation debt; classify it separately from active-change failures.",
+    ],
+    internalSections: [
+      {
+        tag: "internal_command_boundary",
+        items: [
+          "/ow:coder is internal and Agent-only.",
+          "It is not a normal user-facing coding command and must not appear as the recommended handoff for product work.",
+          "It constrains source-edit quality inside /ow:change, /ow:team, git-automation, and other implementation flows.",
+          "Its source behavior lives in skills/coder/SKILL.md and references/internal-coder-protocol.md.",
+        ],
+      },
+      {
+        tag: "preflight_owner_map",
+        items: [
+          "Identify source truth before edits: command registry, artifact registry, schema, validator, adapter template, source skill, or planning queue.",
+          "Identify derived surfaces such as .agents/**, .openworkflow/audit/**, summaries, fixtures, and readable Markdown views.",
+          "Name forbidden paths and dependency order before writing across multiple concerns.",
+          "If two owners define the same rule, either collapse the duplication or record a temporary compatibility boundary.",
+        ],
+      },
+      {
+        tag: "red_green_evidence",
+        items: [
+          "For behavior, validator, CLI report, generated-surface, path-safety, summary, queue, or git-evidence changes, prefer RED evidence before production edits.",
+          "Valid RED evidence can be a failing parsed JSON/YAML assertion, fixture, generated-surface parity check, summary or resume health assertion, compile failure, or runtime verifier failure.",
+          "After edits, rerun the RED evidence or nearest equivalent and record GREEN evidence.",
+          "For docs-only, contract-only, mechanical rename, or exploratory work, mark RED not applicable and use the nearest structural check.",
+        ],
+      },
+      {
+        tag: "validation_ladder",
+        items: [
+          "Use the narrowest honest validation ladder for the touched trust domain.",
+          "Source skill or generated protocol work requires build, sync, generated diff review, strict inspect, and diff check.",
+          "Command registry or generated runtime surface work requires build, sync, runtime-surface verification, and generated diff review.",
+          "Artifact, schema, or validator work requires build, validate, and targeted valid/invalid fixtures.",
+          "Git evidence work requires git-automation preview/write plus strict read-model commands.",
+        ],
+      },
+      {
+        tag: "evidence_binding",
+        items: [
+          "Bind scope and acceptance to SELECTED_CHANGE.yaml.",
+          "Bind task status and verification results to ATOM_TASKS.yaml.",
+          "Bind handoff instructions to IMPLEMENTATION_BRIEF.md.",
+          "Bind local commit hashes and validation evidence to LOCAL_COMMIT_EVIDENCE.yaml when implementation files changed.",
+          "Do not batch multiple completed selected changes into one checkpoint commit.",
+        ],
+      },
+    ],
+    handoffCommands: [],
   };
 }
 

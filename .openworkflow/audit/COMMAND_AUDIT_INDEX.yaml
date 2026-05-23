@@ -415,4 +415,29 @@ commands:
       - openworkflow git-automation draft-pr --root . --queue
         changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base
         <branch> --json
+  - id: coder
+    trigger: /ow:coder
+    stage: execution
+    visibility: internal
+    depth: deep
+    context_packet: context:coder
+    allowed_outputs:
+      - source edits already allowed by the current selected change
+      - test, fixture, verifier, or reference edits already allowed by the current selected change
+      - selected-change evidence updates under changes/<plan_id>/<candidate-id>-<slug>/
+      - source-driven generated surfaces only after sync when the selected change owns them
+    conditional_outputs:
+      - LOCAL_COMMIT_EVIDENCE.yaml through openworkflow git-automation commit when implementation
+        files changed
+      - future optional CODER_EVIDENCE.yaml only after a later selected change defines the artifact
+        contract
+    forbidden_outputs:
+      - user-facing command handoff to /ow:coder
+      - new mandatory CODER_EVIDENCE.yaml
+      - generated .agents/** hand edits
+      - .openworkflow/** mutation unless the active user-facing command owns that output
+      - git push, PR creation, Issue mutation, merge, reset, rebase, force-push, or destructive
+        branch operations
+    handoff_commands:
+      []
 updated_at: null

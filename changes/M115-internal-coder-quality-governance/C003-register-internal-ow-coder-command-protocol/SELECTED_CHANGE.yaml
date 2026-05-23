@@ -1,0 +1,92 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C003
+change_id: C003-register-internal-ow-coder-command-protocol
+title: Register internal `/ow:coder` command protocol
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 because C001 defined the internal protocol boundary and C002
+  created the repo-owned source skill, so the next dependency-ready step is
+  registering `/ow:coder` as an internal command through source registry and
+  source-driven sync.
+rejected_alternatives:
+  - id: C004
+    reason: Depends on the registered internal command protocol.
+  - id: C005
+    reason: Depends on change/team wiring and is high risk.
+  - id: C006
+    reason: Depends on read-model integration and is high risk.
+  - id: C007
+    reason: Lower unlock value than registering the internal command protocol.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/adapters/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - skills/
+  - .agents/skills/
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - schemas/**
+  - packages/cli/src/commands/**
+  - packages/core/src/workflow/**
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - add an internal command registry entry for `coder`
+    - define aliases such as `code-quality-governor` and `engineering-quality`
+    - set `visibility: internal`
+    - define shallow/deep protocol sections for code-change preflight, RED/GREEN evidence, self-check, validation ladder, and evidence binding
+    - keep target artifacts empty or future-facing
+  excludes:
+    - exposing `/ow:coder` as a user command
+    - forcing CODER_EVIDENCE.yaml
+    - replacing `/ow:change` or `/ow:team`
+    - changing CLI command execution semantics
+acceptance:
+  - "`/ow:coder` exists in the registry with `visibility: internal`."
+  - User-facing guidance does not present `/ow:coder` as a normal start command.
+  - Generated Agent skill output is source-driven and marks the protocol internal.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 registers an internal-only command protocol and generated skill. It
+    does not expose `/ow:coder` as a normal user command, require new evidence
+    schemas, change command execution semantics, or alter public JSON shape.
+expected_commit_boundary: >
+  Complete C003 as one coherent commit after source registry changes,
+  source-driven sync, runtime-surface verification, strict inspect, and local
+  commit evidence.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - packages/core/src/commands/registry.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - .agents/skills/ow-coder/SKILL.md
+    - .agents/skills/ow-coder/agents/openai.yaml
+    - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
+    - git diff --check
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - npm run verify:runtime-surface

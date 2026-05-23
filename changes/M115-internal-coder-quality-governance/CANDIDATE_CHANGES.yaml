@@ -97,7 +97,7 @@ scope_control:
         policies should wait until CODER_EVIDENCE or commit evidence binding is
         proven on real queues.
       suggested_plan_id: M117-coder-evidence-enforcement
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -243,7 +243,7 @@ changes:
       - Generated surfaces are updated only through the repo-local sync path.
       - The migrated guidance is narrower than the system skill and specific to OW source execution.
   - id: C003
-    status: ready
+    status: done
     title: Register internal `/ow:coder` command protocol
     purpose: >
       Add `/ow:coder` to the command registry as an internal runtime-stage
@@ -276,6 +276,42 @@ changes:
       - C005
     risk: medium
     size: medium
+    selection:
+      selected_change_id: C003-register-internal-ow-coder-command-protocol
+      reason: >
+        Select C003 because C001 defined the internal protocol boundary and
+        C002 created the repo-owned source skill, so the next dependency-ready
+        step is registering `/ow:coder` as an internal command through source
+        registry and source-driven sync.
+      selected_at: 2026-05-23
+      selected_by: agent
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/core/src/commands/registry.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - .agents/skills/ow-coder/SKILL.md
+        - .agents/skills/ow-coder/agents/openai.yaml
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Registered `/ow:coder` as an internal Agent-only command protocol in
+        the source registry, generated the source-driven Codex skill surface,
+        and added runtime-surface verification that the command remains
+        internal and points to the repo-owned coder skill and protocol
+        reference.
+      validation:
+        - npm run build
+        - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
+        - git diff --check
+        - node dist/cli/src/index.js sync --root . --tools codex --json
+        - npm run verify:runtime-surface
     validation:
       - npm run build
       - npm run verify:runtime-surface
@@ -287,7 +323,7 @@ changes:
       - User-facing guidance does not present `/ow:coder` as a normal start command.
       - Generated Agent skill output is source-driven and marks the protocol internal.
   - id: C004
-    status: candidate
+    status: ready
     title: Wire coder governance into change and team protocols
     purpose: >
       Make `/ow:change` and `/ow:team` reference coder governance at planning
@@ -522,3 +558,35 @@ operations:
     evidence:
       - skills/coder/SKILL.md
       - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Selected C003 to register the internal `/ow:coder` command protocol after
+      the protocol contract and source skill were completed.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Completed internal `/ow:coder` registry and generated-surface wiring with
+      runtime-surface verification and without exposing coder as a user-facing
+      command.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-coder/SKILL.md
+      - changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/LOCAL_COMMIT_EVIDENCE.yaml

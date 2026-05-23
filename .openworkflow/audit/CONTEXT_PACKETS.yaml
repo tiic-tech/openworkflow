@@ -811,4 +811,55 @@ packets:
         - Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.
         - Report remote operations as gated and include ordered commit or queue evidence for push,
           PR, and merge planning.
+  - packet_id: context:coder
+    command: /ow:coder
+    visibility: internal
+    required:
+      - references/internal-coder-protocol.md
+      - skills/coder/SKILL.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml when queue-driven
+      - changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml when selected-change-driven
+      - git status --short --branch
+    optional:
+      - references/validation-trust-domains.md
+      - references/skill-system-lifecycle.md
+      - references/git-version-control-governance.md
+      - changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml
+      - changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md
+      - changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml
+    forbidden:
+      - .openworkflow/runtime/** unless the active task is /ow:team execution
+      - generated .agents/** as source truth
+    conditional_outputs:
+      - LOCAL_COMMIT_EVIDENCE.yaml through openworkflow git-automation commit when implementation
+        files changed
+      - future optional CODER_EVIDENCE.yaml only after a later selected change defines the artifact
+        contract
+    audit_checkpoints:
+      before:
+        - Recover trust with repo-local resume, handoff, inspect --strict, and git status before
+          source edits.
+        - Identify selected plan id, candidate id, selected-change artifact, owned paths, forbidden
+          paths, and validation commands when queue-driven.
+        - Build an owner/file/dependency map that names source truth, derived surfaces, validators,
+          tests or fixtures, public report surfaces, and docs or skills.
+        - Decide whether RED evidence is required for the change type; for docs-only or
+          contract-only work, record why RED is not applicable.
+      during:
+        - Change the source owner first and regenerate derived surfaces only through the repo-local
+          sync path when generated surfaces are in scope.
+        - For behavior, validator, CLI report, generated-surface, path-safety, summary, queue, or
+          git-evidence changes, produce RED evidence before production edits when practical.
+        - After edits, rerun the RED evidence or nearest equivalent and record GREEN evidence for
+          the touched trust domain.
+        - Keep /ow:change responsible for selected-change boundaries and /ow:team responsible for
+          managed execution; coder governance constrains source edits but does not replace either
+          command.
+      after:
+        - Run the post-write self-check from skills/coder/SKILL.md before final validation.
+        - Run the narrowest honest validation ladder for the touched trust domain.
+        - Bind validation evidence to SELECTED_CHANGE.yaml, ATOM_TASKS.yaml,
+          IMPLEMENTATION_BRIEF.md, or LOCAL_COMMIT_EVIDENCE.yaml as appropriate.
+        - Report generated surfaces as source-driven or intentionally untouched; do not present
+          /ow:coder as a normal user-facing next step.
 updated_at: null

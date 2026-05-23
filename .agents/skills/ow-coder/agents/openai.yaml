@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.coder
+interface:
+  display_name: "ow:coder"
+  short_description: "Govern source edits with internal Agent-only code quality preflight, RED/GREEN evidence, self-check, validation, and evidence binding. Internal audit only."
+  default_prompt: "Use /ow:coder for this OpenWorkflow repository."
