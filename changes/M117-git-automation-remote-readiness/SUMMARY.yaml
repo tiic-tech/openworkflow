@@ -38,10 +38,14 @@ completed_change_id: M117-C002-apply-branch-identity-governance-across-git-autom
 selected_candidate_id: null
 selected_change_id: null
 next_recommended_candidate_id: C003
+high_risk_decision_status: pending_user_decision
+high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+high_risk_recommended_option: Option D
 outputs:
   candidate_changes_yaml: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.md
   summary: changes/M117-git-automation-remote-readiness/SUMMARY.yaml
+  high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
   selected_change: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml
   atom_tasks: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml
   implementation_brief: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md

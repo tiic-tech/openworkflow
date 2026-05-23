@@ -12,6 +12,15 @@ Completed candidate: C002.
 
 Next recommended target: C003 high-risk decision before selection.
 
+High-risk decision report:
+`HIGH_RISK_DECISION_REPORT.md`
+
+Decision status: pending user decision.
+
+Recommended option: Option D, approve C003 then C004 as local/read-only
+hardening only. This does not authorize push, PR mutation, Issue mutation,
+merge, rebase, reset, force-push, or working-tree conflict resolution.
+
 ## Scope
 
 This queue prepares `git-automation` for future full remote management without

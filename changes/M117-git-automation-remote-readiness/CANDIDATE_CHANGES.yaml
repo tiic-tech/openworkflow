@@ -58,6 +58,19 @@ selection_policy:
     candidate in this queue may push, merge, or mutate Issues unless a later approved queue
     explicitly enables that mode.
   recommended_first_candidate_id: C001
+high_risk_decision:
+  status: pending_user_decision
+  report_path: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  recommended_option: Option D
+  recommended_option_summary: >
+    Approve C003 then C004 as local/read-only hardening only. Do not authorize
+    push, PR mutation, Issue mutation, merge, rebase, reset, force-push, or
+    working-tree conflict resolution.
+  applies_to:
+    - C003
+    - C004
+  approval_required_before_selection: true
+  remote_mutation_authorized: false
 scope_control:
   current_boundary: >
     Git-automation remote readiness: make local evidence, branch identity, remote PR planning, draft
@@ -504,3 +517,17 @@ operations:
       - packages/cli/src/commands/gitAutomation.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs
+  - operation_id: OP006
+    operation_type: high_risk_report
+    target_candidate_ids:
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Created a pending high-risk decision report before selecting either
+      remaining high-risk candidate. The report recommends local/read-only
+      hardening only and keeps all remote mutation out of scope unless the user
+      gives exact operation-level approval.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
