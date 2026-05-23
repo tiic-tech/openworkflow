@@ -21,7 +21,7 @@ Select C001 first. C002, C003, and C004 are high-risk remote publication
 boundaries. A high-risk report and exact operation-level user approval are
 required before any push or PR mutation.
 
-Next recommended candidate: C004, gated by separate exact approval for draft PR creation.
+Next recommended candidate: C005, to record the M117 publication audit and next governance handoff.
 
 ## Observed State
 
@@ -33,7 +33,7 @@ Next recommended candidate: C004, gated by separate exact approval for draft PR 
 - M117 branch-local PR-ready summary: present
 - M117 summary repair commit: `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`
 - M117 remote branch: present at `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`
-- M117 existing PRs: none
+- M117 draft PR: #5, `https://github.com/tiic-tech/openworkflow/pull/5`
 - Fresh remote-plan from the M120 branch is read-only but blocked by current
   branch mismatch and missing simulator evidence binding.
 - Fresh simulator from the M120 branch is read-only but blocked by current
@@ -139,12 +139,25 @@ Unlocks: C004, C005
 
 ### C004 - Create approved M117 draft PR
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Outcome: after separate exact approval, create one draft PR from M117 into
 `main` and record local PR evidence.
+
+PR evidence:
+
+- `changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md`
+- `changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_EVIDENCE.md`
+
+Result: user approved draft PR creation. PR #5 was created as a draft:
+`https://github.com/tiic-tech/openworkflow/pull/5`. The PR is open, draft, and
+points from `codex/m117-git-automation-remote-readiness` at
+`898f0152a4e3e026ee5dcc78d4ef585c722a37b7` into `main` at
+`d0e13f4bba3a847b763d2db3f771659aac3a4fe5`. No ready-for-review conversion,
+merge, PR #4 edit, Issue mutation, force-push, branch deletion, rebase, reset,
+or history rewrite was performed.
 
 Owned paths:
 
@@ -174,6 +187,7 @@ Unlocks: M122, M123, M124
 ## Stop Gates
 
 - Do not create a draft PR without separate exact approval.
+- Do not mark PR #5 ready for review without separate exact approval.
 - Do not mark any PR ready for review from M121.
 - Do not merge.
 - Do not mutate Issues.

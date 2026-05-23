@@ -186,7 +186,29 @@ c003_push_result:
   unauthorized_operations_performed:
     - none
   rollback_preference: follow-up revert PR after review; no remote branch deletion or force-push without new exact approval
-next_recommended_candidate_id: C004
+c004_draft_pr_result:
+  path: changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_EVIDENCE.md
+  body_path: changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md
+  approval_source: user_input:2026-05-23-approved-draft-pr
+  approved_command: >
+    gh pr create --repo tiic-tech/openworkflow --head
+    codex/m117-git-automation-remote-readiness --base main --draft --title
+    "M117: Git automation remote readiness governance" --body-file
+    changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md
+  created_at: 2026-05-23T20:17:01+08:00
+  pr_number: 5
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/5
+  pr_state: OPEN
+  is_draft: true
+  title: "M117: Git automation remote readiness governance"
+  head_ref: codex/m117-git-automation-remote-readiness
+  head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  unauthorized_operations_performed:
+    - none
+  rollback_preference: close PR only after separate exact approval; do not force-push or delete remote branch without new approval
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -359,7 +381,7 @@ changes:
       recommendation: >
         C004 may create a draft PR only after separate exact approval for PR creation.
   - id: C004
-    status: candidate
+    status: done
     title: Create approved M117 draft PR
     purpose: >
       After the M117 branch is pushed and the user separately approves PR creation, open one draft PR
@@ -391,6 +413,27 @@ changes:
       - Exactly one draft PR exists for M117 into main.
       - The PR remains draft unless separately approved for ready-for-review.
       - Local audit evidence records the PR URL and approval source.
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 created the approved draft PR and recorded local governance evidence, but did not
+        change product source or generated runtime behavior.
+      evidence:
+        - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md
+        - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_EVIDENCE.md
+      remote_evidence:
+        pr_number: 5
+        pr_url: https://github.com/tiic-tech/openworkflow/pull/5
+        state: OPEN
+        is_draft: true
+        head_ref: codex/m117-git-automation-remote-readiness
+        head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+        base_ref: main
+        base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      recommendation: >
+        C005 should record the M117 publication audit and next governance handoff. Ready-for-review
+        remains out of scope without separate approval.
   - id: C005
     status: candidate
     title: Record M117 publication audit and next governance handoff
@@ -512,3 +555,15 @@ operations:
     after_status: done
     evidence:
       - changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: Create approved M117 draft PR and record remote evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_BODY.md
+      - changes/M121-m117-remote-publication/C004-approved-draft-pr/PR_EVIDENCE.md
