@@ -1,8 +1,8 @@
 import { execFile } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { promisify } from "node:util";
-import { dumpYaml } from "../contracts/yaml.js";
+import { dumpYaml, parseYaml } from "../contracts/yaml.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -44,6 +44,8 @@ export interface CommitSelectedChangeOptions {
   dryRun?: boolean;
   evidencePath?: string;
   commitEvidence?: boolean;
+  queuePath?: string;
+  selectedChangePath?: string;
 }
 
 export interface CommitSelectedChangeResult {
@@ -63,6 +65,7 @@ export interface CommitSelectedChangeResult {
   evidenceCommit: string | null;
   headCommit: string | null;
   evidencePath: string | null;
+  evidenceBackfilledPaths: string[];
   errors: string[];
   warnings: string[];
 }
@@ -177,18 +180,34 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
   const primaryCommit = await readHeadCommit(options.root);
 
   if (options.evidencePath && options.commitEvidence) {
+    const evidencePath = normalizeRepoPath(options.evidencePath);
     const evidence = buildCommitEvidence(options, primaryCommit);
-    const absoluteEvidencePath = `${options.root}/${normalizeRepoPath(options.evidencePath)}`;
+    const absoluteEvidencePath = `${options.root}/${evidencePath}`;
     await mkdir(dirname(absoluteEvidencePath), { recursive: true });
     await writeFile(absoluteEvidencePath, dumpYaml(evidence), "utf8");
-    const evidenceAddResult = await gitCapture(options.root, ["add", "--", normalizeRepoPath(options.evidencePath)]);
+    const backfill = await backfillCommitEvidence(options, evidencePath);
+    const evidenceAddResult = await gitCapture(options.root, ["add", "--", evidencePath, ...backfill.updatedPaths]);
     if (!evidenceAddResult.ok) {
-      return { ...withState, preview, primaryCommit, errors: [evidenceAddResult.stderr || evidenceAddResult.stdout || "git add evidence failed"] };
+      return {
+        ...withState,
+        preview,
+        primaryCommit,
+        evidenceBackfilledPaths: backfill.updatedPaths,
+        warnings: backfill.warnings,
+        errors: [evidenceAddResult.stderr || evidenceAddResult.stdout || "git add evidence failed"],
+      };
     }
     const evidenceMessage = `${options.planId}/${options.candidateId} Record commit evidence`;
     const evidenceCommitResult = await gitCapture(options.root, ["commit", "-m", evidenceMessage]);
     if (!evidenceCommitResult.ok) {
-      return { ...withState, preview, primaryCommit, errors: [evidenceCommitResult.stderr || evidenceCommitResult.stdout || "git commit evidence failed"] };
+      return {
+        ...withState,
+        preview,
+        primaryCommit,
+        evidenceBackfilledPaths: backfill.updatedPaths,
+        warnings: backfill.warnings,
+        errors: [evidenceCommitResult.stderr || evidenceCommitResult.stdout || "git commit evidence failed"],
+      };
     }
     const evidenceCommit = await readHeadCommit(options.root);
     return {
@@ -199,7 +218,9 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
       primaryCommit,
       evidenceCommit,
       headCommit: evidenceCommit,
-      evidencePath: normalizeRepoPath(options.evidencePath),
+      evidencePath,
+      evidenceBackfilledPaths: backfill.updatedPaths,
+      warnings: backfill.warnings,
     };
   }
 
@@ -211,6 +232,77 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
     primaryCommit,
     headCommit: primaryCommit,
   };
+}
+
+async function backfillCommitEvidence(
+  options: CommitSelectedChangeOptions,
+  evidencePath: string,
+): Promise<{ updatedPaths: string[]; warnings: string[] }> {
+  const queuePath = options.queuePath ? normalizeRepoPath(options.queuePath) : null;
+  const selectedChangePath = options.selectedChangePath ? normalizeRepoPath(options.selectedChangePath) : null;
+  const warnings: string[] = [];
+  if (!queuePath) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: queue path was not provided"] };
+  }
+  if (!selectedChangePath) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change path was not provided"] };
+  }
+  if (pathEscapesRepo(queuePath) || pathEscapesRepo(selectedChangePath) || pathEscapesRepo(evidencePath)) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: queue, selected-change, and evidence paths must be repo-relative"] };
+  }
+  const selectedChangeDir = dirname(selectedChangePath);
+  if (!(evidencePath === `${selectedChangeDir}/LOCAL_COMMIT_EVIDENCE.yaml` || evidencePath.startsWith(`${selectedChangeDir}/`))) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: evidence path is outside the selected-change folder"] };
+  }
+
+  let queue: Record<string, unknown>;
+  let selectedChange: Record<string, unknown>;
+  try {
+    queue = readYamlRecord(await readFile(`${options.root}/${queuePath}`, "utf8"));
+    selectedChange = readYamlRecord(await readFile(`${options.root}/${selectedChangePath}`, "utf8"));
+  } catch (error) {
+    return {
+      updatedPaths: [],
+      warnings: [`commit evidence backfill skipped: could not read planning artifacts: ${error instanceof Error ? error.message : String(error)}`],
+    };
+  }
+
+  const candidate = array(queue.changes).map(record).find((item) => item.id === options.candidateId);
+  if (!candidate) {
+    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} was not found in queue`] };
+  }
+  if (candidate.status !== "done") {
+    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} status is not done`] };
+  }
+  const queueCompletion = recordOrNull(candidate.completion);
+  if (!queueCompletion) {
+    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} has no completion object`] };
+  }
+  const selectedCompletion = recordOrNull(selectedChange.completion);
+  if (!selectedCompletion) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change artifact has no completion object"] };
+  }
+  const queueEvidence = arrayOrNull(queueCompletion.evidence);
+  if (!queueEvidence) {
+    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} completion.evidence is not an array`] };
+  }
+  const selectedEvidence = arrayOrNull(selectedCompletion.evidence);
+  if (!selectedEvidence) {
+    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change completion.evidence is not an array"] };
+  }
+
+  const updatedPaths: string[] = [];
+  if (!queueEvidence.includes(evidencePath)) {
+    queueEvidence.push(evidencePath);
+    await writeFile(`${options.root}/${queuePath}`, dumpYaml(queue), "utf8");
+    updatedPaths.push(queuePath);
+  }
+  if (!selectedEvidence.includes(evidencePath)) {
+    selectedEvidence.push(evidencePath);
+    await writeFile(`${options.root}/${selectedChangePath}`, dumpYaml(selectedChange), "utf8");
+    updatedPaths.push(selectedChangePath);
+  }
+  return { updatedPaths, warnings };
 }
 
 async function validateGitRoot(root: string): Promise<{ ok: boolean; errors: string[] }> {
@@ -255,6 +347,7 @@ function emptyCommitResult(options: CommitSelectedChangeOptions, dryRun: boolean
     evidenceCommit: null,
     headCommit: null,
     evidencePath: options.evidencePath ? normalizeRepoPath(options.evidencePath) : null,
+    evidenceBackfilledPaths: [],
     errors: [],
     warnings: [],
   };
@@ -338,8 +431,32 @@ function normalizeRepoPath(path: string): string {
   return path.replace(/\\/g, "/").replace(/^\.?\//, "").replace(/\/+$/g, "");
 }
 
+function pathEscapesRepo(path: string): boolean {
+  return path === ".." || path.startsWith("../") || path.startsWith("/") || path.includes("://");
+}
+
 function isAllowedDirtyPath(path: string, allowedPaths: string[]): boolean {
   return allowedPaths.some((allowedPath) => path === allowedPath || path.startsWith(`${allowedPath}/`));
+}
+
+function readYamlRecord(content: string): Record<string, unknown> {
+  return record(parseYaml(content));
+}
+
+function record(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function recordOrNull(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function array(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function arrayOrNull(value: unknown): unknown[] | null {
+  return Array.isArray(value) ? value : null;
 }
 
 async function gitExitCode(root: string, args: string[]): Promise<number | null> {

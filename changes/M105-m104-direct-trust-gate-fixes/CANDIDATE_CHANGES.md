@@ -30,7 +30,7 @@ Out of scope:
 
 ## Selection Policy
 
-Recommended next candidate: C003.
+Recommended next candidate: C004.
 
 C001 is first because M104 directly proved that `summarize --write` can create
 a `SUMMARY.yaml` file that `validate --json` then rejects. This is a small,
@@ -92,7 +92,7 @@ Completion:
 
 ### C003 - Auto-backfill commit evidence into selected-change completion
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -100,6 +100,24 @@ Purpose: make `git-automation commit --commit-evidence` close the evidence
 loop by writing and linking `LOCAL_COMMIT_EVIDENCE.yaml` when safe.
 
 Depends on: C001.
+
+High-risk decision:
+
+- Approved option: Option A - Narrow Safe Backfill
+- Decision report: `changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md`
+
+Selection artifacts:
+
+- `changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/SELECTED_CHANGE.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/ATOM_TASKS.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- `changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md`
+- `packages/core/src/git/localGitAutomation.ts`
+- `packages/cli/src/commands/gitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
 
 ### C004 - Reconcile selected-change owned paths with command pointer and summary outputs
 

@@ -85,7 +85,7 @@ scope_control:
         Related to image generation evidence and should be designed with
         prompt2proto strategy, not mixed into trust-gate bug fixes.
       suggested_plan_id: M109-provider-fallback-generation-metadata
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -230,7 +230,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C003
-    status: candidate
+    status: done
     title: Auto-backfill commit evidence into selected-change completion
     purpose: >
       Reduce the manual repair loop M104 exposed when LOCAL_COMMIT_EVIDENCE
@@ -268,6 +268,40 @@ changes:
       - git-automation commit with --commit-evidence can create evidence and link it into completion records without manual queue edits.
       - Strict summaries and handoff pass after the evidence commit when no other blockers exist.
       - Runtime coverage includes the M104-style missing evidence repair loop.
+    selection:
+      selected_change_id: M105-C003-auto-backfill-commit-evidence
+      selected_at: 2026-05-23
+      reason: >
+        Selected after explicit user approval of high-risk Option A. The
+        implementation is constrained to narrow safe backfill and must not
+        create completion sections or change candidate status automatically.
+      risk_decision:
+        approved_option: Option A - Narrow Safe Backfill
+        decision_report: changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+      summary: >
+        git-automation commit now performs narrow safe completion evidence
+        backfill after the primary commit and before the evidence commit,
+        adding LOCAL_COMMIT_EVIDENCE.yaml to existing queue and selected-change
+        completion evidence arrays only when the approved preconditions hold.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
   - id: C004
     status: candidate
     title: Reconcile selected-change owned paths with command pointer and summary outputs
@@ -381,3 +415,45 @@ operations:
       - packages/cli/src/commands/check.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: high_risk_decision
+    target_candidate_ids:
+      - C003
+    actor: user
+    reason: >
+      User approved Option A from HIGH_RISK_DECISION_REPORT.md for the
+      high-risk git-automation evidence backfill change.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Selected C003 after high-risk approval, constrained to narrow safe
+      backfill of existing completion evidence arrays.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Implemented and verified narrow safe completion evidence backfill for
+      git-automation commit evidence creation.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts

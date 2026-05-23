@@ -1872,6 +1872,97 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(cliEvidence.includes("source_candidate_id: C004"), "CLI commit evidence missing source candidate id");
     const cliCleanStatus = await runCaptureInCwd(cliRoot, ["git", "status", "--porcelain"]);
     assert(cliCleanStatus.trim().length === 0, "CLI commit evidence fixture should finish clean");
+
+    const backfillRoot = join(tempRoot, "selected-change-evidence-backfill");
+    await mkdir(join(backfillRoot, "allowed"), { recursive: true });
+    await mkdir(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill"), { recursive: true });
+    await runInCwd(backfillRoot, ["git", "init"]);
+    await runInCwd(backfillRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(backfillRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\n", "utf8");
+    await writeFile(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill", "SELECTED_CHANGE.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: selected_change:M105-backfill:C003",
+      "contract_type: planning",
+      "planning_artifact_type: selected_change",
+      "selected_change_id: M105-C003-evidence-backfill",
+      "source_plan_id: M105-backfill",
+      "source_candidate_id: C003",
+      "title: Evidence backfill selected change fixture",
+      "status: done",
+      "completion:",
+      "  completed_at: 2026-05-23",
+      "  implementation_changed_files: true",
+      "  evidence:",
+      "    - packages/core/src/git/localGitAutomation.ts",
+      "",
+    ].join("\n"), "utf8");
+    await writeFile(join(backfillRoot, "changes", "M105-backfill", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M105-backfill",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M105-backfill",
+      "title: Candidate changes for evidence backfill fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m105-backfill",
+      "changes:",
+      "  - id: C003",
+      "    status: done",
+      "    title: Evidence backfill fixture",
+      "    risk: high",
+      "    owned_paths:",
+      "      - allowed/",
+      "      - changes/M105-backfill/",
+      "    selection:",
+      "      selected_change_id: M105-C003-evidence-backfill",
+      "      artifacts:",
+      "        selected_change: changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
+      "    completion:",
+      "      completed_at: 2026-05-23",
+      "      implementation_changed_files: true",
+      "      evidence:",
+      "        - packages/core/src/git/localGitAutomation.ts",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(backfillRoot, ["git", "add", "."]);
+    await runInCwd(backfillRoot, ["git", "commit", "-m", "M105-backfill initial"]);
+    await runInCwd(backfillRoot, ["git", "switch", "-c", "codex/m105-backfill"]);
+    await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\nafter\n", "utf8");
+    const backfillCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      backfillRoot,
+      "--queue",
+      "changes/M105-backfill/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C003",
+      "--message",
+      "M105-backfill/C003 evidence backfill fixture",
+      "--validation-evidence",
+      "validation: fixture",
+      "--commit-evidence",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(backfillCommit.code === 0, `git-automation commit should backfill completion evidence: ${backfillCommit.output}`);
+    const backfillReport = parseJsonReport(backfillCommit.output, "git-automation commit");
+    const backfillData = record(backfillReport.data, "git-automation backfill data");
+    const backfillResult = record(backfillData.result, "git-automation backfill result");
+    const backfilledPaths = backfillResult.evidenceBackfilledPaths;
+    assert(Array.isArray(backfilledPaths) && backfilledPaths.includes("changes/M105-backfill/CANDIDATE_CHANGES.yaml"), "backfill result missing queue path");
+    assert(Array.isArray(backfilledPaths) && backfilledPaths.includes("changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml"), "backfill result missing selected-change path");
+    const backfillEvidencePath = "changes/M105-backfill/C003-evidence-backfill/LOCAL_COMMIT_EVIDENCE.yaml";
+    const backfilledQueue = await read(join(backfillRoot, "changes", "M105-backfill", "CANDIDATE_CHANGES.yaml"));
+    const backfilledSelectedChange = await read(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill", "SELECTED_CHANGE.yaml"));
+    assert(backfilledQueue.includes(backfillEvidencePath), "queue completion evidence was not backfilled");
+    assert(backfilledSelectedChange.includes(backfillEvidencePath), "selected-change completion evidence was not backfilled");
+    const backfillCleanStatus = await runCaptureInCwd(backfillRoot, ["git", "status", "--porcelain"]);
+    assert(backfillCleanStatus.trim().length === 0, "backfill fixture should finish clean");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
