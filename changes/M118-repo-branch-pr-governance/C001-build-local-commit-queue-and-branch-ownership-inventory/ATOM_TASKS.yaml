@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M118-repo-branch-pr-governance:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C001
+selected_change_id: M118-C001-build-local-commit-queue-and-branch-ownership-inventory
+status: in_progress
+tasks:
+  - id: T001
+    title: Capture git and queue source facts
+    status: done
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    commands:
+      - git status --short --branch
+      - git log --oneline main..HEAD
+      - git branch --all --format='%(refname:short) %(objectname:short) %(upstream:short)'
+      - find changes -maxdepth 2 -name CANDIDATE_CHANGES.yaml -o -name PR_READY_SUMMARY.md
+    acceptance:
+      - Local dirty paths, branch refs, queue files, PR summary files, and main..HEAD commits are
+        reflected in the inventory.
+  - id: T002
+    title: Classify queue and branch readiness
+    status: done
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    acceptance:
+      - Completed queues, active queues, malformed queues, branch-governed queues, local PR-ready
+        queues, and branch-stacked queues are separately recorded.
+  - id: T003
+    title: Record PR planning implications
+    status: done
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    acceptance:
+      - The inventory states which queues are candidates for local PR-ready planning and which need
+        branch strategy or evidence repair first.
+  - id: T004
+    title: Validate C001 artifacts
+    status: done
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    commands:
+      - ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts "ok #{f}" }' changes/M118-repo-branch-pr-governance/CANDIDATE_CHANGES.yaml changes/M118-repo-branch-pr-governance/SUMMARY.yaml changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/SELECTED_CHANGE.yaml changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/ATOM_TASKS.yaml
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - YAML parses, OW validate remains green, and whitespace checks pass.
+    evidence:
+      - ruby -ryaml parsed CANDIDATE_CHANGES.yaml, SUMMARY.yaml, SELECTED_CHANGE.yaml, and
+        ATOM_TASKS.yaml
+      - node dist/cli/src/index.js validate --root . --json passed
+      - git diff --check passed
+validation_policy:
+  red_green_required: false
+  reason: >
+    C001 is a planning inventory artifact and does not change product or CLI behavior.

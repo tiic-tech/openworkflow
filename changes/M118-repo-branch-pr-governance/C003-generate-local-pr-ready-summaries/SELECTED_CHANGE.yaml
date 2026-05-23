@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: selected_change:M118-repo-branch-pr-governance:C003
+contract_type: planning
+planning_artifact_type: selected_change
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C003
+selected_change_id: M118-C003-generate-local-pr-ready-summaries
+title: Generate local PR-ready summaries for reviewable feat queues
+status: done
+selected_at: 2026-05-23
+reason: >
+  C003 follows the branch ownership strategy by generating local PR-ready summaries only where
+  evidence supports them and recording not-ready queues without pretending they are publishable.
+scope:
+  includes:
+    - generate PR_READY_SUMMARY.md for completed queues with trustworthy local evidence
+    - record warnings for queues with missing commit evidence, missing validation, malformed YAML, or
+      branch-boundary mismatch
+    - keep summaries local-only and clearly separate them from remote PR creation
+  excludes:
+    - opening, editing, or merging remote PRs
+    - manufacturing missing validation evidence for old queues
+    - broad historical artifact cleanup
+owned_paths:
+  - changes/*/PR_READY_SUMMARY.md
+  - changes/M118-repo-branch-pr-governance/
+dependencies:
+  - C001
+  - C002
+unlocks:
+  - C004
+risk: medium
+validation:
+  - node dist/cli/src/index.js git-automation summary --root . --queue <queue> --json
+  - git diff --check
+acceptance:
+  - M117, M115, M106, and M102 have local PR_READY_SUMMARY.md files.
+  - M100-style queues with no validation evidence are not represented as ready without warnings.
+  - Summary generation remains local-only and does not imply remote PR approval.
+outputs:
+  atom_tasks: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/ATOM_TASKS.yaml
+  implementation_brief: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/IMPLEMENTATION_BRIEF.md
+  readiness_matrix: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: false
+  commit_not_required_reason: Local-only planning summaries; no product implementation or remote mutation.

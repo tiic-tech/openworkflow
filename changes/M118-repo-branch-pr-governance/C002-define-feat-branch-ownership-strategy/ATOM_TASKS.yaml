@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M118-repo-branch-pr-governance:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C002
+selected_change_id: M118-C002-define-feat-branch-ownership-strategy
+status: in_progress
+tasks:
+  - id: T001
+    title: Compute existing branch topology
+    status: done
+    commands:
+      - git show-ref --heads
+      - git for-each-ref refs/heads refs/remotes/origin
+    acceptance:
+      - Existing branch heads, current HEAD ancestry, and remote branch presence are reflected in
+        the strategy.
+  - id: T002
+    title: Define non-destructive PR train
+    status: done
+    acceptance:
+      - The strategy names base and head branches for a possible stacked local PR train without
+        moving branch pointers.
+  - id: T003
+    title: Classify repair-required branches
+    status: done
+    acceptance:
+      - Queues that need branch repair, evidence repair, status repair, or YAML repair are separated
+        from clean PR candidates.
+  - id: T004
+    title: Validate C002 artifacts
+    status: done
+    commands:
+      - ruby YAML parse for M118 C002 artifacts
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - YAML parses, OW validate remains green, and whitespace checks pass.
+    evidence:
+      - ruby YAML parse for M118 C002 artifacts passed
+      - node dist/cli/src/index.js validate --root . --json passed
+      - git diff --check passed
+validation_policy:
+  red_green_required: false
+  reason: >
+    C002 is a planning strategy artifact and does not change product or CLI behavior.

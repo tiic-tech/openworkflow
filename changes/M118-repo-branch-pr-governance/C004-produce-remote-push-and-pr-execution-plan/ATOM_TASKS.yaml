@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M118-repo-branch-pr-governance:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C004
+selected_change_id: M118-C004-produce-remote-push-and-pr-execution-plan
+status: done
+tasks:
+  - id: T001
+    title: Run read-only remote-plan probes
+    status: done
+    commands:
+      - remote-plan M102
+      - remote-plan M117
+  - id: T002
+    title: Record approval-gated operation plan
+    status: done
+    outputs:
+      - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+  - id: T003
+    title: Validate C004 artifacts
+    status: done
+    commands:
+      - ruby YAML parse for M118 C004 artifacts
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    evidence:
+      - ruby YAML parse for M118 C004 artifacts passed
+      - node dist/cli/src/index.js validate --root . --json passed
+      - git diff --check passed
+validation_policy:
+  red_green_required: false
+  reason: C004 is local remote planning only.

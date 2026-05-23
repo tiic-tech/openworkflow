@@ -1,0 +1,462 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M118-repo-branch-pr-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M118-repo-branch-pr-governance
+title: Candidate changes for repo branch and PR governance recovery
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-temporary-cc-for-commit-branch-pr-governance
+    - AGENTS.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+    - git status --short --branch
+    - git log --oneline main..HEAD
+    - git branch --all --verbose --no-abbrev
+    - node dist/cli/src/index.js resume --root . --json
+  summary: >
+    After completing M117, the repository has a large local commit stack and many local feat-style
+    branches, but only a small part of the work has remote branch or PR governance. This temporary
+    queue records the cleanup work needed to map commits back to owning candidate queues, decide how
+    existing feat branches should own or stack completed queues, generate local PR-ready review
+    summaries, and prepare an ordered remote push and draft-PR plan without performing any remote
+    mutation.
+queue_policy:
+  branch_boundary: codex/m118-repo-branch-pr-governance
+  branch_note: >
+    Queue opened while the working tree was on codex/m117-git-automation-remote-readiness after
+    M117 completion, then a local codex/m118-repo-branch-pr-governance branch was created from the
+    M117 HEAD. The branch has not been pushed and no remote PR was opened.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. The repository needs an auditable inventory of local commits, queue status,
+    branch boundaries, PR-ready summaries, remote branch presence, and current blockers before any
+    branch creation, branch repair, push, or PR operation can be trusted.
+  high_risk_rule: >
+    C004 is read-only planning. Any later command that pushes a branch, creates or edits a remote PR,
+    mutates Issues, rebases, resets, force-pushes, deletes branches, or merges must stop for explicit
+    operation-level user approval and a high-risk decision report.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Repo branch and PR governance recovery after M117: local commit ownership audit, feat-branch
+    ownership plan, local PR-ready summaries, and remote push/PR execution plan.
+  boundary_type: git_governance_recovery
+  in_scope_rule: >
+    Include only local planning, local evidence generation, read-only remote inspection, and
+    operation plans needed to make existing commits and candidate queues reviewable by feat branch.
+  out_of_scope_rule: >
+    Do not push, create or edit GitHub PRs, mutate Issues, merge, rebase, reset, force-push, delete
+    branches, or rewrite historical commits in this queue without a separate explicit approval gate.
+  deferred_features:
+    - title: Approved remote push and draft PR execution
+      reason: >
+        Remote mutation needs operation-level approval after local branch and PR-ready evidence is
+        reviewed.
+      suggested_plan_id: M119-approved-remote-pr-publication
+    - title: Historical branch rewrite or cherry-pick repair
+      reason: >
+        Reassigning old commits across branches can change collaboration semantics and needs a
+        separate high-risk branch surgery decision.
+      suggested_plan_id: M120-historical-branch-repair
+observed_state:
+  captured_at: 2026-05-23
+  initial_branch: codex/m117-git-automation-remote-readiness
+  current_branch_after_setup: codex/m118-repo-branch-pr-governance
+  remote: origin
+  remote_url: https://github.com/tiic-tech/openworkflow.git
+  gh_auth_status: authenticated_as_tiic-tech
+  recently_completed_queue: M117-git-automation-remote-readiness
+  local_pr_ready_summaries_written:
+    - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+    - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+    - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  remote_plan_probe:
+    command: node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    status: blocked_read_only
+    blockers:
+      - working tree is not clean
+      - remote base head is unknown for origin/main
+      - simulator evidence is missing
+    warnings:
+      - remote branch head is absent or unreadable for origin/codex/m117-git-automation-remote-readiness
+      - no push, PR creation, PR edit, merge, or Issue mutation was performed
+next_recommended_candidate_id: C004
+changes:
+  - id: C001
+    status: done
+    title: Build local commit, queue, and branch ownership inventory
+    purpose: >
+      Produce one auditable map from local commits to candidate queues, branch boundaries, local
+      branch heads, existing remote refs, and PR-ready summary status so branch and PR cleanup starts
+      from facts instead of memory.
+    scope:
+      includes:
+        - list completed, active, and malformed candidate queues
+        - map queue branch boundaries to current local branches and remote branches
+        - identify commits on main..HEAD that do not have clear queue or candidate ownership
+        - record which queues have PR_READY_SUMMARY.md and which are blocked by missing validation or
+          missing commit evidence
+        - record read-only remote and gh availability
+      excludes:
+        - branch switching or creation
+        - commits
+        - push or PR creation
+        - rewriting old queue artifacts beyond the inventory output
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git log --oneline main..HEAD
+      - git branch --all --verbose --no-abbrev
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - The inventory separates queue ownership, branch ownership, remote presence, and PR summary
+        readiness.
+      - M117 is recorded as completed with local PR-ready summary evidence.
+      - Ambiguous stacked-branch work is called out instead of silently assigned to the wrong feat
+        branch.
+      - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: M118-C001-build-local-commit-queue-and-branch-ownership-inventory
+      selected_at: 2026-05-23
+      reason: >
+        Selected first because all later M118 branch strategy, PR-ready summary generation, and
+        remote publication planning depend on a factual inventory of local commits, candidate queues,
+        branch boundaries, remote refs, and evidence gaps.
+      artifacts:
+        selected_change: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/ATOM_TASKS.yaml
+        implementation_brief: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/IMPLEMENTATION_BRIEF.md
+        inventory: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced planning inventory artifacts only under changes/M118-repo-branch-pr-governance
+        and did not change product source, generated surfaces, runtime behavior, or remote state.
+      evidence:
+        - changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+      validation:
+        - ruby YAML parse for M118 C001 artifacts
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
+  - id: C002
+    status: done
+    title: Define feat branch ownership strategy for the existing local stack
+    purpose: >
+      Decide whether completed queues should remain as stacked local branch work, become separate
+      branch heads at existing commits, or wait for later branch repair, while preserving the current
+      non-destructive policy.
+    scope:
+      includes:
+        - classify queues as own-branch, stacked-on-continuation-branch, or historical-migration
+        - propose local branch names for completed queue review boundaries
+        - define which branch heads can be created without moving commits
+        - define which branch repairs require explicit approval before cherry-pick, rebase, or reset
+      excludes:
+        - creating or switching branches
+        - moving branch pointers
+        - cherry-picking, rebasing, or resetting
+        - pushing any branch
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+      - references/git-version-control-governance.md
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - git status --short --branch
+      - git show-ref --heads
+      - git diff --check
+    acceptance:
+      - Each reviewed queue has a proposed local branch ownership disposition.
+      - Stacked M101/M106/M114/M115-style work is explicitly marked instead of treated as separate
+        already-clean PR branches.
+      - Any operation that rewrites history or changes collaboration semantics is deferred behind an
+        approval gate.
+    selection:
+      selected_change_id: M118-C002-define-feat-branch-ownership-strategy
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C001 inventory because full repo PR planning needs a branch ownership strategy
+        that respects the actual stacked local topology and avoids pretending every queue already has
+        an independent clean PR branch.
+      artifacts:
+        selected_change: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/ATOM_TASKS.yaml
+        implementation_brief: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/IMPLEMENTATION_BRIEF.md
+        strategy: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced planning strategy artifacts only under changes/M118-repo-branch-pr-governance
+        and did not change product source, generated surfaces, branch pointers, history, or remote
+        state.
+      evidence:
+        - changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+      validation:
+        - ruby YAML parse for M118 C002 artifacts
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
+  - id: C003
+    status: done
+    title: Generate local PR-ready summaries for reviewable feat queues
+    purpose: >
+      Use the M117 git-automation summary path to create local PR handoff artifacts for completed
+      queues that have enough commit and validation evidence, while marking older incomplete queues
+      as not ready.
+    scope:
+      includes:
+        - generate PR_READY_SUMMARY.md for completed queues with trustworthy local evidence
+        - record warnings for queues with missing commit evidence, missing validation, malformed YAML,
+          or branch-boundary mismatch
+        - keep summaries local-only and clearly separate them from remote PR creation
+      excludes:
+        - opening, editing, or merging remote PRs
+        - manufacturing missing validation evidence for old queues
+        - broad historical artifact cleanup
+    owned_paths:
+      - changes/*/PR_READY_SUMMARY.md
+      - changes/M118-repo-branch-pr-governance/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - node dist/cli/src/index.js git-automation summary --root . --queue <queue> --json
+      - git diff --check
+    acceptance:
+      - M117, M115, M106, and M102 have local PR_READY_SUMMARY.md files.
+      - M100-style queues with no validation evidence are not represented as ready without warnings.
+      - Summary generation remains local-only and does not imply remote PR approval.
+    selection:
+      selected_change_id: M118-C003-generate-local-pr-ready-summaries
+      selected_at: 2026-05-23
+      reason: >
+        Selected after branch strategy to generate only honest local PR-ready summaries and record
+        queues whose evidence or topology should block PR readiness.
+      artifacts:
+        selected_change: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/ATOM_TASKS.yaml
+        implementation_brief: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/IMPLEMENTATION_BRIEF.md
+        readiness_matrix: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 generated local planning and PR-ready summary artifacts only; it did not change product
+        source, generated surfaces, branch pointers, history, or remote state.
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+        - changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+      validation:
+        - node dist/cli/src/index.js git-automation summary dry-runs for M105, M98, M99, M101, M71
+        - node dist/cli/src/index.js git-automation summary --root . --queue
+          changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml --write --json
+  - id: C004
+    status: done
+    title: Produce remote push and local-to-remote PR execution plan
+    purpose: >
+      Convert the inventory, branch strategy, and local PR summaries into an ordered remote operation
+      plan that a user can approve queue by queue.
+    scope:
+      includes:
+        - choose push order from lowest-risk completed feat branches to current M117
+        - run read-only remote-plan probes where the working tree and evidence allow it
+        - list exact commands that would be run after approval
+        - define rollback and stop conditions for branch push, draft PR create, draft PR update, and
+          conflict handling
+      excludes:
+        - git push
+        - gh pr create or edit
+        - gh issue mutation
+        - merge, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M118-repo-branch-pr-governance/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M119-approved-remote-pr-publication
+    risk: high
+    size: medium
+    validation:
+      - node dist/cli/src/index.js git-automation remote-plan --root . --queue <queue> --base
+        origin/main --remote origin --target-base main --json
+      - gh auth status
+      - git remote -v
+      - git diff --check
+    acceptance:
+      - The plan names branch, target base, local PR summary, ordered commits, remote-readiness
+        blockers, and exact approval boundary for each proposed remote operation.
+      - Remote mutation remains blocked until explicit operation-level approval is captured.
+      - Current M117 remote-plan blockers are recorded and not hidden.
+    selection:
+      selected_change_id: M118-C004-produce-remote-push-and-pr-execution-plan
+      selected_at: 2026-05-23
+      reason: >
+        Selected after local summaries were classified so M118 can hand off a concrete remote
+        publication plan while preserving operation-level approval gates.
+      artifacts:
+        selected_change: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/ATOM_TASKS.yaml
+        implementation_brief: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/IMPLEMENTATION_BRIEF.md
+        remote_publication_plan: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 produced a local remote-publication plan only and did not push, create PRs, edit PRs,
+        merge, mutate Issues, move branch pointers, or rewrite history.
+      evidence:
+        - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+      validation:
+        - read-only remote-plan for M102 returned expected blockers
+        - read-only remote-plan for M117 returned expected blockers
+        - gh auth status
+        - git remote -v
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      User requested a temporary CC after M117 to organize local commits, feat branch ownership,
+      local PR readiness, and remote push planning.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - node dist/cli/src/index.js resume --root . --json
+      - git status --short --branch
+      - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Created the local M118 branch after the queue artifacts were opened so future selection and
+      commit work can happen on the queue branch boundary.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: active
+    evidence:
+      - git switch -c codex/m118-repo-branch-pr-governance
+  - operation_id: OP003
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      User approved advancing M118; C001 was selected and moved to in_progress for the full repo git
+      history inventory.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: in_progress
+    evidence:
+      - changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/SELECTED_CHANGE.yaml
+      - changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+    actor: agent
+    reason: >
+      C001 planning inventory was completed without product implementation changes, and C002 was
+      selected to define the non-destructive branch ownership strategy for full-history PR planning.
+    changed_at: 2026-05-23
+    before_status: C001 in_progress, C002 candidate
+    after_status: C001 done, C002 in_progress
+    evidence:
+      - changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+      - changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+      - C003
+    actor: agent
+    reason: >
+      C002 branch ownership strategy was completed as planning-only evidence. C003 is now the next
+      recommended candidate for local PR-ready summary generation and readiness marking.
+    changed_at: 2026-05-23
+    before_status: C002 in_progress, C003 candidate
+    after_status: C002 done, C003 candidate
+    evidence:
+      - changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+  - operation_id: OP006
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      C003 generated the M105 local PR-ready summary and recorded a readiness matrix for other
+      candidate queues. C004 is now the next recommended remote planning candidate.
+    changed_at: 2026-05-23
+    before_status: C003 candidate, C004 candidate
+    after_status: C003 done, C004 candidate
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+      - changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 produced the local remote publication plan and recorded read-only remote-plan blockers for
+      M102 and M117. No remote operation was performed.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md

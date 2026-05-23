@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:M118-repo-branch-pr-governance:C002
+contract_type: planning
+planning_artifact_type: selected_change
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C002
+selected_change_id: M118-C002-define-feat-branch-ownership-strategy
+title: Define feat branch ownership strategy for the existing local stack
+status: in_progress
+selected_at: 2026-05-23
+reason: >
+  The C001 inventory showed that most local work is already reachable from the current M118 HEAD but
+  is not divided into independently clean feat branches. C002 defines a non-destructive ownership
+  strategy before any branch repair, push, or PR mutation is attempted.
+scope:
+  includes:
+    - classify queues as own-branch, stacked-on-continuation-branch, or historical-migration
+    - propose local branch names and PR train bases for completed queue review boundaries
+    - define which existing branch heads can be used without moving commits
+    - define which branch repairs require explicit approval before cherry-pick, rebase, or reset
+  excludes:
+    - creating or switching branches
+    - moving branch pointers
+    - cherry-picking, rebasing, or resetting
+    - pushing any branch
+    - opening or editing GitHub PRs
+owned_paths:
+  - changes/M118-repo-branch-pr-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+dependencies:
+  - C001
+unlocks:
+  - C003
+  - C004
+risk: medium
+validation:
+  - git status --short --branch
+  - git show-ref --heads
+  - git diff --check
+acceptance:
+  - Each reviewed queue has a proposed local branch ownership disposition.
+  - Stacked M101/M106/M114/M115-style work is explicitly marked instead of treated as separate
+    already-clean PR branches.
+  - Any operation that rewrites history or changes collaboration semantics is deferred behind an
+    approval gate.
+outputs:
+  atom_tasks: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/ATOM_TASKS.yaml
+  implementation_brief: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/IMPLEMENTATION_BRIEF.md
+  strategy: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+git_governance:
+  current_branch: codex/m118-repo-branch-pr-governance
+  branch_boundary: codex/m118-repo-branch-pr-governance
+  remote_mutation_allowed: false
+  destructive_git_allowed: false

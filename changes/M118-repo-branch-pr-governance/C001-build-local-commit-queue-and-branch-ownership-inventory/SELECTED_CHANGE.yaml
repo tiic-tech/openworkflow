@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M118-repo-branch-pr-governance:C001
+contract_type: planning
+planning_artifact_type: selected_change
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C001
+selected_change_id: M118-C001-build-local-commit-queue-and-branch-ownership-inventory
+title: Build local commit, queue, and branch ownership inventory
+status: in_progress
+selected_at: 2026-05-23
+reason: >
+  M118 cannot safely plan PRs for the full local history until it separates queue ownership, branch
+  ownership, remote presence, local PR-ready summary status, and evidence gaps. C001 creates that
+  inventory without branch switching, commits, push, PR creation, merge, rebase, reset, or force-push.
+scope:
+  includes:
+    - list completed, active, and malformed candidate queues
+    - map queue branch boundaries to current local branches and remote branches
+    - identify commit groups on main..HEAD by milestone token and legacy descriptive messages
+    - record which queues have PR_READY_SUMMARY.md and which are blocked by missing validation or
+      missing commit evidence
+    - record read-only remote and gh availability
+  excludes:
+    - branch switching or creation
+    - commits
+    - push or PR creation
+    - rewriting old queue artifacts beyond the inventory output
+    - rebase, reset, force-push, merge, or branch deletion
+owned_paths:
+  - changes/M118-repo-branch-pr-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - references/**
+dependencies: []
+unlocks:
+  - C002
+  - C003
+  - C004
+risk: medium
+validation:
+  - git status --short --branch
+  - git log --oneline main..HEAD
+  - git branch --all --verbose --no-abbrev
+  - node dist/cli/src/index.js resume --root . --json
+  - git diff --check
+acceptance:
+  - The inventory separates queue ownership, branch ownership, remote presence, and PR summary
+    readiness.
+  - M117 is recorded as completed with local PR-ready summary evidence.
+  - Ambiguous stacked-branch work is called out instead of silently assigned to the wrong feat branch.
+  - No remote or destructive git mutation occurs.
+outputs:
+  atom_tasks: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/ATOM_TASKS.yaml
+  implementation_brief: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/IMPLEMENTATION_BRIEF.md
+  inventory: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+git_governance:
+  current_branch: codex/m118-repo-branch-pr-governance
+  branch_boundary: codex/m118-repo-branch-pr-governance
+  remote_mutation_allowed: false
+  destructive_git_allowed: false
+completion_policy:
+  selected_change_commit_gate: strict
+  note: >
+    Do not mark C001 done until local commit evidence exists or the queue explicitly records why no
+    implementation commit is required. Current state is in_progress.

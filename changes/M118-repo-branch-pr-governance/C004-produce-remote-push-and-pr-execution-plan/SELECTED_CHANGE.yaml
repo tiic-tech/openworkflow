@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:M118-repo-branch-pr-governance:C004
+contract_type: planning
+planning_artifact_type: selected_change
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C004
+selected_change_id: M118-C004-produce-remote-push-and-pr-execution-plan
+title: Produce remote push and local-to-remote PR execution plan
+status: done
+selected_at: 2026-05-23
+reason: >
+  M118 needs a concrete remote publication handoff that names exact commands, blockers, ordering,
+  rollback notes, and approval boundaries without performing remote mutation.
+scope:
+  includes:
+    - choose push order from lowest-risk completed feat branches to current M117
+    - run read-only remote-plan probes where the working tree and evidence allow it
+    - list exact commands that would be run after approval
+    - define rollback and stop conditions for branch push, draft PR create, draft PR update, and
+      conflict handling
+  excludes:
+    - git push
+    - gh pr create or edit
+    - gh issue mutation
+    - merge, rebase, reset, force-push, or branch deletion
+owned_paths:
+  - changes/M118-repo-branch-pr-governance/
+dependencies:
+  - C001
+  - C002
+  - C003
+unlocks:
+  - M119-approved-remote-pr-publication
+risk: high
+validation:
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue <queue> --base
+    origin/main --remote origin --target-base main --json
+  - gh auth status
+  - git remote -v
+  - git diff --check
+acceptance:
+  - The plan names branch, target base, local PR summary, ordered commits, remote-readiness blockers,
+    and exact approval boundary for each proposed remote operation.
+  - Remote mutation remains blocked until explicit operation-level approval is captured.
+  - Current M117 remote-plan blockers are recorded and not hidden.
+outputs:
+  atom_tasks: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/ATOM_TASKS.yaml
+  implementation_brief: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/IMPLEMENTATION_BRIEF.md
+  remote_publication_plan: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: false
+  commit_not_required_reason: Local-only remote planning; no product implementation or remote mutation.

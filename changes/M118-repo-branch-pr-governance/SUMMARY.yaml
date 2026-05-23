@@ -1,0 +1,155 @@
+schema_version: 0.1.0
+contract_id: summary:M118-repo-branch-pr-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M118-repo-branch-pr-governance
+title: Summary for repo branch and PR governance recovery
+status: active
+source:
+  kind: mixed
+  summary: >
+    Temporary governance queue opened after M117 to organize the large local commit stack into
+    auditable feat branch and local PR boundaries before any remote push or GitHub PR mutation.
+  refs:
+    - user_input:2026-05-23-temporary-cc-for-commit-branch-pr-governance
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+scope_boundary: >
+  Local commit ownership inventory, branch ownership strategy, local PR-ready summaries, and remote
+  push/PR execution planning only. No remote or destructive git mutation is approved.
+branch_boundary: codex/m118-repo-branch-pr-governance
+branch_note: >
+  Created from codex/m117-git-automation-remote-readiness, then local branch
+  codex/m118-repo-branch-pr-governance was created from M117 HEAD. The branch has not been pushed.
+candidate_count: 4
+completed_candidate_id: C004
+completed_change_id: M118-C004-produce-remote-push-and-pr-execution-plan
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M118-repo-branch-pr-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M118-repo-branch-pr-governance/CANDIDATE_CHANGES.md
+  summary: changes/M118-repo-branch-pr-governance/SUMMARY.yaml
+  selected_change: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/SELECTED_CHANGE.yaml
+  atom_tasks: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/ATOM_TASKS.yaml
+  implementation_brief: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/IMPLEMENTATION_BRIEF.md
+  inventory: changes/M118-repo-branch-pr-governance/C001-build-local-commit-queue-and-branch-ownership-inventory/REPO_GIT_HISTORY_INVENTORY.md
+  current_selected_change: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/SELECTED_CHANGE.yaml
+  current_atom_tasks: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/ATOM_TASKS.yaml
+  current_implementation_brief: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/IMPLEMENTATION_BRIEF.md
+  branch_strategy: changes/M118-repo-branch-pr-governance/C002-define-feat-branch-ownership-strategy/BRANCH_OWNERSHIP_STRATEGY.md
+  pr_ready_matrix: changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+  remote_publication_plan: changes/M118-repo-branch-pr-governance/C004-produce-remote-push-and-pr-execution-plan/REMOTE_PUBLICATION_PLAN.md
+  local_git_checkpoint: changes/M118-repo-branch-pr-governance/LOCAL_GIT_CHECKPOINT.md
+local_pr_ready_summaries:
+  written:
+    - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+    - changes/M102-selected-change-commit-gate/PR_READY_SUMMARY.md
+    - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+    - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  existing_before_this_queue:
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+  intentionally_not_written:
+    - plan_id: M100-dailin-grade-image-prompt-paragraphs
+      reason: Dry-run summary warned that no validation evidence was found.
+remote_readiness:
+  remote: origin
+  remote_url: https://github.com/tiic-tech/openworkflow.git
+  gh_auth_status: authenticated_as_tiic-tech
+  m117_remote_plan_probe:
+    status: blocked_read_only
+    blockers:
+      - working tree is not clean
+      - remote base head is unknown for origin/main
+      - simulator evidence is missing
+    notes:
+      - Remote branch origin/codex/m117-git-automation-remote-readiness is absent or unreadable.
+      - The probe performed no push, PR create, PR edit, merge, or Issue mutation.
+key_dependencies:
+  - C001 must produce the inventory before branch or remote planning can be trusted.
+  - C002 must separate true feat branch ownership from stacked continuation branches.
+  - C003 local PR summaries should exist before C004 remote operation planning.
+  - C004 is a planning gate for a later approved remote publication queue.
+risks:
+  - id: R001
+    level: high
+    description: The local branch stack contains many queues on continuation branches, so treating
+      every queue as an independently pushable PR branch would misrepresent history.
+    mitigation: C001 and C002 must classify stacked branches before any remote operation.
+  - id: R002
+    level: high
+    description: Remote push and PR creation are authenticated operations against
+      tiic-tech/openworkflow.
+    mitigation: C004 is read-only planning; actual mutation is deferred to M119 with explicit
+      operation-level approval.
+  - id: R003
+    level: medium
+    description: Older queues may lack strict LOCAL_COMMIT_EVIDENCE.yaml or validation evidence.
+    mitigation: C003 marks those queues not ready instead of manufacturing PR readiness.
+unresolved_questions:
+  - Should completed queues that share codex/m101-build-proto-prompt-command-split remain stacked
+    under one remote PR, or should later approved branch repair split them?
+  - Should M117 be the first remote push pilot after its dirty local PR summary files are committed,
+    or should a lower-risk historical queue be published first?
+  - Should remote-plan use a fresh fetch and simulator evidence as mandatory preflight for every
+    queue before push approval?
+deferred_features:
+  - M119-approved-remote-pr-publication
+  - M120-historical-branch-repair
+validation:
+  commands_run:
+    - openworkflow --help
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js inspect --root . --json
+    - npm run build
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --write --json
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --write --json
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.yaml --write --json
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml --write --json
+    - gh auth status
+    - git remote -v
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - git switch -c codex/m118-repo-branch-pr-governance
+    - ruby YAML parse for M118 C001 artifacts
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+    - git show-ref --heads
+    - git for-each-ref refs/heads refs/remotes/origin
+    - ruby YAML parse for M118 C002 artifacts
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+    - node dist/cli/src/index.js git-automation summary dry-runs for M105, M98, M99, M101, M71
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml --write --json
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation commit dry-runs for M118 C004 and C003
+  notes:
+    - The remote-plan command returned ok:false because it correctly stopped on local and remote
+      readiness blockers.
+    - No remote mutation was performed.
+    - C001 inventory artifacts validate locally, but C001 remains in_progress until local commit
+      evidence is created or the queue explicitly records why no implementation commit is required.
+    - C001 and C002 are planning-only completions with implementation_changed_files false.
+    - C003 should generate only local summaries with honest readiness warnings; no remote mutation is
+      authorized.
+    - C003 wrote M105 and recorded M98/M99 as blocked by missing validation evidence, M101 as blocked
+      by mixed stack and missing early commit evidence, and M113 as blocked by malformed YAML.
+    - C004 remote-plan probes were read-only and returned expected blockers. Actual push and PR
+      creation are deferred to M119 with explicit operation-level approval.
+    - M118 local git checkpoint records the manual commit boundary because git-automation commit
+      correctly refused a cross-queue summary commit from a single selected candidate path set.

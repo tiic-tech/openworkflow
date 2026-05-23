@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M118-repo-branch-pr-governance:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M118-repo-branch-pr-governance
+candidate_id: C003
+selected_change_id: M118-C003-generate-local-pr-ready-summaries
+status: done
+tasks:
+  - id: T001
+    title: Dry-run candidate summaries
+    status: done
+    commands:
+      - git-automation summary dry-run for M105
+      - git-automation summary dry-run for M98
+      - git-automation summary dry-run for M99
+      - git-automation summary dry-run for M101
+      - git-automation summary dry-run for M71
+  - id: T002
+    title: Write supported local summaries
+    status: done
+    commands:
+      - node dist/cli/src/index.js git-automation summary --root . --queue
+        changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml --write --json
+  - id: T003
+    title: Record readiness matrix
+    status: done
+    outputs:
+      - changes/M118-repo-branch-pr-governance/C003-generate-local-pr-ready-summaries/LOCAL_PR_READY_SUMMARY_MATRIX.md
+  - id: T004
+    title: Validate C003 artifacts
+    status: done
+    commands:
+      - ruby YAML parse for M118 C003 artifacts
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    evidence:
+      - ruby YAML parse for M118 C003 artifacts passed
+      - node dist/cli/src/index.js validate --root . --json passed
+      - git diff --check passed
+validation_policy:
+  red_green_required: false
+  reason: C003 is local planning and summary generation only.
