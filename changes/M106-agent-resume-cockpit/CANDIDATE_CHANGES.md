@@ -28,16 +28,18 @@ Out of scope:
 
 ## Selection Policy
 
-Recommended first candidate: C001.
+Selected candidate: none.
 
 C001 defines the packet contract and command boundary before implementation
 aggregates existing read models.
+
+Next recommended candidate: C002.
 
 ## Candidates
 
 ### C001 - Define resume packet contract and command boundary
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -46,9 +48,22 @@ guidance, and read-only command boundary.
 
 Depends on: none.
 
+Selection artifacts:
+
+- `changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/SELECTED_CHANGE.yaml`
+- `changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/ATOM_TASKS.yaml`
+- `changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- Defined the read-only resume packet contract in `references/planning-artifact-contracts.md`.
+- Exposed the planned command boundary in CLI help without adding the full aggregator entrypoint.
+- Runtime-surface verification asserts the contract-defined help boundary.
+- Local commit evidence: `changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml`
+
 ### C002 - Implement base resume aggregator
 
-Status: candidate
+Status: ready
 
 Risk: medium
 

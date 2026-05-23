@@ -1,0 +1,91 @@
+schema_version: 0.1.0
+contract_id: selected_change:M106-agent-resume-cockpit:C001
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M106-C001-define-resume-packet-contract
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C001
+title: Define resume packet contract and command boundary
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected first because M106 must define the read-only resume packet contract,
+  command boundary, and deferred work before implementation aggregates existing
+  handoff, inspect, summaries, check, queue, and git signals. The candidate is
+  ready, has no dependencies, is medium risk, and unlocks the rest of the queue.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Define contract and command boundary only; do not implement the full
+    resume aggregator in this selected change.
+scope:
+  includes:
+    - define the resume JSON packet shape
+    - define text output expectations for non-json usage
+    - update source command registry/help surfaces as needed
+    - document read-only behavior and non-goals
+  excludes:
+    - implementing full aggregation logic
+    - changing handoff, inspect, summaries, or check semantics
+    - generated .agents edits by hand
+    - artifact lineage or prompt2proto strategy fields
+owned_paths:
+  - packages/cli/src/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/onboarding/
+  - references/planning-artifact-contracts.md
+  - changes/M106-agent-resume-cockpit/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - changes/M105-m104-direct-trust-gate-fixes/**
+  - changes/M107-artifact-lineage-graph/**
+  - changes/M108-consistency-first-split-later-prompt2proto/**
+  - changes/M109-provider-fallback-generation-metadata/**
+  - changes/M110-boundary-preflight-compiler/**
+acceptance:
+  - The resume packet contract names required top-level fields and read-only semantics.
+  - CLI help or command registry can expose resume without implying mutation.
+  - Deferred lineage, prompt2proto, provider metadata, and boundary compiler work stays out of scope.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C001 should complete as one local commit containing the resume packet
+  contract, read-only command boundary exposure, focused verification, queue
+  updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - references/planning-artifact-contracts.md
+    - packages/cli/src/index.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check
+rejected_alternatives:
+  - plan_id: M107-artifact-lineage-graph
+    candidate_id: future
+    reason: >
+      Higher-risk lineage work is deferred until resume can reliably surface
+      current workflow state and active queue boundaries.
+  - plan_id: M108-consistency-first-split-later-prompt2proto
+    candidate_id: future
+    reason: >
+      Prompt2proto strategy decisions depend on later lineage and provider
+      capability work, not the initial resume command contract.
+  - plan_id: M110-boundary-preflight-compiler
+    candidate_id: future
+    reason: >
+      A write preflight compiler should reuse the resume packet after this
+      queue establishes the read-only recovery model.

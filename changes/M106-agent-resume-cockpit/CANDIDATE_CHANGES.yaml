@@ -78,10 +78,10 @@ scope_control:
         A full write/commit preflight command should reuse resume's current
         work packet after M106 lands.
       suggested_plan_id: M110-boundary-preflight-compiler
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Define resume packet contract and command boundary
     purpose: >
       Establish the `openworkflow resume --root . --json` contract, including
@@ -123,8 +123,39 @@ changes:
       - The resume packet contract names required top-level fields and read-only semantics.
       - CLI help or command registry can expose resume without implying mutation.
       - Deferred lineage, prompt2proto, provider metadata, and boundary compiler work stays out of scope.
+    selection:
+      selected_change_id: M106-C001-define-resume-packet-contract
+      selected_at: 2026-05-23
+      reason: >
+        Selected first because M106 must define the read-only resume packet
+        contract, command boundary, and deferred work before implementation
+        aggregates existing handoff, inspect, summaries, check, queue, and git
+        signals.
+      artifacts:
+        selected_change: changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/ATOM_TASKS.yaml
+        implementation_brief: changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/planning-artifact-contracts.md
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Defined the read-only resume packet contract, exposed the planned
+        command boundary in CLI help without shipping the aggregator entrypoint,
+        and added runtime-surface assertions for the contract boundary.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
   - id: C002
-    status: candidate
+    status: ready
     title: Implement base resume aggregator
     purpose: >
       Implement the read-only CLI command that aggregates current state,
@@ -157,7 +188,7 @@ changes:
       - node dist/cli/src/index.js resume --root . --json
       - git diff --check
     acceptance:
-      - `resume --json` returns one packet with current trust, next action, and git cleanliness.
+      - "`resume --json` returns one packet with current trust, next action, and git cleanliness."
       - The command does not write or update files.
       - Runtime coverage verifies fresh and initialized repo behavior.
   - id: C003
@@ -288,3 +319,48 @@ operations:
     evidence:
       - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
       - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Selected C001 as the no-dependency medium-risk contract slice for the
+      resume cockpit, constrained to packet shape and read-only command
+      boundary before any full aggregation logic.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/SELECTED_CHANGE.yaml
+      - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/ATOM_TASKS.yaml
+      - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed the resume packet contract and read-only command boundary
+      without implementing the full aggregation logic.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C001 completed the contract boundary dependency, so the base resume
+      aggregator candidate is now dependency-ready.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/SELECTED_CHANGE.yaml

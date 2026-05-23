@@ -20,11 +20,11 @@ scope_boundary: >
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 5
 active_candidate_count: 5
-completed_candidate_id: null
-completed_change_id: null
+completed_candidate_id: C001
+completed_change_id: M106-C001-define-resume-packet-contract
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 outputs:
   candidate_changes_yaml: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.md
@@ -59,3 +59,5 @@ validation:
   notes:
     - Created cross-scenario analysis before DTC queue creation.
     - No source implementation was performed by this decomposition.
+    - C001 was selected and completed as the resume packet contract and read-only command boundary slice.
+    - C002 is now dependency-ready for the base resume aggregator implementation.

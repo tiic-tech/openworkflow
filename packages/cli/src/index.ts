@@ -128,6 +128,11 @@ Commands:
   git-automation  Managed git lifecycle shell, read-only remote planning, and autonomous simulator; remote mutation is gated.
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
+Planned read-only recovery command:
+  resume     Contract-defined Agent resume cockpit for one recovery packet. The
+             packet is read-only and implementation is staged behind the M106
+             selected-change queue before the executable command is exposed.
+
 Agent quick start:
   Read AGENTS.md, then run openworkflow handoff --root . --json. Handoff is
   the strict Agent trust gate before context loading. If you need the packet
@@ -169,6 +174,13 @@ Two command surfaces:
                draft PR pilot, and simulate for read-only autonomous push/PR/merge planning.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
+  Contract-defined read-only recovery:
+    resume     Planned Agent startup cockpit. The \`resume --json\` packet will
+               aggregate existing handoff, inspect, summaries, check, planning
+               queue, selected-change, evidence, and git signals without
+               mutating workflow state. Until the executable entrypoint lands,
+               use handoff plus context/inspect for current trust gates.
+
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
     with schema_version, command, ok, root, data, warnings, errors,
@@ -181,6 +193,10 @@ Two command surfaces:
     inspect --strict --json at repo entry, when draft/thin sources must block trust.
     Use context --handoff --json when an Agent needs a bounded context packet and
     strict handoff-quality blocking in the same command.
+    The resume packet contract uses the same report envelope and reserves
+    data.command_boundary, data.trust, data.workflow, data.active_queue,
+    data.current_work_item, data.actions, data.evidence, data.git, and
+    data.sources for the read-only recovery model.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery
