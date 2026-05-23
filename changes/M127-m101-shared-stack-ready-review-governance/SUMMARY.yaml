@@ -1,0 +1,135 @@
+schema_version: 0.1.0
+contract_id: summary:M127-m101-shared-stack-ready-review-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M127-m101-shared-stack-ready-review-governance
+title: Summary for M101 shared-stack PR #7 readiness governance
+status: complete
+source:
+  kind: mixed
+  summary: >
+    M124 published the shared M101-derived stack as draft PR #7 and deferred
+    ready-for-review transition. M126 completed PR #6 readiness governance and
+    recommended M127 next. M127 owns PR #7 read-only readiness refresh, exact
+    ready-for-review approval gating, approved transition if granted, and audit
+    handoff.
+  refs:
+    - user_input:2026-05-24-create-m127-cc
+    - changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+    - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+scope_boundary: PR #7 M101 shared-stack ready-for-review governance only.
+branch_boundary: codex/m127-m101-shared-stack-ready-review-governance
+branch_identity_exception:
+  mode: temporary_continuation_branch
+  current_branch: codex/m122-m71-historical-stack-publication
+  allowed_operations:
+    - local planning artifact creation
+    - local validation
+  reason: >
+    M127 was created as local governance planning on the existing aggregate
+    governance branch. No branch creation, checkout, push, or branch surgery
+    occurred.
+target_pr:
+  number: 7
+  url: https://github.com/tiic-tech/openworkflow/pull/7
+  title: "M101 shared stack: M105/M106/M115 governance updates"
+  state: OPEN
+  draft: false
+  head_ref: codex/m101-build-proto-prompt-command-split
+  head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  status_check_rollup: []
+candidate_count: 4
+completed_candidate_id: C004
+completed_change_id: C004-readiness-governance-audit-handoff
+next_recommended_candidate_id: future-merge-governance
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M127-m101-shared-stack-ready-review-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M127-m101-shared-stack-ready-review-governance/CANDIDATE_CHANGES.md
+  summary: changes/M127-m101-shared-stack-ready-review-governance/SUMMARY.yaml
+  c001_selected_change: changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/SELECTED_CHANGE.yaml
+  c001_readiness_preflight: changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/READINESS_PREFLIGHT.md
+  c002_selected_change: changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+  c002_high_risk_decision_report: changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  c003_selected_change: changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/SELECTED_CHANGE.yaml
+  c003_transition_evidence: changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+  c004_readiness_governance_audit: changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md
+  c004_selected_change: changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+c004_audit_handoff_result:
+  path: changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md
+  captured_at: 2026-05-24T07:27:10+08:00
+  m127_complete: true
+  final_pr_state: OPEN
+  final_pr_draft: false
+  final_mergeable: MERGEABLE
+  unauthorized_operations_performed: false
+  next_recommended_queue: future-merge-governance
+c003_ready_transition_result:
+  path: changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+  captured_at: 2026-05-24T07:24:05+08:00
+  approved_command: gh pr ready 7 --repo tiic-tech/openworkflow
+  gh_result: Pull request tiic-tech/openworkflow#7 is marked as ready for review
+  pr_state: OPEN
+  pr_draft: false
+  head_oid_unchanged: true
+  base_oid_unchanged: true
+  mergeable: MERGEABLE
+  unauthorized_operations_performed: false
+  next_recommended_candidate_id: C004
+c002_decision_result:
+  path: changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  captured_at: 2026-05-24T07:21:12+08:00
+  approved_option: local-only decision packet
+  recommendation: mark PR #7 ready for review after exact approval
+  evidence_not_approval: true
+  required_ready_approval_text: >
+    Approve M127 C003 ready PR #7: run gh pr ready 7 --repo tiic-tech/openworkflow
+  forbidden_without_later_exact_approval:
+    - gh pr ready
+    - merge
+    - PR edit, close, comment, retarget, or review request mutation
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion, or branch surgery
+    - shared-stack split/surgery
+  next_recommended_candidate_id: C003
+key_dependencies:
+  - M124 published draft PR #7 and deferred ready-for-review governance.
+  - M126 completed PR #6 readiness governance and recommended M127 next.
+risks:
+  - id: R001
+    level: high
+    description: Marking PR #7 ready for review mutates GitHub collaboration state.
+    mitigation: Require exact approval before gh pr ready.
+  - id: R002
+    level: medium
+    description: PR #7 is a shared M101-derived historical branch and should not be merged from this queue.
+    mitigation: Keep merge governance separate.
+  - id: R003
+    level: high
+    description: Split/surgery of the shared M101 stack would rewrite or restructure branch history.
+    mitigation: Keep split/surgery outside M127 and require a separate high-risk queue if needed.
+unresolved_questions: []
+deferred_features:
+  - future-merge-governance
+  - future-m101-shared-stack-split-governance
+validation:
+  commands_run:
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote --heads origin codex/m101-build-proto-prompt-command-split
+    - gh pr ready 7 --repo tiic-tech/openworkflow
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  notes: |
+    - M127 queue creation performed no remote mutation.
+    - C001 refreshed read-only PR #7 readiness facts and performed no remote mutation.
+    - C002 recorded the high-risk ready-for-review decision packet and performed no remote mutation.
+    - C003 ran only the exact approved ready-for-review command and PR #7 is no longer draft.
+    - C004 completed local audit handoff.
+    - PR #7 is now ready for review and remains open.
+    - Merge governance remains separate and requires later exact approval.
+    - Shared-stack split/surgery remains separate and requires a future high-risk queue if needed.

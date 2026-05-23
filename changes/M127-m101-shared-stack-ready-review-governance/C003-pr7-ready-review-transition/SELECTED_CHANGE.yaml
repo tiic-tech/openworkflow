@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-pr7-ready-review-transition
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-pr7-ready-review-transition
+source_plan_id: M127-m101-shared-stack-ready-review-governance
+source_candidate_id: C003
+title: Execute approved PR #7 ready-for-review transition
+status: done
+selection_reason: >
+  User provided the exact approval text recorded by C002. C003 verified PR #7
+  still matched the expected draft/head/mergeability state, ran only the
+  approved gh pr ready command, and recorded the result.
+approved_operation:
+  approved_at: 2026-05-24T07:24:05+08:00
+  user_text: >
+    Approve M127 C003 ready PR #7: run gh pr ready 7 --repo tiic-tech/openworkflow
+  command: gh pr ready 7 --repo tiic-tech/openworkflow
+  allowed:
+    - verify PR #7 current metadata before execution
+    - run gh pr ready 7 --repo tiic-tech/openworkflow
+    - record resulting PR metadata
+  forbidden:
+    - merge
+    - PR edit after transition
+    - PR close, comment, retarget, or review request mutation
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion, or branch surgery
+    - shared-stack split/surgery
+scope:
+  includes:
+    - verify exact approval text
+    - verify PR #7 still matches expected state
+    - run approved gh pr ready command
+    - record resulting PR metadata
+  excludes:
+    - merge
+    - PR edit after transition
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion
+owned_paths:
+  - changes/M127-m101-shared-stack-ready-review-governance/
+forbidden_paths: []
+acceptance:
+  - PR #7 is no longer draft.
+  - Local audit evidence records approval, command, and result.
+  - No merge, PR edit/close, Issue mutation, push, or branch surgery occurs.
+validation:
+  - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git diff --check
+completion:
+  completed_at: 2026-05-24T07:24:05+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C003 performed the exact approved GitHub ready-for-review transition and
+    recorded local governance evidence only; no product source, generated
+    surface, Issue, merge, push, branch surgery, split/surgery, or local git
+    history was mutated.
+  evidence:
+    - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+    - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/SELECTED_CHANGE.yaml
+    - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/ATOM_TASKS.yaml
+    - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/IMPLEMENTATION_BRIEF.md

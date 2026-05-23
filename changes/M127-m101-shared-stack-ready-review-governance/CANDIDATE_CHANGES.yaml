@@ -1,0 +1,459 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M127-m101-shared-stack-ready-review-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M127-m101-shared-stack-ready-review-governance
+title: Candidate changes for M101 shared-stack PR #7 ready-for-review governance
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-24-create-m127-cc
+    - changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+    - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+    - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+  summary: >
+    M124 published the shared M101-derived stack as draft PR #7 and deferred
+    ready-for-review transition. M126 completed PR #6 readiness governance and
+    recommended M127 next. M127 owns PR #7 read-only readiness refresh, exact
+    ready-for-review approval gating, approved transition if granted, and local
+    audit handoff.
+queue_policy:
+  branch_boundary: codex/m127-m101-shared-stack-ready-review-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    current_branch: codex/m122-m71-historical-stack-publication
+    reason: >
+      M127 is being created as local governance planning after M126 on the
+      existing aggregate governance branch. No branch creation, checkout, push,
+      or branch surgery is part of this decompose-to-changes pass.
+  target_pr_number: 7
+  target_pr_url: https://github.com/tiic-tech/openworkflow/pull/7
+  target_branch: codex/m101-build-proto-prompt-command-split
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. PR #7 readiness must be refreshed before preparing an
+    exact ready-for-review decision packet.
+  high_risk_rule: >
+    C002 and C003 prepare or execute a GitHub PR ready-for-review mutation.
+    Exact approval is required before running gh pr ready.
+scope_control:
+  current_boundary: >
+    PR #7 M101 shared-stack ready-for-review governance only.
+  boundary_type: pr_ready_review_governance_slice
+  in_scope_rule: >
+    Include read-only PR #7 readiness facts, a ready-for-review decision
+    packet, approved ready transition if granted, and local audit handoff.
+  out_of_scope_rule: >
+    Do not merge PR #7, edit/close/comment/retarget PR #7, mutate Issues,
+    push, force-push, rebase, reset, delete branches, perform split/surgery,
+    publish unrelated branches, or change product source.
+  deferred_features:
+    - title: Merge governance
+      suggested_plan_id: future-merge-governance
+      reason: Merge should wait for ready-for-review, review/CI signals, and exact approval.
+    - title: Shared-stack split or branch-surgery execution
+      suggested_plan_id: future-m101-shared-stack-split-governance
+      reason: >
+        Split/surgery remains a separate high-risk branch-history operation if
+        the shared-stack review path is rejected after review.
+observed_state:
+  captured_at: 2026-05-24T06:40:06+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: true
+  pr_number: 7
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/7
+  pr_state: OPEN
+  pr_draft: true
+  pr_title: "M101 shared stack: M105/M106/M115 governance updates"
+  head_ref: codex/m101-build-proto-prompt-command-split
+  head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  review_decision: ""
+  status_check_rollup: []
+  remote_branch_present: true
+  remote_branch_head: f8bf087211316506f48155859f3e18edbc7224e4
+next_recommended_candidate_id: future-merge-governance
+changes:
+  - id: C001
+    status: done
+    title: Refresh PR #7 readiness preflight
+    purpose: >
+      Produce current read-only readiness facts for PR #7 before any
+      ready-for-review decision is considered.
+    scope:
+      includes:
+        - inspect PR #7 state, draft flag, head/base refs, OIDs, mergeability, and status checks
+        - verify remote head branch exists at the PR head OID
+        - recommend whether C002 can prepare the ready-for-review decision packet
+      excludes:
+        - gh pr ready
+        - PR edit, close, merge, comment, retarget, or review request mutation
+        - push, force-push, branch deletion, rebase, reset, split/surgery, Issue mutation, or product source changes
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git ls-remote --heads origin codex/m101-build-proto-prompt-command-split
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - PR #7 readiness facts are recorded.
+      - The packet states whether C002 can proceed.
+      - No remote mutation occurs.
+    selection:
+      selected_change_id: C001-pr7-readiness-preflight
+      reason: >
+        C001 is the required read-only PR #7 readiness refresh before any
+        ready-for-review decision packet or remote mutation.
+      selected_at: 2026-05-24
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T06:48:52+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced read-only readiness and local planning evidence only; no
+        product source, generated surface, remote PR, Issue, or git history was
+        mutated.
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/READINESS_PREFLIGHT.md
+        - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+  - id: C002
+    status: done
+    title: Prepare PR #7 ready-for-review decision packet
+    purpose: >
+      Convert C001 facts into a high-risk decision packet for marking PR #7
+      ready for review.
+    scope:
+      includes:
+        - exact approval text for gh pr ready 7
+        - current PR #7 facts and stop gates
+        - ready-for-review rationale and risks
+      excludes:
+        - executing gh pr ready
+        - merge
+        - PR edit, close, comment, retarget, or review request mutation
+        - Issue mutation, push, or branch surgery
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Decision packet states evidence, not approval.
+      - Exact approval text is recorded.
+      - Remote mutation remains blocked until exact approval.
+    selection:
+      selected_change_id: C002-pr7-ready-review-decision
+      reason: >
+        User explicitly approved the local-only C002 decision-packet option.
+        C002 prepares the PR #7 ready-for-review high-risk decision report and
+        records the exact later approval gate without running gh pr ready.
+      selected_at: 2026-05-24
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/IMPLEMENTATION_BRIEF.md
+        - changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+    completion:
+      completed_at: 2026-05-24T07:21:12+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local planning and decision evidence only; no product
+        source, generated surface, remote PR, Issue, or git history was
+        mutated.
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/IMPLEMENTATION_BRIEF.md
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C003
+    status: done
+    title: Execute approved PR #7 ready-for-review transition
+    purpose: >
+      If C002 recommends readiness and the user approves the exact command,
+      run only the approved gh pr ready command for PR #7 and record evidence.
+    scope:
+      includes:
+        - verify exact approval text
+        - verify PR #7 still matches expected state
+        - run approved gh pr ready command
+        - record resulting PR metadata
+      excludes:
+        - merge
+        - PR edit after transition
+        - Issue mutation
+        - push, force-push, rebase, reset, branch deletion
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+    risk: high
+    size: small
+    validation:
+      - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - PR #7 is no longer draft.
+      - Local audit evidence records approval, command, and result.
+      - No merge, PR edit/close, Issue mutation, push, or branch surgery occurs.
+    selection:
+      selected_change_id: C003-pr7-ready-review-transition
+      reason: >
+        User provided the exact approval text recorded by C002. C003 verified
+        PR #7 still matched the expected draft/head/mergeability state, ran
+        only the approved gh pr ready command, and recorded the result.
+      selected_at: 2026-05-24
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T07:24:05+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 performed the exact approved GitHub ready-for-review transition
+        and recorded local governance evidence only; no product source,
+        generated surface, Issue, merge, push, branch surgery, split/surgery,
+        or local git history was mutated.
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+        - "approval: Approve M127 C003 ready PR #7: run gh pr ready 7 --repo tiic-tech/openworkflow"
+        - "command: gh pr ready 7 --repo tiic-tech/openworkflow"
+        - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+  - id: C004
+    status: done
+    title: Record PR #7 readiness governance audit and handoff
+    purpose: >
+      Close M127 with local audit evidence naming whether PR #7 was marked
+      ready or why it remains draft.
+    scope:
+      includes:
+        - summarize completed readiness transition or stop reasons
+        - record deferred merge and split/surgery governance queues
+        - confirm unauthorized operations did not occur
+      excludes:
+        - merge
+        - Issue mutation
+        - PR edit, close, comment, or retarget
+        - push or branch surgery
+        - product source changes
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - future-merge-governance
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Local audit names authorized and unauthorized operation boundaries.
+      - Remaining governance queues are explicit.
+      - M127 can be handed off without raw session context.
+    selection:
+      selected_change_id: C004-readiness-governance-audit-handoff
+      reason: >
+        C003 completed PR #7 ready-for-review transition, so C004 closes M127
+        with local audit evidence and deferred governance queues.
+      selected_at: 2026-05-24
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md
+    completion:
+      completed_at: 2026-05-24T07:27:10+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 produced local audit and handoff evidence only; no product source,
+        remote PR, Issue, push, merge, branch surgery, split/surgery, or git
+        history mutation occurred.
+      evidence:
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+        - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: Create M127 candidate queue for PR #7 M101 shared-stack ready-for-review governance.
+    changed_at: 2026-05-24
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: User asked to advance M127; C001 is the required read-only PR #7 readiness preflight.
+    changed_at: 2026-05-24
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/SELECTED_CHANGE.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/ATOM_TASKS.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Current read-only PR #7 readiness facts are recorded and C002 can prepare the evidence-only ready-for-review decision packet.
+    changed_at: 2026-05-24
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C001-pr7-readiness-preflight/READINESS_PREFLIGHT.md
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User approved the local-only PR #7 ready-for-review high-risk decision
+      packet and explicitly forbade gh pr ready, merge, PR edits, Issue
+      mutation, push, and branch surgery.
+    changed_at: 2026-05-24
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/ATOM_TASKS.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 produced the evidence-only high-risk decision packet and recorded
+      the exact C003 approval gate without mutating GitHub or git history.
+    changed_at: 2026-05-24
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/ATOM_TASKS.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/IMPLEMENTATION_BRIEF.md
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: User provided exact approval to run the C003 PR #7 ready-for-review command.
+    changed_at: 2026-05-24
+    before_status: ready
+    after_status: selected
+    evidence:
+      - "approval: Approve M127 C003 ready PR #7: run gh pr ready 7 --repo tiic-tech/openworkflow"
+      - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/SELECTED_CHANGE.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/ATOM_TASKS.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: PR #7 was marked ready for review using only the exact approved command.
+    changed_at: 2026-05-24
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+      - "command: gh pr ready 7 --repo tiic-tech/openworkflow"
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: C003 completed, PR #7 is ready for review, and M127 needs final local audit and handoff.
+    changed_at: 2026-05-24
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+      - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: M127 audit handoff is recorded locally, PR #7 final state is ready for review, and remaining governance queues are explicit.
+    changed_at: 2026-05-24
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - M127-m101-shared-stack-ready-review-governance
+    actor: agent
+    reason: All M127 candidates are complete and PR #7 is ready for review. Merge and split/surgery governance remain separate.
+    changed_at: 2026-05-24
+    before_status: active
+    after_status: complete
+    evidence:
+      - changes/M127-m101-shared-stack-ready-review-governance/C004-readiness-governance-audit-handoff/M127_READINESS_GOVERNANCE_AUDIT.md

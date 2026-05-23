@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-pr7-ready-review-decision
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-pr7-ready-review-decision
+source_plan_id: M127-m101-shared-stack-ready-review-governance
+source_candidate_id: C002
+title: Prepare PR #7 ready-for-review decision packet
+status: done
+selection_reason: >
+  User explicitly approved the local-only C002 decision-packet option. C002
+  prepares the PR #7 ready-for-review high-risk decision report and records the
+  exact later approval gate without running gh pr ready.
+approved_option:
+  approved_at: 2026-05-24T07:21:12+08:00
+  user_text: >
+    Approve M127 C002 decision packet: prepare PR #7 ready-for-review high-risk
+    decision packet; do not run gh pr ready, merge, edit PRs, mutate Issues,
+    push, or perform branch surgery.
+  allowed:
+    - create local decision packet
+    - update M127 queue and summary
+    - prepare exact later approval gate
+  forbidden:
+    - gh pr ready
+    - merge
+    - PR edit, close, comment, retarget, or review request mutation
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion, or branch surgery
+scope:
+  includes:
+    - exact approval text for gh pr ready 7
+    - current PR #7 facts and stop gates
+    - ready-for-review rationale and risks
+  excludes:
+    - executing gh pr ready
+    - merge
+    - PR edit, close, comment, retarget, or review request mutation
+    - Issue mutation, push, or branch surgery
+owned_paths:
+  - changes/M127-m101-shared-stack-ready-review-governance/
+forbidden_paths: []
+acceptance:
+  - Decision packet states evidence, not approval.
+  - Exact approval text is recorded.
+  - Remote mutation remains blocked until exact approval.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-24T07:21:12+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C002 produced local planning and decision evidence only; no product source,
+    generated surface, remote PR, Issue, or git history was mutated.
+  evidence:
+    - changes/M127-m101-shared-stack-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+    - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/SELECTED_CHANGE.yaml
+    - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/ATOM_TASKS.yaml
+    - changes/M127-m101-shared-stack-ready-review-governance/C002-pr7-ready-review-decision/IMPLEMENTATION_BRIEF.md

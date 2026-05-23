@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-pr7-ready-review-transition
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-pr7-ready-review-transition
+title: Atom tasks for approved PR #7 ready-for-review transition
+status: done
+tasks:
+  - task_id: T001
+    title: Verify exact approval and PR state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    done_when:
+      - User approval exactly matches the C002 approval text.
+      - PR #7 is open, draft, mergeable, and still points at the expected head OID.
+  - task_id: T002
+    title: Execute approved ready-for-review command
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/
+    done_when:
+      - Only `gh pr ready 7 --repo tiic-tech/openworkflow` is run.
+  - task_id: T003
+    title: Record transition evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M127-m101-shared-stack-ready-review-governance/C003-pr7-ready-review-transition/TRANSITION_EVIDENCE.md
+    done_when:
+      - Resulting PR metadata confirms PR #7 is no longer draft.
