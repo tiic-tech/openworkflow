@@ -13,6 +13,7 @@ source:
     - changes/M114-engineering-quality-foundation/SUMMARY.yaml
     - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
     - references/internal-coder-protocol.md
+    - skills/coder/SKILL.md
   summary: >
     The user wants OW to absorb the current code-quality governor as an
     internal, Agent-only coder governance protocol rather than a normal
@@ -96,7 +97,7 @@ scope_control:
         policies should wait until CODER_EVIDENCE or commit evidence binding is
         proven on real queues.
       suggested_plan_id: M117-coder-evidence-enforcement
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -172,7 +173,7 @@ changes:
       - The contract names integration points without implementing them.
       - No runtime behavior, generated surfaces, or public JSON shape changes.
   - id: C002
-    status: ready
+    status: done
     title: Migrate code-quality governor into OW source coder skill
     purpose: >
       Move the current system-level `ow-code-quality-governor` guidance into a
@@ -201,6 +202,37 @@ changes:
       - C007
     risk: medium
     size: medium
+    selection:
+      selected_change_id: C002-migrate-code-quality-governor-into-ow-source-coder-skill
+      reason: >
+        Select C002 because C001 established the internal `/ow:coder` protocol
+        boundary, making source skill ownership the next dependency-ready step
+        before registry, generated-surface, change/team, or read-model
+        integration can proceed.
+      selected_at: 2026-05-23
+      selected_by: agent
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - skills/coder/SKILL.md
+        - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Added the repo-owned `skills/coder/SKILL.md` source skill for internal
+        Agent-only code execution governance, preserving OW-specific quality
+        model, preflight, RED/GREEN, self-check, validation ladder, evidence
+        binding, and continuous-growth guidance without registering `/ow:coder`
+        or hand-editing generated surfaces.
+      validation:
+        - npm run build
+        - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+        - node dist/cli/src/index.js sync --root . --tools codex --json
+        - node dist/cli/src/index.js inspect --root . --strict --json
+        - git diff --check
     validation:
       - npm run build
       - node dist/cli/src/index.js sync --root . --tools codex --json
@@ -211,7 +243,7 @@ changes:
       - Generated surfaces are updated only through the repo-local sync path.
       - The migrated guidance is narrower than the system skill and specific to OW source execution.
   - id: C003
-    status: candidate
+    status: ready
     title: Register internal `/ow:coder` command protocol
     purpose: >
       Add `/ow:coder` to the command registry as an internal runtime-stage
@@ -372,7 +404,7 @@ changes:
       - Validators distinguish missing optional evidence from malformed present evidence.
       - The contract does not require migrating historical queues.
   - id: C007
-    status: candidate
+    status: ready
     title: Add coder continuous growth loop for reusable lessons
     purpose: >
       Define how repeated implementation patterns, major mistakes, and
@@ -460,3 +492,33 @@ operations:
     evidence:
       - references/internal-coder-protocol.md
       - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Selected C002 after C001 completed the internal coder protocol boundary,
+      so OW can own the durable coder governance source skill before registry
+      or generated-surface integration.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed the repo-owned coder source skill migration without registering
+      `/ow:coder`, changing generated surfaces, or altering runtime behavior.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/coder/SKILL.md
+      - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/LOCAL_COMMIT_EVIDENCE.yaml

@@ -17,7 +17,7 @@ priority:
   priority_rank: above_M114
   preempts:
     - M114-engineering-quality-foundation
-  next_action: Select M115 C002 before returning to M114 C002.
+  next_action: Select M115 C003 before returning to M114 C002.
 source:
   kind: planning_discussion
   refs:
@@ -33,13 +33,17 @@ outputs:
   atom_tasks: changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/ATOM_TASKS.yaml
   implementation_brief: changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md
   protocol_contract: references/internal-coder-protocol.md
+  selected_change_c002: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml
+  atom_tasks_c002: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+  implementation_brief_c002: changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/IMPLEMENTATION_BRIEF.md
+  source_skill: skills/coder/SKILL.md
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 7
-completed_candidate_id: C001
-completed_change_id: C001-define-internal-coder-protocol-contract-and-command-boundary
+completed_candidate_id: C002
+completed_change_id: C002-migrate-code-quality-governor-into-ow-source-coder-skill
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 completed_candidate:
   id: C001
   title: Define internal coder protocol contract and command boundary
@@ -49,12 +53,20 @@ completed_candidate:
     migrates the skill, registers the internal command, or wires coder
     governance into implementation flows.
 next_recommended_candidate:
+  id: C003
+  title: Register internal `/ow:coder` command protocol
+  risk: medium
+  reason: >
+    C003 is now dependency-ready because C001 established the internal boundary
+    and C002 created the repo-owned source skill.
+completed_candidate:
   id: C002
   title: Migrate code-quality governor into OW source coder skill
   risk: medium
   reason: >
-    C002 is now dependency-ready because C001 established the internal coder
-    command boundary and source ownership constraints.
+    C002 added the repo-owned source skill for internal coder governance without
+    registering `/ow:coder`, changing generated surfaces, or altering runtime
+    behavior.
 key_dependencies:
   - C001 unlocks source skill migration, registry work, protocol wiring, and read-model integration.
   - C005 and C006 are high risk because they touch recovery/git evidence semantics and persistent evidence shape.
@@ -91,6 +103,7 @@ validation:
     - "`resume --json` now selects M115 C001 as the active queue and reports no active-queue uncertainty."
     - "`handoff`, `inspect --strict`, `summaries --strict`, and `git diff --check` pass for this planning update."
     - C001 selection artifacts and protocol contract are complete; local commit evidence is recorded under the selected change.
+    - C002 source skill migration is complete; `sync --tools codex --json` reported unchanged generated surfaces.
 notes:
   - >
     This queue intentionally supersedes the uninstantiated M115 placeholder from

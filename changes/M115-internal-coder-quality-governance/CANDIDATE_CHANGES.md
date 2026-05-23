@@ -40,9 +40,9 @@ Out of scope:
 
 ## Selection Policy
 
-`C001` is complete. The protocol contract now defines the internal command
-boundary before registry, generated surface, change/team/git integration, or
-evidence artifact work begins. Continue with `C002`.
+`C001` and `C002` are complete. OW now has the internal coder protocol contract
+and a repo-owned source skill. Continue with `C003` to register the internal
+command protocol before change/team/git integration or evidence artifact work.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -67,7 +67,7 @@ as internal-only and behavior-compatible.
 
 ### C002: Migrate code-quality governor into OW source coder skill
 
-- Status: `ready`
+- Status: `done`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: move durable OW-specific quality governance into repo-owned source
@@ -76,10 +76,12 @@ as internal-only and behavior-compatible.
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C001`
 - Unlocks: `C003`, `C004`, `C007`
+- Selection: `C002-migrate-code-quality-governor-into-ow-source-coder-skill`
+- Completion: `skills/coder/SKILL.md`
 
 ### C003: Register internal `/ow:coder` command protocol
 
-- Status: `candidate`
+- Status: `ready`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: add an internal registry command with `visibility: internal` and no
@@ -93,7 +95,7 @@ as internal-only and behavior-compatible.
 
 ### C004: Wire coder governance into change and team protocols
 
-- Status: `candidate`
+- Status: `ready`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: make `/ow:change` and `/ow:team` reference coder governance without
