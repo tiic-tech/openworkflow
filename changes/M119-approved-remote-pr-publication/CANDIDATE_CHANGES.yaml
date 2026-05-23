@@ -303,3 +303,14 @@ operations:
     after_status: done
     evidence:
       - changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/REMOTE_PUBLICATION_PREFLIGHT.md
+  - operation_id: OP004
+    operation_type: query
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Create high-risk decision report before any remote branch push can be selected or executed.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md

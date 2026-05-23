@@ -88,6 +88,30 @@ conflict files. M117 remains a second candidate.
   - remote branch head is absent or unreadable
 - Merge checkpoint remained fast-forward and clean with no conflict files.
 
+## Proxy-Fixed Target-Branch Rerun
+
+After the user's correction that the active local proxy port is `10808`, Git global proxy was updated
+to `http://127.0.0.1:10808` and `git ls-remote --heads origin main` succeeded.
+
+M102 was rerun from its own branch boundary:
+
+- Branch: `codex/m102-selected-change-commit-gate`
+- Local PR-ready summary commit: `bd2780b1d5b117b2734e5b732164e5d299bd521a`
+- `git-automation summary --write`: ok
+- `git-automation simulate --base main`: ok with no blockers
+- `git-automation remote-plan --base origin/main --target-base main`: blocked only by
+  `simulator evidence is missing`
+- `origin/main` base head: `d0e13f4bba3a847b763d2db3f771659aac3a4fe5`
+- Merge checkpoint: fast-forward and clean with no conflict files
+
+The remaining remote-plan blocker is a current evidence-binding limitation: remote-plan checks
+whether the target queue already contains a done candidate with id `G017` or a title containing
+`simulator`; it does not consume the green simulator command result from stdout.
+
+M117 was also rerun from its branch boundary. It cleared branch mismatch and base head blockers, but
+still lacks a branch-local `PR_READY_SUMMARY.md` and still hits the same simulator-evidence binding
+gate.
+
 ### M117 after local M119 commit
 
 - Current branch: `codex/m119-approved-remote-pr-publication`

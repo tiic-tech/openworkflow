@@ -16,6 +16,8 @@ Select C001 first. Push and draft PR candidates are high risk and require a gree
 
 Completed candidate: C001
 
+High-risk report: `changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md`
+
 ## Candidates
 
 ### C001 - Refresh remote publication preflight and choose the first pilot
@@ -53,6 +55,14 @@ Risk: high
 Purpose: after C001 is green and the user approves the exact command, push one pilot branch to origin and record local audit evidence.
 
 Approval required: yes
+
+Current recommended pilot: `codex/m102-selected-change-commit-gate`
+
+Exact push command requiring approval:
+
+```bash
+git push origin codex/m102-selected-change-commit-gate
+```
 
 Excludes: draft PR creation, multi-branch push, force-push, rebase, reset, cherry-pick, branch deletion, Issue mutation, and PR edits.
 

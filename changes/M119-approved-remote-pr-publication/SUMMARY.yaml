@@ -36,6 +36,7 @@ outputs:
   candidate_changes_yaml: changes/M119-approved-remote-pr-publication/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M119-approved-remote-pr-publication/CANDIDATE_CHANGES.md
   summary: changes/M119-approved-remote-pr-publication/SUMMARY.yaml
+  high_risk_decision_report: changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md
   selected_change: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/SELECTED_CHANGE.yaml
   atom_tasks: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/ATOM_TASKS.yaml
   implementation_brief: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/IMPLEMENTATION_BRIEF.md
@@ -45,11 +46,14 @@ preflight_result:
   first_pilot_ready: false
   preferred_next_pilot_after_clean_tree: M102-selected-change-commit-gate
   local_preflight_commit: 0c3b2e41b82dd0d37886cf9be32a3569aba5def9
+  proxy_fixed_remote_read_ok: true
+  m102_branch_local_pr_summary_commit: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  m102_simulate_ok: true
+  m102_remote_plan_remaining_blocker: simulator evidence is missing
   blockers:
-    - M102 and M117 clean-tree remote-plan probes were run from M119, not from their target branch boundaries.
-    - remote-plan still reports unknown remote base head for origin/main.
-    - simulator evidence is missing.
-    - direct git ls-remote was blocked by local proxy connection to 127.0.0.1:7897.
+    - Remote-plan does not consume the green simulator command result; it checks for a completed
+      simulator candidate in the target queue.
+    - C002 push remains blocked until explicit approval of the exact push command.
 key_dependencies:
   - C001 must refresh current remote readiness before any push or PR operation can be selected.
   - C002 requires a clean-tree remote-plan rerun, a high-risk report, and explicit approval for one
@@ -60,8 +64,8 @@ risks:
   - id: R001
     level: high
     description: Push and draft PR creation mutate authenticated remote GitHub state.
-    mitigation: Keep C002 and C003 unselected until C001 is green, a high-risk report exists, and
-      the user approves the exact command.
+    mitigation: Keep C002 and C003 unselected until C001 evidence is reviewed, the high-risk report
+      exists, and the user approves the exact command.
   - id: R002
     level: high
     description: Existing branches are stacked and may not map cleanly to independent PRs.
@@ -73,9 +77,9 @@ risks:
 unresolved_questions:
   - Which branch should become the first remote publication pilot after C001 refreshes current
     remote state?
-  - Should M119 publish a governance/meta branch first, or start with M102 or M117 as originally
-    ordered by M118?
-  - What exact user approval text should be captured before the first push and draft PR commands?
+  - Should the known simulator-evidence binding gap block M102 push, or can the green simulator
+    command output be accepted as manual approval evidence for the narrow pilot?
+  - What exact user approval text should be captured before the first push command?
 deferred_features:
   - M120-historical-branch-repair
 validation:
@@ -110,6 +114,18 @@ validation:
     - git diff --cached --check
     - git commit -m "M119-approved-remote-pr-publication/C001 Record remote publication preflight"
     - node dist/cli/src/index.js git-automation remote-plan clean-tree reruns for M102 and M117
+    - git fetch origin main
+    - git switch codex/m102-selected-change-commit-gate
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --write --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+    - git commit -m "M102-selected-change-commit-gate Record PR-ready summary"
+    - node dist/cli/src/index.js git-automation simulate --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base main --json
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+      changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
   notes:
     - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is
       /ow:vision; the user explicitly requested DTC creation for M119.
@@ -121,3 +137,7 @@ validation:
       until M119 evidence is committed and remote-plan is rerun from a clean tree.
     - Clean-tree reruns removed the dirty-tree blocker but still reported branch mismatch, unknown
       remote base head, missing simulator evidence, and absent or unreadable remote branch heads.
+    - After proxy correction, M102 rerun from its branch boundary cleared branch mismatch, dirty tree,
+      remote base head, and PR-ready summary blockers. The remaining remote-plan blocker is the
+      simulator evidence binding rule, despite simulate returning ok:true.
+    - HIGH_RISK_DECISION_REPORT.md records the exact C002 push approval boundary and stop criteria.
