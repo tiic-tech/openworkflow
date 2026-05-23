@@ -60,7 +60,7 @@ Result: M117 is the next low-risk evidence repair target. M71 may remain an inte
 
 ### C003 - Restore branch-local PR-ready evidence for low-risk candidates
 
-Status: candidate
+Status: selected
 
 Risk: medium
 
@@ -69,6 +69,8 @@ Purpose: for candidates that do not require history rewriting, ensure the owning
 Depends on: C001, C002
 
 Excludes: publishing branches, creating PRs, rewriting history, and repairing high-risk branches.
+
+Selected target: M117 branch-local `PR_READY_SUMMARY.md` restoration.
 
 Unlocks: C005
 

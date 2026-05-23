@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:M120-C003-restore-branch-local-pr-ready-evidence
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M120-C003-restore-branch-local-pr-ready-evidence
+source_plan_id: M120-historical-branch-repair
+source_candidate_id: C003
+title: Restore branch-local PR-ready evidence for low-risk candidates
+status: selected
+selection_reason: >
+  C003 is the next recommended candidate after C002. The branch repair policy identifies M117 as
+  the low-risk evidence repair target because the branch boundary is independent and the missing
+  artifact is branch-local PR-ready summary evidence, not history repair.
+target_repairs:
+  - plan_id: M117-git-automation-remote-readiness
+    branch: codex/m117-git-automation-remote-readiness
+    summary_path: changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+scope:
+  includes:
+    - identify low-risk branch-local summary restoration targets
+    - regenerate or copy PR_READY_SUMMARY.md through git-automation summary when appropriate
+    - record before/after branch and file evidence
+    - keep each restoration scoped to its owning branch
+  excludes:
+    - publishing restored branches
+    - creating PRs
+    - rewriting commit history
+    - repairing branches classified as high risk by C002
+owned_paths:
+  - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  - changes/M120-historical-branch-repair/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - Each repaired branch has a branch-local PR_READY_SUMMARY.md or a recorded blocker.
+  - No branch pointer rewrite or remote mutation occurs.
+  - Future publication candidates have explicit remaining blockers.
+validation:
+  - node dist/cli/src/index.js git-automation summary --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --json
+  - node dist/cli/src/index.js git-automation summary --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --write --json
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rejected_alternatives:
+  - id: C004
+    reason: C004 is only needed if branch surgery is required; C002 classified M117 as low-risk evidence repair.
+  - id: C005
+    reason: Publication ordering depends on completing the M117 evidence repair first.

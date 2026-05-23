@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M120-C003-restore-branch-local-pr-ready-evidence
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M120-C003-restore-branch-local-pr-ready-evidence
+title: Atom tasks for branch-local PR-ready evidence repair
+status: ready
+tasks:
+  - task_id: T001
+    title: Confirm M117 branch-local summary is missing
+    status: pending
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - M117 branch exists locally.
+      - M117 branch lacks its PR_READY_SUMMARY.md before repair.
+  - task_id: T002
+    title: Generate PR-ready summary on M117 branch
+    status: pending
+    type: document
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+    done_when:
+      - git-automation summary writes the M117 PR-ready summary on the M117 branch.
+      - The change is committed locally on the M117 branch.
+  - task_id: T003
+    title: Rerun M117 remote readiness after local evidence repair
+    status: pending
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - remote-plan no longer reports missing PR_READY_SUMMARY.md for M117.
+      - Remaining blockers are recorded.
+  - task_id: T004
+    title: Record M120 repair audit and queue completion
+    status: pending
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - M120 records the M117 repair commit and remaining blockers.
+      - The queue advances to C005 unless high-risk surgery is needed.

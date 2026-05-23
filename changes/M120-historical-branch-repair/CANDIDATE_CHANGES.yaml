@@ -231,7 +231,7 @@ changes:
         - node dist/cli/src/index.js validate --root . --json
         - git diff --check
   - id: C003
-    status: candidate
+    status: selected
     title: Restore branch-local PR-ready evidence for low-risk candidates
     purpose: >
       For candidates that do not require history rewriting, ensure the owning local branch contains
@@ -267,6 +267,16 @@ changes:
       - Each repaired branch has a branch-local PR_READY_SUMMARY.md or a recorded blocker.
       - No branch pointer rewrite or remote mutation occurs.
       - Future publication candidates have explicit remaining blockers.
+    selection:
+      selected_change_id: M120-C003-restore-branch-local-pr-ready-evidence
+      selected_at: 2026-05-23
+      reason: >
+        Selected because C002 classified M117 as the low-risk branch-local evidence repair target
+        and C003 can restore its PR-ready summary without history rewrite or remote mutation.
+      artifacts:
+        selected_change: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
+        implementation_brief: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
   - id: C004
     status: candidate
     title: Prepare high-risk decision report for history surgery if needed
@@ -411,3 +421,16 @@ operations:
     after_status: done
     evidence:
       - changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: Select low-risk M117 branch-local PR-ready evidence repair.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
+      - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
+      - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md

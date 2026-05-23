@@ -30,7 +30,7 @@ completed_candidate_id: C002
 completed_change_id: M120-C002-branch-repair-policy
 next_recommended_candidate_id: C003
 selected_candidate_id: null
-selected_change_id: null
+selected_change_id: M120-C003-restore-branch-local-pr-ready-evidence
 outputs:
   candidate_changes_yaml: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.md
@@ -43,6 +43,9 @@ outputs:
   c002_atom_tasks: changes/M120-historical-branch-repair/C002-branch-repair-policy/ATOM_TASKS.yaml
   c002_implementation_brief: changes/M120-historical-branch-repair/C002-branch-repair-policy/IMPLEMENTATION_BRIEF.md
   c002_branch_repair_policy: changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md
+  c003_selected_change: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
+  c003_atom_tasks: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
+  c003_implementation_brief: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
 inventory_result:
   current_branch: codex/m120-historical-branch-repair
   remote_codex_branches:
@@ -139,3 +142,5 @@ validation:
     - C002 selected and completed a local branch repair policy. It recommends C003 for low-risk
       M117 branch-local PR-ready evidence repair and reserves history surgery for C004 only when
       needed.
+    - C003 selected M117 branch-local PR-ready evidence repair. M117 branch changes must be
+      committed locally before M120 records C003 completion.
