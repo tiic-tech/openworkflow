@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M126-m71-ready-review-governance
 title: Summary for M71 PR #6 readiness governance
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -34,7 +34,7 @@ target_pr:
   url: https://github.com/tiic-tech/openworkflow/pull/6
   title: "M71: Git version control governance"
   state: OPEN
-  draft: true
+  draft: false
   head_ref: codex/m71-git-version-governance
   head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
   base_ref: main
@@ -42,15 +42,34 @@ target_pr:
   mergeable: MERGEABLE
   status_check_rollup: []
 candidate_count: 4
-completed_candidate_id: null
-completed_change_id: null
-next_recommended_candidate_id: C001
+completed_candidate_id: C004
+completed_change_id: C004-readiness-governance-audit-handoff
+next_recommended_candidate_id: M127-m101-shared-stack-ready-review-governance
 selected_candidate_id: null
 selected_change_id: null
 outputs:
   candidate_changes_yaml: changes/M126-m71-ready-review-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M126-m71-ready-review-governance/CANDIDATE_CHANGES.md
   summary: changes/M126-m71-ready-review-governance/SUMMARY.yaml
+  c001_selected_change: changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/SELECTED_CHANGE.yaml
+  c001_readiness_preflight: changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/READINESS_PREFLIGHT.md
+  c002_selected_change: changes/M126-m71-ready-review-governance/C002-pr6-ready-review-decision/SELECTED_CHANGE.yaml
+  c002_high_risk_decision_report: changes/M126-m71-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  c003_selected_change: changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/SELECTED_CHANGE.yaml
+  c003_transition_evidence: changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/TRANSITION_EVIDENCE.md
+  c004_readiness_governance_audit: changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+  c004_selected_change: changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+c004_audit_handoff_result:
+  path: changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+  captured_at: 2026-05-24T06:40:00+08:00
+  m126_complete: true
+  final_pr_state: OPEN
+  final_pr_draft: false
+  final_mergeable: MERGEABLE
+  unauthorized_operations_performed: false
+  next_recommended_queue: M127-m101-shared-stack-ready-review-governance
 key_dependencies:
   - M122 published draft PR #6 and deferred ready-for-review governance.
   - M125 completed PR #4 readiness governance and recommended M126 next.
@@ -71,7 +90,13 @@ validation:
   commands_run:
     - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
     - git ls-remote --heads origin codex/m71-git-version-governance
+    - gh pr ready 6 --repo tiic-tech/openworkflow
+    - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
   notes: |
     - M126 queue creation performed no remote mutation.
-    - PR #6 remains draft until a later exact approval gate.
-    - C001 is the next recommended candidate.
+    - C001 refreshed read-only PR #6 readiness facts and performed no remote mutation.
+    - C002 recorded the high-risk ready-for-review decision packet and performed no remote mutation.
+    - C003 ran only the exact approved ready-for-review command and PR #6 is no longer draft.
+    - C004 completed local audit handoff.
+    - PR #6 is now ready for review and remains open.
+    - Merge governance remains separate and requires later exact approval.

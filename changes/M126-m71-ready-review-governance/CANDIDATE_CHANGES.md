@@ -18,7 +18,7 @@ publication, or product source changes.
 ## Current State
 
 - PR #6 state: `OPEN`
-- PR #6 draft: `true`
+- PR #6 draft: `false`
 - Head OID: `a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1`
 - Base OID: `d0e13f4bba3a847b763d2db3f771659aac3a4fe5`
 - Mergeability: `MERGEABLE`
@@ -27,16 +27,35 @@ publication, or product source changes.
 
 ## Next Recommended Candidate
 
-`C001 - Refresh PR #6 readiness preflight`
+`M127 - PR #7 M101 shared-stack ready-for-review governance`
 
-C001 is read-only and must run before any high-risk decision packet or remote
-ready-for-review mutation.
+C001, C002, C003, and C004 are complete. PR #6 is ready for review and not
+merged. M127 is the next recommended queue.
+
+Selected artifacts:
+
+- `changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/SELECTED_CHANGE.yaml`
+- `changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/ATOM_TASKS.yaml`
+- `changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/IMPLEMENTATION_BRIEF.md`
+- `changes/M126-m71-ready-review-governance/C001-pr6-readiness-preflight/READINESS_PREFLIGHT.md`
+- `changes/M126-m71-ready-review-governance/C002-pr6-ready-review-decision/SELECTED_CHANGE.yaml`
+- `changes/M126-m71-ready-review-governance/C002-pr6-ready-review-decision/ATOM_TASKS.yaml`
+- `changes/M126-m71-ready-review-governance/C002-pr6-ready-review-decision/IMPLEMENTATION_BRIEF.md`
+- `changes/M126-m71-ready-review-governance/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/SELECTED_CHANGE.yaml`
+- `changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/ATOM_TASKS.yaml`
+- `changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/IMPLEMENTATION_BRIEF.md`
+- `changes/M126-m71-ready-review-governance/C003-pr6-ready-review-transition/TRANSITION_EVIDENCE.md`
+- `changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml`
+- `changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml`
+- `changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md`
+- `changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md`
 
 ## Candidates
 
 ### C001 - Refresh PR #6 readiness preflight
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -44,7 +63,7 @@ Outcome: record current read-only PR #6 readiness facts.
 
 ### C002 - Prepare PR #6 ready-for-review decision packet
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -53,7 +72,7 @@ Outcome: prepare an evidence-only decision packet with exact approval text for
 
 ### C003 - Execute approved PR #6 ready-for-review transition
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -61,7 +80,7 @@ Outcome: after exact approval, run only the approved PR #6 ready command.
 
 ### C004 - Record PR #6 readiness governance audit and handoff
 
-Status: candidate
+Status: done
 
 Risk: medium
 

@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-readiness-governance-audit-handoff
+title: Atom tasks for PR #6 readiness governance audit handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Select local audit handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    done_when:
+      - C004 selection artifacts exist and forbid remote mutation.
+  - task_id: T002
+    title: Write readiness governance audit
+    status: done
+    type: document
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/C004-readiness-governance-audit-handoff/M126_READINESS_GOVERNANCE_AUDIT.md
+    done_when:
+      - Completed candidates, final PR state, unauthorized operations, and next queues are recorded.
+  - task_id: T003
+    title: Close M126 queue
+    status: done
+    type: document
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    done_when:
+      - C004 completion is recorded and M126 summary is handoff-ready.
