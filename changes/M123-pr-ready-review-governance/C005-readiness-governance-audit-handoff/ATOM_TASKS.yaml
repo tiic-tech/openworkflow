@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C005-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C005-readiness-governance-audit-handoff
+title: Atom tasks for M123 readiness governance audit and handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Summarize completed M123 outcomes
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - PR #5 ready-for-review transition is summarized.
+      - PR #4 deferral is summarized.
+  - task_id: T002
+    title: Record operation boundaries
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/
+    done_when:
+      - Authorized and unauthorized operations are explicit.
+      - Remaining stop gates are explicit.
+  - task_id: T003
+    title: Update queue handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - M123 summary and readable view point to the audit packet.
+      - C005 completion evidence is recorded.
+  - task_id: T004
+    title: Run final validation
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - `validate --json`, `summaries --strict --json`, and `git diff --check` pass.

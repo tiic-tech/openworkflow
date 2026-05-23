@@ -117,12 +117,21 @@ M102-specific readiness governance.
 
 ### C005 - Record PR readiness governance audit and handoff
 
-Status: ready
+Status: done
 
 Risk: medium
 
 Outcome: close M123 with local audit evidence and name remaining publication
 governance queues.
+
+Selection: `C005-readiness-governance-audit-handoff`
+
+Completion evidence:
+
+- `changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/LOCAL_COMMIT_EVIDENCE.yaml`
+- `changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md`
+
+Result: M123 is complete.
 
 ## Stop Gates
 

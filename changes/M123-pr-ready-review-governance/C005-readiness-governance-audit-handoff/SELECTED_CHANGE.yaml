@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:C005-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C005-readiness-governance-audit-handoff
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C005
+title: Record PR readiness governance audit and handoff
+status: done
+selection_reason: >
+  C005 is the final M123 candidate. C001-C004 resolved the PR #5 ready-for-review path and the
+  optional PR #4 path, so M123 now needs a durable audit and handoff packet.
+scope:
+  includes:
+    - summarize completed ready-for-review transitions or stop reasons
+    - update M123 summary and readable view
+    - record deferred next queues for M71 and shared M101-derived branches
+    - confirm no unauthorized PR, Issue, merge, or destructive git operations occurred
+  excludes:
+    - merge
+    - Issue mutation
+    - publishing M71 or shared M101-derived branches
+    - changing product source
+owned_paths:
+  - changes/M123-pr-ready-review-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - A local audit names each authorized and unauthorized operation boundary.
+  - Remaining draft PRs and next governance queues are explicit.
+  - M123 can be handed off without raw session context.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+    - "validation: node dist/cli/src/index.js validate --root . --json"
+    - "validation: node dist/cli/src/index.js summaries --root . --strict --json"
+    - "validation: git diff --check"

@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M123-pr-ready-review-governance
 title: Candidate changes for draft PR ready-for-review governance
-status: active
+status: done
 source:
   kind: mixed
   refs:
@@ -113,7 +113,7 @@ high_risk_report:
   decision_boundary: draft PR ready-for-review transition
   recommended_first_target: PR #5
   report_is_approval: false
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -319,7 +319,7 @@ changes:
         - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate"
         - "validation: git diff --check"
   - id: C005
-    status: ready
+    status: done
     title: Record PR readiness governance audit and handoff
     purpose: >
       Close M123 with local audit evidence naming which PRs were transitioned, which remained draft,
@@ -351,6 +351,25 @@ changes:
       - A local audit names each authorized and unauthorized operation boundary.
       - Remaining draft PRs and next governance queues are explicit.
       - M123 can be handed off without raw session context.
+    selection:
+      selected_change_id: C005-readiness-governance-audit-handoff
+      reason: >
+        C005 closes M123 after C001-C004 completed PR #5 readiness governance and PR #4 deferral.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_by_change_id: C005-readiness-governance-audit-handoff
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: node dist/cli/src/index.js summaries --root . --strict --json"
+        - "validation: git diff --check"
 operations:
   - operation_id: OP001
     operation_type: add
@@ -497,3 +516,28 @@ operations:
     evidence:
       - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml
       - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: C005 is the final M123 audit and handoff candidate after PR #5 readiness and PR #4 deferral.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: M123 readiness governance audit and handoff are recorded.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
