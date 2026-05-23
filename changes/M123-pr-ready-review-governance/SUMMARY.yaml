@@ -38,6 +38,7 @@ outputs:
   summary: changes/M123-pr-ready-review-governance/SUMMARY.yaml
   high_risk_decision_report: changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
   c001_preflight: changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
+  c001_commit_evidence: changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/LOCAL_COMMIT_EVIDENCE.yaml
 observed_state:
   captured_at: 2026-05-23T20:39:29+08:00
   current_branch: codex/m123-pr-ready-review-governance

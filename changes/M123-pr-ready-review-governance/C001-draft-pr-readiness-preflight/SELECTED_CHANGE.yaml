@@ -48,6 +48,7 @@ completion:
   completed_at: 2026-05-23
   implementation_changed_files: true
   evidence:
+    - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/LOCAL_COMMIT_EVIDENCE.yaml
     - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
     - "validation: git status --short --branch"
     - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"

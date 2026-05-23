@@ -53,6 +53,7 @@ Selection: `C001-draft-pr-readiness-preflight`
 
 Completion evidence:
 
+- `changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/LOCAL_COMMIT_EVIDENCE.yaml`
 - `changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md`
 - `gh pr view 5 --repo tiic-tech/openworkflow`
 - `gh pr view 4 --repo tiic-tech/openworkflow`
