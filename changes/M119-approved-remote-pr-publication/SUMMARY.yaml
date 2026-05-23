@@ -44,9 +44,9 @@ preflight_result:
   mutation_performed: false
   first_pilot_ready: false
   preferred_next_pilot_after_clean_tree: M102-selected-change-commit-gate
+  local_preflight_commit: 0c3b2e41b82dd0d37886cf9be32a3569aba5def9
   blockers:
-    - M119 planning and preflight evidence are currently uncommitted.
-    - M102 and M117 remote-plan probes were run from M119, not from their target branch boundaries.
+    - M102 and M117 clean-tree remote-plan probes were run from M119, not from their target branch boundaries.
     - remote-plan still reports unknown remote base head for origin/main.
     - simulator evidence is missing.
     - direct git ls-remote was blocked by local proxy connection to 127.0.0.1:7897.
@@ -106,6 +106,10 @@ validation:
     - node dist/cli/src/index.js git-automation remote-plan --root . --queue
       changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
       --remote origin --target-base main --json
+    - git add changes/M119-approved-remote-pr-publication
+    - git diff --cached --check
+    - git commit -m "M119-approved-remote-pr-publication/C001 Record remote publication preflight"
+    - node dist/cli/src/index.js git-automation remote-plan clean-tree reruns for M102 and M117
   notes:
     - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is
       /ow:vision; the user explicitly requested DTC creation for M119.
@@ -115,3 +119,5 @@ validation:
       and C001 was selected.
     - C001 completed a read-only preflight and recorded that no branch is ready for immediate push
       until M119 evidence is committed and remote-plan is rerun from a clean tree.
+    - Clean-tree reruns removed the dirty-tree blocker but still reported branch mismatch, unknown
+      remote base head, missing simulator evidence, and absent or unreadable remote branch heads.

@@ -61,13 +61,44 @@ Mutation performed: none.
 
 No branch is ready for immediate push from this state.
 
-The best next local action is to commit the M119 planning and C001 preflight evidence on
-`codex/m119-approved-remote-pr-publication`, then rerun remote-plan from a clean tree. Only after a
-clean preflight should M119 produce a high-risk decision report for one exact push command.
+The M119 planning and C001 preflight evidence was committed locally as:
+
+```text
+0c3b2e41b82dd0d37886cf9be32a3569aba5def9 M119-approved-remote-pr-publication/C001 Record remote publication preflight
+```
+
+After that commit, both remote-plan probes were rerun from a clean worktree. The dirty-tree blocker
+was cleared, but no branch became ready for immediate push.
 
 When the clean-tree preflight is rerun, M102 remains the preferred pilot candidate because its
 branch boundary owns its plan and the read-only merge checkpoint reports fast-forward with no
 conflict files. M117 remains a second candidate.
+
+## Clean-Tree Rerun
+
+### M102 after local M119 commit
+
+- Current branch: `codex/m119-approved-remote-pr-publication`
+- Local HEAD: `0c3b2e41b82dd0d37886cf9be32a3569aba5def9`
+- Dirty paths: none
+- Remaining blockers:
+  - current branch `codex/m119-approved-remote-pr-publication` does not match `codex/m102-selected-change-commit-gate`
+  - remote base head is unknown for `origin/main`
+  - simulator evidence is missing
+  - remote branch head is absent or unreadable
+- Merge checkpoint remained fast-forward and clean with no conflict files.
+
+### M117 after local M119 commit
+
+- Current branch: `codex/m119-approved-remote-pr-publication`
+- Local HEAD: `0c3b2e41b82dd0d37886cf9be32a3569aba5def9`
+- Dirty paths: none
+- Remaining blockers:
+  - current branch `codex/m119-approved-remote-pr-publication` does not match `codex/m117-git-automation-remote-readiness`
+  - remote base head is unknown for `origin/main`
+  - simulator evidence is missing
+  - remote branch head is absent or unreadable
+- Merge checkpoint remained fast-forward and clean with no conflict files.
 
 ## Approval-Gated Commands
 
