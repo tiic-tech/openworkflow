@@ -1,0 +1,24 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C005-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C005-readiness-governance-audit-handoff
+status: current
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C005
+selected_change_id: C005-readiness-governance-audit-handoff
+primary_commit: c90a79dd04421e97b34c1e8e1c8a4a5c2b1c620e
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
