@@ -251,10 +251,9 @@ changes:
       selected_change_id: M117-C002-apply-branch-identity-governance-across-git-automation-modes
       selected_at: 2026-05-23
       reason: >
-        Selected immediately after C001 because remote readiness now has modern
-        local commit evidence, but branch, remote-plan, simulate, and draft-pr
-        still need the same feat-scoped branch identity governance that M114
-        already applied to commit and resume.
+        Selected immediately after C001 because remote readiness now has modern local commit
+        evidence, but branch, remote-plan, simulate, and draft-pr still need the same feat-scoped
+        branch identity governance that M114 already applied to commit and resume.
       artifacts:
         selected_change: changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/SELECTED_CHANGE.yaml
         atom_tasks: changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/ATOM_TASKS.yaml
@@ -271,17 +270,24 @@ changes:
         - packages/cli/src/commands/gitAutomation.ts
         - packages/cli/src/dev/verifyRuntimeSurface.ts
         - changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs
+        - changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/LOCAL_COMMIT_EVIDENCE.yaml
       summary: >
-        Reused the branch identity assessment across branch, remote-plan,
-        simulate, and draft-pr. These modes now report branch_matches_current,
-        branch_owns_plan, and structured branch_identity details, and stale
-        branch identities fail closed unless a scoped temporary continuation
-        exception applies.
+        Reused the branch identity assessment across branch, remote-plan, simulate, and draft-pr.
+        These modes now report branch_matches_current, branch_owns_plan, and structured
+        branch_identity details, and stale branch identities fail closed unless a scoped temporary
+        continuation exception applies.
       validation:
-        - "RED: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs failed because branch mode accepted stale branch identity"
+        - "RED: node
+          changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across\
+          -git-automation-modes/branch_identity_remote_modes_fixture.mjs failed because branch mode
+          accepted stale branch identity"
         - npm run build
-        - "GREEN: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs"
-        - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+        - "GREEN: node
+          changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across\
+          -git-automation-modes/branch_identity_remote_modes_fixture.mjs"
+        - "GREEN: node
+          changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/bran\
+          ch_identity_fixture.mjs"
         - npm run verify:runtime-surface
         - node dist/cli/src/index.js resume --root . --json
         - git diff --check
@@ -471,10 +477,9 @@ operations:
       - C002
     actor: agent
     reason: >
-      Selected the next dependency-ready candidate after C001 commit evidence
-      restored strict handoff trust. C002 carries branch identity governance
-      into all non-mutating git-automation readiness modes before later draft PR
-      or conflict checkpoint work can rely on them.
+      Selected the next dependency-ready candidate after C001 commit evidence restored strict
+      handoff trust. C002 carries branch identity governance into all non-mutating git-automation
+      readiness modes before later draft PR or conflict checkpoint work can rely on them.
     changed_at: 2026-05-23
     evidence:
       - changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/SELECTED_CHANGE.yaml
@@ -486,9 +491,9 @@ operations:
       - C002
     actor: agent
     reason: >
-      Completed branch identity governance for queue-bound git-automation
-      readiness modes so later draft PR and merge-conflict work cannot treat a
-      stale continuation branch as owning the feat plan.
+      Completed branch identity governance for queue-bound git-automation readiness modes so later
+      draft PR and merge-conflict work cannot treat a stale continuation branch as owning the feat
+      plan.
     changed_at: 2026-05-23
     evidence:
       - packages/core/src/git/branchIdentity.ts
