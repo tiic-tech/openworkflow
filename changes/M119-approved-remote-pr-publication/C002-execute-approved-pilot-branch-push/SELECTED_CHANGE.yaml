@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:M119-C002-execute-approved-pilot-branch-push
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M119-C002-execute-approved-pilot-branch-push
+source_plan_id: M119-approved-remote-pr-publication
+source_candidate_id: C002
+title: Execute an explicitly approved pilot branch push
+status: selected
+selection_reason: >
+  C002 was selected only after C001 produced the remote publication preflight, the
+  high-risk decision report named the exact push boundary, and the user explicitly approved
+  the concrete command `git push origin codex/m102-selected-change-commit-gate`.
+approved_operation:
+  approved_at: 2026-05-23
+  approval_source: user_input:2026-05-23-approved-exact-push-command
+  command: git push origin codex/m102-selected-change-commit-gate
+  branch: codex/m102-selected-change-commit-gate
+  remote: origin
+  target_base: main
+scope:
+  includes:
+    - confirm the current branch matches the approved pilot branch boundary before push
+    - confirm the working tree is clean before push
+    - run read-only remote and git-automation checks immediately before push
+    - execute one approved git push command
+    - record the remote ref, local commit hash, approval source, and rollback notes
+  excludes:
+    - draft PR creation
+    - pushing more than one branch
+    - force-push
+    - rebasing, resetting, cherry-picking, or deleting branches
+    - editing remote Issues or PRs
+owned_paths:
+  - changes/M119-approved-remote-pr-publication/
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - Exactly one user-approved branch is pushed.
+  - Local audit evidence records the approval source, branch, base, commit hash, remote ref, and result.
+  - No PR, Issue, merge, force-push, or history rewrite occurs.
+validation:
+  - git status --short --branch
+  - git ls-remote --heads origin main codex/m102-selected-change-commit-gate
+  - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base main --json
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - git push origin codex/m102-selected-change-commit-gate
+  - git ls-remote --heads origin codex/m102-selected-change-commit-gate
+rejected_alternatives:
+  - id: C003
+    reason: Draft PR creation is a separate remote mutation and still requires explicit operation-level approval.
+  - id: multi_branch_push
+    reason: M119 C002 approval covered exactly one pilot branch push.

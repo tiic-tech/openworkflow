@@ -89,7 +89,7 @@ observed_state:
     - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
     - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
     - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
-next_recommended_candidate_id: null
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -160,7 +160,7 @@ changes:
         - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
         - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
   - id: C002
-    status: candidate
+    status: done
     title: Execute an explicitly approved pilot branch push
     purpose: >
       After C001 is green and the user approves the exact command, push exactly one pilot branch to
@@ -196,6 +196,37 @@ changes:
       - Exactly one user-approved branch is pushed.
       - Local audit evidence records the approval source, branch, base, commit hash, remote ref, and result.
       - No PR, Issue, merge, force-push, or history rewrite occurs.
+    selection:
+      selected_change_id: M119-C002-execute-approved-pilot-branch-push
+      selected_at: 2026-05-23
+      reason: >
+        Selected after the high-risk report named the exact operation boundary and the user
+        explicitly approved `git push origin codex/m102-selected-change-commit-gate`.
+      artifacts:
+        selected_change: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/ATOM_TASKS.yaml
+        implementation_brief: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 performed one approved remote branch publication and then produced local governance
+        evidence only. It did not change product source, generated surfaces, runtime behavior, or
+        local branch pointers beyond switching branches for the approved push.
+      approval_source: user_input:2026-05-23-approved-exact-push-command
+      pushed_branch: codex/m102-selected-change-commit-gate
+      pushed_commit: bd2780b1d5b117b2734e5b732164e5d299bd521a
+      remote_ref: refs/heads/codex/m102-selected-change-commit-gate
+      evidence:
+        - changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md
+        - changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
+      validation:
+        - git status --short --branch
+        - git ls-remote --heads origin main codex/m102-selected-change-commit-gate
+        - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base main --json
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - git push origin codex/m102-selected-change-commit-gate
+        - git ls-remote --heads origin codex/m102-selected-change-commit-gate
   - id: C003
     status: candidate
     title: Create an explicitly approved draft PR for the pushed pilot branch

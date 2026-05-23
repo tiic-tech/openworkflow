@@ -14,7 +14,7 @@ Current branch after selection setup: `codex/m119-approved-remote-pr-publication
 
 Select C001 first. Push and draft PR candidates are high risk and require a green C001 preflight, a high-risk decision report for the exact operation boundary, and explicit user approval for the concrete command.
 
-Completed candidate: C001
+Completed candidate: C002
 
 High-risk report: `changes/M119-approved-remote-pr-publication/HIGH_RISK_DECISION_REPORT.md`
 
@@ -48,21 +48,29 @@ Result: no branch is ready for immediate push from the current dirty M119 planni
 
 ### C002 - Execute an explicitly approved pilot branch push
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Purpose: after C001 is green and the user approves the exact command, push one pilot branch to origin and record local audit evidence.
 
-Approval required: yes
+Approval required: satisfied for one exact push command
 
-Current recommended pilot: `codex/m102-selected-change-commit-gate`
+Pushed pilot: `codex/m102-selected-change-commit-gate`
 
-Exact push command requiring approval:
+Approved and executed command:
 
 ```bash
 git push origin codex/m102-selected-change-commit-gate
 ```
+
+Pushed commit: `bd2780b1d5b117b2734e5b732164e5d299bd521a`
+
+Remote ref: `refs/heads/codex/m102-selected-change-commit-gate`
+
+Audit evidence:
+
+- `changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md`
 
 Excludes: draft PR creation, multi-branch push, force-push, rebase, reset, cherry-pick, branch deletion, Issue mutation, and PR edits.
 

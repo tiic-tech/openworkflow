@@ -27,9 +27,9 @@ branch_note: >
   Queue creation happened on codex/m118-repo-branch-pr-governance after commit 34708e0 with a clean
   working tree.
 candidate_count: 4
-completed_candidate_id: C001
-completed_change_id: M119-C001-refresh-remote-publication-preflight
-next_recommended_candidate_id: null
+completed_candidate_id: C002
+completed_change_id: M119-C002-execute-approved-pilot-branch-push
+next_recommended_candidate_id: C003
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -41,6 +41,10 @@ outputs:
   atom_tasks: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/ATOM_TASKS.yaml
   implementation_brief: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/IMPLEMENTATION_BRIEF.md
   remote_publication_preflight: changes/M119-approved-remote-pr-publication/C001-refresh-remote-publication-preflight/REMOTE_PUBLICATION_PREFLIGHT.md
+  c002_selected_change: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/IMPLEMENTATION_BRIEF.md
+  remote_push_audit: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
 preflight_result:
   mutation_performed: false
   first_pilot_ready: false
@@ -53,12 +57,20 @@ preflight_result:
   blockers:
     - Remote-plan does not consume the green simulator command result; it checks for a completed
       simulator candidate in the target queue.
-    - C002 push remains blocked until explicit approval of the exact push command.
+push_result:
+  mutation_performed: true
+  approved_operation: git push origin codex/m102-selected-change-commit-gate
+  approval_source: user_input:2026-05-23-approved-exact-push-command
+  pushed_branch: codex/m102-selected-change-commit-gate
+  pushed_commit: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  remote_ref: refs/heads/codex/m102-selected-change-commit-gate
+  remote_ref_verified: true
+  draft_pr_created: false
+  audit: changes/M119-approved-remote-pr-publication/C002-execute-approved-pilot-branch-push/REMOTE_PUSH_AUDIT.md
 key_dependencies:
   - C001 must refresh current remote readiness before any push or PR operation can be selected.
-  - C002 requires a clean-tree remote-plan rerun, a high-risk report, and explicit approval for one
-    exact push command.
-  - C003 requires C002 plus explicit approval for one exact draft PR command.
+  - C002 completed one explicitly approved push for codex/m102-selected-change-commit-gate.
+  - C003 requires explicit approval for one exact draft PR command.
   - C004 requires C002 and C003 evidence before it can summarize publication results.
 risks:
   - id: R001
@@ -75,11 +87,8 @@ risks:
     description: Remote base visibility and simulator evidence were missing in M118 read-only probes.
     mitigation: C001 must refresh remote-plan evidence before any mutation candidate proceeds.
 unresolved_questions:
-  - Which branch should become the first remote publication pilot after C001 refreshes current
-    remote state?
-  - Should the known simulator-evidence binding gap block M102 push, or can the green simulator
-    command output be accepted as manual approval evidence for the narrow pilot?
-  - What exact user approval text should be captured before the first push command?
+  - What exact user approval text should be captured before draft PR creation for C003?
+  - Should C003 use the GitHub-suggested PR URL flow or an explicit `gh pr create --draft` command?
 deferred_features:
   - M120-historical-branch-repair
 validation:
@@ -126,6 +135,8 @@ validation:
     - node dist/cli/src/index.js git-automation remote-plan --root . --queue
       changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml --base origin/main
       --remote origin --target-base main --json
+    - git push origin codex/m102-selected-change-commit-gate
+    - git ls-remote --heads origin codex/m102-selected-change-commit-gate
   notes:
     - The DTC readiness check returned ok:true with a warning that CURRENT_STATE next_command is
       /ow:vision; the user explicitly requested DTC creation for M119.
@@ -141,3 +152,6 @@ validation:
       remote base head, and PR-ready summary blockers. The remaining remote-plan blocker is the
       simulator evidence binding rule, despite simulate returning ok:true.
     - HIGH_RISK_DECISION_REPORT.md records the exact C002 push approval boundary and stop criteria.
+    - User approval was received for `git push origin codex/m102-selected-change-commit-gate`.
+    - C002 pushed exactly codex/m102-selected-change-commit-gate to origin and verified the remote
+      ref. No draft PR, Issue mutation, merge, force-push, or history rewrite was performed.

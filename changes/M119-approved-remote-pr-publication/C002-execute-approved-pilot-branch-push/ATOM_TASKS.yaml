@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M119-C002-execute-approved-pilot-branch-push
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M119-C002-execute-approved-pilot-branch-push
+title: Atom tasks for approved pilot branch push
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm approval and exact operation boundary
+    status: done
+    type: governance
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The high-risk report names the exact push command.
+      - The user approval source for the exact command is recorded.
+  - task_id: T002
+    title: Run immediate pre-push checks
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The approved branch is current and clean before push.
+      - The remote main ref is readable.
+      - The approved remote branch is confirmed absent before first push.
+      - Simulator and remote-plan evidence are captured.
+  - task_id: T003
+    title: Push exactly one approved branch
+    status: done
+    type: remote_mutation
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - "git push origin codex/m102-selected-change-commit-gate succeeds."
+      - No draft PR or other remote mutation is performed.
+  - task_id: T004
+    title: Record remote ref and local audit evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M119-approved-remote-pr-publication/
+    done_when:
+      - The pushed remote ref and commit hash are recorded.
+      - Rollback guidance and next approval gate are recorded.
