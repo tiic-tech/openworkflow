@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active; C002 completed after `M115-internal-coder-quality-governance`
+Status: active; C008 inserted before C003 for branch governance
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -55,11 +55,13 @@ visible until classified or fixed.
 
 Selected candidate: none.
 
-Next recommended candidate: C003.
+Next recommended candidate: C008.
 
 M114 has resumed after M115 established the internal coder protocol boundary.
 C001 has completed the domain taxonomy; C002 has completed the shared
-path-safety helper slice.
+path-safety helper slice. C002 exposed that the recorded branch boundary can
+name an unrelated continuation branch while resume and git-automation still
+treat the branch as matching, so C008 is inserted before C003.
 
 ## Candidates
 
@@ -179,3 +181,26 @@ Risk: medium
 Purpose: make broad scans visible and measurable for Agent entry commands.
 
 Depends on: C001, C003.
+
+### C008 - Enforce Feat-Scoped Branch Identity For Candidate Queues And Git Automation
+
+Status: ready
+
+Risk: medium
+
+Purpose: close the branch governance defect where `queue_policy.branch_boundary`
+can point at another feat's continuation branch and still be treated as valid
+because the current branch string matches.
+
+Depends on: C001, C002.
+
+Acceptance focus:
+
+- New branch-governed queues have an enforceable feat-scoped branch identity
+  rule.
+- A queue whose `branch_boundary` names another plan id is surfaced as a branch
+  identity warning or validation failure.
+- `git-automation commit` cannot silently bless a stale continuation branch as
+  the owning feat branch.
+- `resume` distinguishes current-branch equality from feat-branch ownership.
+- Temporary continuation branch exceptions are explicit and narrow.

@@ -85,7 +85,7 @@ scope_control:
         C004 should extract one high-churn validation domain first; splitting
         all large files is too broad for a single queue.
       suggested_plan_id: M116-validator-and-verifier-decomposition
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C008
 quality_baseline:
   trust_commands:
     - command: node dist/cli/src/index.js handoff --root . --json
@@ -433,6 +433,59 @@ changes:
       - At least one entry command exposes scan scope or budget-relevant diagnostics.
       - The report distinguishes necessary broad scans from pointer/index reads.
       - No new full-repo scan is added without justification.
+  - id: C008
+    status: ready
+    title: Enforce feat-scoped branch identity for candidate queues and git automation
+    purpose: >
+      Close the branch governance defect exposed by M114 C002: OW currently
+      treats queue_policy.branch_boundary as a string equality guard, but does
+      not prove that the branch identity actually belongs to the queue's feat.
+      This allows M114, M115, M106, and similar queues to keep committing on a
+      stale continuation branch such as codex/m101-build-proto-prompt-command-split.
+    scope:
+      includes:
+        - define the branch identity invariant for candidate queues
+        - add validation or runtime guidance when plan_id and branch_boundary are semantically mismatched
+        - update resume or git-automation reporting so branch_matches_current does not imply feat ownership when the boundary is stale
+        - add a targeted fixture covering a queue whose branch_boundary points at another plan id
+        - document the explicit exception path for temporary continuation branches
+      excludes:
+        - rewriting git history
+        - pushing, opening PRs, or mutating remote state
+        - migrating every historical queue branch in the same candidate
+        - changing selected-change commit evidence semantics beyond branch identity checks
+    owned_paths:
+      - references/git-version-control-governance.md
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - packages/core/src/git/
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M114-engineering-quality-foundation/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C003
+      - C004
+      - C007
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - targeted branch-identity fixture
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - New branch-governed queues have an enforceable feat-scoped branch identity rule.
+      - A queue whose branch_boundary names another plan id is surfaced as a branch identity warning or validation failure.
+      - git-automation commit cannot silently bless a stale continuation branch as the owning feat branch.
+      - resume distinguishes current-branch equality from feat-branch ownership.
+      - The policy defines a narrow explicit exception for temporary continuation branches without making it the default.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -518,3 +571,35 @@ operations:
     evidence:
       - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
       - changes/M115-internal-coder-quality-governance/SUMMARY.yaml
+  - operation_id: OP006
+    operation_type: add
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      Added a temporary branch-governance candidate after M114 C002 exposed that
+      queue_policy.branch_boundary can point at an unrelated continuation branch
+      while resume and git-automation still report the branch as matching.
+      This must be fixed before continuing C003 because selected-change commits
+      should happen on the feat branch that owns the candidate queue.
+    changed_at: 2026-05-23
+    evidence:
+      - references/git-version-control-governance.md
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/workflow/planningQueueResume.ts
+      - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: priority_change
+    target_candidate_ids:
+      - C008
+      - C003
+    actor: agent
+    reason: >
+      Prioritized C008 ahead of C003 because branch-per-feat ownership is a
+      git-governance trust defect that affects every following implementation
+      candidate in this queue.
+    changed_at: 2026-05-23
+    before_status: next_recommended_candidate_id C003
+    after_status: next_recommended_candidate_id C008
+    evidence:
+      - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
