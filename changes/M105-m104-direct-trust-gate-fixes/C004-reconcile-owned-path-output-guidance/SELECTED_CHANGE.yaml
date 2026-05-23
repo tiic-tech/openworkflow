@@ -9,9 +9,9 @@ title: Reconcile selected-change owned paths with command pointer and summary ou
 status: done
 selected_at: 2026-05-23
 selection_reason: >
-  Selected after C003 completed because C004 is the last direct M104
-  trust-gate defect in this queue. M104 showed that expected pointer/index or
-  summary outputs can appear as out-of-scope dirty paths only at commit time.
+  Selected after C003 completed because C004 is the last direct M104 trust-gate defect in this
+  queue. M104 showed that expected pointer/index or summary outputs can appear as out-of-scope dirty
+  paths only at commit time.
 risk_decision:
   risk: medium
   selected_option: Improve commit-scope diagnostics without weakening enforcement.
@@ -38,7 +38,8 @@ forbidden_paths:
   - changes/M101-build-proto-prompt-command-split/**
   - changes/M102-selected-change-commit-gate/**
 acceptance:
-  - git-automation commit reports missing owned path guidance when dirty pointer, index, summary, or decision outputs are outside selected-change scope.
+  - git-automation commit reports missing owned path guidance when dirty pointer, index, summary, or
+    decision outputs are outside selected-change scope.
   - The command still refuses dirty paths outside selected-change owned_paths.
   - Runtime coverage captures the M104-style late scope failure.
 validation:
@@ -49,14 +50,15 @@ validation:
   - node dist/cli/src/index.js handoff --root . --json
   - git diff --check
 expected_commit_boundary: >
-  C004 should complete as one local implementation commit containing scoped
-  diagnostics, runtime coverage, queue updates, and local commit evidence.
+  C004 should complete as one local implementation commit containing scoped diagnostics, runtime
+  coverage, queue updates, and local commit evidence.
 completion:
   completed_at: 2026-05-23
   implementation_changed_files: true
   evidence:
     - packages/core/src/git/localGitAutomation.ts
     - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/LOCAL_COMMIT_EVIDENCE.yaml
   validation:
     - npm run build
     - npm run verify:runtime-surface

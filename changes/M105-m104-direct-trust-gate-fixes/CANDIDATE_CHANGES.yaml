@@ -348,9 +348,8 @@ changes:
       selected_change_id: M105-C004-reconcile-owned-path-output-guidance
       selected_at: 2026-05-23
       reason: >
-        Selected after C003 completed. C004 is the remaining direct M104
-        trust-gate fix and is constrained to diagnostics, not relaxed scope
-        enforcement.
+        Selected after C003 completed. C004 is the remaining direct M104 trust-gate fix and is
+        constrained to diagnostics, not relaxed scope enforcement.
       artifacts:
         selected_change: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml
         atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml
@@ -361,10 +360,11 @@ changes:
       evidence:
         - packages/core/src/git/localGitAutomation.ts
         - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/LOCAL_COMMIT_EVIDENCE.yaml
       summary: >
-        git-automation commit now keeps strict dirty-path refusal while adding
-        actionable warnings when unrelated dirty paths look like OpenWorkflow
-        command outputs that may need explicit selected-change owned_paths.
+        git-automation commit now keeps strict dirty-path refusal while adding actionable warnings
+        when unrelated dirty paths look like OpenWorkflow command outputs that may need explicit
+        selected-change owned_paths.
       validation:
         - npm run build
         - npm run verify:runtime-surface
@@ -495,9 +495,8 @@ operations:
     target_candidate_ids:
       - C004
     actor: agent
-    reason: >
-      Selected the last direct M104 trust-gate fix after C003 completed and
-      strict handoff passed.
+    reason: |
+      Selected the last direct M104 trust-gate fix after C003 completed and strict handoff passed.
     changed_at: 2026-05-23
     before_status: candidate
     after_status: selected
@@ -510,9 +509,8 @@ operations:
     target_candidate_ids:
       - C004
     actor: agent
-    reason: >
-      Implemented and verified owned-path diagnostics for out-of-scope
-      OpenWorkflow command outputs.
+    reason: |
+      Implemented and verified owned-path diagnostics for out-of-scope OpenWorkflow command outputs.
     changed_at: 2026-05-23
     before_status: selected
     after_status: done
