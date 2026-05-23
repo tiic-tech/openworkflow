@@ -602,7 +602,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const writeRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--write", "--json"], env), "summarize");
   const writeEffects = record(writeRun.effects, "summarize write effects");
   assert(Array.isArray(writeEffects.written) && writeEffects.written.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize write did not report summary write");
-  assert(await exists(join(artifactDir, "SUMMARY.yaml")), "summarize --write did not create SUMMARY.yaml");
+  const writtenSummaryPath = join(artifactDir, "SUMMARY.yaml");
+  assert(await exists(writtenSummaryPath), "summarize --write did not create SUMMARY.yaml");
+  const writtenSummary = await readFile(writtenSummaryPath, "utf8");
+  assert(writtenSummary.includes("contract_type: workflow"), "summarize --write summary must use a validate-compatible contract_type");
+  assert(writtenSummary.includes("status: current"), "summarize --write summary must include status for common contract validation");
   const currentAfterWrite = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const currentEntries = record(currentAfterWrite.data, "summary health data").entries;
   assert(Array.isArray(currentEntries), "summary health entries must be array");
