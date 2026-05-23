@@ -1,0 +1,809 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M124-shared-branch-publication-strategy
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M124-shared-branch-publication-strategy
+title: Candidate changes for shared M101-derived branch publication strategy
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-plan-m124-cc
+    - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+    - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+    - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+    - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+    - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+  summary: >
+    M120 and M123 deferred the shared M101-derived branch group because M105, M106, and M115 all
+    record the same branch boundary, codex/m101-build-proto-prompt-command-split. M122 has now
+    published the older M71 branch as draft PR #6. M124 owns the next planning lane: decide whether
+    the M105/M106/M115 group should publish as one intentionally shared historical review branch or
+    require a high-risk split/surgery plan before publication.
+queue_policy:
+  branch_boundary: codex/m124-shared-branch-publication-strategy
+  branch_note: >
+    Proposed by DTC while the repository was on codex/m122-m71-historical-stack-publication with
+    uncommitted M122 publication evidence. Branch creation was intentionally not performed during
+    planning. M124 is a governance branch for publication strategy; its publication target is the
+    existing shared M101-derived branch, not the M124 governance branch.
+  target_publication_branch: codex/m101-build-proto-prompt-command-split
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. M124 must refresh current shared-branch publication facts before deciding
+    whether to publish one shared historical stack or prepare a split/surgery plan.
+  high_risk_rule: >
+    C002 through C005 involve high-risk publication, draft PR, or branch-history surgery boundaries.
+    Exact remote or destructive commands must be captured in a high-risk decision report and
+    approved explicitly before execution.
+scope_control:
+  current_boundary: >
+    Strategy and approval-gated publication workflow for the shared M101-derived branch group that
+    currently contains M105, M106, and M115 evidence.
+  boundary_type: git_remote_publication_strategy_slice
+  in_scope_rule: >
+    Include read-only shared-branch inventory, shared-stack versus split decision reporting,
+    approved push/PR planning if shared-stack publication is accepted, and split/surgery design if
+    shared-stack publication is rejected.
+  out_of_scope_rule: >
+    Do not mark PR #4 or PR #6 ready for review, merge PRs, edit or close PRs, mutate Issues,
+    publish unrelated branches, execute branch split surgery, cherry-pick, rebase, reset,
+    force-push, delete remote branches, or change product source in this queue without a later
+    exact high-risk approval.
+  deferred_features:
+    - title: PR #4 M102-specific readiness governance
+      reason: PR #4 was deferred by M123 and belongs to an older M102 flow.
+      suggested_plan_id: M125-m102-pr4-readiness-governance
+    - title: PR #6 M71 ready-for-review governance
+      reason: M122 created PR #6 as draft only; ready-for-review transition is a separate PR mutation.
+      suggested_plan_id: M126-m71-ready-review-governance
+observed_state:
+  captured_at: 2026-05-23T21:51:28+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: false
+  dirty_tree_note: >
+    Dirty paths are M122 publication evidence from the immediately preceding approved M71 push and
+    draft PR creation workflow. M124 creation only writes under changes/M124-shared-branch-publication-strategy/.
+  target_branch: codex/m101-build-proto-prompt-command-split
+  target_branch_head: f8bf087211316506f48155859f3e18edbc7224e4
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  merge_base: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 251
+  origin_main_is_ancestor: true
+  conflict_probe_tree: e70f5ae555b03b1ee3f1a3f32f94a0e8c94b55c9
+  target_remote_branch_present: false
+  existing_prs_for_target_branch: []
+  shared_source_queues:
+    - plan_id: M105-m104-direct-trust-gate-fixes
+      branch_boundary: codex/m101-build-proto-prompt-command-split
+      pr_ready_summary_present: true
+      status: complete
+    - plan_id: M106-agent-resume-cockpit
+      branch_boundary: codex/m101-build-proto-prompt-command-split
+      pr_ready_summary_present: true
+      status: completed
+    - plan_id: M115-internal-coder-quality-governance
+      branch_boundary: codex/m101-build-proto-prompt-command-split
+      pr_ready_summary_present: true
+      status: completed
+  recently_completed_publication:
+    m71_pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+    m71_pr_state: OPEN
+    m71_pr_draft: true
+c001_inventory_result:
+  path: changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/PUBLICATION_INVENTORY.md
+  captured_at: 2026-05-23T22:06:39+08:00
+  target_branch: codex/m101-build-proto-prompt-command-split
+  target_branch_head: f8bf087211316506f48155859f3e18edbc7224e4
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  merge_base: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 251
+  origin_main_is_ancestor: true
+  conflict_probe_tree: e70f5ae555b03b1ee3f1a3f32f94a0e8c94b55c9
+  remote_branch_present: false
+  existing_prs: []
+  pr_ready_summaries_present:
+    M105-m104-direct-trust-gate-fixes: true
+    M106-agent-resume-cockpit: true
+    M115-internal-coder-quality-governance: true
+  recommended_next: C002
+c002_decision_result:
+  path: changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+  captured_at: 2026-05-23T22:16:03+08:00
+  approved_option: local-only decision report
+  recommendation: shared-stack publication as one draft PR, with strict approval gates
+  evidence_not_approval: true
+  preferred_next_candidate_id: C003
+  fallback_candidate_id: C005
+  required_push_approval_text: >
+    Approve M124 C003 push: run git -C /Users/archy/Projects/StartUp/openworkflow push origin
+    codex/m101-build-proto-prompt-command-split:refs/heads/codex/m101-build-proto-prompt-command-split
+  forbidden_without_later_exact_approval:
+    - push
+    - draft PR creation
+    - ready-for-review transition
+    - cherry-pick, rebase, reset, force-push, branch deletion, branch pointer moves, or split history
+    - PR edit, PR close, Issue mutation, or merge
+c003_push_result:
+  path: changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/PUSH_EVIDENCE.md
+  pushed_at: 2026-05-23T22:27:01+08:00
+  approved_command: git -C /Users/archy/Projects/StartUp/openworkflow push origin codex/m101-build-proto-prompt-command-split:refs/heads/codex/m101-build-proto-prompt-command-split
+  remote_branch: refs/heads/codex/m101-build-proto-prompt-command-split
+  remote_head: f8bf087211316506f48155859f3e18edbc7224e4
+  existing_prs_after_push: []
+  no_draft_pr_created: true
+  next_recommended_candidate_id: C004
+c004_draft_pr_approval_packet:
+  path: changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+  body_file: changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+  prepared_at: 2026-05-23T22:43:17+08:00
+  remote_head: f8bf087211316506f48155859f3e18edbc7224e4
+  existing_prs_before_create: []
+  draft_pr_created: false
+  required_approval_text: >
+    Approve M124 C004 draft PR: run gh pr create --repo tiic-tech/openworkflow --head
+    codex/m101-build-proto-prompt-command-split --base main --draft --title "M101 shared stack:
+    M105/M106/M115 governance updates" --body-file
+    changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+c004_pr_result:
+  path: changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  created_at: 2026-05-23T22:46:11+08:00
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/7
+  pr_number: 7
+  state: OPEN
+  draft: true
+  title: "M101 shared stack: M105/M106/M115 governance updates"
+  head_ref: codex/m101-build-proto-prompt-command-split
+  head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  status_check_rollup: []
+  ready_for_review_transitioned: false
+  next_recommended_candidate_id: C006
+c006_audit_result:
+  path: changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+  completed_at: 2026-05-23T22:49:57+08:00
+  final_state: complete
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/7
+  pr_draft: true
+  unauthorized_operations_not_performed:
+    - ready-for-review transition
+    - merge
+    - PR edit after creation
+    - Issue mutation
+    - branch surgery
+    - destructive git operations
+  deferred_next_queues:
+    - M125-m102-pr4-readiness-governance
+    - M126-m71-ready-review-governance
+    - future-pr7-ready-review-governance
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Refresh shared M101 branch publication inventory
+    purpose: >
+      Produce a current read-only inventory for the shared M101-derived branch group, including
+      local branch head, base ancestry, ahead count, conflict probe, remote branch presence,
+      existing PRs, and the per-queue PR-ready summary state for M105, M106, and M115.
+    scope:
+      includes:
+        - verify local shared M101 branch and head
+        - verify origin/main ancestry, ahead count, and conflict probe
+        - verify remote target branch absence or head
+        - verify existing PRs for the shared head branch
+        - verify M105, M106, and M115 PR_READY_SUMMARY.md files
+        - recommend whether C002 can prepare a shared-stack versus split decision packet
+      excludes:
+        - push
+        - draft PR creation
+        - ready-for-review transition
+        - branch split surgery, cherry-pick, rebase, reset, force-push, branch deletion, PR edit/close, Issue mutation, or merge
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    dependencies: []
+    unlocks:
+      - C002
+      - C006
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git rev-parse origin/main codex/m101-build-proto-prompt-command-split
+      - git merge-base origin/main codex/m101-build-proto-prompt-command-split
+      - git rev-list --count origin/main..codex/m101-build-proto-prompt-command-split
+      - git merge-base --is-ancestor origin/main codex/m101-build-proto-prompt-command-split
+      - git merge-tree --write-tree origin/main codex/m101-build-proto-prompt-command-split
+      - git ls-remote --heads origin codex/m101-build-proto-prompt-command-split
+      - gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+      - git diff --check
+    acceptance:
+      - A durable inventory packet names current shared-branch publication facts.
+      - The packet states whether C002 can proceed to an exact decision report.
+      - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: C001-refresh-shared-m101-publication-inventory
+      reason: >
+        C001 is the required first M124 candidate. It refreshes read-only publication facts for the
+        shared M101-derived branch group before any high-risk shared-stack versus split decision.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T22:06:39+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced read-only publication inventory and local planning evidence only; no product
+        source, generated surface, remote branch, PR, Issue, or git history was mutated.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/PUBLICATION_INVENTORY.md
+        - "validation: git status --short --branch"
+        - "validation: git rev-parse origin/main codex/m101-build-proto-prompt-command-split"
+        - "validation: git merge-base origin/main codex/m101-build-proto-prompt-command-split"
+        - "validation: git rev-list --count origin/main..codex/m101-build-proto-prompt-command-split"
+        - "validation: git merge-base --is-ancestor origin/main codex/m101-build-proto-prompt-command-split"
+        - "validation: git merge-tree --write-tree origin/main codex/m101-build-proto-prompt-command-split"
+        - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+        - "validation: git diff --check"
+  - id: C002
+    status: done
+    title: Prepare shared-stack versus split decision report
+    purpose: >
+      Convert C001 facts into a high-risk decision packet that compares publishing one shared
+      historical M101-derived review branch against preparing a split/surgery plan for M105, M106,
+      and M115.
+    scope:
+      includes:
+        - shared-stack acceptance rationale
+        - split/surgery risks and non-goals
+        - exact decision options for shared-stack publication, design-only split planning, or defer
+        - required approval text for any later push or branch surgery
+      excludes:
+        - executing push
+        - creating a draft PR
+        - performing cherry-pick, rebase, reset, force-push, or branch pointer surgery
+        - PR ready-for-review transition, merge, PR edit/close, or Issue mutation
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C005
+      - C006
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The decision packet names the shared-stack option and split/surgery option.
+      - The packet states that it is evidence, not approval.
+      - The packet blocks push, PR creation, and history surgery until exact approval is received.
+    selection:
+      selected_change_id: C002-shared-stack-versus-split-decision-report
+      reason: >
+        User explicitly approved the local-only decision-report option. C002 is limited to preparing
+        a high-risk shared-stack versus split report and recording later approval gates; it does not
+        authorize push, draft PR creation, or branch surgery.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/IMPLEMENTATION_BRIEF.md
+        - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+    completion:
+      completed_at: 2026-05-23T22:16:03+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local planning and decision evidence only; no product source, generated
+        surface, remote branch, PR, Issue, or git history was mutated.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/IMPLEMENTATION_BRIEF.md
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C003
+    status: done
+    title: Execute approved shared M101 branch push
+    purpose: >
+      If C002 recommends shared-stack publication and the user approves the exact command, push only
+      codex/m101-build-proto-prompt-command-split to origin and record local audit evidence.
+    scope:
+      includes:
+        - verify exact approval text for the shared branch push
+        - verify local and remote refs immediately before mutation
+        - execute one approved push for codex/m101-build-proto-prompt-command-split
+        - record resulting remote branch head and rollback guidance
+      excludes:
+        - draft PR creation
+        - branch split surgery
+        - merge, PR edit, PR close, Issue mutation, ready-for-review transition, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+      - C006
+    risk: high
+    size: small
+    validation:
+      - git ls-remote --heads origin codex/m101-build-proto-prompt-command-split
+      - git diff --check
+    acceptance:
+      - The shared M101 remote branch exists at the approved local head.
+      - Local audit evidence records approval, command, result, and rollback guidance.
+      - No draft PR, merge, PR edit, Issue mutation, branch surgery, or unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C003-approved-shared-m101-branch-push
+      reason: >
+        User explicitly approved the exact push command after C002 recommended shared-stack
+        publication. Preflight confirmed the expected local branch head, absent remote branch, and
+        absent existing PR.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T22:27:01+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 executed the explicitly approved remote branch push and recorded local planning
+        evidence only; no product source or generated surface was changed.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/PUSH_EVIDENCE.md
+        - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C004
+    status: done
+    title: Create approved shared M101 draft PR
+    purpose: >
+      After C003 pushes the shared branch and the user approves the exact command, create one draft
+      PR from the shared M101-derived branch into main and record local audit evidence.
+    scope:
+      includes:
+        - prepare shared-stack draft PR body from M105, M106, and M115 PR-ready summaries
+        - verify exact approval text for draft PR creation
+        - execute one approved draft PR creation
+        - record resulting PR URL and state
+      excludes:
+        - marking the PR ready for review
+        - branch split surgery
+        - merge, PR edit after creation, PR close, Issue mutation, push, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    dependencies:
+      - C003
+    unlocks:
+      - C006
+    risk: high
+    size: small
+    validation:
+      - gh pr view <created-pr> --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - One shared M101 draft PR exists and remains draft.
+      - Local audit evidence records approval, command, PR URL, resulting state, and rollback guidance.
+      - No ready-for-review transition, merge, PR edit after creation, PR close, Issue mutation, or unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C004-draft-pr-approval-packet
+      reason: >
+        User explicitly approved the exact draft PR creation command after C003 pushed the shared
+        branch. Preflight confirmed the remote branch head and no existing PR for the head branch.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/IMPLEMENTATION_BRIEF.md
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+    completion:
+      completed_at: 2026-05-23T22:46:11+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 executed the explicitly approved draft PR creation and recorded local planning
+        evidence only; no product source or generated surface was changed.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+        - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C005
+    status: deferred
+    title: Prepare approved branch split or surgery plan
+    purpose: >
+      If C002 rejects shared-stack publication, prepare a design-only split/surgery packet that
+      names the exact high-risk git operations needed before any later execution.
+    scope:
+      includes:
+        - split strategy for M105, M106, and M115 if they must become separate review branches
+        - candidate branch names, source ranges, and evidence requirements
+        - exact operation categories that require later approval
+        - stop criteria for cherry-pick, rebase, reset, force-push, and branch deletion
+      excludes:
+        - executing cherry-pick, rebase, reset, force-push, branch deletion, branch pointer moves, or remote mutation
+        - draft PR creation
+        - merge, PR edit, PR close, Issue mutation, or ready-for-review transition
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    dependencies:
+      - C002
+    unlocks:
+      - future split execution queue
+      - C006
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The split/surgery packet is design-only and names exact later approval gates.
+      - No branch surgery or remote mutation occurs.
+      - The packet can seed a future execution queue if the user accepts split over shared-stack publication.
+    deferral:
+      deferred_at: 2026-05-23T22:49:57+08:00
+      reason: >
+        M124 accepted and executed the shared-stack publication path through draft PR #7. Split or
+        surgery planning remains available only as a future queue if review rejects the shared stack.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+  - id: C006
+    status: done
+    title: Record M124 publication strategy audit and handoff
+    purpose: >
+      Close M124 with local audit evidence naming whether the shared M101-derived branch was
+      published, whether a draft PR was created, or whether split/surgery planning was deferred.
+    scope:
+      includes:
+        - summarize completed publication transitions or stop reasons
+        - update M124 summary and readable view
+        - record deferred next queues for PR #4 and PR #6 ready-for-review governance
+        - confirm no unauthorized PR, Issue, merge, branch surgery, or destructive git operations occurred
+      excludes:
+        - merge
+        - Issue mutation
+        - PR ready-for-review transition
+        - executing split/surgery operations
+        - changing product source
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    dependencies:
+      - C001
+    unlocks:
+      - M125-m102-pr4-readiness-governance
+      - M126-m71-ready-review-governance
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - A local audit names each authorized and unauthorized operation boundary.
+      - Remaining ready-for-review and split/surgery queues are explicit.
+      - M124 can be handed off without raw session context.
+    selection:
+      selected_change_id: C006-audit-handoff
+      reason: >
+        User asked to advance C006 after C004 created draft PR #7. C006 closes M124 with local
+        audit and handoff evidence, without remote mutation.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/ATOM_TASKS.yaml
+        - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T22:49:57+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C006 produced local audit and handoff evidence only; no product source, generated surface,
+        remote PR, Issue, merge, or branch history was mutated.
+      evidence:
+        - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+        - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    actor: agent
+    reason: Create M124 candidate queue for shared M101-derived branch publication strategy.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+      - changes/M105-m104-direct-trust-gate-fixes/PR_READY_SUMMARY.md
+      - changes/M106-agent-resume-cockpit/PR_READY_SUMMARY.md
+      - changes/M115-internal-coder-quality-governance/PR_READY_SUMMARY.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: User asked to advance M124; C001 is the required read-only inventory before high-risk strategy decisions.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/SELECTED_CHANGE.yaml
+      - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/ATOM_TASKS.yaml
+      - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Current read-only shared M101-derived branch publication facts are recorded.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/PUBLICATION_INVENTORY.md
+      - "validation: git status --short --branch"
+      - "validation: git rev-parse origin/main codex/m101-build-proto-prompt-command-split"
+      - "validation: git merge-base origin/main codex/m101-build-proto-prompt-command-split"
+      - "validation: git rev-list --count origin/main..codex/m101-build-proto-prompt-command-split"
+      - "validation: git merge-base --is-ancestor origin/main codex/m101-build-proto-prompt-command-split"
+      - "validation: git merge-tree --write-tree origin/main codex/m101-build-proto-prompt-command-split"
+      - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+      - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+      - "validation: git diff --check"
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: C001 completed read-only publication inventory and unlocked the high-risk shared-stack versus split decision packet.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/PUBLICATION_INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User explicitly approved the local-only M124 C002 decision-report option and forbade push,
+      draft PR creation, and branch surgery.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/SELECTED_CHANGE.yaml
+      - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/ATOM_TASKS.yaml
+      - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/IMPLEMENTATION_BRIEF.md
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      High-risk decision report completed. It recommends shared-stack publication as the preferred
+      least-destructive path but records that the report is evidence, not approval.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 recommends shared-stack publication as one draft PR with strict gates, making C003 ready
+      only as an exact-approval shared-branch push candidate.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User explicitly approved the exact C003 push command for the shared M101-derived branch.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/SELECTED_CHANGE.yaml
+      - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/ATOM_TASKS.yaml
+      - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/IMPLEMENTATION_BRIEF.md
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Approved push succeeded and remote branch origin/codex/m101-build-proto-prompt-command-split
+      now exists at f8bf087211316506f48155859f3e18edbc7224e4.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/PUSH_EVIDENCE.md
+      - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+      - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Shared M101 remote branch now exists at the approved head, unlocking the separately gated
+      draft PR candidate.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C003-approved-shared-m101-branch-push/PUSH_EVIDENCE.md
+  - operation_id: OP011
+    operation_type: prepare_approval_packet
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User asked to enter C004. Prepared local-only draft PR body and exact approval packet without
+      creating or mutating a remote PR.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+      - "validation: git ls-remote --heads origin codex/m101-build-proto-prompt-command-split"
+      - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User explicitly approved the exact gh pr create command for the shared M101-derived draft PR.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/SELECTED_CHANGE.yaml
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/ATOM_TASKS.yaml
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/IMPLEMENTATION_BRIEF.md
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_BODY.md
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Approved draft PR creation succeeded. PR #7 is open, draft, and points at the approved shared
+      M101-derived branch head.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP014
+    operation_type: status_change
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Shared M101 draft PR #7 now exists and remains draft, unlocking final M124 audit and handoff.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  - operation_id: OP015
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      User asked to advance C006; final local audit and handoff are ready after draft PR #7 was
+      created.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/ATOM_TASKS.yaml
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP016
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      M124 final audit and handoff completed. PR #7 remains draft, unauthorized operations are
+      explicitly recorded as not performed, and follow-up governance queues are named.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+      - "validation: gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP017
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Shared-stack publication completed through draft PR #7, so split/surgery planning is deferred
+      unless future review rejects the shared stack.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: deferred
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md
+  - operation_id: OP018
+    operation_type: complete_queue
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C006
+    actor: agent
+    reason: >
+      M124 publication strategy lane is complete: inventory, decision report, approved push,
+      approved draft PR, and audit handoff are recorded.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: complete
+    evidence:
+      - changes/M124-shared-branch-publication-strategy/C006-audit-handoff/M124_PUBLICATION_AUDIT.md

@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-refresh-shared-m101-publication-inventory
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-refresh-shared-m101-publication-inventory
+source_plan_id: M124-shared-branch-publication-strategy
+source_candidate_id: C001
+title: Refresh shared M101 branch publication inventory
+status: done
+selection_reason: >
+  C001 is the required first M124 candidate. It refreshes read-only publication facts for the
+  shared M101-derived branch group before any high-risk shared-stack publication or split/surgery
+  decision packet is prepared.
+scope:
+  includes:
+    - verify local shared M101 branch and head
+    - verify origin/main ancestry, ahead count, and conflict probe
+    - verify remote target branch absence or head
+    - verify existing PRs for the shared head branch
+    - verify M105, M106, and M115 PR_READY_SUMMARY.md files
+    - recommend whether C002 can prepare a shared-stack versus split decision packet
+  excludes:
+    - push
+    - draft PR creation
+    - ready-for-review transition
+    - branch split surgery, cherry-pick, rebase, reset, force-push, branch deletion, PR edit/close, Issue mutation, or merge
+owned_paths:
+  - changes/M124-shared-branch-publication-strategy/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+  - remote:origin/**
+acceptance:
+  - A durable inventory packet names current shared-branch publication facts.
+  - The packet states whether C002 can proceed to an exact decision report.
+  - No remote or destructive git mutation occurs.
+validation:
+  - git status --short --branch
+  - git rev-parse origin/main codex/m101-build-proto-prompt-command-split
+  - git merge-base origin/main codex/m101-build-proto-prompt-command-split
+  - git rev-list --count origin/main..codex/m101-build-proto-prompt-command-split
+  - git merge-base --is-ancestor origin/main codex/m101-build-proto-prompt-command-split
+  - git merge-tree --write-tree origin/main codex/m101-build-proto-prompt-command-split
+  - git ls-remote --heads origin codex/m101-build-proto-prompt-command-split
+  - gh pr list --repo tiic-tech/openworkflow --head codex/m101-build-proto-prompt-command-split --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+  - git diff --check
+completion:
+  completed_at: 2026-05-23T22:06:39+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C001 produced read-only publication inventory and local planning evidence only; no product
+    source, generated surface, remote branch, PR, Issue, or git history was mutated.
+  evidence:
+    - changes/M124-shared-branch-publication-strategy/C001-refresh-shared-m101-publication-inventory/PUBLICATION_INVENTORY.md

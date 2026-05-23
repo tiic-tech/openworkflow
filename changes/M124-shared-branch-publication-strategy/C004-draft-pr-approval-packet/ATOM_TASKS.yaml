@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-draft-pr-approval-packet
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-draft-pr-approval-packet
+title: Atom tasks for approved shared M101 draft PR
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm exact draft PR approval
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - User approval exactly names the gh pr create command.
+      - Draft PR body file exists.
+  - task_id: T002
+    title: Run remote preflight
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - Remote branch exists at the expected head.
+      - No existing PR exists for the target head branch.
+  - task_id: T003
+    title: Create approved draft PR
+    status: done
+    type: execute
+    owned_paths:
+      - remote:github/pr/7
+    done_when:
+      - Draft PR exists and remains draft.
+  - task_id: T004
+    title: Record local PR evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - PR evidence, queue completion, summary, and readable view are updated.
+      - C006 is ready for audit and handoff.

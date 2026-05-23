@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-approved-shared-m101-branch-push
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-approved-shared-m101-branch-push
+title: Atom tasks for approved shared M101 branch push
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm exact push approval
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - User approval text exactly names the push command.
+      - C002 high-risk report permits C003 only after exact approval.
+  - task_id: T002
+    title: Run remote preflight
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - Local target branch head, base ancestry, remote branch absence, and PR absence are recorded.
+  - task_id: T003
+    title: Execute approved push
+    status: done
+    type: execute
+    owned_paths:
+      - remote:origin/codex/m101-build-proto-prompt-command-split
+    done_when:
+      - Remote branch exists at the approved local target branch head.
+  - task_id: T004
+    title: Record local audit evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - Push evidence, queue completion, summary, and readable view are updated.
+      - C004 is ready only as a separately approved draft PR candidate.

@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-shared-stack-versus-split-decision-report
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-shared-stack-versus-split-decision-report
+source_plan_id: M124-shared-branch-publication-strategy
+source_candidate_id: C002
+title: Prepare shared-stack versus split decision report
+status: done
+selection_reason: >
+  User explicitly approved the local-only M124 C002 decision-report option:
+  prepare the shared-stack versus split high-risk decision report without push,
+  draft PR creation, or branch surgery. C001 facts show the target branch is
+  local-only, cleanly based on origin/main, has no existing remote branch or PR,
+  and is shared by M105, M106, and M115.
+approved_option:
+  approved_at: 2026-05-23T22:16:03+08:00
+  user_text: >
+    Approve M124 C002 decision report: prepare shared-stack versus split
+    high-risk decision report; do not push, create PR, or perform branch
+    surgery.
+  allowed:
+    - create local decision report
+    - update M124 queue status and summary
+    - prepare exact later approval gates
+  forbidden:
+    - push
+    - draft PR creation
+    - ready-for-review transition
+    - branch split surgery
+    - cherry-pick, rebase, reset, force-push, branch deletion, or branch pointer moves
+    - PR edit, PR close, Issue mutation, merge
+scope:
+  includes:
+    - shared-stack acceptance rationale
+    - split/surgery risks and non-goals
+    - exact decision options for shared-stack publication, design-only split planning, or defer
+    - required approval text for any later push or branch surgery
+  excludes:
+    - executing push
+    - creating a draft PR
+    - performing cherry-pick, rebase, reset, force-push, or branch pointer surgery
+    - PR ready-for-review transition, merge, PR edit/close, or Issue mutation
+owned_paths:
+  - changes/M124-shared-branch-publication-strategy/
+  - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+  - remote:origin/**
+acceptance:
+  - The decision packet names the shared-stack option and split/surgery option.
+  - The packet states that it is evidence, not approval.
+  - The packet blocks push, PR creation, and history surgery until exact approval is received.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23T22:16:03+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C002 produced local planning and decision evidence only; it made no product
+    source changes and performed no remote or destructive git mutation.
+  evidence:
+    - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+    - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/SELECTED_CHANGE.yaml
+    - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/ATOM_TASKS.yaml
+    - changes/M124-shared-branch-publication-strategy/C002-shared-stack-versus-split-decision-report/IMPLEMENTATION_BRIEF.md

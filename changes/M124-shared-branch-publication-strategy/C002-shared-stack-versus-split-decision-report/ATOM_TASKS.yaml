@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-shared-stack-versus-split-decision-report
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-shared-stack-versus-split-decision-report
+title: Atom tasks for shared-stack versus split decision report
+status: done
+tasks:
+  - task_id: T001
+    title: Select approved local-only C002 option
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - C002 has selected-change, atom-task, and implementation-brief artifacts.
+      - The approved option forbids push, draft PR creation, and branch surgery.
+  - task_id: T002
+    title: Convert inventory facts into decision options
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - Shared-stack publication, split/surgery planning, and defer options are named.
+      - The report states evidence, risks, recommendation, go criteria, and stop criteria.
+  - task_id: T003
+    title: Update M124 queue handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - C002 completion evidence is recorded.
+      - C003 is ready only as an approval-gated shared-branch push candidate.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - OpenWorkflow validation, diff whitespace check, and YAML parse pass.

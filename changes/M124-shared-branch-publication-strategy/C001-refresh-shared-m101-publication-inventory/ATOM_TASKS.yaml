@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-refresh-shared-m101-publication-inventory
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-refresh-shared-m101-publication-inventory
+title: Atom tasks for shared M101 publication inventory
+status: done
+tasks:
+  - task_id: T001
+    title: Select C001 in M124
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - C001 has selected-change, atom-task, and implementation-brief artifacts.
+      - M124 queue records C001 selection.
+  - task_id: T002
+    title: Refresh shared branch read-only facts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - Shared branch local head, base ancestry, ahead count, conflict probe, remote branch, and PR state are recorded.
+  - task_id: T003
+    title: Verify shared source queues
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - M105, M106, and M115 PR-ready summary presence and shared branch boundary are recorded.
+  - task_id: T004
+    title: Update queue handoff state
+    status: done
+    type: document
+    owned_paths:
+      - changes/M124-shared-branch-publication-strategy/
+    done_when:
+      - C001 completion evidence is recorded.
+      - C002 is unlocked for high-risk shared-stack versus split decision packet work.
