@@ -103,7 +103,7 @@ observed_state:
       of independent queue branches.
     - M71 is older and includes a long historical stack with early commits that predate strict
       commit evidence.
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -231,7 +231,7 @@ changes:
         - node dist/cli/src/index.js validate --root . --json
         - git diff --check
   - id: C003
-    status: selected
+    status: done
     title: Restore branch-local PR-ready evidence for low-risk candidates
     purpose: >
       For candidates that do not require history rewriting, ensure the owning local branch contains
@@ -277,6 +277,27 @@ changes:
         selected_change: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
         atom_tasks: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
         implementation_brief: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        M120 C003 itself produced governance evidence only on the M120 branch. The branch-local M117
+        evidence repair was committed separately on codex/m117-git-automation-remote-readiness and
+        is referenced below.
+      repaired_plan_id: M117-git-automation-remote-readiness
+      repaired_branch: codex/m117-git-automation-remote-readiness
+      repaired_summary_path: changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+      repaired_branch_commit: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+      remaining_blockers:
+        - simulator evidence is missing
+      evidence:
+        - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md
+      validation:
+        - node dist/cli/src/index.js git-automation summary --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --json
+        - node dist/cli/src/index.js git-automation summary --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --write --json
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
   - id: C004
     status: candidate
     title: Prepare high-risk decision report for history surgery if needed
@@ -434,3 +455,14 @@ operations:
       - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
       - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
       - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: Restore M117 branch-local PR-ready summary and record remaining remote-plan blockers.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md

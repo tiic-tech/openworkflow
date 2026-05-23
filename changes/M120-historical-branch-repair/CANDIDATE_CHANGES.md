@@ -18,7 +18,7 @@ Select C001 first. M120 must produce a read-only branch ownership inventory befo
 
 High-risk operations such as rebase, reset, force-push, remote deletion, PR edit, merge, or ready-for-review transition require a dedicated high-risk report and exact operation-level approval.
 
-Next recommended candidate: C003
+Next recommended candidate: C005
 
 ## Candidates
 
@@ -60,7 +60,7 @@ Result: M117 is the next low-risk evidence repair target. M71 may remain an inte
 
 ### C003 - Restore branch-local PR-ready evidence for low-risk candidates
 
-Status: selected
+Status: done
 
 Risk: medium
 
@@ -71,6 +71,12 @@ Depends on: C001, C002
 Excludes: publishing branches, creating PRs, rewriting history, and repairing high-risk branches.
 
 Selected target: M117 branch-local `PR_READY_SUMMARY.md` restoration.
+
+Completion evidence:
+
+- `changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md`
+
+Result: M117 branch-local summary was restored and committed on `codex/m117-git-automation-remote-readiness` at `898f0152`. Remote-plan no longer reports a missing summary; `simulator evidence is missing` remains.
 
 Unlocks: C005
 

@@ -26,11 +26,11 @@ branch_note: >
   creation was intentionally not performed during DTC queue creation. The local boundary branch was
   later created with git-automation before C001 selection.
 candidate_count: 5
-completed_candidate_id: C002
-completed_change_id: M120-C002-branch-repair-policy
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: M120-C003-restore-branch-local-pr-ready-evidence
+next_recommended_candidate_id: C005
 selected_candidate_id: null
-selected_change_id: M120-C003-restore-branch-local-pr-ready-evidence
+selected_change_id: null
 outputs:
   candidate_changes_yaml: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M120-historical-branch-repair/CANDIDATE_CHANGES.md
@@ -46,6 +46,7 @@ outputs:
   c003_selected_change: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/SELECTED_CHANGE.yaml
   c003_atom_tasks: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/ATOM_TASKS.yaml
   c003_implementation_brief: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/IMPLEMENTATION_BRIEF.md
+  c003_m117_evidence_repair: changes/M120-historical-branch-repair/C003-restore-branch-local-pr-ready-evidence/M117_EVIDENCE_REPAIR.md
 inventory_result:
   current_branch: codex/m120-historical-branch-repair
   remote_codex_branches:
@@ -85,11 +86,21 @@ policy_result:
     - force-push or remote branch deletion
     - PR create/edit/close/ready/merge
   recommended_next: C003 low-risk M117 evidence repair
+evidence_repair_result:
+  repaired_plan_id: M117-git-automation-remote-readiness
+  repaired_branch: codex/m117-git-automation-remote-readiness
+  repaired_summary_path: changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  repaired_branch_commit: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  branch_local_summary_present_after_repair: true
+  remote_plan_missing_summary_blocker_cleared: true
+  remaining_remote_plan_blockers:
+    - simulator evidence is missing
+  recommended_next: C005 repaired publication order
 key_dependencies:
   - C001 completed the branch ownership and PR-ready evidence inventory.
   - C002 completed the repair policy and stop boundaries.
-  - C003 can restore low-risk branch-local summaries only after C001 and C002.
-  - C004 must create a high-risk report before any history surgery is selected or executed.
+  - C003 restored M117 branch-local PR-ready evidence.
+  - C004 remains available only if high-risk history surgery is needed.
   - C005 depends on repaired evidence before recommending the next publication queue.
 risks:
   - id: R001
@@ -131,6 +142,12 @@ validation:
     - branch-local PR_READY_SUMMARY.md presence checks with git cat-file -e
     - node dist/cli/src/index.js validate --root . --json
     - git diff --check
+    - node dist/cli/src/index.js git-automation summary --root .
+      --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --write --json
+    - git commit -m "M117-git-automation-remote-readiness Record PR-ready summary"
+    - node dist/cli/src/index.js git-automation remote-plan --root .
+      --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
   notes:
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly requested M120 CC creation.
@@ -144,3 +161,6 @@ validation:
       needed.
     - C003 selected M117 branch-local PR-ready evidence repair. M117 branch changes must be
       committed locally before M120 records C003 completion.
+    - C003 restored and committed M117 branch-local PR_READY_SUMMARY.md on
+      codex/m117-git-automation-remote-readiness at commit 898f0152. The missing-summary blocker is
+      cleared; simulator evidence remains the only remote-plan blocker.
