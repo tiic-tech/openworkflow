@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-refresh-m71-publication-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-refresh-m71-publication-preflight
+source_plan_id: M122-m71-historical-stack-publication
+source_candidate_id: C001
+title: Refresh M71 remote publication preflight
+status: done
+selection_reason: >
+  C001 is the required first M122 candidate. It refreshes read-only publication facts for the M71
+  historical branch before any high-risk push or draft PR approval packet is prepared.
+scope:
+  includes:
+    - verify M71 local branch and PR_READY_SUMMARY.md
+    - verify origin/main ancestry and ahead count
+    - verify remote target branch absence or head
+    - verify existing PRs for the M71 head branch
+    - recommend whether M71 can proceed to a high-risk push decision
+  excludes:
+    - push
+    - draft PR creation
+    - PR ready-for-review transition
+    - merge, PR edit, PR close, Issue mutation, rebase, reset, force-push, or branch deletion
+owned_paths:
+  - changes/M122-m71-historical-stack-publication/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - A durable preflight packet names current M71 publication facts.
+  - The packet states whether M71 can proceed to an exact high-risk push decision.
+  - No remote or destructive git mutation occurs.
+validation:
+  - git status --short --branch
+  - git rev-parse origin/main codex/m71-git-version-governance
+  - git merge-base origin/main codex/m71-git-version-governance
+  - git rev-list --count origin/main..codex/m71-git-version-governance
+  - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
+  - git merge-tree origin/main codex/m71-git-version-governance
+  - git ls-remote --heads origin codex/m71-git-version-governance
+  - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
+    - "validation: git status --short --branch"
+    - "validation: git rev-parse origin/main codex/m71-git-version-governance"
+    - "validation: git merge-base origin/main codex/m71-git-version-governance"
+    - "validation: git rev-list --count origin/main..codex/m71-git-version-governance"
+    - "validation: git merge-base --is-ancestor origin/main codex/m71-git-version-governance"
+    - "validation: git merge-tree origin/main codex/m71-git-version-governance"
+    - "validation: git ls-remote --heads origin codex/m71-git-version-governance"
+    - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+    - "validation: git diff --check"

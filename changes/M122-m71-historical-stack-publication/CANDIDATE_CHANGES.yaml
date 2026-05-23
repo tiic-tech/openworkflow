@@ -88,10 +88,10 @@ high_risk_report:
   status: not_created
   decision_boundary: M71 branch push and draft PR creation
   report_is_approval: false
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Refresh M71 remote publication preflight
     purpose: >
       Produce a current read-only preflight packet for publishing the M71 historical branch,
@@ -131,8 +131,34 @@ changes:
       - A durable preflight packet names current M71 publication facts.
       - The packet states whether M71 can proceed to an exact high-risk push decision.
       - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: C001-refresh-m71-publication-preflight
+      reason: >
+        C001 is the required first M122 candidate. It refreshes current read-only M71 publication
+        facts before any high-risk push or draft PR approval packet is prepared.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/SELECTED_CHANGE.yaml
+        - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/ATOM_TASKS.yaml
+        - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_by_change_id: C001-refresh-m71-publication-preflight
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
+        - "validation: git status --short --branch"
+        - "validation: git rev-parse origin/main codex/m71-git-version-governance"
+        - "validation: git merge-base origin/main codex/m71-git-version-governance"
+        - "validation: git rev-list --count origin/main..codex/m71-git-version-governance"
+        - "validation: git merge-base --is-ancestor origin/main codex/m71-git-version-governance"
+        - "validation: git merge-tree origin/main codex/m71-git-version-governance"
+        - "validation: git ls-remote --heads origin codex/m71-git-version-governance"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+        - "validation: git diff --check"
   - id: C002
-    status: candidate
+    status: ready
     title: Prepare M71 push decision and isolated execution preflight
     purpose: >
       Convert C001 facts into a high-risk decision report for pushing the M71 branch and, if needed,
@@ -281,3 +307,39 @@ operations:
       - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
       - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
       - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: C001 is the required first M122 preflight before any high-risk publication decision.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/SELECTED_CHANGE.yaml
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/ATOM_TASKS.yaml
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Current read-only M71 publication facts are recorded.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: C001 completed read-only publication preflight and unlocked the high-risk push decision packet.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md

@@ -37,9 +37,9 @@ target_publication:
   existing_prs: []
   branch_local_pr_ready_summary_present: true
 candidate_count: 5
-completed_candidate_id: null
-completed_change_id: null
-next_recommended_candidate_id: C001
+completed_candidate_id: C001
+completed_change_id: C001-refresh-m71-publication-preflight
+next_recommended_candidate_id: C002
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -47,6 +47,8 @@ outputs:
   candidate_changes_md: changes/M122-m71-historical-stack-publication/CANDIDATE_CHANGES.md
   summary: changes/M122-m71-historical-stack-publication/SUMMARY.yaml
   high_risk_decision_report: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+  c001_publication_preflight: changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
+  c001_commit_evidence: changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml
 observed_state:
   captured_at: 2026-05-23T21:20:15+08:00
   current_branch: codex/m122-m71-historical-stack-publication
@@ -70,6 +72,7 @@ key_dependencies:
   - M120 ranked M71 as the next historical publication candidate after M117.
   - M71 branch-local PR_READY_SUMMARY.md is present.
   - C001 must refresh publication facts before any high-risk push decision.
+  - C001 completed read-only publication preflight and recommends C002.
 risks:
   - id: R001
     level: high
@@ -101,8 +104,12 @@ validation:
     - git rev-list --count origin/main..codex/m71-git-version-governance
     - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
     - git merge-tree origin/main codex/m71-git-version-governance
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
   notes: |
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly asked to judge and proceed with M122 after M123 completed.
     - M122 queue creation performed no remote mutation.
+    - C001 refreshed M71 publication facts: local branch exists at a0ddcf94, origin/main is its
+      ancestor, it is 66 commits ahead, the remote target branch is absent, and no target-head PR
+      exists.
     - M71 push and draft PR creation remain unapproved high-risk operations.

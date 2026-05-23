@@ -33,16 +33,23 @@ Branch boundary for this queue: `codex/m122-m71-historical-stack-publication`.
 
 ### C001 - Refresh M71 remote publication preflight
 
-Status: ready
+Status: done
 
 Risk: medium
 
 Outcome: produce current read-only readiness facts for M71 and recommend whether
 to proceed to a high-risk push decision.
 
+Selection: `C001-refresh-m71-publication-preflight`
+
+Completion evidence:
+
+- `changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml`
+- `changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md`
+
 ### C002 - Prepare M71 push decision and isolated execution preflight
 
-Status: candidate
+Status: ready
 
 Risk: high
 

@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-refresh-m71-publication-preflight
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-refresh-m71-publication-preflight
+title: Atom tasks for M71 remote publication preflight
+status: done
+tasks:
+  - task_id: T001
+    title: Select C001 in M122
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C001 has selected-change, atom-task, and implementation-brief artifacts.
+      - M122 queue records C001 selection.
+  - task_id: T002
+    title: Refresh M71 read-only facts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - M71 local branch, base ancestry, ahead count, conflict probe, remote branch, and PR state are recorded.
+  - task_id: T003
+    title: Record publication recommendation
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/
+    done_when:
+      - Preflight recommends whether to proceed to C002.
+      - Stop gates for remote mutation are explicit.
+  - task_id: T004
+    title: Update queue handoff state
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C001 completion evidence is recorded.
+      - C002 is unlocked for high-risk decision packet work.
