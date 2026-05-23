@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: selected_change:M105-m104-direct-trust-gate-fixes:C002
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M105-C002-fix-current-vision-pointer-reporting
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C002
+title: Fix current vision pointer reporting after vision session registration
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  C002 is now dependency-ready after C001 completed. M104 directly showed that
+  register/current-state semantics can leave handoff active_pointers reporting
+  current_vision as null even when VISION_CONTRACT current_session and
+  summaries identify the current vision session.
+risk_decision:
+  risk: medium
+  selected_option: Align handoff/current pointer reporting with registered vision session semantics.
+scope:
+  includes:
+    - inspect vision session registration and current-state updates
+    - make handoff active_pointers report the current vision session when available
+    - add regression coverage for the M104 pointer display failure mode
+  excludes:
+    - redesigning the vision artifact contract
+    - changing validation, prototype, or decision pointer semantics
+    - creating new vision workflow stages
+owned_paths:
+  - packages/core/src/
+  - packages/cli/src/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M105-m104-direct-trust-gate-fixes/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - skills/**
+acceptance:
+  - After registering a vision session current, handoff active_pointers.current_vision is no longer misleadingly null.
+  - The fix preserves summaries and VISION_CONTRACT current_session semantics.
+  - Regression coverage captures the M104 failure mode.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C002 should complete as one local implementation commit containing the
+  pointer reporting fix, regression coverage, M105 planning updates, and local
+  commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml
+    - packages/cli/src/commands/brief.ts
+    - packages/cli/src/commands/check.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check

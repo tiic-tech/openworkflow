@@ -30,7 +30,7 @@ Out of scope:
 
 ## Selection Policy
 
-Recommended next candidate: C002.
+Recommended next candidate: C003.
 
 C001 is first because M104 directly proved that `summarize --write` can create
 a `SUMMARY.yaml` file that `validate --json` then rejects. This is a small,
@@ -68,7 +68,7 @@ Completion:
 
 ### C002 - Fix current vision pointer reporting after vision session registration
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -76,6 +76,19 @@ Purpose: stop handoff/current-state from showing `current_vision: null` after a
 current vision session has been registered and summaries trust it.
 
 Depends on: C001.
+
+Selection artifacts:
+
+- `changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/SELECTED_CHANGE.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/ATOM_TASKS.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- `packages/cli/src/commands/brief.ts`
+- `packages/cli/src/commands/check.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ### C003 - Auto-backfill commit evidence into selected-change completion
 

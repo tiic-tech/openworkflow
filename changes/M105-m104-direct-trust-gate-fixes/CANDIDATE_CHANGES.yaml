@@ -85,7 +85,7 @@ scope_control:
         Related to image generation evidence and should be designed with
         prompt2proto strategy, not mixed into trust-gate bug fixes.
       suggested_plan_id: M109-provider-fallback-generation-metadata
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -163,7 +163,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C002
-    status: ready
+    status: done
     title: Fix current vision pointer reporting after vision session registration
     purpose: >
       Resolve the M104 observation that vision registration made
@@ -198,6 +198,37 @@ changes:
       - After registering a vision session current, handoff active_pointers does not misleadingly show current_vision as null.
       - summaries and CURRENT_STATE/current pointer reporting agree or the handoff packet explicitly explains current_session.
       - Regression coverage captures the M104 failure mode.
+    selection:
+      selected_change_id: M105-C002-fix-current-vision-pointer-reporting
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C001 completed. C002 is the next direct M104
+        Agent-facing defect and focuses on pointer reporting, not broader
+        resume/read-model redesign.
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/cli/src/commands/brief.ts
+        - packages/cli/src/commands/check.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+      summary: >
+        Handoff and check active pointer read models now report
+        CURRENT_STATE.current_session as current_vision when no explicit
+        current_vision path is present. Runtime-surface coverage registers a
+        current vision session and verifies handoff/check expose the pointer.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
   - id: C003
     status: candidate
     title: Auto-backfill commit evidence into selected-change completion
@@ -320,3 +351,33 @@ operations:
       - packages/cli/src/commands/summarize.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Selected the current vision pointer reporting bug after C001 restored
+      trust gates and unlocked dependent direct M104 fixes.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Implemented and verified the M104 current vision pointer reporting fix.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/check.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml

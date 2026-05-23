@@ -421,6 +421,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   await verifyDraftCommand(draftRoot, env);
   await verifyRegisterCommand(draftRoot, env);
 
+  const visionPointerRoot = join(tempRoot, "vision-pointer-handoff");
+  await run(["node", CLI, "init", visionPointerRoot, "--tools", "codex", "--force"], env);
+  await verifyVisionPointerHandoff(visionPointerRoot, env);
+
   const root = join(tempRoot, "summary-health");
   await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
   const fresh = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
@@ -1280,6 +1284,47 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(mismatch.code !== 0, "register should reject artifact_type mismatches");
   const mismatchReport = parseJsonReport(mismatch.output, "register");
   assert(mismatchReport.ok === false, "register mismatch should report ok=false");
+}
+
+async function verifyVisionPointerHandoff(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const visionPath = ".openworkflow/vision/sessions/vision-pointer/VISION_SESSION.yaml";
+  await mkdir(dirname(join(root, visionPath)), { recursive: true });
+  await writeFile(join(root, visionPath), visionSessionYaml({
+    id: "vision-pointer",
+    status: "active",
+    oneSentence: "A proto-ready vision used to verify current pointer reporting.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+
+  const register = parseJsonReport(await runCapture([
+    "node",
+    CLI,
+    "register",
+    "--root",
+    root,
+    "--artifact",
+    visionPath,
+    "--current",
+    "--next-command",
+    "/ow:validation",
+    "--write",
+    "--json",
+  ], env), "register");
+  assert(register.ok === true, "vision register current should be ok");
+  const currentState = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  assert(currentState.includes(`current_session: ${visionPath}`), "vision register current did not write current_session");
+
+  const handoff = parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
+  const handoffData = record(handoff.data, "vision pointer handoff data");
+  const activePointers = record(handoffData.active_pointers, "vision pointer active_pointers");
+  assert(handoff.ok === true, "vision pointer handoff should stay ok");
+  assert(activePointers.current_vision === visionPath, "handoff active_pointers.current_vision should report current_session");
+
+  const check = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:validation", "--root", root, "--json"], env), "check");
+  const checkData = record(check.data, "vision pointer check data");
+  const checkPointers = record(checkData.active_pointers, "vision pointer check active_pointers");
+  assert(checkPointers.current_vision === visionPath, "check active_pointers.current_vision should report current_session");
 }
 
 async function assertNoStageArtifacts(root: string): Promise<void> {

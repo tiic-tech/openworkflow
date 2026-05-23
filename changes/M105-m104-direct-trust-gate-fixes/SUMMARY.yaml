@@ -21,11 +21,11 @@ scope_boundary: >
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 4
 active_candidate_count: 4
-completed_candidate_id: C001
-completed_change_id: M105-C001-align-summarize-output-shape
+completed_candidate_id: C002
+completed_change_id: M105-C002-fix-current-vision-pointer-reporting
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 outputs:
   candidate_changes_yaml: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.md
@@ -64,3 +64,5 @@ validation:
     - C001 is the next recommended candidate because it is the smallest direct trust-gate contradiction from M104.
     - C001 was selected for implementation under /ow:select-change boundaries.
     - C001 implementation passed build, runtime-surface verification, validate, summaries --strict, handoff, and git diff --check.
+    - C002 was selected to fix the current vision pointer reporting bug exposed by M104.
+    - C002 implementation passed build and runtime-surface verification before commit evidence creation.
