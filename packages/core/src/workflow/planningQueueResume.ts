@@ -49,6 +49,18 @@ export interface CurrentWorkItem {
   title: string | null;
   risk: string | null;
   owned_paths: string[];
+  forbidden_paths: string[];
+  validation_commands: string[];
+  acceptance: string[];
+  scope: {
+    includes: string[];
+    excludes: string[];
+  };
+  commit_evidence: {
+    required: boolean;
+    expected_path: string | null;
+  };
+  git_governance: string[];
   selected_change_path: string | null;
   atom_tasks_path: string | null;
   implementation_brief_path: string | null;
@@ -207,6 +219,8 @@ async function workItemForCandidate(
   const atomTasksPath = stringValue(artifacts.atom_tasks);
   const implementationBriefPath = stringValue(artifacts.implementation_brief);
   const atomTasks = atomTasksPath ? await readAtomTasks(root, atomTasksPath) : { status: null, incomplete: [] };
+  const selectedChange = selectedChangePath ? await readYamlRecord(join(root, selectedChangePath)) : null;
+  const boundary = boundaryForCandidate(candidate, selectedChange);
   return {
     status,
     plan_id: queue.plan_id,
@@ -214,7 +228,16 @@ async function workItemForCandidate(
     selected_change_id: stringValue(candidate.selection.selected_change_id),
     title: candidate.title,
     risk: candidate.risk,
-    owned_paths: candidate.owned_paths,
+    owned_paths: boundary.ownedPaths,
+    forbidden_paths: boundary.forbiddenPaths,
+    validation_commands: boundary.validationCommands,
+    acceptance: boundary.acceptance,
+    scope: boundary.scope,
+    commit_evidence: {
+      required: candidate.status === "selected" || candidate.completion.implementation_changed_files === true,
+      expected_path: defaultEvidencePath(queue.queue_path, candidate),
+    },
+    git_governance: gitGovernanceFor(queue, candidate),
     selected_change_path: selectedChangePath,
     atom_tasks_path: atomTasksPath,
     implementation_brief_path: implementationBriefPath,
@@ -253,6 +276,18 @@ function emptyWorkItem(queue: QueueInfo, status: CurrentWorkItem["status"], next
     title: null,
     risk: null,
     owned_paths: [],
+    forbidden_paths: [],
+    validation_commands: [],
+    acceptance: [],
+    scope: {
+      includes: [],
+      excludes: [],
+    },
+    commit_evidence: {
+      required: false,
+      expected_path: null,
+    },
+    git_governance: stopConditionsFor(queue),
     selected_change_path: null,
     atom_tasks_path: null,
     implementation_brief_path: null,
@@ -262,6 +297,36 @@ function emptyWorkItem(queue: QueueInfo, status: CurrentWorkItem["status"], next
     next_action: nextAction,
     stop_if: stopConditionsFor(queue),
   };
+}
+
+function boundaryForCandidate(candidate: QueueCandidate, selectedChange: Record<string, unknown> | null): {
+  ownedPaths: string[];
+  forbiddenPaths: string[];
+  validationCommands: string[];
+  acceptance: string[];
+  scope: { includes: string[]; excludes: string[] };
+} {
+  const selectedScope = recordValue(selectedChange?.scope);
+  const candidateScope = recordValue(candidate.raw.scope);
+  const scope = {
+    includes: unique([...stringList(recordValue(candidateScope).includes), ...stringList(recordValue(selectedScope).includes)]),
+    excludes: unique([...stringList(recordValue(candidateScope).excludes), ...stringList(recordValue(selectedScope).excludes)]),
+  };
+  return {
+    ownedPaths: unique([...candidate.owned_paths, ...stringList(selectedChange?.owned_paths)]),
+    forbiddenPaths: unique(stringList(selectedChange?.forbidden_paths)),
+    validationCommands: unique([...stringList(candidate.raw.validation), ...stringList(selectedChange?.validation)]),
+    acceptance: unique([...stringList(candidate.raw.acceptance), ...stringList(selectedChange?.acceptance)]),
+    scope,
+  };
+}
+
+function gitGovernanceFor(queue: QueueInfo, candidate: QueueCandidate): string[] {
+  return unique([
+    queue.branch_boundary ? `work on branch boundary ${queue.branch_boundary}` : "",
+    candidate.status === "selected" ? "complete this selected change as one local commit through openworkflow git-automation commit" : "",
+    "do not push, create PRs, or mutate remote state without explicit approval",
+  ]);
 }
 
 async function readQueueInfo(root: string, absoluteQueuePath: string, currentBranch: string | null): Promise<QueueInfo | null> {
@@ -341,7 +406,7 @@ async function missingCommitEvidenceFor(
     if (!evidencePath) {
       missing.push({
         candidate_id: candidate.id,
-        expected_path: defaultEvidencePath(absoluteQueuePath, candidate),
+        expected_path: defaultEvidencePath(queuePath, candidate),
         reason: `${queuePath} ${candidate.id}: implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml`,
       });
       continue;

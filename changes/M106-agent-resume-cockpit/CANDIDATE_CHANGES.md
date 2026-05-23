@@ -43,10 +43,10 @@ Out of scope:
 
 Selected candidate: none.
 
-C003 completed queue-local breakpoint detection. C004 is now ready to add
-richer action and evidence classification for Agent handoff.
+C004 completed action and evidence classification. C005 is now ready to expose
+resume in runtime guidance and documentation.
 
-Next recommended candidate: C004.
+Next recommended candidate: C005.
 
 ## Candidates
 
@@ -156,7 +156,7 @@ Completion:
 
 ### C004 - Classify actions and evidence for Agent handoff
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -178,9 +178,26 @@ Acceptance focus:
 - Product-alignment context is exposed when available so local implementation
   does not drift away from vision evidence.
 
+Selection artifacts:
+
+- `changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/SELECTED_CHANGE.yaml`
+- `changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/ATOM_TASKS.yaml`
+- `changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- `resume --json` now includes `allowed_actions`, `forbidden_actions`, and
+  `stop_conditions`.
+- The current work item exposes owned paths, forbidden paths, validation
+  commands, acceptance checks, commit evidence expectations, and git governance.
+- Evidence is classified as primary, auxiliary, comparison, and missing/unknown.
+- Product-alignment pointer context is exposed when available.
+- Local commit evidence:
+  `changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/LOCAL_COMMIT_EVIDENCE.yaml`
+
 ### C005 - Expose resume in runtime surface and documentation
 
-Status: candidate
+Status: ready
 
 Risk: medium
 

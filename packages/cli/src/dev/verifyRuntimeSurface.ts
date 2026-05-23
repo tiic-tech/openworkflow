@@ -462,6 +462,19 @@ async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.
     "source_candidate_id: C001",
     "title: Active resume fixture",
     "status: selected",
+    "owned_paths:",
+    "  - packages/cli/src/commands/",
+    "forbidden_paths:",
+    "  - .openworkflow/**",
+    "validation:",
+    "  - npm run build",
+    "acceptance:",
+    "  - Resume fixture exposes boundary fields.",
+    "scope:",
+    "  includes:",
+    "    - classify fixture action",
+    "  excludes:",
+    "    - mutate workflow state",
     "",
   ].join("\n"), "utf8");
   await writeFile(join(selectedRoot, "ATOM_TASKS.yaml"), [
@@ -487,12 +500,25 @@ async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.
   const selectedData = record(selectedResume.data, "selected resume data");
   const selectedQueue = record(selectedData.active_queue, "selected resume active_queue");
   const selectedWorkItem = record(selectedData.current_work_item, "selected resume current_work_item");
+  const selectedActions = record(selectedData.actions, "selected resume actions");
+  const selectedEvidence = record(selectedData.evidence, "selected resume evidence");
+  const selectedProductAlignment = record(selectedData.product_alignment, "selected resume product_alignment");
   assert(selectedQueue.status === "found", "resume should find an active planning queue");
   assert(selectedQueue.plan_id === "M900-resume-queue-fixture", "resume active queue plan mismatch");
   assert(record(selectedQueue.breakpoint, "selected breakpoint").status === "selected_candidate", "resume should report selected candidate breakpoint");
   assert(selectedWorkItem.status === "selected", "resume current work item should be selected");
   assert(selectedWorkItem.candidate_id === "C001", "resume current work item candidate mismatch");
+  assert(Array.isArray(selectedWorkItem.forbidden_paths) && selectedWorkItem.forbidden_paths.includes(".openworkflow/**"), "resume should expose selected-change forbidden paths");
+  assert(Array.isArray(selectedWorkItem.validation_commands) && selectedWorkItem.validation_commands.includes("npm run build"), "resume should expose validation commands");
+  assert(Array.isArray(selectedWorkItem.acceptance) && selectedWorkItem.acceptance.length === 1, "resume should expose acceptance checks");
+  assert(record(selectedWorkItem.commit_evidence, "selected commit evidence").expected_path === "changes/M900-resume-queue-fixture/C001-active-selection/LOCAL_COMMIT_EVIDENCE.yaml", "resume should expose expected local commit evidence path");
   assert(Array.isArray(selectedWorkItem.incomplete_atom_tasks) && selectedWorkItem.incomplete_atom_tasks.length === 1, "resume should expose incomplete atom tasks");
+  assert(Array.isArray(selectedActions.allowed_actions) && selectedActions.allowed_actions.some((item) => String(item).includes("continue selected change C001")), "resume should classify allowed actions");
+  assert(Array.isArray(selectedActions.forbidden_actions) && selectedActions.forbidden_actions.some((item) => String(item).includes(".openworkflow/**")), "resume should classify forbidden actions");
+  assert(Array.isArray(selectedEvidence.primary) && selectedEvidence.primary.includes("changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml"), "resume should classify primary evidence");
+  assert(Array.isArray(selectedEvidence.auxiliary) && selectedEvidence.auxiliary.includes("changes/M900-resume-queue-fixture/SUMMARY.yaml"), "resume should classify auxiliary evidence");
+  assert(Array.isArray(selectedEvidence.comparison), "resume should include comparison evidence array");
+  assert(Array.isArray(selectedProductAlignment.missing_context), "resume should expose product alignment context");
   assert(Array.isArray(selectedResume.next_actions) && selectedResume.next_actions.includes("continue selected change C001"), "resume should rank selected-change continuation");
 
   await writeFile(join(queueRoot, "CANDIDATE_CHANGES.yaml"), [

@@ -30,11 +30,11 @@ scope_boundary: >
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 5
 active_candidate_count: 5
-completed_candidate_id: C003
-completed_change_id: M106-C003-detect-active-planning-queue-and-current-work-item
+completed_candidate_id: C004
+completed_change_id: M106-C004-classify-actions-and-evidence-for-agent-handoff
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 outputs:
   candidate_changes_yaml: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.md
@@ -84,4 +84,5 @@ validation:
     - Scenario analysis maintenance added S006 for project-local SOUL.md and MEMORY.md evolution as a deferred M112 feature, separate from the resume cockpit implementation queue.
     - C002 implemented the executable read-only `resume` base aggregator with a standard JSON report envelope, explicit command boundary, trust/workflow/git/action/evidence fields, and active_queue/current_work_item uncertainty deferred to C003.
     - C003 implemented active planning queue and current-work-item detection for resume, including queue ranking, selected/completed/next-ready candidates, atom-task breakpoints, missing commit evidence, and queue-local next action.
-    - C004 is now dependency-ready to add richer action and evidence classification.
+    - C004 added Agent-facing action and evidence classification to resume: allowed/forbidden actions, stop conditions, evidence classes, validation expectations, commit-evidence expectations, git-governance constraints, and product-alignment pointer context.
+    - C005 is now dependency-ready to expose resume in runtime guidance and documentation.

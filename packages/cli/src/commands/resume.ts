@@ -41,12 +41,23 @@ export interface ResumeModel {
   actions: {
     immediate: string[];
     allowed_next_steps: string[];
+    allowed_actions: string[];
+    forbidden_actions: string[];
+    stop_conditions: string[];
     stop_if: string[];
   };
   evidence: {
     primary_context: string[];
+    primary: string[];
+    auxiliary: string[];
+    comparison: string[];
     raw_evidence_only_if: string[];
     missing_or_unknown: string[];
+  };
+  product_alignment: {
+    active_pointers: Record<string, string | null>;
+    available_context: string[];
+    missing_context: string[];
   };
   git: BriefModel["git"];
   sources: string[];
@@ -139,13 +150,20 @@ function buildResumeModel(
     actions: {
       immediate: immediateActionsFor(handoff, brief, planningQueue.current_work_item),
       allowed_next_steps: allowedNextStepsFor(handoff),
+      allowed_actions: allowedActionsFor(handoff, planningQueue.current_work_item),
+      forbidden_actions: forbiddenActionsFor(nextCommandCheck, planningQueue.current_work_item),
+      stop_conditions: stopConditionsFor(handoff, brief, planningQueue.current_work_item),
       stop_if: stopConditionsFor(handoff, brief, planningQueue.current_work_item),
     },
     evidence: {
       primary_context: primaryContextFor(handoff.read_order),
+      primary: primaryEvidenceFor(planningQueue.active_queue, planningQueue.current_work_item),
+      auxiliary: auxiliaryEvidenceFor(planningQueue.active_queue, planningQueue.current_work_item),
+      comparison: comparisonEvidenceFor(planningQueue.active_queue),
       raw_evidence_only_if: handoff.read_order.raw_evidence_only_if,
       missing_or_unknown: missingOrUnknownFor(planningQueue.active_queue, planningQueue.current_work_item),
     },
+    product_alignment: productAlignmentFor(handoff.active_pointers),
     git: brief.git,
     sources: [
       "brief",
@@ -198,6 +216,39 @@ function allowedNextStepsFor(handoff: HandoffModel): string[] {
   ]);
 }
 
+function allowedActionsFor(handoff: HandoffModel, currentWorkItem: ResumeModel["current_work_item"]): string[] {
+  if (!handoff.handoff_ok) {
+    return ["repair trust blockers before implementation"];
+  }
+  if (currentWorkItem.status === "unknown") {
+    return ["run read-only diagnostics until behavior boundary is known"];
+  }
+  return unique([
+    currentWorkItem.next_action ?? "",
+    currentWorkItem.status === "selected" ? "continue only the selected change" : "",
+    currentWorkItem.status === "next_ready" ? "select the ready candidate before implementation" : "",
+    ...currentWorkItem.owned_paths.map((path) => `edit owned path: ${path}`),
+    ...currentWorkItem.validation_commands.map((command) => `run validation: ${command}`),
+    currentWorkItem.commit_evidence.required ? "record local commit evidence through openworkflow git-automation commit" : "",
+  ]);
+}
+
+function forbiddenActionsFor(nextCommandCheck: ReadinessModel | null, currentWorkItem: ResumeModel["current_work_item"]): string[] {
+  const commandForbidden = nextCommandCheck?.forbidden_outputs.map((path) => `write forbidden command output: ${path}`) ?? [];
+  if (currentWorkItem.status === "unknown") {
+    return unique([
+      "select or implement work before active queue/current work item is known",
+      ...commandForbidden,
+    ]);
+  }
+  return unique([
+    ...currentWorkItem.forbidden_paths.map((path) => `edit forbidden path: ${path}`),
+    ...currentWorkItem.scope.excludes.map((item) => `out of scope: ${item}`),
+    ...commandForbidden,
+    "push, create PRs, merge, or mutate remote state without explicit approval",
+  ]);
+}
+
 function stopConditionsFor(handoff: HandoffModel, brief: BriefModel, currentWorkItem: ResumeModel["current_work_item"]): string[] {
   return unique([
     ...handoff.blocking_reasons,
@@ -213,6 +264,42 @@ function primaryContextFor(readOrder: ReadOrder): string[] {
     ...readOrder.must_read,
     "openworkflow resume --root . --json",
   ]);
+}
+
+function primaryEvidenceFor(activeQueue: ResumeModel["active_queue"], currentWorkItem: ResumeModel["current_work_item"]): string[] {
+  return unique([
+    activeQueue.status === "found" ? activeQueue.queue_path : "",
+    currentWorkItem.status !== "unknown" ? currentWorkItem.selected_change_path ?? "" : "",
+    currentWorkItem.status !== "unknown" ? currentWorkItem.atom_tasks_path ?? "" : "",
+    currentWorkItem.status !== "unknown" ? currentWorkItem.implementation_brief_path ?? "" : "",
+  ]);
+}
+
+function auxiliaryEvidenceFor(activeQueue: ResumeModel["active_queue"], currentWorkItem: ResumeModel["current_work_item"]): string[] {
+  return unique([
+    activeQueue.status === "found" ? activeQueue.summary_path ?? "" : "",
+    currentWorkItem.status !== "unknown" ? currentWorkItem.commit_evidence.expected_path ?? "" : "",
+    ...(activeQueue.status === "found" && activeQueue.completed_candidate?.selected_change_id
+      ? [`completed candidate ${activeQueue.completed_candidate.id}: ${activeQueue.completed_candidate.selected_change_id}`]
+      : []),
+  ]);
+}
+
+function comparisonEvidenceFor(activeQueue: ResumeModel["active_queue"]): string[] {
+  return activeQueue.status === "found"
+    ? activeQueue.alternatives.map((item) => `${item.queue_path}: ${item.reason}`)
+    : [];
+}
+
+function productAlignmentFor(activePointers: Record<string, string | null>): ResumeModel["product_alignment"] {
+  const available = Object.entries(activePointers)
+    .filter(([, value]) => typeof value === "string" && value.length > 0)
+    .map(([key, value]) => `${key}: ${value}`);
+  return {
+    active_pointers: activePointers,
+    available_context: available,
+    missing_context: available.length === 0 ? ["no active vision, validation, design, spec, decision, or accepted evidence pointer is registered"] : [],
+  };
 }
 
 function warningsFor(

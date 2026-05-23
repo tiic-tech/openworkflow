@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M106-agent-resume-cockpit:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M106-C004-classify-actions-and-evidence-for-agent-handoff
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C004
+title: Atom tasks for M106 C004 action and evidence classification
+status: completed
+tasks:
+  - task_id: T001
+    title: Inspect current resume and queue read model fields
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Existing queue, selected-change, atom-task, command readiness, and git
+      governance fields needed for action/evidence classification are known.
+  - task_id: T002
+    title: Add current work item boundary fields
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/workflow/
+    done_when: >
+      The planning queue read model exposes owned paths, forbidden paths,
+      validation commands, acceptance checks, scope includes/excludes, and
+      commit-evidence expectations for the current work item when available.
+  - task_id: T003
+    title: Add resume action and evidence classes
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/resume.ts
+    done_when: >
+      `resume --json` includes allowed_actions, forbidden_actions, stop
+      conditions, primary/auxiliary/comparison evidence, missing evidence, and
+      product-alignment context.
+  - task_id: T004
+    title: Add runtime coverage
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification covers action/evidence classification for a
+      selected-change fixture.
+  - task_id: T005
+    title: Validate and record completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Build, runtime-surface verification, direct resume JSON command, handoff,
+      summaries, validate, and diff-check pass, then completion and local
+      commit evidence are recorded.

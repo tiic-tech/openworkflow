@@ -1,0 +1,83 @@
+schema_version: 0.1.0
+contract_id: selected_change:M106-agent-resume-cockpit:C004
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M106-C004-classify-actions-and-evidence-for-agent-handoff
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C004
+title: Classify actions and evidence for Agent handoff
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after C003 completed queue-local breakpoint detection. C004 is the
+  next recommended dependency-ready slice: add Agent-facing action policy,
+  evidence classes, owned/forbidden paths, validation expectations, and stop
+  conditions without enforcing write preflight or lineage scoring.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Classify guidance from existing queue, selected-change, command readiness,
+    and git governance signals only; keep enforcement and deeper product drift
+    scoring deferred.
+scope:
+  includes:
+    - classify allowed and forbidden next actions from command and queue context
+    - classify primary, auxiliary, and comparison evidence when queues name them
+    - surface "do not do" guidance from queue boundaries and command checks
+    - surface owned paths, forbidden paths, validation expectations, and git-governance constraints for the current work item
+    - turn user scope bans and queue out-of-scope rules into explicit stop conditions when available
+    - expose available vision, validation, design, spec, decision, or accepted-evidence alignment signals when current artifacts name them
+  excludes:
+    - enforcing write preflight decisions
+    - artifact lineage graph schema
+    - implementing a full vision-product drift scoring engine
+    - provider-backed image provenance
+owned_paths:
+  - packages/core/src/workflow/
+  - packages/cli/src/commands/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M106-agent-resume-cockpit/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - changes/M107-artifact-lineage-graph/**
+  - changes/M108-consistency-first-later-prompt2proto/**
+  - changes/M109-provider-fallback-generation-metadata/**
+  - changes/M110-boundary-preflight-compiler/**
+  - changes/M112-project-soul-memory/**
+  - changes/M113-spicyclaw-rename-and-compatibility/**
+acceptance:
+  - Resume includes allowed_actions and forbidden_actions.
+  - Resume identifies primary evidence separately from auxiliary/comparison evidence when available.
+  - Queue boundaries and user bans are visible before implementation work begins.
+  - Resume exposes owned_paths, forbidden_paths, validation commands, and commit evidence expectations for the current selected change when available.
+  - Resume tells the Agent to stop instead of continuing when behavior boundaries cannot be established.
+  - Resume exposes product-alignment context when available so atom tasks do not optimize local code movement against stale or missing vision evidence.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C004 should complete as one local implementation commit containing
+  action/evidence classification, resume packet integration, runtime-surface
+  coverage, queue updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - packages/core/src/workflow/planningQueueResume.ts
+    - packages/cli/src/commands/resume.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check
