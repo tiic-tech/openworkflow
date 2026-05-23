@@ -41,8 +41,9 @@ Out of scope:
 ## Selection Policy
 
 `C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
-internal command protocol with source-driven generated surfaces. Continue with
-`C004` to wire coder governance into change and team protocols.
+internal command protocol with source-driven generated surfaces. `C004` is
+complete. The next ready candidate is `C005`, which is high risk and should not
+be selected without an explicit high-risk decision.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -97,16 +98,24 @@ as internal-only and behavior-compatible.
 
 ### C004: Wire coder governance into change and team protocols
 
-- Status: `ready`
+- Status: `done`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: make `/ow:change` and `/ow:team` reference coder governance without
   changing their primary responsibilities.
 - Owns: `packages/core/src/commands/registry.ts`, `skills/select-change/`,
   `skills/run-team/`, `packages/cli/src/dev/verifyRuntimeSurface.ts`,
+  `.agents/skills/ow-change/`, `.agents/skills/ow-team/`,
+  `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`,
+  `.openworkflow/audit/CONTEXT_PACKETS.yaml`,
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C002`, `C003`
 - Unlocks: `C005`
+- Selection:
+  `C004-wire-coder-governance-into-change-and-team-protocols`
+- Completion: source protocol and generated skill guidance for coder preflight,
+  RED/GREEN evidence, post-write self-check, validation ladder, and evidence
+  binding
 
 ### C005: Surface coder gate state in recovery and git governance
 

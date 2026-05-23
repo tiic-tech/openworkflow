@@ -17,7 +17,7 @@ priority:
   priority_rank: above_M114
   preempts:
     - M114-engineering-quality-foundation
-  next_action: Complete M115 C003 before returning to M114 C002.
+  next_action: Prepare a high-risk decision before selecting M115 C005, or return to M114 C002 if M115 pauses.
 source:
   kind: planning_discussion
   refs:
@@ -40,36 +40,25 @@ outputs:
   selected_change_c003: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml
   atom_tasks_c003: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
   implementation_brief_c003: changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/IMPLEMENTATION_BRIEF.md
+  selected_change_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/SELECTED_CHANGE.yaml
+  atom_tasks_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/ATOM_TASKS.yaml
+  implementation_brief_c004: changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/IMPLEMENTATION_BRIEF.md
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 7
-completed_candidate_id: C002
-completed_change_id: C002-migrate-code-quality-governor-into-ow-source-coder-skill
-selected_candidate_id: C003
-selected_change_id: C003-register-internal-ow-coder-command-protocol
-next_recommended_candidate_id: null
+completed_candidate_id: C004
+completed_change_id: C004-wire-coder-governance-into-change-and-team-protocols
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C005
 completed_candidate:
-  id: C001
-  title: Define internal coder protocol contract and command boundary
+  id: C004
+  title: Wire coder governance into change and team protocols
   risk: medium
   reason: >
-    C001 defined internal-only semantics and integration boundaries before OW
-    migrates the skill, registers the internal command, or wires coder
-    governance into implementation flows.
-selected_candidate:
-  id: C003
-  title: Register internal `/ow:coder` command protocol
-  risk: medium
-  reason: >
-    C003 is selected because C001 established the internal boundary and C002
-    created the repo-owned source skill.
-completed_candidate:
-  id: C002
-  title: Migrate code-quality governor into OW source coder skill
-  risk: medium
-  reason: >
-    C002 added the repo-owned source skill for internal coder governance without
-    registering `/ow:coder`, changing generated surfaces, or altering runtime
-    behavior.
+    C004 wired coder preflight, RED/GREEN evidence, post-write self-check,
+    validation ladder, and evidence binding into change/team protocols without
+    changing command identity or adding hard enforcement.
+selected_candidate: null
 key_dependencies:
   - C001 unlocks source skill migration, registry work, protocol wiring, and read-model integration.
   - C005 and C006 are high risk because they touch recovery/git evidence semantics and persistent evidence shape.

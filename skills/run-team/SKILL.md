@@ -55,10 +55,14 @@ On `/ow:team CONTENT`, do not start coding immediately.
    - Immediately record the returned `agent_id` in `AGENT_ROSTER.yaml` and the task entry.
    - Keep persistent implementation agents mounted across related atom tasks and issue-fix loops.
    - Use event-driven review, security, QA, and git-release agents asynchronously where ownership is disjoint.
+   - For source-edit work, apply coder governance before completion: owner/file
+     map, RED evidence when applicable, GREEN evidence after edits,
+     post-write self-check, validation ladder, and evidence binding.
 
 8. Checkpoint.
    - Update runtime state after every real state transition.
    - Run required checks.
+   - Record coder evidence status for source-edit work.
    - Commit coherent runtime/implementation/QA slices, or record why a checkpoint is deferred.
 
 ## Runtime Rules

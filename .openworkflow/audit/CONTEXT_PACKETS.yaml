@@ -621,17 +621,22 @@ packets:
         - Confirm a focused production spec exists.
         - Inspect the repository just enough to identify affected paths, integration points, and
           verification commands.
+        - "Apply coder preflight before finalizing selected implementation boundaries: identify
+          source truth, owned paths, forbidden paths, generated surfaces, and the honest validation
+          ladder."
         - Lazy-create the changes index, change artifact, and work items only when /ow:change is
           invoked.
       during:
         - Convert the spec into one bounded implementation change with non-goals and rollback notes.
-        - Split work into ordered items with owned paths, dependencies, acceptance, and verification.
+        - Split work into ordered items with owned paths, dependencies, acceptance, verification,
+          and coder evidence expectations when source edits are likely.
         - Record unresolved implementation risks instead of expanding scope.
       after:
         - Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.
         - Refresh change SUMMARY.yaml when summary_policy is configured and update
           CURRENT_STATE.yaml with current_change and runtime readiness.
-        - Hand off to /ow:team only when work items are implementable and verification is explicit.
+        - Hand off to /ow:team only when work items are implementable, verification is explicit, and
+          coder preflight expectations are visible to the execution agent.
         - Confirm no runtime artifacts were created.
   - packet_id: context:team
     command: /ow:team
@@ -655,18 +660,21 @@ packets:
       before:
         - Confirm an approved or active change plan and work items exist.
         - Audit git status, relevant source files, and any existing runtime state before execution.
+        - "Recover coder governance expectations from the change plan before source edits: owner
+          map, RED/GREEN target, self-check, validation ladder, and evidence binding."
         - Lazy-create runtime state only when /ow:team is invoked for an approved change.
       during:
         - Execute work items in dependency order and keep runtime state current.
         - Delegate only when the task can run independently with clear owned paths and acceptance.
-        - Record issues, verification results, checkpoints, and residual risks as development
-          proceeds.
+        - Preserve RED/GREEN evidence, post-write self-check notes, verification results,
+          checkpoints, and residual risks as development proceeds.
       after:
         - Update runtime state, issues, and checkpoints.
         - Refresh runtime SUMMARY.yaml when summary_policy is configured and update
           CURRENT_STATE.yaml with current_run, blockers, and next action.
         - Run the verification named by the change plan when practical.
-        - Report changed artifacts, verification result, and remaining blockers.
+        - Report changed artifacts, coder evidence status, verification result, and remaining
+          blockers.
   - packet_id: context:decompose-to-changes
     command: /ow:decompose-to-changes
     visibility: user

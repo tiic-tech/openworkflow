@@ -2510,6 +2510,9 @@ function verifyChangeSkill(content: string): void {
     "create it together with the first change artifact during /ow:change",
     "<planning_quality_bar>",
     "owned_paths",
+    "<coder_preflight>",
+    "coder preflight from skills/coder/SKILL.md",
+    "RED/GREEN evidence",
     "Do not hand off to /ow:team until CHANGE.yaml and WORK_ITEMS.yaml agree on scope and verification.",
   ]) {
     assert(content.includes(required), `ow-change missing production guidance: ${required}`);
@@ -2523,6 +2526,11 @@ function verifyTeamSkill(content: string): void {
     "Create RUNTIME_INDEX.yaml and the first runtime state only when /ow:team begins approved execution.",
     "<execution_quality_bar>",
     "Track active change, active work item",
+    "<coder_execution_gate>",
+    "RED evidence when applicable",
+    "GREEN evidence after edits",
+    "post-write self-check",
+    "LOCAL_COMMIT_EVIDENCE.yaml",
     "When work is incomplete, leave the next action and blocker explicit in runtime state.",
   ]) {
     assert(content.includes(required), `ow-team missing production guidance: ${required}`);

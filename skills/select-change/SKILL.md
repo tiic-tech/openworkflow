@@ -171,6 +171,10 @@ narrow enough to match that approved option.
 - Include `done_when` criteria that an implementation agent can verify.
 - Add forbidden paths in `SELECTED_CHANGE.yaml` when generated or unrelated
   surfaces should not be touched.
+- For source-edit candidates, include coder preflight expectations: source
+  truth, generated surfaces, owned paths, forbidden paths, RED/GREEN evidence
+  when applicable, post-write self-check, validation ladder, and evidence
+  binding.
 
 ## Selection Boundaries
 
@@ -186,3 +190,5 @@ narrow enough to match that approved option.
 - Do not hand-edit generated `.agents/` or `.openworkflow/` surfaces unless the
   selected candidate explicitly owns those paths and the user accepts that
   scope.
+- Do not treat coder governance as a replacement for selection. Selection owns
+  the implementation boundary; coder governance constrains later source edits.
