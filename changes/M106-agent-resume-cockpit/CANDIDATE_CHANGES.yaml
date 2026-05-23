@@ -11,11 +11,22 @@ source:
     - docs/M104_AGENT_CONSUMER_INTERVIEW.md
     - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
     - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+    - user_input:2026-05-23-resume-zero-thought-recovery-standard
+    - user_input:2026-05-23-ow-not-ordinary-ralf-loop-north-star
+    - user_input:2026-05-23-project-soul-memory-scenario
   summary: >
     M104 showed that Agents need one recovery packet that explains where the
     workflow really is, whether the state can be trusted, what queue boundary is
     active, what evidence is missing, and what the smallest correct next action
-    is. M105 repaired the direct trust-gate defects; M106 owns the read-only
+    is. The human operator expectation is zero-thought recovery after network
+    loss, context overflow, compaction failure, or other interrupted sessions:
+    a new Agent should run resume, understand the project, current task,
+    breakpoint, behavior boundaries, and allowed work, then continue through OW
+    health maintenance. The deeper product expectation is that OW must not
+    become a generic Ralf Loop; it should let Agents use minimal context for
+    precise action across arbitrary repo scale and recover from interruptions
+    into corrected, ranked atom-task execution that minimizes vision-to-product
+    drift. M105 repaired the direct trust-gate defects; M106 owns the read-only
     resume cockpit feature.
 queue_policy:
   branch_boundary: codex/m101-build-proto-prompt-command-split
@@ -55,8 +66,8 @@ scope_control:
     existing trust gates, queue files, and git state.
   out_of_scope_rule: >
     Do not implement artifact lineage graph, prompt2proto strategy selection,
-    provider-backed generation, or a full write/commit preflight compiler in
-    this queue.
+    provider-backed generation, a full write/commit preflight compiler, or
+    project SOUL/MEMORY evolution in this queue.
   deferred_features:
     - title: Artifact lineage graph
       reason: >
@@ -78,6 +89,77 @@ scope_control:
         A full write/commit preflight command should reuse resume's current
         work packet after M106 lands.
       suggested_plan_id: M110-boundary-preflight-compiler
+    - title: Vision-product drift minimization loop
+      reason: >
+        The final OW loop should measure and correct drift between product
+        vision, accepted evidence, implementation tasks, and shipped behavior.
+        Resume should expose available alignment signals, but the full drift
+        model needs its own queue.
+      suggested_plan_id: M111-vision-product-drift-minimization
+    - title: Project SOUL.md and MEMORY.md evolution
+      reason: >
+        Each initialized repo should eventually grow project-local Agent Soul
+        and memory from auditable development records: high-value insights,
+        implementation patterns, emergent capabilities, and major mistakes that
+        must not recur. This is a separate high-risk feature because persistent
+        project personality and reusable expertise need promotion, pruning,
+        privacy, and governance rules.
+      suggested_plan_id: M112-project-soul-memory
+resume_success_standard:
+  persona: >
+    A fresh Agent in a new session after an unexpected interruption, with no
+    reliable conversation context beyond the user's instruction to use OW resume
+    and continue.
+  human_operator_goal: >
+    The human operator should not need to inspect queue files, remember the
+    breakpoint, explain the branch, or restate allowed work before the Agent can
+    safely continue.
+  success_rule: >
+    `resume --json` succeeds only when the packet is sufficient for that fresh
+    Agent to understand project overview, current task boundary, breakpoint,
+    behavior boundaries, allowed work scope, validation expectations, and the
+    smallest correct next OW-maintained action.
+  failure_rule: >
+    If resume cannot establish any of those facts, it must say exactly what is
+    unknown, which source was missing or conflicting, and what read-only check
+    should happen before implementation continues.
+  minimum_packet_capabilities:
+    - project_overview
+    - trust_and_health_state
+    - current_queue_boundary
+    - current_work_item_or_next_candidate
+    - breakpoint_since_last_commit_or_evidence
+    - allowed_actions
+    - forbidden_actions
+    - owned_paths_and_write_boundary
+    - validation_and_git_governance_expectations
+    - uncertainty_and_blockers
+    - smallest_correct_next_action
+ow_north_star_constraints:
+  non_goal: >
+    OW must not become a generic repeated Agent loop that burns context,
+    retries blindly, or treats each interruption as a reason to rediscover the
+    repo from scratch.
+  operating_model: >
+    OW should let Agents act with the least sufficient context, choose the most
+    precise next action, recover from arbitrary interruption, and keep moving
+    through corrected, ranked atom tasks inside explicit behavior boundaries.
+  scale_target: >
+    The recovery model should remain useful across repos of any practical
+    scale by preferring summary/current-state surfaces, queue boundaries,
+    selected-change artifacts, and targeted evidence over broad raw scans.
+  correction_loop: >
+    After entering OW's own loop, every interruption or mismatch should route
+    the Agent back to a trustable packet, current boundary, ranked next action,
+    and stop condition rather than free-form replanning.
+  product_alignment_goal: >
+    Resume should preserve or expose the best available product intent and
+    evidence alignment signals so downstream atom tasks minimize
+    vision-product drift.
+  soul_memory_relation: >
+    Resume is not the long-term Soul or memory store, but it should eventually
+    be able to surface the current repo's project-specific SOUL/MEMORY signals
+    when those artifacts exist and are trusted.
 next_recommended_candidate_id: C002
 changes:
   - id: C001
@@ -160,12 +242,18 @@ changes:
     purpose: >
       Implement the read-only CLI command that aggregates current state,
       handoff-quality signals, next-command readiness, summary quality, and git
-      state into one resume packet.
+      state into one resume packet. The packet must be useful as the first
+      command a fresh Agent runs after an interrupted session, before any queue
+      scanning heuristics are added, and must avoid broad rediscovery when
+      existing trust surfaces are enough.
     scope:
       includes:
         - add the resume CLI command entrypoint
         - reuse existing handoff, inspect, summaries, check, and git-state logic where practical
         - support `--json` with an Agent-safe report envelope
+        - include a zero-thought recovery summary with project overview, trust state, git state, and smallest safe next action
+        - report unknown queue/work-item context explicitly until C003 implements active queue detection
+        - prefer least-sufficient context surfaces over broad repository scans
         - keep command read-only
       excludes:
         - queue scanning heuristics beyond current obvious queue inputs
@@ -188,7 +276,10 @@ changes:
       - node dist/cli/src/index.js resume --root . --json
       - git diff --check
     acceptance:
-      - "`resume --json` returns one packet with current trust, next action, and git cleanliness."
+      - "`resume --json` returns one packet with project overview, trust state, next action, and git cleanliness."
+      - The packet is sufficient for a new Agent to decide whether it can continue or must stop for missing context.
+      - Unknown active queue or current work item is represented as explicit uncertainty, not omitted or guessed.
+      - Resume favors existing OW trust surfaces and does not require whole-repo rediscovery for a healthy initialized project.
       - The command does not write or update files.
       - Runtime coverage verifies fresh and initialized repo behavior.
   - id: C003
@@ -197,13 +288,17 @@ changes:
     purpose: >
       Teach resume to identify the most relevant active queue, previous
       completed candidate, selected candidate, missing evidence, and when queue
-      boundary should override a misleading `CURRENT_STATE.next_command`.
+      boundary should override a misleading `CURRENT_STATE.next_command`, so a
+      fresh Agent can resume the real task instead of falling back to a generic
+      workflow command or an unranked loop.
     scope:
       includes:
         - scan obvious `changes/*/SUMMARY.yaml` and `CANDIDATE_CHANGES.yaml` planning queues
         - prefer active selected changes over generic workflow next command
         - expose previous completed candidate and missing commit evidence
         - report queue-boundary override reasons
+        - identify interruption breakpoints from selected-change status, atom-task status, completion evidence, and recent local commits when available
+        - rank the smallest correct queue-local action when the evidence clearly supports one
       excludes:
         - selecting candidates
         - editing queues
@@ -227,22 +322,31 @@ changes:
     acceptance:
       - Resume identifies an active selected-change queue when one exists.
       - Resume distinguishes workflow `next_command` from queue-local next action.
+      - Resume reports the likely breakpoint as selected candidate, next ready candidate, incomplete atom task, missing evidence, or clean handoff point.
       - Resume reports missing local commit evidence without mutating queue files.
+      - Resume reports a ranked next action without authorizing broad replanning when a bounded atom-task path is available.
+      - A fresh Agent can tell which M106 candidate to select or implement next without human memory of the previous session.
   - id: C004
     status: candidate
     title: Classify actions and evidence for Agent handoff
     purpose: >
       Add Agent-facing action policy and evidence classification so resume says
       what is allowed, forbidden, primary evidence, auxiliary evidence, and
-      comparison evidence.
+      comparison evidence. This is the behavior-boundary layer that prevents a
+      fresh Agent from widening scope after an interrupted session and keeps
+      corrective atom-task execution aligned with product intent.
     scope:
       includes:
         - classify allowed and forbidden next actions from command and queue context
         - classify primary, auxiliary, and comparison evidence when queues name them
         - surface "do not do" guidance from queue boundaries and command checks
+        - surface owned paths, forbidden paths, validation expectations, and git-governance constraints for the current work item
+        - turn user scope bans and queue out-of-scope rules into explicit stop conditions when available
+        - expose available vision, validation, design, spec, decision, or accepted-evidence alignment signals when current artifacts name them
       excludes:
         - enforcing write preflight decisions
         - artifact lineage graph schema
+        - implementing a full vision-product drift scoring engine
         - provider-backed image provenance
     owned_paths:
       - packages/core/src/workflow/
@@ -264,19 +368,29 @@ changes:
       - Resume includes allowed_actions and forbidden_actions.
       - Resume identifies primary evidence separately from auxiliary/comparison evidence when available.
       - Queue boundaries and user bans are visible before implementation work begins.
+      - Resume exposes owned_paths, forbidden_paths, validation commands, and commit evidence expectations for the current selected change when available.
+      - Resume tells the Agent to stop instead of continuing when behavior boundaries cannot be established.
+      - Resume exposes product-alignment context when available so atom tasks do not optimize local code movement against stale or missing vision evidence.
   - id: C005
     status: candidate
     title: Expose resume in runtime surface and documentation
     purpose: >
       Complete the command surface by updating source-generated skill guidance,
       runtime verification, and docs so Agents know to start recovery with
-      `resume --json` when resuming breakpoint work.
+      `resume --json` when resuming breakpoint work. The documented user story
+      is: the human opens a new session, says "use OW resume and continue", and
+      the Agent can proceed without extra human context while staying inside
+      OW's corrected atom-task loop.
     scope:
       includes:
         - update source registry or onboarding text that generates Agent guidance
         - run sync only if generated surfaces must be refreshed from source changes
         - add runtime-surface coverage for CLI help and command availability
         - document handoff usage
+        - document zero-thought recovery expectations for interrupted sessions
+        - make generated Agent guidance distinguish resume from lower-level handoff, inspect, context, and status commands
+        - document that resume is a minimal-context precision entrypoint, not a generic autonomous retry loop
+        - keep project SOUL/MEMORY evolution documented as a deferred feature, not part of the resume implementation queue
       excludes:
         - hand-editing generated `.agents/**`
         - changing default `CURRENT_STATE.next_command`
@@ -302,6 +416,10 @@ changes:
       - Agent-facing source guidance points resume users to the new command.
       - Runtime verification covers command help and JSON shape.
       - Generated surfaces are updated only through source-driven sync when required.
+      - Documentation states that resume is the first recovery command for a fresh Agent after network loss, context overflow, compaction failure, or unexpected termination.
+      - Guidance explains when to use resume versus handoff/context/inspect without requiring the human to remember the project breakpoint.
+      - Guidance frames OW recovery as ranked atom-task continuation with explicit correction and product-alignment boundaries, not broad free-form replanning.
+      - Guidance does not conflate resume's recovery packet with the future project SOUL/MEMORY store.
 operations:
   - operation_id: OP001
     operation_type: add
@@ -364,3 +482,57 @@ operations:
     after_status: ready
     evidence:
       - changes/M106-agent-resume-cockpit/C001-define-resume-packet-contract-and-command-boundary/SELECTED_CHANGE.yaml
+  - operation_id: OP005
+    operation_type: update
+    target_candidate_ids:
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Incorporated the human operator and first-consumer Agent success standard:
+      resume must be the zero-thought recovery entry after interrupted sessions,
+      giving a fresh Agent project overview, task boundary, breakpoint, behavior
+      boundaries, allowed work, validation expectations, and the smallest
+      correct OW-maintained next action.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: active
+    evidence:
+      - user_input:2026-05-23-resume-zero-thought-recovery-standard
+  - operation_id: OP006
+    operation_type: update
+    target_candidate_ids:
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Incorporated the broader OW north-star constraint from the first-consumer
+      Agent perspective: OW should not become a generic Ralf Loop; resume should
+      support minimal-context precise action at arbitrary repo scale, recovery
+      from interruptions, corrected and ranked atom-task continuation, and
+      vision-product drift minimization signals.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: active
+    evidence:
+      - user_input:2026-05-23-ow-not-ordinary-ralf-loop-north-star
+  - operation_id: OP007
+    operation_type: update
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Recorded the sixth major interview-derived scenario as a deferred
+      feature: project-local .openworkflow/SOUL.md and MEMORY.md should evolve
+      from auditable development evidence into reusable expert Agent Soul for
+      similar projects, distinct from generic user-habit memory.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: active
+    evidence:
+      - user_input:2026-05-23-project-soul-memory-scenario
+      - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml

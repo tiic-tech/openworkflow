@@ -7,6 +7,7 @@ Source of truth: `CHANGE_ANALYSIS.yaml`
 - `docs/M104_AGENT_CONSUMER_INTERVIEW.md`
 - `changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml`
 - `changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml`
+- `user_input:2026-05-23-project-soul-memory-scenario`
 
 Git state: clean on `codex/m101-build-proto-prompt-command-split`.
 
@@ -25,12 +26,14 @@ the cross-session recovery problem exposed by M104.
 3. Artifact lineage graph: defer to M107.
 4. Prompt2Proto strategy engine: defer to M108.
 5. Boundary preflight compiler: defer to M110 after resume clarifies the current work packet.
+6. Project `SOUL.md` and `MEMORY.md`: defer to M112 as a dedicated high-risk queue for project-local Agent Soul that evolves from auditable development evidence.
 
 ## Rejected Alternatives
 
 - M107 lineage graph: valuable but broader than the immediate recovery read model.
 - M108 prompt2proto strategy: valuable but should be backed by lineage and provider capability metadata.
 - M110 boundary preflight compiler: useful, but M105 C004 already improved commit-time diagnostics.
+- M112 project Soul/Memory: strategically differentiating, but needs its own queue because persistent project personality, mistake-prevention memory, reusable implementation patterns, and emergent capability capture must be governed by audit evidence rather than user habit logging.
 
 ## Handoff
 

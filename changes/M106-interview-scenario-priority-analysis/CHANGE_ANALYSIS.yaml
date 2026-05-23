@@ -11,13 +11,17 @@ source:
     - docs/M104_AGENT_CONSUMER_INTERVIEW.md
     - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
     - changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
+    - user_input:2026-05-23-project-soul-memory-scenario
   queues:
     - changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
   summary: >
-    The interview identified five high-value OW development scenarios. M105
-    has already completed the direct commit-evidence closure and owned-path
-    diagnostic slice, so the next best feature boundary is the Agent resume
-    cockpit exposed as resume --json.
+    The interview identified five high-value OW development scenarios, and
+    later planning added a sixth differentiating scenario: project-local
+    SOUL.md and MEMORY.md under .openworkflow that evolve from auditable
+    development records into reusable expert Agent Soul for similar projects.
+    M105 has already completed the direct commit-evidence closure and
+    owned-path diagnostic slice, so the next best feature boundary remains the
+    Agent resume cockpit exposed as resume --json.
 git_state:
   branch: codex/m101-build-proto-prompt-command-split
   dirty: false
@@ -84,6 +88,23 @@ scenario_scores:
       M105 C004 improved commit-time diagnostics, but a full write preflight
       command should be designed after resume establishes the current work
       packet and queue boundary model.
+  - scenario_id: S006
+    title: Project SOUL.md and MEMORY.md evolution
+    suggested_plan_id: M112-project-soul-memory
+    status: deferred
+    priority: 6
+    risk: high
+    readiness: medium
+    reason: >
+      Creates project-local `.openworkflow/SOUL.md` and
+      `.openworkflow/MEMORY.md` that evolve from auditable OW development
+      records, linear governance, high-value implementation patterns, emergent
+      Agent capabilities, and major mistake prevention. This is a differentiator
+      from generic human preference memory: OW Soul should be trained by
+      development evidence, not by user habit logs. It should follow resume and
+      trust-surface foundations because capture, promotion, pruning, privacy,
+      and reuse rules need a reliable audit model before they affect every
+      initialized repo.
 rejected_alternatives:
   - plan_id: M107-artifact-lineage-graph
     candidate_id: future
@@ -100,6 +121,14 @@ rejected_alternatives:
     reason: >
       Useful, but partially reduced by M105 C004 and less urgent than solving
       cross-session recovery.
+  - plan_id: M112-project-soul-memory
+    candidate_id: future
+    reason: >
+      Strategically important and strongly differentiating, but high risk
+      because it creates persistent project personality and reusable Agent
+      expertise. It needs a dedicated queue after the resume/trust model can
+      identify which discoveries are evidence-backed, durable, and safe to
+      promote into SOUL or MEMORY.
 high_risk_stop:
   required: false
 validation:
@@ -109,3 +138,4 @@ validation:
   notes:
     - Analysis is advisory and does not select or implement a candidate.
     - M105 is complete and unblocks the resume cockpit queue.
+    - Added S006 as a deferred project SOUL/MEMORY scenario from later planning input.
