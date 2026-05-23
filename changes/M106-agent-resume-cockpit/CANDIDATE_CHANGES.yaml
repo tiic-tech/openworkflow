@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M106-agent-resume-cockpit
 title: Candidate changes for Agent resume cockpit
-status: active
+status: completed
 source:
   kind: mixed
   refs:
@@ -160,7 +160,7 @@ ow_north_star_constraints:
     Resume is not the long-term Soul or memory store, but it should eventually
     be able to surface the current repo's project-specific SOUL/MEMORY signals
     when those artifacts exist and are trusted.
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -473,7 +473,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C005
-    status: ready
+    status: done
     title: Expose resume in runtime surface and documentation
     purpose: >
       Complete the command surface by updating source-generated skill guidance,
@@ -497,7 +497,10 @@ changes:
         - changing default `CURRENT_STATE.next_command`
         - remote git or PR automation
     owned_paths:
+      - AGENTS.md
       - packages/core/src/commands/registry.ts
+      - packages/cli/src/commands/resume.ts
+      - packages/cli/src/index.ts
       - packages/core/src/onboarding/
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - docs/
@@ -512,6 +515,8 @@ changes:
       - npm run verify:runtime-surface
       - node dist/cli/src/index.js resume --root . --json
       - node dist/cli/src/index.js handoff --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
       - git diff --check
     acceptance:
       - Agent-facing source guidance points resume users to the new command.
@@ -521,6 +526,44 @@ changes:
       - Guidance explains when to use resume versus handoff/context/inspect without requiring the human to remember the project breakpoint.
       - Guidance frames OW recovery as ranked atom-task continuation with explicit correction and product-alignment boundaries, not broad free-form replanning.
       - Guidance does not conflate resume's recovery packet with the future project SOUL/MEMORY store.
+    selection:
+      selected_change_id: M106-C005-expose-resume-in-runtime-surface-and-documentation
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C004 completed behavior-boundary and evidence
+        classification. C005 is the final dependency-ready slice and should
+        expose the implemented resume cockpit in runtime guidance and docs
+        without changing workflow state or expanding into future SOUL/MEMORY
+        behavior.
+      artifacts:
+        selected_change: changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/ATOM_TASKS.yaml
+        implementation_brief: changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - AGENTS.md
+        - docs/AGENT_RESUME_COCKPIT.md
+        - packages/core/src/onboarding/agentsGuide.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/commands/resume.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Exposed resume as the first interrupted-session recovery command in
+        source-generated Agent guidance and CLI help, documented zero-thought
+        Agent recovery, refreshed AGENTS.md through sync, removed stale deferred
+        runtime-surface wording from the resume command boundary, and added
+        runtime-surface assertions for help, generated guidance, and JSON shape.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -775,3 +818,40 @@ operations:
     after_status: ready
     evidence:
       - changes/M106-agent-resume-cockpit/C004-classify-actions-and-evidence-for-agent-handoff/SELECTED_CHANGE.yaml
+  - operation_id: OP017
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Selected C005 to expose the implemented resume cockpit in
+      source-generated Agent guidance, runtime-surface verification, and
+      documentation after C004 completed behavior-boundary classification.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/SELECTED_CHANGE.yaml
+      - changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/ATOM_TASKS.yaml
+      - changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP018
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Completed runtime and documentation exposure for `resume --json`,
+      including source-generated Agent guidance, CLI help, zero-thought
+      recovery docs, source-driven AGENTS.md refresh, stale deferred-boundary
+      cleanup, and runtime-surface coverage.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - AGENTS.md
+      - docs/AGENT_RESUME_COCKPIT.md
+      - packages/core/src/onboarding/agentsGuide.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/commands/resume.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/LOCAL_COMMIT_EVIDENCE.yaml

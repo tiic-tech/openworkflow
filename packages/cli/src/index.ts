@@ -136,12 +136,19 @@ Commands:
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
-  Read AGENTS.md, then run openworkflow handoff --root . --json. Handoff is
-  the strict Agent trust gate before context loading. If you need the packet
-  and the trust gate in one call, run openworkflow context --root . --handoff --json.
-  Otherwise, run openworkflow context --root . --json after handoff passes. Inspect starts
-  from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
-  full evidence. Doctor confirms managed surface health, not handoff quality.
+  Read AGENTS.md. If this is a fresh Agent continuing after network loss,
+  context overflow, compaction failure, or unexpected termination, run
+  openworkflow resume --root . --json first. Resume gives one low-context
+  recovery packet with project overview, trust state, active queue/work item,
+  breakpoint, behavior boundaries, allowed work, validation expectations,
+  git state, and the smallest correct OW-maintained next action.
+  Run openworkflow handoff --root . --json when you only need the strict Agent
+  trust gate before context loading. If you need a command-specific packet and
+  the trust gate in one call, run openworkflow context --root . --handoff --json.
+  Otherwise, run openworkflow context --root . --json after handoff passes.
+  Inspect starts from .openworkflow/CURRENT_STATE.yaml and returns read_order
+  before loading full evidence. Status and brief are lightweight summaries.
+  Doctor confirms managed surface health, not handoff quality.
   Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
   but check summary quality fields before treating a current summary
   as a complete handoff. In context --json and doctor --json, read
@@ -160,9 +167,10 @@ Two command surfaces:
     handoff    Strict read-only Agent trust gate; aggregates doctor-style surface health, inspect --strict quality, summaries --strict quality, and next-command readiness.
     resume     Read-only Agent recovery cockpit; aggregates handoff, inspect,
                summaries, check, current pointers, read order, evidence boundaries,
-               and git state into one continuation packet. C002 reports planning
-               queue and current-work-item details as explicit unknowns until C003
-               adds active queue detection.
+               active planning queue/work item, action boundaries, validation
+               expectations, and git state into one continuation packet.
+               Use it as the first command for interrupted-session recovery,
+               not as a generic autonomous retry loop.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; add --handoff to fail on strict handoff-quality blockers, or use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
@@ -184,9 +192,11 @@ Two command surfaces:
   Contract-defined read-only recovery:
     resume     Agent startup cockpit. The \`resume --json\` packet aggregates
                existing handoff, inspect, summaries, check, current pointers,
-               read-order, evidence-boundary, and git signals without mutating
-               workflow state. In the C002 base aggregator, active_queue and
-               current_work_item are intentionally explicit unknowns deferred to C003.
+               read-order, planning queue, current work item, action/evidence
+               boundaries, product-alignment signals, and git signals without
+               mutating workflow state. It should route a fresh Agent into
+               corrected, ranked atom-task continuation with explicit stop
+               conditions instead of broad free-form replanning.
 
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
@@ -203,7 +213,9 @@ Two command surfaces:
     The resume packet contract uses the same report envelope and reserves
     data.command_boundary, data.trust, data.workflow, data.active_queue,
     data.current_work_item, data.actions, data.evidence, data.git, and
-    data.sources for the read-only recovery model.
+    data.sources for the read-only recovery model. Future project-local
+    SOUL.md and MEMORY.md learning artifacts are separate governed features;
+    resume does not create or evolve persistent project personality or memory.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

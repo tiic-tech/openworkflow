@@ -124,8 +124,9 @@ function buildResumeModel(
         "push, open PRs, or mutate remote state",
       ],
       deferred_capabilities: [
-        "Agent action and evidence classification",
-        "runtime documentation beyond the executable CLI surface",
+        "artifact lineage graph",
+        "write/commit preflight compiler",
+        "project-local SOUL.md and MEMORY.md learning artifacts",
       ],
     },
     trust: {

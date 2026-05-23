@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -43,10 +43,9 @@ Out of scope:
 
 Selected candidate: none.
 
-C004 completed action and evidence classification. C005 is now ready to expose
-resume in runtime guidance and documentation.
+C005 completed runtime guidance and documentation exposure for resume.
 
-Next recommended candidate: C005.
+Next recommended candidate: none.
 
 ## Candidates
 
@@ -197,7 +196,7 @@ Completion:
 
 ### C005 - Expose resume in runtime surface and documentation
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -219,6 +218,27 @@ Acceptance focus:
   explanation of the breakpoint.
 - Docs describe OW recovery as ranked atom-task continuation with correction and
   product-alignment boundaries.
+
+Selection artifacts:
+
+- `changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/SELECTED_CHANGE.yaml`
+- `changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/ATOM_TASKS.yaml`
+- `changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- `resume` is documented as the first recovery command for fresh Agents after
+  interrupted sessions.
+- Source-generated `AGENTS.md` guidance distinguishes `resume` from `handoff`,
+  `context`, `inspect`, `status`, and `brief`.
+- CLI help now frames resume as minimal-context precision recovery into ranked
+  atom-task continuation, not broad free-form replanning.
+- `docs/AGENT_RESUME_COCKPIT.md` records the zero-thought recovery standard and
+  keeps project SOUL/MEMORY deferred.
+- Runtime-surface verification covers generated guidance, help text, JSON
+  shape, and resume deferred-boundary wording.
+- Local commit evidence:
+  `changes/M106-agent-resume-cockpit/C005-expose-resume-in-runtime-surface-and-documentation/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ## Deferred
 

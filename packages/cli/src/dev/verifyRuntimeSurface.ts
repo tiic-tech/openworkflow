@@ -194,6 +194,13 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "template-id: openworkflow.agents-guide.v1",
     "openworkflow --help",
     "ok:false",
+    "openworkflow resume --root . --json",
+    "first recovery command",
+    "network loss",
+    "context overflow",
+    "compaction failure",
+    "unexpected termination",
+    "minimal-context precision entrypoint",
     "openworkflow handoff --root . --json",
     "strict Agent trust gate",
     "handoff_quality_ok",
@@ -212,6 +219,10 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow register --root . --artifact <path> --json",
     "openworkflow brief --root .",
     "openworkflow status --root .",
+    "interrupted-session recovery",
+    "generic autonomous retry loop",
+    "ranked atom-task continuation",
+    "product-alignment",
     "openworkflow check /ow:<command> --root . --json",
     "openworkflow summaries --root . --json",
     "draft/thin source quality return `ok:false`",
@@ -224,6 +235,8 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:analyze-changes",
     "/ow:select-change",
     "/ow:git-automation",
+    "SOUL.md",
+    "MEMORY.md",
     "Respect lazy creation",
   ]) {
     assert(guide.includes(required), `AGENTS.md missing onboarding guidance: ${required}`);
@@ -242,6 +255,15 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
   const help = await runCapture(["node", CLI, "--help"], env);
   for (const required of [
     "Agent quick start",
+    "openworkflow resume --root . --json first",
+    "network loss",
+    "context overflow",
+    "compaction failure",
+    "unexpected termination",
+    "active queue/work item",
+    "behavior boundaries",
+    "smallest correct OW-maintained next action",
+    "Status and brief are lightweight summaries",
     "Two command surfaces",
     "CLI maintenance commands",
     "Doctor confirms managed surface health, not handoff quality",
@@ -284,9 +306,16 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "openworkflow resume --root <folder> [--tools auto|codex] [--json]",
     "resume",
     "Read-only Agent recovery cockpit",
+    "interrupted-session recovery",
+    "generic autonomous retry loop",
     "Contract-defined read-only recovery",
+    "planning queue",
+    "corrected, ranked atom-task continuation",
+    "broad free-form replanning",
     "data.command_boundary",
     "data.current_work_item",
+    "SOUL.md",
+    "MEMORY.md",
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
@@ -363,8 +392,13 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   const resumeGit = record(resumeData.git, "resume git");
   assert(resumeReport.ok === true, "fresh resume should pass handoff trust");
   assert(resumeData.resume_version === "0.1.0", "resume json missing version");
+  for (const required of ["command_boundary", "trust", "workflow", "active_queue", "current_work_item", "actions", "evidence", "git", "sources"]) {
+    assert(required in resumeData, `resume json missing data key ${required}`);
+  }
   assert(resumeBoundary.read_only === true, "resume command boundary must be read-only");
   assert(Array.isArray(resumeBoundary.writes) && resumeBoundary.writes.length === 0, "resume command boundary must have no writes");
+  assert(Array.isArray(resumeBoundary.deferred_capabilities) && resumeBoundary.deferred_capabilities.includes("project-local SOUL.md and MEMORY.md learning artifacts"), "resume boundary should keep SOUL/MEMORY deferred");
+  assert(!String(resumeBoundary.deferred_capabilities).includes("runtime documentation beyond the executable CLI surface"), "resume boundary should not describe runtime docs as deferred");
   assert(resumeTrust.handoff_ok === true, "resume trust should expose handoff_ok");
   assert(resumeQueue.status === "unknown", "fresh resume without changes should report unknown active queue");
   assert(Array.isArray(resumeQueue.uncertainty) && resumeQueue.uncertainty.some((item) => String(item).includes("changes/")), "fresh resume should explain missing planning queue");
