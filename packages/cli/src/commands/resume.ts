@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { buildPlanningQueueResume, type ActivePlanningQueue, type CurrentWorkItem, type UnknownCurrentWorkItem, type UnknownPlanningQueue } from "../../../core/src/workflow/planningQueueResume.js";
 import { buildSummaryQualitySummary, evaluateSummaryQualityGate, type SummaryQualitySummary } from "../../../core/src/workflow/summaryHealth.js";
 import { booleanFlag, stringFlag } from "../args.js";
 import { emptyEffects, printJsonReport } from "../report.js";
@@ -35,8 +36,8 @@ export interface ResumeModel {
     read_order: ReadOrder;
     next_command_check: ReadinessModel | null;
   };
-  active_queue: DeferredResumeSection;
-  current_work_item: DeferredResumeSection;
+  active_queue: ActivePlanningQueue | UnknownPlanningQueue;
+  current_work_item: CurrentWorkItem | UnknownCurrentWorkItem;
   actions: {
     immediate: string[];
     allowed_next_steps: string[];
@@ -51,13 +52,6 @@ export interface ResumeModel {
   sources: string[];
 }
 
-export interface DeferredResumeSection {
-  status: "unknown";
-  reason: string;
-  deferred_to: string;
-  known_fields: Record<string, string | null>;
-}
-
 export async function resumeCommand(flags: Map<string, string | boolean>): Promise<number> {
   const root = resolve(stringFlag(flags, "root", ".") ?? ".");
   const json = booleanFlag(flags, "json");
@@ -68,8 +62,9 @@ export async function resumeCommand(flags: Map<string, string | boolean>): Promi
   const inspect = buildInspectModel(brief, nextCommandCheck, strictQuality);
   const qualitySummary = buildSummaryQualitySummary(brief.health.summaries, strictQuality);
   const handoff = buildHandoffModel(brief, nextCommandCheck, inspect.read_order, qualitySummary);
-  const model = buildResumeModel(brief, nextCommandCheck, handoff);
-  const warnings = warningsFor(brief, nextCommandCheck, model);
+  const planningQueue = await buildPlanningQueueResume(root, brief.git.branch);
+  const model = buildResumeModel(brief, nextCommandCheck, handoff, planningQueue);
+  const warnings = warningsFor(brief, nextCommandCheck, model, planningQueue.warnings);
   const healthErrors = model.trust.handoff_ok ? [] : model.trust.blocking_reasons;
 
   if (json) {
@@ -90,15 +85,12 @@ export async function resumeCommand(flags: Map<string, string | boolean>): Promi
   return model.trust.handoff_ok ? 0 : 1;
 }
 
-function buildResumeModel(brief: BriefModel, nextCommandCheck: ReadinessModel | null, handoff: HandoffModel): ResumeModel {
-  const activeQueue = deferredSection("active queue detection is deferred to C003", "M106-C003-detect-active-planning-queue-and-current-work-item", {
-    next_command: handoff.next_command,
-    active_stage: handoff.active_stage,
-  });
-  const currentWorkItem = deferredSection("current work item detection is deferred to C003", "M106-C003-detect-active-planning-queue-and-current-work-item", {
-    selected_change_id: null,
-    candidate_id: null,
-  });
+function buildResumeModel(
+  brief: BriefModel,
+  nextCommandCheck: ReadinessModel | null,
+  handoff: HandoffModel,
+  planningQueue: Awaited<ReturnType<typeof buildPlanningQueueResume>>,
+): ResumeModel {
   return {
     resume_version: "0.1.0",
     project: brief.project,
@@ -121,8 +113,6 @@ function buildResumeModel(brief: BriefModel, nextCommandCheck: ReadinessModel | 
         "push, open PRs, or mutate remote state",
       ],
       deferred_capabilities: [
-        "active planning queue detection",
-        "selected-change/current-work-item detection",
         "Agent action and evidence classification",
         "runtime documentation beyond the executable CLI surface",
       ],
@@ -144,21 +134,17 @@ function buildResumeModel(brief: BriefModel, nextCommandCheck: ReadinessModel | 
       read_order: handoff.read_order,
       next_command_check: nextCommandCheck,
     },
-    active_queue: activeQueue,
-    current_work_item: currentWorkItem,
+    active_queue: planningQueue.active_queue,
+    current_work_item: planningQueue.current_work_item,
     actions: {
-      immediate: immediateActionsFor(handoff, brief),
+      immediate: immediateActionsFor(handoff, brief, planningQueue.current_work_item),
       allowed_next_steps: allowedNextStepsFor(handoff),
-      stop_if: stopConditionsFor(handoff, brief),
+      stop_if: stopConditionsFor(handoff, brief, planningQueue.current_work_item),
     },
     evidence: {
       primary_context: primaryContextFor(handoff.read_order),
       raw_evidence_only_if: handoff.read_order.raw_evidence_only_if,
-      missing_or_unknown: [
-        "active planning queue",
-        "selected candidate/current work item",
-        "candidate-specific validation evidence",
-      ],
+      missing_or_unknown: missingOrUnknownFor(planningQueue.active_queue, planningQueue.current_work_item),
     },
     git: brief.git,
     sources: [
@@ -168,28 +154,30 @@ function buildResumeModel(brief: BriefModel, nextCommandCheck: ReadinessModel | 
       ...(nextCommandCheck ? ["check <next_command>"] : []),
       "summaries --strict",
       "git status --porcelain",
+      ...planningQueue.sources,
     ],
   };
 }
 
-function deferredSection(reason: string, deferredTo: string, knownFields: Record<string, string | null>): DeferredResumeSection {
-  return {
-    status: "unknown",
-    reason,
-    deferred_to: deferredTo,
-    known_fields: knownFields,
-  };
+function missingOrUnknownFor(activeQueue: ResumeModel["active_queue"], currentWorkItem: ResumeModel["current_work_item"]): string[] {
+  return unique([
+    activeQueue.status === "unknown" ? "active planning queue" : "",
+    currentWorkItem.status === "unknown" ? "selected candidate/current work item" : "",
+    ...(activeQueue.status === "found" && activeQueue.commit_evidence.missing.length > 0 ? ["candidate-specific commit evidence"] : []),
+  ]);
 }
 
-function immediateActionsFor(handoff: HandoffModel, brief: BriefModel): string[] {
+function immediateActionsFor(handoff: HandoffModel, brief: BriefModel, currentWorkItem: ResumeModel["current_work_item"]): string[] {
   if (handoff.handoff_ok) {
     return unique([
+      currentWorkItem.status !== "unknown" ? currentWorkItem.next_action ?? "" : "",
       ...handoff.next_actions,
       brief.git.dirty ? "inspect git.changed_files before editing; preserve existing uncommitted work" : "",
     ]);
   }
   return unique([
     "stop implementation until trust blockers are resolved",
+    currentWorkItem.status !== "unknown" ? currentWorkItem.next_action ?? "" : "",
     ...handoff.next_actions,
   ]);
 }
@@ -204,17 +192,19 @@ function allowedNextStepsFor(handoff: HandoffModel): string[] {
   }
   return unique([
     "load only workflow.read_order.must_read first",
-    "continue with workflow.next_command after checking output boundaries",
+    "use current_work_item.next_action when active_queue.status is found",
+    "continue with workflow.next_command only when no queue-local action is available",
     "load raw evidence only when evidence.raw_evidence_only_if applies",
   ]);
 }
 
-function stopConditionsFor(handoff: HandoffModel, brief: BriefModel): string[] {
+function stopConditionsFor(handoff: HandoffModel, brief: BriefModel, currentWorkItem: ResumeModel["current_work_item"]): string[] {
   return unique([
     ...handoff.blocking_reasons,
     ...brief.workflow.blocked_by.map((item) => `CURRENT_STATE blocked_by: ${item}`),
     brief.git.dirty ? "git worktree has uncommitted changes; classify ownership before editing" : "",
-    "active_queue.status is unknown and the task requires queue-specific mutation",
+    ...(currentWorkItem.status === "unknown" ? ["active_queue.status is unknown and the task requires queue-specific mutation"] : []),
+    ...(currentWorkItem.status !== "unknown" ? currentWorkItem.stop_if : []),
   ]);
 }
 
@@ -225,15 +215,21 @@ function primaryContextFor(readOrder: ReadOrder): string[] {
   ]);
 }
 
-function warningsFor(brief: BriefModel, nextCommandCheck: ReadinessModel | null, model: ResumeModel): string[] {
+function warningsFor(
+  brief: BriefModel,
+  nextCommandCheck: ReadinessModel | null,
+  model: ResumeModel,
+  planningQueueWarnings: string[],
+): string[] {
   return unique([
     ...brief.health.workflow.warnings,
     ...brief.health.agents_md.warnings,
     ...Object.values(brief.health.adapters).flatMap((section) => section.warnings),
     ...brief.health.summaries.warnings,
     ...nextCommandCheck?.warnings ?? [],
-    model.active_queue.reason,
-    model.current_work_item.reason,
+    ...planningQueueWarnings,
+    ...(model.active_queue.status === "unknown" ? model.active_queue.uncertainty : []),
+    ...(model.current_work_item.status === "unknown" ? model.current_work_item.uncertainty : []),
   ]);
 }
 
@@ -244,12 +240,26 @@ function printResume(model: ResumeModel): void {
   console.log(`active_stage: ${model.workflow.active_stage ?? "unknown"}`);
   console.log(`next_command: ${model.workflow.next_command ?? "none"}`);
   console.log(`next_command_ready: ${model.trust.next_command_ready ?? "unknown"}`);
-  console.log(`active_queue: ${model.active_queue.status} (${model.active_queue.reason})`);
-  console.log(`current_work_item: ${model.current_work_item.status} (${model.current_work_item.reason})`);
+  console.log(`active_queue: ${activeQueueLabel(model.active_queue)}`);
+  console.log(`current_work_item: ${currentWorkItemLabel(model.current_work_item)}`);
   console.log(`git: available=${model.git.available}, branch=${model.git.branch ?? "none"}, dirty=${model.git.dirty}`);
   printList("blocking_reasons", model.trust.blocking_reasons);
   printList("must_read", model.workflow.read_order.must_read);
   printList("immediate_actions", model.actions.immediate);
+}
+
+function activeQueueLabel(queue: ResumeModel["active_queue"]): string {
+  if (queue.status === "unknown") {
+    return `unknown (${queue.reason})`;
+  }
+  return `${queue.plan_id} (${queue.breakpoint.status})`;
+}
+
+function currentWorkItemLabel(workItem: ResumeModel["current_work_item"]): string {
+  if (workItem.status === "unknown") {
+    return `unknown (${workItem.reason})`;
+  }
+  return `${workItem.status}${workItem.candidate_id ? ` ${workItem.candidate_id}` : ""}`;
 }
 
 function printList(label: string, values: string[]): void {

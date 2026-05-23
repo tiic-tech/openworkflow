@@ -1,0 +1,82 @@
+schema_version: 0.1.0
+contract_id: selected_change:M106-agent-resume-cockpit:C003
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M106-C003-detect-active-planning-queue-and-current-work-item
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C003
+title: Detect active planning queue and current work item
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after C002 completed the executable base resume aggregator. C003 is
+  the next recommended dependency-ready slice and is needed so `resume --json`
+  can recover the real queue-local breakpoint instead of only reporting generic
+  workflow state.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Implement obvious planning queue and current work-item detection only;
+    keep selection, queue mutation, broad historical analysis, and richer
+    action/evidence policy out of scope.
+scope:
+  includes:
+    - scan obvious `changes/*/SUMMARY.yaml` and `CANDIDATE_CHANGES.yaml` planning queues
+    - prefer active selected changes over generic workflow next command
+    - expose previous completed candidate and missing commit evidence
+    - report queue-boundary override reasons
+    - identify interruption breakpoints from selected-change status, atom-task status, completion evidence, and recent local commits when available
+    - rank the smallest correct queue-local action when the evidence clearly supports one
+  excludes:
+    - selecting candidates
+    - editing queues
+    - broad historical queue analysis
+owned_paths:
+  - packages/core/src/workflow/
+  - packages/cli/src/commands/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M106-agent-resume-cockpit/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - changes/M107-artifact-lineage-graph/**
+  - changes/M108-consistency-first-later-prompt2proto/**
+  - changes/M109-provider-fallback-generation-metadata/**
+  - changes/M110-boundary-preflight-compiler/**
+  - changes/M112-project-soul-memory/**
+  - changes/M113-spicyclaw-rename-and-compatibility/**
+acceptance:
+  - Resume identifies an active selected-change queue when one exists.
+  - Resume distinguishes workflow `next_command` from queue-local next action.
+  - Resume reports the likely breakpoint as selected candidate, next ready candidate, incomplete atom task, missing evidence, or clean handoff point.
+  - Resume reports missing local commit evidence without mutating queue files.
+  - Resume reports a ranked next action without authorizing broad replanning when a bounded atom-task path is available.
+  - A fresh Agent can tell which M106 candidate to select or implement next without human memory of the previous session.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C003 should complete as one local implementation commit containing the
+  queue/current-work-item detection model, resume packet integration,
+  runtime-surface coverage, queue updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - packages/core/src/workflow/planningQueueResume.ts
+    - packages/cli/src/commands/resume.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M106-agent-resume-cockpit/C003-detect-active-planning-queue-and-current-work-item/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check

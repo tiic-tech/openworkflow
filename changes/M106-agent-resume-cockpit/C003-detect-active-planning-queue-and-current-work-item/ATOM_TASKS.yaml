@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M106-agent-resume-cockpit:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M106-C003-detect-active-planning-queue-and-current-work-item
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C003
+title: Atom tasks for M106 C003 active queue and work item detection
+status: completed
+tasks:
+  - task_id: T001
+    title: Inspect planning queue shapes and commit-evidence health
+    status: completed
+    type: read
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+    done_when: >
+      The queue summary, candidate status, selected-change, atom-task, and
+      commit-evidence fields needed for resume detection are identified.
+  - task_id: T002
+    title: Add read-only planning queue detector
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+    done_when: >
+      Resume can identify obvious active planning queues, selected candidates,
+      completed candidates, next ready candidates, missing commit evidence, and
+      queue-local breakpoint status without mutating files.
+  - task_id: T003
+    title: Integrate queue-local next action into resume
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/resume.ts
+    done_when: >
+      `resume --json` distinguishes generic workflow next_command from a
+      queue-local next action when queue evidence is clear.
+  - task_id: T004
+    title: Add runtime coverage
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification covers a fixture with an active selected
+      change and a fixture with a next ready candidate/missing commit evidence
+      signal where practical.
+  - task_id: T005
+    title: Validate and record completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Build, runtime-surface verification, direct resume JSON command, and
+      diff-check pass, then completion and local commit evidence are recorded.

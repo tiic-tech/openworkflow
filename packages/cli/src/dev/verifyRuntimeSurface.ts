@@ -51,6 +51,7 @@ async function main(): Promise<number> {
     await verifyHelpSurface(env);
     await verifyBriefStatus(target, tempRoot, env);
     await verifyJsonReports(target, tempRoot, env);
+    await verifyResumePlanningQueueDetection(tempRoot, env);
     await verifyCommandCheck(target, env);
     await verifySummaryHealth(tempRoot, env);
     await verifyConfig(target);
@@ -365,9 +366,9 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   assert(resumeBoundary.read_only === true, "resume command boundary must be read-only");
   assert(Array.isArray(resumeBoundary.writes) && resumeBoundary.writes.length === 0, "resume command boundary must have no writes");
   assert(resumeTrust.handoff_ok === true, "resume trust should expose handoff_ok");
-  assert(resumeQueue.status === "unknown", "C002 resume must defer active queue detection");
-  assert(String(resumeQueue.deferred_to).includes("M106-C003"), "resume active queue should point to C003");
-  assert(resumeWorkItem.status === "unknown", "C002 resume must defer current work item detection");
+  assert(resumeQueue.status === "unknown", "fresh resume without changes should report unknown active queue");
+  assert(Array.isArray(resumeQueue.uncertainty) && resumeQueue.uncertainty.some((item) => String(item).includes("changes/")), "fresh resume should explain missing planning queue");
+  assert(resumeWorkItem.status === "unknown", "fresh resume without changes should report unknown current work item");
   assert(resumeGit.available === false, "resume git state should reuse brief git state");
   const validateReport = parseJsonReport(await runCapture(["node", CLI, "validate", "--root", root, "--json"], env), "validate");
   const validateData = record(validateReport.data, "validate data");
@@ -387,6 +388,160 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
   assert(summarizeStatus.code === 0, "summarize --all dry-run should succeed");
   parseJsonReport(summarizeStatus.output, "summarize");
+}
+
+async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const root = join(tempRoot, "resume-queue-detection");
+  await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
+  const queueRoot = join(root, "changes", "M900-resume-queue-fixture");
+  const selectedRoot = join(queueRoot, "C001-active-selection");
+  await mkdir(selectedRoot, { recursive: true });
+  await writeFile(join(queueRoot, "SUMMARY.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: summary:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: summary",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "branch_boundary: null",
+    "candidate_count: 2",
+    "completed_candidate_id: null",
+    "completed_change_id: null",
+    "selected_candidate_id: C001",
+    "selected_change_id: M900-C001-active-selection",
+    "next_recommended_candidate_id: null",
+    "outputs:",
+    "  candidate_changes_yaml: changes/M900-resume-queue-fixture/CANDIDATE_CHANGES.yaml",
+    "key_dependencies: []",
+    "risks: []",
+    "unresolved_questions: []",
+    "validation:",
+    "  commands_run: []",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(queueRoot, "CANDIDATE_CHANGES.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "queue_policy:",
+    "  selected_change_commit_gate: strict",
+    "next_recommended_candidate_id: null",
+    "changes:",
+    "  - id: C001",
+    "    status: selected",
+    "    title: Active resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/cli/src/commands/",
+    "    selection:",
+    "      selected_change_id: M900-C001-active-selection",
+    "      artifacts:",
+    "        selected_change: changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml",
+    "        atom_tasks: changes/M900-resume-queue-fixture/C001-active-selection/ATOM_TASKS.yaml",
+    "        implementation_brief: changes/M900-resume-queue-fixture/C001-active-selection/IMPLEMENTATION_BRIEF.md",
+    "  - id: C002",
+    "    status: ready",
+    "    title: Next resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/core/src/workflow/",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "SELECTED_CHANGE.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: selected_change:M900-resume-queue-fixture:C001",
+    "contract_type: planning",
+    "planning_artifact_type: selected_change",
+    "selected_change_id: M900-C001-active-selection",
+    "source_plan_id: M900-resume-queue-fixture",
+    "source_candidate_id: C001",
+    "title: Active resume fixture",
+    "status: selected",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "ATOM_TASKS.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: atom_tasks:M900-resume-queue-fixture:C001",
+    "contract_type: planning",
+    "planning_artifact_type: atom_tasks",
+    "selected_change_id: M900-C001-active-selection",
+    "source_plan_id: M900-resume-queue-fixture",
+    "source_candidate_id: C001",
+    "title: Active resume fixture tasks",
+    "status: pending",
+    "tasks:",
+    "  - task_id: T001",
+    "    title: Continue selected fixture",
+    "    status: pending",
+    "    type: edit",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "IMPLEMENTATION_BRIEF.md"), "# Active resume fixture\n", "utf8");
+
+  const selectedResume = parseJsonReport(await runCapture(["node", CLI, "resume", "--root", root, "--json"], env), "resume");
+  const selectedData = record(selectedResume.data, "selected resume data");
+  const selectedQueue = record(selectedData.active_queue, "selected resume active_queue");
+  const selectedWorkItem = record(selectedData.current_work_item, "selected resume current_work_item");
+  assert(selectedQueue.status === "found", "resume should find an active planning queue");
+  assert(selectedQueue.plan_id === "M900-resume-queue-fixture", "resume active queue plan mismatch");
+  assert(record(selectedQueue.breakpoint, "selected breakpoint").status === "selected_candidate", "resume should report selected candidate breakpoint");
+  assert(selectedWorkItem.status === "selected", "resume current work item should be selected");
+  assert(selectedWorkItem.candidate_id === "C001", "resume current work item candidate mismatch");
+  assert(Array.isArray(selectedWorkItem.incomplete_atom_tasks) && selectedWorkItem.incomplete_atom_tasks.length === 1, "resume should expose incomplete atom tasks");
+  assert(Array.isArray(selectedResume.next_actions) && selectedResume.next_actions.includes("continue selected change C001"), "resume should rank selected-change continuation");
+
+  await writeFile(join(queueRoot, "CANDIDATE_CHANGES.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "queue_policy:",
+    "  selected_change_commit_gate: strict",
+    "next_recommended_candidate_id: C002",
+    "changes:",
+    "  - id: C001",
+    "    status: done",
+    "    title: Active resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/cli/src/commands/",
+    "    selection:",
+    "      selected_change_id: M900-C001-active-selection",
+    "      artifacts:",
+    "        selected_change: changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml",
+    "        atom_tasks: changes/M900-resume-queue-fixture/C001-active-selection/ATOM_TASKS.yaml",
+    "        implementation_brief: changes/M900-resume-queue-fixture/C001-active-selection/IMPLEMENTATION_BRIEF.md",
+    "    completion:",
+    "      implementation_changed_files: true",
+    "      evidence:",
+    "        - packages/cli/src/commands/resume.ts",
+    "  - id: C002",
+    "    status: ready",
+    "    title: Next resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/core/src/workflow/",
+    "",
+  ].join("\n"), "utf8");
+  const missingEvidenceStatus = await runCaptureStatus(["node", CLI, "resume", "--root", root, "--json"], env);
+  assert(missingEvidenceStatus.code !== 0, "resume should fail handoff trust when selected-change commit evidence is missing");
+  const missingEvidenceResume = parseJsonReport(missingEvidenceStatus.output, "resume");
+  const missingData = record(missingEvidenceResume.data, "missing evidence resume data");
+  const missingQueue = record(missingData.active_queue, "missing evidence active_queue");
+  const missingWorkItem = record(missingData.current_work_item, "missing evidence work item");
+  const missingCommitEvidence = record(missingQueue.commit_evidence, "commit evidence").missing;
+  assert(record(missingQueue.breakpoint, "missing evidence breakpoint").status === "missing_commit_evidence", "resume should expose missing commit evidence breakpoint");
+  assert(missingWorkItem.status === "missing_evidence", "resume current work item should point at missing evidence");
+  assert(Array.isArray(missingCommitEvidence) && missingCommitEvidence.length === 1, "resume should list missing commit evidence");
+  assert(Array.isArray(missingEvidenceResume.health_errors) && missingEvidenceResume.health_errors.some((item) => String(item).includes("LOCAL_COMMIT_EVIDENCE.yaml")), "resume should preserve commit evidence health error");
 }
 
 async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {

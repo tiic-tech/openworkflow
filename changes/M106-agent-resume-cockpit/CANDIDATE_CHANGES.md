@@ -43,10 +43,10 @@ Out of scope:
 
 Selected candidate: none.
 
-C002 completed the executable base resume packet. C003 is now ready to make the
-packet queue-aware enough to recover the real breakpoint.
+C003 completed queue-local breakpoint detection. C004 is now ready to add
+richer action and evidence classification for Agent handoff.
 
-Next recommended candidate: C003.
+Next recommended candidate: C004.
 
 ## Candidates
 
@@ -116,7 +116,7 @@ Completion:
 
 ### C003 - Detect active planning queue and current work item
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -137,9 +137,26 @@ Acceptance focus:
 - The next action is ranked when evidence is clear.
 - The Agent can tell what to select or implement next without human memory.
 
+Selection artifacts:
+
+- `changes/M106-agent-resume-cockpit/C003-detect-active-planning-queue-and-current-work-item/SELECTED_CHANGE.yaml`
+- `changes/M106-agent-resume-cockpit/C003-detect-active-planning-queue-and-current-work-item/ATOM_TASKS.yaml`
+- `changes/M106-agent-resume-cockpit/C003-detect-active-planning-queue-and-current-work-item/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- Added read-only planning queue detection in `packages/core/src/workflow/planningQueueResume.ts`.
+- `resume --json` now reports active queue, selected/completed/next-ready
+  candidates, selected-change artifacts, atom-task breakpoints, missing commit
+  evidence, and queue-local next action.
+- Runtime-surface verification covers selected-candidate continuation and
+  missing commit evidence reporting.
+- Local commit evidence:
+  `changes/M106-agent-resume-cockpit/C003-detect-active-planning-queue-and-current-work-item/LOCAL_COMMIT_EVIDENCE.yaml`
+
 ### C004 - Classify actions and evidence for Agent handoff
 
-Status: candidate
+Status: ready
 
 Risk: medium
 
