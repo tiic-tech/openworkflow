@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M120-C002-branch-repair-policy
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M120-C002-branch-repair-policy
+title: Atom tasks for historical branch repair policy
+status: done
+tasks:
+  - task_id: T001
+    title: Classify inventory findings by repair risk
+    status: done
+    type: read
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - M102, M117, M71, and M101-derived queues are assigned policy categories.
+  - task_id: T002
+    title: Define low-risk evidence repair criteria
+    status: done
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - The policy states when branch-local PR-ready summary restoration is enough.
+  - task_id: T003
+    title: Define high-risk surgery stop boundaries
+    status: done
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - The policy names commands and operations that require a high-risk report plus exact approval.
+  - task_id: T004
+    title: Update queue evidence and validate
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - The queue points to the policy artifact and advances to the next repair candidate.
+      - OpenWorkflow validate and diff checks pass.

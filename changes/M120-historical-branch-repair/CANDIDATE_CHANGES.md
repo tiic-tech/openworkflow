@@ -18,7 +18,7 @@ Select C001 first. M120 must produce a read-only branch ownership inventory befo
 
 High-risk operations such as rebase, reset, force-push, remote deletion, PR edit, merge, or ready-for-review transition require a dedicated high-risk report and exact operation-level approval.
 
-Next recommended candidate: C002
+Next recommended candidate: C003
 
 ## Candidates
 
@@ -42,7 +42,7 @@ Unlocks: C002, C003, C004
 
 ### C002 - Decide historical branch repair policy and stop boundaries
 
-Status: candidate
+Status: done
 
 Risk: medium
 
@@ -51,6 +51,12 @@ Purpose: define when stacked branches are acceptable, when branch-local evidence
 Depends on: C001
 
 Unlocks: C003, C004, C005
+
+Completion evidence:
+
+- `changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md`
+
+Result: M117 is the next low-risk evidence repair target. M71 may remain an intentional historical stack after review. M105, M106, and M115 need shared-branch policy before publication. History surgery remains blocked behind C004 high-risk reporting and exact approval.
 
 ### C003 - Restore branch-local PR-ready evidence for low-risk candidates
 

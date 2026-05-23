@@ -26,9 +26,9 @@ branch_note: >
   creation was intentionally not performed during DTC queue creation. The local boundary branch was
   later created with git-automation before C001 selection.
 candidate_count: 5
-completed_candidate_id: C001
-completed_change_id: M120-C001-inventory-historical-branch-ownership
-next_recommended_candidate_id: C002
+completed_candidate_id: C002
+completed_change_id: M120-C002-branch-repair-policy
+next_recommended_candidate_id: C003
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -39,6 +39,10 @@ outputs:
   c001_atom_tasks: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/ATOM_TASKS.yaml
   c001_implementation_brief: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/IMPLEMENTATION_BRIEF.md
   c001_inventory: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/INVENTORY.md
+  c002_selected_change: changes/M120-historical-branch-repair/C002-branch-repair-policy/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M120-historical-branch-repair/C002-branch-repair-policy/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M120-historical-branch-repair/C002-branch-repair-policy/IMPLEMENTATION_BRIEF.md
+  c002_branch_repair_policy: changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md
 inventory_result:
   current_branch: codex/m120-historical-branch-repair
   remote_codex_branches:
@@ -61,9 +65,26 @@ inventory_result:
       - M106-agent-resume-cockpit
       - M115-internal-coder-quality-governance
   recommended_next: C002 repair policy
+policy_result:
+  low_risk_evidence_repair_target: M117-git-automation-remote-readiness
+  intentionally_stacked_candidate: M71-git-version-control-governance
+  shared_branch_boundary_group:
+    branch: codex/m101-build-proto-prompt-command-split
+    plans:
+      - M105-m104-direct-trust-gate-fixes
+      - M106-agent-resume-cockpit
+      - M115-internal-coder-quality-governance
+  high_risk_report_required_for:
+    - rebase
+    - reset
+    - cherry-pick branch splitting
+    - destructive branch deletion
+    - force-push or remote branch deletion
+    - PR create/edit/close/ready/merge
+  recommended_next: C003 low-risk M117 evidence repair
 key_dependencies:
   - C001 completed the branch ownership and PR-ready evidence inventory.
-  - C002 must define repair policy before any branch-local evidence restoration.
+  - C002 completed the repair policy and stop boundaries.
   - C003 can restore low-risk branch-local summaries only after C001 and C002.
   - C004 must create a high-risk report before any history surgery is selected or executed.
   - C005 depends on repaired evidence before recommending the next publication queue.
@@ -105,6 +126,8 @@ validation:
       number,url,state,isDraft,title,headRefName,baseRefName --limit 50
     - find changes -maxdepth 2 -name PR_READY_SUMMARY.md
     - branch-local PR_READY_SUMMARY.md presence checks with git cat-file -e
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
   notes:
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly requested M120 CC creation.
@@ -113,3 +136,6 @@ validation:
     - After queue creation, git-automation created the local M120 branch boundary.
     - C001 selected and completed a read-only inventory. No remote or destructive git mutation was
       performed.
+    - C002 selected and completed a local branch repair policy. It recommends C003 for low-risk
+      M117 branch-local PR-ready evidence repair and reserves history surgery for C004 only when
+      needed.

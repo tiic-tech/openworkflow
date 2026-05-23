@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:M120-C002-branch-repair-policy
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M120-C002-branch-repair-policy
+source_plan_id: M120-historical-branch-repair
+source_candidate_id: C002
+title: Decide historical branch repair policy and stop boundaries
+status: selected
+selection_reason: >
+  C002 is the next recommended candidate after C001. The inventory identified low-risk evidence
+  repair for M117, shared M101 branch-boundary ambiguity for M105/M106/M115, and an older M71 stack
+  that needs a policy decision before further publication planning.
+scope:
+  includes:
+    - define criteria for accepting a stacked branch as intentional
+    - define criteria for requiring a new independent branch boundary
+    - define when branch-local PR-ready summaries are sufficient repair
+    - define when a high-risk decision report is required before branch pointer changes
+  excludes:
+    - executing branch repair
+    - moving commits between branches
+    - remote mutation
+owned_paths:
+  - changes/M120-historical-branch-repair/
+  - references/git-version-control-governance.md
+  - references/gh-operation-governance.md
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - The repair policy separates low-risk evidence repair from high-risk history rewriting.
+  - The policy states when stacked branches may remain coupled.
+  - Remote publication remains approval-gated and out of scope.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rejected_alternatives:
+  - id: C003
+    reason: Evidence restoration depends on this repair policy.
+  - id: C004
+    reason: High-risk report creation depends on this repair policy identifying surgery needs.
+  - id: C005
+    reason: Publication ordering depends on repair policy and restored evidence.

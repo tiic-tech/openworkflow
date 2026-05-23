@@ -103,7 +103,7 @@ observed_state:
       of independent queue branches.
     - M71 is older and includes a long historical stack with early commits that predate strict
       commit evidence.
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -171,7 +171,7 @@ changes:
         - branch-local PR_READY_SUMMARY.md presence checks with git cat-file -e
         - git diff --check
   - id: C002
-    status: candidate
+    status: done
     title: Decide historical branch repair policy and stop boundaries
     purpose: >
       Convert the C001 inventory into a repair policy that distinguishes acceptable stacked review
@@ -205,6 +205,31 @@ changes:
       - The repair policy separates low-risk evidence repair from high-risk history rewriting.
       - The policy states when stacked branches may remain coupled.
       - Remote publication remains approval-gated and out of scope.
+    selection:
+      selected_change_id: M120-C002-branch-repair-policy
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C001 inventory identified one low-risk M117 evidence repair target, one older
+        M71 stack, and a shared M101 branch-boundary group that needs policy before repair.
+      artifacts:
+        selected_change: changes/M120-historical-branch-repair/C002-branch-repair-policy/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M120-historical-branch-repair/C002-branch-repair-policy/ATOM_TASKS.yaml
+        implementation_brief: changes/M120-historical-branch-repair/C002-branch-repair-policy/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local governance policy evidence only. It did not change product source,
+        generated surfaces, runtime behavior, branch pointers, remote refs, PR state, or Issues.
+      evidence:
+        - changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md
+      recommendation: >
+        Proceed to C003 for low-risk M117 branch-local PR-ready evidence repair. Use C004 only if
+        later work requires cherry-pick, rebase, reset, deletion, force-push, PR mutation, or other
+        high-risk branch surgery.
+      validation:
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
   - id: C003
     status: candidate
     title: Restore branch-local PR-ready evidence for low-risk candidates
@@ -362,3 +387,27 @@ operations:
     after_status: done
     evidence:
       - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Select repair policy after C001 completed the branch ownership inventory.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M120-historical-branch-repair/C002-branch-repair-policy/SELECTED_CHANGE.yaml
+      - changes/M120-historical-branch-repair/C002-branch-repair-policy/ATOM_TASKS.yaml
+      - changes/M120-historical-branch-repair/C002-branch-repair-policy/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Complete historical branch repair policy and stop boundaries.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M120-historical-branch-repair/C002-branch-repair-policy/BRANCH_REPAIR_POLICY.md
