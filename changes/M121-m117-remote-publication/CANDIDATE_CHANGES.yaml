@@ -169,7 +169,24 @@ c002_narrow_spike_result:
   simulator_ok: true
   simulator_blockers: []
   exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
-next_recommended_candidate_id: C002
+c003_push_result:
+  path: changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md
+  approval_source: user_input:2026-05-23-approved-push-command
+  approved_command: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+  pushed_at: 2026-05-23T20:13:12+08:00
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m117-publish
+  worktree_branch: codex/m117-git-automation-remote-readiness
+  local_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  previous_remote_branch_present: false
+  resulting_remote_ref: refs/heads/codex/m117-git-automation-remote-readiness
+  resulting_remote_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  push_exit_code: 0
+  existing_prs_after_push: []
+  github_pr_suggestion_url: https://github.com/tiic-tech/openworkflow/pull/new/codex/m117-git-automation-remote-readiness
+  unauthorized_operations_performed:
+    - none
+  rollback_preference: follow-up revert PR after review; no remote branch deletion or force-push without new exact approval
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -249,7 +266,7 @@ changes:
         - git merge-tree --write-tree origin/main codex/m117-git-automation-remote-readiness
         - git diff --check
   - id: C002
-    status: candidate
+    status: done
     title: Prepare exact high-risk push decision report
     purpose: >
       Convert the C001 preflight into a HIGH_RISK_DECISION_REPORT.md for exactly one M117 branch
@@ -281,8 +298,18 @@ changes:
       - The report names exactly one push operation and target ref.
       - The report states that it is evidence, not approval.
       - The report blocks execution until exact user approval is received.
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local high-risk decision and read-only worktree preflight evidence only.
+      evidence:
+        - changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+        - changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+      recommendation: >
+        C003 was unlocked after exact user approval for the M117 push command.
   - id: C003
-    status: candidate
+    status: done
     title: Execute approved M117 branch push and record remote evidence
     purpose: >
       After C002 exists and the user approves the exact push command, push the M117 branch to origin
@@ -315,6 +342,22 @@ changes:
       - The M117 remote branch exists at the expected commit.
       - Local audit evidence records approval, command, remote ref, and rollback guidance.
       - No PR, Issue, merge, force-push, or unrelated remote mutation occurs.
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 performed the approved remote branch push and recorded local governance evidence, but
+        did not change product source or generated runtime behavior.
+      evidence:
+        - changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md
+      remote_evidence:
+        branch: codex/m117-git-automation-remote-readiness
+        remote: origin
+        remote_ref: refs/heads/codex/m117-git-automation-remote-readiness
+        remote_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+        existing_prs_after_push: []
+      recommendation: >
+        C004 may create a draft PR only after separate exact approval for PR creation.
   - id: C004
     status: candidate
     title: Create approved M117 draft PR
@@ -446,3 +489,26 @@ operations:
     after_status: candidate
     evidence:
       - changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Complete high-risk push report and narrow isolated-worktree preflight evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+      - changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: Execute approved M117 branch push and record remote evidence.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: done
+    evidence:
+      - changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md

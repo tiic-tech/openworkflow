@@ -33,14 +33,15 @@ target_publication:
   branch: codex/m117-git-automation-remote-readiness
   base: main
   remote: origin
-  remote_branch_present: false
+  remote_branch_present: true
+  remote_branch_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
   existing_prs: []
   branch_local_summary_present: true
   summary_repair_commit: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
 candidate_count: 5
-completed_candidate_id: C001
-completed_change_id: M121-C001-refresh-m117-publication-preflight
-next_recommended_candidate_id: C002
+completed_candidate_id: C003
+completed_change_id: M121-C003-approved-m117-push
+next_recommended_candidate_id: C004
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -53,6 +54,7 @@ outputs:
   c001_publication_preflight: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md
   high_risk_decision_report: changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
   c002_worktree_preflight: changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+  c003_push_evidence: changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md
 observed_state:
   captured_at: 2026-05-23
   current_branch: codex/m120-historical-branch-repair
@@ -105,6 +107,18 @@ c002_narrow_spike_result:
   simulator_ok: true
   simulator_blockers: []
   exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+c003_push_result:
+  path: changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md
+  approval_source: user_input:2026-05-23-approved-push-command
+  approved_command: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+  pushed_at: 2026-05-23T20:13:12+08:00
+  worktree_branch: codex/m117-git-automation-remote-readiness
+  local_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  previous_remote_branch_present: false
+  resulting_remote_branch_present: true
+  resulting_remote_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  existing_prs_after_push: []
+  pr_created: false
 key_dependencies:
   - M120 completed repaired publication ordering and recommended M121.
   - M117 branch-local PR_READY_SUMMARY.md was restored on the M117 branch at commit 898f0152.
@@ -125,10 +139,6 @@ risks:
     description: M121 governance artifacts and M117 target branch have different branch identities.
     mitigation: C001 must choose a cross-branch-safe execution model and classify branch mismatch blockers.
 unresolved_questions:
-  - Should C002 approve the isolated M117 worktree model for the exact push decision report?
-  - Should the user approve the recommended C002 narrow isolated-worktree preflight spike?
-  - Should the known simulator-evidence binding gap block M117 publication if fresh simulator evidence is otherwise green in the chosen execution model?
-  - Should C003 accept the remote-plan simulator-evidence binding gap based on the green M117-context simulator result?
   - Should M117 draft PR creation happen in the same M121 queue after push, or stop after push for a separate PR queue?
 deferred_features:
   - M122-m71-historical-stack-publication
@@ -164,6 +174,11 @@ validation:
     - git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish merge-tree --write-tree
       origin/main HEAD
     - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
+    - git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin
+      HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+    - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness
+      --base main --json number,url,state,isDraft,title,headRefName,baseRefName
     - node dist/cli/src/index.js git-automation branch --root .
       --queue changes/M121-m117-remote-publication/CANDIDATE_CHANGES.yaml --json
     - node dist/cli/src/index.js git-automation branch --root .
@@ -208,3 +223,7 @@ validation:
     - The approved C002 narrow spike created an isolated M117 worktree and ran read-only checks.
       The M117-context simulator is ok:true and branch identity blockers are cleared. The
       remote-plan still reports simulator evidence is missing, so exact push approval remains gated.
+    - The user approved the exact push command. C003 pushed only
+      codex/m117-git-automation-remote-readiness to origin at
+      898f0152a4e3e026ee5dcc78d4ef585c722a37b7. No PR, Issue, merge, force-push,
+      remote branch deletion, rebase, reset, or product source edit was performed.

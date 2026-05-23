@@ -21,7 +21,7 @@ Select C001 first. C002, C003, and C004 are high-risk remote publication
 boundaries. A high-risk report and exact operation-level user approval are
 required before any push or PR mutation.
 
-Next recommended candidate: C002, gated by high-risk report and exact operation approval.
+Next recommended candidate: C004, gated by separate exact approval for draft PR creation.
 
 ## Observed State
 
@@ -32,7 +32,7 @@ Next recommended candidate: C002, gated by high-risk report and exact operation 
 - Target remote: `origin`
 - M117 branch-local PR-ready summary: present
 - M117 summary repair commit: `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`
-- M117 remote branch: absent
+- M117 remote branch: present at `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`
 - M117 existing PRs: none
 - Fresh remote-plan from the M120 branch is read-only but blocked by current
   branch mismatch and missing simulator evidence binding.
@@ -70,7 +70,7 @@ absent, no PR exists, merge-tree is clean, and M117 is 263 commits ahead of
 
 ### C002 - Prepare exact high-risk push decision report
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -81,8 +81,8 @@ High-risk report:
 
 - `changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md`
 
-Recommended option: run a narrow isolated-worktree preflight spike before asking
-for exact push approval. The future push command remains unapproved:
+Recommended option was to run a narrow isolated-worktree preflight spike before
+asking for exact push approval. The future push command was:
 
 ```bash
 git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
@@ -94,7 +94,7 @@ Narrow spike evidence:
 
 Result: isolated M117 worktree preflight clears the branch mismatch blocker.
 `simulate` is `ok:true`; `remote-plan` still reports only `simulator evidence is
-missing`. The exact push command remains unapproved:
+missing`. The exact push command was later approved for C003:
 
 ```bash
 git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
@@ -111,13 +111,23 @@ Unlocks: C003
 
 ### C003 - Execute approved M117 branch push and record remote evidence
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Outcome: after exact approval, push only
 `codex/m117-git-automation-remote-readiness` to origin and record local audit
 evidence.
+
+Push evidence:
+
+- `changes/M121-m117-remote-publication/C003-approved-m117-push/PUSH_EVIDENCE.md`
+
+Result: user approved the exact push command. The isolated M117 worktree pushed
+`HEAD` to `origin/codex/m117-git-automation-remote-readiness`; the resulting
+remote branch head is `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`. No PR exists
+after the push, and no PR, Issue, merge, force-push, remote branch deletion,
+rebase, reset, or product source edit was performed.
 
 Owned paths:
 
@@ -163,7 +173,6 @@ Unlocks: M122, M123, M124
 
 ## Stop Gates
 
-- Do not push M117 without exact approval for the concrete command.
 - Do not create a draft PR without separate exact approval.
 - Do not mark any PR ready for review from M121.
 - Do not merge.
