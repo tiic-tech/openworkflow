@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
 import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
 
 const execFileAsync = promisify(execFile);
@@ -30,6 +31,9 @@ export interface PlanRemoteReadonlyResult {
     branch: string;
     currentBranch: string | null;
     branchBoundary: string | null;
+    branchMatchesCurrent: boolean | null;
+    branchOwnsPlan: boolean | null;
+    branchIdentity: BranchIdentityAssessment;
   };
   localState: {
     head: string | null;
@@ -61,8 +65,11 @@ export interface PlanRemoteReadonlyResult {
 export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Promise<PlanRemoteReadonlyResult> {
   const queue = await loadQueue(options.root, options.queuePath);
   const planId = stringValue(queue.plan_id) ?? "unknown-plan";
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
   const currentBranch = await gitCaptureTrim(options.root, ["branch", "--show-current"]);
+  const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy), "remote-plan");
+  const branchMatchesCurrent = branchBoundary ? currentBranch === branchBoundary : null;
   const targetRemote = options.targetRemote ?? "origin";
   const targetBase = options.targetBase ?? options.baseRef ?? "main";
   const targetBranch = options.targetBranch ?? branchBoundary ?? currentBranch ?? "HEAD";
@@ -82,6 +89,7 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
   const prState = await readPrState(options.root, targetBranch, targetBase);
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
+    ...branchIdentity.errors,
     ...(branchBoundary && currentBranch !== branchBoundary ? [`current branch ${currentBranch ?? "(detached)"} does not match branch boundary ${branchBoundary}`] : []),
     ...(dirtyPaths.length > 0 ? ["working tree is not clean"] : []),
     ...(!remoteUrl ? [`target remote is unknown: ${targetRemote}`] : []),
@@ -93,6 +101,7 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
   ];
   const warnings = [
     ...(!branchHead ? [`remote branch head is absent or unreadable for ${targetRemote}/${targetBranch}`] : []),
+    ...branchIdentity.warnings,
     ...localEvidence.warnings,
     ...(prState.warning ? [prState.warning] : []),
     "remote-readonly-plan is read-only and did not push, create PRs, edit PRs, merge, or mutate Issues",
@@ -111,6 +120,9 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
       branch: targetBranch,
       currentBranch,
       branchBoundary,
+      branchMatchesCurrent,
+      branchOwnsPlan: branchIdentity.owns_plan,
+      branchIdentity,
     },
     localState: {
       head: localHead,

@@ -1,0 +1,117 @@
+schema_version: 0.1.0
+contract_id: selected_change:M117-git-automation-remote-readiness:C002
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M117-C002-apply-branch-identity-governance-across-git-automation-modes
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C002
+title: Apply branch identity governance across git-automation modes
+status: completed
+selected_at: 2026-05-23
+selection_reason: >
+  Select C002 after C001 because remote readiness now consumes modern local
+  evidence, but every queue-bound git-automation mode must also know whether
+  the current branch merely matches the queue boundary or actually owns the
+  plan token. This prevents stale continuation branches from becoming false
+  remote-readiness signals.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Reuse M114's branch identity assessment in branch, remote-plan, simulate,
+    and draft-pr reporting. Fail closed for mismatched branch identities unless
+    a scoped temporary continuation exception explicitly allows that operation.
+    Do not change remote mutation permissions.
+scope:
+  includes:
+    - apply assessBranchIdentity or an equivalent shared gate to branch, remote-plan, simulate, and draft-pr
+    - surface branch_matches_current separately from branch_owns_plan in remote readiness reports
+    - support explicit temporary continuation exceptions only for scoped operations
+    - add runtime verifier coverage for stale branch identity in remote planning modes
+  excludes:
+    - creating or switching branches automatically during decompose or select-change
+    - changing remote mutation permissions
+    - migrating historical queues
+owned_paths:
+  - packages/core/src/git/branchIdentity.ts
+  - packages/core/src/git/localGitAutomation.ts
+  - packages/core/src/git/remoteReadonlyPlanner.ts
+  - packages/core/src/git/autonomousSimulator.ts
+  - packages/core/src/git/draftPrPilot.ts
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M117-git-automation-remote-readiness/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+acceptance:
+  - Every git-automation mode that reads a queue branch boundary reports whether the boundary owns the plan.
+  - Stale branch identities fail closed unless a scoped explicit exception applies.
+  - Existing C008 commit behavior remains green.
+validation:
+  - npm run build
+  - targeted branch-identity remote-plan fixture
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - git diff --check
+coder_governance:
+  required: true
+  protocol_source: skills/coder/SKILL.md
+  quality_benchmark: /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
+  required_evidence:
+    - trust recovery
+    - owner/file/dependency map
+    - RED branch-identity remote-readiness fixture before production edits
+    - GREEN branch-identity remote-readiness fixture after production edits
+    - post-write self-check
+    - validation ladder
+    - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
+expected_commit_boundary: >
+  C002 should complete as one local implementation commit plus local commit
+  evidence, containing branch identity gating/reporting for branch,
+  remote-plan, simulate, and draft-pr, targeted fixture coverage, queue updates,
+  and coder evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - packages/core/src/git/branchIdentity.ts
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/core/src/git/remoteReadonlyPlanner.ts
+    - packages/core/src/git/autonomousSimulator.ts
+    - packages/core/src/git/draftPrPilot.ts
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs
+  summary: >
+    Extended branch identity assessment to branch, remote-plan, simulate, and
+    draft-pr. Readiness results now expose branch_matches_current,
+    branch_owns_plan, and branch_identity, and stale branch identities fail
+    closed unless explicitly allowed for the scoped operation.
+  validation:
+    - "RED: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs failed because branch mode accepted stale branch identity"
+    - npm run build
+    - "GREEN: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs"
+    - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - git diff --check
+  coder_evidence:
+    status: recorded
+    enforcement: guidance_only
+    preflight:
+      - Recovered trust with resume, validate, and git status before source edits.
+      - Confirmed C002 owned paths and forbidden generated surfaces.
+      - Kept branch identity truth in packages/core/src/git/branchIdentity.ts and consumers in git automation source modules.
+    red_green:
+      - RED fixture failed because stale branch identity was accepted by branch mode.
+      - GREEN fixture passed after branch, remote-plan, simulate, and draft-pr reported and blocked stale branch identity.
+      - Existing M114 C008 branch identity fixture stayed green.
+    self_check:
+      - No remote mutation permissions changed.
+      - No push, PR mutation, Issue mutation, merge, rebase, reset, or force-push was enabled.
+      - Runtime-surface verifier now includes the branch identity remote-modes fixture.
+stop_conditions:
+  - Fix requires push, PR mutation, Issue mutation, merge, rebase, reset, or force-push.
+  - Scope expands into draft PR approval hardening or merge conflict checkpoint design.
+  - Durable fix would require hand-editing generated .agents/** or .openworkflow/** surfaces.

@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
+import type { BranchIdentityAssessment } from "./branchIdentity.js";
 import { planRemoteReadonly } from "./remoteReadonlyPlanner.js";
 
 const execFileAsync = promisify(execFile);
@@ -32,7 +33,10 @@ export interface DraftPrPilotResult {
     remote: string;
     base: string;
     branch: string;
+    branchMatchesCurrent: boolean | null;
+    branchOwnsPlan: boolean | null;
   };
+  branchIdentity: BranchIdentityAssessment;
   bodyDigest: string | null;
   managedBodyPreview: string | null;
   preview: {
@@ -49,6 +53,8 @@ export async function pilotDraftPr(options: DraftPrPilotOptions): Promise<DraftP
     remote: remotePlan.targetIdentity.remote,
     base: remotePlan.targetIdentity.base,
     branch: remotePlan.targetIdentity.branch,
+    branchMatchesCurrent: remotePlan.targetIdentity.branchMatchesCurrent,
+    branchOwnsPlan: remotePlan.targetIdentity.branchOwnsPlan,
   };
   const prSummaryPath = remotePlan.localState.prSummaryPath;
   const prSummary = remotePlan.localState.prSummaryExists ? await readFile(join(options.root, prSummaryPath), "utf8") : "";
@@ -75,6 +81,7 @@ export async function pilotDraftPr(options: DraftPrPilotOptions): Promise<DraftP
         ...(options.dryRun ? ["draft-pr pilot dry-run did not create or edit a PR"] : []),
       ],
       target,
+      branchIdentity: remotePlan.targetIdentity.branchIdentity,
       bodyDigest,
       managedBodyPreview: managedBody,
       preview,
@@ -92,6 +99,7 @@ export async function pilotDraftPr(options: DraftPrPilotOptions): Promise<DraftP
     blockers: [],
     warnings: remotePlan.warnings,
     target,
+    branchIdentity: remotePlan.targetIdentity.branchIdentity,
     bodyDigest,
     managedBodyPreview: managedBody,
     preview,

@@ -57,11 +57,19 @@ async function gitAutomationBranch(root: string, flags: Map<string, string | boo
     return finishGitAutomationError(root, json, "branch mode requires --queue <CANDIDATE_CHANGES.yaml>", []);
   }
   const queue = await loadQueue(root, queuePath);
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const planId = stringValue(queue.plan_id) ?? "unknown-plan";
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
   if (!branchBoundary) {
     return finishGitAutomationError(root, json, "queue_policy.branch_boundary is required for branch automation", []);
   }
-  const result = await ensureLocalFeatBranch({ root, branchBoundary, dryRun: !write });
+  const result = await ensureLocalFeatBranch({
+    root,
+    planId,
+    branchBoundary,
+    branchIdentityException: branchIdentityExceptionFrom(queuePolicy),
+    dryRun: !write,
+  });
   return finishGitAutomationResult(root, json, "git-automation branch", result.ok, {
     mode: "managed",
     action: "branch",

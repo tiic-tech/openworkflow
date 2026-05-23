@@ -8,7 +8,9 @@ Branch boundary: `codex/m117-git-automation-remote-readiness`
 
 Completed candidate: C001.
 
-Next implementation target: C002.
+Completed candidate: C002.
+
+Next recommended target: C003 high-risk decision before selection.
 
 ## Scope
 
@@ -81,7 +83,7 @@ surface verification.
 
 ### C002 - Apply Branch Identity Governance Across Git-Automation Modes
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -96,6 +98,16 @@ Acceptance focus:
   plan.
 - Stale branch identities fail closed unless a scoped exception applies.
 - Existing C008 commit behavior remains green.
+
+Selection artifacts:
+
+- `C002-apply-branch-identity-governance-across-git-automation-modes/SELECTED_CHANGE.yaml`
+- `C002-apply-branch-identity-governance-across-git-automation-modes/ATOM_TASKS.yaml`
+- `C002-apply-branch-identity-governance-across-git-automation-modes/IMPLEMENTATION_BRIEF.md`
+
+Completion: branch, remote-plan, simulate, and draft-pr now report and enforce
+feat-scoped branch identity. Stale branch identity fails closed unless a scoped
+temporary continuation exception applies.
 
 ### C003 - Harden Draft PR Pilot Approval And Local Audit Evidence
 

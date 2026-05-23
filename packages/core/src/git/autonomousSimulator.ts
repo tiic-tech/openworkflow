@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
 import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
 
 const execFileAsync = promisify(execFile);
@@ -24,6 +25,9 @@ export interface SimulateAutonomousGitResult {
   planId: string;
   branchBoundary: string | null;
   currentBranch: string | null;
+  branchMatchesCurrent: boolean | null;
+  branchOwnsPlan: boolean | null;
+  branchIdentity: BranchIdentityAssessment;
   targetRemote: string;
   targetBase: string;
   baseRef: string | null;
@@ -47,12 +51,15 @@ export interface SimulateAutonomousGitResult {
 export async function simulateAutonomousGit(options: SimulateAutonomousGitOptions): Promise<SimulateAutonomousGitResult> {
   const queue = await loadQueue(options.root, options.queuePath);
   const planId = stringValue(queue.plan_id) ?? "unknown-plan";
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
+  const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy), "simulate");
   const targetRemote = options.targetRemote ?? "origin";
   const targetBase = options.targetBase ?? options.baseRef ?? "main";
   const baseRef = options.baseRef ?? targetBase;
   const prSummaryPath = options.prSummaryPath ?? defaultPrSummaryPath(options.queuePath);
   const currentBranch = await gitCaptureTrim(options.root, ["branch", "--show-current"]);
+  const branchMatchesCurrent = branchBoundary ? currentBranch === branchBoundary : null;
   const localHead = await gitCaptureTrim(options.root, ["rev-parse", "HEAD"]);
   const dirtyPaths = await readDirtyPaths(options.root);
   const orderedLocalCommits = await readOrderedCommits(options.root, baseRef);
@@ -64,6 +71,7 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
   const baseHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, targetBase]);
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
+    ...branchIdentity.errors,
     ...(branchBoundary && currentBranch !== branchBoundary ? [`current branch ${currentBranch ?? "(detached)"} does not match branch boundary ${branchBoundary}`] : []),
     ...(dirtyPaths.length > 0 ? ["working tree is not clean"] : []),
     ...(orderedLocalCommits.length === 0 && commitEvidence.length === 0 ? ["no local commits or commit evidence available for autonomous plan"] : []),
@@ -73,6 +81,7 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
   const warnings = [
     ...(!remoteHead ? [`remote branch head is unknown for ${targetRemote}/${branchBoundary ?? currentBranch ?? "HEAD"}`] : []),
     ...(!baseHead ? [`remote base head is unknown for ${targetRemote}/${targetBase}`] : []),
+    ...branchIdentity.warnings,
     ...localEvidence.warnings,
     "simulator is read-only and did not push, create PRs, merge, or mutate Issues",
   ];
@@ -85,6 +94,9 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
     planId,
     branchBoundary,
     currentBranch,
+    branchMatchesCurrent,
+    branchOwnsPlan: branchIdentity.owns_plan,
+    branchIdentity,
     targetRemote,
     targetBase,
     baseRef,
