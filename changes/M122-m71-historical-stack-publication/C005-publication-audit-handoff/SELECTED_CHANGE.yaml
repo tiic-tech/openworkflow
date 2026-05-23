@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: selected_change:C005-publication-audit-handoff
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C005-publication-audit-handoff
+source_plan_id: M122-m71-historical-stack-publication
+source_candidate_id: C005
+title: Record M71 publication audit and handoff
+status: done
+selection_reason: >
+  User asked to advance M122 C005 after C004 created draft PR #6. C005 closes
+  M122 with local audit and handoff evidence, without remote mutation.
+scope:
+  includes:
+    - summarize completed publication transitions or stop reasons
+    - update M122 summary and readable view
+    - record deferred next queues for PR #4 and shared M101-derived branches
+    - confirm no unauthorized PR, Issue, merge, or destructive git operations occurred
+  excludes:
+    - merge
+    - Issue mutation
+    - PR ready-for-review transition
+    - publishing shared M101-derived branches
+    - changing product source
+owned_paths:
+  - changes/M122-m71-historical-stack-publication/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - A local audit names each authorized and unauthorized operation boundary.
+  - Remaining draft PRs and next governance queues are explicit.
+  - M122 can be handed off without raw session context.
+validation:
+  - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23T23:00:00+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C005 produced local audit and handoff evidence only; no product source,
+    generated surface, remote PR, Issue, merge, or branch history was mutated.
+  evidence:
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/SELECTED_CHANGE.yaml
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/ATOM_TASKS.yaml
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/IMPLEMENTATION_BRIEF.md

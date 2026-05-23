@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M122-m71-historical-stack-publication
 title: Candidate changes for M71 historical stack publication
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -85,10 +85,89 @@ observed_state:
   m123_status: done
 high_risk_report:
   path: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
-  status: not_created
+  status: present
   decision_boundary: M71 branch push and draft PR creation
   report_is_approval: false
-next_recommended_candidate_id: C002
+c002_narrow_preflight_result:
+  path: changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+  approved_scope: narrow local-only isolated execution preflight; do not push
+  approval_source: user_input:2026-05-23-approved-c002-narrow-preflight
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m71-publish
+  worktree_branch: codex/m71-git-version-governance
+  worktree_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  worktree_clean: true
+  remote_branch_present: false
+  existing_prs: []
+  conflict_probe_clean: true
+  remote_plan_ok: true
+  simulator_ok: true
+  exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m71-publish push origin HEAD:refs/heads/codex/m71-git-version-governance
+c003_push_result:
+  path: changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+  approval_source: user_input:2026-05-23-approved-m71-push-command
+  approved_command: git -C /Users/archy/Projects/StartUp/openworkflow-m71-publish push origin HEAD:refs/heads/codex/m71-git-version-governance
+  pushed_at: 2026-05-23T21:46:44+08:00
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m71-publish
+  worktree_branch: codex/m71-git-version-governance
+  local_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  previous_remote_branch_present: false
+  resulting_remote_ref: refs/heads/codex/m71-git-version-governance
+  resulting_remote_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  push_exit_code: 0
+  existing_prs_after_push: []
+  github_pr_suggestion_url: https://github.com/tiic-tech/openworkflow/pull/new/codex/m71-git-version-governance
+  unauthorized_operations_performed:
+    - none
+  rollback_preference: follow-up revert PR after review; no remote branch deletion or force-push without new exact approval
+c004_approval_packet:
+  path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+  body_path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  status: completed
+  requested_by: user_input:2026-05-23-advance-c004
+  exact_command_unapproved: >
+    gh pr create --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base
+    main --draft --title "M71: Git version control governance" --body-file
+    changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+c004_draft_pr_result:
+  path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  body_path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  approval_source: user_input:2026-05-23-approved-draft-pr
+  approved_command: >
+    gh pr create --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base
+    main --draft --title "M71: Git version control governance" --body-file
+    changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  created_at: 2026-05-23T21:54:32+08:00
+  pr_number: 6
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  pr_state: OPEN
+  is_draft: true
+  title: "M71: Git version control governance"
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeability_signal: MERGEABLE
+  unauthorized_operations_performed:
+    - none
+  rollback_preference: close PR only after separate exact approval; do not force-push or delete remote branch without new approval
+c005_audit_result:
+  path: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+  completed_at: 2026-05-23T23:00:00+08:00
+  final_state: complete
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  pr_draft: true
+  unauthorized_operations_not_performed:
+    - ready-for-review transition
+    - merge
+    - PR edit after creation
+    - Issue mutation
+    - additional push after C003
+    - destructive git operations
+  deferred_next_queues:
+    - M125-m102-pr4-readiness-governance
+    - M126-m71-ready-review-governance
+    - M127-m101-shared-stack-ready-review-governance
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -158,7 +237,7 @@ changes:
         - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
         - "validation: git diff --check"
   - id: C002
-    status: ready
+    status: done
     title: Prepare M71 push decision and isolated execution preflight
     purpose: >
       Convert C001 facts into a high-risk decision report for pushing the M71 branch and, if needed,
@@ -192,8 +271,33 @@ changes:
       - The decision packet names exactly one M71 push command.
       - The packet states that it is evidence, not approval.
       - The packet blocks execution until exact user approval is received.
+    selection:
+      selected_change_id: C002-prepare-m71-push-decision-preflight
+      reason: >
+        User approved the concrete narrow preflight option from HIGH_RISK_DECISION_REPORT.md:
+        select C002 and prepare local-only isolated execution preflight; do not push.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+        - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/SELECTED_CHANGE.yaml
+        - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/ATOM_TASKS.yaml
+        - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local high-risk decision and read-only isolated worktree preflight evidence
+        only; no product source, generated surface, remote branch, PR, or Issue was mutated.
+      evidence:
+        - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+        - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+      recommendation: >
+        C003 is unlocked but remains unapproved. It may execute only after exact user approval of
+        the push command named in HIGH_RISK_DECISION_REPORT.md and WORKTREE_PREFLIGHT.md.
   - id: C003
-    status: candidate
+    status: done
     title: Execute approved M71 branch push
     purpose: >
       After C002 exists and the user approves the exact command, push only the M71 branch to the
@@ -224,8 +328,31 @@ changes:
       - The M71 remote branch exists at the approved local head.
       - Local audit evidence records approval, command, result, and rollback guidance.
       - No draft PR, merge, PR edit, Issue mutation, or unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C003-approved-m71-push
+      reason: >
+        User approved the exact C003 push command after C002 isolated preflight showed the target
+        worktree was clean, the target remote branch was absent, and no target-head PR existed.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+        - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/SELECTED_CHANGE.yaml
+        - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/ATOM_TASKS.yaml
+        - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T21:46:44+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 performed one approved remote branch push and wrote local audit evidence only. The
+        operation did not change product source files and must not be represented as a local
+        selected-change implementation commit.
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+        - "validation: git ls-remote --heads origin codex/m71-git-version-governance"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+        - "validation: git diff --check"
   - id: C004
-    status: candidate
+    status: done
     title: Create approved M71 draft PR
     purpose: >
       After C003 pushes the branch and the user approves the exact command, create one draft PR from
@@ -255,8 +382,32 @@ changes:
       - One M71 draft PR exists and remains draft.
       - Local audit evidence records approval, command, PR URL, resulting state, and rollback guidance.
       - No ready-for-review transition, merge, PR edit after creation, PR close, Issue mutation, or unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C004-approved-draft-pr
+      reason: >
+        User approved the exact C004 draft PR creation command after C003 pushed the M71 branch and
+        pre-checks showed no existing target-head PR.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/SELECTED_CHANGE.yaml
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/ATOM_TASKS.yaml
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T21:54:32+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 performed one approved draft PR creation and wrote local audit evidence only. The
+        operation did not change product source files and must not be represented as a local
+        selected-change implementation commit.
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+        - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base main --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+        - "validation: git diff --check"
   - id: C005
-    status: candidate
+    status: done
     title: Record M71 publication audit and handoff
     purpose: >
       Close M122 with local audit evidence naming whether M71 was pushed, whether a draft PR was
@@ -289,6 +440,27 @@ changes:
       - A local audit names each authorized and unauthorized operation boundary.
       - Remaining draft PRs and next governance queues are explicit.
       - M122 can be handed off without raw session context.
+    selection:
+      selected_change_id: C005-publication-audit-handoff
+      reason: >
+        User asked to advance M122 C005 after C004 created draft PR #6. C005 closes M122 with
+        local audit and handoff evidence, without remote mutation.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/ATOM_TASKS.yaml
+        - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T23:00:00+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C005 produced local audit and handoff evidence only; no product source, generated surface,
+        remote PR, Issue, merge, or branch history was mutated.
+      evidence:
+        - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+        - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
 operations:
   - operation_id: OP001
     operation_type: add
@@ -343,3 +515,214 @@ operations:
     after_status: ready
     evidence:
       - changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
+  - operation_id: OP005
+    operation_type: query
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: High-risk stop converted into a decision report before selecting or implementing C002.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User explicitly approved the narrow C002 local-only preflight option from the high-risk
+      decision report; push remains unapproved.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/SELECTED_CHANGE.yaml
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/ATOM_TASKS.yaml
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed the approved local-only isolated worktree preflight without push, PR creation, Issue
+      mutation, merge, rebase, reset, force-push, or branch deletion.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completed the exact push decision and isolated preflight evidence; C003 is now ready but
+      still requires exact push approval before any remote mutation.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User explicitly approved the exact M71 push command after C002 local-only preflight completed.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/SELECTED_CHANGE.yaml
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/ATOM_TASKS.yaml
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Executed exactly one approved push for codex/m71-git-version-governance and recorded local
+      remote-operation evidence. No draft PR, merge, PR edit, Issue mutation, rebase, reset,
+      force-push, or branch deletion occurred.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+      - "validation: git ls-remote --heads origin codex/m71-git-version-governance"
+      - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+      - "validation: git diff --check"
+  - operation_id: OP011
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      The M71 remote branch now exists at the approved local head, so draft PR creation is ready but
+      remains blocked on separate exact user approval.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+  - operation_id: OP012
+    operation_type: query
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User asked to advance C004; prepared the local draft PR body and exact approval packet without
+      creating a GitHub PR.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User explicitly approved the exact M71 draft PR creation command after C004 approval packet
+      preparation.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/SELECTED_CHANGE.yaml
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/ATOM_TASKS.yaml
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Created one approved draft PR for the pushed M71 branch and recorded local evidence. No
+      ready-for-review transition, merge, PR edit after creation, PR close, Issue mutation, push,
+      rebase, reset, force-push, or branch deletion occurred.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+      - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base main --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid"
+      - "validation: git diff --check"
+  - operation_id: OP015
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      M71 branch push and draft PR creation are complete; final M122 publication audit and handoff
+      can now be recorded.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+      - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      User asked to advance M122 C005; final local audit and handoff are ready after draft PR #6
+      was created.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/ATOM_TASKS.yaml
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      M122 final audit and handoff completed. PR #6 remains draft, unauthorized operations are
+      explicitly recorded as not performed, and follow-up governance queues are named.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+      - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP018
+    operation_type: complete_queue
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      M122 publication lane is complete: preflight, high-risk decision report, isolated preflight,
+      approved push, approved draft PR, and audit handoff are recorded.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: complete
+    evidence:
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md

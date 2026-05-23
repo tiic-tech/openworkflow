@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-prepare-m71-push-decision-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-prepare-m71-push-decision-preflight
+source_plan_id: M122-m71-historical-stack-publication
+source_candidate_id: C002
+title: Prepare M71 push decision and isolated execution preflight
+status: done
+selection_reason: >
+  User explicitly approved the concrete narrow preflight option from
+  HIGH_RISK_DECISION_REPORT.md: select C002 and prepare local-only isolated execution preflight;
+  do not push. This selection does not approve C003 push execution or draft PR creation.
+approved_option: narrow_preflight
+approval_source: user_input:2026-05-23-approved-c002-narrow-preflight
+scope:
+  includes:
+    - exact push command for codex/m71-git-version-governance
+    - current local and remote refs
+    - historical-stack acceptance rationale
+    - stop criteria and rollback guidance
+    - isolated worktree execution model for later approved push
+  excludes:
+    - executing push
+    - draft PR creation
+    - merge, PR edit, PR close, Issue mutation, rebase, reset, force-push, or branch deletion
+owned_paths:
+  - changes/M122-m71-historical-stack-publication/
+  - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+  - remote:origin/**
+acceptance:
+  - The decision packet names exactly one M71 push command.
+  - The packet states that it is evidence, not approval.
+  - The packet blocks execution until exact user approval is received.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C002 produced local high-risk decision and read-only isolated worktree preflight evidence only;
+    no product source, generated surface, remote branch, PR, or Issue was mutated.
+  evidence:
+    - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+    - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md

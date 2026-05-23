@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-approved-draft-pr
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-approved-draft-pr
+source_plan_id: M122-m71-historical-stack-publication
+source_candidate_id: C004
+title: Create approved M71 draft PR
+status: done
+selection_reason: >
+  User explicitly approved the exact C004 draft PR creation command after the M71 branch was pushed
+  and pre-checks showed no existing target-head PR. This selection did not approve ready-for-review
+  transition, merge, PR edit after creation, PR close, Issue mutation, push, rebase, reset,
+  force-push, or branch deletion.
+approved_command: gh pr create --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base main --draft --title "M71: Git version control governance" --body-file changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+approval_source: user_input:2026-05-23-approved-draft-pr
+scope:
+  includes:
+    - prepare M71 draft PR body from PR_READY_SUMMARY.md and publication evidence
+    - verify exact approval text for draft PR creation
+    - execute one approved draft PR creation for M71
+    - record resulting PR URL and state
+  excludes:
+    - marking the PR ready for review
+    - merge, PR edit after creation, PR close, Issue mutation, push, rebase, reset, force-push, or branch deletion
+owned_paths:
+  - changes/M122-m71-historical-stack-publication/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - One M71 draft PR exists and remains draft.
+  - Local audit evidence records approval, command, PR URL, resulting state, and rollback guidance.
+  - No ready-for-review transition, merge, PR edit after creation, PR close, Issue mutation, or unrelated remote mutation occurs.
+validation:
+  - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git diff --check
+completion:
+  completed_at: 2026-05-23T21:54:32+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C004 performed one approved draft PR creation and wrote local audit evidence only. The
+    operation did not change product source files and must not be represented as a local
+    selected-change implementation commit.
+  evidence:
+    - changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md

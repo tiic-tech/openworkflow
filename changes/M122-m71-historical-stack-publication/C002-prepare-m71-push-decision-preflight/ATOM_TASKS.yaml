@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-prepare-m71-push-decision-preflight
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-prepare-m71-push-decision-preflight
+title: Atom tasks for M71 push decision and isolated preflight
+status: done
+tasks:
+  - task_id: T001
+    title: Select approved C002 narrow preflight
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C002 has selected-change, atom-task, and implementation-brief artifacts.
+      - The selected change records that push and draft PR creation remain unapproved.
+  - task_id: T002
+    title: Create isolated M71 worktree
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/
+    done_when:
+      - A local worktree exists at the M71 target branch.
+      - The worktree is clean and its HEAD matches the approved preflight target.
+  - task_id: T003
+    title: Run read-only remote publication checks
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/
+    done_when:
+      - Remote branch state, PR state, remote-plan, simulator, and conflict probe evidence are recorded.
+      - No push, PR creation, Issue mutation, merge, rebase, reset, force-push, or branch deletion occurs.
+  - task_id: T004
+    title: Record C002 completion and C003 gate
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C002 completion evidence is recorded.
+      - C003 is ready only behind exact user approval of the push command.

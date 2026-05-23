@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-approved-draft-pr
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-approved-draft-pr
+title: Atom tasks for approved M71 draft PR
+status: done
+tasks:
+  - task_id: T001
+    title: Verify exact C004 approval
+    status: done
+    type: read
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Approval text exactly names the C004 draft PR creation command.
+      - Ready-for-review transition and merge remain outside the approval.
+  - task_id: T002
+    title: Re-check remote branch and PR state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Remote M71 branch exists at the expected head.
+      - No existing M71 PR exists before creation.
+  - task_id: T003
+    title: Create approved draft PR only
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Exactly one approved draft PR command runs.
+      - The resulting PR is open and draft.
+  - task_id: T004
+    title: Record PR evidence and handoff gate
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - PR_EVIDENCE.md records approval, command, PR URL, resulting state, and rollback guidance.
+      - C005 is ready for final publication audit and handoff.

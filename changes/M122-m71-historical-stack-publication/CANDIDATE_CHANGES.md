@@ -25,9 +25,22 @@ Branch boundary for this queue: `codex/m122-m71-historical-stack-publication`.
 - M71 is 66 commits ahead of `origin/main`.
 - `origin/main` is an ancestor of M71.
 - Conflict probe produced tree `bbf7b9e12650cd3d984f7fa379e8ecd3871bf5e3`.
-- Remote branch `origin/codex/m71-git-version-governance` is absent.
-- No PR exists for head `codex/m71-git-version-governance`.
+- Remote branch `origin/codex/m71-git-version-governance` exists at
+  `a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1`.
+- Draft PR #6 exists for head `codex/m71-git-version-governance`:
+  `https://github.com/tiic-tech/openworkflow/pull/6`.
 - `changes/M71-git-version-control-governance/PR_READY_SUMMARY.md` exists.
+- High-risk decision report:
+  `changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md`.
+- C002 isolated preflight:
+  `changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md`.
+- Remote M71 branch `origin/codex/m71-git-version-governance` now exists at
+  `a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1`.
+- C003 push evidence:
+  `changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md`.
+- C004 draft PR approval packet:
+  `changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md`.
+- M71 draft PR: `https://github.com/tiic-tech/openworkflow/pull/6` (`OPEN`, draft).
 
 ## Candidates
 
@@ -49,42 +62,64 @@ Completion evidence:
 
 ### C002 - Prepare M71 push decision and isolated execution preflight
 
-Status: ready
+Status: done
 
 Risk: high
 
 Outcome: prepare the exact push decision packet. This is evidence, not approval.
 
+Completion evidence:
+
+- `changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md`
+
 ### C003 - Execute approved M71 branch push
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Outcome: after exact approval, push only the M71 branch and record local audit
 evidence.
 
+Completion evidence:
+
+- `changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md`
+
 ### C004 - Create approved M71 draft PR
 
-Status: candidate
+Status: done
 
 Risk: high
 
 Outcome: after exact approval, create one draft PR from M71 into `main`.
 
+Completion evidence:
+
+- `changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md`
+- `changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md`
+- `changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md`
+
 ### C005 - Record M71 publication audit and handoff
 
-Status: candidate
+Status: done
 
 Risk: medium
 
 Outcome: close M122 with local audit evidence and handoff remaining publication
 governance.
 
+Completion evidence:
+
+- `changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md`
+- `changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/SELECTED_CHANGE.yaml`
+- `changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/ATOM_TASKS.yaml`
+- `changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/IMPLEMENTATION_BRIEF.md`
+
 ## Stop Gates
 
-- Do not push M71 without exact approval.
-- Do not create a draft PR for M71 without exact approval.
+- Do not push M71 again without exact approval.
+- Do not create another draft PR for M71 without exact approval.
 - Do not mark any PR ready for review.
 - Do not merge, close, edit, or retarget any PR.
 - Do not mutate Issues.

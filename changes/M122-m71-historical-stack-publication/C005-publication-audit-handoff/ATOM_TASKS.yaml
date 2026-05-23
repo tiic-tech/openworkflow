@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C005-publication-audit-handoff
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C005-publication-audit-handoff
+title: Atom tasks for M122 publication audit and handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Select C005 audit candidate
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C005 has selected-change, atom-task, and implementation-brief artifacts.
+  - task_id: T002
+    title: Verify PR #6 handoff state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - PR #6 state, draft flag, head/base OIDs, and mergeability are recorded.
+  - task_id: T003
+    title: Write M122 publication audit
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Audit names completed C001-C004 transitions, unauthorized operations not performed, and deferred next queues.
+  - task_id: T004
+    title: Refresh queue handoff state
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - C005 completion is recorded and M122 is marked complete.
+      - Validation commands pass.

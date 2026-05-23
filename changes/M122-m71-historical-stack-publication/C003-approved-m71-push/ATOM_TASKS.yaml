@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-approved-m71-push
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-approved-m71-push
+title: Atom tasks for approved M71 branch push
+status: done
+tasks:
+  - task_id: T001
+    title: Verify exact C003 approval
+    status: done
+    type: read
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Approval text exactly names the C003 push command.
+      - Draft PR creation remains outside the approval.
+  - task_id: T002
+    title: Re-check target refs and PR state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Local M71 head, remote target branch state, clean worktree, and PR state are verified before push.
+  - task_id: T003
+    title: Execute approved push only
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - Exactly one approved push command runs.
+      - No draft PR, merge, PR edit, Issue mutation, rebase, reset, force-push, or branch deletion occurs.
+  - task_id: T004
+    title: Record push evidence and next gate
+    status: done
+    type: document
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    done_when:
+      - PUSH_EVIDENCE.md records approval, command, result, remote ref, and rollback guidance.
+      - C004 is ready only behind separate exact draft PR approval.

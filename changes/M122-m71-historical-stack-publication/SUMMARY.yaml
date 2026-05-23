@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M122-m71-historical-stack-publication
 title: Summary for M71 historical stack publication
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -30,16 +30,21 @@ target_publication:
   base: main
   remote: origin
   local_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  remote_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
   origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
   commits_ahead_of_origin_main: 66
   origin_main_is_ancestor: true
-  remote_branch_present: false
-  existing_prs: []
+  remote_branch_present: true
+  existing_prs:
+    - number: 6
+      url: https://github.com/tiic-tech/openworkflow/pull/6
+      state: OPEN
+      draft: true
   branch_local_pr_ready_summary_present: true
 candidate_count: 5
-completed_candidate_id: C001
-completed_change_id: C001-refresh-m71-publication-preflight
-next_recommended_candidate_id: C002
+completed_candidate_id: C005
+completed_change_id: C005-publication-audit-handoff
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -49,6 +54,14 @@ outputs:
   high_risk_decision_report: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
   c001_publication_preflight: changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/PUBLICATION_PREFLIGHT.md
   c001_commit_evidence: changes/M122-m71-historical-stack-publication/C001-refresh-m71-publication-preflight/LOCAL_COMMIT_EVIDENCE.yaml
+  c002_worktree_preflight: changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+  c003_push_evidence: changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+  c004_pr_body: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  c004_pr_evidence: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  c005_publication_audit: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+  c005_selected_change: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/SELECTED_CHANGE.yaml
+  c005_atom_tasks: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/ATOM_TASKS.yaml
+  c005_implementation_brief: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/IMPLEMENTATION_BRIEF.md
 observed_state:
   captured_at: 2026-05-23T21:20:15+08:00
   current_branch: codex/m122-m71-historical-stack-publication
@@ -63,16 +76,82 @@ observed_state:
   remote_branch_present: false
   existing_prs: []
 high_risk_report:
-  status: not_created
+  status: present
   path: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
   decision_boundary: M71 branch push and draft PR creation
   report_is_approval: false
+c002_narrow_preflight_result:
+  path: changes/M122-m71-historical-stack-publication/C002-prepare-m71-push-decision-preflight/WORKTREE_PREFLIGHT.md
+  approved_scope: narrow local-only isolated execution preflight; do not push
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m71-publish
+  worktree_branch: codex/m71-git-version-governance
+  worktree_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  worktree_clean: true
+  remote_branch_present: false
+  existing_prs: []
+  remote_plan_ok: true
+  simulator_ok: true
+  exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m71-publish push origin HEAD:refs/heads/codex/m71-git-version-governance
+c003_push_result:
+  path: changes/M122-m71-historical-stack-publication/C003-approved-m71-push/PUSH_EVIDENCE.md
+  approval_source: user_input:2026-05-23-approved-m71-push-command
+  approved_command: git -C /Users/archy/Projects/StartUp/openworkflow-m71-publish push origin HEAD:refs/heads/codex/m71-git-version-governance
+  pushed_at: 2026-05-23T21:46:44+08:00
+  remote_branch_present: true
+  remote_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  existing_prs_after_push: []
+  draft_pr_created: false
+  unauthorized_operations_performed:
+    - none
+c004_approval_packet:
+  path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/DRAFT_PR_APPROVAL_PACKET.md
+  body_path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+  status: completed
+  exact_command_unapproved: >
+    gh pr create --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --base
+    main --draft --title "M71: Git version control governance" --body-file
+    changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_BODY.md
+c004_draft_pr_result:
+  path: changes/M122-m71-historical-stack-publication/C004-draft-pr-approval-packet/PR_EVIDENCE.md
+  pr_number: 6
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  pr_state: OPEN
+  is_draft: true
+  title: "M71: Git version control governance"
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeability_signal: MERGEABLE
+  unauthorized_operations_performed:
+    - none
+c005_audit_result:
+  path: changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+  completed_at: 2026-05-23T23:00:00+08:00
+  final_state: complete
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  pr_draft: true
+  unauthorized_operations_not_performed:
+    - ready-for-review transition
+    - merge
+    - PR edit after creation
+    - Issue mutation
+    - additional push after C003
+    - destructive git operations
+  deferred_next_queues:
+    - M125-m102-pr4-readiness-governance
+    - M126-m71-ready-review-governance
+    - M127-m101-shared-stack-ready-review-governance
 key_dependencies:
   - M123 completed PR #5 ready-for-review governance and deferred PR #4.
   - M120 ranked M71 as the next historical publication candidate after M117.
   - M71 branch-local PR_READY_SUMMARY.md is present.
   - C001 must refresh publication facts before any high-risk push decision.
   - C001 completed read-only publication preflight and recommends C002.
+  - C002 completed the approved local-only isolated preflight and recommends exact approval gating for C003.
+  - C003 executed the exact approved M71 push and recommends separate approval gating for C004 draft PR creation.
+  - C004 created draft PR #6 after exact approval and recommends C005 final audit handoff.
+  - C005 completed local audit and handoff; M122 is complete.
 risks:
   - id: R001
     level: high
@@ -87,10 +166,12 @@ risks:
     description: M71 is a 66-commit historical stack with early work predating strict commit evidence.
     mitigation: Publish it as one intentionally coupled review branch only after explicit historical-stack acceptance.
 unresolved_questions:
-  - Should M71 be accepted as one intentionally coupled historical review branch after C001 preflight?
+  - PR #6 ready-for-review transition remains deferred to M126 or another separate approval-gated queue.
+  - PR #6 merge remains deferred to a separate approval-gated queue.
 deferred_features:
   - M125-m102-pr4-readiness-governance
-  - M124-shared-branch-publication-strategy
+  - M126-m71-ready-review-governance
+  - M127-m101-shared-stack-ready-review-governance
 validation:
   commands_run:
     - npm run build
@@ -105,6 +186,9 @@ validation:
     - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
     - git merge-tree origin/main codex/m71-git-version-governance
     - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+    - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
   notes: |
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly asked to judge and proceed with M122 after M123 completed.
@@ -112,4 +196,6 @@ validation:
     - C001 refreshed M71 publication facts: local branch exists at a0ddcf94, origin/main is its
       ancestor, it is 66 commits ahead, the remote target branch is absent, and no target-head PR
       exists.
-    - M71 push and draft PR creation remain unapproved high-risk operations.
+    - C003 pushed origin/codex/m71-git-version-governance to a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1 after exact approval.
+    - C004 created draft PR #6 at https://github.com/tiic-tech/openworkflow/pull/6 after exact approval; it remains draft.
+    - C005 recorded final audit and handoff; M122 is complete.
