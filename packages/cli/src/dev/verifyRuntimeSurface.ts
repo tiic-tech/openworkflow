@@ -280,9 +280,9 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "pass --write to update summary files",
     "git-automation",
     "Managed git lifecycle shell",
-    "Planned read-only recovery command",
+    "openworkflow resume --root <folder> [--tools auto|codex] [--json]",
     "resume",
-    "Contract-defined Agent resume cockpit",
+    "Read-only Agent recovery cockpit",
     "Contract-defined read-only recovery",
     "data.command_boundary",
     "data.current_work_item",
@@ -353,6 +353,22 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "sync", "--root", root, "--json"], env), "sync");
   parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", root, "--json"], env), "doctor");
   parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
+  const resumeReport = parseJsonReport(await runCapture(["node", CLI, "resume", "--root", root, "--json"], env), "resume");
+  const resumeData = record(resumeReport.data, "resume data");
+  const resumeBoundary = record(resumeData.command_boundary, "resume command_boundary");
+  const resumeTrust = record(resumeData.trust, "resume trust");
+  const resumeQueue = record(resumeData.active_queue, "resume active_queue");
+  const resumeWorkItem = record(resumeData.current_work_item, "resume current_work_item");
+  const resumeGit = record(resumeData.git, "resume git");
+  assert(resumeReport.ok === true, "fresh resume should pass handoff trust");
+  assert(resumeData.resume_version === "0.1.0", "resume json missing version");
+  assert(resumeBoundary.read_only === true, "resume command boundary must be read-only");
+  assert(Array.isArray(resumeBoundary.writes) && resumeBoundary.writes.length === 0, "resume command boundary must have no writes");
+  assert(resumeTrust.handoff_ok === true, "resume trust should expose handoff_ok");
+  assert(resumeQueue.status === "unknown", "C002 resume must defer active queue detection");
+  assert(String(resumeQueue.deferred_to).includes("M106-C003"), "resume active queue should point to C003");
+  assert(resumeWorkItem.status === "unknown", "C002 resume must defer current work item detection");
+  assert(resumeGit.available === false, "resume git state should reuse brief git state");
   const validateReport = parseJsonReport(await runCapture(["node", CLI, "validate", "--root", root, "--json"], env), "validate");
   const validateData = record(validateReport.data, "validate data");
   const validateScope = record(validateData.scope, "validate scope");

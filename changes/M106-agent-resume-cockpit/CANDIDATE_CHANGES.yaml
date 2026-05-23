@@ -49,9 +49,9 @@ queue_policy:
     - superseded
 selection_policy:
   next_selection_rule: >
-    Start with C001 because a stable resume packet contract must define the
-    output shape, trust semantics, and command boundary before implementation
-    can aggregate existing read models.
+    After C002, select C003 because the executable base resume packet now
+    needs active queue and current-work-item detection to recover the real
+    breakpoint instead of falling back to generic workflow state.
   high_risk_rule: >
     Resume is read-only and should remain medium risk. Any candidate that
     mutates workflow state, generated adapters, or selected-change statuses
@@ -160,7 +160,7 @@ ow_north_star_constraints:
     Resume is not the long-term Soul or memory store, but it should eventually
     be able to surface the current repo's project-specific SOUL/MEMORY signals
     when those artifacts exist and are trusted.
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -237,7 +237,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C002
-    status: ready
+    status: done
     title: Implement base resume aggregator
     purpose: >
       Implement the read-only CLI command that aggregates current state,
@@ -282,8 +282,42 @@ changes:
       - Resume favors existing OW trust surfaces and does not require whole-repo rediscovery for a healthy initialized project.
       - The command does not write or update files.
       - Runtime coverage verifies fresh and initialized repo behavior.
+    selection:
+      selected_change_id: M106-C002-implement-base-resume-aggregator
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C001 completed the resume packet contract. C002 is the
+        next recommended dependency-ready slice and is constrained to a
+        read-only base packet before C003 adds active queue scanning.
+      artifacts:
+        selected_change: changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/ATOM_TASKS.yaml
+        implementation_brief: changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/cli/src/commands/resume.ts
+        - packages/cli/src/commands/handoff.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Implemented the read-only `resume` CLI command and base packet by
+        reusing existing brief, inspect, handoff, check, summary-quality, and
+        git-state read models. The C002 packet exposes project overview, trust
+        state, workflow/read-order, git state, command boundary, next actions,
+        and explicit active_queue/current_work_item unknowns deferred to C003.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
   - id: C003
-    status: candidate
+    status: ready
     title: Detect active planning queue and current work item
     purpose: >
       Teach resume to identify the most relevant active queue, previous
@@ -536,3 +570,50 @@ operations:
     evidence:
       - user_input:2026-05-23-project-soul-memory-scenario
       - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Selected C002 to implement the read-only base resume aggregator after
+      C001 completed the contract boundary and planning checkpoints were
+      committed.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/SELECTED_CHANGE.yaml
+      - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/ATOM_TASKS.yaml
+      - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed the read-only base resume aggregator. The executable `resume`
+      command now returns one standard JSON packet built from existing OW trust
+      surfaces and explicitly defers active queue/current-work-item detection to
+      C003.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/resume.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completed the executable base packet, so C003 is now dependency-ready
+      to add active planning queue and current-work-item detection.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/SELECTED_CHANGE.yaml

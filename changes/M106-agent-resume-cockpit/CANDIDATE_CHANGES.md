@@ -43,10 +43,10 @@ Out of scope:
 
 Selected candidate: none.
 
-C001 defines the packet contract and command boundary before implementation
-aggregates existing read models.
+C002 completed the executable base resume packet. C003 is now ready to make the
+packet queue-aware enough to recover the real breakpoint.
 
-Next recommended candidate: C002.
+Next recommended candidate: C003.
 
 ## Candidates
 
@@ -76,7 +76,7 @@ Completion:
 
 ### C002 - Implement base resume aggregator
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -89,6 +89,12 @@ The base packet should prefer OW trust surfaces over broad repo rediscovery.
 
 Depends on: C001.
 
+Selection artifacts:
+
+- `changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/SELECTED_CHANGE.yaml`
+- `changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/ATOM_TASKS.yaml`
+- `changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/IMPLEMENTATION_BRIEF.md`
+
 Acceptance focus:
 
 - Project overview, trust state, next action, and git cleanliness are present.
@@ -97,9 +103,20 @@ Acceptance focus:
   not force whole-repo scanning.
 - The command remains read-only.
 
+Completion:
+
+- Added `packages/cli/src/commands/resume.ts` as the read-only base aggregator.
+- Reused existing brief, inspect, handoff, check, summary-quality, and git-state
+  read models instead of duplicating trust policy.
+- `resume --json` returns command boundary, trust, workflow/read-order,
+  active_queue/current_work_item uncertainty, actions, evidence, and git state.
+- Runtime-surface verification asserts fresh initialized project behavior.
+- Local commit evidence:
+  `changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/LOCAL_COMMIT_EVIDENCE.yaml`
+
 ### C003 - Detect active planning queue and current work item
 
-Status: candidate
+Status: ready
 
 Risk: medium
 
