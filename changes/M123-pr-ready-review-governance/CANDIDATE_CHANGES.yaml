@@ -1,0 +1,293 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M123-pr-ready-review-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M123-pr-ready-review-governance
+title: Candidate changes for draft PR ready-for-review governance
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-approved-m123-pr-ready-review-governance
+    - changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
+    - changes/M121-m117-remote-publication/SUMMARY.yaml
+    - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  summary: >
+    M121 completed M117 remote publication and left PR #5 open as a draft. PR #4 from the earlier
+    M102 pilot also remains open as a draft. M123 owns ready-for-review governance for these draft
+    PRs: refresh read-only readiness facts, prepare exact high-risk approval packets, execute only
+    explicitly approved ready-for-review transitions, and record local audit evidence.
+queue_policy:
+  branch_boundary: codex/m123-pr-ready-review-governance
+  branch_note: >
+    Queue created while the repository was on codex/m121-m117-remote-publication. Branch creation
+    was intentionally not performed during DTC queue creation.
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. M123 must refresh current PR readiness facts before asking for any
+    ready-for-review approval.
+  high_risk_rule: >
+    C002, C003, and C004 are high-risk PR mutation boundaries. A high-risk decision report must
+    exist for the exact ready-for-review operation, and the user must approve the concrete command
+    before any PR state is changed.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Ready-for-review governance for existing draft PRs #5 and #4 only.
+  boundary_type: gh_pr_ready_review_workflow_slice
+  in_scope_rule: >
+    Include read-only PR readiness preflight, exact ready-for-review decision reports, approved
+    ready-for-review transitions, rollback guidance, and post-transition audit evidence for PR #5
+    and optionally PR #4.
+  out_of_scope_rule: >
+    Do not merge PRs, edit PR body or title, close PRs, mutate Issues, publish M71, publish or split
+    shared M101-derived branches, force-push, delete remote branches, rebase, reset, or change
+    product source in this queue.
+  deferred_features:
+    - title: M71 historical stack publication
+      reason: >
+        M71 has separate branch publication risk and should remain in M122.
+      suggested_plan_id: M122-m71-historical-stack-publication
+    - title: Shared M101-derived branch publication strategy
+      reason: >
+        M105, M106, and M115 need a separate shared-stack or split decision before any publication.
+      suggested_plan_id: M124-shared-branch-publication-strategy
+observed_state:
+  captured_at: 2026-05-23T20:32:17+08:00
+  current_branch: codex/m121-m117-remote-publication
+  working_tree_clean_before_queue_creation: true
+  m121_status: done
+  m121_publication_audit: changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
+  open_draft_prs:
+    - number: 5
+      url: https://github.com/tiic-tech/openworkflow/pull/5
+      title: "M117: Git automation remote readiness governance"
+      state: OPEN
+      is_draft: true
+      head_ref: codex/m117-git-automation-remote-readiness
+      head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeability_signal: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+    - number: 4
+      url: https://github.com/tiic-tech/openworkflow/pull/4
+      title: OpenWorkflow M102-selected-change-commit-gate
+      state: OPEN
+      is_draft: true
+      head_ref: codex/m102-selected-change-commit-gate
+      head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeability_signal: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+  exact_ready_commands_unapproved:
+    - gh pr ready 5 --repo tiic-tech/openworkflow
+    - gh pr ready 4 --repo tiic-tech/openworkflow
+high_risk_report:
+  path: changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  status: present
+  decision_boundary: draft PR ready-for-review transition
+  recommended_first_target: PR #5
+  report_is_approval: false
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Refresh draft PR readiness preflight
+    purpose: >
+      Produce a current read-only preflight packet for PR #5 and PR #4, including draft state,
+      head/base refs, mergeability, status checks, branch heads, and recommended ready-review order.
+    scope:
+      includes:
+        - verify PR #5 and PR #4 are still open draft PRs
+        - verify head/base refs and head OIDs
+        - inspect mergeability, review decision, and status check rollup
+        - verify corresponding remote branch heads
+        - recommend whether PR #5 or PR #4 should be considered first
+      excludes:
+        - ready-for-review transition
+        - PR edit, close, merge, or Issue mutation
+        - push, force-push, branch deletion, rebase, reset, or source edits
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate
+      - git diff --check
+    acceptance:
+      - A durable preflight packet names current PR state and readiness facts for PR #5 and PR #4.
+      - The packet recommends the first ready-for-review target or explains why neither is ready.
+      - No remote or destructive git mutation occurs.
+  - id: C002
+    status: candidate
+    title: Prepare exact PR #5 ready-for-review decision
+    purpose: >
+      Convert C001 facts into an exact high-risk approval packet for marking PR #5 ready for review.
+    scope:
+      includes:
+        - state exact ready command for PR #5
+        - record current draft state, head/base refs, mergeability, status checks, and rollback guidance
+        - require exact user approval before any PR mutation
+      excludes:
+        - executing ready-for-review
+        - changing PR #4
+        - merge, PR edit, PR close, or Issue mutation
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+      - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C005
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The decision packet names exactly one PR #5 ready-for-review command.
+      - The packet states that it is evidence, not approval.
+      - The packet blocks execution until exact user approval is received.
+  - id: C003
+    status: candidate
+    title: Execute approved PR #5 ready-for-review transition
+    purpose: >
+      After C002 exists and the user approves the exact command, mark PR #5 ready for review and
+      record local audit evidence.
+    scope:
+      includes:
+        - verify exact approval text for PR #5
+        - verify PR #5 is still open and draft immediately before mutation
+        - execute one approved ready-for-review transition for PR #5
+        - record resulting PR state and rollback guidance
+      excludes:
+        - PR #4 transition
+        - merge, PR edit, PR close, or Issue mutation
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    dependencies:
+      - C002
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+      - git diff --check
+    acceptance:
+      - PR #5 is no longer draft and remains open.
+      - Local audit evidence records approval, command, result, and rollback guidance.
+      - No merge, PR edit, PR close, Issue mutation, or unrelated remote mutation occurs.
+  - id: C004
+    status: candidate
+    title: Prepare PR #4 ready-for-review decision
+    purpose: >
+      Decide whether PR #4 should be handled in this queue after PR #5, or deferred to a separate
+      M102-specific readiness queue.
+    scope:
+      includes:
+        - inspect current PR #4 state and readiness facts
+        - prepare or update a high-risk stop packet for PR #4 if it should proceed here
+        - record deferral if PR #4 needs separate governance
+      excludes:
+        - executing ready-for-review for PR #4 without exact approval
+        - merge, PR edit, PR close, or Issue mutation
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - PR #4 is either prepared for an exact approval gate or explicitly deferred.
+      - No PR #4 mutation occurs without separate exact approval.
+  - id: C005
+    status: candidate
+    title: Record PR readiness governance audit and handoff
+    purpose: >
+      Close M123 with local audit evidence naming which PRs were transitioned, which remained draft,
+      and which later queue owns remaining publication governance.
+    scope:
+      includes:
+        - summarize completed ready-for-review transitions or stop reasons
+        - update M123 summary and readable view
+        - record deferred next queues for M71 and shared M101-derived branches
+        - confirm no unauthorized PR, Issue, merge, or destructive git operations occurred
+      excludes:
+        - merge
+        - Issue mutation
+        - publishing M71 or shared M101-derived branches
+        - changing product source
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - M122-m71-historical-stack-publication
+      - M124-shared-branch-publication-strategy
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - A local audit names each authorized and unauthorized operation boundary.
+      - Remaining draft PRs and next governance queues are explicit.
+      - M123 can be handed off without raw session context.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: Create M123 candidate queue for draft PR ready-for-review governance after M121 audit.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+      - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
