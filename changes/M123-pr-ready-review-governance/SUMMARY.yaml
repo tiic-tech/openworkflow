@@ -27,9 +27,9 @@ branch_note: >
   Proposed while on codex/m121-m117-remote-publication. Branch creation was intentionally not
   performed during DTC queue creation.
 candidate_count: 5
-completed_candidate_id: C003
-completed_change_id: C003-pr5-ready-review-transition
-next_recommended_candidate_id: C004
+completed_candidate_id: C004
+completed_change_id: C004-pr4-readiness-deferral
+next_recommended_candidate_id: C005
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -43,6 +43,8 @@ outputs:
   c002_commit_evidence: changes/M123-pr-ready-review-governance/C002-pr5-ready-review-decision/LOCAL_COMMIT_EVIDENCE.yaml
   c003_pr5_audit: changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
   c003_commit_evidence: changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
+  c004_pr4_decision: changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md
+  c004_commit_evidence: changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml
 observed_state:
   captured_at: 2026-05-23T20:39:29+08:00
   current_branch: codex/m123-pr-ready-review-governance
@@ -97,7 +99,7 @@ risks:
     description: PR #4 belongs to an older M102 publication flow and may need separate review context.
     mitigation: C004 must decide whether PR #4 stays in M123 or is deferred.
 unresolved_questions:
-  - Should PR #4 remain deferred until PR #5 review is underway?
+  - Which later M102-specific readiness queue should own PR #4 ready-for-review if it proceeds?
 deferred_features:
   - M122-m71-historical-stack-publication
   - M124-shared-branch-publication-strategy
@@ -124,6 +126,8 @@ validation:
       C003 was blocked until the user approved: gh pr ready 5 --repo tiic-tech/openworkflow
     - C003 executed the exact approved command: gh pr ready 5 --repo tiic-tech/openworkflow.
       PR #5 is now open and no longer draft.
+    - C004 refreshed PR #4 facts and deferred PR #4 ready-for-review to separate M102-specific
+      readiness governance. PR #4 remains open and draft.
     - No PR #4 transition, PR edit, merge, Issue mutation, push, force-push, branch
       deletion, rebase, reset, or product source edit was performed.
     - The high-risk decision report is a stop packet and does not approve any PR mutation.

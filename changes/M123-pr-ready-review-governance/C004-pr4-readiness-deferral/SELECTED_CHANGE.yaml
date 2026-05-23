@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-pr4-readiness-deferral
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-pr4-readiness-deferral
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C004
+title: Prepare PR #4 ready-for-review decision
+status: done
+selection_reason: >
+  C004 follows the completed PR #5 transition and resolves the optional PR #4 path. Current
+  read-only facts show PR #4 is still open, draft, mergeable, and head-matched, but it belongs to
+  the older M102 flow and should be deferred to separate M102-specific readiness governance.
+scope:
+  includes:
+    - inspect current PR #4 state and readiness facts
+    - prepare or update a high-risk stop packet for PR #4 if it should proceed here
+    - record deferral if PR #4 needs separate governance
+  excludes:
+    - executing ready-for-review for PR #4 without exact approval
+    - merge, PR edit, PR close, or Issue mutation
+owned_paths:
+  - changes/M123-pr-ready-review-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - PR #4 is either prepared for an exact approval gate or explicitly deferred.
+  - No PR #4 mutation occurs without separate exact approval.
+validation:
+  - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md
+    - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+    - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate"
+    - "validation: git diff --check"

@@ -113,7 +113,7 @@ high_risk_report:
   decision_boundary: draft PR ready-for-review transition
   recommended_first_target: PR #5
   report_is_approval: false
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -270,7 +270,7 @@ changes:
         - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
         - "validation: git diff --check"
   - id: C004
-    status: ready
+    status: done
     title: Prepare PR #4 ready-for-review decision
     purpose: >
       Decide whether PR #4 should be handled in this queue after PR #5, or deferred to a separate
@@ -297,6 +297,27 @@ changes:
     acceptance:
       - PR #4 is either prepared for an exact approval gate or explicitly deferred.
       - No PR #4 mutation occurs without separate exact approval.
+    selection:
+      selected_change_id: C004-pr4-readiness-deferral
+      reason: >
+        C004 resolves the optional PR #4 path after PR #5 was marked ready. Current PR #4 facts are
+        healthy, but PR #4 belongs to the older M102 flow and should be deferred to separate
+        readiness governance.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/SELECTED_CHANGE.yaml
+        - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/ATOM_TASKS.yaml
+        - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_by_change_id: C004-pr4-readiness-deferral
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate"
+        - "validation: git diff --check"
   - id: C005
     status: ready
     title: Record PR readiness governance audit and handoff
@@ -451,3 +472,28 @@ operations:
       - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/LOCAL_COMMIT_EVIDENCE.yaml
       - changes/M123-pr-ready-review-governance/C003-pr5-ready-review-transition/PR5_READY_REVIEW_AUDIT.md
       - "remote: gh pr ready 5 --repo tiic-tech/openworkflow"
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: C004 is the next M123 candidate after PR #5 was marked ready.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/SELECTED_CHANGE.yaml
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/ATOM_TASKS.yaml
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: PR #4 was explicitly deferred to separate M102-specific readiness governance.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md

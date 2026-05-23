@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-pr4-readiness-deferral
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-pr4-readiness-deferral
+title: Atom tasks for PR #4 readiness decision
+status: done
+tasks:
+  - task_id: T001
+    title: Refresh PR #4 readiness facts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - PR #4 state, refs, mergeability, review decision, and status checks are refreshed.
+      - PR #4 remote branch head is compared with the PR head OID.
+  - task_id: T002
+    title: Decide PR #4 boundary
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/
+    done_when:
+      - PR #4 is either prepared for exact approval or deferred.
+      - The decision explains why no PR #4 mutation occurs in M123.
+  - task_id: T003
+    title: Update M123 queue
+    status: done
+    type: document
+    owned_paths:
+      - changes/M123-pr-ready-review-governance/
+    done_when:
+      - C004 completion evidence is recorded.
+      - C005 is the next recommended handoff candidate.

@@ -98,12 +98,22 @@ Result: PR #5 is open and no longer draft.
 
 ### C004 - Prepare PR #4 ready-for-review decision
 
-Status: ready
+Status: done
 
 Risk: high
 
 Outcome: decide whether PR #4 should be handled after PR #5 in this queue or
 deferred to M102-specific readiness governance.
+
+Selection: `C004-pr4-readiness-deferral`
+
+Completion evidence:
+
+- `changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/LOCAL_COMMIT_EVIDENCE.yaml`
+- `changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md`
+
+Result: PR #4 remains open and draft. Ready-for-review is deferred to separate
+M102-specific readiness governance.
 
 ### C005 - Record PR readiness governance audit and handoff
 

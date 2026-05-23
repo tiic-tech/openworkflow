@@ -148,6 +148,21 @@ Audit evidence:
 Result: PR #5 is open and no longer draft. This does not approve merge and does
 not authorize any PR #4 transition.
 
+## PR #4 Deferral
+
+C004 refreshed PR #4 readiness facts and deferred PR #4 ready-for-review to
+separate M102-specific readiness governance.
+
+Evidence:
+
+- `changes/M123-pr-ready-review-governance/C004-pr4-readiness-deferral/PR4_READINESS_DECISION.md`
+
+The following command remains unapproved and was not executed:
+
+```bash
+gh pr ready 4 --repo tiic-tech/openworkflow
+```
+
 ## Guardrails
 
 - Do not mark any PR ready for review without exact operation-level approval.
