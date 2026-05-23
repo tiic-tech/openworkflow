@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M114-engineering-quality-foundation:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M114-C002-shared-path-safety-local-reference-helpers
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C002
+title: Atom tasks for M114 C002 shared path-safety helper
+status: completed
+tasks:
+  - task_id: T001
+    title: Recover trust and map owned helper boundary
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/fs/
+      - packages/core/src/validators/
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      Repo-local resume, handoff, inspect --strict, and git status have been
+      run; the source truth, validator call site, forbidden paths, and
+      validation ladder are identified.
+  - task_id: T002
+    title: Add targeted RED path-safety evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/fs/
+    done_when: >
+      A targeted command fails because no shared helper currently exposes the
+      required root-contained local-reference API and prefix-collision cases.
+  - task_id: T003
+    title: Implement helper and narrow validator replacement
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/fs/
+      - packages/core/src/validators/
+    done_when: >
+      Root containment and local-reference resolution are centralized in the
+      fs helper, and one validator call site uses it with compatible error
+      messages.
+  - task_id: T004
+    title: Run GREEN and validation ladder
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/core/src/fs/
+      - packages/core/src/validators/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      The RED command is GREEN, build and OW validation/trust commands have
+      been run, and any broad validation failures are classified honestly.
+  - task_id: T005
+    title: Complete queue and bind commit evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      Queue, summary, atom tasks, and LOCAL_COMMIT_EVIDENCE.yaml record C002
+      completion, validation evidence, commit hashes, coder evidence, and next
+      M114 candidate guidance.
+verification_results:
+  red_evidence:
+    command: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+    result: >
+      Failed before production edits because dist/core/src/fs/index.js did not
+      provide the resolveLocalReference export.
+  green_evidence:
+    command: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+    result: passed after adding shared fs helper exports
+  validation_ladder:
+    - npm run build
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

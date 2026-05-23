@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: deferred behind `M115-internal-coder-quality-governance`
+Status: active; C002 completed after `M115-internal-coder-quality-governance`
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -55,11 +55,11 @@ visible until classified or fixed.
 
 Selected candidate: none.
 
-Next recommended candidate when this queue resumes: C002.
+Next recommended candidate: C003.
 
-M114 is paused because the user promoted internal coder quality governance
-above this queue. C001 has completed the domain taxonomy; C002 remains the next
-M114 candidate after M115 establishes the internal coder protocol boundary.
+M114 has resumed after M115 established the internal coder protocol boundary.
+C001 has completed the domain taxonomy; C002 has completed the shared
+path-safety helper slice.
 
 ## Candidates
 
@@ -99,13 +99,29 @@ Completion:
 
 ### C002 - Introduce Shared Path-Safety And Local-Reference Helpers
 
-Status: ready
+Status: done
 
 Risk: medium
 
 Purpose: centralize root containment and repo-local reference resolution.
 
 Depends on: C001.
+
+Selection artifacts:
+
+- `changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/SELECTED_CHANGE.yaml`
+- `changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/ATOM_TASKS.yaml`
+- `changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- Added shared fs helpers for root-contained paths and local references.
+- Added targeted RED/GREEN fixture coverage for relative escapes, prefix
+  collisions, absolute paths, external refs, missing files, and valid refs.
+- Replaced one repository-contract validator local-reference call site while
+  preserving behavior-compatible diagnostics.
+- Local commit evidence:
+  `changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/LOCAL_COMMIT_EVIDENCE.yaml`
 
 ### C003 - Split Repository Validation Into Explicit Domain Sections
 

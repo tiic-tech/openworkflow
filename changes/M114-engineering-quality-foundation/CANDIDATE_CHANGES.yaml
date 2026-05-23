@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M114-engineering-quality-foundation
 title: Candidate changes for OW engineering quality foundation
-status: deferred
+status: active
 source:
   kind: mixed
   refs:
@@ -46,10 +46,10 @@ queue_policy:
     - superseded
 selection_policy:
   next_selection_rule: >
-    M114 is deferred while M115 internal coder quality governance is selected
-    and established. When M114 resumes, select C002 because C001 has completed
-    the trust-domain taxonomy needed before changing validation behavior, path
-    safety helpers, verifier structure, or typed protocol ownership.
+    M114 has resumed after M115 internal coder quality governance completed.
+    Select and complete C002 because C001 has completed the trust-domain
+    taxonomy needed before changing validation behavior, path safety helpers,
+    verifier structure, or typed protocol ownership.
   high_risk_rule: >
     Candidates that change public CLI JSON semantics, generated adapter output,
     broad validation pass/fail behavior, or release gate policy become high
@@ -85,7 +85,7 @@ scope_control:
         C004 should extract one high-churn validation domain first; splitting
         all large files is too broad for a single queue.
       suggested_plan_id: M116-validator-and-verifier-decomposition
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 quality_baseline:
   trust_commands:
     - command: node dist/cli/src/index.js handoff --root . --json
@@ -195,7 +195,7 @@ changes:
         - "npm run validate (expected fail: baseline repository quality debt only; no M114 errors)"
         - git diff --check
   - id: C002
-    status: ready
+    status: done
     title: Introduce shared path-safety and local-reference helpers
     purpose: >
       Centralize root containment and repo-local reference resolution so
@@ -230,6 +230,37 @@ changes:
       - A single helper owns root containment semantics for the touched path.
       - Targeted tests cover escape and prefix-collision cases.
       - Existing validation diagnostics remain behavior-compatible for the replaced call site.
+    selection:
+      selected_change_id: M114-C002-shared-path-safety-local-reference-helpers
+      selected_at: 2026-05-23
+      reason: >
+        Selected after M115 completed because C002 is the next recommended
+        dependency-ready candidate and establishes the shared path-safety
+        helper needed before broader validator decomposition.
+      artifacts:
+        selected_change: changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/ATOM_TASKS.yaml
+        implementation_brief: changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+        - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Introduced shared core fs helpers for root-contained path and
+        local-reference resolution, added targeted path-safety RED/GREEN
+        fixture coverage, and replaced the repository-contract validator
+        local-reference call site with compatible diagnostics.
+      validation:
+        - "RED: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs failed before helper exports existed"
+        - npm run build
+        - "GREEN: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs"
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
   - id: C003
     status: ready
     title: Split repository validation into explicit domain sections

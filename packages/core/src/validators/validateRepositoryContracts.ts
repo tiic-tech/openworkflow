@@ -4,7 +4,7 @@ import { basename, join, relative, resolve } from "node:path";
 import { getWorkflowCommands, type WorkflowCommand } from "../commands/registry.js";
 import { SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
-import { isNotFound } from "../fs/index.js";
+import { isExternalReference, isNotFound, resolveLocalReference } from "../fs/index.js";
 import type { ValidationResult } from "./validateOpenWorkflow.js";
 
 const REQUIRED_FILES = [
@@ -2744,21 +2744,24 @@ function validateEvidenceRefs(root: string, label: string, data: Record<string, 
 }
 
 function validateLocalRef(root: string, label: string, field: string, value: unknown, errors: string[]): void {
-  if (typeof value !== "string" || value.length === 0 || isExternalRef(value)) {
+  if (typeof value !== "string") {
     return;
   }
-  const resolved = resolve(root, value);
-  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+  const ref = resolveLocalReference(root, value, { exists: existsSyncSafe });
+  if (ref.kind === "empty" || ref.kind === "external") {
+    return;
+  }
+  if (ref.kind === "outside-root") {
     errors.push(`${label} ${field} references path outside root: ${value}`);
     return;
   }
-  if (!existsSyncSafe(resolved)) {
+  if (!ref.exists) {
     errors.push(`${label} ${field} references missing path ${value}`);
   }
 }
 
 function isExternalRef(value: string): boolean {
-  return /^[a-z][a-z0-9+.-]*:/i.test(value);
+  return isExternalReference(value);
 }
 
 function nonEmptyString(value: unknown): boolean {
