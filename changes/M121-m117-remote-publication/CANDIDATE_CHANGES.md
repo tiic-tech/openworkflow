@@ -21,7 +21,7 @@ Select C001 first. C002, C003, and C004 are high-risk remote publication
 boundaries. A high-risk report and exact operation-level user approval are
 required before any push or PR mutation.
 
-Next recommended candidate: C001
+Next recommended candidate: C002, gated by high-risk report and exact operation approval.
 
 ## Observed State
 
@@ -43,7 +43,7 @@ Next recommended candidate: C001
 
 ### C001 - Refresh M117 publication preflight and choose execution model
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -58,6 +58,15 @@ Owned paths:
 Depends on: none
 
 Unlocks: C002, C003, C004, C005
+
+Completion evidence:
+
+- `changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md`
+
+Result: M117 local branch head is `898f0152a4e3e026ee5dcc78d4ef585c722a37b7`,
+`origin/main` is `d0e13f4bba3a847b763d2db3f771659aac3a4fe5`, remote branch is
+absent, no PR exists, merge-tree is clean, and M117 is 263 commits ahead of
+`origin/main`. The selected future execution model is an isolated M117 worktree.
 
 ### C002 - Prepare exact high-risk push decision report
 

@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M121-C001-refresh-m117-publication-preflight
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M121-m117-remote-publication
+source_candidate_id: C001
+selected_change_id: M121-C001-refresh-m117-publication-preflight
+status: done
+tasks:
+  - task_id: T001
+    title: Inspect M121 and M117 publication context
+    status: done
+    type: read
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+      - changes/M117-git-automation-remote-readiness/
+    done_when: M121 queue, M117 PR-ready summary, git governance, and gh governance context are understood.
+  - task_id: T002
+    title: Run read-only publication checks
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+    done_when: Local branch, remote branch, PR state, merge readiness, remote-plan, and simulator evidence are recorded.
+  - task_id: T003
+    title: Choose cross-branch execution model
+    status: done
+    type: document
+    owned_paths:
+      - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md
+    done_when: The preflight names the chosen future execution model and stop gates.
+  - task_id: T004
+    title: Update M121 queue handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M121-m117-remote-publication/CANDIDATE_CHANGES.yaml
+      - changes/M121-m117-remote-publication/CANDIDATE_CHANGES.md
+      - changes/M121-m117-remote-publication/SUMMARY.yaml
+    done_when: C001 is completed with durable evidence and C002 is the next gated candidate.

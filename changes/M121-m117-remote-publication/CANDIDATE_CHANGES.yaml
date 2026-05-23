@@ -125,10 +125,29 @@ observed_state:
     merge_readiness: fast_forward_clean
     existing_pr: none
   exact_push_command_unapproved: git push origin codex/m117-git-automation-remote-readiness:codex/m117-git-automation-remote-readiness
-next_recommended_candidate_id: C001
+c001_preflight_result:
+  local_branch_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  merge_base: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 263
+  origin_main_is_ancestor: true
+  branch_local_pr_ready_summary_present: true
+  remote_branch_present: false
+  existing_prs: []
+  conflict_probe_clean: true
+  remote_plan_from_m121_ok: false
+  remote_plan_from_m121_blockers:
+    - current branch codex/m121-m117-remote-publication does not match branch boundary codex/m117-git-automation-remote-readiness
+    - simulator evidence is missing
+  simulator_from_m121_ok: false
+  simulator_from_m121_blockers:
+    - current branch codex/m121-m117-remote-publication does not match branch boundary codex/m117-git-automation-remote-readiness
+  chosen_execution_model: isolated_m117_worktree
+  recommended_next: C002
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Refresh M117 publication preflight and choose execution model
     purpose: >
       Produce a current, read-only preflight packet for publishing the existing M117 branch from the
@@ -170,6 +189,40 @@ changes:
       - The packet chooses an execution model for the later approved push.
       - Any current branch mismatch is classified instead of ignored.
       - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: M121-C001-refresh-m117-publication-preflight
+      selected_at: 2026-05-23
+      reason: >
+        Selected first because M121 needs current M117 remote publication facts and an execution
+        model before any high-risk push or draft PR candidate can be prepared.
+      artifacts:
+        selected_change: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/ATOM_TASKS.yaml
+        implementation_brief: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced local planning and preflight evidence only. It did not change product source,
+        generated surfaces, runtime behavior, branch pointers, remote refs, PR state, or Issues.
+      evidence:
+        - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md
+      recommendation: >
+        Use an isolated M117 worktree for any later approved M117 push. C002 should prepare the
+        exact high-risk push decision report and must not execute the push.
+      validation:
+        - git status --short --branch
+        - git rev-parse codex/m117-git-automation-remote-readiness
+        - git rev-parse origin/main
+        - git merge-base origin/main codex/m117-git-automation-remote-readiness
+        - git merge-base --is-ancestor origin/main codex/m117-git-automation-remote-readiness
+        - git cat-file -e codex/m117-git-automation-remote-readiness:changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+        - git ls-remote --heads origin main codex/m117-git-automation-remote-readiness
+        - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+        - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+        - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+        - git merge-tree --write-tree origin/main codex/m117-git-automation-remote-readiness
+        - git diff --check
   - id: C002
     status: candidate
     title: Prepare exact high-risk push decision report
@@ -322,3 +375,27 @@ operations:
     evidence:
       - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
       - changes/M120-historical-branch-repair/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Select the first required M117 publication preflight candidate.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/SELECTED_CHANGE.yaml
+      - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/ATOM_TASKS.yaml
+      - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Complete read-only M117 publication preflight and choose isolated worktree execution model.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md

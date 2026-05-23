@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: selected_change:M121-C001-refresh-m117-publication-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+source_plan_id: M121-m117-remote-publication
+source_candidate_id: C001
+selected_change_id: M121-C001-refresh-m117-publication-preflight
+title: Refresh M117 publication preflight and choose execution model
+selected_at: 2026-05-23
+selection_reason: >
+  C001 is the required first M121 step. It refreshes M117 publication facts from the M121
+  governance branch before any high-risk push or PR operation can be prepared.
+includes:
+  - verify local M117 branch head and repaired PR-ready summary
+  - verify origin/main and absence or presence of the M117 remote branch
+  - verify existing PR state for the M117 head branch
+  - rerun remote-plan and simulator checks and classify branch-context blockers
+  - choose the exact non-mutating preflight-to-push execution model
+excludes:
+  - git push
+  - PR creation or edit
+  - Issue mutation
+  - merge, ready-for-review, rebase, reset, force-push, or branch deletion
+owned_paths:
+  - changes/M121-m117-remote-publication/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+acceptance:
+  - A durable preflight packet names the target branch, base branch, remote state, PR state, and blockers.
+  - The packet chooses an execution model for the later approved push.
+  - Any current branch mismatch is classified instead of ignored.
+  - No remote or destructive git mutation occurs.
+validation:
+  - git status --short --branch
+  - git rev-parse codex/m117-git-automation-remote-readiness
+  - git cat-file -e codex/m117-git-automation-remote-readiness:changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+  - git ls-remote --heads origin main codex/m117-git-automation-remote-readiness
+  - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+  - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+  - git diff --check
