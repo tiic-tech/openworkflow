@@ -9,24 +9,25 @@ title: Normalize git-automation local evidence readers
 status: completed
 selected_at: 2026-05-23
 selection_reason: >
-  Select C001 first because every later remote-readiness gate depends on the
-  same local source of truth: selected-change LOCAL_COMMIT_EVIDENCE.yaml
-  records. PR-ready summary, remote-plan, and simulator must stop relying only
-  on legacy completion strings before branch publication, draft PR planning, or
-  merge-conflict readiness can be trusted.
+  Select C001 first because every later remote-readiness gate depends on the same local source of
+  truth: selected-change LOCAL_COMMIT_EVIDENCE.yaml records. PR-ready summary, remote-plan, and
+  simulator must stop relying only on legacy completion strings before branch publication, draft PR
+  planning, or merge-conflict readiness can be trusted.
 risk_decision:
   risk: medium
   selected_option: >
-    Add a focused shared evidence reader and wire it into non-mutating
-    git-automation reporting paths. Preserve legacy `commit:` evidence
-    compatibility and do not enable push, PR mutation, merge, rebase, reset, or
-    force-push.
+    Add a focused shared evidence reader and wire it into non-mutating git-automation reporting
+    paths. Preserve legacy `commit:` evidence compatibility and do not enable push, PR mutation,
+    merge, rebase, reset, or force-push.
 scope:
   includes:
-    - add a shared git automation evidence reader for queue completion evidence and LOCAL_COMMIT_EVIDENCE.yaml
-    - return primary implementation commit, evidence commit, head commit, validation evidence, selected-change id, and evidence path
+    - add a shared git automation evidence reader for queue completion evidence and
+      LOCAL_COMMIT_EVIDENCE.yaml
+    - return primary implementation commit, evidence commit, head commit, validation evidence,
+      selected-change id, and evidence path
     - update PR-ready summary, remote-plan, and simulator to use the shared reader
-    - add fixture coverage showing M114-style LOCAL_COMMIT_EVIDENCE.yaml is reported as commit and validation evidence
+    - add fixture coverage showing M114-style LOCAL_COMMIT_EVIDENCE.yaml is reported as commit and
+      validation evidence
   excludes:
     - remote mutation
     - branch identity policy changes beyond using existing evidence paths
@@ -42,14 +43,16 @@ forbidden_paths:
   - packages/adapters/**
 acceptance:
   - PR-ready summary reports commits and validation evidence from LOCAL_COMMIT_EVIDENCE.yaml.
-  - Remote-plan and simulator expose ordered local commit evidence from modern selected-change evidence records.
+  - Remote-plan and simulator expose ordered local commit evidence from modern selected-change
+    evidence records.
   - Legacy `commit:` evidence remains supported as migration compatibility.
   - No remote git or GitHub mutation is enabled.
 validation:
   - npm run build
   - targeted LOCAL_COMMIT_EVIDENCE.yaml evidence-reader fixture
   - npm run verify:runtime-surface
-  - node dist/cli/src/index.js git-automation summary --root . --queue changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
+  - node dist/cli/src/index.js git-automation summary --root . --queue
+    changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
   - node dist/cli/src/index.js validate --root . --json
   - git diff --check
 coder_governance:
@@ -65,26 +68,32 @@ coder_governance:
     - validation ladder
     - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
 expected_commit_boundary: >
-  C001 should complete as one local implementation commit plus local commit
-  evidence, containing the shared evidence reader, targeted fixture coverage,
-  minimum report wiring for summary/remote-plan/simulate, queue completion
-  updates, and coder evidence.
+  C001 should complete as one local implementation commit plus local commit evidence, containing the
+  shared evidence reader, targeted fixture coverage, minimum report wiring for
+  summary/remote-plan/simulate, queue completion updates, and coder evidence.
 completion:
   completed_at: 2026-05-23
   implementation_changed_files: true
   evidence:
     - packages/core/src/git/localEvidenceReader.ts
     - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs
+    - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/LOCAL_COMMIT_EVIDENCE.yaml
   summary: >
-    Added a shared local git evidence reader that resolves legacy completion
-    evidence and selected-change LOCAL_COMMIT_EVIDENCE.yaml records, then wired
-    PR-ready summary, remote-plan, and simulator to report modern local commit
-    and validation evidence without enabling remote mutation.
+    Added a shared local git evidence reader that resolves legacy completion evidence and
+    selected-change LOCAL_COMMIT_EVIDENCE.yaml records, then wired PR-ready summary, remote-plan,
+    and simulator to report modern local commit and validation evidence without enabling remote
+    mutation.
   validation:
-    - "RED: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs failed because summary did not render primary_commit from LOCAL_COMMIT_EVIDENCE.yaml"
+    - "RED: node
+      changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-rea\
+      ders/local_evidence_reader_fixture.mjs failed because summary did not render primary_commit
+      from LOCAL_COMMIT_EVIDENCE.yaml"
     - npm run build
-    - "GREEN: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs"
-    - node dist/cli/src/index.js git-automation summary --root . --queue changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
+    - "GREEN: node
+      changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-rea\
+      ders/local_evidence_reader_fixture.mjs"
+    - node dist/cli/src/index.js git-automation summary --root . --queue
+      changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
     - npm run verify:runtime-surface
     - node dist/cli/src/index.js validate --root . --json
     - git diff --check
@@ -92,11 +101,14 @@ completion:
     status: recorded
     enforcement: guidance_only
     preflight:
-      - Recovered trust with resume, strict summaries, validation, and git status before source edits.
+      - Recovered trust with resume, strict summaries, validation, and git status before source
+        edits.
       - Confirmed dirty paths were the M117 selection artifacts created in this turn.
-      - Kept source truth in packages/core/src/git and runtime verifier coverage; generated .agents and .openworkflow surfaces were not hand-edited.
+      - Kept source truth in packages/core/src/git and runtime verifier coverage; generated .agents
+        and .openworkflow surfaces were not hand-edited.
     red_green:
-      - RED fixture failed because current git-automation reports ignored LOCAL_COMMIT_EVIDENCE.yaml primary_commit records.
+      - RED fixture failed because current git-automation reports ignored LOCAL_COMMIT_EVIDENCE.yaml
+        primary_commit records.
       - GREEN fixture passed after summary, remote-plan, and simulator consumed the shared reader.
     self_check:
       - No remote push, PR mutation, Issue mutation, merge, rebase, reset, or force-push was enabled.
