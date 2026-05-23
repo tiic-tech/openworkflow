@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M114-engineering-quality-foundation
 title: Summary for OW engineering quality foundation
-status: active
+status: deferred
 source:
   kind: mixed
   summary: >
@@ -13,6 +13,8 @@ source:
     engineering-quality governance: trust-signal coherence, validation domain
     taxonomy, single-source contract ownership, path safety, validator/verifier
     decomposition, structural verification, and entry-command scan visibility.
+    This queue is now deferred behind M115 internal coder quality governance,
+    because coder governance should constrain future source-editing work.
   refs:
     - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
     - /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
@@ -30,6 +32,11 @@ completed_change_id: M114-C001-define-validation-trust-domains-and-report-taxono
 selected_candidate_id: null
 selected_change_id: null
 next_recommended_candidate_id: C002
+deferred_by:
+  plan_id: M115-internal-coder-quality-governance
+  reason: >
+    Internal coder quality governance has been promoted above M114. Resume
+    should select M115 C001 before returning to M114 C002.
 outputs:
   candidate_changes_yaml: changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.md
@@ -71,4 +78,4 @@ validation:
     - "'npm run validate' failed with known baseline quality debt."
     - Quality snapshot reported giant source files and risk patterns for type escapes, sync filesystem checks in validators, raw prefix path checks, and substring-heavy assertions.
     - C001 completed the validation trust-domain taxonomy and baseline red-domain classification.
-    - C002, C003, and C005 are now dependency-ready; C002 is the next recommended candidate.
+    - C002, C003, and C005 are dependency-ready, but M114 is deferred until M115 establishes the internal coder protocol boundary.

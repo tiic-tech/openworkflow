@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M114-engineering-quality-foundation
 title: Candidate changes for OW engineering quality foundation
-status: active
+status: deferred
 source:
   kind: mixed
   refs:
@@ -46,10 +46,10 @@ queue_policy:
     - superseded
 selection_policy:
   next_selection_rule: >
-    Select C001 first because trust-domain taxonomy must exist before changing
-    validation behavior, path safety helpers, verifier structure, or typed
-    protocol ownership. Do not continue M70 or M107-M111 until this foundation
-    queue has at least established the trust-domain model.
+    M114 is deferred while M115 internal coder quality governance is selected
+    and established. When M114 resumes, select C002 because C001 has completed
+    the trust-domain taxonomy needed before changing validation behavior, path
+    safety helpers, verifier structure, or typed protocol ownership.
   high_risk_rule: >
     Candidates that change public CLI JSON semantics, generated adapter output,
     broad validation pass/fail behavior, or release gate policy become high
@@ -472,3 +472,18 @@ operations:
     after_status: ready
     evidence:
       - references/validation-trust-domains.md
+  - operation_id: OP005
+    operation_type: priority_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Deferred M114 behind M115 after the user promoted internal coder quality
+      governance above the engineering-quality foundation queue. M114 C002
+      remains the next candidate when this queue resumes.
+    changed_at: 2026-05-23
+    before_status: active
+    after_status: deferred
+    evidence:
+      - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+      - changes/M115-internal-coder-quality-governance/SUMMARY.yaml

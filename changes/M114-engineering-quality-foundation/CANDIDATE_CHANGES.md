@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: deferred behind `M115-internal-coder-quality-governance`
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -55,11 +55,11 @@ visible until classified or fixed.
 
 Selected candidate: none.
 
-Next recommended candidate: C002.
+Next recommended candidate when this queue resumes: C002.
 
-C001 comes first because domain taxonomy must exist before changing validator
-behavior, path safety, runtime verifier structure, typed protocol ownership, or
-scan-budget reports.
+M114 is paused because the user promoted internal coder quality governance
+above this queue. C001 has completed the domain taxonomy; C002 remains the next
+M114 candidate after M115 establishes the internal coder protocol boundary.
 
 ## Candidates
 

@@ -1,0 +1,398 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M115-internal-coder-quality-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M115-internal-coder-quality-governance
+title: Candidate changes for internal coder quality governance
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - user_input:2026-05-23-internal-coder-quality-governance
+    - /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
+    - changes/M114-engineering-quality-foundation/SUMMARY.yaml
+    - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
+  summary: >
+    The user wants OW to absorb the current code-quality governor as an
+    internal, Agent-only coder governance protocol rather than a normal
+    user-facing command. The intended `/ow:coder` role is not "write code"; it
+    is a cross-cutting engineering immune system that constrains all source
+    edits with trust recovery, owner/file/dependency maps, RED evidence before
+    production changes, GREEN evidence after fixes, self-checks, validation
+    ladder selection, evidence binding, and long-term promotion of repeated
+    quality lessons back into OW source skills and policy.
+priority:
+  priority_rank: above_M114
+  preempts:
+    - M114-engineering-quality-foundation
+  reason: >
+    M114 started broad repository-quality foundation work, but coder governance
+    is the missing execution protocol that should constrain M114 and future
+    implementation queues before they continue. This queue should be selected
+    before returning to M114 C002.
+queue_policy:
+  branch_boundary: codex/m101-build-proto-prompt-command-split
+  branch_note: >
+    Created on the current continuation branch because the user explicitly
+    promoted internal coder governance above M114. A later git-automation
+    branch action may move this queue if branch governance requires it.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. The internal coder protocol contract must define
+    command visibility, source skill ownership, non-user-facing boundaries,
+    required gates, and non-goals before any registry, generated surface,
+    change/team/git integration, or evidence artifact is implemented.
+  high_risk_rule: >
+    Any candidate that changes public CLI JSON semantics, user-facing command
+    listings, generated adapter delivery, enforced commit gates, or persistent
+    evidence schemas is high risk unless it is explicitly scoped as
+    internal-only and behavior-compatible.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Internal, Agent-only coder quality governance protocol for code execution
+    preflight, RED/GREEN evidence, self-check, validation selection, and
+    evidence binding.
+  boundary_type: internal_command_and_cross_cutting_quality_protocol
+  in_scope_rule: >
+    Include only the source skill, internal command registry contract, protocol
+    references, read-model exposure, and evidence hooks needed to make code
+    execution quality governance native to OW.
+  out_of_scope_rule: >
+    Do not expose `/ow:coder` as a normal user workflow entry, do not replace
+    `/ow:change` or `/ow:team`, do not implement a broad auto-coding agent, do
+    not force new evidence schemas before the protocol proves useful, and do
+    not continue unrelated M114 refactors inside this queue.
+  deferred_features:
+    - title: User-facing code review or quality command
+      reason: >
+        The desired primitive is internal and Agent-only. A user-facing
+        `/ow:coder-review` or `/ow:quality` should be considered only after
+        internal adoption proves a stable need.
+      suggested_plan_id: M116-user-facing-quality-review
+    - title: Project SOUL and MEMORY promotion from coder lessons
+      reason: >
+        Coder governance can produce high-value lessons, but durable
+        project-local SOUL/MEMORY requires its own persistence, privacy,
+        pruning, and promotion rules.
+      suggested_plan_id: M112-project-soul-memory
+    - title: Full enforcement of mandatory coder evidence
+      reason: >
+        Initial integration should report and guide missing gates. Hard failure
+        policies should wait until CODER_EVIDENCE or commit evidence binding is
+        proven on real queues.
+      suggested_plan_id: M117-coder-evidence-enforcement
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define internal coder protocol contract and command boundary
+    purpose: >
+      Establish `/ow:coder` as an internal, Agent-only code execution
+      governance protocol and define its source skill boundary, required gates,
+      non-goals, and integration points without changing runtime behavior.
+    scope:
+      includes:
+        - define the semantic contract for `/ow:coder`
+        - specify `visibility: internal` and Agent-only consumption
+        - define preflight owner/file/dependency map expectations
+        - define RED evidence, GREEN evidence, post-write self-check, validation ladder, and evidence binding rules
+        - define why `/ow:coder` must not replace `/ow:change` or `/ow:team`
+        - identify future integration points for change, team, git-automation, resume, context, handoff, summaries, and inspect
+      excludes:
+        - modifying command registry
+        - creating generated `.agents/**` or `.openworkflow/**` surfaces
+        - migrating the system skill into repo source
+        - creating CODER_EVIDENCE.yaml
+        - changing CLI JSON output
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+      - references/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js handoff --root . --json
+      - node dist/cli/src/index.js inspect --root . --strict --json
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - The contract states that `/ow:coder` is internal, Agent-only, and not a user-facing coding entrypoint.
+      - The contract defines preflight, RED/GREEN, self-check, validation ladder, and evidence binding responsibilities.
+      - The contract names integration points without implementing them.
+      - No runtime behavior, generated surfaces, or public JSON shape changes.
+  - id: C002
+    status: candidate
+    title: Migrate code-quality governor into OW source coder skill
+    purpose: >
+      Move the current system-level `ow-code-quality-governor` guidance into a
+      repo-owned source skill so OW can generate, version, and evolve the coder
+      governance protocol from its own source truth.
+    scope:
+      includes:
+        - add a repo source skill such as `skills/coder/SKILL.md` or `skills/code-quality-governor/SKILL.md`
+        - migrate only the durable OW-specific quality rules from the system skill
+        - keep generated `.agents/**` updates source-driven through sync
+        - preserve references for quality model, refactor protocol, validation ladder, and continuous growth loop
+      excludes:
+        - hand-editing `.agents/skills/**`
+        - registering `/ow:coder` in the command registry
+        - changing change/team/git behavior
+    owned_paths:
+      - skills/
+      - references/
+      - packages/core/src/onboarding/
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+      - C007
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --tools codex --json
+      - node dist/cli/src/index.js inspect --root . --strict --json
+      - git diff --check
+    acceptance:
+      - OW owns the durable coder governance source skill.
+      - Generated surfaces are updated only through the repo-local sync path.
+      - The migrated guidance is narrower than the system skill and specific to OW source execution.
+  - id: C003
+    status: candidate
+    title: Register internal `/ow:coder` command protocol
+    purpose: >
+      Add `/ow:coder` to the command registry as an internal runtime-stage
+      protocol with no user-facing workflow entry and no required write
+      artifact in the first implementation.
+    scope:
+      includes:
+        - add an internal command registry entry for `coder`
+        - define aliases such as `code-quality-governor` and `engineering-quality`
+        - set `visibility: internal`
+        - define shallow/deep protocol sections for code-change preflight, RED/GREEN evidence, self-check, validation ladder, and evidence binding
+        - keep target artifacts empty or future-facing
+      excludes:
+        - exposing `/ow:coder` as a user command
+        - forcing CODER_EVIDENCE.yaml
+        - replacing `/ow:change` or `/ow:team`
+        - changing CLI command execution semantics
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/adapters/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - skills/
+      - .agents/skills/
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --tools codex --json
+      - node dist/cli/src/index.js inspect --root . --strict --json
+      - git diff --check
+    acceptance:
+      - "`/ow:coder` exists in the registry with `visibility: internal`."
+      - User-facing guidance does not present `/ow:coder` as a normal start command.
+      - Generated Agent skill output is source-driven and marks the protocol internal.
+  - id: C004
+    status: candidate
+    title: Wire coder governance into change and team protocols
+    purpose: >
+      Make `/ow:change` and `/ow:team` reference coder governance at planning
+      and execution time so implementation Agents inherit owner/file/dependency
+      mapping and RED/GREEN/self-check expectations.
+    scope:
+      includes:
+        - update `/ow:change` protocol to require coder preflight thinking before selected implementation boundaries
+        - update `/ow:team` protocol to require RED/GREEN evidence and post-write self-check before completion
+        - keep `/ow:change` responsible for planning and `/ow:team` responsible for execution
+        - add runtime-surface checks for the references
+      excludes:
+        - changing command identities
+        - adding hard blocking evidence enforcement
+        - changing public JSON output
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/select-change/
+      - skills/run-team/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --tools codex --json
+      - git diff --check
+    acceptance:
+      - Change planning references coder preflight without becoming execution.
+      - Team execution references RED/GREEN/self-check without replacing team runtime.
+      - Generated skills remain source-driven and aligned with registry protocol.
+  - id: C005
+    status: candidate
+    title: Surface coder gate state in recovery and git governance
+    purpose: >
+      Let Agents see whether coder governance was required, completed,
+      skipped, or missing during recovery, context, handoff, inspect, summaries,
+      and local commit evidence flows.
+    scope:
+      includes:
+        - define optional coder gate status in resume/context/handoff read models
+        - define how git-automation commit evidence can reference coder validation evidence
+        - report missing coder gates as guidance before hard enforcement
+        - preserve read-only semantics for resume
+      excludes:
+        - mandatory CODER_EVIDENCE.yaml enforcement
+        - remote git or PR behavior
+        - broad public JSON breaking changes
+    owned_paths:
+      - packages/cli/src/commands/resume.ts
+      - packages/core/src/workflow/
+      - packages/core/src/git/
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C003
+      - C004
+    unlocks:
+      - C006
+      - C007
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+    acceptance:
+      - Recovery surfaces can report coder gate state without mutating artifacts.
+      - Git commit evidence has a clear optional binding point for coder validation.
+      - Missing coder gates are visible guidance, not a sudden hard failure.
+  - id: C006
+    status: candidate
+    title: Introduce optional coder evidence artifact contract
+    purpose: >
+      Add a future-proof `CODER_EVIDENCE.yaml` or equivalent evidence binding
+      contract only after protocol and read-model integration prove the stable
+      fields that Agents actually need.
+    scope:
+      includes:
+        - define evidence fields for preflight, RED/GREEN, self-check, validation ladder, and learned quality lessons
+        - decide whether the evidence is standalone or embedded into LOCAL_COMMIT_EVIDENCE.yaml
+        - add validators and fixtures only for the selected evidence shape
+      excludes:
+        - mandatory enforcement across all queues
+        - historical artifact migration
+        - user-facing command exposure
+    owned_paths:
+      - references/
+      - packages/core/src/artifacts/
+      - packages/core/src/validators/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C005
+    unlocks: []
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The evidence contract is optional and narrowly scoped.
+      - Validators distinguish missing optional evidence from malformed present evidence.
+      - The contract does not require migrating historical queues.
+  - id: C007
+    status: candidate
+    title: Add coder continuous growth loop for reusable lessons
+    purpose: >
+      Define how repeated implementation patterns, major mistakes, and
+      high-value quality insights discovered during code execution can be
+      promoted back into OW source policy without turning transient session
+      notes into ungoverned memory.
+    scope:
+      includes:
+        - define promotion criteria for recurring quality lessons
+        - define what belongs in coder policy versus future project SOUL/MEMORY
+        - require source-reviewed updates rather than free-form generated memory
+        - tie lessons to auditable commit or validation evidence
+      excludes:
+        - implementing project-local SOUL.md or MEMORY.md
+        - autonomous memory writes
+        - broad product intelligence scoring
+    owned_paths:
+      - skills/
+      - references/
+      - changes/M115-internal-coder-quality-governance/
+    dependencies:
+      - C002
+    unlocks: []
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js inspect --root . --strict --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The growth loop explains how coder lessons become durable source policy.
+      - It separates OW coder policy from future project-local SOUL/MEMORY.
+      - It requires auditable evidence before promotion.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+    actor: agent
+    reason: >
+      Created a higher-priority queue for internal, Agent-only coder governance
+      after the user promoted it above M114 engineering-quality foundation.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+      - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.md
+      - changes/M115-internal-coder-quality-governance/SUMMARY.yaml
