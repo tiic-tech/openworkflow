@@ -1,0 +1,234 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M126-m71-ready-review-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M126-m71-ready-review-governance
+title: Candidate changes for M71 PR #6 ready-for-review governance
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-24-create-m126-cc
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+  summary: >
+    M122 published the M71 historical stack as draft PR #6 and deferred its
+    ready-for-review transition. M125 completed PR #4 readiness governance and
+    recommended M126 next. M126 owns PR #6 read-only readiness refresh, exact
+    ready-for-review approval gating, the approved transition if granted, and
+    local audit handoff.
+queue_policy:
+  branch_boundary: codex/m126-m71-ready-review-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    current_branch: codex/m122-m71-historical-stack-publication
+    reason: >
+      M126 is being created as local governance planning after M125 on the
+      existing aggregate governance branch. No branch creation, checkout, push,
+      or branch surgery is part of this decompose-to-changes pass.
+  target_pr_number: 6
+  target_pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  target_branch: codex/m71-git-version-governance
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. PR #6 readiness must be refreshed before preparing an
+    exact ready-for-review decision packet.
+  high_risk_rule: >
+    C002 and C003 prepare or execute a GitHub PR ready-for-review mutation.
+    Exact approval is required before running gh pr ready.
+scope_control:
+  current_boundary: >
+    PR #6 M71 ready-for-review governance only.
+  boundary_type: pr_ready_review_governance_slice
+  in_scope_rule: >
+    Include read-only PR #6 readiness facts, a ready-for-review decision
+    packet, approved ready transition if granted, and local audit handoff.
+  out_of_scope_rule: >
+    Do not merge PR #6, edit/close/comment/retarget PR #6, mutate Issues,
+    push, force-push, rebase, reset, delete branches, publish unrelated
+    branches, or change product source.
+  deferred_features:
+    - title: PR #7 M101 shared-stack ready-for-review governance
+      suggested_plan_id: M127-m101-shared-stack-ready-review-governance
+      reason: Separate PR and branch; should follow PR #6 readiness governance.
+    - title: Merge governance
+      suggested_plan_id: future-merge-governance
+      reason: Merge should wait for ready-for-review, review/CI signals, and exact approval.
+observed_state:
+  captured_at: 2026-05-24T06:07:29+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: true
+  pr_number: 6
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+  pr_state: OPEN
+  pr_draft: true
+  pr_title: "M71: Git version control governance"
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  review_decision: ""
+  status_check_rollup: []
+  remote_branch_present: true
+  remote_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Refresh PR #6 readiness preflight
+    purpose: >
+      Produce current read-only readiness facts for PR #6 before any
+      ready-for-review decision is considered.
+    scope:
+      includes:
+        - inspect PR #6 state, draft flag, head/base refs, OIDs, mergeability, and status checks
+        - verify remote head branch exists at the PR head OID
+        - recommend whether C002 can prepare the ready-for-review decision packet
+      excludes:
+        - gh pr ready
+        - PR edit, close, merge, comment, retarget, or review request mutation
+        - push, force-push, branch deletion, rebase, reset, Issue mutation, or product source changes
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git ls-remote --heads origin codex/m71-git-version-governance
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - PR #6 readiness facts are recorded.
+      - The packet states whether C002 can proceed.
+      - No remote mutation occurs.
+  - id: C002
+    status: candidate
+    title: Prepare PR #6 ready-for-review decision packet
+    purpose: >
+      Convert C001 facts into a high-risk decision packet for marking PR #6
+      ready for review.
+    scope:
+      includes:
+        - exact approval text for gh pr ready 6
+        - current PR #6 facts and stop gates
+        - ready-for-review rationale and risks
+      excludes:
+        - executing gh pr ready
+        - merge
+        - PR edit, close, comment, retarget, or review request mutation
+        - Issue mutation, push, or branch surgery
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Decision packet states evidence, not approval.
+      - Exact approval text is recorded.
+      - Remote mutation remains blocked until exact approval.
+  - id: C003
+    status: candidate
+    title: Execute approved PR #6 ready-for-review transition
+    purpose: >
+      If C002 recommends readiness and the user approves the exact command,
+      run only the approved gh pr ready command for PR #6 and record evidence.
+    scope:
+      includes:
+        - verify exact approval text
+        - verify PR #6 still matches expected state
+        - run approved gh pr ready command
+        - record resulting PR metadata
+      excludes:
+        - merge
+        - PR edit after transition
+        - Issue mutation
+        - push, force-push, rebase, reset, branch deletion
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+    risk: high
+    size: small
+    validation:
+      - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - PR #6 is no longer draft.
+      - Local audit evidence records approval, command, and result.
+      - No merge, PR edit/close, Issue mutation, push, or branch surgery occurs.
+  - id: C004
+    status: candidate
+    title: Record PR #6 readiness governance audit and handoff
+    purpose: >
+      Close M126 with local audit evidence naming whether PR #6 was marked
+      ready or why it remains draft.
+    scope:
+      includes:
+        - summarize completed readiness transition or stop reasons
+        - record deferred M127 and merge governance queues
+        - confirm unauthorized operations did not occur
+      excludes:
+        - merge
+        - Issue mutation
+        - PR edit, close, comment, or retarget
+        - push or branch surgery
+        - product source changes
+    owned_paths:
+      - changes/M126-m71-ready-review-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - M127-m101-shared-stack-ready-review-governance
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Local audit names authorized and unauthorized operation boundaries.
+      - Remaining governance queues are explicit.
+      - M126 can be handed off without raw session context.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: Create M126 candidate queue for PR #6 M71 ready-for-review governance.
+    changed_at: 2026-05-24
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+      - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+      - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: git ls-remote --heads origin codex/m71-git-version-governance"

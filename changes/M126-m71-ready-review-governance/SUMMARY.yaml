@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: summary:M126-m71-ready-review-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M126-m71-ready-review-governance
+title: Summary for M71 PR #6 readiness governance
+status: active
+source:
+  kind: mixed
+  summary: >
+    M122 published the M71 historical stack as draft PR #6 and deferred its
+    ready-for-review transition. M125 completed PR #4 readiness governance and
+    recommended M126 next. M126 owns PR #6 read-only readiness refresh, exact
+    ready-for-review approval gating, approved transition if granted, and audit
+    handoff.
+  refs:
+    - user_input:2026-05-24-create-m126-cc
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+    - changes/M122-m71-historical-stack-publication/C005-publication-audit-handoff/M122_PUBLICATION_AUDIT.md
+scope_boundary: PR #6 M71 ready-for-review governance only.
+branch_boundary: codex/m126-m71-ready-review-governance
+branch_identity_exception:
+  mode: temporary_continuation_branch
+  current_branch: codex/m122-m71-historical-stack-publication
+  allowed_operations:
+    - local planning artifact creation
+    - local validation
+  reason: >
+    M126 was created as local governance planning on the existing aggregate
+    governance branch. No branch creation, checkout, push, or branch surgery
+    occurred.
+target_pr:
+  number: 6
+  url: https://github.com/tiic-tech/openworkflow/pull/6
+  title: "M71: Git version control governance"
+  state: OPEN
+  draft: true
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  status_check_rollup: []
+candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+next_recommended_candidate_id: C001
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M126-m71-ready-review-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M126-m71-ready-review-governance/CANDIDATE_CHANGES.md
+  summary: changes/M126-m71-ready-review-governance/SUMMARY.yaml
+key_dependencies:
+  - M122 published draft PR #6 and deferred ready-for-review governance.
+  - M125 completed PR #4 readiness governance and recommended M126 next.
+risks:
+  - id: R001
+    level: high
+    description: Marking PR #6 ready for review mutates GitHub collaboration state.
+    mitigation: Require exact approval before gh pr ready.
+  - id: R002
+    level: medium
+    description: PR #6 is an older historical branch and should not be merged from this queue.
+    mitigation: Keep merge governance separate.
+unresolved_questions: []
+deferred_features:
+  - M127-m101-shared-stack-ready-review-governance
+  - future-merge-governance
+validation:
+  commands_run:
+    - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote --heads origin codex/m71-git-version-governance
+  notes: |
+    - M126 queue creation performed no remote mutation.
+    - PR #6 remains draft until a later exact approval gate.
+    - C001 is the next recommended candidate.
