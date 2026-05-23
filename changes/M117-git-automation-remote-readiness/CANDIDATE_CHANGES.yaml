@@ -1,0 +1,350 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M117-git-automation-remote-readiness
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M117-git-automation-remote-readiness
+title: Candidate changes for git automation remote readiness governance
+status: active
+source:
+  kind: discussion_and_repo_audit
+  refs:
+    - user_input:2026-05-23-create-cc-for-git-automation-remote-readiness
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/core/src/git/remoteReadonlyPlanner.ts
+    - packages/core/src/git/autonomousSimulator.ts
+    - packages/core/src/git/draftPrPilot.ts
+    - packages/core/src/git/prReadySummary.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+  summary: >
+    The user confirmed the governing decision for git automation: complete
+    local automation first, do not silently push or merge, but preserve a clear
+    path for future fully managed git operation where an Agent can order local
+    commits, branch publication, PR creation or update, checks, conflict
+    handling, merge, and rollback evidence. A review found that local branch
+    and commit automation is mostly in place, while remote readiness still has
+    gaps: PR summary and remote plan do not consume LOCAL_COMMIT_EVIDENCE.yaml,
+    branch identity is not enforced across all git-automation modes, draft PR
+    mutation has weak approval and audit binding, and merge conflict handling is
+    only prose rather than a structured checkpoint.
+queue_policy:
+  branch_boundary: codex/m117-git-automation-remote-readiness
+  branch_note: >
+    Queue created while the repo is on codex/m101-build-proto-prompt-command-split.
+    Before selecting implementation candidates, use git-automation branch or an
+    explicit user-approved continuation exception so work does not continue on a
+    stale feat branch by accident.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. Remote readiness depends on one shared evidence reader
+    that can resolve LOCAL_COMMIT_EVIDENCE.yaml, primary implementation commits,
+    evidence commits, validation evidence, and selected-change provenance before
+    PR summaries, remote plans, simulators, or draft PR pilots can be trusted.
+  high_risk_rule: >
+    C003 and C004 are high-risk because they touch remote PR mutation approval
+    or future merge conflict policy. They require an explicit high-risk decision
+    report before selection. No candidate in this queue may push, merge, or
+    mutate Issues unless a later approved queue explicitly enables that mode.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Git-automation remote readiness: make local evidence, branch identity,
+    remote PR planning, draft PR gating, and merge-conflict checkpoints coherent
+    enough for future fully managed git operation without enabling push or merge
+    in this queue.
+  boundary_type: git_automation_command_surface
+  in_scope_rule: >
+    Include only changes that strengthen git-automation evidence consumption,
+    branch/remote target identity, explicit approval gates, read-only remote
+    planning, draft PR pilot auditability, and structured merge conflict
+    checkpoints.
+  out_of_scope_rule: >
+    Do not enable autonomous push, ready-for-review PR mutation, issue mutation,
+    gh pr merge, git merge, force-push, rebase, or broad GitHub integration.
+  deferred_features:
+    - title: Fully autonomous remote push and merge execution
+      reason: >
+        This queue prepares machine-readable prerequisites but does not approve
+        remote mutation or merge execution.
+      suggested_plan_id: M118-autonomous-git-remote-execution
+    - title: GitHub Issue source-of-truth mutation
+      reason: >
+        Issue mutation has separate governance and should not be bundled with
+        git branch, PR, and merge readiness.
+      suggested_plan_id: M119-gh-issue-source-of-truth-operations
+next_recommended_candidate_id: C001
+review_findings:
+  - id: F001
+    severity: P1
+    summary: Draft PR mutation can run with --write --allow-draft-pr but lacks a hard high-risk approval and durable local operation evidence.
+    refs:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - references/gh-operation-governance.md
+  - id: F002
+    severity: P1
+    summary: Merge conflict handling is prose-only; no structured conflict checkpoint, merge-base probe, conflict file list, validation ladder, or rollback evidence exists.
+    refs:
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+  - id: F003
+    severity: P2
+    summary: Branch identity enforcement added by M114 C008 is not yet applied to branch, remote-plan, simulate, or draft-pr modes.
+    refs:
+      - packages/core/src/git/branchIdentity.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+  - id: F004
+    severity: P2
+    summary: PR-ready summary, remote-plan, and simulate still read only commit-prefixed strings and miss LOCAL_COMMIT_EVIDENCE.yaml records.
+    refs:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+changes:
+  - id: C001
+    status: ready
+    title: Normalize git-automation local evidence readers
+    purpose: >
+      Make PR-ready summary, remote-plan, and simulator consume the same
+      selected-change LOCAL_COMMIT_EVIDENCE.yaml records that strict queues now
+      require, instead of relying only on legacy `commit:` strings in
+      completion evidence.
+    scope:
+      includes:
+        - add a shared git automation evidence reader for queue completion evidence and LOCAL_COMMIT_EVIDENCE.yaml
+        - return primary implementation commit, evidence commit, head commit, validation evidence, selected-change id, and evidence path
+        - update PR-ready summary, remote-plan, and simulator to use the shared reader
+        - add fixture coverage showing M114-style LOCAL_COMMIT_EVIDENCE.yaml is reported as commit and validation evidence
+      excludes:
+        - remote mutation
+        - branch identity policy changes beyond using existing evidence paths
+        - merge conflict planning
+        - changing selected-change commit gate semantics
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - targeted LOCAL_COMMIT_EVIDENCE.yaml evidence-reader fixture
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js git-automation summary --root . --queue changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - PR-ready summary reports commits and validation evidence from LOCAL_COMMIT_EVIDENCE.yaml.
+      - remote-plan and simulator expose ordered local commit evidence from modern selected-change evidence records.
+      - Legacy `commit:` evidence remains supported as migration compatibility.
+      - No remote git or GitHub mutation is enabled.
+  - id: C002
+    status: ready
+    title: Apply branch identity governance across git-automation modes
+    purpose: >
+      Extend M114 C008 branch identity protection beyond commit and resume so
+      branch, remote-plan, simulate, and draft-pr cannot treat a stale
+      continuation branch as the owning feat branch.
+    scope:
+      includes:
+        - apply assessBranchIdentity or an equivalent shared gate to branch, remote-plan, simulate, and draft-pr
+        - surface branch_matches_current separately from branch_owns_plan in remote readiness reports
+        - support explicit temporary continuation exceptions only for scoped operations
+        - add runtime verifier coverage for stale branch identity in remote planning modes
+      excludes:
+        - creating or switching branches automatically during decompose or select-change
+        - changing remote mutation permissions
+        - migrating historical queues
+    owned_paths:
+      - packages/core/src/git/branchIdentity.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - targeted branch-identity remote-plan fixture
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - Every git-automation mode that reads a queue branch boundary reports whether the boundary owns the plan.
+      - Stale branch identities fail closed unless a scoped explicit exception applies.
+      - Existing C008 commit behavior remains green.
+  - id: C003
+    status: candidate
+    title: Harden draft PR pilot approval and local audit evidence
+    purpose: >
+      Make the existing draft PR pilot match gh-operation governance before any
+      future remote PR automation relies on it.
+    scope:
+      includes:
+        - require explicit high-risk approval evidence for write-mode draft PR create or edit
+        - record operation kind, target PR URL or number, branch, base, body digest, approval source, timestamp, and rollback guidance locally
+        - keep preview mode non-mutating and useful without approval
+        - distinguish create, edit, and no-op outcomes in JSON
+      excludes:
+        - ready-for-review PR mutation
+        - PR merge
+        - issue mutation
+        - pushing branches
+    owned_paths:
+      - references/gh-operation-governance.md
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C005
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - targeted draft-pr approval/evidence fixture
+      - npm run verify:runtime-surface
+      - git diff --check
+    acceptance:
+      - "`--write --allow-draft-pr` is insufficient without explicit local approval evidence."
+      - Successful draft PR mutation writes local audit evidence.
+      - Missing approval fails closed with an actionable error.
+      - Preview mode remains read-only.
+  - id: C004
+    status: candidate
+    title: Define structured merge-conflict readiness checkpoint
+    purpose: >
+      Replace prose-only merge conflict guidance with a machine-readable
+      checkpoint that future autonomous git execution can use before any merge
+      operation is approved.
+    scope:
+      includes:
+        - define remote merge readiness fields for target base, branch head, merge base, fast-forward status, conflict probe, conflict files, required validations, and stop reasons
+        - add read-only conflict probe coverage using temporary repositories
+        - update remote-plan and simulator to expose conflict checkpoint fields
+        - document how conflict resolution must use isolated worktrees, explicit user approval, validation reruns, and local evidence before merge
+      excludes:
+        - running git merge against the user's working tree
+        - auto-resolving conflicts
+        - merging PRs
+        - force-push or rebase operations
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C005
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - targeted merge-conflict checkpoint fixture
+      - npm run verify:runtime-surface
+      - git diff --check
+    acceptance:
+      - Remote readiness reports include structured conflict checkpoint data.
+      - Conflict cases stop with conflict files and required next evidence.
+      - Clean cases distinguish fast-forward, non-fast-forward clean merge, and unknown states.
+      - No merge, rebase, reset, force-push, or PR merge is executed.
+  - id: C005
+    status: candidate
+    title: Add full remote-readiness story verifier
+    purpose: >
+      Prove the non-mutating remote readiness path end to end: modern local
+      evidence, branch identity, PR-ready summary, remote-plan, draft-pr
+      preview, conflict checkpoint, and refusal to merge without approval.
+    scope:
+      includes:
+        - add one integrated verifier fixture with a bare remote and local feat branch
+        - assert ordered commits, evidence records, branch identity, PR summary, remote refs, PR preview, conflict checkpoint, and refusal boundaries
+        - keep the fixture non-mutating except for temporary local repositories
+      excludes:
+        - real GitHub network mutation
+        - user repository remote mutation
+        - full autonomous execution
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    dependencies:
+      - C001
+      - C002
+      - C003
+      - C004
+    unlocks:
+      - M118-autonomous-git-remote-execution
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The verifier demonstrates the complete future handoff order without real remote mutation.
+      - The verifier fails if commit evidence, branch identity, draft PR approval, or conflict checkpoint fields disappear.
+      - The next autonomous queue has concrete evidence to consume instead of prose-only policy.
+operations:
+  - operation_id: OP001
+    operation_type: create
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Created a dedicated git-automation remote-readiness queue from the review
+      finding that local automation is mostly complete, but future fully managed
+      branch, PR, and merge operation still lacks shared evidence reading,
+      branch identity propagation, hard draft PR audit gates, and structured
+      merge conflict checkpoints.
+    changed_at: 2026-05-23
+    evidence:
+      - user_input:2026-05-23-create-cc-for-git-automation-remote-readiness
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/core/src/git/prReadySummary.ts
