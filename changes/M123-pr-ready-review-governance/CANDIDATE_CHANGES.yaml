@@ -113,10 +113,10 @@ high_risk_report:
   decision_boundary: draft PR ready-for-review transition
   recommended_first_target: PR #5
   report_is_approval: false
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Refresh draft PR readiness preflight
     purpose: >
       Produce a current read-only preflight packet for PR #5 and PR #4, including draft state,
@@ -151,8 +151,24 @@ changes:
       - A durable preflight packet names current PR state and readiness facts for PR #5 and PR #4.
       - The packet recommends the first ready-for-review target or explains why neither is ready.
       - No remote or destructive git mutation occurs.
+    selection:
+      selected_change_id: C001-draft-pr-readiness-preflight
+      reason: >
+        C001 is the required first M123 candidate. It refreshes current read-only PR readiness
+        facts before any high-risk ready-for-review approval packet is prepared.
+      selected_at: 2026-05-23
+    completion:
+      completed_by_change_id: C001-draft-pr-readiness-preflight
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
+        - "validation: git status --short --branch"
+        - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate"
   - id: C002
-    status: candidate
+    status: ready
     title: Prepare exact PR #5 ready-for-review decision
     purpose: >
       Convert C001 facts into an exact high-risk approval packet for marking PR #5 ready for review.
@@ -213,7 +229,7 @@ changes:
       - Local audit evidence records approval, command, result, and rollback guidance.
       - No merge, PR edit, PR close, Issue mutation, or unrelated remote mutation occurs.
   - id: C004
-    status: candidate
+    status: ready
     title: Prepare PR #4 ready-for-review decision
     purpose: >
       Decide whether PR #4 should be handled in this queue after PR #5, or deferred to a separate
@@ -241,7 +257,7 @@ changes:
       - PR #4 is either prepared for an exact approval gate or explicitly deferred.
       - No PR #4 mutation occurs without separate exact approval.
   - id: C005
-    status: candidate
+    status: ready
     title: Record PR readiness governance audit and handoff
     purpose: >
       Close M123 with local audit evidence naming which PRs were transitioned, which remained draft,
@@ -291,3 +307,43 @@ operations:
       - changes/M121-m117-remote-publication/C005-publication-audit-handoff/PUBLICATION_AUDIT.md
       - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
       - changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: C001 is the required first candidate before any ready-for-review approval packet.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/SELECTED_CHANGE.yaml
+      - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/ATOM_TASKS.yaml
+      - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Current read-only preflight facts for PR #5 and PR #4 are recorded.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
+      - "validation: gh pr view 5 --repo tiic-tech/openworkflow"
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow"
+      - "validation: git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate"
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+      - C004
+      - C005
+    actor: agent
+    reason: C001 completed the shared read-only preflight dependency.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md

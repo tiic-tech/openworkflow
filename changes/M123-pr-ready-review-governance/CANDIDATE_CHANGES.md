@@ -13,8 +13,7 @@ Out of scope: merge, PR body/title edit, PR close, Issue mutation, M71
 publication, shared M101-derived branch strategy, force-push, remote branch
 deletion, rebase, reset, or product source changes.
 
-Branch boundary proposed for this queue:
-`codex/m123-pr-ready-review-governance`. It has not been created yet.
+Branch boundary for this queue: `codex/m123-pr-ready-review-governance`.
 
 ## Current State
 
@@ -24,6 +23,7 @@ Branch boundary proposed for this queue:
 - PR #4 is open, draft, mergeable, and points from
   `codex/m102-selected-change-commit-gate` at
   `bd2780b1d5b117b2734e5b732164e5d299bd521a` into `main`.
+- Both remote branch heads match their PR head OIDs.
 - Both queried PRs have empty status check rollups.
 - Ready-for-review commands remain unapproved:
 
@@ -42,16 +42,25 @@ The report is evidence, not approval.
 
 ### C001 - Refresh draft PR readiness preflight
 
-Status: ready
+Status: done
 
 Risk: medium
 
 Outcome: produce current read-only readiness facts for PR #5 and PR #4 and
 recommend the first ready-for-review target.
 
+Selection: `C001-draft-pr-readiness-preflight`
+
+Completion evidence:
+
+- `changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md`
+- `gh pr view 5 --repo tiic-tech/openworkflow`
+- `gh pr view 4 --repo tiic-tech/openworkflow`
+- `git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate`
+
 ### C002 - Prepare exact PR #5 ready-for-review decision
 
-Status: candidate
+Status: ready
 
 Risk: high
 
@@ -69,7 +78,7 @@ audit evidence.
 
 ### C004 - Prepare PR #4 ready-for-review decision
 
-Status: candidate
+Status: ready
 
 Risk: high
 
@@ -78,7 +87,7 @@ deferred to M102-specific readiness governance.
 
 ### C005 - Record PR readiness governance audit and handoff
 
-Status: candidate
+Status: ready
 
 Risk: medium
 

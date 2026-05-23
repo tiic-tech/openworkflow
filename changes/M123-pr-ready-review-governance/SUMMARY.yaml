@@ -27,9 +27,9 @@ branch_note: >
   Proposed while on codex/m121-m117-remote-publication. Branch creation was intentionally not
   performed during DTC queue creation.
 candidate_count: 5
-completed_candidate_id: null
-completed_change_id: null
-next_recommended_candidate_id: C001
+completed_candidate_id: C001
+completed_change_id: C001-draft-pr-readiness-preflight
+next_recommended_candidate_id: C002
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -37,9 +37,10 @@ outputs:
   candidate_changes_md: changes/M123-pr-ready-review-governance/CANDIDATE_CHANGES.md
   summary: changes/M123-pr-ready-review-governance/SUMMARY.yaml
   high_risk_decision_report: changes/M123-pr-ready-review-governance/HIGH_RISK_DECISION_REPORT.md
+  c001_preflight: changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
 observed_state:
-  captured_at: 2026-05-23T20:32:17+08:00
-  current_branch: codex/m121-m117-remote-publication
+  captured_at: 2026-05-23T20:39:29+08:00
+  current_branch: codex/m123-pr-ready-review-governance
   working_tree_clean_before_queue_creation: true
   pr_5:
     number: 5
@@ -91,7 +92,7 @@ risks:
     description: PR #4 belongs to an older M102 publication flow and may need separate review context.
     mitigation: C004 must decide whether PR #4 stays in M123 or is deferred.
 unresolved_questions:
-  - Should PR #5 be marked ready first after C001 preflight?
+  - Should PR #5 be marked ready after C002 prepares the exact approval packet?
   - Should PR #4 remain deferred until PR #5 review is underway?
 deferred_features:
   - M122-m71-historical-stack-publication
@@ -108,9 +109,13 @@ validation:
       number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
     - gh pr view 4 --repo tiic-tech/openworkflow --json
       number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate
   notes: |
     - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
       the user explicitly approved creating this git governance CC.
+    - C001 refreshed current read-only PR readiness facts. PR #5 and PR #4 remain open draft PRs,
+      both are mergeable, both have empty status check rollups, and both remote branch heads match
+      their PR head OIDs.
     - No ready-for-review transition, PR edit, merge, Issue mutation, push, force-push, branch
       deletion, rebase, reset, or product source edit was performed.
     - The high-risk decision report is a stop packet and does not approve any PR mutation.

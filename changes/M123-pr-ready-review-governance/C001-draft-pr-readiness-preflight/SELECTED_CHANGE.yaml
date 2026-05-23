@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-draft-pr-readiness-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-draft-pr-readiness-preflight
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C001
+title: Refresh draft PR readiness preflight
+status: done
+selection_reason: >
+  C001 is the required first candidate for M123. It refreshes read-only PR readiness facts
+  before any high-risk ready-for-review approval packet or PR state mutation is considered.
+rejected_alternatives:
+  - candidate_ref: C002
+    reason: PR #5 ready-for-review approval must wait for current preflight facts.
+  - candidate_ref: C004
+    reason: PR #4 readiness decision must wait for the shared draft PR preflight.
+scope:
+  includes:
+    - verify PR #5 and PR #4 are still open draft PRs
+    - verify head/base refs and head OIDs
+    - inspect mergeability, review decision, and status check rollup
+    - verify corresponding remote branch heads
+    - recommend whether PR #5 or PR #4 should be considered first
+  excludes:
+    - ready-for-review transition
+    - PR edit, close, merge, or Issue mutation
+    - push, force-push, branch deletion, rebase, reset, or source edits
+owned_paths:
+  - changes/M123-pr-ready-review-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+acceptance:
+  - A durable preflight packet names current PR state and readiness facts for PR #5 and PR #4.
+  - The packet recommends the first ready-for-review target or explains why neither is ready.
+  - No remote or destructive git mutation occurs.
+validation:
+  - git status --short --branch
+  - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M123-pr-ready-review-governance/C001-draft-pr-readiness-preflight/READINESS_PREFLIGHT.md
+    - "validation: git status --short --branch"
+    - "validation: gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+    - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+    - "validation: git ls-remote --heads origin codex/m117-git-automation-remote-readiness codex/m102-selected-change-commit-gate"
