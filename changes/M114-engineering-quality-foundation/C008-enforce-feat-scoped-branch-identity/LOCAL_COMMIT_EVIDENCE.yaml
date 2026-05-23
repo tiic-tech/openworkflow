@@ -1,0 +1,25 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M114-C008-enforce-feat-scoped-branch-identity
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M114-C008-enforce-feat-scoped-branch-identity
+status: current
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C008
+selected_change_id: M114-C008-enforce-feat-scoped-branch-identity
+primary_commit: 6c7b5148269a54eabf881c6b3bf2b19b00c7b676
+validation_evidence:
+  - "RED: branch_identity_fixture failed before implementation; npm run build; GREEN:
+    branch_identity_fixture passed; npm run verify:runtime-surface; resume reported missing commit
+    evidence before git-automation commit; validate --json passed; git diff --check passed"
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

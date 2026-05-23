@@ -16,21 +16,18 @@ source:
     - /Users/archy/.codex/skills/ow-code-quality-governor/references/03_validation_ladder.md
     - user_input:2026-05-23-pause-planned-cc-for-repo-quality-governance
   summary: >
-    The user introduced the OW Code Quality Governor skill and a repository
-    quality report, then directed current planned CC work to pause in favor of
-    whole-repo engineering quality governance. The report finds that OW's
-    Agent-facing trust commands can be green while broad repository validation
-    is red, contract truth is duplicated across registries, schemas,
-    validators, generated surfaces, skills, docs, and fixtures, several source
-    files are too large to extend safely, protocols are string-heavy, validation
-    domains are mixed together, path safety is not centralized enough, and
-    runtime verifier assertions are too prose-substring dependent.
+    The user introduced the OW Code Quality Governor skill and a repository quality report, then
+    directed current planned CC work to pause in favor of whole-repo engineering quality governance.
+    The report finds that OW's Agent-facing trust commands can be green while broad repository
+    validation is red, contract truth is duplicated across registries, schemas, validators,
+    generated surfaces, skills, docs, and fixtures, several source files are too large to extend
+    safely, protocols are string-heavy, validation domains are mixed together, path safety is not
+    centralized enough, and runtime verifier assertions are too prose-substring dependent.
 queue_policy:
   branch_boundary: codex/m101-build-proto-prompt-command-split
   branch_note: >
-    Created on the current continuation branch because the user explicitly
-    paused planned CC work and made engineering quality governance the
-    immediate priority.
+    Created on the current continuation branch because the user explicitly paused planned CC work
+    and made engineering quality governance the immediate priority.
   branch_identity_exception:
     mode: temporary_continuation_branch
     approved: true
@@ -38,10 +35,10 @@ queue_policy:
       - resume
       - commit
     reason: >
-      M114 was intentionally created on the already-active M101 continuation
-      branch before feat-scoped branch identity was enforceable. This exception
-      permits the current governance repair to finish locally while making the
-      mismatch explicit in resume and git-automation output.
+      M114 was intentionally created on the already-active M101 continuation branch before
+      feat-scoped branch identity was enforceable. This exception permits the current governance
+      repair to finish locally while making the mismatch explicit in resume and git-automation
+      output.
   source_of_truth: CANDIDATE_CHANGES.yaml
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable ids are assigned once and referenced by select-change.
@@ -57,44 +54,40 @@ queue_policy:
     - superseded
 selection_policy:
   next_selection_rule: >
-    M114 has resumed after M115 internal coder quality governance completed.
-    Select and complete C002 because C001 has completed the trust-domain
-    taxonomy needed before changing validation behavior, path safety helpers,
-    verifier structure, or typed protocol ownership.
+    M114 has resumed after M115 internal coder quality governance completed. Select and complete
+    C002 because C001 has completed the trust-domain taxonomy needed before changing validation
+    behavior, path safety helpers, verifier structure, or typed protocol ownership.
   high_risk_rule: >
-    Candidates that change public CLI JSON semantics, generated adapter output,
-    broad validation pass/fail behavior, or release gate policy become high
-    risk and require a decision report before selection.
+    Candidates that change public CLI JSON semantics, generated adapter output, broad validation
+    pass/fail behavior, or release gate policy become high risk and require a decision report before
+    selection.
   recommended_first_candidate_id: C001
 scope_control:
-  current_boundary: >
-    Engineering-quality foundation for trust-gate coherence and validation
-    domain separation.
+  current_boundary: |
+    Engineering-quality foundation for trust-gate coherence and validation domain separation.
   boundary_type: repository_quality_foundation
   in_scope_rule: >
-    Include only quality governance changes that reduce false trust, contract
-    duplication, unsafe mutation, validation ambiguity, oversized-validator
-    risk, brittle verifier assertions, or entry-command scan opacity.
+    Include only quality governance changes that reduce false trust, contract duplication, unsafe
+    mutation, validation ambiguity, oversized-validator risk, brittle verifier assertions, or
+    entry-command scan opacity.
   out_of_scope_rule: >
-    Do not advance product-stage features, rename/productization work,
-    provider-backed generation, SOUL/MEMORY implementation, adapter expansion,
-    or broad aesthetic cleanup in this queue.
+    Do not advance product-stage features, rename/productization work, provider-backed generation,
+    SOUL/MEMORY implementation, adapter expansion, or broad aesthetic cleanup in this queue.
   deferred_features:
     - title: Product-stage feature expansion
       reason: >
-        M107-M111 and M70 remain valuable, but current repo quality governance
-        outranks them until trust-domain coherence is under control.
+        M107-M111 and M70 remain valuable, but current repo quality governance outranks them until
+        trust-domain coherence is under control.
       suggested_plan_id: M107-through-M111-after-quality-foundation
     - title: Full typed command and artifact model migration
       reason: >
-        C006 should start with one family; a full migration across all command
-        and artifact contracts requires a later queue after the first model is
-        proven.
+        C006 should start with one family; a full migration across all command and artifact
+        contracts requires a later queue after the first model is proven.
       suggested_plan_id: M115-typed-contract-model-migration
     - title: Complete god-file decomposition
       reason: >
-        C004 should extract one high-churn validation domain first; splitting
-        all large files is too broad for a single queue.
+        C004 should extract one high-churn validation domain first; splitting all large files is too
+        broad for a single queue.
       suggested_plan_id: M116-validator-and-verifier-decomposition
 next_recommended_candidate_id: C003
 quality_baseline:
@@ -113,7 +106,8 @@ quality_baseline:
         - high-risk report sections
         - example prompt-pack shape
   quality_snapshot:
-    command: node /Users/archy/.codex/skills/ow-code-quality-governor/scripts/ow_quality_snapshot.mjs /Users/archy/Projects/StartUp/openworkflow
+    command: node /Users/archy/.codex/skills/ow-code-quality-governor/scripts/ow_quality_snapshot.mjs
+      /Users/archy/Projects/StartUp/openworkflow
     giant_source_files:
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - packages/core/src/validators/validateRepositoryContracts.ts
@@ -131,14 +125,16 @@ changes:
     status: done
     title: Define validation trust domains and report taxonomy
     purpose: >
-      Establish the domain model that explains why handoff and inspect can be
-      green while broader repository validation is red, and define how every
-      trust command should disclose its validation scope before implementation
-      changes alter pass/fail behavior.
+      Establish the domain model that explains why handoff and inspect can be green while broader
+      repository validation is red, and define how every trust command should disclose its
+      validation scope before implementation changes alter pass/fail behavior.
     scope:
       includes:
-        - define trust domains for entry commands, strict handoff, summary health, source contract validation, generated adapter parity, active queue health, historical archive health, fixture corpus, and release readiness
-        - define report taxonomy for failures, warnings, residual historical debt, and newly introduced defects
+        - define trust domains for entry commands, strict handoff, summary health, source contract
+          validation, generated adapter parity, active queue health, historical archive health,
+          fixture corpus, and release readiness
+        - define report taxonomy for failures, warnings, residual historical debt, and newly
+          introduced defects
         - map current commands to their intended domains and non-domains
         - document how Agents should interpret narrower green signals when broader domains are red
         - record the current npm validate red classes as baseline, not as accepted health
@@ -152,7 +148,8 @@ changes:
       - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
       - references/validation-trust-domains.md
       - changes/M114-engineering-quality-foundation/
-    dependencies: []
+    dependencies:
+      []
     unlocks:
       - C002
       - C003
@@ -172,16 +169,18 @@ changes:
     acceptance:
       - The taxonomy names each validation and trust domain.
       - Each Agent-facing trust command has an explicit intended domain and non-domain.
-      - The current npm validate red classes are recorded as baseline historical/release-readiness debt, not hidden.
-      - The taxonomy defines how future commands should expose narrower green signals when broader validation domains are red.
+      - The current npm validate red classes are recorded as baseline historical/release-readiness
+        debt, not hidden.
+      - The taxonomy defines how future commands should expose narrower green signals when broader
+        validation domains are red.
       - No runtime behavior, generated surface, or validator pass/fail behavior changes.
     selection:
       selected_change_id: M114-C001-define-validation-trust-domains-and-report-taxonomy
       selected_at: 2026-05-23
       reason: >
-        Selected first because trust-domain taxonomy is the prerequisite for
-        later validation behavior changes, path safety consolidation, verifier
-        structure changes, typed protocol ownership, and scan-budget reporting.
+        Selected first because trust-domain taxonomy is the prerequisite for later validation
+        behavior changes, path safety consolidation, verifier structure changes, typed protocol
+        ownership, and scan-budget reporting.
       artifacts:
         selected_change: changes/M114-engineering-quality-foundation/C001-define-validation-trust-domains-and-report-taxonomy/SELECTED_CHANGE.yaml
         atom_tasks: changes/M114-engineering-quality-foundation/C001-define-validation-trust-domains-and-report-taxonomy/ATOM_TASKS.yaml
@@ -194,10 +193,9 @@ changes:
         - references/validation-trust-domains.md
         - changes/M114-engineering-quality-foundation/C001-define-validation-trust-domains-and-report-taxonomy/LOCAL_COMMIT_EVIDENCE.yaml
       summary: >
-        Created the validation trust-domain taxonomy and baseline classification
-        for current red repository validation domains without changing runtime
-        behavior, generated surfaces, validator pass/fail behavior, or
-        historical artifacts.
+        Created the validation trust-domain taxonomy and baseline classification for current red
+        repository validation domains without changing runtime behavior, generated surfaces,
+        validator pass/fail behavior, or historical artifacts.
       validation:
         - npm run build
         - node dist/cli/src/index.js handoff --root . --json
@@ -209,12 +207,13 @@ changes:
     status: done
     title: Introduce shared path-safety and local-reference helpers
     purpose: >
-      Centralize root containment and repo-local reference resolution so
-      validators stop reimplementing path-prefix checks.
+      Centralize root containment and repo-local reference resolution so validators stop
+      reimplementing path-prefix checks.
     scope:
       includes:
         - add one audited helper for root-contained paths and local refs
-        - cover relative escapes, prefix collisions, absolute paths, external refs, missing files, and valid refs
+        - cover relative escapes, prefix collisions, absolute paths, external refs, missing files,
+          and valid refs
         - replace one narrow validator call site without changing behavior
       excludes:
         - broad validator rewrite
@@ -245,9 +244,9 @@ changes:
       selected_change_id: M114-C002-shared-path-safety-local-reference-helpers
       selected_at: 2026-05-23
       reason: >
-        Selected after M115 completed because C002 is the next recommended
-        dependency-ready candidate and establishes the shared path-safety
-        helper needed before broader validator decomposition.
+        Selected after M115 completed because C002 is the next recommended dependency-ready
+        candidate and establishes the shared path-safety helper needed before broader validator
+        decomposition.
       artifacts:
         selected_change: changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/SELECTED_CHANGE.yaml
         atom_tasks: changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/ATOM_TASKS.yaml
@@ -259,14 +258,17 @@ changes:
         - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
         - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/LOCAL_COMMIT_EVIDENCE.yaml
       summary: >
-        Introduced shared core fs helpers for root-contained path and
-        local-reference resolution, added targeted path-safety RED/GREEN
-        fixture coverage, and replaced the repository-contract validator
-        local-reference call site with compatible diagnostics.
+        Introduced shared core fs helpers for root-contained path and local-reference resolution,
+        added targeted path-safety RED/GREEN fixture coverage, and replaced the repository-contract
+        validator local-reference call site with compatible diagnostics.
       validation:
-        - "RED: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs failed before helper exports existed"
+        - "RED: node
+          changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpe\
+          rs/path_safety_fixture.mjs failed before helper exports existed"
         - npm run build
-        - "GREEN: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs"
+        - "GREEN: node
+          changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpe\
+          rs/path_safety_fixture.mjs"
         - node dist/cli/src/index.js validate --root . --json
         - node dist/cli/src/index.js resume --root . --json
         - node dist/cli/src/index.js handoff --root . --json
@@ -276,9 +278,8 @@ changes:
     status: ready
     title: Split repository validation into explicit domain sections
     purpose: >
-      Keep broad validation available while grouping failures by trust domain
-      and caller relevance so Agents can tell release debt from active
-      continuation blockers.
+      Keep broad validation available while grouping failures by trust domain and caller relevance
+      so Agents can tell release debt from active continuation blockers.
     scope:
       includes:
         - introduce domain-classified validation result sections
@@ -311,9 +312,8 @@ changes:
     status: candidate
     title: Extract high-churn artifact and queue validators from god files
     purpose: >
-      Reduce validator god-file growth by extracting one cohesive domain around
-      candidate completion evidence, local commit evidence, high-risk report
-      checks, or prototype prompt-pack fixtures.
+      Reduce validator god-file growth by extracting one cohesive domain around candidate completion
+      evidence, local commit evidence, high-risk report checks, or prototype prompt-pack fixtures.
     scope:
       includes:
         - pick one high-churn validation domain
@@ -329,7 +329,8 @@ changes:
     dependencies:
       - C001
       - C003
-    unlocks: []
+    unlocks:
+      []
     risk: medium
     size: medium
     validation:
@@ -345,8 +346,8 @@ changes:
     status: ready
     title: Replace priority brittle verifier assertions with structural checks
     purpose: >
-      Convert one high-value runtime verifier section from prose substring
-      checks to parsed YAML or JSON structural assertions.
+      Convert one high-value runtime verifier section from prose substring checks to parsed YAML or
+      JSON structural assertions.
     scope:
       includes:
         - choose one verifier section whose target is structured
@@ -377,8 +378,8 @@ changes:
     status: candidate
     title: Create typed protocol source model for one command or artifact family
     purpose: >
-      Start reducing duplicated contract truth by making one command family or
-      artifact family render and validate from one typed model.
+      Start reducing duplicated contract truth by making one command family or artifact family
+      render and validate from one typed model.
     scope:
       includes:
         - choose one narrow family
@@ -398,7 +399,8 @@ changes:
     dependencies:
       - C001
       - C005
-    unlocks: []
+    unlocks:
+      []
     risk: high
     size: medium
     validation:
@@ -414,8 +416,8 @@ changes:
     status: candidate
     title: Add entry-command performance and scan-budget reporting
     purpose: >
-      Make broad scans visible and measurable for Agent entry commands so OW
-      can protect low-context startup behavior at larger repo scales.
+      Make broad scans visible and measurable for Agent entry commands so OW can protect low-context
+      startup behavior at larger repo scales.
     scope:
       includes:
         - identify scan-heavy entry command paths
@@ -432,7 +434,8 @@ changes:
     dependencies:
       - C001
       - C003
-    unlocks: []
+    unlocks:
+      []
     risk: medium
     size: medium
     validation:
@@ -448,16 +451,18 @@ changes:
     status: done
     title: Enforce feat-scoped branch identity for candidate queues and git automation
     purpose: >
-      Close the branch governance defect exposed by M114 C002: OW currently
-      treats queue_policy.branch_boundary as a string equality guard, but does
-      not prove that the branch identity actually belongs to the queue's feat.
-      This allows M114, M115, M106, and similar queues to keep committing on a
-      stale continuation branch such as codex/m101-build-proto-prompt-command-split.
+      Close the branch governance defect exposed by M114 C002: OW currently treats
+      queue_policy.branch_boundary as a string equality guard, but does not prove that the branch
+      identity actually belongs to the queue's feat. This allows M114, M115, M106, and similar
+      queues to keep committing on a stale continuation branch such as
+      codex/m101-build-proto-prompt-command-split.
     scope:
       includes:
         - define the branch identity invariant for candidate queues
-        - add validation or runtime guidance when plan_id and branch_boundary are semantically mismatched
-        - update resume or git-automation reporting so branch_matches_current does not imply feat ownership when the boundary is stale
+        - add validation or runtime guidance when plan_id and branch_boundary are semantically
+          mismatched
+        - update resume or git-automation reporting so branch_matches_current does not imply feat
+          ownership when the boundary is stale
         - add a targeted fixture covering a queue whose branch_boundary points at another plan id
         - document the explicit exception path for temporary continuation branches
       excludes:
@@ -493,17 +498,19 @@ changes:
       - git diff --check
     acceptance:
       - New branch-governed queues have an enforceable feat-scoped branch identity rule.
-      - A queue whose branch_boundary names another plan id is surfaced as a branch identity warning or validation failure.
-      - git-automation commit cannot silently bless a stale continuation branch as the owning feat branch.
+      - A queue whose branch_boundary names another plan id is surfaced as a branch identity warning
+        or validation failure.
+      - git-automation commit cannot silently bless a stale continuation branch as the owning feat
+        branch.
       - resume distinguishes current-branch equality from feat-branch ownership.
-      - The policy defines a narrow explicit exception for temporary continuation branches without making it the default.
+      - The policy defines a narrow explicit exception for temporary continuation branches without
+        making it the default.
     selection:
       selected_change_id: M114-C008-enforce-feat-scoped-branch-identity
       selected_at: 2026-05-23
       reason: >
-        Selected before C003 because branch-per-feat ownership is a
-        git-governance trust defect that affects every following implementation
-        candidate in this queue.
+        Selected before C003 because branch-per-feat ownership is a git-governance trust defect that
+        affects every following implementation candidate in this queue.
       artifacts:
         selected_change: changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/SELECTED_CHANGE.yaml
         atom_tasks: changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/ATOM_TASKS.yaml
@@ -513,16 +520,21 @@ changes:
       implementation_changed_files: true
       evidence:
         - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs
+        - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/LOCAL_COMMIT_EVIDENCE.yaml
       summary: >
-        Added branch identity assessment for plan-token ownership, made resume
-        report feat ownership separately from branch equality, made
-        git-automation commit refuse stale branch ownership without an explicit
-        temporary continuation exception, documented the policy, and added
+        Added branch identity assessment for plan-token ownership, made resume report feat ownership
+        separately from branch equality, made git-automation commit refuse stale branch ownership
+        without an explicit temporary continuation exception, documented the policy, and added
         RED/GREEN runtime coverage.
       validation:
-        - "RED: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs failed because commitSelectedChange accepted a stale branch identity"
+        - "RED: node
+          changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/bran\
+          ch_identity_fixture.mjs failed because commitSelectedChange accepted a stale branch
+          identity"
         - npm run build
-        - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+        - "GREEN: node
+          changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/bran\
+          ch_identity_fixture.mjs"
         - npm run verify:runtime-surface
         - node dist/cli/src/index.js resume --root . --json
         - node dist/cli/src/index.js validate --root . --json
@@ -540,24 +552,25 @@ operations:
       - C007
     actor: agent
     reason: >
-      Created the engineering quality foundation queue from the OW Code Quality
-      Governor report after the user paused planned CC work and made repo-wide
-      quality governance the immediate priority.
+      Created the engineering quality foundation queue from the OW Code Quality Governor report
+      after the user paused planned CC work and made repo-wide quality governance the immediate
+      priority.
     changed_at: 2026-05-23
     evidence:
       - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
       - node dist/cli/src/index.js handoff --root . --json
       - node dist/cli/src/index.js inspect --root . --strict --json
       - npm run validate
-      - node /Users/archy/.codex/skills/ow-code-quality-governor/scripts/ow_quality_snapshot.mjs /Users/archy/Projects/StartUp/openworkflow
+      - node /Users/archy/.codex/skills/ow-code-quality-governor/scripts/ow_quality_snapshot.mjs
+        /Users/archy/Projects/StartUp/openworkflow
   - operation_id: OP002
     operation_type: select
     target_candidate_ids:
       - C001
     actor: agent
     reason: >
-      Selected C001 as the first quality-foundation slice because taxonomy must
-      precede validation-domain implementation changes.
+      Selected C001 as the first quality-foundation slice because taxonomy must precede
+      validation-domain implementation changes.
     changed_at: 2026-05-23
     before_status: ready
     after_status: selected
@@ -571,9 +584,8 @@ operations:
       - C001
     actor: agent
     reason: >
-      Completed the validation trust-domain taxonomy and baseline report
-      classification without changing runtime behavior, generated surfaces, or
-      validator pass/fail behavior.
+      Completed the validation trust-domain taxonomy and baseline report classification without
+      changing runtime behavior, generated surfaces, or validator pass/fail behavior.
     changed_at: 2026-05-23
     before_status: selected
     after_status: done
@@ -589,9 +601,8 @@ operations:
       - C005
     actor: agent
     reason: >
-      C001 completed the trust-domain taxonomy dependency, so the path-safety,
-      validation-domain sectioning, and structural verifier candidates are now
-      dependency-ready.
+      C001 completed the trust-domain taxonomy dependency, so the path-safety, validation-domain
+      sectioning, and structural verifier candidates are now dependency-ready.
     changed_at: 2026-05-23
     before_status: candidate
     after_status: ready
@@ -603,9 +614,9 @@ operations:
       - C002
     actor: agent
     reason: >
-      Deferred M114 behind M115 after the user promoted internal coder quality
-      governance above the engineering-quality foundation queue. M114 C002
-      remains the next candidate when this queue resumes.
+      Deferred M114 behind M115 after the user promoted internal coder quality governance above the
+      engineering-quality foundation queue. M114 C002 remains the next candidate when this queue
+      resumes.
     changed_at: 2026-05-23
     before_status: active
     after_status: deferred
@@ -619,10 +630,10 @@ operations:
     actor: agent
     reason: >
       Added a temporary branch-governance candidate after M114 C002 exposed that
-      queue_policy.branch_boundary can point at an unrelated continuation branch
-      while resume and git-automation still report the branch as matching.
-      This must be fixed before continuing C003 because selected-change commits
-      should happen on the feat branch that owns the candidate queue.
+      queue_policy.branch_boundary can point at an unrelated continuation branch while resume and
+      git-automation still report the branch as matching. This must be fixed before continuing C003
+      because selected-change commits should happen on the feat branch that owns the candidate
+      queue.
     changed_at: 2026-05-23
     evidence:
       - references/git-version-control-governance.md
@@ -636,9 +647,8 @@ operations:
       - C003
     actor: agent
     reason: >
-      Prioritized C008 ahead of C003 because branch-per-feat ownership is a
-      git-governance trust defect that affects every following implementation
-      candidate in this queue.
+      Prioritized C008 ahead of C003 because branch-per-feat ownership is a git-governance trust
+      defect that affects every following implementation candidate in this queue.
     changed_at: 2026-05-23
     before_status: next_recommended_candidate_id C003
     after_status: next_recommended_candidate_id C008
@@ -650,8 +660,8 @@ operations:
       - C008
     actor: agent
     reason: >
-      Selected C008 as the active M114 work item after committing the DTC queue
-      maintenance checkpoint. Implementation has not started yet.
+      Selected C008 as the active M114 work item after committing the DTC queue maintenance
+      checkpoint. Implementation has not started yet.
     changed_at: 2026-05-23
     before_status: ready
     after_status: selected
@@ -665,9 +675,8 @@ operations:
       - C008
     actor: agent
     reason: >
-      Completed C008 after adding branch identity enforcement, resume reporting,
-      git-automation commit protection, policy documentation, and RED/GREEN
-      runtime coverage.
+      Completed C008 after adding branch identity enforcement, resume reporting, git-automation
+      commit protection, policy documentation, and RED/GREEN runtime coverage.
     changed_at: 2026-05-23
     before_status: selected
     after_status: done
@@ -686,8 +695,8 @@ operations:
       - C003
     actor: agent
     reason: >
-      After C008 closed the branch identity governance bug, return to the next
-      dependency-ready M114 validation-domain candidate.
+      After C008 closed the branch identity governance bug, return to the next dependency-ready M114
+      validation-domain candidate.
     changed_at: 2026-05-23
     before_status: next_recommended_candidate_id C008
     after_status: next_recommended_candidate_id C003
