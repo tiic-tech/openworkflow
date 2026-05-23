@@ -43,6 +43,10 @@ If the queue has `queue_policy.branch_boundary`, compare it with the current
 branch. When they differ, stop before creating selection artifacts unless the
 user explicitly says this is a planning-only exception or asks to proceed on the
 current branch. Do not switch branches from this skill.
+Also compare feat identity: a branch boundary that names another plan id is not
+the owning feat branch just because it equals the current branch. Proceed only
+when the queue records an explicit `branch_identity_exception` for temporary
+continuation, or stop and surface the mismatch.
 
 If the working tree is dirty, inspect whether the changes are only the current
 selection operation. If the dirty tree appears to contain an uncommitted
@@ -66,6 +70,8 @@ Read these only as needed:
 2. Read `CANDIDATE_CHANGES.yaml` as the source of truth.
 3. Check `queue_policy.branch_boundary` when present. Stop on branch mismatch
    unless the user has approved a planning-only exception.
+   If the branch boundary names another plan id, require an explicit temporary
+   continuation exception before treating the branch as acceptable.
 4. Check dirty-tree state. Stop if uncommitted work would contaminate a new
    selected change or blur the one-change-one-commit boundary.
 5. If the user names a candidate id, perform targeted readiness review for

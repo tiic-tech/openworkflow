@@ -13,11 +13,9 @@ source:
     engineering-quality governance: trust-signal coherence, validation domain
     taxonomy, single-source contract ownership, path safety, validator/verifier
     decomposition, structural verification, and entry-command scan visibility.
-    M115 internal coder quality governance has completed, and M114 C002 has
-    now introduced the first shared path-safety helper under the repo-owned
-    coder protocol. A temporary branch-governance candidate C008 has been added
-    before C003 after C002 exposed that branch_boundary can point at an
-    unrelated continuation branch.
+    M115 internal coder quality governance has completed, M114 C002 introduced
+    the first shared path-safety helper under the repo-owned coder protocol,
+    and M114 C008 closed the branch identity governance gap before C003.
   refs:
     - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
     - /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
@@ -28,13 +26,14 @@ scope_boundary: >
   provider-backed generation, spicyclaw rename/productization, and SOUL/MEMORY
   implementation are out of scope for this queue.
 branch_boundary: codex/m101-build-proto-prompt-command-split
+branch_identity_exception: temporary_continuation_branch
 candidate_count: 8
-active_candidate_count: 6
-completed_candidate_id: C002
-completed_change_id: M114-C002-shared-path-safety-local-reference-helpers
+active_candidate_count: 5
+completed_candidate_id: C008
+completed_change_id: M114-C008-enforce-feat-scoped-branch-identity
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C008
+next_recommended_candidate_id: C003
 deferred_by:
   plan_id: M115-internal-coder-quality-governance
   reason: >
@@ -64,14 +63,14 @@ risks:
     description: Historical validation debt can obscure regressions introduced by new work.
     mitigation: Classify baseline red domains and prove each candidate with targeted checks.
   - id: R004
-    level: high
+    level: medium
     description: Queue branch boundaries can preserve stale continuation branches and allow later selected-change commits on the wrong feat branch.
-    mitigation: Complete C008 before C003 so git-automation and resume distinguish branch equality from feat ownership.
+    mitigation: C008 now makes git-automation fail closed by default and makes resume report feat ownership separately from current branch equality.
 unresolved_questions:
   - Should `validate --json` become release-domain only, or should it expose subdomain ok values while keeping top-level failure?
   - Which validator domain should C004 extract first: selected-change evidence, high-risk reports, or prototype prompt-pack fixtures?
   - Which command or artifact family is narrow enough for the first typed source-model pilot in C006?
-  - Should temporary continuation branch exceptions be explicit queue fields, operation records, or high-risk approvals?
+  - Which historical continuation queues should be migrated to feat-owned branches versus left under explicit temporary exceptions?
 deferred_features:
   - M107-through-M111-after-quality-foundation
   - M115-typed-contract-model-migration
@@ -88,4 +87,4 @@ validation:
     - Quality snapshot reported giant source files and risk patterns for type escapes, sync filesystem checks in validators, raw prefix path checks, and substring-heavy assertions.
     - C001 completed the validation trust-domain taxonomy and baseline red-domain classification.
     - C002 completed a shared path-safety/local-reference helper and one behavior-compatible validator call-site replacement.
-    - C008 is now the next recommended M114 candidate to close branch-per-feat governance before C003.
+    - C008 completed branch identity enforcement, resume reporting, git-automation protection, policy documentation, and RED/GREEN fixture coverage.

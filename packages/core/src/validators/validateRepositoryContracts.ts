@@ -865,6 +865,9 @@ async function validateCandidateChanges(root: string, path: string, data: Record
   if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
     validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
   }
+  if (isRecord(queuePolicy) && "branch_identity_exception" in queuePolicy) {
+    validateBranchIdentityException(label, queuePolicy.branch_identity_exception, errors);
+  }
   const strictCommitGate = isRecord(queuePolicy) && queuePolicy.selected_change_commit_gate === "strict";
   if (!Array.isArray(data.changes)) {
     errors.push(`${label} changes must be a list`);
@@ -876,6 +879,25 @@ async function validateCandidateChanges(root: string, path: string, data: Record
       continue;
     }
     validateCandidateCompletionEvidence(root, label, candidate, errors, { strictCommitGate });
+  }
+}
+
+function validateBranchIdentityException(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} queue_policy.branch_identity_exception must be a mapping when present`);
+    return;
+  }
+  if (value.mode !== "temporary_continuation_branch") {
+    errors.push(`${label} queue_policy.branch_identity_exception.mode must be temporary_continuation_branch`);
+  }
+  if (value.approved !== true) {
+    errors.push(`${label} queue_policy.branch_identity_exception.approved must be true`);
+  }
+  if (!Array.isArray(value.allowed_operations) || !value.allowed_operations.every((item) => typeof item === "string")) {
+    errors.push(`${label} queue_policy.branch_identity_exception.allowed_operations must be a string list`);
+  }
+  if (!nonEmptyString(value.reason)) {
+    errors.push(`${label} queue_policy.branch_identity_exception.reason must explain the temporary continuation branch`);
   }
 }
 

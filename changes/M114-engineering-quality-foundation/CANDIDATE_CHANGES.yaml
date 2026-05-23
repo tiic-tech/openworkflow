@@ -31,6 +31,17 @@ queue_policy:
     Created on the current continuation branch because the user explicitly
     paused planned CC work and made engineering quality governance the
     immediate priority.
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - resume
+      - commit
+    reason: >
+      M114 was intentionally created on the already-active M101 continuation
+      branch before feat-scoped branch identity was enforceable. This exception
+      permits the current governance repair to finish locally while making the
+      mismatch explicit in resume and git-automation output.
   source_of_truth: CANDIDATE_CHANGES.yaml
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable ids are assigned once and referenced by select-change.
@@ -85,7 +96,7 @@ scope_control:
         C004 should extract one high-churn validation domain first; splitting
         all large files is too broad for a single queue.
       suggested_plan_id: M116-validator-and-verifier-decomposition
-next_recommended_candidate_id: C008
+next_recommended_candidate_id: C003
 quality_baseline:
   trust_commands:
     - command: node dist/cli/src/index.js handoff --root . --json
@@ -434,7 +445,7 @@ changes:
       - The report distinguishes necessary broad scans from pointer/index reads.
       - No new full-repo scan is added without justification.
   - id: C008
-    status: ready
+    status: done
     title: Enforce feat-scoped branch identity for candidate queues and git automation
     purpose: >
       Close the branch governance defect exposed by M114 C002: OW currently
@@ -486,6 +497,36 @@ changes:
       - git-automation commit cannot silently bless a stale continuation branch as the owning feat branch.
       - resume distinguishes current-branch equality from feat-branch ownership.
       - The policy defines a narrow explicit exception for temporary continuation branches without making it the default.
+    selection:
+      selected_change_id: M114-C008-enforce-feat-scoped-branch-identity
+      selected_at: 2026-05-23
+      reason: >
+        Selected before C003 because branch-per-feat ownership is a
+        git-governance trust defect that affects every following implementation
+        candidate in this queue.
+      artifacts:
+        selected_change: changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/ATOM_TASKS.yaml
+        implementation_brief: changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs
+      summary: >
+        Added branch identity assessment for plan-token ownership, made resume
+        report feat ownership separately from branch equality, made
+        git-automation commit refuse stale branch ownership without an explicit
+        temporary continuation exception, documented the policy, and added
+        RED/GREEN runtime coverage.
+      validation:
+        - "RED: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs failed because commitSelectedChange accepted a stale branch identity"
+        - npm run build
+        - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -601,5 +642,54 @@ operations:
     changed_at: 2026-05-23
     before_status: next_recommended_candidate_id C003
     after_status: next_recommended_candidate_id C008
+    evidence:
+      - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      Selected C008 as the active M114 work item after committing the DTC queue
+      maintenance checkpoint. Implementation has not started yet.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/SELECTED_CHANGE.yaml
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/ATOM_TASKS.yaml
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      Completed C008 after adding branch identity enforcement, resume reporting,
+      git-automation commit protection, policy documentation, and RED/GREEN
+      runtime coverage.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/SELECTED_CHANGE.yaml
+      - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/ATOM_TASKS.yaml
+      - packages/core/src/git/branchIdentity.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP010
+    operation_type: recommend
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      After C008 closed the branch identity governance bug, return to the next
+      dependency-ready M114 validation-domain candidate.
+    changed_at: 2026-05-23
+    before_status: next_recommended_candidate_id C008
+    after_status: next_recommended_candidate_id C003
     evidence:
       - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml

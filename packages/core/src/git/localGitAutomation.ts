@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { promisify } from "node:util";
 import { dumpYaml, parseYaml } from "../contracts/yaml.js";
+import { assessBranchIdentity, type BranchIdentityException } from "./branchIdentity.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -46,6 +47,7 @@ export interface CommitSelectedChangeOptions {
   commitEvidence?: boolean;
   queuePath?: string;
   selectedChangePath?: string;
+  branchIdentityException?: BranchIdentityException | null;
 }
 
 export interface CommitSelectedChangeResult {
@@ -153,6 +155,15 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
   if (options.branchBoundary && currentBranch !== options.branchBoundary) {
     return { ...withState, errors: [`current branch ${currentBranch ?? "(detached)"} does not match branch boundary ${options.branchBoundary}`] };
   }
+  if (options.branchBoundary) {
+    const branchIdentity = assessBranchIdentity(options.planId, options.branchBoundary, options.branchIdentityException, "commit");
+    if (!branchIdentity.ok) {
+      return { ...withState, errors: branchIdentity.errors };
+    }
+    if (branchIdentity.warnings.length > 0) {
+      withState.warnings.push(...branchIdentity.warnings);
+    }
+  }
   if (options.validationEvidence.length === 0) {
     return { ...withState, errors: ["validation evidence is required before local commit automation"] };
   }
@@ -162,7 +173,7 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
   if (unrelatedDirtyPaths.length > 0) {
     return {
       ...withState,
-      warnings: scopeGuidanceForUnrelatedPaths(unrelatedDirtyPaths),
+      warnings: [...withState.warnings, ...scopeGuidanceForUnrelatedPaths(unrelatedDirtyPaths)],
       errors: ["working tree contains dirty paths outside the selected change scope"],
     };
   }
@@ -197,7 +208,7 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
         preview,
         primaryCommit,
         evidenceBackfilledPaths: backfill.updatedPaths,
-        warnings: backfill.warnings,
+        warnings: [...withState.warnings, ...backfill.warnings],
         errors: [evidenceAddResult.stderr || evidenceAddResult.stdout || "git add evidence failed"],
       };
     }
@@ -209,7 +220,7 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
         preview,
         primaryCommit,
         evidenceBackfilledPaths: backfill.updatedPaths,
-        warnings: backfill.warnings,
+        warnings: [...withState.warnings, ...backfill.warnings],
         errors: [evidenceCommitResult.stderr || evidenceCommitResult.stdout || "git commit evidence failed"],
       };
     }
@@ -224,7 +235,7 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
       headCommit: evidenceCommit,
       evidencePath,
       evidenceBackfilledPaths: backfill.updatedPaths,
-      warnings: backfill.warnings,
+      warnings: [...withState.warnings, ...backfill.warnings],
     };
   }
 

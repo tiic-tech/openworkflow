@@ -2,6 +2,7 @@ import { readdir, stat } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound, readTextFile } from "../fs/index.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "../git/branchIdentity.js";
 
 export interface PlanningQueueResumeModel {
   active_queue: ActivePlanningQueue | UnknownPlanningQueue;
@@ -19,6 +20,8 @@ export interface ActivePlanningQueue {
   queue_status: string | null;
   branch_boundary: string | null;
   branch_matches_current: boolean | null;
+  branch_owns_plan: boolean | null;
+  branch_identity: BranchIdentityAssessment | null;
   selected_candidate: CandidateResumeSummary | null;
   completed_candidate: CandidateResumeSummary | null;
   next_recommended_candidate: CandidateResumeSummary | null;
@@ -133,6 +136,8 @@ interface QueueInfo {
   queue_status: string | null;
   branch_boundary: string | null;
   branch_matches_current: boolean | null;
+  branch_owns_plan: boolean | null;
+  branch_identity: BranchIdentityAssessment | null;
   selected_candidate: QueueCandidate | null;
   completed_candidate: QueueCandidate | null;
   next_recommended_candidate: QueueCandidate | null;
@@ -168,6 +173,7 @@ export async function buildPlanningQueueResume(root: string, currentBranch: stri
   const uncertainty = [
     ...(tied.length > 0 ? [`${tied.length + 1} queues have the same resume rank; active queue selection may be ambiguous`] : []),
     ...(active.branch_matches_current === false ? [`current branch does not match queue boundary ${active.branch_boundary}`] : []),
+    ...(active.branch_identity && active.branch_identity.owns_plan === false ? active.branch_identity.warnings.concat(active.branch_identity.errors) : []),
   ];
   const activeQueue = activeQueueFor(active, alternatives, uncertainty);
   return {
@@ -189,6 +195,8 @@ function activeQueueFor(queue: QueueInfo, alternatives: QueueAlternative[], unce
     queue_status: queue.queue_status,
     branch_boundary: queue.branch_boundary,
     branch_matches_current: queue.branch_matches_current,
+    branch_owns_plan: queue.branch_owns_plan,
+    branch_identity: queue.branch_identity,
     selected_candidate: candidateSummary(queue.selected_candidate),
     completed_candidate: candidateSummary(queue.completed_candidate),
     next_recommended_candidate: candidateSummary(queue.next_recommended_candidate),
@@ -464,6 +472,9 @@ async function readQueueInfo(root: string, absoluteQueuePath: string, currentBra
     ? nextRecommended
     : candidates.find((candidate) => candidate.status === "ready") ?? null;
   const branchBoundary = stringValue(queuePolicy.branch_boundary);
+  const branchIdentity = branchBoundary
+    ? assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy.branch_identity_exception), "resume")
+    : null;
   const mtime = await stat(absoluteQueuePath);
   const missingCommitEvidence = await missingCommitEvidenceFor(root, absoluteQueuePath, queuePath, queuePolicy, candidates);
   const info = {
@@ -474,6 +485,8 @@ async function readQueueInfo(root: string, absoluteQueuePath: string, currentBra
     queue_status: stringValue(queue.status),
     branch_boundary: branchBoundary,
     branch_matches_current: branchBoundary && currentBranch ? branchBoundary === currentBranch : null,
+    branch_owns_plan: branchIdentity?.owns_plan ?? null,
+    branch_identity: branchIdentity,
     selected_candidate: selected,
     completed_candidate: completed,
     next_recommended_candidate: nextRecommended,
@@ -555,6 +568,7 @@ function queueScore(queue: Omit<QueueInfo, "score">): number {
     queue.queue_status === "active" ? 100 : 0,
     queue.branch_matches_current === true ? 40 : 0,
     queue.branch_matches_current === false ? -100 : 0,
+    queue.branch_owns_plan === false ? -50 : 0,
     Math.min(Math.floor(queue.mtime_ms / 1000), 1_000_000),
   ].reduce((sum, value) => sum + value, 0);
 }
@@ -610,6 +624,7 @@ function nextActionFor(queue: QueueInfo, breakpoint: ActivePlanningQueue["breakp
 function stopConditionsFor(queue: QueueInfo): string[] {
   return unique([
     ...(queue.branch_matches_current === false ? [`current branch does not match queue boundary ${queue.branch_boundary}`] : []),
+    ...(queue.branch_identity && queue.branch_identity.owns_plan === false ? queue.branch_identity.errors : []),
     ...(queue.missing_commit_evidence.length > 0 ? queue.missing_commit_evidence.map((item) => item.reason) : []),
   ]);
 }

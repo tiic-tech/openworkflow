@@ -2003,6 +2003,40 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
 
     await mkdir(join(gitRoot, "allowed"), { recursive: true });
     await writeFile(join(gitRoot, "allowed", "change.txt"), "selected change\n", "utf8");
+    const staleBranchIdentity = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M114-engineering-quality-foundation",
+      candidateId: "C008",
+      selectedChangeId: "M114-C008-enforce-feat-scoped-branch-identity",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: branch identity fixture"],
+      commitMessage: "M114-engineering-quality-foundation C008 branch identity fixture",
+      dryRun: true,
+    });
+    assert(!staleBranchIdentity.ok, "commit automation should refuse branch boundaries that name another plan id");
+    assert(staleBranchIdentity.errors.some((item) => item.includes("branch identity mismatch")), "branch identity mismatch should be explicit");
+
+    const explicitContinuation = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M114-engineering-quality-foundation",
+      candidateId: "C008",
+      selectedChangeId: "M114-C008-enforce-feat-scoped-branch-identity",
+      branchBoundary: "codex/m71-commit-fixture",
+      branchIdentityException: {
+        mode: "temporary_continuation_branch",
+        approved: true,
+        allowedOperations: ["commit"],
+        reason: "runtime fixture exercises the explicit temporary continuation branch exception",
+      },
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: branch identity fixture"],
+      commitMessage: "M114-engineering-quality-foundation C008 branch identity fixture",
+      dryRun: true,
+    });
+    assert(explicitContinuation.ok, `explicit temporary continuation exception should allow commit preview: ${explicitContinuation.errors.join(", ")}`);
+    assert(explicitContinuation.warnings.some((item) => item.includes("temporary continuation exception")), "branch identity exception should be reported as a warning");
+
     await writeFile(join(gitRoot, "unrelated.txt"), "unrelated\n", "utf8");
 
     const unrelated = await commitSelectedChange({

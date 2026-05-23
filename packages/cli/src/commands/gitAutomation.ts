@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { simulateAutonomousGit } from "../../../core/src/git/autonomousSimulator.js";
+import { branchIdentityExceptionFrom } from "../../../core/src/git/branchIdentity.js";
 import { pilotDraftPr } from "../../../core/src/git/draftPrPilot.js";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
@@ -85,7 +86,9 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
   const planId = stringValue(queue.plan_id) ?? "unknown-plan";
   const selectedChangeId = stringValue(record(candidate.selection).selected_change_id) ?? stringFlag(flags, "selected-change") ?? candidateId;
   const selectedChangePath = inferSelectedChangePath(candidate);
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
+  const branchIdentityException = branchIdentityExceptionFrom(queuePolicy.branch_identity_exception);
   const allowedPaths = listFlag(flags, "allowed-paths");
   const candidateOwnedPaths = array(candidate.owned_paths).map(String);
   const commitEvidence = booleanFlag(flags, "commit-evidence");
@@ -109,6 +112,7 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
     commitEvidence,
     queuePath,
     selectedChangePath,
+    branchIdentityException,
     dryRun: !write,
   });
   return finishGitAutomationResult(root, json, "git-automation commit", result.ok, {

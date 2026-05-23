@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active; C008 inserted before C003 for branch governance
+Status: active; C008 completed, C003 is next recommended
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -55,13 +55,12 @@ visible until classified or fixed.
 
 Selected candidate: none.
 
-Next recommended candidate: C008.
+Next recommended candidate: C003.
 
 M114 has resumed after M115 established the internal coder protocol boundary.
 C001 has completed the domain taxonomy; C002 has completed the shared
-path-safety helper slice. C002 exposed that the recorded branch boundary can
-name an unrelated continuation branch while resume and git-automation still
-treat the branch as matching, so C008 is inserted before C003.
+path-safety helper slice. C008 has closed the branch identity governance gap,
+so C003 is again the next recommended validation-domain split candidate.
 
 ## Candidates
 
@@ -184,7 +183,7 @@ Depends on: C001, C003.
 
 ### C008 - Enforce Feat-Scoped Branch Identity For Candidate Queues And Git Automation
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -204,3 +203,14 @@ Acceptance focus:
   the owning feat branch.
 - `resume` distinguishes current-branch equality from feat-branch ownership.
 - Temporary continuation branch exceptions are explicit and narrow.
+
+Selection artifacts:
+
+- `changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/SELECTED_CHANGE.yaml`
+- `changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/ATOM_TASKS.yaml`
+- `changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/IMPLEMENTATION_BRIEF.md`
+
+Completion evidence:
+
+- `changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs`
+- `packages/core/src/git/branchIdentity.ts`
