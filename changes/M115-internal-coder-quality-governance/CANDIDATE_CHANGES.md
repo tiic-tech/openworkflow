@@ -42,9 +42,9 @@ Out of scope:
 
 `C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
 internal command protocol with source-driven generated surfaces. `C004` and
-`C005` and `C007` are complete. The remaining forward path is C006, which can
-introduce an optional evidence artifact contract only after the C005
-guidance-only fields prove stable.
+`C005` and `C007` are complete. The remaining forward path is C006, but C006 is
+under a high-risk stop until the user approves Option A, Option B, or Option C
+from `HIGH_RISK_DECISION_REPORT.md`.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -147,6 +147,10 @@ as internal-only and behavior-compatible.
   `packages/core/src/validators/`, `packages/cli/src/dev/verifyRuntimeSurface.ts`,
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C005`
+- High-risk report:
+  `changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md`
+- Recommended option: Option A, optional embedded `coder_evidence` in
+  `LOCAL_COMMIT_EVIDENCE.yaml`.
 
 ### C007: Add coder continuous growth loop for reusable lessons
 

@@ -515,6 +515,19 @@ changes:
     unlocks: []
     risk: high
     size: medium
+    high_risk_report: changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md
+    decision_options:
+      recommended: optional_embedded_contract
+      options:
+        - id: optional_embedded_contract
+          label: Option A - optional embedded coder_evidence in LOCAL_COMMIT_EVIDENCE.yaml
+          requires_user_approval: true
+        - id: optional_standalone_contract
+          label: Option B - optional standalone CODER_EVIDENCE.yaml
+          requires_user_approval: true
+        - id: defer_contract
+          label: Option C - defer C006 and keep coder_gate only
+          requires_user_approval: true
     validation:
       - npm run build
       - npm run verify:runtime-surface
@@ -803,3 +816,18 @@ operations:
       - packages/core/src/git/localGitAutomation.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M115-internal-coder-quality-governance/C005-surface-coder-gate-state-in-recovery-and-git-governance/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP014
+    operation_type: high_risk_report
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Added the required high-risk decision packet before selecting C006. The
+      recommended implementation path is optional embedded coder_evidence in
+      LOCAL_COMMIT_EVIDENCE.yaml, with missing evidence valid and malformed
+      present evidence rejected.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md
