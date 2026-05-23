@@ -41,9 +41,10 @@ Out of scope:
 ## Selection Policy
 
 `C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
-internal command protocol with source-driven generated surfaces. `C004` is
-complete. The next ready candidate is `C005`, which is high risk and should not
-be selected without an explicit high-risk decision.
+internal command protocol with source-driven generated surfaces. `C004` and
+`C007` are complete. The remaining forward path is the high-risk C005/C006
+evidence/read-model sequence, which should not be selected without an explicit
+high-risk decision.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -145,7 +146,7 @@ as internal-only and behavior-compatible.
 
 ### C007: Add coder continuous growth loop for reusable lessons
 
-- Status: `candidate`
+- Status: `done`
 - Risk: `medium`
 - Size: `small`
 - Purpose: define how recurring quality lessons become durable OW source
@@ -153,6 +154,10 @@ as internal-only and behavior-compatible.
 - Owns: `skills/`, `references/`,
   `changes/M115-internal-coder-quality-governance/`
 - Depends on: `C002`
+- Selection:
+  `C007-add-coder-continuous-growth-loop-for-reusable-lessons`
+- Completion: `references/coder-continuous-growth-loop.md` plus coder skill
+  linkage
 
 ## Deferred
 

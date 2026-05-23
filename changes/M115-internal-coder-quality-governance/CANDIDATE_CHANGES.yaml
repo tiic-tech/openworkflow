@@ -480,7 +480,7 @@ changes:
       - Validators distinguish missing optional evidence from malformed present evidence.
       - The contract does not require migrating historical queues.
   - id: C007
-    status: ready
+    status: done
     title: Add coder continuous growth loop for reusable lessons
     purpose: >
       Define how repeated implementation patterns, major mistakes, and
@@ -506,6 +506,34 @@ changes:
     unlocks: []
     risk: medium
     size: small
+    selection:
+      selected_change_id: C007-add-coder-continuous-growth-loop-for-reusable-lessons
+      reason: >
+        Select C007 because C004 completed change/team coder governance wiring
+        while C005 and C006 remain high-risk evidence/read-model work.
+      selected_at: 2026-05-23
+      selected_by: agent
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/coder-continuous-growth-loop.md
+        - skills/coder/SKILL.md
+        - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Added a source-owned coder continuous growth loop that defines
+        promotion criteria, evidence requirements, durable policy targets,
+        review gates, and the boundary between coder policy and future
+        project-local SOUL/MEMORY.
+      validation:
+        - node dist/cli/src/index.js inspect --root . --strict --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+        - git diff --check
     validation:
       - node dist/cli/src/index.js inspect --root . --strict --json
       - node dist/cli/src/index.js summaries --root . --strict --json
@@ -665,3 +693,34 @@ operations:
       - skills/run-team/SKILL.md
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Selected C007 as the next dependency-ready medium-risk candidate after
+      C004 completion while C005 and C006 remain high-risk evidence/read-model
+      work.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      Completed coder continuous-growth source policy with auditable promotion
+      criteria and explicit boundaries against unmanaged project memory.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/coder-continuous-growth-loop.md
+      - skills/coder/SKILL.md
+      - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/LOCAL_COMMIT_EVIDENCE.yaml

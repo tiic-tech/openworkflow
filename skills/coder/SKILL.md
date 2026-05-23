@@ -175,6 +175,11 @@ approval.
 Promote a quality lesson into source policy only when it is repeated,
 high-leverage, and backed by implementation or validation evidence.
 
+Use `references/coder-continuous-growth-loop.md` as the source policy for
+promotion criteria, evidence requirements, and boundaries. Session notes,
+unreviewed memories, or one-off fixes are not enough to change durable coder
+policy by themselves.
+
 Promotion targets:
 
 - role or stance: this skill

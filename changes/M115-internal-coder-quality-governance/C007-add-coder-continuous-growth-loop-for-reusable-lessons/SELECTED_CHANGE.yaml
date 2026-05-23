@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C007
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C007
+change_id: C007-add-coder-continuous-growth-loop-for-reusable-lessons
+title: Add coder continuous growth loop for reusable lessons
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: small
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C007 because C004 completed change/team coder governance wiring while
+  C005 and C006 remain high-risk evidence/read-model work. C007 is the next
+  dependency-ready medium-risk source-policy improvement.
+rejected_alternatives:
+  - id: C005
+    reason: High-risk recovery and git evidence integration needs an explicit decision before selection.
+  - id: C006
+    reason: Depends on C005 and would define evidence shape before gate-state fields are proven.
+owned_paths:
+  - skills/
+  - references/
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/**
+dependencies:
+  - C002
+scope:
+  includes:
+    - define promotion criteria for recurring quality lessons
+    - define what belongs in coder policy versus future project SOUL/MEMORY
+    - require source-reviewed updates rather than free-form generated memory
+    - tie lessons to auditable commit or validation evidence
+  excludes:
+    - implementing project-local SOUL.md or MEMORY.md
+    - autonomous memory writes
+    - broad product intelligence scoring
+acceptance:
+  - The growth loop explains how coder lessons become durable source policy.
+  - It separates OW coder policy from future project-local SOUL/MEMORY.
+  - It requires auditable evidence before promotion.
+validation:
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+  - git diff --check
+red_evidence:
+  status: not_applicable
+  reason: >
+    C007 is a docs/source-policy change. The nearest structural check is YAML
+    parsing plus strict OW read-model validation.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - references/coder-continuous-growth-loop.md
+    - skills/coder/SKILL.md
+    - changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+    - git diff --check
