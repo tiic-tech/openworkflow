@@ -7,14 +7,11 @@ status: current
 source_plan_id: M123-pr-ready-review-governance
 source_candidate_id: C001
 selected_change_id: C001-draft-pr-readiness-preflight
-primary_commit: 4319df2d442f53ff28ceddefe28a1fd543a2aec2
+primary_commit: 32601c861a9209ca42dbe92c568dacc9a11fc182
 validation_evidence:
   - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
   - git diff --check
-  - gh pr view 5 --repo tiic-tech/openworkflow
-  - gh pr view 4 --repo tiic-tech/openworkflow
-  - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
-    codex/m102-selected-change-commit-gate
 coder_gate:
   status: recorded
   enforcement: guidance_only
