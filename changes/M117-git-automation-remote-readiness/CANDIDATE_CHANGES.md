@@ -153,7 +153,18 @@ edit.
 
 ### C004 - Define Structured Merge-Conflict Readiness Checkpoint
 
-Status: candidate
+Status: done
+
+Selection artifacts:
+
+- `C004-define-structured-merge-conflict-readiness-checkpoint/SELECTED_CHANGE.yaml`
+- `C004-define-structured-merge-conflict-readiness-checkpoint/ATOM_TASKS.yaml`
+- `C004-define-structured-merge-conflict-readiness-checkpoint/IMPLEMENTATION_BRIEF.md`
+
+Completion: remote-plan and simulator now expose structured merge-readiness
+checkpoint data. Clean cases report fast-forward state and no conflict files;
+conflict cases stop with named files and isolated worktree evidence
+requirements. No merge, rebase, reset, force-push, or PR merge was executed.
 
 Risk: high
 

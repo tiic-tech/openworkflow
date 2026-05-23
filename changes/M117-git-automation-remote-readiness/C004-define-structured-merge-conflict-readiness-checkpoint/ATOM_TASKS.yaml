@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M117-git-automation-remote-readiness:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M117-C004-define-structured-merge-conflict-readiness-checkpoint
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C004
+title: Atom tasks for M117 C004 merge-conflict readiness checkpoint
+status: completed
+tasks:
+  - task_id: T001
+    title: Map remote readiness merge and conflict inputs
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+    done_when: >
+      The target base, target branch, remote heads, local merge-base probe,
+      fast-forward states, and no-merge guardrails are mapped.
+  - task_id: T002
+    title: Add RED merge-conflict checkpoint fixture
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      Runtime-surface verification fails because remote-plan and simulator do
+      not expose structured conflict checkpoint data.
+  - task_id: T003
+    title: Implement shared merge-readiness checkpoint
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/mergeReadinessCheckpoint.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+    done_when: >
+      Remote-plan and simulator report target base/branch heads, merge base,
+      fast-forward status, read-only conflict probe result, conflict files,
+      required validations, and stop reasons.
+  - task_id: T004
+    title: Document no-merge conflict resolution boundary
+    status: completed
+    type: document
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+    done_when: >
+      Governance references state that conflict resolution requires isolated
+      worktrees, explicit approval, validation reruns, and local evidence before
+      any later approved merge.
+  - task_id: T005
+    title: Run GREEN validation and record completion evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      RED fixture is green, runtime validation passes, queue completion evidence
+      references LOCAL_COMMIT_EVIDENCE.yaml, and git diff check is clean.
+verification:
+  red:
+    - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because simulator merge readiness checkpoint was missing"
+  green:
+    - npm run build
+    - "GREEN: npm run verify:runtime-surface covered fast-forward clean checkpoint and conflicting merge checkpoint with conflict.txt"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

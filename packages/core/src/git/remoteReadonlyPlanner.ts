@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
 import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
 import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
+import { buildMergeReadinessCheckpoint, type MergeReadinessCheckpoint } from "./mergeReadinessCheckpoint.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -56,6 +57,7 @@ export interface PlanRemoteReadonlyResult {
     items: Array<Record<string, unknown>>;
     warning: string | null;
   };
+  mergeReadiness: MergeReadinessCheckpoint;
   blockers: string[];
   warnings: string[];
   readOnlyPlan: string[];
@@ -87,6 +89,15 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
   const branchHead = parseLsRemoteHead(await gitCapture(options.root, ["ls-remote", "--heads", targetRemote, targetBranch]));
   const baseHead = parseLsRemoteHead(await gitCapture(options.root, ["ls-remote", "--heads", targetRemote, targetBase]));
   const prState = await readPrState(options.root, targetBranch, targetBase);
+  const mergeReadiness = await buildMergeReadinessCheckpoint({
+    root: options.root,
+    targetRemote,
+    targetBase,
+    targetBranch,
+    baseHead,
+    branchHead,
+    validationEvidence,
+  });
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
     ...branchIdentity.errors,
@@ -98,6 +109,7 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
     ...(!simulatorEvidencePresent ? ["simulator evidence is missing"] : []),
     ...(!prSummaryExists ? [`PR-ready summary is missing: ${prSummaryPath}`] : []),
     ...(validationEvidence.length === 0 ? ["validation evidence is missing"] : []),
+    ...mergeReadiness.stopReasons.filter((reason) => reason.includes("merge conflict checkpoint")),
   ];
   const warnings = [
     ...(!branchHead ? [`remote branch head is absent or unreadable for ${targetRemote}/${targetBranch}`] : []),
@@ -140,12 +152,14 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
       baseHead,
     },
     prState,
+    mergeReadiness,
     blockers,
     warnings,
     readOnlyPlan: [
       "verify target remote, branch, and base identity",
       "compare local HEAD, ordered commits, and queue commit evidence",
       "compare remote branch head and target base head",
+      "compute read-only merge readiness checkpoint without running git merge",
       "inspect existing draft PR metadata when gh is available",
       "produce a push and draft PR operation preview for a later approved mutation candidate",
       "stop before any git push, gh pr create, gh pr edit, merge, or Issue mutation",

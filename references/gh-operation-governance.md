@@ -81,6 +81,11 @@ These operations require a `HIGH_RISK_DECISION_REPORT.md` until OW has an
 approved remote operation model. Approval must name the concrete action and
 guardrails.
 
+Merge-readiness conflict probes are not merge approval. A read-only checkpoint
+may name conflict files and required evidence, but conflict resolution requires
+an isolated worktree, explicit operation-level approval, validation reruns, and
+local audit evidence before any later merge operation.
+
 ## Audit Requirements
 
 For any evidence-writing or high-risk mutation, record locally:

@@ -5,6 +5,7 @@ import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
 import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
 import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
+import { buildMergeReadinessCheckpoint, type MergeReadinessCheckpoint } from "./mergeReadinessCheckpoint.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -44,6 +45,7 @@ export interface SimulateAutonomousGitResult {
     remoteHead: string | null;
     baseHead: string | null;
   };
+  mergeReadiness: MergeReadinessCheckpoint;
   simulatedPlan: string[];
   rollbackPlan: string[];
 }
@@ -69,6 +71,16 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
   const validationEvidence = localEvidence.validationEvidence.map((item) => item.value);
   const remoteHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, branchBoundary ?? currentBranch ?? "HEAD"]);
   const baseHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, targetBase]);
+  const targetBranch = branchBoundary ?? currentBranch ?? "HEAD";
+  const mergeReadiness = await buildMergeReadinessCheckpoint({
+    root: options.root,
+    targetRemote,
+    targetBase,
+    targetBranch,
+    baseHead,
+    branchHead: remoteHead,
+    validationEvidence,
+  });
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
     ...branchIdentity.errors,
@@ -77,6 +89,7 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
     ...(orderedLocalCommits.length === 0 && commitEvidence.length === 0 ? ["no local commits or commit evidence available for autonomous plan"] : []),
     ...(!prSummaryExists ? [`PR-ready summary is missing: ${prSummaryPath}`] : []),
     ...(validationEvidence.length === 0 ? ["validation evidence is missing"] : []),
+    ...mergeReadiness.stopReasons.filter((reason) => reason.includes("merge conflict checkpoint")),
   ];
   const warnings = [
     ...(!remoteHead ? [`remote branch head is unknown for ${targetRemote}/${branchBoundary ?? currentBranch ?? "HEAD"}`] : []),
@@ -113,11 +126,13 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
       remoteHead,
       baseHead,
     },
+    mergeReadiness,
     simulatedPlan: [
       "verify clean working tree and branch boundary",
       "verify validation evidence and PR-ready summary are current",
       `push ${branchBoundary ?? currentBranch ?? "<branch>"} to ${targetRemote}`,
       `create or update PR from ${branchBoundary ?? currentBranch ?? "<branch>"} into ${targetBase}`,
+      "review structured merge readiness checkpoint before any merge approval",
       "wait for checks and repository protection",
       "stop for conflict evidence if merge cannot be cleanly planned",
       "merge only after autonomous merge policy is separately approved",

@@ -77,6 +77,7 @@ async function main(): Promise<number> {
   await verifyModernLocalCommitEvidenceReader();
   await verifyBranchIdentityRemoteModes();
   await verifyGitAutomationManagedShell();
+  await verifyMergeConflictReadinessCheckpoint();
   await verifyPlanningArtifactRegistrationContract();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
@@ -2444,6 +2445,10 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert((simulateResult.orderedLocalCommits as unknown[]).length > 0, "simulator should include ordered local commits");
     assert(Array.isArray(simulateResult.rollbackPlan), "simulator missing rollback plan");
     assert(Array.isArray(simulateResult.blockers), "simulator missing blockers");
+    const simulateMergeReadiness = record(simulateResult.mergeReadiness, "simulator merge readiness checkpoint");
+    const simulateConflictProbe = record(simulateMergeReadiness.conflictProbe, "simulator merge conflict probe");
+    assert(simulateConflictProbe.attempted === true, "simulator should attempt read-only merge readiness probe");
+    assert(Array.isArray(simulateConflictProbe.conflictFiles), "simulator conflict probe missing conflict files array");
     assert(simulate.output.includes("validation evidence is missing"), "simulator should report missing validation blocker");
 
     await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
@@ -2504,6 +2509,12 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     const remoteState = record(remotePlanResult.remoteState, "remote-plan remote state");
     assert(typeof remoteState.baseHead === "string", "remote-plan should read remote base head");
     assert(typeof remoteState.branchHead === "string", "remote-plan should read remote branch head");
+    const remoteMergeReadiness = record(remotePlanResult.mergeReadiness, "remote-plan merge readiness checkpoint");
+    assert(remoteMergeReadiness.fastForward === "fast_forward", "remote-plan should identify fast-forward clean case");
+    const remoteConflictProbe = record(remoteMergeReadiness.conflictProbe, "remote-plan merge conflict probe");
+    assert(remoteConflictProbe.attempted === true, "remote-plan should attempt read-only merge readiness probe");
+    assert(remoteConflictProbe.clean === true, "remote-plan should report clean merge probe for fast-forward fixture");
+    assert(Array.isArray(remoteConflictProbe.conflictFiles) && remoteConflictProbe.conflictFiles.length === 0, "remote-plan clean fixture should not report conflict files");
     assert(Array.isArray(remotePlanResult.readOnlyPlan), "remote-plan missing read-only plan");
     assert(remotePlan.output.includes("did not push"), "remote-plan should state non-mutation boundary");
 
@@ -2633,6 +2644,118 @@ async function verifyGitAutomationManagedShell(): Promise<void> {
     assert(draftPrAuditEvidence.includes("operation_kind: create"), "draft PR audit evidence missing operation kind");
     assert(draftPrAuditEvidence.includes("approval_source: user_input:fixture-draft-pr-approval"), "draft PR audit evidence missing approval source");
     assert(draftPrAuditEvidence.includes("https://example.invalid/openworkflow/pull/1"), "draft PR audit evidence missing target PR URL");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+    await rm(remoteRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifyMergeConflictReadinessCheckpoint(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-merge-readiness-"));
+  const remoteRoot = `${tempRoot}-remote.git`;
+  try {
+    await runInCwd(tempRoot, ["git", "init"]);
+    await runInCwd(tempRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(tempRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await writeFile(join(tempRoot, "conflict.txt"), "base\n", "utf8");
+    await runInCwd(tempRoot, ["git", "add", "conflict.txt"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "initial"]);
+    await runInCwd(tempRoot, ["git", "switch", "-c", "codex/m117-conflict-fixture"]);
+    await writeFile(join(tempRoot, "conflict.txt"), "feature\n", "utf8");
+    await runInCwd(tempRoot, ["git", "commit", "-am", "feature conflict side"]);
+    await runInCwd(tempRoot, ["git", "switch", "master"]);
+    await writeFile(join(tempRoot, "conflict.txt"), "master\n", "utf8");
+    await runInCwd(tempRoot, ["git", "commit", "-am", "base conflict side"]);
+    await runInCwd(tempRoot, ["git", "init", "--bare", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "remote", "add", "origin", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "master"]);
+    await runInCwd(tempRoot, ["git", "switch", "codex/m117-conflict-fixture"]);
+    await mkdir(join(tempRoot, "changes", "M117-conflict"), { recursive: true });
+    await writeFile(join(tempRoot, "changes", "M117-conflict", "PR_READY_SUMMARY.md"), "# PR Ready\n", "utf8");
+    await writeFile(join(tempRoot, "changes", "M117-conflict", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M117-conflict",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M117-conflict",
+      "title: Conflict checkpoint fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m117-conflict-fixture",
+      "changes:",
+      "  - id: G017",
+      "    status: done",
+      "    title: Build read-only autonomous git simulator",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: feed017'",
+      "        - 'validation: npm run verify:runtime-surface'",
+      "  - id: C004",
+      "    status: done",
+      "    title: Conflict checkpoint fixture",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: face004'",
+      "        - 'validation: npm run validate'",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(tempRoot, ["git", "add", "changes/M117-conflict/CANDIDATE_CHANGES.yaml", "changes/M117-conflict/PR_READY_SUMMARY.md"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "M117/C004 conflict checkpoint fixture"]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "codex/m117-conflict-fixture"]);
+
+    const remotePlan = await runCaptureStatus([
+      process.execPath,
+      CLI,
+      "git-automation",
+      "remote-plan",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M117-conflict/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(remotePlan.code !== 0, "remote-plan should stop when merge readiness finds conflicts");
+    const remoteReport = parseJsonReport(remotePlan.output, "git-automation remote-plan");
+    const remoteData = record(remoteReport.data, "conflict remote-plan data");
+    const remoteResult = record(remoteData.result, "conflict remote-plan result");
+    const mergeReadiness = record(remoteResult.mergeReadiness, "conflict remote-plan merge readiness");
+    assert(mergeReadiness.fastForward === "non_fast_forward", "conflict remote-plan should report non-fast-forward state");
+    const conflictProbe = record(mergeReadiness.conflictProbe, "conflict remote-plan probe");
+    assert(conflictProbe.clean === false, "conflict remote-plan probe should not be clean");
+    assert(Array.isArray(conflictProbe.conflictFiles) && conflictProbe.conflictFiles.includes("conflict.txt"), "conflict remote-plan should name conflict file");
+    assert(remotePlan.output.includes("isolated worktree resolution"), "conflict remote-plan should include isolated worktree stop reason");
+
+    const simulate = await runCaptureStatus([
+      process.execPath,
+      CLI,
+      "git-automation",
+      "simulate",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M117-conflict/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(simulate.code !== 0, "simulator should stop when merge readiness finds conflicts");
+    const simulateReport = parseJsonReport(simulate.output, "git-automation simulate");
+    const simulateData = record(simulateReport.data, "conflict simulator data");
+    const simulateResult = record(simulateData.result, "conflict simulator result");
+    const simulateMergeReadiness = record(simulateResult.mergeReadiness, "conflict simulator merge readiness");
+    const simulateConflictProbe = record(simulateMergeReadiness.conflictProbe, "conflict simulator probe");
+    assert(Array.isArray(simulateConflictProbe.conflictFiles) && simulateConflictProbe.conflictFiles.includes("conflict.txt"), "conflict simulator should name conflict file");
+    assert(simulate.output.includes("isolated worktree resolution"), "conflict simulator should include isolated worktree stop reason");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
     await rm(remoteRoot, { recursive: true, force: true });

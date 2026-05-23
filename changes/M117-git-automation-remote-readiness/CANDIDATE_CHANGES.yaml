@@ -383,7 +383,7 @@ changes:
         - node dist/cli/src/index.js summaries --root . --strict --json
         - git diff --check
   - id: C004
-    status: candidate
+    status: done
     title: Define structured merge-conflict readiness checkpoint
     purpose: >
       Replace prose-only merge conflict guidance with a machine-readable checkpoint that future
@@ -405,6 +405,7 @@ changes:
     owned_paths:
       - references/git-version-control-governance.md
       - references/gh-operation-governance.md
+      - packages/core/src/git/mergeReadinessCheckpoint.ts
       - packages/core/src/git/remoteReadonlyPlanner.ts
       - packages/core/src/git/autonomousSimulator.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
@@ -426,6 +427,42 @@ changes:
       - Conflict cases stop with conflict files and required next evidence.
       - Clean cases distinguish fast-forward, non-fast-forward clean merge, and unknown states.
       - No merge, rebase, reset, force-push, or PR merge is executed.
+    selection:
+      selected_change_id: M117-C004-define-structured-merge-conflict-readiness-checkpoint
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C003 completed because M117 remains the active queue
+        boundary until cleared. Option D already approved C004 as
+        local/read-only structured merge-conflict readiness checkpointing.
+      approved_high_risk_option: Option D
+      artifacts:
+        selected_change: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/ATOM_TASKS.yaml
+        implementation_brief: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/git-version-control-governance.md
+        - references/gh-operation-governance.md
+        - packages/core/src/git/mergeReadinessCheckpoint.ts
+        - packages/core/src/git/remoteReadonlyPlanner.ts
+        - packages/core/src/git/autonomousSimulator.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Remote-plan and simulator now expose structured merge-readiness
+        checkpoint data, including target heads, merge base, fast-forward state,
+        read-only conflict probe, conflict files, required validations, and stop
+        reasons. Conflict cases stop before merge and require isolated worktree
+        evidence.
+      validation:
+        - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because simulator merge readiness checkpoint was missing"
+        - npm run build
+        - "GREEN: npm run verify:runtime-surface covered fast-forward clean checkpoint and conflicting merge checkpoint with conflict.txt"
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
   - id: C005
     status: candidate
     title: Add full remote-readiness story verifier
@@ -612,3 +649,37 @@ operations:
       - packages/cli/src/commands/gitAutomation.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Selected C004 after C003 completed because M117 should continue until the
+      queue is cleared. Scope is limited to local/read-only structured merge
+      conflict readiness checkpointing.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/SELECTED_CHANGE.yaml
+      - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/ATOM_TASKS.yaml
+      - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Completed structured merge-conflict readiness checkpointing for remote-plan
+      and simulator without running merge, rebase, reset, force-push, PR merge,
+      or working-tree conflict resolution.
+    changed_at: 2026-05-23
+    evidence:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - packages/core/src/git/mergeReadinessCheckpoint.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/LOCAL_COMMIT_EVIDENCE.yaml
