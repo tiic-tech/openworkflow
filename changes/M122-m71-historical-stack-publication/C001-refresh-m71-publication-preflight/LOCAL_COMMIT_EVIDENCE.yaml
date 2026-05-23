@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-refresh-m71-publication-preflight
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001-refresh-m71-publication-preflight
+status: current
+source_plan_id: M122-m71-historical-stack-publication
+source_candidate_id: C001
+selected_change_id: C001-refresh-m71-publication-preflight
+primary_commit: be501002ba20971bd6b2ed27077da22a2f802133
+validation_evidence:
+  - git status --short --branch
+  - git rev-parse origin/main codex/m71-git-version-governance
+  - git merge-base origin/main codex/m71-git-version-governance
+  - git rev-list --count origin/main..codex/m71-git-version-governance
+  - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
+  - git merge-tree origin/main codex/m71-git-version-governance
+  - git ls-remote --heads origin codex/m71-git-version-governance
+  - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all
+  - git diff --check
+  - node dist/cli/src/index.js validate --root . --json
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
