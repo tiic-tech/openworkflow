@@ -1,0 +1,283 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M122-m71-historical-stack-publication
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M122-m71-historical-stack-publication
+title: Candidate changes for M71 historical stack publication
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-after-m123-open-m122
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+    - changes/M123-pr-ready-review-governance/SUMMARY.yaml
+    - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    - changes/M71-git-version-control-governance/SUMMARY.yaml
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+  summary: >
+    M123 completed PR #5 ready-for-review governance and deferred PR #4. M122 owns the next
+    approval-gated publication lane for the older M71 git-version-control governance stack. M71 is
+    technically remote-ready: the local branch exists, PR-ready summary exists, the branch is 66
+    commits ahead of origin/main, origin/main is an ancestor, the remote branch is absent, and no PR
+    currently exists. Because M71 is a historical stack and remote push/PR creation are high-risk
+    mutations, this queue separates read-only preflight, decision reporting, approved push, approved
+    draft PR creation, and final audit.
+queue_policy:
+  branch_boundary: codex/m122-m71-historical-stack-publication
+  target_publication_branch: codex/m71-git-version-governance
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. M122 must refresh current M71 remote publication facts before creating any
+    push or draft PR approval packet.
+  high_risk_rule: >
+    C002, C003, and C004 contain or prepare high-risk remote mutation boundaries. Exact push and
+    draft PR commands must be captured in a high-risk decision report and approved explicitly before
+    execution.
+scope_control:
+  current_boundary: >
+    Approval-gated publication of the existing M71 branch as one historical stack review branch.
+  boundary_type: git_remote_publication_workflow_slice
+  in_scope_rule: >
+    Include read-only publication preflight, high-risk decision packets, approved push of only the
+    M71 target branch, approved draft PR creation, and local audit evidence.
+  out_of_scope_rule: >
+    Do not merge PRs, mark PRs ready for review, edit or close existing PRs, mutate Issues, publish
+    M101-derived shared branches, force-push, delete remote branches, rebase, reset, cherry-pick,
+    split M71 history, or change product source in this queue.
+  deferred_features:
+    - title: PR #4 M102-specific readiness governance
+      reason: PR #4 was deferred by M123 and belongs to an older M102 flow.
+      suggested_plan_id: M125-m102-pr4-readiness-governance
+    - title: Shared M101-derived branch publication strategy
+      reason: M105, M106, and M115 need a separate shared-stack or split decision before publication.
+      suggested_plan_id: M124-shared-branch-publication-strategy
+observed_state:
+  captured_at: 2026-05-23T21:20:15+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  target_branch: codex/m71-git-version-governance
+  target_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  merge_base: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 66
+  origin_main_is_ancestor: true
+  conflict_probe_tree: bbf7b9e12650cd3d984f7fa379e8ecd3871bf5e3
+  target_remote_branch_present: false
+  existing_prs_for_target_branch: []
+  pr_ready_summary_present: true
+  m123_status: done
+high_risk_report:
+  path: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+  status: not_created
+  decision_boundary: M71 branch push and draft PR creation
+  report_is_approval: false
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Refresh M71 remote publication preflight
+    purpose: >
+      Produce a current read-only preflight packet for publishing the M71 historical branch,
+      including local branch head, base ancestry, ahead count, conflict probe, remote branch
+      presence, existing PRs, and recommended execution model.
+    scope:
+      includes:
+        - verify M71 local branch and PR_READY_SUMMARY.md
+        - verify origin/main ancestry and ahead count
+        - verify remote target branch absence or head
+        - verify existing PRs for the M71 head branch
+        - recommend whether M71 can proceed to a high-risk push decision
+      excludes:
+        - push
+        - draft PR creation
+        - PR ready-for-review transition
+        - merge, PR edit, PR close, Issue mutation, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    dependencies: []
+    unlocks:
+      - C002
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git rev-parse origin/main codex/m71-git-version-governance
+      - git merge-base origin/main codex/m71-git-version-governance
+      - git rev-list --count origin/main..codex/m71-git-version-governance
+      - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
+      - git merge-tree origin/main codex/m71-git-version-governance
+      - git ls-remote --heads origin codex/m71-git-version-governance
+      - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+      - git diff --check
+    acceptance:
+      - A durable preflight packet names current M71 publication facts.
+      - The packet states whether M71 can proceed to an exact high-risk push decision.
+      - No remote or destructive git mutation occurs.
+  - id: C002
+    status: candidate
+    title: Prepare M71 push decision and isolated execution preflight
+    purpose: >
+      Convert C001 facts into a high-risk decision report for pushing the M71 branch and, if needed,
+      an isolated worktree preflight that can safely execute the exact target-branch push after
+      approval.
+    scope:
+      includes:
+        - exact push command for codex/m71-git-version-governance
+        - current local and remote refs
+        - historical-stack acceptance rationale
+        - stop criteria and rollback guidance
+        - isolated worktree or equivalent execution model if branch identity differs
+      excludes:
+        - executing push
+        - draft PR creation
+        - merge, PR edit, PR close, Issue mutation, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+      - changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C005
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The decision packet names exactly one M71 push command.
+      - The packet states that it is evidence, not approval.
+      - The packet blocks execution until exact user approval is received.
+  - id: C003
+    status: candidate
+    title: Execute approved M71 branch push
+    purpose: >
+      After C002 exists and the user approves the exact command, push only the M71 branch to the
+      configured remote and record local audit evidence.
+    scope:
+      includes:
+        - verify exact approval text for the M71 push
+        - verify local and remote refs immediately before mutation
+        - execute one approved push for codex/m71-git-version-governance
+        - record resulting remote branch head and rollback guidance
+      excludes:
+        - draft PR creation
+        - merge, PR edit, PR close, Issue mutation, ready-for-review transition, rebase, reset,
+          force-push, or branch deletion
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: high
+    size: small
+    validation:
+      - git ls-remote --heads origin codex/m71-git-version-governance
+      - git diff --check
+    acceptance:
+      - The M71 remote branch exists at the approved local head.
+      - Local audit evidence records approval, command, result, and rollback guidance.
+      - No draft PR, merge, PR edit, Issue mutation, or unrelated remote mutation occurs.
+  - id: C004
+    status: candidate
+    title: Create approved M71 draft PR
+    purpose: >
+      After C003 pushes the branch and the user approves the exact command, create one draft PR from
+      the M71 branch into main and record local audit evidence.
+    scope:
+      includes:
+        - prepare M71 draft PR body from PR_READY_SUMMARY.md and publication evidence
+        - verify exact approval text for draft PR creation
+        - execute one approved draft PR creation for M71
+        - record resulting PR URL and state
+      excludes:
+        - marking the PR ready for review
+        - merge, PR edit after creation, PR close, Issue mutation, push, rebase, reset, force-push,
+          or branch deletion
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    dependencies:
+      - C003
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr view <created-pr> --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - One M71 draft PR exists and remains draft.
+      - Local audit evidence records approval, command, PR URL, resulting state, and rollback guidance.
+      - No ready-for-review transition, merge, PR edit after creation, PR close, Issue mutation, or unrelated remote mutation occurs.
+  - id: C005
+    status: candidate
+    title: Record M71 publication audit and handoff
+    purpose: >
+      Close M122 with local audit evidence naming whether M71 was pushed, whether a draft PR was
+      created, and which later queue owns remaining publication governance.
+    scope:
+      includes:
+        - summarize completed publication transitions or stop reasons
+        - update M122 summary and readable view
+        - record deferred next queues for PR #4 and shared M101-derived branches
+        - confirm no unauthorized PR, Issue, merge, or destructive git operations occurred
+      excludes:
+        - merge
+        - Issue mutation
+        - PR ready-for-review transition
+        - publishing shared M101-derived branches
+        - changing product source
+    owned_paths:
+      - changes/M122-m71-historical-stack-publication/
+    dependencies:
+      - C001
+    unlocks:
+      - M124-shared-branch-publication-strategy
+      - M125-m102-pr4-readiness-governance
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - A local audit names each authorized and unauthorized operation boundary.
+      - Remaining draft PRs and next governance queues are explicit.
+      - M122 can be handed off without raw session context.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: Create M122 candidate queue for M71 historical stack publication after M123 completed.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+      - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md

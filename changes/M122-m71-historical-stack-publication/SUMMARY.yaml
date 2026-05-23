@@ -1,0 +1,108 @@
+schema_version: 0.1.0
+contract_id: summary:M122-m71-historical-stack-publication
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M122-m71-historical-stack-publication
+title: Summary for M71 historical stack publication
+status: active
+source:
+  kind: mixed
+  summary: >
+    M122 was created after M123 completed PR #5 ready-for-review governance and deferred PR #4.
+    It owns approval-gated remote publication of the existing M71 git-version-control governance
+    branch as one historical stack review branch.
+  refs:
+    - user_input:2026-05-23-after-m123-open-m122
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+    - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+scope_boundary: >
+  M71 historical stack publication only. M122 may refresh read-only publication preflight, prepare
+  exact high-risk push and draft PR decision reports, execute only explicitly approved M71
+  publication commands, and record local audit evidence. It does not approve any remote mutation by
+  itself.
+branch_boundary: codex/m122-m71-historical-stack-publication
+target_publication:
+  plan_id: M71-git-version-control-governance
+  branch: codex/m71-git-version-governance
+  base: main
+  remote: origin
+  local_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 66
+  origin_main_is_ancestor: true
+  remote_branch_present: false
+  existing_prs: []
+  branch_local_pr_ready_summary_present: true
+candidate_count: 5
+completed_candidate_id: null
+completed_change_id: null
+next_recommended_candidate_id: C001
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M122-m71-historical-stack-publication/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M122-m71-historical-stack-publication/CANDIDATE_CHANGES.md
+  summary: changes/M122-m71-historical-stack-publication/SUMMARY.yaml
+  high_risk_decision_report: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+observed_state:
+  captured_at: 2026-05-23T21:20:15+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: true
+  target_branch: codex/m71-git-version-governance
+  target_branch_head: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  origin_main_head: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  merge_base: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  commits_ahead_of_origin_main: 66
+  origin_main_is_ancestor: true
+  conflict_probe_tree: bbf7b9e12650cd3d984f7fa379e8ecd3871bf5e3
+  remote_branch_present: false
+  existing_prs: []
+high_risk_report:
+  status: not_created
+  path: changes/M122-m71-historical-stack-publication/HIGH_RISK_DECISION_REPORT.md
+  decision_boundary: M71 branch push and draft PR creation
+  report_is_approval: false
+key_dependencies:
+  - M123 completed PR #5 ready-for-review governance and deferred PR #4.
+  - M120 ranked M71 as the next historical publication candidate after M117.
+  - M71 branch-local PR_READY_SUMMARY.md is present.
+  - C001 must refresh publication facts before any high-risk push decision.
+risks:
+  - id: R001
+    level: high
+    description: Pushing M71 mutates the remote repository and affects collaboration state.
+    mitigation: Require HIGH_RISK_DECISION_REPORT.md and exact operation-level approval.
+  - id: R002
+    level: high
+    description: Creating a draft PR mutates GitHub state.
+    mitigation: Require separate exact approval after the branch push succeeds.
+  - id: R003
+    level: medium
+    description: M71 is a 66-commit historical stack with early work predating strict commit evidence.
+    mitigation: Publish it as one intentionally coupled review branch only after explicit historical-stack acceptance.
+unresolved_questions:
+  - Should M71 be accepted as one intentionally coupled historical review branch after C001 preflight?
+deferred_features:
+  - M125-m102-pr4-readiness-governance
+  - M124-shared-branch-publication-strategy
+validation:
+  commands_run:
+    - npm run build
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+    - git show-ref --heads codex/m71-git-version-governance codex/m122-m71-historical-stack-publication
+    - git ls-remote --heads origin codex/m71-git-version-governance codex/m122-m71-historical-stack-publication
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m71-git-version-governance --state all --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+    - git rev-parse main origin/main codex/m71-git-version-governance
+    - git merge-base origin/main codex/m71-git-version-governance
+    - git rev-list --count origin/main..codex/m71-git-version-governance
+    - git merge-base --is-ancestor origin/main codex/m71-git-version-governance
+    - git merge-tree origin/main codex/m71-git-version-governance
+  notes: |
+    - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
+      the user explicitly asked to judge and proceed with M122 after M123 completed.
+    - M122 queue creation performed no remote mutation.
+    - M71 push and draft PR creation remain unapproved high-risk operations.
