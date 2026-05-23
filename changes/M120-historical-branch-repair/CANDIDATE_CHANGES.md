@@ -8,9 +8,9 @@ M120 owns historical local branch and PR-ready evidence repair after the M102 re
 
 Proposed branch boundary: `codex/m120-historical-branch-repair`
 
-Current branch during queue creation: `codex/m119-approved-remote-pr-publication`
+Current branch: `codex/m120-historical-branch-repair`
 
-DTC did not create or switch branches. A later git-automation branch action should create or switch to the boundary branch before selecting implementation candidates.
+DTC did not create or switch branches during queue creation. A later git-automation branch action created the local boundary branch before C001 selection.
 
 ## Selection Policy
 
@@ -18,19 +18,25 @@ Select C001 first. M120 must produce a read-only branch ownership inventory befo
 
 High-risk operations such as rebase, reset, force-push, remote deletion, PR edit, merge, or ready-for-review transition require a dedicated high-risk report and exact operation-level approval.
 
-Next recommended candidate: C001
+Next recommended candidate: C002
 
 ## Candidates
 
 ### C001 - Inventory historical branch ownership and PR-ready evidence
 
-Status: ready
+Status: done
 
 Risk: medium
 
 Purpose: build a read-only baseline mapping local branches, remote branches, queue branch boundaries, PR-ready summaries, existing PRs, and blockers.
 
 Excludes: branch creation, checkout-based repair, cherry-pick, rebase, reset, force-push, remote mutation, PR mutation, and Issue mutation.
+
+Completion evidence:
+
+- `changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/INVENTORY.md`
+
+Result: M102 and M71 have branch-local PR-ready summaries; M117 is missing its branch-local summary; M105, M106, and M115 share the M101 branch boundary and need policy before repair.
 
 Unlocks: C002, C003, C004
 

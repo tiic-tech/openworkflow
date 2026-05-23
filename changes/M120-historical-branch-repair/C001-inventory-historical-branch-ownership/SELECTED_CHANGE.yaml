@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:M120-C001-inventory-historical-branch-ownership
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M120-C001-inventory-historical-branch-ownership
+source_plan_id: M120-historical-branch-repair
+source_candidate_id: C001
+title: Inventory historical branch ownership and PR-ready evidence
+status: selected
+selection_reason: >
+  C001 is the first ready candidate in M120 and is required before any repair policy, branch-local
+  summary restoration, or high-risk history surgery can be considered. It is read-only and matches
+  the current branch boundary.
+scope:
+  includes:
+    - list local codex branches and remote codex branches
+    - map PR_READY_SUMMARY.md artifacts to their recorded branch boundaries
+    - identify queues whose summaries are not present on their owning branches
+    - identify queues that share a historical branch boundary
+    - record existing PRs and their head/base relationships
+  excludes:
+    - branch creation or deletion
+    - checkout-based repair
+    - cherry-pick, rebase, reset, force-push, or remote mutation
+    - PR creation, edit, close, merge, or ready-for-review transition
+owned_paths:
+  - changes/M120-historical-branch-repair/
+forbidden_paths:
+  - .git/
+  - .openworkflow/**
+  - .agents/**
+  - package.json
+  - src/**
+  - tests/**
+acceptance:
+  - A durable inventory names every currently known publication candidate and blocker.
+  - Shared or mismatched branch boundaries are called out explicitly.
+  - No branch pointer, remote, PR, or Issue state is mutated.
+validation:
+  - git status --short --branch
+  - git branch --list 'codex/m*' --format='%(refname:short)'
+  - git ls-remote --heads origin 'codex/*'
+  - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,state,isDraft,title,headRefName,baseRefName --limit 50
+  - find changes -maxdepth 2 -name PR_READY_SUMMARY.md
+  - git diff --check
+rejected_alternatives:
+  - id: C002
+    reason: Repair policy depends on the C001 inventory.
+  - id: C003
+    reason: Branch-local evidence restoration depends on inventory and repair policy.
+  - id: C004
+    reason: High-risk history surgery reporting depends on inventory and repair policy.
+  - id: C005
+    reason: Publication ordering depends on repaired inventory evidence.

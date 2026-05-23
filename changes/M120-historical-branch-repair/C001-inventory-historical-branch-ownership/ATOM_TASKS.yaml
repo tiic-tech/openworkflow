@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M120-C001-inventory-historical-branch-ownership
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M120-C001-inventory-historical-branch-ownership
+title: Atom tasks for historical branch ownership inventory
+status: done
+tasks:
+  - task_id: T001
+    title: Capture current branch, local branches, and remote branches
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - The current branch and local dirty-tree state are recorded.
+      - Local and remote codex branch lists are recorded.
+  - task_id: T002
+    title: Map PR-ready summaries to branch boundaries
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - Every discovered PR_READY_SUMMARY.md is linked to a plan id and recorded branch boundary.
+      - Shared branch boundaries are identified.
+  - task_id: T003
+    title: Check branch-local summary presence and PR state
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - Summary presence on the owning branch is recorded.
+      - Existing GitHub PRs are recorded without mutation.
+  - task_id: T004
+    title: Write inventory report and update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M120-historical-branch-repair/
+    done_when:
+      - INVENTORY.md records candidates, blockers, and next repair inputs.
+      - The queue can safely advance to C002.

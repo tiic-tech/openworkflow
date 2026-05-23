@@ -29,9 +29,8 @@ queue_policy:
   branch_boundary: codex/m120-historical-branch-repair
   branch_note: >
     Proposed by DTC while the repository was on codex/m119-approved-remote-pr-publication after
-    local commit 27a267a. Per DTC protocol, branch creation is not performed by this queue creation
-    step; a later git-automation branch action should create or switch to the boundary branch before
-    selecting implementation candidates.
+    local commit 27a267a. The local branch was later created with git-automation before selecting
+    C001.
   source_of_truth: CANDIDATE_CHANGES.yaml
   readable_view: CANDIDATE_CHANGES.md
   id_policy: Stable ids are assigned once and referenced by select-change.
@@ -104,10 +103,10 @@ observed_state:
       of independent queue branches.
     - M71 is older and includes a long historical stack with early commits that predate strict
       commit evidence.
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Inventory historical branch ownership and PR-ready evidence
     purpose: >
       Build a read-only inventory that maps local branches, remote branches, queue branch boundaries,
@@ -145,6 +144,32 @@ changes:
       - A durable inventory names every currently known publication candidate and blocker.
       - Shared or mismatched branch boundaries are called out explicitly.
       - No branch pointer, remote, PR, or Issue state is mutated.
+    selection:
+      selected_change_id: M120-C001-inventory-historical-branch-ownership
+      selected_at: 2026-05-23
+      reason: >
+        Selected first because M120 needs a read-only branch ownership and PR-ready evidence
+        baseline before repair policy, evidence restoration, or high-risk history surgery.
+      artifacts:
+        selected_change: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/ATOM_TASKS.yaml
+        implementation_brief: changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced local planning inventory evidence only. It did not change product source,
+        generated surfaces, runtime behavior, branch pointers, remote refs, PR state, or Issues.
+      evidence:
+        - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/INVENTORY.md
+      validation:
+        - git status --short --branch
+        - git branch --list 'codex/m*' --format='%(refname:short)'
+        - git ls-remote --heads origin 'codex/*'
+        - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,state,isDraft,title,headRefName,baseRefName --limit 50
+        - find changes -maxdepth 2 -name PR_READY_SUMMARY.md
+        - branch-local PR_READY_SUMMARY.md presence checks with git cat-file -e
+        - git diff --check
   - id: C002
     status: candidate
     title: Decide historical branch repair policy and stop boundaries
@@ -302,3 +327,38 @@ operations:
     evidence:
       - changes/M119-approved-remote-pr-publication/C004-post-publication-audit/POST_PUBLICATION_AUDIT.md
       - changes/M119-approved-remote-pr-publication/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Create and switch to the local M120 branch boundary before selection.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: ready
+    evidence:
+      - node dist/cli/src/index.js git-automation branch --root . --queue changes/M120-historical-branch-repair/CANDIDATE_CHANGES.yaml --write --json
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Select the first ready read-only inventory candidate.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/SELECTED_CHANGE.yaml
+      - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/ATOM_TASKS.yaml
+      - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Complete read-only historical branch ownership inventory.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M120-historical-branch-repair/C001-inventory-historical-branch-ownership/INVENTORY.md
