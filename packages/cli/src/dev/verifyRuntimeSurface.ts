@@ -74,6 +74,7 @@ async function main(): Promise<number> {
   await verifyLocalFeatBranchAutomation();
   await verifySelectedChangeCommitAutomation();
   await verifyPrReadySummaryGeneration();
+  await verifyModernLocalCommitEvidenceReader();
   await verifyGitAutomationManagedShell();
   await verifyPlanningArtifactRegistrationContract();
   console.log("OpenWorkflow runtime surface verification passed.");
@@ -2341,6 +2342,12 @@ async function verifyPrReadySummaryGeneration(): Promise<void> {
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
+}
+
+async function verifyModernLocalCommitEvidenceReader(): Promise<void> {
+  const fixturePath = "changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs";
+  const result = await runCaptureStatus(["node", fixturePath], process.env);
+  assert(result.code === 0, `modern local commit evidence reader fixture failed:\n${result.output}`);
 }
 
 async function verifyGitAutomationManagedShell(): Promise<void> {

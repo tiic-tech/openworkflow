@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
+import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -29,7 +30,7 @@ export interface SimulateAutonomousGitResult {
   localHead: string | null;
   dirtyPaths: string[];
   orderedLocalCommits: Array<{ hash: string; subject: string }>;
-  commitEvidence: Array<{ candidate_id: string; hash: string }>;
+  commitEvidence: LocalGitCommitEvidence[];
   prSummaryPath: string;
   prSummaryExists: boolean;
   validationEvidence: string[];
@@ -55,9 +56,10 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
   const localHead = await gitCaptureTrim(options.root, ["rev-parse", "HEAD"]);
   const dirtyPaths = await readDirtyPaths(options.root);
   const orderedLocalCommits = await readOrderedCommits(options.root, baseRef);
-  const commitEvidence = commitEvidenceFromQueue(queue);
+  const localEvidence = await readLocalGitEvidence(options.root, queue);
+  const commitEvidence = localEvidence.commitEvidence;
   const prSummaryExists = await exists(join(options.root, prSummaryPath));
-  const validationEvidence = collectValidationEvidence(queue);
+  const validationEvidence = localEvidence.validationEvidence.map((item) => item.value);
   const remoteHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, branchBoundary ?? currentBranch ?? "HEAD"]);
   const baseHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, targetBase]);
   const blockers = [
@@ -71,6 +73,7 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
   const warnings = [
     ...(!remoteHead ? [`remote branch head is unknown for ${targetRemote}/${branchBoundary ?? currentBranch ?? "HEAD"}`] : []),
     ...(!baseHead ? [`remote base head is unknown for ${targetRemote}/${targetBase}`] : []),
+    ...localEvidence.warnings,
     "simulator is read-only and did not push, create PRs, merge, or mutate Issues",
   ];
 
@@ -162,31 +165,6 @@ async function exists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-function collectValidationEvidence(queue: Record<string, unknown>): string[] {
-  const values = new Set<string>();
-  for (const item of array(record(queue.validation).commands_run)) {
-    values.add(String(item));
-  }
-  for (const change of array(queue.changes).map(record)) {
-    for (const item of array(record(change.completion).evidence).map(String)) {
-      if (item.startsWith("validation:")) {
-        values.add(item.replace(/^validation:\s*/, ""));
-      }
-    }
-  }
-  return [...values];
-}
-
-function commitEvidenceFromQueue(queue: Record<string, unknown>): Array<{ candidate_id: string; hash: string }> {
-  return array(queue.changes).map(record).flatMap((candidate) => {
-    const candidateId = stringValue(candidate.id) ?? "unknown";
-    return array(record(candidate.completion).evidence)
-      .map(String)
-      .filter((item) => item.startsWith("commit:"))
-      .map((item) => ({ candidate_id: candidateId, hash: item.replace(/^commit:\s*/, "") }));
-  });
 }
 
 function defaultPrSummaryPath(queuePath: string): string {

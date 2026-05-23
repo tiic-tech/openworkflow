@@ -87,7 +87,7 @@ scope_control:
         Issue mutation has separate governance and should not be bundled with
         git branch, PR, and merge readiness.
       suggested_plan_id: M119-gh-issue-source-of-truth-operations
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 review_findings:
   - id: F001
     severity: P1
@@ -119,7 +119,7 @@ review_findings:
       - packages/core/src/git/autonomousSimulator.ts
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Normalize git-automation local evidence readers
     purpose: >
       Make PR-ready summary, remote-plan, and simulator consume the same
@@ -162,6 +162,39 @@ changes:
       - remote-plan and simulator expose ordered local commit evidence from modern selected-change evidence records.
       - Legacy `commit:` evidence remains supported as migration compatibility.
       - No remote git or GitHub mutation is enabled.
+    selection:
+      selected_change_id: M117-C001-normalize-git-automation-local-evidence-readers
+      selected_at: 2026-05-23
+      reason: >
+        C001 is dependency-free and unlocks the rest of the remote-readiness
+        queue: PR summaries, remote-plan, simulator, draft PR hardening, and
+        future conflict checkpoints all need one trusted reader for modern
+        LOCAL_COMMIT_EVIDENCE.yaml records before they can produce actionable
+        git automation handoffs.
+      artifacts:
+        selected_change: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml
+        implementation_brief: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/core/src/git/localEvidenceReader.ts
+        - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs
+      summary: >
+        Added one shared local git evidence reader for queue completion records
+        and selected-change LOCAL_COMMIT_EVIDENCE.yaml files, then wired
+        PR-ready summary, remote-plan, and simulator to consume modern commit
+        and validation evidence while preserving legacy `commit:` and
+        `validation:` evidence strings.
+      validation:
+        - "RED: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs failed because summary did not render primary_commit from LOCAL_COMMIT_EVIDENCE.yaml"
+        - npm run build
+        - "GREEN: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs"
+        - node dist/cli/src/index.js git-automation summary --root . --queue changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - git diff --check
   - id: C002
     status: ready
     title: Apply branch identity governance across git-automation modes
@@ -348,3 +381,36 @@ operations:
       - packages/core/src/git/autonomousSimulator.ts
       - packages/core/src/git/draftPrPilot.ts
       - packages/core/src/git/prReadySummary.ts
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Selected the first dependency-ready candidate after git-automation branch
+      successfully created and switched to the queue branch boundary. C001 is
+      the lowest-risk first step because it strengthens local evidence
+      consumption without enabling push, PR mutation, merge, or remote writes.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml
+      - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml
+      - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md
+      - openworkflow git-automation branch --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --write --json
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed the shared local evidence reader and wired it into the
+      non-mutating git-automation report surfaces required before later remote
+      readiness work can be trusted.
+    changed_at: 2026-05-23
+    evidence:
+      - packages/core/src/git/localEvidenceReader.ts
+      - packages/core/src/git/prReadySummary.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs

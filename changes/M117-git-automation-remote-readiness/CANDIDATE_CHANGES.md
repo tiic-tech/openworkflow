@@ -6,7 +6,9 @@ Status: active
 
 Branch boundary: `codex/m117-git-automation-remote-readiness`
 
-Next recommended candidate: C001.
+Completed candidate: C001.
+
+Next implementation target: C002.
 
 ## Scope
 
@@ -49,7 +51,7 @@ Out of scope:
 
 ### C001 - Normalize Git-Automation Local Evidence Readers
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -66,6 +68,16 @@ Acceptance focus:
 - Remote-plan and simulator expose modern selected-change evidence records.
 - Legacy `commit:` evidence remains supported.
 - No remote mutation is enabled.
+
+Selection artifacts:
+
+- `C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml`
+- `C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml`
+- `C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md`
+
+Completion: shared local evidence reader added and wired into PR-ready summary,
+remote-plan, and simulator. Targeted RED/GREEN fixture is now part of runtime
+surface verification.
 
 ### C002 - Apply Branch Identity Governance Across Git-Automation Modes
 

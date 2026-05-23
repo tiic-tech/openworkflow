@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parseYaml } from "../contracts/yaml.js";
+import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
 
 export interface GeneratePrReadySummaryOptions {
   root: string;
@@ -47,9 +48,11 @@ export async function generatePrReadySummary(options: GeneratePrReadySummaryOpti
   const completed = changes.filter((change) => change.status === "done");
   const remaining = changes.filter((change) => change.status !== "done");
   const highRisk = changes.filter((change) => change.risk === "high");
-  const validation = collectValidationEvidence(queue, completed);
+  const localEvidence = await readLocalGitEvidence(options.root, queue);
+  const validation = localEvidence.validationEvidence.map((item) => item.value);
   const warnings = [
     ...base.warnings,
+    ...localEvidence.warnings,
     ...(remaining.length > 0 ? ["candidate queue is not fully complete; PR-ready summary is a review packet, not a merge signal"] : []),
     ...(validation.length === 0 ? ["no validation evidence found in queue or completed candidates"] : []),
   ];
@@ -61,6 +64,7 @@ export async function generatePrReadySummary(options: GeneratePrReadySummaryOpti
     completed,
     remaining,
     highRisk,
+    commitEvidence: localEvidence.commitEvidence,
     validation,
     warnings,
   });
@@ -81,6 +85,7 @@ function renderSummary(input: {
   completed: CandidateChange[];
   remaining: CandidateChange[];
   highRisk: CandidateChange[];
+  commitEvidence: LocalGitCommitEvidence[];
   validation: string[];
   warnings: string[];
 }): string {
@@ -98,7 +103,7 @@ function renderSummary(input: {
     "",
     "## Completed Changes",
     "",
-    ...renderCompleted(input.completed),
+    ...renderCompleted(input.completed, input.commitEvidence),
     "",
     "## Deferred Or Blocked Changes",
     "",
@@ -121,17 +126,22 @@ function renderSummary(input: {
   ].join("\n");
 }
 
-function renderCompleted(changes: CandidateChange[]): string[] {
+function renderCompleted(changes: CandidateChange[], commitEvidence: LocalGitCommitEvidence[]): string[] {
   if (changes.length === 0) {
     return ["- No completed changes recorded."];
   }
   return changes.map((change) => {
+    const candidateId = scalar(change.id, "unknown");
     const selectedChangeId = scalar(asRecord(change.selection).selected_change_id, "not recorded");
-    const evidence = asArray(asRecord(change.completion).evidence).map(String);
-    const commits = evidence.filter((item) => item.startsWith("commit:"));
+    const commits = commitEvidence.filter((item) => item.candidate_id === candidateId).map(formatCommitEvidence);
     const commitText = commits.length > 0 ? `; ${commits.join("; ")}` : "; commit: not recorded";
-    return `- \`${scalar(change.id, "unknown")}\` ${scalar(change.title, "Untitled change")} (selected: \`${selectedChangeId}\`${commitText})`;
+    return `- \`${candidateId}\` ${scalar(change.title, "Untitled change")} (selected: \`${selectedChangeId}\`${commitText})`;
   });
+}
+
+function formatCommitEvidence(item: LocalGitCommitEvidence): string {
+  const path = item.evidence_path ? `, evidence: ${item.evidence_path}` : "";
+  return `commit: ${item.hash}${path}`;
 }
 
 function renderRemaining(changes: CandidateChange[]): string[] {
@@ -146,21 +156,6 @@ function renderHighRisk(changes: CandidateChange[]): string[] {
     return ["- No high-risk candidates recorded."];
   }
   return changes.map((change) => `- \`${scalar(change.id, "unknown")}\` status \`${scalar(change.status, "unknown")}\`: ${scalar(change.title, "Untitled high-risk change")}`);
-}
-
-function collectValidationEvidence(queue: Record<string, unknown>, completed: CandidateChange[]): string[] {
-  const values = new Set<string>();
-  for (const item of asArray(asRecord(queue.validation).commands_run)) {
-    values.add(String(item));
-  }
-  for (const change of completed) {
-    for (const item of asArray(asRecord(change.completion).evidence).map(String)) {
-      if (item.startsWith("validation:")) {
-        values.add(item.replace(/^validation:\s*/, ""));
-      }
-    }
-  }
-  return [...values];
 }
 
 function renderList(values: string[], empty: string): string[] {
