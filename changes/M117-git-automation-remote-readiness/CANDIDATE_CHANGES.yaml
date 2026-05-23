@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M117-git-automation-remote-readiness
 title: Candidate changes for git automation remote readiness governance
-status: active
+status: completed
 source:
   kind: discussion_and_repo_audit
   refs:
@@ -464,7 +464,7 @@ changes:
         - node dist/cli/src/index.js summaries --root . --strict --json
         - git diff --check
   - id: C005
-    status: candidate
+    status: done
     title: Add full remote-readiness story verifier
     purpose: >
       Prove the non-mutating remote readiness path end to end: modern local evidence, branch
@@ -502,6 +502,34 @@ changes:
       - The verifier fails if commit evidence, branch identity, draft PR approval, or conflict
         checkpoint fields disappear.
       - The next autonomous queue has concrete evidence to consume instead of prose-only policy.
+    selection:
+      selected_change_id: M117-C005-add-full-remote-readiness-story-verifier
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C004 completed because C005 is the final dependency-ready
+        M117 candidate and proves the full non-mutating remote-readiness story.
+      artifacts:
+        selected_change: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/ATOM_TASKS.yaml
+        implementation_brief: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Added an integrated full remote-readiness runtime fixture covering local
+        evidence, branch identity, PR-ready summary generation, remote refs,
+        remote-plan, draft-pr preview and approval refusal, merge-readiness
+        checkpoint, and remote merge refusal without real remote mutation.
+      validation:
+        - "RED: npm run build failed because verifyFullRemoteReadinessStory was missing"
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: create
@@ -683,3 +711,30 @@ operations:
       - packages/core/src/git/autonomousSimulator.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts
       - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Selected the final M117 candidate after C004 completed so the queue can be
+      cleared through an integrated non-mutating remote-readiness verifier.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/SELECTED_CHANGE.yaml
+      - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/ATOM_TASKS.yaml
+      - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      Completed the integrated non-mutating remote-readiness story verifier and
+      cleared all M117 candidates.
+    changed_at: 2026-05-23
+    evidence:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/LOCAL_COMMIT_EVIDENCE.yaml

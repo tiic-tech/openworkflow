@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M117-git-automation-remote-readiness
 title: Summary for git automation remote readiness governance
-status: active
+status: completed
 source:
   kind: discussion_and_repo_audit
   summary: >
@@ -33,9 +33,9 @@ scope_boundary: >
   rebase, force-push, ready-for-review PR mutation, or Issue mutation.
 branch_boundary: codex/m117-git-automation-remote-readiness
 candidate_count: 5
-completed_candidate_id: C004
-completed_change_id: M117-C004-define-structured-merge-conflict-readiness-checkpoint
-next_recommended_candidate_id: C005
+completed_candidate_id: C005
+completed_change_id: M117-C005-add-full-remote-readiness-story-verifier
+next_recommended_candidate_id: null
 high_risk_decision_status: approved
 high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
 high_risk_approved_option: Option D
@@ -46,9 +46,9 @@ outputs:
   candidate_changes_md: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.md
   summary: changes/M117-git-automation-remote-readiness/SUMMARY.yaml
   high_risk_decision_report: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
-  latest_selected_change: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/SELECTED_CHANGE.yaml
-  latest_atom_tasks: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/ATOM_TASKS.yaml
-  latest_implementation_brief: changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/IMPLEMENTATION_BRIEF.md
+  latest_selected_change: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/SELECTED_CHANGE.yaml
+  latest_atom_tasks: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/ATOM_TASKS.yaml
+  latest_implementation_brief: changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/IMPLEMENTATION_BRIEF.md
   selected_change: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml
   atom_tasks: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml
   implementation_brief: changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md
@@ -57,7 +57,8 @@ key_dependencies:
   - C002 is complete; branch identity reports are now attached to branch, remote-plan, simulate, and draft-pr readiness packets.
   - C003 is complete; draft-pr write mode now requires explicit approval evidence and writes local audit evidence on approved fake-gh write coverage.
   - C004 is complete; remote-plan and simulator now expose structured merge-readiness checkpoints with conflict stop evidence.
-  - C005 is the next dependency-ready candidate to verify the full non-mutating remote-readiness story.
+  - C005 is complete; the integrated verifier now proves the full non-mutating remote-readiness story.
+  - M117 has no remaining candidates.
 risks:
   - id: R001
     level: high
@@ -88,7 +89,11 @@ validation:
     - npm run build
     - node dist/cli/src/dev/verifyRuntimeSurface.js
     - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
   notes:
     - C003 runtime-surface coverage uses fake gh and does not execute real remote PR creation or editing.
     - C004 conflict checkpoint coverage uses temporary repositories and does not run git merge against the user's working tree.
+    - C005 integrated coverage uses temporary local repositories and a bare remote; no real GitHub network mutation or user repository remote mutation was performed.
     - No generated .agents surface, .openworkflow surface, git push, real PR mutation, Issue mutation, or merge was performed.

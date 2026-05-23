@@ -2,15 +2,13 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m117-git-automation-remote-readiness`
 
-Completed candidate: C001.
+Completed candidates: C001, C002, C003, C004, C005.
 
-Completed candidate: C002.
-
-Next recommended target: C003 high-risk decision before selection.
+Next recommended target: none; M117 is cleared.
 
 High-risk decision report:
 `HIGH_RISK_DECISION_REPORT.md`
@@ -21,7 +19,7 @@ Recommended option: Option D, approve C003 then C004 as local/read-only
 hardening only. This does not authorize push, PR mutation, Issue mutation,
 merge, rebase, reset, force-push, or working-tree conflict resolution.
 
-Selected candidate: C003.
+Selected candidate: none.
 
 ## Scope
 
@@ -183,7 +181,7 @@ Acceptance focus:
 
 ### C005 - Add Full Remote-Readiness Story Verifier
 
-Status: candidate
+Status: done
 
 Risk: medium
 
@@ -197,3 +195,8 @@ Acceptance focus:
 - Verifier fails if commit evidence, branch identity, draft PR approval, or
   conflict checkpoint fields disappear.
 - The later autonomous queue has concrete evidence to consume.
+
+Completion: integrated verifier now covers local evidence, branch identity,
+PR-ready summary generation, remote refs, remote-plan, draft-pr preview and
+approval refusal, merge-readiness checkpoint, and remote merge refusal using
+temporary local repositories only.
