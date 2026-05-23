@@ -1762,6 +1762,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
   const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
   const selectedCommitGateQueue = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "CANDIDATE_CHANGES.yaml");
+  const selectedCommitGateEvidence = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "C001-selected-change-commit-enforcement-policy", "LOCAL_COMMIT_EVIDENCE.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
@@ -1769,6 +1770,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const originalHighRiskReport = await read(highRiskReport);
   const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
   const originalSelectedCommitGateQueue = await read(selectedCommitGateQueue);
+  const originalSelectedCommitGateEvidence = await read(selectedCommitGateEvidence);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -1856,6 +1858,18 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const validCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(!validCommitEvidence.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid local commit evidence fixture reported missing no-commit reason");
     assert(!validCommitEvidence.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid local commit evidence fixture reported missing commit evidence");
+
+    const absentCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!absentCoderEvidence.output.includes("coder_evidence"), "missing optional coder_evidence should remain valid");
+
+    await writeFile(selectedCommitGateEvidence, `${originalSelectedCommitGateEvidence}\ncoder_evidence:\n  status: recorded\n  preflight: should-be-list\n`, "utf8");
+    const malformedCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedCoderEvidence.code !== 0, "validate passed after malformed present coder_evidence");
+    assert(malformedCoderEvidence.output.includes("coder_evidence.preflight must be a list of non-empty strings"), "malformed coder_evidence validation did not explain list shape");
+
+    await writeFile(selectedCommitGateEvidence, `${originalSelectedCommitGateEvidence}\ncoder_evidence:\n  status: recorded\n  enforcement: guidance_only\n  preflight:\n    - checked owned paths\n`, "utf8");
+    const validCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validCoderEvidence.output.includes("coder_evidence"), "valid optional coder_evidence should not emit validation errors");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
@@ -1863,6 +1877,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
     await writeFile(selectedCommitGateQueue, originalSelectedCommitGateQueue, "utf8");
+    await writeFile(selectedCommitGateEvidence, originalSelectedCommitGateEvidence, "utf8");
   }
 }
 

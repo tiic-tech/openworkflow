@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C006
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C006
+change_id: C006-introduce-optional-coder-evidence-artifact-contract
+title: Introduce optional coder evidence artifact contract
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: high
+size: medium
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+  high_risk_report: changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md
+approved_option: optional_embedded_contract
+approval:
+  approved_at: 2026-05-23
+  approved_by: user
+  user_instruction: >
+    可以先按方案A推进。但是要记录以后等合适时机要为CODE_EVIDENCE.yaml单开CC
+selection_reason: >
+  Select C006 because C005 proved the guidance-only coder gate read model and
+  the user explicitly approved high-risk Option A. Implement only optional
+  embedded `coder_evidence` inside LOCAL_COMMIT_EVIDENCE.yaml; do not create or
+  require a standalone CODE_EVIDENCE.yaml or CODER_EVIDENCE.yaml in this change.
+owned_paths:
+  - references/
+  - packages/core/src/validators/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - packages/core/src/artifacts/registry.ts
+  - .agents/**
+  - .openworkflow/**
+  - remote git or GitHub mutation surfaces
+dependencies:
+  - C005
+scope:
+  includes:
+    - define optional embedded coder_evidence fields in LOCAL_COMMIT_EVIDENCE.yaml
+    - validate malformed present coder_evidence
+    - keep absent coder_evidence valid
+    - document standalone CODE_EVIDENCE.yaml as a future separate candidate change
+  excludes:
+    - mandatory coder evidence enforcement
+    - standalone CODE_EVIDENCE.yaml or CODER_EVIDENCE.yaml implementation
+    - discovery artifact registry exposure
+    - historical artifact migration
+    - remote git or PR behavior
+acceptance:
+  - The evidence contract is optional and narrowly scoped.
+  - Validators distinguish missing optional evidence from malformed present evidence.
+  - The contract does not require migrating historical queues.
+  - Future standalone CODE_EVIDENCE.yaml work is recorded as a separate candidate-change follow-up.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  Complete C006 as one implementation commit plus local commit evidence. Keep
+  coder evidence optional, embedded, and validator-only when present.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - references/planning-artifact-contracts.md
+    - references/internal-coder-protocol.md
+    - skills/coder/SKILL.md
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - RED targeted malformed coder_evidence fixture was not rejected before validator implementation.
+    - GREEN targeted malformed coder_evidence fixture is rejected with precise errors.
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

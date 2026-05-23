@@ -165,6 +165,9 @@ Bind implementation evidence to the current OW selected change:
 - `IMPLEMENTATION_BRIEF.md` owns the handoff for the next implementation Agent.
 - `LOCAL_COMMIT_EVIDENCE.yaml` records local commit hashes and validation
   evidence when implementation files changed.
+- Optional `LOCAL_COMMIT_EVIDENCE.yaml.coder_evidence` records coder preflight,
+  RED/GREEN, self-check, validation ladder, and lessons when those details are
+  useful. Missing `coder_evidence` is valid; malformed present evidence is not.
 
 Do not batch multiple completed selected changes into one checkpoint commit.
 Remote push, PR creation, Issue mutation, and merge require separate explicit

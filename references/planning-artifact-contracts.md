@@ -410,6 +410,35 @@ Required fields for new evidence files:
 - `primary_commit`
 - `validation_evidence`
 
+Optional `coder_evidence` fields may be embedded in
+`LOCAL_COMMIT_EVIDENCE.yaml` when an implementation change needs to bind
+`/ow:coder` evidence beyond the guidance-only `coder_gate` state:
+
+```yaml
+coder_evidence:
+  status: recorded # recorded | skipped | not_applicable
+  enforcement: guidance_only
+  preflight:
+    - checked owned paths and validation ladder
+  red_evidence:
+    - failing structural assertion before implementation
+  green_evidence:
+    - passing structural assertion after implementation
+  self_check:
+    - reviewed generated surfaces and trust boundaries
+  validation_ladder:
+    - npm run build
+    - npm run verify:runtime-surface
+  lessons:
+    - promote only repeated quality lessons into source policy
+  notes: Optional concise context for later Agents.
+```
+
+`coder_evidence` is optional. Validators must accept missing coder evidence and
+must reject malformed present coder evidence. Standalone `CODE_EVIDENCE.yaml`
+or `CODER_EVIDENCE.yaml` is intentionally deferred to a separate future
+candidate change.
+
 Historical evidence files may use older field names such as `plan_id`,
 `candidate_id`, `change_id`, and `implementation_commit`; validators accept
 those during migration, but new git-automation evidence should use the source

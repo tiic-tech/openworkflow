@@ -42,9 +42,9 @@ Out of scope:
 
 `C001`, `C002`, and `C003` are complete. `/ow:coder` is now registered as an
 internal command protocol with source-driven generated surfaces. `C004` and
-`C005` and `C007` are complete. The remaining forward path is C006, but C006 is
-under a high-risk stop until the user approves Option A, Option B, or Option C
-from `HIGH_RISK_DECISION_REPORT.md`.
+`C005` and `C007` are complete. C006 is complete under high-risk Option A:
+optional embedded `coder_evidence` in `LOCAL_COMMIT_EVIDENCE.yaml`. Standalone
+`CODE_EVIDENCE.yaml` is recorded as a future separate candidate-change follow-up.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -138,7 +138,7 @@ as internal-only and behavior-compatible.
 
 ### C006: Introduce optional coder evidence artifact contract
 
-- Status: `candidate`
+- Status: `done`
 - Risk: `high`
 - Size: `medium`
 - Purpose: define optional `CODER_EVIDENCE.yaml` or commit-evidence embedding
@@ -151,6 +151,12 @@ as internal-only and behavior-compatible.
   `changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md`
 - Recommended option: Option A, optional embedded `coder_evidence` in
   `LOCAL_COMMIT_EVIDENCE.yaml`.
+- Selection:
+  `C006-introduce-optional-coder-evidence-artifact-contract`
+- Completion: optional embedded `coder_evidence` contract, validator coverage,
+  runtime-surface coverage, and local commit evidence.
+- Future follow-up: standalone `CODE_EVIDENCE.yaml` should be handled as a
+  separate candidate change when the timing is appropriate.
 
 ### C007: Add coder continuous growth loop for reusable lessons
 
@@ -172,6 +178,8 @@ as internal-only and behavior-compatible.
 - User-facing `/ow:coder-review` or `/ow:quality`.
 - Project-local `SOUL.md` and `MEMORY.md` promotion layer.
 - Mandatory coder evidence enforcement across all queues.
+- Standalone `CODE_EVIDENCE.yaml` evidence artifact as its own candidate
+  change.
 
 ## Validation
 

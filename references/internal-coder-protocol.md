@@ -159,8 +159,10 @@ Initial binding points:
 - `ATOM_TASKS.yaml` for task-level status and verification commands
 - `IMPLEMENTATION_BRIEF.md` for handoff instructions
 - `LOCAL_COMMIT_EVIDENCE.yaml` when a candidate changes implementation files
-- future optional `CODER_EVIDENCE.yaml` only after M115 proves the stable field
-  shape
+- optional embedded `LOCAL_COMMIT_EVIDENCE.yaml.coder_evidence` for preflight,
+  RED/GREEN, self-check, validation ladder, and lesson evidence when present
+- future standalone `CODE_EVIDENCE.yaml` or `CODER_EVIDENCE.yaml` only as a
+  separate candidate change after the embedded field shape proves insufficient
 
 Evidence must include command names and enough result detail for a later Agent
 to distinguish targeted GREEN evidence from unrelated historical failures.

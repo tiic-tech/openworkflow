@@ -31,7 +31,7 @@ must not migrate historical queues.
 - A large schema or generated-surface change would exceed C006's commit-sized
   boundary.
 
-## Options
+## Decision Options
 
 ### Option A: Optional Embedded Contract
 
@@ -74,7 +74,7 @@ Pros:
 Cons:
 - Leaves `/ow:coder` adaptation without a reusable optional evidence shape.
 
-## Recommended Option
+## Recommended Path
 
 Approve Option A for implementation now.
 
@@ -82,6 +82,11 @@ The current proven path is commit evidence, and C005 already added a
 guidance-only `coder_gate` field there. Option A extends that same binding point
 with optional `coder_evidence` details while avoiding a new required artifact or
 user-facing workflow surface.
+
+Implementation resumes only after explicit approval of Option A, Option B, or
+Option C. On 2026-05-23, the user explicitly approved Option A and requested
+that standalone `CODE_EVIDENCE.yaml` be recorded as a future separate candidate
+change.
 
 ## Guardrails
 
@@ -101,6 +106,18 @@ user-facing workflow surface.
 - RED evidence demonstrates malformed present evidence is currently unchecked.
 - GREEN evidence proves malformed present evidence is rejected while absent
   evidence remains valid.
+
+## Validation Expectations
+
+- RED evidence: malformed present `coder_evidence` is not rejected before the
+  validator change.
+- GREEN evidence: malformed present `coder_evidence` is rejected with a precise
+  error.
+- Absence evidence: `LOCAL_COMMIT_EVIDENCE.yaml` without `coder_evidence`
+  remains valid.
+- Runtime evidence: `npm run verify:runtime-surface`.
+- Trust evidence: `resume --json`, `handoff --json`, and summary checks remain
+  non-blocking for optional coder evidence.
 
 ## Stop Criteria
 

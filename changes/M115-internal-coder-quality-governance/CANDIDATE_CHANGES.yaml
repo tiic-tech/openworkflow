@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M115-internal-coder-quality-governance
 title: Candidate changes for internal coder quality governance
-status: active
+status: completed
 source:
   kind: planning_discussion
   refs:
@@ -97,7 +97,14 @@ scope_control:
         policies should wait until CODER_EVIDENCE or commit evidence binding is
         proven on real queues.
       suggested_plan_id: M117-coder-evidence-enforcement
-next_recommended_candidate_id: C006
+    - title: Standalone CODE_EVIDENCE.yaml evidence artifact
+      reason: >
+        The user approved C006 Option A first, but explicitly requested a future
+        separate candidate change for CODE_EVIDENCE.yaml when the timing is
+        appropriate. That work should decide naming, standalone artifact
+        ownership, discovery exposure, and migration boundaries outside C006.
+      suggested_plan_id: M118-standalone-code-evidence-artifact
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -489,7 +496,7 @@ changes:
       - Git commit evidence has a clear optional binding point for coder validation.
       - Missing coder gates are visible guidance, not a sudden hard failure.
   - id: C006
-    status: candidate
+    status: done
     title: Introduce optional coder evidence artifact contract
     purpose: >
       Add a future-proof `CODER_EVIDENCE.yaml` or equivalent evidence binding
@@ -528,6 +535,46 @@ changes:
         - id: defer_contract
           label: Option C - defer C006 and keep coder_gate only
           requires_user_approval: true
+    selection:
+      selected_change_id: C006-introduce-optional-coder-evidence-artifact-contract
+      reason: >
+        Select C006 because C005 proved the guidance-only coder gate read-model
+        field and the user explicitly approved high-risk Option A. Implement
+        only optional embedded `coder_evidence` in LOCAL_COMMIT_EVIDENCE.yaml,
+        and record standalone CODE_EVIDENCE.yaml as future separate candidate
+        change work.
+      selected_at: 2026-05-23
+      selected_by: agent
+      approved_option: optional_embedded_contract
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/internal-coder-protocol.md
+        - skills/coder/SKILL.md
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Implemented high-risk Option A: optional embedded coder_evidence in
+        LOCAL_COMMIT_EVIDENCE.yaml. Missing coder_evidence remains valid,
+        malformed present coder_evidence is rejected, and standalone
+        CODE_EVIDENCE.yaml is deferred to a future separate candidate change.
+      validation:
+        - RED targeted malformed coder_evidence fixture was not rejected before validator implementation.
+        - GREEN targeted malformed coder_evidence fixture is rejected with precise errors.
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js resume --root . --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - git diff --check
     validation:
       - npm run build
       - npm run verify:runtime-surface
@@ -831,3 +878,40 @@ operations:
     after_status: candidate
     evidence:
       - changes/M115-internal-coder-quality-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP015
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Selected C006 after explicit user approval of high-risk Option A. The
+      selected boundary is optional embedded coder_evidence in
+      LOCAL_COMMIT_EVIDENCE.yaml; standalone CODE_EVIDENCE.yaml is recorded as
+      a future separate candidate-change follow-up.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP016
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Completed optional embedded coder_evidence validation and documentation.
+      Missing coder_evidence remains valid, malformed present evidence is
+      rejected, and standalone CODE_EVIDENCE.yaml is deferred to future
+      candidate-change work.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/internal-coder-protocol.md
+      - skills/coder/SKILL.md
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M115-internal-coder-quality-governance/C006-introduce-optional-coder-evidence-artifact-contract/LOCAL_COMMIT_EVIDENCE.yaml
