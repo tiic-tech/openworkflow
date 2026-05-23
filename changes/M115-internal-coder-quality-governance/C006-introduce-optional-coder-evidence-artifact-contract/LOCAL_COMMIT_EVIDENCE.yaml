@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C006-introduce-optional-coder-evidence-artifact-contract
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C006-introduce-optional-coder-evidence-artifact-contract
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C006
+selected_change_id: C006-introduce-optional-coder-evidence-artifact-contract
+primary_commit: f84c9e552ba834c5db19f7102f95b02393c675ff
+validation_evidence:
+  - RED malformed coder_evidence fixture initially not rejected
+  - GREEN malformed coder_evidence rejected
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - ruby -ryaml C006 planning artifacts
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
