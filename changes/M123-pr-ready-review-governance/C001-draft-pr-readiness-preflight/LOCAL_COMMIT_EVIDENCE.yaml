@@ -1,0 +1,28 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-draft-pr-readiness-preflight
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001-draft-pr-readiness-preflight
+status: current
+source_plan_id: M123-pr-ready-review-governance
+source_candidate_id: C001
+selected_change_id: C001-draft-pr-readiness-preflight
+primary_commit: 4319df2d442f53ff28ceddefe28a1fd543a2aec2
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+  - gh pr view 5 --repo tiic-tech/openworkflow
+  - gh pr view 4 --repo tiic-tech/openworkflow
+  - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
+    codex/m102-selected-change-commit-gate
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
