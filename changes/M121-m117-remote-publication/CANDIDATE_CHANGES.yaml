@@ -1,0 +1,324 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M121-m117-remote-publication
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M121-m117-remote-publication
+title: Candidate changes for M117 remote publication
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-create-m121-cc
+    - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+    - changes/M120-historical-branch-repair/SUMMARY.yaml
+    - changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml
+    - changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+    - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+    - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+    - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+    - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
+  summary: >
+    M120 ranked M117 as the cleanest next publication candidate after restoring branch-local
+    PR-ready evidence. M121 owns the approval-gated publication workflow for that existing M117
+    branch: refresh preflight in a cross-branch-safe way, prepare exact high-risk push approval,
+    execute only if approved, optionally create a draft PR only after separate approval, and record
+    post-publication audit evidence.
+queue_policy:
+  branch_boundary: codex/m121-m117-remote-publication
+  branch_note: >
+    Proposed by DTC while the repository was on codex/m120-historical-branch-repair after local
+    commit 8a3d807. Branch creation was intentionally not performed during DTC queue creation.
+    M121 is a governance branch for publication evidence; its remote publication target is the
+    existing M117 feat branch, not the M121 governance branch.
+  target_publication_branch: codex/m117-git-automation-remote-readiness
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. M121 must refresh M117 publication facts from the M121 governance context and
+    choose a safe execution model before any push or PR operation can be requested.
+  high_risk_rule: >
+    C002, C003, and C004 are high-risk remote publication boundaries. A HIGH_RISK_DECISION_REPORT.md
+    must exist for the exact push or PR operation, and the user must approve the concrete command
+    before any remote mutation is executed.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Approval-gated remote publication for the existing M117 git automation remote readiness branch.
+  boundary_type: gh_remote_publication_workflow_slice
+  in_scope_rule: >
+    Include M117-specific read-only publication preflight, exact push approval packet, approved
+    branch push evidence, optional approved draft PR creation, rollback guidance, and
+    post-publication audit.
+  out_of_scope_rule: >
+    Do not publish M71, mark PR #4 ready for review, split the M101 shared branch group, rebase,
+    reset, force-push, delete branches, merge PRs, mutate Issues, or change product source in this
+    queue.
+  deferred_features:
+    - title: Publish M71 historical stack
+      reason: >
+        M71 is technically remote-ready but carries an older 66-commit historical stack that needs
+        explicit acceptance as one coupled review branch.
+      suggested_plan_id: M122-m71-historical-stack-publication
+    - title: Mark PR #4 ready for review
+      reason: >
+        Ready-for-review mutates an existing GitHub PR and should remain separate from M117 branch
+        publication.
+      suggested_plan_id: M123-pr4-ready-review-governance
+    - title: Decide M101 shared branch group strategy
+      reason: >
+        M105, M106, and M115 share a historical branch boundary and need a later shared-stack or
+        split decision before publication.
+      suggested_plan_id: M124-shared-branch-publication-strategy
+observed_state:
+  captured_at: 2026-05-23
+  current_branch: codex/m120-historical-branch-repair
+  working_tree_clean_before_queue_creation: true
+  latest_local_commit: 8a3d807
+  latest_local_commit_subject: M120-historical-branch-repair/C005 Record publication order
+  m120_recommendation: M121-m117-remote-publication
+  target_plan_id: M117-git-automation-remote-readiness
+  target_branch: codex/m117-git-automation-remote-readiness
+  target_branch_local_summary_present: true
+  target_branch_summary_repair_commit: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  target_remote_branch_present: false
+  target_existing_prs: []
+  target_base: main
+  remote: origin
+  remote_plan_from_current_branch:
+    ok: false
+    blockers:
+      - current branch codex/m120-historical-branch-repair does not match branch boundary codex/m117-git-automation-remote-readiness
+      - simulator evidence is missing
+    warnings:
+      - remote branch head is absent or unreadable for origin/codex/m117-git-automation-remote-readiness
+      - command was read-only and did not mutate remote state
+  simulator_from_current_branch:
+    ok: false
+    blockers:
+      - current branch codex/m120-historical-branch-repair does not match branch boundary codex/m117-git-automation-remote-readiness
+    warnings:
+      - remote branch head is unknown for origin/codex/m117-git-automation-remote-readiness
+      - simulator was read-only and did not mutate remote state
+  m120_branch_local_interpretation:
+    remote_plan_missing_summary_blocker_cleared: true
+    simulator_ok_on_target_branch_context: true
+    remaining_remote_plan_blocker: simulator evidence is missing
+    merge_readiness: fast_forward_clean
+    existing_pr: none
+  exact_push_command_unapproved: git push origin codex/m117-git-automation-remote-readiness:codex/m117-git-automation-remote-readiness
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Refresh M117 publication preflight and choose execution model
+    purpose: >
+      Produce a current, read-only preflight packet for publishing the existing M117 branch from the
+      M121 governance queue, including whether the later approved push should use a checked-out M117
+      branch, an isolated worktree, or an exact refspec push from the governance branch.
+    scope:
+      includes:
+        - verify local M117 branch head and repaired PR-ready summary
+        - verify origin/main and absence or presence of the M117 remote branch
+        - verify existing PR state for the M117 head branch
+        - rerun remote-plan and simulator checks and classify branch-context blockers
+        - choose the exact non-mutating preflight-to-push execution model
+      excludes:
+        - git push
+        - PR creation or edit
+        - Issue mutation
+        - merge, ready-for-review, rebase, reset, force-push, or branch deletion
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - git status --short --branch
+      - git rev-parse codex/m117-git-automation-remote-readiness
+      - git cat-file -e codex/m117-git-automation-remote-readiness:changes/M117-git-automation-remote-readiness/PR_READY_SUMMARY.md
+      - git ls-remote --heads origin main codex/m117-git-automation-remote-readiness
+      - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+      - node dist/cli/src/index.js git-automation remote-plan --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main --remote origin --target-base main --json
+      - node dist/cli/src/index.js git-automation simulate --root . --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+      - git diff --check
+    acceptance:
+      - A durable preflight packet names the target branch, base branch, remote state, PR state, and blockers.
+      - The packet chooses an execution model for the later approved push.
+      - Any current branch mismatch is classified instead of ignored.
+      - No remote or destructive git mutation occurs.
+  - id: C002
+    status: candidate
+    title: Prepare exact high-risk push decision report
+    purpose: >
+      Convert the C001 preflight into a HIGH_RISK_DECISION_REPORT.md for exactly one M117 branch
+      push command, including approval text, rollback guidance, and stop conditions.
+    scope:
+      includes:
+        - state the exact git push command or exact approved alternative
+        - record prior remote ref state and rollback preference
+        - require clean local state and fresh C001 preflight evidence
+        - record user approval language required before execution
+      excludes:
+        - executing the push
+        - draft PR creation
+        - force-push or deleting remote refs
+        - PR or Issue mutation
+    owned_paths:
+      - changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+      - changes/M121-m117-remote-publication/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The report names exactly one push operation and target ref.
+      - The report states that it is evidence, not approval.
+      - The report blocks execution until exact user approval is received.
+  - id: C003
+    status: candidate
+    title: Execute approved M117 branch push and record remote evidence
+    purpose: >
+      After C002 exists and the user approves the exact push command, push the M117 branch to origin
+      and record local audit evidence for the remote ref and rollback guidance.
+    scope:
+      includes:
+        - verify the approval text matches the C002 report
+        - verify clean working tree and target branch head before push
+        - execute one approved git push for codex/m117-git-automation-remote-readiness
+        - record remote ref, local commit, timestamp, approval source, and rollback guidance
+      excludes:
+        - draft PR creation
+        - pushing any other branch
+        - force-push
+        - PR edit, ready-for-review, merge, or Issue mutation
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: high
+    size: small
+    validation:
+      - git status --short --branch
+      - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
+      - git diff --check
+    acceptance:
+      - The M117 remote branch exists at the expected commit.
+      - Local audit evidence records approval, command, remote ref, and rollback guidance.
+      - No PR, Issue, merge, force-push, or unrelated remote mutation occurs.
+  - id: C004
+    status: candidate
+    title: Create approved M117 draft PR
+    purpose: >
+      After the M117 branch is pushed and the user separately approves PR creation, open one draft PR
+      from M117 into main and record local PR evidence.
+    scope:
+      includes:
+        - verify remote branch exists and matches C003 evidence
+        - prepare PR title and body from M117 PR_READY_SUMMARY.md
+        - create one draft PR only after exact approval
+        - record PR URL, number, base/head refs, draft state, and rollback guidance
+      excludes:
+        - marking ready for review
+        - editing PR #4
+        - merging
+        - Issue mutation
+        - creating PRs for M71 or shared M101-derived branches
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+    dependencies:
+      - C003
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+      - git diff --check
+    acceptance:
+      - Exactly one draft PR exists for M117 into main.
+      - The PR remains draft unless separately approved for ready-for-review.
+      - Local audit evidence records the PR URL and approval source.
+  - id: C005
+    status: candidate
+    title: Record M117 publication audit and next governance handoff
+    purpose: >
+      Close the M121 publication queue with a local post-publication audit that captures what
+      happened, what remained blocked, and which later queue should handle M71, PR #4, or the shared
+      M101 branch group.
+    scope:
+      includes:
+        - summarize completed push and PR evidence or explain why publication stopped
+        - update M121 summary and readable queue view
+        - record deferred next queues for M71, PR #4 ready-for-review, and shared branch strategy
+        - confirm no unauthorized remote or destructive operations occurred
+      excludes:
+        - publishing M71
+        - marking PR #4 or the M117 PR ready
+        - merging
+        - changing product source
+    owned_paths:
+      - changes/M121-m117-remote-publication/
+    dependencies:
+      - C001
+    unlocks:
+      - M122-m71-historical-stack-publication
+      - M123-pr4-ready-review-governance
+      - M124-shared-branch-publication-strategy
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - A local audit names each authorized and unauthorized operation boundary.
+      - The next publication governance target is explicit.
+      - M121 can be handed off without requiring raw session context.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: Create M121 candidate queue from M120 repaired publication order.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M120-historical-branch-repair/C005-repaired-publication-order/PUBLICATION_ORDER.md
+      - changes/M120-historical-branch-repair/SUMMARY.yaml
