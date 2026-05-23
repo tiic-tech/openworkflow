@@ -1758,7 +1758,27 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(!unrelated.ok, "commit automation should refuse unrelated dirty paths");
     assert(unrelated.unrelatedDirtyPaths.includes("unrelated.txt"), "commit automation should report unrelated dirty path");
 
+    await mkdir(join(gitRoot, ".openworkflow"), { recursive: true });
+    await writeFile(join(gitRoot, ".openworkflow", "CURRENT_STATE.yaml"), "next_command: /ow:validation\n", "utf8");
+    await runInCwd(gitRoot, ["git", "add", "-N", ".openworkflow/CURRENT_STATE.yaml"]);
+    const workflowOutputScope = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(!workflowOutputScope.ok, "commit automation should still refuse out-of-scope workflow outputs");
+    assert(workflowOutputScope.warnings.some((item) => item.includes("OpenWorkflow command outputs")), "workflow output scope warning missing command-output guidance");
+    assert(workflowOutputScope.warnings.some((item) => item.includes("owned_paths")), "workflow output scope warning missing owned_paths guidance");
+
     await unlink(join(gitRoot, "unrelated.txt"));
+    await runInCwd(gitRoot, ["git", "reset", "--", ".openworkflow/CURRENT_STATE.yaml"]);
+    await rm(join(gitRoot, ".openworkflow"), { recursive: true, force: true });
     const preview = await commitSelectedChange({
       root: gitRoot,
       planId: "M71-git-version-control-governance",

@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M105-m104-direct-trust-gate-fixes
 title: Summary for M104 direct trust-gate and evidence fixes
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -21,11 +21,11 @@ scope_boundary: >
 branch_boundary: codex/m101-build-proto-prompt-command-split
 candidate_count: 4
 active_candidate_count: 4
-completed_candidate_id: C003
-completed_change_id: M105-C003-auto-backfill-commit-evidence
+completed_candidate_id: C004
+completed_change_id: M105-C004-reconcile-owned-path-output-guidance
 selected_candidate_id: null
 selected_change_id: null
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 outputs:
   candidate_changes_yaml: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.md
@@ -68,3 +68,5 @@ validation:
     - C002 implementation passed build and runtime-surface verification before commit evidence creation.
     - C003 high-risk Option A was approved and selected for narrow safe evidence backfill.
     - C003 implementation passed build and runtime-surface verification before commit evidence creation.
+    - C004 was selected to improve owned-path diagnostics for expected OW output files.
+    - C004 implementation passed build and runtime-surface verification before commit evidence creation.

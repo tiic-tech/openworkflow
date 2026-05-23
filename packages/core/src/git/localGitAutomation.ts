@@ -160,7 +160,11 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
     return { ...withState, errors: ["no dirty paths are available to commit"] };
   }
   if (unrelatedDirtyPaths.length > 0) {
-    return { ...withState, errors: ["working tree contains dirty paths outside the selected change scope"] };
+    return {
+      ...withState,
+      warnings: scopeGuidanceForUnrelatedPaths(unrelatedDirtyPaths),
+      errors: ["working tree contains dirty paths outside the selected change scope"],
+    };
   }
 
   const commitArgs = ["commit", "-m", options.commitMessage];
@@ -437,6 +441,29 @@ function pathEscapesRepo(path: string): boolean {
 
 function isAllowedDirtyPath(path: string, allowedPaths: string[]): boolean {
   return allowedPaths.some((allowedPath) => path === allowedPath || path.startsWith(`${allowedPath}/`));
+}
+
+function scopeGuidanceForUnrelatedPaths(paths: string[]): string[] {
+  const workflowOutputs = paths.filter(isLikelyOpenWorkflowOutputPath);
+  if (workflowOutputs.length === 0) {
+    return [];
+  }
+  return [
+    `dirty paths look like OpenWorkflow command outputs outside selected-change owned_paths: ${workflowOutputs.join(", ")}`,
+    "If these outputs are expected for the selected change, add the exact file or containing command-output folder to the candidate owned_paths and rerun git-automation commit; otherwise revert or move the unrelated output before committing.",
+  ];
+}
+
+function isLikelyOpenWorkflowOutputPath(path: string): boolean {
+  if (!path.startsWith(".openworkflow/")) {
+    return false;
+  }
+  return path === ".openworkflow/CURRENT_STATE.yaml"
+    || path.endsWith("/SUMMARY.yaml")
+    || path.endsWith("_INDEX.yaml")
+    || path.endsWith("/DECISION.yaml")
+    || path.endsWith("/VISION_CONTRACT.yaml")
+    || path.endsWith("/VALIDATION_INDEX.yaml");
 }
 
 function readYamlRecord(content: string): Record<string, unknown> {

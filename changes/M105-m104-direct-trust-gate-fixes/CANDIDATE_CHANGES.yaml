@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M105-m104-direct-trust-gate-fixes
 title: Candidate changes for M104 direct trust-gate and evidence fixes
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -80,7 +80,7 @@ scope_control:
         Related to image generation evidence and should be designed with prompt2proto strategy, not
         mixed into trust-gate bug fixes.
       suggested_plan_id: M109-provider-fallback-generation-metadata
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -305,7 +305,7 @@ changes:
         - node dist/cli/src/index.js handoff --root . --json
         - git diff --check
   - id: C004
-    status: candidate
+    status: done
     title: Reconcile selected-change owned paths with command pointer and summary outputs
     purpose: >
       Prevent implementation candidates from failing git-automation scope checks only after the
@@ -344,6 +344,34 @@ changes:
         or summary outputs.
       - Dirty-path scope enforcement remains strict.
       - M104 C005-style summary refresh is represented as an expected owned output or clear warning.
+    selection:
+      selected_change_id: M105-C004-reconcile-owned-path-output-guidance
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C003 completed. C004 is the remaining direct M104
+        trust-gate fix and is constrained to diagnostics, not relaxed scope
+        enforcement.
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+      summary: >
+        git-automation commit now keeps strict dirty-path refusal while adding
+        actionable warnings when unrelated dirty paths look like OpenWorkflow
+        command outputs that may need explicit selected-change owned_paths.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
 operations:
   - operation_id: OP001
     operation_type: add
@@ -461,4 +489,33 @@ operations:
       - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
       - packages/core/src/git/localGitAutomation.ts
       - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Selected the last direct M104 trust-gate fix after C003 completed and
+      strict handoff passed.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Implemented and verified owned-path diagnostics for out-of-scope
+      OpenWorkflow command outputs.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
       - packages/cli/src/dev/verifyRuntimeSurface.ts

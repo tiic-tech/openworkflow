@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: complete
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -30,7 +30,7 @@ Out of scope:
 
 ## Selection Policy
 
-Recommended next candidate: C004.
+Selected candidate: none.
 
 C001 is first because M104 directly proved that `summarize --write` can create
 a `SUMMARY.yaml` file that `validate --json` then rejects. This is a small,
@@ -121,7 +121,7 @@ Completion:
 
 ### C004 - Reconcile selected-change owned paths with command pointer and summary outputs
 
-Status: candidate
+Status: done
 
 Risk: medium
 
@@ -129,6 +129,17 @@ Purpose: give earlier guidance when a selected change omits expected pointer,
 index, or summary outputs from owned paths.
 
 Depends on: C001.
+
+Selection artifacts:
+
+- `changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml`
+- `changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/IMPLEMENTATION_BRIEF.md`
+
+Completion:
+
+- `packages/core/src/git/localGitAutomation.ts`
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
 
 ## Deferred
 
