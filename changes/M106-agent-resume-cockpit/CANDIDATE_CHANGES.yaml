@@ -1,0 +1,290 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M106-agent-resume-cockpit
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M106-agent-resume-cockpit
+title: Candidate changes for Agent resume cockpit
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+    - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+  summary: >
+    M104 showed that Agents need one recovery packet that explains where the
+    workflow really is, whether the state can be trusted, what queue boundary is
+    active, what evidence is missing, and what the smallest correct next action
+    is. M105 repaired the direct trust-gate defects; M106 owns the read-only
+    resume cockpit feature.
+queue_policy:
+  branch_boundary: codex/m101-build-proto-prompt-command-split
+  branch_note: >
+    Queue is created on the current continuation branch because M106 follows
+    directly from the M104/M105 dogfood intelligence. A later git-automation
+    branch action may move this queue if branch governance requires it.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Start with C001 because a stable resume packet contract must define the
+    output shape, trust semantics, and command boundary before implementation
+    can aggregate existing read models.
+  high_risk_rule: >
+    Resume is read-only and should remain medium risk. Any candidate that
+    mutates workflow state, generated adapters, or selected-change statuses
+    must be split out or converted into a high-risk decision report.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Read-only Agent resume cockpit and `resume --json` command surface.
+  boundary_type: read_model_command_surface
+  in_scope_rule: >
+    Include only work needed to produce an actionable recovery packet from
+    existing trust gates, queue files, and git state.
+  out_of_scope_rule: >
+    Do not implement artifact lineage graph, prompt2proto strategy selection,
+    provider-backed generation, or a full write/commit preflight compiler in
+    this queue.
+  deferred_features:
+    - title: Artifact lineage graph
+      reason: >
+        Needs schema, validators, evidence semantics, and decision-reference
+        updates beyond a read-only resume packet.
+      suggested_plan_id: M107-artifact-lineage-graph
+    - title: Consistency-first split-later prompt2proto strategy
+      reason: >
+        Requires prompt2proto strategy and provider capability design after
+        resume and lineage foundations are clearer.
+      suggested_plan_id: M108-consistency-first-split-later-prompt2proto
+    - title: Provider and fallback generation metadata
+      reason: >
+        Closely related to prompt2proto strategy and lineage; keep outside the
+        resume command boundary.
+      suggested_plan_id: M109-provider-fallback-generation-metadata
+    - title: Boundary preflight compiler
+      reason: >
+        A full write/commit preflight command should reuse resume's current
+        work packet after M106 lands.
+      suggested_plan_id: M110-boundary-preflight-compiler
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define resume packet contract and command boundary
+    purpose: >
+      Establish the `openworkflow resume --root . --json` contract, including
+      trust signals, active queue fields, current work item, action guidance,
+      evidence classification, and explicit read-only command boundaries.
+    scope:
+      includes:
+        - define the resume JSON packet shape
+        - define text output expectations for non-json usage
+        - update source command registry/help surfaces as needed
+        - document read-only behavior and non-goals
+      excludes:
+        - implementing full aggregation logic
+        - changing handoff, inspect, summaries, or check semantics
+        - generated .agents edits by hand
+        - artifact lineage or prompt2proto strategy fields
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/
+      - references/planning-artifact-contracts.md
+      - changes/M106-agent-resume-cockpit/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+    acceptance:
+      - The resume packet contract names required top-level fields and read-only semantics.
+      - CLI help or command registry can expose resume without implying mutation.
+      - Deferred lineage, prompt2proto, provider metadata, and boundary compiler work stays out of scope.
+  - id: C002
+    status: candidate
+    title: Implement base resume aggregator
+    purpose: >
+      Implement the read-only CLI command that aggregates current state,
+      handoff-quality signals, next-command readiness, summary quality, and git
+      state into one resume packet.
+    scope:
+      includes:
+        - add the resume CLI command entrypoint
+        - reuse existing handoff, inspect, summaries, check, and git-state logic where practical
+        - support `--json` with an Agent-safe report envelope
+        - keep command read-only
+      excludes:
+        - queue scanning heuristics beyond current obvious queue inputs
+        - mutating CURRENT_STATE or summaries
+        - implementing write preflight checks
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/workflow/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - `resume --json` returns one packet with current trust, next action, and git cleanliness.
+      - The command does not write or update files.
+      - Runtime coverage verifies fresh and initialized repo behavior.
+  - id: C003
+    status: candidate
+    title: Detect active planning queue and current work item
+    purpose: >
+      Teach resume to identify the most relevant active queue, previous
+      completed candidate, selected candidate, missing evidence, and when queue
+      boundary should override a misleading `CURRENT_STATE.next_command`.
+    scope:
+      includes:
+        - scan obvious `changes/*/SUMMARY.yaml` and `CANDIDATE_CHANGES.yaml` planning queues
+        - prefer active selected changes over generic workflow next command
+        - expose previous completed candidate and missing commit evidence
+        - report queue-boundary override reasons
+      excludes:
+        - selecting candidates
+        - editing queues
+        - broad historical queue analysis
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - Resume identifies an active selected-change queue when one exists.
+      - Resume distinguishes workflow `next_command` from queue-local next action.
+      - Resume reports missing local commit evidence without mutating queue files.
+  - id: C004
+    status: candidate
+    title: Classify actions and evidence for Agent handoff
+    purpose: >
+      Add Agent-facing action policy and evidence classification so resume says
+      what is allowed, forbidden, primary evidence, auxiliary evidence, and
+      comparison evidence.
+    scope:
+      includes:
+        - classify allowed and forbidden next actions from command and queue context
+        - classify primary, auxiliary, and comparison evidence when queues name them
+        - surface "do not do" guidance from queue boundaries and command checks
+      excludes:
+        - enforcing write preflight decisions
+        - artifact lineage graph schema
+        - provider-backed image provenance
+    owned_paths:
+      - packages/core/src/workflow/
+      - packages/cli/src/commands/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M106-agent-resume-cockpit/
+    dependencies:
+      - C003
+    unlocks:
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - git diff --check
+    acceptance:
+      - Resume includes allowed_actions and forbidden_actions.
+      - Resume identifies primary evidence separately from auxiliary/comparison evidence when available.
+      - Queue boundaries and user bans are visible before implementation work begins.
+  - id: C005
+    status: candidate
+    title: Expose resume in runtime surface and documentation
+    purpose: >
+      Complete the command surface by updating source-generated skill guidance,
+      runtime verification, and docs so Agents know to start recovery with
+      `resume --json` when resuming breakpoint work.
+    scope:
+      includes:
+        - update source registry or onboarding text that generates Agent guidance
+        - run sync only if generated surfaces must be refreshed from source changes
+        - add runtime-surface coverage for CLI help and command availability
+        - document handoff usage
+      excludes:
+        - hand-editing generated `.agents/**`
+        - changing default `CURRENT_STATE.next_command`
+        - remote git or PR automation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - docs/
+      - changes/M106-agent-resume-cockpit/
+    dependencies:
+      - C004
+    unlocks: []
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+    acceptance:
+      - Agent-facing source guidance points resume users to the new command.
+      - Runtime verification covers command help and JSON shape.
+      - Generated surfaces are updated only through source-driven sync when required.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Decomposed the top-priority M104 interview scenario into a bounded
+      resume cockpit queue after cross-scenario analysis.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+      - docs/M104_AGENT_CONSUMER_INTERVIEW.md

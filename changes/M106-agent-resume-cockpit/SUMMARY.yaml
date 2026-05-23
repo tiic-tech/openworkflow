@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: summary:M106-agent-resume-cockpit
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M106-agent-resume-cockpit
+title: Summary for Agent resume cockpit
+status: active
+source:
+  kind: mixed
+  summary: >
+    M106 implements the highest-priority remaining M104 interview scenario:
+    a read-only Agent resume cockpit exposed as `resume --json`.
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+    - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+scope_boundary: >
+  Read-only resume packet only. Artifact lineage, prompt2proto strategy,
+  provider metadata, and full write preflight are deferred.
+branch_boundary: codex/m101-build-proto-prompt-command-split
+candidate_count: 5
+active_candidate_count: 5
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+outputs:
+  candidate_changes_yaml: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.md
+  summary: changes/M106-agent-resume-cockpit/SUMMARY.yaml
+  change_analysis_yaml: changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+  change_analysis_md: changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.md
+key_dependencies:
+  - M104 interview identified resume --json as the top remaining Agent-consumer scenario.
+  - M105 completed direct trust-gate and evidence-closure fixes needed before resume can aggregate trustworthy signals.
+  - Existing handoff, inspect, summaries, check, and git status commands provide the initial signal sources.
+risks:
+  - id: R001
+    level: medium
+    description: Resume could duplicate or diverge from existing handoff/inspect/check semantics.
+    mitigation: Keep resume read-only and aggregate existing signals before adding new policy.
+  - id: R002
+    level: medium
+    description: Queue scanning could become too broad or noisy.
+    mitigation: Start with obvious active planning queues and record uncertainty instead of selecting work.
+unresolved_questions:
+  - Should resume become the default first command in generated Agent guidance after the command stabilizes?
+  - How much queue scanning should resume perform before it becomes too expensive for low-context startup?
+deferred_features:
+  - M107-artifact-lineage-graph
+  - M108-consistency-first-split-later-prompt2proto
+  - M109-provider-fallback-generation-metadata
+  - M110-boundary-preflight-compiler
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+  notes:
+    - Created cross-scenario analysis before DTC queue creation.
+    - No source implementation was performed by this decomposition.
