@@ -27,6 +27,10 @@ In scope:
 - evidence binding
 - source-policy growth from repeated quality lessons
 
+Primary C001 contract:
+
+- `references/internal-coder-protocol.md`
+
 Out of scope:
 
 - a user-facing "write code" command
@@ -36,9 +40,9 @@ Out of scope:
 
 ## Selection Policy
 
-Start with `C001`. The protocol contract must define the internal command
+`C001` is complete. The protocol contract now defines the internal command
 boundary before registry, generated surface, change/team/git integration, or
-evidence artifact work begins.
+evidence artifact work begins. Continue with `C002`.
 
 High-risk stop: candidates that alter public CLI JSON semantics, expose
 `/ow:coder` as a normal user command, enforce new commit gates, or add
@@ -49,7 +53,7 @@ as internal-only and behavior-compatible.
 
 ### C001: Define internal coder protocol contract and command boundary
 
-- Status: `ready`
+- Status: `done`
 - Risk: `medium`
 - Size: `small`
 - Purpose: define `/ow:coder` as an internal, Agent-only governance protocol
@@ -58,10 +62,12 @@ as internal-only and behavior-compatible.
 - Unlocks: `C002`, `C003`, `C004`, `C005`
 - Acceptance: contract states internal-only semantics, required gates,
   integration points, and non-goals; no generated or runtime behavior changes.
+- Selection: `C001-define-internal-coder-protocol-contract-and-command-boundary`
+- Completion: `references/internal-coder-protocol.md`
 
 ### C002: Migrate code-quality governor into OW source coder skill
 
-- Status: `candidate`
+- Status: `ready`
 - Risk: `medium`
 - Size: `medium`
 - Purpose: move durable OW-specific quality governance into repo-owned source

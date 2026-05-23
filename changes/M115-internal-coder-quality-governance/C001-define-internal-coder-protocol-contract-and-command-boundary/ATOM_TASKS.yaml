@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C001
+change_id: C001-define-internal-coder-protocol-contract-and-command-boundary
+title: Atom tasks for internal coder protocol contract
+status: completed
+tasks:
+  - id: T001
+    title: Inspect existing internal command and quality references
+    type: read
+    status: completed
+    owned_paths:
+      - references/
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Internal command visibility and generated-surface ownership patterns are understood before writing the contract.
+  - id: T002
+    title: Add internal coder protocol contract reference
+    type: document
+    status: completed
+    owned_paths:
+      - references/
+    done_when:
+      - The reference defines `/ow:coder` as internal and Agent-only.
+      - The reference defines preflight, RED/GREEN, self-check, validation ladder, and evidence binding responsibilities.
+      - The reference names future integration points without implementing them.
+  - id: T003
+    title: Refresh M115 selection and queue artifacts
+    type: document
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - The queue records C001 as selected and points to the selection artifacts.
+      - The readable queue view and summary reflect the selected C001 boundary.
+  - id: T004
+    title: Verify C001
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+      - references/
+    done_when:
+      - Required validation commands pass or any unrelated baseline failure is recorded precisely.
+verification:
+  - node dist/cli/src/index.js handoff --root . --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - node dist/cli/src/index.js resume --root . --json
+  - git diff --check
+results:
+  passed:
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/ATOM_TASKS.yaml
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - node dist/cli/src/index.js resume --root . --json
+    - git diff --check
+  failed: []

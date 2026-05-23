@@ -12,6 +12,7 @@ source:
     - /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
     - changes/M114-engineering-quality-foundation/SUMMARY.yaml
     - changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml
+    - references/internal-coder-protocol.md
   summary: >
     The user wants OW to absorb the current code-quality governor as an
     internal, Agent-only coder governance protocol rather than a normal
@@ -95,10 +96,10 @@ scope_control:
         policies should wait until CODER_EVIDENCE or commit evidence binding is
         proven on real queues.
       suggested_plan_id: M117-coder-evidence-enforcement
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
+    status: done
     title: Define internal coder protocol contract and command boundary
     purpose: >
       Establish `/ow:coder` as an internal, Agent-only code execution
@@ -129,6 +130,37 @@ changes:
       - C005
     risk: medium
     size: small
+    selection:
+      selected_change_id: C001-define-internal-coder-protocol-contract-and-command-boundary
+      reason: >
+        Select C001 because it is dependency-free, is the queue's recommended
+        first candidate, and establishes the internal-only `/ow:coder` semantic
+        contract before source skill migration, registry work, generated
+        surfaces, read-model integration, or evidence schema work begins.
+      selected_at: 2026-05-23
+      selected_by: agent
+      artifacts:
+        selected_change: changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/ATOM_TASKS.yaml
+        implementation_brief: changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - references/internal-coder-protocol.md
+        - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        Defined the internal `/ow:coder` protocol contract as an Agent-only
+        source-edit quality governance boundary covering trust recovery,
+        owner/file/dependency maps, RED/GREEN evidence, self-check, validation
+        ladder selection, evidence binding, and future integration points,
+        without changing runtime behavior or generated surfaces.
+      validation:
+        - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/ATOM_TASKS.yaml
+        - node dist/cli/src/index.js handoff --root . --json
+        - node dist/cli/src/index.js inspect --root . --strict --json
+        - node dist/cli/src/index.js resume --root . --json
+        - git diff --check
     validation:
       - node dist/cli/src/index.js handoff --root . --json
       - node dist/cli/src/index.js inspect --root . --strict --json
@@ -140,7 +172,7 @@ changes:
       - The contract names integration points without implementing them.
       - No runtime behavior, generated surfaces, or public JSON shape changes.
   - id: C002
-    status: candidate
+    status: ready
     title: Migrate code-quality governor into OW source coder skill
     purpose: >
       Move the current system-level `ow-code-quality-governor` guidance into a
@@ -396,3 +428,35 @@ operations:
       - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
       - changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.md
       - changes/M115-internal-coder-quality-governance/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Selected C001 to define the internal coder protocol contract and command
+      boundary before implementation candidates can migrate source skills,
+      register `/ow:coder`, or expose coder gate state.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/SELECTED_CHANGE.yaml
+      - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/ATOM_TASKS.yaml
+      - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/IMPLEMENTATION_BRIEF.md
+      - references/internal-coder-protocol.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed the internal coder protocol contract and unlocked C002 source
+      skill migration without changing runtime behavior, generated surfaces, or
+      public CLI JSON output.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/internal-coder-protocol.md
+      - changes/M115-internal-coder-quality-governance/C001-define-internal-coder-protocol-contract-and-command-boundary/LOCAL_COMMIT_EVIDENCE.yaml
