@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-readiness-governance-audit-handoff
+source_plan_id: M125-m102-pr4-readiness-governance
+source_candidate_id: C004
+title: Record PR #4 readiness governance audit and handoff
+status: done
+selection_reason: >
+  C003 completed the approved PR #4 ready-for-review transition. C004 closes
+  M125 with local audit evidence, remaining boundaries, and the next governance
+  queue recommendation.
+approved_boundary:
+  selected_at: 2026-05-24T05:59:24+08:00
+  mode: local_audit_handoff
+  allowed:
+    - record final M125 readiness governance audit
+    - update M125 queue, summary, and readable view
+    - validate local artifacts
+  forbidden:
+    - merge
+    - PR edit, close, comment, retarget, or review request mutation
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion, or branch surgery
+scope:
+  includes:
+    - summarize completed readiness transition
+    - record deferred M126/M127 and merge governance queues
+    - confirm unauthorized operations did not occur
+  excludes:
+    - merge
+    - Issue mutation
+    - PR edit/close
+    - push or branch surgery
+    - product source changes
+owned_paths:
+  - changes/M125-m102-pr4-readiness-governance/
+acceptance:
+  - Local audit names authorized and unauthorized operation boundaries.
+  - Remaining governance queues are explicit.
+  - M125 can be handed off without raw session context.
+validation:
+  - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts "ok #{f}" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-24T05:59:24+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C004 produced local audit and handoff evidence only; no product source,
+    remote PR, Issue, push, merge, or git history mutation occurred.
+  evidence:
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+    - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md

@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-pr4-readiness-preflight
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-pr4-readiness-preflight
+title: Atom tasks for PR #4 readiness preflight
+status: done
+tasks:
+  - task_id: T001
+    title: Select C001
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - C001 selection artifacts exist.
+  - task_id: T002
+    title: Refresh PR #4 remote facts
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - PR metadata and remote head branch state are recorded.
+  - task_id: T003
+    title: Update queue handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - C001 completion is recorded and C002 is ready.

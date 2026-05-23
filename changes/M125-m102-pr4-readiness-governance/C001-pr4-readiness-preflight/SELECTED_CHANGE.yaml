@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-pr4-readiness-preflight
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-pr4-readiness-preflight
+source_plan_id: M125-m102-pr4-readiness-governance
+source_candidate_id: C001
+title: Refresh PR #4 readiness preflight
+status: done
+selection_reason: >
+  C001 is the required read-only PR #4 readiness refresh before any
+  ready-for-review decision packet or remote mutation.
+scope:
+  includes:
+    - inspect PR #4 state, draft flag, head/base refs, OIDs, mergeability, and status checks
+    - verify remote head branch exists at the PR head OID
+    - recommend whether C002 can prepare the ready-for-review decision packet
+  excludes:
+    - gh pr ready
+    - PR edit, close, merge, comment, retarget, or review request mutation
+    - push, force-push, branch deletion, rebase, reset, Issue mutation, or product source changes
+owned_paths:
+  - changes/M125-m102-pr4-readiness-governance/
+acceptance:
+  - PR #4 readiness facts are recorded.
+  - The packet states whether C002 can proceed.
+  - No remote mutation occurs.
+validation:
+  - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git ls-remote --heads origin codex/m102-selected-change-commit-gate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23T23:06:57+08:00
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C001 produced read-only readiness and local planning evidence only; no
+    product source, generated surface, remote PR, Issue, or git history was
+    mutated.
+  evidence:
+    - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/READINESS_PREFLIGHT.md

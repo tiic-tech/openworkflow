@@ -1,0 +1,548 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M125-m102-pr4-readiness-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M125-m102-pr4-readiness-governance
+title: Candidate changes for M102 PR #4 readiness governance
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-23-continue-git-governance
+    - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+  summary: >
+    M123 explicitly deferred PR #4 to a separate M102-specific readiness queue.
+    M125 owns read-only PR #4 readiness refresh, exact ready-for-review approval
+    gating, the approved ready transition if granted, and local audit handoff.
+queue_policy:
+  branch_boundary: codex/m125-m102-pr4-readiness-governance
+  target_pr_number: 4
+  target_pr_url: https://github.com/tiic-tech/openworkflow/pull/4
+  target_branch: codex/m102-selected-change-commit-gate
+  target_base_branch: main
+  target_remote: origin
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. PR #4 readiness must be refreshed before preparing an
+    exact ready-for-review decision packet.
+  high_risk_rule: >
+    C002 and C003 prepare or execute a GitHub PR ready-for-review mutation.
+    Exact approval is required before running gh pr ready.
+scope_control:
+  current_boundary: >
+    PR #4 ready-for-review governance only.
+  boundary_type: pr_ready_review_governance_slice
+  in_scope_rule: >
+    Include read-only PR #4 readiness facts, a ready-for-review decision packet,
+    approved ready transition, and local audit handoff.
+  out_of_scope_rule: >
+    Do not merge PR #4, edit/close PR #4, mutate Issues, push, force-push,
+    rebase, reset, delete branches, publish unrelated branches, or change
+    product source.
+  deferred_features:
+    - title: PR #6 M71 ready-for-review governance
+      suggested_plan_id: M126-m71-ready-review-governance
+    - title: PR #7 M101 shared-stack ready-for-review governance
+      suggested_plan_id: M127-m101-shared-stack-ready-review-governance
+    - title: Merge governance
+      reason: Merge should wait for ready-for-review, review/CI signals, and exact approval.
+observed_state:
+  captured_at: 2026-05-23T23:06:57+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: true
+  local_governance_branch_publication_decision: >
+    Do not publish the current local M122/M124 aggregate governance branch as a
+    separate PR now because it is 300 commits ahead of origin/main and overlaps
+    existing PR #4, #5, #6, and #7. Continue with targeted PR readiness queues.
+  pr_number: 4
+  pr_url: https://github.com/tiic-tech/openworkflow/pull/4
+  pr_state: OPEN
+  pr_draft: true
+  pr_title: OpenWorkflow M102-selected-change-commit-gate
+  head_ref: codex/m102-selected-change-commit-gate
+  head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+  review_decision: ""
+  status_check_rollup: []
+  remote_branch_present: true
+  remote_branch_head: bd2780b1d5b117b2734e5b732164e5d299bd521a
+c001_preflight_result:
+  path: changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/READINESS_PREFLIGHT.md
+  captured_at: 2026-05-23T23:06:57+08:00
+  pr_state: OPEN
+  pr_draft: true
+  mergeable: MERGEABLE
+  head_matches_remote_branch: true
+  status_check_rollup: []
+  recommended_next: C002
+c002_decision_result:
+  path: changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+  captured_at: 2026-05-23T23:09:49+08:00
+  approved_option: local-only decision packet
+  recommendation: mark PR #4 ready for review after exact approval
+  evidence_not_approval: true
+  required_ready_approval_text: >
+    Approve M125 C003 ready PR #4: run gh pr ready 4 --repo tiic-tech/openworkflow
+  forbidden_without_later_exact_approval:
+    - gh pr ready
+    - merge
+    - PR edit, close, comment, retarget, or review request mutation
+    - Issue mutation
+    - push, force-push, rebase, reset, branch deletion, or branch surgery
+  next_recommended_candidate_id: C003
+c003_ready_transition_result:
+  path: changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/READY_TRANSITION_EVIDENCE.md
+  captured_at: 2026-05-23T23:15:50+08:00
+  approved_command: gh pr ready 4 --repo tiic-tech/openworkflow
+  gh_result: Pull request tiic-tech/openworkflow#4 is marked as ready for review
+  pr_state: OPEN
+  pr_draft: false
+  head_oid_unchanged: true
+  base_oid_unchanged: true
+  mergeable: MERGEABLE
+  unauthorized_operations_performed: false
+  next_recommended_candidate_id: C004
+c004_audit_handoff_result:
+  path: changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+  captured_at: 2026-05-24T05:59:24+08:00
+  m125_complete: true
+  final_pr_state: OPEN
+  final_pr_draft: false
+  final_mergeable: MERGEABLE
+  unauthorized_operations_performed: false
+  next_recommended_queue: M126-m71-ready-review-governance
+next_recommended_candidate_id: M126-m71-ready-review-governance
+changes:
+  - id: C001
+    status: done
+    title: Refresh PR #4 readiness preflight
+    purpose: >
+      Produce current read-only readiness facts for PR #4 before any
+      ready-for-review decision is considered.
+    scope:
+      includes:
+        - inspect PR #4 state, draft flag, head/base refs, OIDs, mergeability, and status checks
+        - verify remote head branch exists at the PR head OID
+        - recommend whether C002 can prepare the ready-for-review decision packet
+      excludes:
+        - gh pr ready
+        - PR edit, close, merge, comment, retarget, or review request mutation
+        - push, force-push, branch deletion, rebase, reset, Issue mutation, or product source changes
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git ls-remote --heads origin codex/m102-selected-change-commit-gate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - PR #4 readiness facts are recorded.
+      - The packet states whether C002 can proceed.
+      - No remote mutation occurs.
+    selection:
+      selected_change_id: C001-pr4-readiness-preflight
+      reason: >
+        C001 is the required read-only PR #4 readiness refresh before any
+        ready-for-review decision packet or remote mutation.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23T23:06:57+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced read-only readiness and local planning evidence only; no
+        product source, generated surface, remote PR, Issue, or git history was
+        mutated.
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/READINESS_PREFLIGHT.md
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C002
+    status: done
+    title: Prepare PR #4 ready-for-review decision packet
+    purpose: >
+      Convert C001 facts into a high-risk decision packet for marking PR #4
+      ready for review.
+    scope:
+      includes:
+        - exact approval text for gh pr ready 4
+        - current PR #4 facts and stop gates
+        - ready-for-review rationale and risks
+      excludes:
+        - executing gh pr ready
+        - merge
+        - PR edit/close/comment/retarget
+        - Issue mutation, push, or branch surgery
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: high
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Decision packet states evidence, not approval.
+      - Exact approval text is recorded.
+      - Remote mutation remains blocked until exact approval.
+    selection:
+      selected_change_id: C002-pr4-ready-review-decision
+      reason: >
+        User explicitly approved the local-only C002 decision-packet option. C002 prepares the PR #4
+        ready-for-review high-risk decision report and records the exact later approval gate without
+        running gh pr ready.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/IMPLEMENTATION_BRIEF.md
+        - changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+    completion:
+      completed_at: 2026-05-23T23:09:49+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced local planning and decision evidence only; no product source, generated
+        surface, remote PR, Issue, or git history was mutated.
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/IMPLEMENTATION_BRIEF.md
+        - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+  - id: C003
+    status: done
+    title: Execute approved PR #4 ready-for-review transition
+    purpose: >
+      If C002 recommends readiness and the user approves the exact command,
+      run only the approved gh pr ready command for PR #4 and record evidence.
+    scope:
+      includes:
+        - verify exact approval text
+        - verify PR #4 still matches expected state
+        - run approved gh pr ready command
+        - record resulting PR metadata
+      excludes:
+        - merge
+        - PR edit after transition
+        - Issue mutation
+        - push, force-push, rebase, reset, branch deletion
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+    risk: high
+    size: small
+    validation:
+      - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - PR #4 is no longer draft.
+      - Local audit evidence records approval, command, and result.
+      - No merge, PR edit/close, Issue mutation, push, or branch surgery occurs.
+    selection:
+      selected_change_id: C003-pr4-ready-review-transition
+      reason: >
+        User explicitly approved the exact C003 command. C003 executed only
+        gh pr ready 4 for PR #4 and recorded before/after PR metadata.
+      selected_at: 2026-05-23
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/IMPLEMENTATION_BRIEF.md
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/READY_TRANSITION_EVIDENCE.md
+    completion:
+      completed_at: 2026-05-23T23:15:50+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 performed one approved GitHub PR state transition and wrote local
+        audit evidence only; no product source, push, merge, Issue mutation,
+        or git history mutation occurred.
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/READY_TRANSITION_EVIDENCE.md
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/IMPLEMENTATION_BRIEF.md
+        - "approved command: gh pr ready 4 --repo tiic-tech/openworkflow"
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/ATOM_TASKS.yaml"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+  - id: C004
+    status: done
+    title: Record PR #4 readiness governance audit and handoff
+    purpose: >
+      Close M125 with local audit evidence naming whether PR #4 was marked
+      ready or why it remains draft.
+    scope:
+      includes:
+        - summarize completed readiness transition or stop reasons
+        - record deferred M126/M127 and merge governance queues
+        - confirm unauthorized operations did not occur
+      excludes:
+        - merge
+        - Issue mutation
+        - PR edit/close
+        - push or branch surgery
+        - product source changes
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - M126-m71-ready-review-governance
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Local audit names authorized and unauthorized operation boundaries.
+      - Remaining governance queues are explicit.
+      - M125 can be handed off without raw session context.
+    selection:
+      selected_change_id: C004-readiness-governance-audit-handoff
+      reason: >
+        C003 completed PR #4 ready-for-review transition, so C004 closes M125
+        with local audit evidence and a next-queue handoff.
+      selected_at: 2026-05-24
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+    completion:
+      completed_at: 2026-05-24T05:59:24+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 produced local audit and handoff evidence only; no product source,
+        remote PR, Issue, push, merge, or git history mutation occurred.
+      evidence:
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+        - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+        - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml"
+        - "validation: node dist/cli/src/index.js validate --root . --json"
+        - "validation: git diff --check"
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: Create M125 candidate queue for PR #4 M102-specific readiness governance.
+    changed_at: 2026-05-23
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M123-pr-ready-review-governance/C005-readiness-governance-audit-handoff/READINESS_GOVERNANCE_AUDIT.md
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: User asked to continue git governance in order; C001 is the read-only readiness preflight.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/SELECTED_CHANGE.yaml
+      - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/ATOM_TASKS.yaml
+      - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: Current read-only PR #4 readiness facts are recorded.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/READINESS_PREFLIGHT.md
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate"
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: C001 completed and unlocked the high-risk PR #4 ready-for-review decision packet.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C001-pr4-readiness-preflight/READINESS_PREFLIGHT.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User approved the local-only PR #4 ready-for-review high-risk decision
+      packet and explicitly forbade gh pr ready, merge, PR edits, Issue
+      mutation, push, and branch surgery.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 produced the evidence-only high-risk decision packet and recorded
+      the exact C003 approval gate without mutating GitHub or git history.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml
+      - changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/IMPLEMENTATION_BRIEF.md
+      - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C002-pr4-ready-review-decision/ATOM_TASKS.yaml"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completed and unlocked C003 as the exact-approval remote mutation
+      candidate for marking PR #4 ready for review.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User explicitly approved the exact PR #4 ready-for-review command.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/SELECTED_CHANGE.yaml
+      - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/ATOM_TASKS.yaml
+      - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      PR #4 was marked ready for review using only the exact approved command,
+      and before/after PR metadata was recorded locally.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/READY_TRANSITION_EVIDENCE.md
+      - "approved command: gh pr ready 4 --repo tiic-tech/openworkflow"
+      - "result: Pull request tiic-tech/openworkflow#4 is marked as ready for review"
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/ATOM_TASKS.yaml"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C003 completed and unlocked final M125 readiness governance audit and
+      handoff.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C003-pr4-ready-review-transition/READY_TRANSITION_EVIDENCE.md
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C003 completed, PR #4 is ready for review, and M125 needs final local
+      audit and handoff.
+    changed_at: 2026-05-24
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      M125 audit handoff is recorded locally, PR #4 final state is ready for
+      review, and remaining governance queues are explicit.
+    changed_at: 2026-05-24
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+      - "validation: gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup"
+      - "validation: ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }' changes/M125-m102-pr4-readiness-governance/CANDIDATE_CHANGES.yaml changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/SELECTED_CHANGE.yaml changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/ATOM_TASKS.yaml"
+      - "validation: node dist/cli/src/index.js validate --root . --json"
+      - "validation: git diff --check"
+  - operation_id: OP013
+    operation_type: status_change
+    target_candidate_ids:
+      - M125-m102-pr4-readiness-governance
+    actor: agent
+    reason: >
+      All M125 candidates are complete and PR #4 is ready for review. Merge
+      governance remains separate.
+    changed_at: 2026-05-24
+    before_status: active
+    after_status: complete
+    evidence:
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md

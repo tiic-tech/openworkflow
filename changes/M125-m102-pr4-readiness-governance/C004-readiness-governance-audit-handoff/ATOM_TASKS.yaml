@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-readiness-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-readiness-governance-audit-handoff
+title: Atom tasks for M125 readiness governance audit handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Capture final PR #4 state
+    status: done
+    type: validation
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - PR #4 is open, ready for review, mergeable, and still at the expected head/base OIDs.
+  - task_id: T002
+    title: Write M125 audit handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/C004-readiness-governance-audit-handoff/M125_READINESS_GOVERNANCE_AUDIT.md
+    done_when:
+      - Audit summarizes C001-C003 evidence, unauthorized operations not performed, and remaining governance queues.
+  - task_id: T003
+    title: Close queue locally
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - C004 is marked done, M125 summary is complete, and next queue is M126.

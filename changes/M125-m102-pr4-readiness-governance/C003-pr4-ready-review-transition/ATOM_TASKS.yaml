@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-pr4-ready-review-transition
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-pr4-ready-review-transition
+title: Atom tasks for approved PR #4 ready-for-review transition
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm exact approval and pre-mutation PR state
+    status: done
+    type: validation
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - User approval exactly matches the C002 C003 approval gate.
+      - PR #4 is open, draft, mergeable, and still at the expected head/base OIDs.
+  - task_id: T002
+    title: Run approved ready-for-review command
+    status: done
+    type: remote_mutation
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - Only gh pr ready 4 --repo tiic-tech/openworkflow is executed.
+  - task_id: T003
+    title: Record post-mutation evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - PR #4 post-state shows isDraft false.
+      - Local queue, summary, and readable view point to C004 next.

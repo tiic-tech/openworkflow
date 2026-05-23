@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-pr4-ready-review-decision
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-pr4-ready-review-decision
+title: Atom tasks for PR #4 ready-for-review decision packet
+status: done
+tasks:
+  - task_id: T001
+    title: Select approved local-only C002 option
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - C002 selection artifacts exist and forbid remote mutation.
+  - task_id: T002
+    title: Write high-risk decision report
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - Decision options, recommendation, exact C003 approval text, and stop criteria are recorded.
+  - task_id: T003
+    title: Refresh queue handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M125-m102-pr4-readiness-governance/
+    done_when:
+      - C002 completion is recorded and C003 is ready only as exact-approval remote mutation.
