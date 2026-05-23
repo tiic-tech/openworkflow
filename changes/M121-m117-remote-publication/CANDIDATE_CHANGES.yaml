@@ -151,6 +151,24 @@ c002_high_risk_report:
   recommended_option: narrow spike before push approval
   exact_push_command_unapproved: git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
   report_is_approval: false
+c002_narrow_spike_result:
+  path: changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+  approved_scope: narrow isolated-worktree preflight only
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m117-publish
+  worktree_branch: codex/m117-git-automation-remote-readiness
+  worktree_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  worktree_clean: true
+  remote_branch_present: false
+  existing_prs: []
+  conflict_probe_clean: true
+  remote_plan_ok: false
+  remote_plan_remaining_blockers:
+    - simulator evidence is missing
+  remote_plan_cleared_blockers:
+    - current branch mismatch
+  simulator_ok: true
+  simulator_blockers: []
+  exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
 next_recommended_candidate_id: C002
 changes:
   - id: C001
@@ -417,3 +435,14 @@ operations:
     after_status: candidate
     evidence:
       - changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP005
+    operation_type: query
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: Execute approved narrow isolated-worktree preflight spike without remote mutation.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md

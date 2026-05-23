@@ -52,6 +52,7 @@ outputs:
   c001_implementation_brief: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/IMPLEMENTATION_BRIEF.md
   c001_publication_preflight: changes/M121-m117-remote-publication/C001-refresh-m117-publication-preflight/PUBLICATION_PREFLIGHT.md
   high_risk_decision_report: changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md
+  c002_worktree_preflight: changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
 observed_state:
   captured_at: 2026-05-23
   current_branch: codex/m120-historical-branch-repair
@@ -90,6 +91,20 @@ c002_high_risk_report:
   recommended_option: narrow isolated-worktree preflight spike before exact push approval
   exact_push_command_unapproved: git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
   report_is_approval: false
+c002_narrow_spike_result:
+  path: changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md
+  worktree_path: /Users/archy/Projects/StartUp/openworkflow-m117-publish
+  worktree_branch: codex/m117-git-automation-remote-readiness
+  worktree_head: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+  worktree_clean: true
+  remote_branch_present: false
+  existing_prs: []
+  conflict_probe_clean: true
+  remote_plan_ok: false
+  remote_plan_remaining_blocker: simulator evidence is missing
+  simulator_ok: true
+  simulator_blockers: []
+  exact_push_command_unapproved: git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
 key_dependencies:
   - M120 completed repaired publication ordering and recommended M121.
   - M117 branch-local PR_READY_SUMMARY.md was restored on the M117 branch at commit 898f0152.
@@ -113,6 +128,7 @@ unresolved_questions:
   - Should C002 approve the isolated M117 worktree model for the exact push decision report?
   - Should the user approve the recommended C002 narrow isolated-worktree preflight spike?
   - Should the known simulator-evidence binding gap block M117 publication if fresh simulator evidence is otherwise green in the chosen execution model?
+  - Should C003 accept the remote-plan simulator-evidence binding gap based on the green M117-context simulator result?
   - Should M117 draft PR creation happen in the same M121 queue after push, or stop after push for a separate PR queue?
 deferred_features:
   - M122-m71-historical-stack-publication
@@ -136,6 +152,17 @@ validation:
       --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
     - gh pr list --repo tiic-tech/openworkflow --head codex/m117-git-automation-remote-readiness
       --base main --json number,url,state,isDraft,title,headRefName,baseRefName
+    - git worktree add ../openworkflow-m117-publish codex/m117-git-automation-remote-readiness
+    - git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish status --short --branch
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js git-automation remote-plan
+      --root /Users/archy/Projects/StartUp/openworkflow-m117-publish
+      --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base origin/main
+      --remote origin --target-base main --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js git-automation simulate
+      --root /Users/archy/Projects/StartUp/openworkflow-m117-publish
+      --queue changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml --base main --json
+    - git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish merge-tree --write-tree
+      origin/main HEAD
     - git ls-remote --heads origin codex/m117-git-automation-remote-readiness
     - node dist/cli/src/index.js git-automation branch --root .
       --queue changes/M121-m117-remote-publication/CANDIDATE_CHANGES.yaml --json
@@ -178,3 +205,6 @@ validation:
     - C002 high-risk decision report was created as a stop packet. It recommends a narrow
       isolated-worktree preflight spike before any exact push approval. The report is not approval
       for push, PR creation, or any remote mutation.
+    - The approved C002 narrow spike created an isolated M117 worktree and ran read-only checks.
+      The M117-context simulator is ok:true and branch identity blockers are cleared. The
+      remote-plan still reports simulator evidence is missing, so exact push approval remains gated.

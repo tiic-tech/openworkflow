@@ -88,6 +88,18 @@ for exact push approval. The future push command remains unapproved:
 git -C ../openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
 ```
 
+Narrow spike evidence:
+
+- `changes/M121-m117-remote-publication/C002-isolated-worktree-preflight/WORKTREE_PREFLIGHT.md`
+
+Result: isolated M117 worktree preflight clears the branch mismatch blocker.
+`simulate` is `ok:true`; `remote-plan` still reports only `simulator evidence is
+missing`. The exact push command remains unapproved:
+
+```bash
+git -C /Users/archy/Projects/StartUp/openworkflow-m117-publish push origin HEAD:refs/heads/codex/m117-git-automation-remote-readiness
+```
+
 Owned paths:
 
 - `changes/M121-m117-remote-publication/HIGH_RISK_DECISION_REPORT.md`
