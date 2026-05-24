@@ -9,7 +9,7 @@ M134 starts from `origin/main` at `6612aa3e06996ad0151e3686d0c972677fc892c6`, th
 - Branch boundary: `codex/m134-git-governance-baseline-closure`
 - Branch base: `origin/main`
 - Current base commit: `6612aa3e06996ad0151e3686d0c972677fc892c6`
-- Next recommended candidate: `C002`
+- Next recommended candidate: `C003`
 
 In scope: post-merge git/PR inventory, extracting necessary M131/M132 git-governance deltas onto a fresh branch, PR #8 disposition planning, M134 publication planning, and final baseline handoff.
 
@@ -68,7 +68,7 @@ Acceptance:
 
 ### C002 - Extract M131 selected-change commit gate delta onto M134
 
-Status: ready
+Status: done
 Risk: high
 
 Reapply only the necessary M131 source behavior onto the fresh M134 branch.
@@ -79,9 +79,16 @@ Acceptance:
 - Git-automation commit evidence is linked to selected-change completion.
 - Existing strict summary checks still pass.
 
+Result:
+
+- `git-automation commit` refuses completed implementation candidates in strict queues when `--commit-evidence` is omitted.
+- Selected-change artifact inference supports list-shaped `selection.artifacts`.
+- Required evidence backfill fails closed when queue or selected-change completion records cannot be updated.
+- Runtime-surface verification covers the missing-evidence failure and successful backfill path.
+
 ### C003 - Extract M132 CC branch and PR lifecycle gate delta onto M134
 
-Status: candidate
+Status: ready
 Risk: high
 
 Reapply branch-per-CC and completed-CC PR lifecycle gates without importing old stacked history.

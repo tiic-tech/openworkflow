@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C002
+title: Atom tasks for C002 M131 selected-change commit gate extraction
+status: done
+tasks:
+  - task_id: T001
+    title: Compare M131 source delta
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      The M131 delta is reviewed against current origin/main and only the
+      selected-change commit-evidence behavior is chosen for extraction.
+  - task_id: T002
+    title: Enforce strict CLI evidence flag
+    type: implement
+    status: done
+    owned_paths:
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      git-automation commit refuses completed implementation candidates in
+      strict queues unless --commit-evidence is present.
+  - task_id: T003
+    title: Fail closed on required evidence backfill
+    type: implement
+    status: done
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+    done_when: >
+      Commit evidence backfill targets are preflighted and strict required
+      backfill produces an error instead of a warning-only skipped backfill.
+  - task_id: T004
+    title: Add runtime fixture coverage
+    type: verify
+    status: done
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification asserts strict queues reject commits without
+      --commit-evidence and still backfill queue and selected-change evidence.
+  - task_id: T005
+    title: Validate and record queue state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      C002 is marked done, C003 is ready, and validation commands are recorded.

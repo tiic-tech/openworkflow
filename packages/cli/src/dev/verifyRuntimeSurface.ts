@@ -2229,6 +2229,7 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
       "status: active",
       "queue_policy:",
       "  branch_boundary: codex/m105-backfill",
+      "  selected_change_commit_gate: strict",
       "changes:",
       "  - id: C003",
       "    status: done",
@@ -2240,7 +2241,7 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
       "    selection:",
       "      selected_change_id: M105-C003-evidence-backfill",
       "      artifacts:",
-      "        selected_change: changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
+      "        - changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
       "    completion:",
       "      completed_at: 2026-05-23",
       "      implementation_changed_files: true",
@@ -2252,6 +2253,28 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     await runInCwd(backfillRoot, ["git", "commit", "-m", "M105-backfill initial"]);
     await runInCwd(backfillRoot, ["git", "switch", "-c", "codex/m105-backfill"]);
     await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\nafter\n", "utf8");
+    const missingEvidenceCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      backfillRoot,
+      "--queue",
+      "changes/M105-backfill/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C003",
+      "--message",
+      "M105-backfill/C003 missing evidence fixture",
+      "--validation-evidence",
+      "validation: fixture",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(missingEvidenceCommit.code !== 0, "strict git-automation commit passed without --commit-evidence");
+    assert(missingEvidenceCommit.output.includes("strict selected-change commit gate requires --commit-evidence"), "strict commit evidence failure did not explain required flag");
+    const failedCommitStatus = await runCaptureInCwd(backfillRoot, ["git", "status", "--porcelain"]);
+    assert(failedCommitStatus.includes("allowed/change.txt"), "strict failed commit should leave source change uncommitted");
     const backfillCommit = await runCaptureStatus([
       "node",
       CLI,

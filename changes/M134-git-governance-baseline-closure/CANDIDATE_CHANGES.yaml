@@ -109,7 +109,7 @@ observed_state:
     - branch: codex/m133-remaining-pr5-merge-governance
       head: 040f20e
       note: Contains local M133 audit evidence after PR #5 merge; not pushed.
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -172,7 +172,7 @@ changes:
         - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
         - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: ready
+    status: done
     title: "Extract M131 selected-change commit gate delta onto M134"
     purpose: >
       Reapply only the necessary M131 selected-change commit-evidence behavior
@@ -209,8 +209,35 @@ changes:
       - A selected change with implementation_changed_files cannot pass strict handoff without LOCAL_COMMIT_EVIDENCE.yaml.
       - Git-automation commit evidence is linked to selected-change completion.
       - Existing M133/M134 strict summary checks still pass.
+    selection:
+      selected_change_id: C002
+      selected_at: 2026-05-25T03:17:21+08:00
+      reason: >
+        User explicitly authorized completing all M134 git-governance changes
+        with highest permission. C002 is the next recommended ready candidate
+        and extracts the M131 selected-change commit gate onto M134 without
+        importing old stacked branch history.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:17:21+08:00
+      implementation_changed_files: true
+      result: >
+        C002 reintroduced the M131 strict selected-change commit-evidence gate
+        on the M134 branch. Strict completed implementation candidates now
+        require --commit-evidence, selected-change artifact inference supports
+        list-shaped selection.artifacts, and required evidence backfill fails
+        closed when queue or selected-change completion records cannot be
+        updated.
+      evidence:
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
   - id: C003
-    status: candidate
+    status: ready
     title: "Extract M132 CC branch and PR lifecycle gate delta onto M134"
     purpose: >
       Reapply only the necessary M132 branch-per-CC and completed-CC PR
@@ -478,3 +505,49 @@ operations:
     after_status: ready
     evidence:
       - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User granted highest permission for all M134 git-governance commands.
+      C002 was the next ready candidate and C001 established that M131 source
+      deltas were still required on current origin/main.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      The M131 selected-change commit-evidence gate was extracted onto M134 as
+      source changes and runtime fixture coverage without cherry-picking the old
+      stacked branch.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completed the selected-change commit-evidence gate extraction, so
+      the M132 branch and PR lifecycle gate extraction is now ready.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
