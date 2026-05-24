@@ -130,7 +130,7 @@ observed_state:
     M129 evidence also recorded that PR #7 was an ancestor of PR #5 before PR
     #4 merged. C001 must refresh ancestry and merge-readiness against the
     actual remote main before any target choice.
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -320,7 +320,7 @@ changes:
         - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
         - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: ready
+    status: done
     title: Execute approved selected PR merge
     purpose: >
       If C003 recommends merge and the user approves the exact command, run only
@@ -350,8 +350,44 @@ changes:
       - Only the exact approved PR is merged.
       - Local evidence records approval, command, result, and remaining merge boundary.
       - No additional remote mutation occurs.
+    selection:
+      selected_change_id: C004
+      selected_at: 2026-05-25T01:56:58+08:00
+      reason: >
+        User provided the exact C004 merge approval text from the C003
+        high-risk decision report. C004 verified PR #7 state and ran only the
+        approved gh pr merge command.
+      approval_text: >
+        Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+        tiic-tech/openworkflow --merge --match-head-commit
+        f8bf087211316506f48155859f3e18edbc7224e4
+      artifacts:
+        - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T01:56:58+08:00
+      implementation_changed_files: true
+      merged_pr:
+        pr_number: 7
+        url: https://github.com/tiic-tech/openworkflow/pull/7
+        title: "M101 shared stack: M105/M106/M115 governance updates"
+        head_ref: codex/m101-build-proto-prompt-command-split
+        head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+        merged_at: 2026-05-24T17:56:44Z
+        merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+      remote_main_after_merge: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+      result: >
+        C004 merged only PR #7 with the exact approved command. PR #7 is now
+        MERGED with merge commit f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444.
+        Remote main now points to that merge commit. PR #5 remains open,
+        non-draft, and reports mergeability UNKNOWN at capture time, requiring
+        refreshed follow-up governance before any additional merge.
+      evidence:
+        - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+        - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
-    status: candidate
+    status: ready
     title: "Complete PR #5/#7 merge governance audit handoff"
     purpose: >
       Record final M130 audit state, whether a remaining PR merge was executed
@@ -555,3 +591,49 @@ operations:
     after_status: ready
     evidence:
       - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User provided the exact C004 approval text from the C003 high-risk
+      decision report. C004 verified PR #7 still matched the expected state
+      before executing the approved merge command.
+    changed_at: 2026-05-25T01:56:58+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 ran only the exact approved gh pr merge command for PR #7 and
+      recorded the resulting merge evidence. No additional PR, push, PR edit,
+      Issue mutation, or branch surgery occurred.
+    changed_at: 2026-05-25T01:56:58+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml
+  - operation_id: OP014
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      PR #7 was merged and PR #5 remains open with mergeability UNKNOWN after
+      the main branch changed. C005 can now record final M130 audit handoff and
+      the next safe governance boundary.
+    changed_at: 2026-05-25T01:56:58+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md

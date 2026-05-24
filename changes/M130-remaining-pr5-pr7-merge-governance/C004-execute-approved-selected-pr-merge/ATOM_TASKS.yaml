@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M130-remaining-pr5-pr7-merge-governance:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C004
+title: Atom tasks for C004 approved PR #7 merge
+status: done
+tasks:
+  - task_id: T001
+    title: Verify exact approval text and clean local state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      User approval text exactly matches the C003-required C004 approval and
+      the local worktree has no unrelated pending changes.
+  - task_id: T002
+    title: Reconfirm PR #7 readiness before merge
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      PR #7 remains open, non-draft, mergeable, and its head OID matches the
+      approved command's --match-head-commit value.
+  - task_id: T003
+    title: Execute only the approved merge command
+    type: remote_mutation
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      The exact approved gh pr merge command exits successfully and no
+      additional remote mutation is attempted.
+  - task_id: T004
+    title: Record merge evidence and remaining boundary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/
+    done_when: >
+      Merge evidence records approval, command, pre-merge facts, merge result,
+      remote main after merge, remaining PR state, and unauthorized operations
+      not performed.
+  - task_id: T005
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C004 is marked done, C005 is made ready, and the summary/readable view
+      point to the merge evidence.
+  - task_id: T006
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      OpenWorkflow validation passes, summary strict check passes, and git diff
+      whitespace is clean.

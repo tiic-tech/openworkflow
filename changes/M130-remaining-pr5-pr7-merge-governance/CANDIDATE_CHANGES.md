@@ -4,16 +4,16 @@ Source of truth: `CANDIDATE_CHANGES.yaml`.
 
 M130 starts after M129 merged PR #4 into `main` at `b77418e2fe9b1f6eda213e52f495364bb1861e94`. It owns the next refreshed merge-governance slice for PR #5 and PR #7.
 
-C003 completed the high-risk decision packet for PR #7. No merge or remote mutation is authorized.
+C004 executed the approved PR #7 merge. PR #5 remains open and requires refreshed governance before any later merge.
 
 ## Boundary
 
 - Branch boundary: `codex/m130-remaining-pr5-pr7-merge-governance`
 - Current branch exception: planning was created on `codex/m122-m71-historical-stack-publication`
-- Next recommended candidate: `C004`
+- Next recommended candidate: `C005`
 - Priority: active resume target on `codex/m130-remaining-pr5-pr7-merge-governance`
 - Remote/base: `origin` / `main`
-- Current remote main: `b77418e2fe9b1f6eda213e52f495364bb1861e94`
+- Current remote main: `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`
 
 In scope: read-only merge-readiness refresh against the new main, next target sequencing between PR #5 and PR #7, exact approval packet, one approved merge if later authorized, and audit handoff.
 
@@ -23,8 +23,8 @@ Out of scope: merge during DTC, push, PR edits, retargeting, closing, review req
 
 | PR | Branch | State | Draft | Mergeable | Note |
 | --- | --- | --- | --- | --- | --- |
-| #5 | `codex/m117-git-automation-remote-readiness` | OPEN | false | MERGEABLE | Needs refresh against new `main` |
-| #7 | `codex/m101-build-proto-prompt-command-split` | OPEN | false | MERGEABLE | Needs refresh against new `main`; prior M129 evidence showed #7 ancestor of #5 |
+| #5 | `codex/m117-git-automation-remote-readiness` | OPEN | false | UNKNOWN | Needs refresh against `main` after PR #7 merge |
+| #7 | `codex/m101-build-proto-prompt-command-split` | MERGED | false | UNKNOWN | Merged by C004 at `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444` |
 
 GitHub PR metadata currently reports the older base OID for these PRs. C001 must refresh against the actual remote `main` head before any target choice.
 
@@ -113,8 +113,23 @@ Acceptance:
 
 ### C004 - Execute approved selected PR merge
 
-Status: ready
+Status: done
 Risk: high
+
+Selected change artifacts:
+
+- `C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml`
+- `C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml`
+- `C004-execute-approved-selected-pr-merge/IMPLEMENTATION_BRIEF.md`
+- `C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md`
+
+Result:
+
+- Executed exactly: `gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4`
+- PR #7 is now MERGED.
+- Merge commit: `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`
+- Remote `main` now points to `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`.
+- PR #5 remains open and untouched, with mergeability reported as UNKNOWN after the main branch changed.
 
 Run only the exact approved merge command for the selected PR if the user later provides exact approval.
 
@@ -126,7 +141,7 @@ Acceptance:
 
 ### C005 - Complete PR #5/#7 merge governance audit handoff
 
-Status: candidate  
+Status: ready
 Risk: medium
 
 Record final M130 audit state and the next safe governance boundary.

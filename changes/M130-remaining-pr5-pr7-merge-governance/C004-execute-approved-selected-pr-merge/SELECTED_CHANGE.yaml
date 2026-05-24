@@ -1,0 +1,66 @@
+schema_version: 0.1.0
+contract_id: selected_change:M130-remaining-pr5-pr7-merge-governance:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C004
+title: Execute approved selected PR merge
+status: done
+selected_at: 2026-05-25T01:56:58+08:00
+selection_reason: >
+  User provided the exact C004 approval text from the C003 high-risk decision
+  report. C004 executed only the approved PR #7 merge command after confirming
+  PR #7 still matched the expected head and readiness state.
+approval_text: >
+  Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+  tiic-tech/openworkflow --merge --match-head-commit
+  f8bf087211316506f48155859f3e18edbc7224e4
+approved_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+source_candidate:
+  id: C004
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C003
+scope:
+  includes:
+    - verify exact approval text
+    - verify selected PR still matches expected head/base state
+    - run only the approved gh pr merge command
+    - record resulting PR/base metadata and remaining merge boundary
+  excludes:
+    - merging any additional PR
+    - push, force-push, rebase, reset, branch deletion, revert, or split/surgery
+    - PR body edits, Issue mutation, or product source changes
+owned_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/
+selected_pr:
+  number: 7
+  url: https://github.com/tiic-tech/openworkflow/pull/7
+  title: "M101 shared stack: M105/M106/M115 governance updates"
+  head_ref: codex/m101-build-proto-prompt-command-split
+  expected_head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+  base_ref: main
+result:
+  state: MERGED
+  merged_at: 2026-05-24T17:56:44Z
+  merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+  remote_main_after_merge: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+  local_origin_main_after_fetch: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+acceptance:
+  - Only the exact approved PR is merged.
+  - Local evidence records approval, command, result, and remaining merge boundary.
+  - No additional remote mutation occurs.
+validation:
+  - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+  - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+  - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - git fetch origin main
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+evidence:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+commit_boundary:
+  expected: one coherent local commit for M130 C004 merge evidence
+  implementation_changed_files: true

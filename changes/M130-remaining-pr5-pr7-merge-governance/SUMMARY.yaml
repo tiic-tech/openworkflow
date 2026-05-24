@@ -32,7 +32,7 @@ branch_identity_exception:
 target_base:
   remote: origin
   branch: main
-  head_oid: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  head_oid: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
 source_merge:
   pr_number: 4
   state: MERGED
@@ -47,33 +47,35 @@ target_prs:
     head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
     base_ref: main
     base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
-    mergeable: MERGEABLE
+    mergeable: UNKNOWN
     review_decision: ""
     status_check_rollup: []
   - number: 7
     url: https://github.com/tiic-tech/openworkflow/pull/7
     title: "M101 shared stack: M105/M106/M115 governance updates"
-    state: OPEN
+    state: MERGED
     draft: false
     head_ref: codex/m101-build-proto-prompt-command-split
     head_oid: f8bf087211316506f48155859f3e18edbc7224e4
     base_ref: main
     base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
-    mergeable: MERGEABLE
+    mergeable: UNKNOWN
+    merged_at: 2026-05-24T17:56:44Z
+    merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
     review_decision: ""
     status_check_rollup: []
 candidate_count: 5
-completed_candidate_id: C003
-completed_change_id: C003
-next_recommended_candidate_id: C004
+completed_candidate_id: C004
+completed_change_id: C004
+next_recommended_candidate_id: C005
 selected_candidate_id: null
 selected_change_id: null
 priority_note: >
   Refreshed on 2026-05-25T00:35:37+08:00 as the active resume target per user
   instruction by aligning the local branch with the M130 queue boundary. C001
   and C002 have since completed. C003 prepared the PR #7 high-risk decision
-  packet and C004 is now ready only if the user provides the exact merge
-  approval text; no remote mutation was performed.
+  packet, and C004 executed the exact approved PR #7 merge command. C005 is now
+  ready to record final M130 audit handoff and PR #5 follow-up governance.
 outputs:
   candidate_changes_yaml: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
@@ -92,6 +94,11 @@ outputs:
   implementation_brief_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md
   high_risk_decision_report: changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
   local_commit_evidence_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c004: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+  atom_tasks_c004: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml
+  implementation_brief_c004: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/IMPLEMENTATION_BRIEF.md
+  merge_evidence_c004: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+  local_commit_evidence_c004: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - "M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94."
   - "PR #5 and PR #7 remain open and non-draft."
@@ -129,6 +136,23 @@ current_high_risk_decision:
   approval_boundary: >
     C003 is evidence only. It does not authorize C004; C004 requires the exact
     approval text and immediate pre-merge metadata verification.
+executed_remote_operation:
+  candidate_id: C004
+  approved_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+  approval_text: >
+    Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+    tiic-tech/openworkflow --merge --match-head-commit
+    f8bf087211316506f48155859f3e18edbc7224e4
+  result:
+    pr_number: 7
+    state: MERGED
+    merged_at: 2026-05-24T17:56:44Z
+    merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+    remote_main_after_merge: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+  remaining_boundary: >
+    PR #5 remains open and reports mergeability UNKNOWN after the PR #7 merge.
+    Any later PR #5 merge requires refreshed governance against main at
+    f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444.
 deferred_features:
   - future-remaining-pr-merge-governance
   - future-merged-pr-revert-governance
@@ -152,6 +176,11 @@ validation:
     - git fetch origin main codex/m101-build-proto-prompt-command-split
     - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
     - C003 high-risk decision packet recorded
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+    - gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+    - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+    - git fetch origin main
+    - C004 merge evidence recorded
   notes: |
     - M129 was committed first as 716ade230733b24168457f0334b5d62d30967752.
     - M130 queue creation performed no remote mutation.
@@ -165,7 +194,12 @@ validation:
     - C003 prepared the PR #7 high-risk merge decision packet.
     - Proposed C004 command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
     - C004 requires exact approval text before any merge execution.
+    - C004 received exact approval and merged PR #7 with command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+    - PR #7 is MERGED with merge commit f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444.
+    - Remote main now points to f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444.
+    - PR #5 remains open and reports mergeability UNKNOWN after the main branch changed.
     - No merge, push, PR edit, Issue mutation, branch checkout, branch surgery,
       destructive git operation, revert, or product source edit was performed
-      during C001, C002, or C003.
-    - C004 is the next recommended candidate.
+      during C001, C002, or C003. During C004, only the approved PR #7 merge
+      command was run.
+    - C005 is the next recommended candidate.
