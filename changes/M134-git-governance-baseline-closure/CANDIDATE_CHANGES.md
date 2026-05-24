@@ -9,7 +9,7 @@ M134 starts from `origin/main` at `6612aa3e06996ad0151e3686d0c972677fc892c6`, th
 - Branch boundary: `codex/m134-git-governance-baseline-closure`
 - Branch base: `origin/main`
 - Current base commit: `6612aa3e06996ad0151e3686d0c972677fc892c6`
-- Next recommended candidate: `C005`
+- Next recommended candidate: `C006`
 
 In scope: post-merge git/PR inventory, extracting necessary M131/M132 git-governance deltas onto a fresh branch, PR #8 disposition planning, M134 publication planning, and final baseline handoff.
 
@@ -127,7 +127,7 @@ Result:
 
 ### C005 - Prepare M134 baseline publication packet
 
-Status: ready
+Status: done
 Risk: high
 
 Prepare the push/draft-PR decision packet for M134.
@@ -138,9 +138,16 @@ Acceptance:
 - Exact remote publication approval handle is recorded.
 - No remote mutation occurs in C005.
 
+Result:
+
+- Wrote `PR_READY_SUMMARY.md`.
+- Wrote `C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md`.
+- Exact C006 handle is `git push -u origin codex/m134-git-governance-baseline-closure` followed by `gh pr create --repo tiic-tech/openworkflow --base main --head codex/m134-git-governance-baseline-closure --draft --title "M134 git governance baseline closure" --body-file changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md`.
+- Merge is not authorized.
+
 ### C006 - Execute approved M134 baseline publication
 
-Status: candidate
+Status: ready
 Risk: high
 
 Run only approved M134 push and draft PR creation if explicitly authorized.

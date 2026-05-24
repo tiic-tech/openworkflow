@@ -107,7 +107,7 @@ observed_state:
     - branch: codex/m133-remaining-pr5-merge-governance
       head: 040f20e
       note: Contains local M133 audit evidence after PR
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -363,7 +363,7 @@ changes:
         - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
         - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
-    status: ready
+    status: done
     title: Prepare M134 baseline publication packet
     purpose: >
       Prepare a high-risk publication decision packet for the M134 baseline branch after local
@@ -397,8 +397,28 @@ changes:
       - M134 branch is locally PR-ready.
       - Exact remote publication approval handle is recorded.
       - No remote mutation occurs in C005.
+    selection:
+      selected_change_id: C005
+      selected_at: 2026-05-25T03:36:00+08:00
+      reason: >
+        C005 is the next ready candidate after C004 decided PR #8 disposition. It prepares the
+        local publication packet and exact remote operation handle without pushing or creating a PR.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:36:00+08:00
+      implementation_changed_files: true
+      result: >
+        C005 generated the M134 local PR-ready summary and publication packet. It records exact
+        push and draft PR creation commands, states that merge is not authorized, and leaves all
+        remote mutation to C006.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
   - id: C006
-    status: candidate
+    status: ready
     title: Execute approved M134 baseline publication
     purpose: >
       If the user gives exact approval, push only the M134 baseline branch and open a draft PR for
@@ -693,3 +713,45 @@ operations:
     after_status: ready
     evidence:
       - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+  - operation_id: OP014
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 was the next ready candidate after PR #8 disposition was decided and local M134
+      governance deltas were complete.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 wrote PR_READY_SUMMARY.md and M134_PUBLICATION_PACKET.md with exact push and draft PR
+      creation commands. It performed no remote mutation.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  - operation_id: OP016
+    operation_type: status_change
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C005 prepared the publication packet and exact approved remote handle, so C006 can execute
+      the approved branch push and draft PR creation.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
