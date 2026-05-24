@@ -1,0 +1,108 @@
+schema_version: 0.1.0
+contract_id: summary:M130-remaining-pr5-pr7-merge-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M130-remaining-pr5-pr7-merge-governance
+title: Summary for remaining PR #5/#7 merge governance
+status: active
+source:
+  kind: mixed
+  summary: >
+    M130 was created after M129 merged PR #4 into main at merge commit
+    b77418e2fe9b1f6eda213e52f495364bb1861e94 and recommended refreshing PR #5
+    and PR #7 before further merge governance.
+  refs:
+    - user_input:2026-05-25-create-m130-after-m129
+    - changes/M129-remaining-ready-pr-merge-governance/SUMMARY.yaml
+    - changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M129_MERGE_GOVERNANCE_AUDIT.md
+scope_boundary: >
+  Merge governance for remaining open ready PRs after PR #4 merged: PR #5 and
+  PR #7.
+branch_boundary: codex/m130-remaining-pr5-pr7-merge-governance
+branch_identity_exception:
+  mode: temporary_continuation_branch
+  current_branch: codex/m122-m71-historical-stack-publication
+  allowed_operations:
+    - local planning artifact creation
+    - local validation
+  reason: >
+    M130 was created as local DTC planning after M129 was committed on the
+    existing aggregate governance branch. No branch creation, checkout, push,
+    merge, PR edit, Issue mutation, or branch surgery occurred.
+target_base:
+  remote: origin
+  branch: main
+  head_oid: b77418e2fe9b1f6eda213e52f495364bb1861e94
+source_merge:
+  pr_number: 4
+  state: MERGED
+  merge_commit: b77418e2fe9b1f6eda213e52f495364bb1861e94
+target_prs:
+  - number: 5
+    url: https://github.com/tiic-tech/openworkflow/pull/5
+    title: "M117: Git automation remote readiness governance"
+    state: OPEN
+    draft: false
+    head_ref: codex/m117-git-automation-remote-readiness
+    head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+  - number: 7
+    url: https://github.com/tiic-tech/openworkflow/pull/7
+    title: "M101 shared stack: M105/M106/M115 governance updates"
+    state: OPEN
+    draft: false
+    head_ref: codex/m101-build-proto-prompt-command-split
+    head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+candidate_count: 5
+completed_candidate_id: null
+completed_change_id: null
+next_recommended_candidate_id: C001
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
+  summary: changes/M130-remaining-pr5-pr7-merge-governance/SUMMARY.yaml
+key_dependencies:
+  - M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94.
+  - PR #5 and PR #7 remain open and non-draft.
+  - Remaining PRs must be refreshed against the new main before target sequencing.
+risks:
+  - id: R001
+    level: high
+    description: Merging any remaining PR mutates main and repository collaboration state.
+    mitigation: Require C003 high-risk decision packet and exact operation-level approval before C004.
+  - id: R002
+    level: medium
+    description: GitHub PR metadata still reports the old base OID for remaining PRs.
+    mitigation: C001 must refresh against remote main head b77418e2fe9b1f6eda213e52f495364bb1861e94.
+  - id: R003
+    level: high
+    description: PR #7 is the shared M101-derived stack and may still need split/surgery if review rejects the shared branch.
+    mitigation: Keep split/surgery out of M130 and require a separate high-risk queue if needed.
+unresolved_questions: []
+deferred_features:
+  - future-remaining-pr-merge-governance
+  - future-merged-pr-revert-governance
+  - future-m101-shared-stack-split-governance
+validation:
+  commands_run:
+    - git status --short --branch
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+    - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  notes: |
+    - M129 was committed first as 716ade230733b24168457f0334b5d62d30967752.
+    - M130 queue creation performed no remote mutation.
+    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, IMPLEMENTATION_BRIEF.md, merge, push, PR edit,
+      Issue mutation, branch creation, branch checkout, branch surgery, destructive git operation,
+      revert, or product source edit was performed.
+    - C001 is the next recommended candidate and is read-only/local evidence only.
