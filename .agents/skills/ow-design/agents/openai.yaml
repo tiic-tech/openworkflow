@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.design
+interface:
+  display_name: "ow:design"
+  short_description: "Convert accepted prototype evidence into product design for production specification."
+  default_prompt: "Use /ow:design for this OpenWorkflow repository."

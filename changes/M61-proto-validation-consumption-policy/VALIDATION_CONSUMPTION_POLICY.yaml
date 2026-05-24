@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: planning:M61-proto-validation-consumption-policy
+contract_type: planning
+title: Proto validation consumption policy
+status: completed
+policy_id: optional_explicit_validation
+summary: >
+  `/ow:proto` may proceed from vision-only input, must consume validation
+  artifacts when present, and must not silently auto-trigger validation until a
+  separate change implements that behavior.
+input_modes:
+  - mode: vision_only
+    when:
+      - Vision exists.
+      - Validation artifacts are absent or explicitly skipped by the user.
+    behavior:
+      - Extract product uncertainty from the vision.
+      - Generate strategic prototype directions.
+      - Record that validation evidence is absent or skipped.
+    must_not:
+      - Pretend a validation decision exists.
+      - Expand into implementation tasks.
+  - mode: validation_present
+    when:
+      - VALIDATION.yaml exists.
+      - PROTOTYPE_BRIEF.md exists.
+    behavior:
+      - Preserve the validation core question.
+      - Treat include and exclude scope as hard boundaries.
+      - Use validation acceptance as evidence questions.
+    must_not:
+      - Broaden into later features.
+      - Override accepted validation boundaries without an explicit decision.
+  - mode: internally_derived
+    when:
+      - A future selected change implements automatic validation derivation.
+    behavior:
+      - Reserved for future compatibility.
+    must_not:
+      - Be used by current source behavior.
+conflict_policy:
+  - If validation conflicts with the vision, stop for a decision.
+  - If the vision is too vague, ask for vision clarification.
+  - If the user asks to auto-validate, create or select a follow-up change.
+follow_ups:
+  - candidate_id: P002
+    reason: Source proto behavior can now consume the policy.
+  - candidate_id: future-auto-validation
+    reason: Automatic validation requires its own explicit selected change.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

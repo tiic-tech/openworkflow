@@ -1,0 +1,37 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:H002-proto2html-source-behavior
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: H002-proto2html-source-behavior
+title: H002 Proto2html source behavior atom tasks
+status: completed
+tasks:
+  - task_id: H002-A001
+    title: Add proto2html source skill
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/proto2html/SKILL.md
+      - skills/proto2html/agents/openai.yaml
+    done_when:
+      - Skill guidance requires accepted benchmark prototype input.
+      - Skill guidance forbids product exploration, specs, runtime surfaces, and production app work.
+  - task_id: H002-A002
+    title: Add proto2html protocol reference
+    status: completed
+    type: document
+    owned_paths:
+      - skills/proto2html/references/proto2html-protocol.md
+    done_when:
+      - Protocol covers input resolution, reconstruction, fidelity evidence, and quality gates.
+  - task_id: H002-A003
+    title: Complete queue and validate
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/
+      - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/
+    done_when:
+      - H002 is completed with evidence.
+      - "`quick_validate.py skills/proto2html` passes."
+      - "`npm run validate` passes."

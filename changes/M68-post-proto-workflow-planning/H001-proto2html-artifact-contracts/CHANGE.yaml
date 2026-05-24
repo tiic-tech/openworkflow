@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: change:H001-proto2html-artifact-contracts
+contract_type: change
+title: H001 Proto2html artifact contracts
+status: completed
+source_artifacts:
+  - docs/OW_DEVELOP_PLAN.md
+  - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+  - references/proto-redesign-artifact-contracts.md
+depends_on:
+  - change:M67-proto-redesign-runtime-surface
+produces:
+  - selected_change:H001-proto2html-artifact-contracts
+  - atom_tasks:H001-proto2html-artifact-contracts
+  - reference:proto2html-artifact-contracts
+summary: >
+  Define the first post-proto artifact contract for reconstructing an accepted
+  benchmark prototype image into a single HTML prototype with fidelity evidence.
+problem: >
+  The image-first proto flow now intentionally forbids HTML. The next workflow
+  boundary needs a separate artifact contract so HTML reconstruction can happen
+  without leaking implementation work back into `/ow:proto` or `/ow:tune`.
+goals:
+  - Define required input evidence for proto2html.
+  - Define HTML prototype output and fidelity evidence fields.
+  - Keep html2spec, runtime command exposure, and production build out of scope.
+non_goals:
+  - Do not add a proto2html skill.
+  - Do not add a proto2html command.
+  - Do not generate HTML artifacts.
+affected_paths:
+  - references/proto2html-artifact-contracts.md
+  - schemas/html-prototype.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M68-post-proto-workflow-planning/
+  - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/
+acceptance:
+  - Proto2html artifacts require an accepted benchmark image or screen group input.
+  - HTML output, screenshot evidence, fidelity gaps, and known limits are structured.
+  - The contract states that proto2html reconstructs; it does not explore product direction or create specs.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

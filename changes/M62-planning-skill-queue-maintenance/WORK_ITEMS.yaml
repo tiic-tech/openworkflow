@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: work_items:M62-planning-skill-queue-maintenance
+contract_type: work_items
+title: M62 Planning skill queue maintenance work items
+status: completed
+change_contract: changes/M62-planning-skill-queue-maintenance/CHANGE.yaml
+items:
+  - task_id: M62-T001
+    title: Add queue maintenance mode to decompose-to-changes
+    status: completed
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+    acceptance:
+      - Skill supports add, query, update, split, merge, status, priority, and soft-delete operations.
+      - Mutating operations require operation log entries.
+  - task_id: M62-T002
+    title: Add targeted review to select-change
+    status: completed
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+    acceptance:
+      - Skill can review a named candidate id before selection.
+      - Selection updates operation logs and leaves completion to implementation.
+  - task_id: M62-T003
+    title: Extend queue operation contract
+    status: completed
+    owned_paths:
+      - schemas/candidate-changes.schema.json
+      - references/planning-artifact-contracts.md
+    acceptance:
+      - Candidate changes schema accepts top-level operations.
+      - Planning reference defines operation types and status update rules.
+  - task_id: M62-T004
+    title: Dogfood operation log on M54
+    status: completed
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M62-planning-skill-queue-maintenance/
+    acceptance:
+      - M54 records C006 with add, select, and complete operations.
+      - M54 next recommendation remains C004 after hardening completes.
+  - task_id: M62-T005
+    title: Validate hardening
+    status: completed
+    owned_paths:
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - schemas/candidate-changes.schema.json
+      - references/planning-artifact-contracts.md
+    acceptance:
+      - "`npm run validate` passes."

@@ -1,0 +1,30 @@
+<!-- BEGIN OPENWORKFLOW AGENT GUIDE generated-by: openworkflow; template-id: openworkflow.agents-guide.v1 -->
+## OpenWorkflow
+
+- Run `openworkflow --help` first when you need current CLI capabilities, workflow command boundaries, or maintenance commands.
+- Prefer `--json` for structured command output; every OpenWorkflow CLI command supports a JSON report envelope for Agent consumption.
+- Treat JSON `ok:false` as a failed command: OpenWorkflow exits nonzero but still writes the parseable JSON report to stdout. Read `health_errors` for blocking health/readiness failures, `errors` for command/runtime failures, and `warnings` for non-blocking guidance.
+- Run `openworkflow handoff --root . --json` as the strict Agent trust gate before loading context; it aggregates managed surface health, strict summary quality, current pointers, next-command readiness, read order, blockers, and next actions.
+- Use `openworkflow context --root . --handoff --json` when you need both a bounded startup packet and strict handoff-quality blocking in one command; default `context --json` remains packet-only and may return `ok:true` with handoff warnings.
+- Start with `openworkflow inspect --root . --json` for the aggregated Agent entry read model, health, next-command readiness, and read order; add `--strict` when current-but-thin summary quality should block handoff trust.
+- Treat `openworkflow doctor --root . --json` as a managed-surface maintenance check; its top-level `ok` does not prove artifact handoff quality. Read `handoff_quality_ok` or use `inspect --strict` / `summaries --strict` for handoff gates.
+- Start every workflow turn by reading `.openworkflow/CURRENT_STATE.yaml`, then follow its `read_this_first` pointers before loading full evidence.
+- When dogfooding OpenWorkflow inside its own repository, use OpenWorkflow commands as the read model and trust gate before implementation, but make durable product changes in the source files that generate the managed surfaces.
+- Treat each `decompose-to-changes` `CANDIDATE_CHANGES.yaml` queue as the feat boundary. Create one top-level `changes/<feat-id>/` folder for that queue, then treat each selected candidate inside it as a commit-sized change with selection, atom-task, and brief artifacts kept under the feat folder.
+- Do not create a new top-level feat folder for every small candidate. Open a new top-level `changes/<feat-id>/` only when a new decomposition queue or product theme is needed; otherwise advance the current feat through focused commits.
+- Do not manually patch generated or managed surfaces such as `.openworkflow/**`, `.agents/skills/ow-*/SKILL.md`, or `AGENTS.md` to fix product behavior; update the registry, artifact contracts, templates, schemas, or tests that produce them, then run `openworkflow sync` or `init` to regenerate.
+- CLI commands maintain and summarize the repo-local workflow surface: `init`, `sync`, `validate`, `doctor`, `handoff`, `inspect`, `context`, `draft`, `register`, `status`, `brief`, `check`, `summaries`, and `clean`.
+- Use `openworkflow context --root . --json` to materialize a compact startup packet for `CURRENT_STATE.next_command`; compact mode returns a structured `command_audit` slice instead of full audit source. Add `--handoff` when thin or stale summaries should make the packet fail, and add `--for /ow:<command>`, `--max-bytes <n>`, or `--mode full` when you need a specific workflow command, tighter budget, or full managed audit source.
+- In `context --json` and `doctor --json`, read `data.handoff_quality_ok` and `data.quality_summary` before trusting low-context handoff artifacts; `quality_summary.status` tells you whether summaries are trusted, need refresh, or are current-but-thin.
+- Use `openworkflow draft --root . --artifact <type> --id <id> --json` to preview a contract-shaped source artifact; add `--write` only when the active `/ow:*` workflow step should create that artifact.
+- Use `openworkflow register --root . --artifact <path> --json` after a source artifact exists to preview index registration; add `--write` to make it visible to read models, and `--current` only when it should become the active pointer.
+- Use `openworkflow brief --root .` or `openworkflow status --root .` for a low-context Agent read model before deciding what to inspect next; use `--json` when another tool needs structured data.
+- Use `openworkflow check /ow:<command> --root . --json` before uncertain workflow work to verify required context, forbidden context, output boundaries, current artifact usability, and next actions.
+- Use `openworkflow summaries --root . --json` before loading raw evidence when artifact summaries or current slices may be missing, stale, or current-but-thin; add `--strict` to make draft/thin source quality return `ok:false`. Freshness and source artifact quality are separate signals.
+- Use `openworkflow summarize --root . --artifact <path> --json` to preview SUMMARY.yaml refreshes; add `--write` only when you intend to update summary files without changing source artifacts.
+- Use `openworkflow validate --root . --json` for contract shape; SUMMARY.yaml trust is checked by `summaries`, not by `validate`.
+- Use `openworkflow clean --root . --tools codex --json` to preview managed/generated cleanup; `--yes` removes OpenWorkflow managed metadata and generated adapter files while preserving source artifacts, SUMMARY.yaml, evidence, notes, and user AGENTS.md content.
+- Repo-local workflow commands are delivered as Agent skills under `.agents/skills/ow-*/SKILL.md` and map to semantic commands: `/ow:vision`, `/ow:validation`, `/ow:proto`, `/ow:tune`, `/ow:design`, `/ow:spec`, `/ow:change`, `/ow:team`, and `/ow:git-automation`.
+- Respect lazy creation: `openworkflow init` only creates the minimal workflow root; stage artifacts must be created only by the first matching `/ow:*` command.
+- Prefer summary/current-state files for orientation, and load raw evidence only when the current task requires it.
+<!-- END OPENWORKFLOW AGENT GUIDE -->

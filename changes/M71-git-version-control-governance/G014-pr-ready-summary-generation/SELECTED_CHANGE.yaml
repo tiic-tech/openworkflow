@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:G014-pr-ready-summary-generation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G014-pr-ready-summary-generation
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G014
+title: Implement local PR-ready summary generation for completed queues
+status: done
+selection_reason: >
+  G014 is ready after G013. It converts completed candidate and commit evidence
+  into a local PR-ready review packet before any high-risk command shell is
+  considered.
+scope:
+  includes:
+    - local PR_READY_SUMMARY.md generator
+    - completed change and commit evidence summary
+    - remaining candidate and high-risk candidate summary
+    - validation evidence summary
+    - explicit remote PR non-creation notice
+  excludes:
+    - creating a remote PR
+    - pushing a branch
+    - editing GitHub PR bodies
+    - mutating GitHub Issues
+owned_paths:
+  - packages/core/src/git/prReadySummary.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+  - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/**
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - PR_READY_SUMMARY.md is generated locally from queue evidence.
+  - The summary states no remote PR was opened.
+  - Missing validation or incomplete candidates are reported clearly.
+  - No remote mutation occurs.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/git/prReadySummary.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/LOCAL_COMMIT_EVIDENCE.yaml
+    - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+    - "commit: c8d48b1dc387f40d1aae27193155e5fc3847f912"
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"

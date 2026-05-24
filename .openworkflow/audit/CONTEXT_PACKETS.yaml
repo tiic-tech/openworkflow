@@ -1,0 +1,407 @@
+schema_version: 0.1.0
+contract_id: audit:context-packets
+contract_type: workflow
+title: OpenWorkflow context packets
+status: active
+packets:
+  - packet_id: context:workflow
+    command: /ow:workflow
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+    optional:
+      []
+    forbidden:
+      []
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm workflow index exists.
+      during:
+        - Stay inside command scope.
+      after:
+        - Record outputs in the relevant index.
+  - packet_id: context:context
+    command: /ow:context
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+    optional:
+      []
+    forbidden:
+      []
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm workflow index exists.
+      during:
+        - Stay inside command scope.
+      after:
+        - Record outputs in the relevant index.
+  - packet_id: context:vision
+    command: /ow:vision
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    optional:
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - .openworkflow/context/GLOSSARY.yaml
+      - AGENT.md
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm workflow and context indexes exist.
+        - Load CURRENT_STATE.yaml when present to avoid stale stage routing.
+        - Start in conversation mode and ask the next useful vision question before writing
+          artifacts.
+      during:
+        - Ask one focused question at a time and make each question depend on the previous answer.
+        - Cover mandatory vision dimensions before validation handoff.
+        - Provide concrete examples or options when the user is stuck.
+      after:
+        - Persist artifacts only after stable answers, explicit save request, or readiness
+          checkpoint.
+        - Handoff to validation only after mandatory coverage, unresolved blockers are named, and
+          the user confirms readiness.
+        - When handing off, mark the vision session active or reviewed, clear stale current_question
+          when answered, and update CURRENT_STATE.yaml.
+        - Confirm no validation, prototype, spec, change, or runtime artifacts were created.
+  - packet_id: context:validation
+    command: /ow:validation
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+    optional:
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm a vision contract exists.
+        - Load CURRENT_STATE.yaml when present.
+        - Load only vision and validation index context.
+      during:
+        - Classify features as existential, supporting, later, or out of scope.
+        - Name the single highest-risk validation question.
+      after:
+        - Record the validation target and prototype brief.
+        - Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next
+          command.
+        - Mark superseded validation targets accordingly when a new validation target replaces them.
+        - Confirm no prototype, spec, change, or runtime artifacts were created.
+  - packet_id: context:proto
+    command: /ow:proto
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    optional:
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - package.json
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Load vision and optional validation context; validation is optional but must be consumed
+          when present.
+        - Record validation_input.mode as vision_only or validation_present; do not silently
+          auto-generate validation.
+        - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
+          boundary conditions, and central uncertainty."
+      during:
+        - Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
+        - Make directions differ by product form, initiation trigger, interaction model, emotional
+          driver, retention mechanism, validation metric, or main risk.
+        - Write concrete high-fidelity image-generation prompts with screens, journey, interactions,
+          AI/system behavior, trust controls, anti-goals, and sample content.
+        - Recommend the first direction to generate based on risk reduction, observability,
+          feasibility, and closeness to the success signal.
+      after:
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact
+          EVIDENCE.yaml.
+        - Record review evidence and a decision audit record internally after prompt-pack evidence
+          changes.
+        - Refresh prototype SUMMARY.yaml when summary_policy is configured and update
+          CURRENT_STATE.yaml with current_prototype, last_decision, and next_command.
+        - Confirm no HTML, design, spec, change, team, persistence, or production hardening was
+          created.
+  - packet_id: context:tune
+    command: /ow:tune
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    optional:
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/**/EVIDENCE.yaml
+      - .openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/**/REFINED_PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/**/NOTE.md
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+      - .openworkflow/decisions/**/DECISION.yaml
+      - package.json
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted
+          baseline screen group."
+        - Require baseline screens, screenshots, screen descriptions, generated images, or an
+          accepted PROTO_PROMPT_PACK plus a tune request.
+        - Load only the baseline prompt pack, current prototype evidence, relevant validation or
+          vision context, and latest decision audit context.
+      during:
+        - Audit the full baseline screen group before writing refined prompts.
+        - Extract the product system and preserve product thesis, primary loop, component
+          vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+        - Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per
+          target screen.
+        - Bind every refined prompt to target screen id, source screen id(s), generation scope,
+          target form factor, negative constraints, and acceptance criteria.
+        - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
+      after:
+        - Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and
+          compact EVIDENCE.yaml.
+        - Write or update the internal decision audit record.
+        - Refresh prototype SUMMARY.yaml and CURRENT_STATE.yaml after the revision outcome is known.
+        - Show the user only the tuning result, unresolved question if any, and the next user-facing
+          command.
+  - packet_id: context:decision
+    command: /ow:decision
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+    optional:
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+      - .openworkflow/prototypes/**/EVIDENCE.yaml
+      - .openworkflow/validation/**/VALIDATION.yaml
+    forbidden:
+      - .openworkflow/runtime/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm prototype evidence exists.
+        - Load only prototype evidence, user feedback summary, and decision index context.
+      during:
+        - Record audit outcome as continue, revise, pivot, stop, or needs_more_evidence.
+        - Keep only decision-rich evidence.
+      after:
+        - Write the decision record.
+        - Update CURRENT_STATE.yaml last_decision and next_command.
+        - Set prototype status to accepted only when outcome is continue, revise_requested when
+          outcome is revise, or superseded when pivoted.
+        - Authorize /ow:design only when outcome is continue.
+        - Return control to the user-facing proto or tune command.
+  - packet_id: context:design
+    command: /ow:design
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/decisions/DECISION_INDEX.yaml
+    optional:
+      - .openworkflow/prototypes/**/EVIDENCE.yaml
+      - .openworkflow/decisions/**/DECISION.yaml
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/context/CONTEXT_MAP.yaml
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      - .openworkflow/design/<id>/TECH_SPEC.yaml
+      - .openworkflow/design/<id>/FRONTEND_SPEC.yaml
+      - .openworkflow/design/<id>/BACKEND_SPEC.yaml
+      - .openworkflow/design/<id>/API_CONTRACT.yaml
+      - .openworkflow/design/<id>/DB_SCHEMA_MODEL.yaml
+    audit_checkpoints:
+      before:
+        - Confirm accepted prototype evidence or a continue decision exists.
+        - Start by clarifying product behavior and UX gaps before writing PRODUCT_DESIGN.yaml.
+      during:
+        - Ask one focused design question at a time when behavior, states, edge cases, or scope are
+          thin.
+        - Cover mandatory design dimensions before spec handoff.
+        - Create conditional packets only when explicitly needed.
+      after:
+        - Write PRODUCT_DESIGN.yaml only after enough design meaning is stable.
+        - Refresh design SUMMARY.yaml when summary_policy is configured and update
+          CURRENT_STATE.yaml with current_design and spec readiness.
+        - Hand off to /ow:spec only when spec readiness is true and blockers are explicit.
+  - packet_id: context:spec
+    command: /ow:spec
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/design/DESIGN_INDEX.yaml
+    optional:
+      - .openworkflow/design/**/PRODUCT_DESIGN.yaml
+      - .openworkflow/design/**/TECH_SPEC.yaml
+      - .openworkflow/design/**/FRONTEND_SPEC.yaml
+      - .openworkflow/design/**/BACKEND_SPEC.yaml
+      - .openworkflow/design/**/API_CONTRACT.yaml
+      - .openworkflow/design/**/DB_SCHEMA_MODEL.yaml
+      - .openworkflow/specs/SPEC_INDEX.yaml
+      - AGENT.md
+      - package.json
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm a product design exists and spec_readiness.ready is true.
+        - Load only the current design and any conditional design packets named by that design.
+        - Lazy-create the specs index and spec artifact only when /ow:spec is invoked.
+      during:
+        - Translate accepted product behavior into one implementable production slice.
+        - Preserve traceability to design evidence, accepted scope, and known blockers.
+        - Separate user-facing requirements, technical constraints, interfaces, acceptance criteria,
+          and verification plan.
+      after:
+        - Write the spec artifact and update SPEC_INDEX.yaml.
+        - Refresh spec SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml
+          with current_spec and change readiness.
+        - Hand off to /ow:change only when the spec has bounded scope, acceptance, and verification.
+        - Confirm no change or runtime artifacts were created.
+  - packet_id: context:change
+    command: /ow:change
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/specs/SPEC_INDEX.yaml
+    optional:
+      - .openworkflow/specs/**/SPEC.yaml
+      - .openworkflow/specs/**/NOTE.md
+      - .openworkflow/changes/CHANGE_INDEX.yaml
+      - AGENT.md
+      - package.json
+    forbidden:
+      - .openworkflow/runtime/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm a focused production spec exists.
+        - Inspect the repository just enough to identify affected paths, integration points, and
+          verification commands.
+        - Lazy-create the changes index, change artifact, and work items only when /ow:change is
+          invoked.
+      during:
+        - Convert the spec into one bounded implementation change with non-goals and rollback notes.
+        - Split work into ordered items with owned paths, dependencies, acceptance, and verification.
+        - Record unresolved implementation risks instead of expanding scope.
+      after:
+        - Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.
+        - Refresh change SUMMARY.yaml when summary_policy is configured and update
+          CURRENT_STATE.yaml with current_change and runtime readiness.
+        - Hand off to /ow:team only when work items are implementable and verification is explicit.
+        - Confirm no runtime artifacts were created.
+  - packet_id: context:team
+    command: /ow:team
+    visibility: user
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/changes/CHANGE_INDEX.yaml
+    optional:
+      - .openworkflow/changes/**/CHANGE.yaml
+      - .openworkflow/changes/**/WORK_ITEMS.yaml
+      - .openworkflow/runtime/RUNTIME_INDEX.yaml
+      - .openworkflow/runtime/**/STATE.yaml
+      - AGENT.md
+      - package.json
+    forbidden:
+      []
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Confirm an approved or active change plan and work items exist.
+        - Audit git status, relevant source files, and any existing runtime state before execution.
+        - Lazy-create runtime state only when /ow:team is invoked for an approved change.
+      during:
+        - Execute work items in dependency order and keep runtime state current.
+        - Delegate only when the task can run independently with clear owned paths and acceptance.
+        - Record issues, verification results, checkpoints, and residual risks as development
+          proceeds.
+      after:
+        - Update runtime state, issues, and checkpoints.
+        - Refresh runtime SUMMARY.yaml when summary_policy is configured and update
+          CURRENT_STATE.yaml with current_run, blockers, and next action.
+        - Run the verification named by the change plan when practical.
+        - Report changed artifacts, verification result, and remaining blockers.
+  - packet_id: context:git-automation
+    command: /ow:git-automation
+    visibility: user
+    required:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+      - changes/<plan_id>/PR_READY_SUMMARY.md
+      - changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml
+    forbidden:
+      []
+    conditional_outputs:
+      - high-risk decision report when remote mutation or autonomous mode is requested
+      - follow-up CANDIDATE_CHANGES entry for autonomous git automation
+    audit_checkpoints:
+      before:
+        - Read the queue branch boundary and confirm current git state.
+        - Confirm whether the requested mode is managed or autonomous.
+        - Stop on autonomous or remote mutation requests unless a high-risk approval exists for
+          exact operations.
+      during:
+        - Use dry-run or preview before any local mutation.
+        - Record plan id, candidate id, branch, dirty paths, command preview, validation evidence,
+          and affected paths.
+        - Keep local branch, commit, and summary actions scoped to the selected queue.
+      after:
+        - Record commit hash and evidence path when a local commit is created.
+        - Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.
+        - Report remote operations as gated and include ordered commit or queue evidence for push,
+          PR, and merge planning.
+updated_at: null

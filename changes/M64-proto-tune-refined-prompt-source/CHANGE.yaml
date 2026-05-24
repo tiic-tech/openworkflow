@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: change:M64-proto-tune-refined-prompt-source
+contract_type: change
+title: Implement prototype tune to refined prompt source behavior
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - schemas/proto-prompt-pack.schema.json
+  - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+depends_on:
+  - change:M60-proto-redesign-artifact-contracts
+  - change:M63-proto-vision-to-strategic-prompt-source
+produces:
+  - selected_change:M64-proto-tune-refined-prompt-source
+  - atom_tasks:M64-proto-tune-refined-prompt-source
+summary: >
+  Update the source prototype skill so accepted baseline screens and tuning
+  feedback can become screen-bound refined prompt packs without product drift.
+problem: >
+  The strategic prototype source path can create first-pass prompt packs, but
+  iterative tuning still needs explicit baseline audit, product-system
+  continuity, delta rules, and screen-bound prompts before dogfood can evaluate
+  the full image-first loop.
+goals:
+  - Add refinement source mode to build-prototype guidance.
+  - Add a protocol reference for baseline audits, product-system extraction,
+    delta rules, screen manifests, and quality gates.
+  - Preserve accepted baseline product behavior while supporting explicit user
+    tuning requests.
+  - Keep runtime and generated adapter surfaces unchanged.
+non_goals:
+  - Do not expose runtime command surfaces.
+  - Do not edit generated Codex adapter surfaces.
+  - Do not add HTML conversion.
+  - Do not add automatic validation triggers.
+affected_paths:
+  - skills/build-prototype/
+  - changes/M64-proto-tune-refined-prompt-source/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+acceptance:
+  - Tune behavior preserves product system and accepted baseline screens.
+  - Each refined prompt is bound to a target screen id and source screen id(s).
+  - MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE are explicit.
+  - Requested removals are included in negative constraints and acceptance checks.
+created_at: 2026-05-21
+updated_at: 2026-05-21

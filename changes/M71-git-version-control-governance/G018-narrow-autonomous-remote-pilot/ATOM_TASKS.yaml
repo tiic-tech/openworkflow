@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G018-narrow-autonomous-remote-pilot
+contract_type: planning
+planning_artifact_type: atom_tasks
+title: Atom tasks for G018 narrow autonomous remote pilot planning
+status: done
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G018
+selected_change_id: G018-narrow-autonomous-remote-pilot
+tasks:
+  - id: T001
+    status: done
+    title: Record approved staged path
+    output:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+    acceptance:
+      - The artifact states B -> C and separates read-only planning from mutation.
+  - id: T002
+    status: done
+    title: Write high-risk decision report
+    output:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+    acceptance:
+      - Concrete risks, denied operations, required evidence, and recommended sequence are documented.
+  - id: T003
+    status: done
+    title: Update governance reference
+    output:
+      - references/git-automation-governance.md
+    acceptance:
+      - The reference names G019 as the remote read-only step and G020 as the later draft PR pilot.
+  - id: T004
+    status: done
+    title: Add follow-up candidates
+    output:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+    acceptance:
+      - G019 is the next recommended candidate and G020 depends on G019.
+  - id: T005
+    status: done
+    title: Validate planning artifacts
+    output:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Repository contracts and whitespace checks pass.

@@ -1,0 +1,143 @@
+schema_version: 0.1.0
+contract_id: summary:M71-git-version-control-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M71-git-version-control-governance
+title: Summary for git version control governance planning
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    The user asked to turn the commit, feat, branch, and PR governance
+    discussion into a decompose-to-changes candidate queue. The governing model
+    is atom task as implementation checklist, selected change as commit,
+    CANDIDATE_CHANGES as feat, feat as branch, branch as PR, and PR as
+    merge/release boundary. A follow-up queue maintenance pass added Issues,
+    gh operation boundaries, and a read-only analyze-changes skill for
+    cross-queue priority analysis.
+outputs:
+  candidate_changes_yaml: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+  summary: changes/M71-git-version-control-governance/SUMMARY.yaml
+  high_risk_decision_report: changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+branch_boundary: codex/m71-git-version-governance
+candidate_count: 20
+completed_candidate_id: G020
+completed_change_id: G020-draft-pr-remote-pilot
+previous_completed_candidate_id: G019
+previous_completed_change_id: G019-remote-readonly-pr-plan
+fixture_completed_candidate_id: G006
+fixture_completed_change_id: G006-branch-per-feat-dogfood-fixtures
+pr_completed_candidate_id: G005
+pr_completed_change_id: G005-pr-ready-summary-contract
+validation_completed_candidate_id: G004
+validation_completed_change_id: G004-git-governance-validation
+selection_completed_candidate_id: G003
+selection_completed_change_id: G003-select-branch-dirty-guards
+dtc_completed_candidate_id: G002
+dtc_completed_change_id: G002-dtc-branch-boundary-fields
+analysis_completed_candidate_id: G010
+analysis_completed_change_id: G010-analyze-changes-skill
+issue_completed_candidate_id: G008
+issue_completed_change_id: G008-issue-governance-source-of-truth
+initial_completed_candidate_id: G001
+initial_completed_change_id: G001-git-governance-contract
+next_recommended_candidate_id: null
+key_dependencies:
+  - G001 unlocks the source skill and validation changes.
+  - G001 is complete and established the git governance contract.
+  - G002 is complete and teaches decompose-to-changes to record branch boundaries.
+  - G003 is complete and teaches select-change to guard branch and dirty-tree state.
+  - G004 is complete and validates branch-governance metadata.
+  - G005 is complete and defines PR-ready summary handoff semantics.
+  - G006 is complete and adds branch-per-feat dogfood fixtures.
+  - G002 and G003 must complete before G004 can validate the new behavior.
+  - G005 should complete before any PR-ready handoff fixture work.
+  - G008 defines Issue source-of-truth rules before gh operation boundaries or cross-queue analysis depend on Issues.
+  - G008 is complete and made G009 and G010 ready.
+  - G009 is complete and classifies gh issue and PR operation risk before G007 decides mutation automation.
+  - G010 is complete and enables read-only cross-queue priority analysis before select-change.
+  - G007 is complete as a high-risk decision; approved path is Option B plus narrowed local automation.
+  - G011 is complete and defines the command contract before local git automation implementation.
+  - G012 is complete and implements local-only feat branch automation with dirty-tree refusal.
+  - G013 is complete and implements selected-change local commit automation with allowed-path and validation-evidence guards.
+  - G014 is complete and generates local PR-ready summaries without remote mutation.
+  - G015 is complete and introduces the managed git-automation command shell with remote operation planning.
+  - G016 is complete and defines the design-only autonomous git automation lifecycle contract.
+  - G017 is complete and implements the read-only autonomous simulator that precedes full autonomous remote mutation; primary commit 5a5d2e21008b9e31456a9b8b9810cf1014dca282 records the implementation.
+  - G018 is complete and records the approved B -> C path: remote read-only planning first, then a narrow draft PR mutation pilot; primary commit a853ae5581e3a21d8f0ff7e865fb480b92df433c records the planning decision.
+  - G019 is complete and implements remote read-only PR-ready planning without mutation; primary commit 55e62cd3615b047b44705b0dd81be540dc3a1e2e records the implementation.
+  - G020 is complete and pilots draft PR mutation only, disabled by default with dry-run preview and explicit --allow-draft-pr gating; primary commit 768bb16e2d107305c780fcc9c16e5e451209efea records the implementation.
+  - No next candidate is currently recommended in this queue; merge, Issue mutation, force-push, and full autonomous lifecycle remain outside scope.
+risks:
+  - id: R001
+    level: medium
+    description: Branch governance could overconstrain legitimate queue maintenance if exceptions are not documented.
+    mitigation: Define planning-only and explicit-user-override exceptions in the contracts and skills.
+  - id: R002
+    level: high
+    description: Automated git or gh mutation could create unwanted commits, pushes, issue edits, issue closures, or PRs.
+    mitigation: Keep automation as a high-risk decision packet until the user explicitly approves a concrete option.
+  - id: R003
+    level: medium
+    description: Local issue artifacts can drift from GitHub Issues when gh is configured as the remote source of truth.
+    mitigation: Store linkage and audit metadata locally, but avoid duplicating remote issue bodies as authoritative content.
+  - id: R004
+    level: medium
+    description: Cross-queue analysis could silently become selection if its boundary is not explicit.
+    mitigation: Keep analyze-changes read-only and hand off recommended plan and candidate ids to select-change.
+  - id: R005
+    level: high
+    description: Draft PR mutation could expose incomplete work or overwrite human PR body edits if target identity, body digest, and rollback evidence are weak.
+    mitigation: Implement remote read-only planning first, then gate the draft PR pilot with explicit config, payload preview, managed-section boundaries, before/after evidence, and rollback guidance.
+unresolved_questions:
+  - Should OW require a new branch for every new CANDIDATE_CHANGES immediately, or allow a documented exception when retrofitting legacy queues?
+  - Should commit hashes become mandatory completion evidence for all future done candidates, or only for queues that opt into branch governance?
+  - Should local issue backlog artifacts exist only when gh is absent, or also as an optional cache when gh is available?
+  - Should analyze-changes produce one global analysis artifact or one artifact per cross-queue decision episode?
+  - Should the first draft PR pilot create only new draft PRs, or also update an existing managed section when a matching PR already exists?
+validation:
+  commands_run:
+    - npm run validate
+    - git diff --check
+    - npm run verify:runtime-surface
+  notes:
+    - Initial DTC output created without selecting or implementing any candidate.
+    - Repository validation passed after queue creation.
+    - Queue maintenance added G008, G009, and G010, and expanded G007 to include gh mutation automation.
+    - Repository validation passed after queue maintenance.
+    - G001 completed the git governance hierarchy contract and made G002, G003, G005, and G008 ready.
+    - G008 completed the Issue source-of-truth contract and made G009 and G010 ready.
+    - G010 completed the analyze-changes skill and made G002 the next recommended governance hardening change.
+    - G002 completed DTC branch-boundary guidance and made G003 the next recommended governance hardening change.
+    - G003 completed select-change branch and dirty-tree guards and made G004 ready.
+    - G004 completed branch-governance validation and made G005 the next recommended governance change.
+    - G005 completed the PR-ready summary contract and made G006 ready.
+    - G006 completed branch-per-feat dogfood fixtures and made G009 the next recommended governance change.
+    - G009 completed gh operation governance and made G007 the next high-risk stop.
+    - G007 high-risk stop report was created; implementation requires explicit approval of a concrete option.
+    - User approved Option B plus narrowed local automation: local branch, local commit, and local PR-ready summary are in scope; push, remote PR, Issue mutation, and merge still require explicit approval.
+    - G011-G015 were added to decompose the approved path.
+    - G011 completed approved local git automation contract and made G012 ready.
+    - G012 completed local feat branch automation and made G013 ready.
+    - User clarified selected changes must have at least one commit, but may have multiple commits when the final selected-change HEAD preserves traceability.
+    - G013 completed selected-change local commit automation and made G014 ready.
+    - G013 primary implementation commit is fb003d7346ce027e08a9f149718caadf82755ad6; commit evidence is recorded in a follow-up evidence commit.
+    - G014 completed local PR-ready summary generation and made G015 the next high-risk stop.
+    - G014 primary implementation commit is c8d48b1dc387f40d1aae27193155e5fc3847f912; commit evidence is recorded in a follow-up evidence commit.
+    - User approved G015 managed command shell: local automation is available; remote operations produce ordered plans and remain approval-gated.
+    - User clarified managed remote handoff must let agents reconstruct push, PR, conflict resolution, and merge order from local commits and evidence, even for large local histories.
+    - G015 completed the managed git-automation command shell and added G016 as the autonomous-mode high-risk follow-up.
+    - G015 primary implementation commit is 47b708131bc87a1175c3603f0a9643c6f21b0e2e; commit evidence is recorded in a follow-up evidence commit.
+    - G016 high-risk decision report was created; implementation requires explicit approval of a concrete option.
+    - User approved G016 Option B: design-only autonomous contract now, then read-only simulator before full autonomous mode.
+    - G016 completed autonomous enablement, operation matrix, evidence, merge-readiness, conflict, rollback, and implementation-path contracts.
+    - G017 read-only autonomous simulator was added as the next recommended candidate.
+    - G016 primary implementation commit is 94ddaa74596a6428eacad297faf1a851bceb1e10; commit evidence is recorded in a follow-up evidence commit.
+    - G017 completed the read-only autonomous simulator and added G018 as the next high-risk narrow remote pilot planning step.
+    - G018 completed the B -> C high-risk decision and added G019 remote read-only planning plus G020 draft PR pilot.
+    - G018 primary implementation commit is a853ae5581e3a21d8f0ff7e865fb480b92df433c; commit evidence is recorded in a follow-up evidence commit.
+    - G019 completed the remote read-only PR-ready planner and made G020 the next draft PR mutation pilot.
+    - G019 primary implementation commit is 55e62cd3615b047b44705b0dd81be540dc3a1e2e; commit evidence is recorded in a follow-up evidence commit.
+    - G020 completed the disabled-by-default draft PR pilot with preview, allow gate, managed body digest, and rollback guidance.
+    - G020 primary implementation commit is 768bb16e2d107305c780fcc9c16e5e451209efea; commit evidence is recorded in a follow-up evidence commit.

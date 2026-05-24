@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: selected_change:M57-dogfood-proto-redesign-artifact-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M57-dogfood-proto-redesign-artifact-contract
+source_plan_id: M56-proto-redesign-dogfood
+source_candidate_id: P001
+title: Define proto redesign artifact contract
+status: active
+selection_reason:
+  - P001 is the only ready candidate in the dogfood queue.
+  - It unlocks both image-first proto behavior and validation consumption decisions.
+  - It keeps implementation focused on artifact contracts before runtime exposure.
+rejected_alternatives:
+  - id: P002
+    reason: Depends on P001 artifact contract.
+  - id: P003
+    reason: Depends on P001 artifact contract.
+scope:
+  includes:
+    - proto redesign output contract
+    - required and optional source artifacts
+    - image prompt and critique evidence shape
+    - explicit non-goals for HTML generation
+  excludes:
+    - source skill implementation
+    - runtime command exposure
+    - generated adapter surfaces
+owned_paths:
+  - references/
+  - schemas/
+  - changes/proto-redesign-artifact-contract/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - Proto redesign artifacts define vision and validation inputs.
+  - Image-only output is separated from later HTML conversion.
+  - Validation consumption rules are explicit.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

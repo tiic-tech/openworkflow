@@ -1,0 +1,1974 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M71-git-version-control-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M71-git-version-control-governance
+title: Candidate changes for OpenWorkflow git version control governance
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - "user_request: use decompose-to-changes to create a candidate queue for commit, feat, branch, and PR governance"
+    - "user_request: consider whether Issues should be included in git governance, whether authorized gh operations should be covered, and whether an analyze-changes skill is needed for cross-queue priority analysis"
+    - "discussion: atom task -> implementation checklist; selected change -> commit; CANDIDATE_CHANGES -> feat; feat -> branch; branch -> PR; PR -> merge/release boundary"
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/SKILL.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+    - skills/select-change/SKILL.md
+    - skills/select-change/references/selection-protocol.md
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable G-prefixed ids are assigned once and referenced by select-change, completion records, commits, and PR summaries.
+  feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat for git version control governance.
+  branch_boundary: codex/m71-git-version-governance
+  selected_artifact_location: changes/M71-git-version-control-governance/<candidate-id>-<slug>/
+  commit_policy: Each selected candidate should complete with one coherent git commit whose message references the plan id and candidate id.
+  pr_policy: A PR should represent the feat branch, summarize all completed and deferred candidates, and link validation evidence.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - artifact contracts before source skill behavior changes
+    - issue source-of-truth rules before gh mutation behavior
+    - branch and dirty-tree guards before PR handoff automation
+    - cross-queue analysis before selecting across multiple active candidate queues
+    - validation before relying on git governance in dogfood mode
+    - design-only or report-only treatment for high-risk git automation
+  avoid:
+    - selecting candidates while a previous selected change has uncommitted implementation work
+    - mixing multiple feat queues on one branch without an explicit exception
+    - adding destructive git operations to skills
+    - creating PR or remote-push automation before branch and commit invariants are validated
+    - treating remote GitHub Issues as local files when gh is configured as the source of truth
+next_recommended_candidate_id: null
+changes:
+  - id: G001
+    status: done
+    title: Formalize git governance hierarchy in planning contracts
+    purpose: >
+      Define the canonical relationship between atom tasks, selected changes,
+      commits, candidate queues, feats, branches, PRs, and merge boundaries so
+      later skill behavior has one shared contract.
+    scope:
+      includes:
+        - version control hierarchy and naming conventions
+        - commit message expectations for selected candidates
+        - branch ownership expectations for each candidate queue
+        - PR scope and summary expectations for completed feat queues
+        - explicit non-destructive git operation policy
+      excludes:
+        - changing decompose-to-changes behavior
+        - changing select-change behavior
+        - adding runtime git automation
+        - creating PRs
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/
+    dependencies: []
+    unlocks:
+      - G002
+      - G003
+      - G004
+      - G005
+      - G008
+      - G010
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A durable reference defines selected change as commit-sized work.
+      - The planning contracts define CANDIDATE_CHANGES as a feat boundary.
+      - The contracts state that a feat should have an owning branch.
+      - The contracts state that PRs summarize feat branches, not individual atom tasks.
+      - The contracts prohibit destructive git operations unless the user explicitly requests them.
+    selection:
+      selected_change_id: G001-git-governance-contract
+      reason: >
+        G001 is the next recommended candidate and creates the shared
+        version-control contract needed before source skills, Issue governance,
+        gh boundaries, or validation can enforce git behavior.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G001-git-governance-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G002
+    status: done
+    title: Add branch boundary fields to decompose-to-changes outputs
+    purpose: >
+      Teach decompose-to-changes to record branch ownership when it creates a
+      new feat queue, making the branch boundary explicit in YAML, Markdown,
+      and summary artifacts.
+    scope:
+      includes:
+        - branch naming guidance for new candidate queues
+        - queue_policy.branch_boundary guidance
+        - summary output for the owning branch
+        - dirty-tree note behavior before creating a new queue
+        - non-automatic branch creation guidance unless already performed by the agent
+      excludes:
+        - select-change branch enforcement
+        - automatic git checkout or branch creation inside skill instructions
+        - PR creation behavior
+    owned_paths:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - decompose-to-changes tells agents to capture the feat branch in queue policy.
+      - decompose-to-changes distinguishes new feat queue creation from queue maintenance on an existing branch.
+      - decompose-to-changes records dirty-tree observations without widening into implementation.
+      - Markdown and SUMMARY expectations include the branch boundary.
+    selection:
+      selected_change_id: G002-dtc-branch-boundary-fields
+      reason: >
+        G002 is the next recommended candidate after G010 and teaches
+        decompose-to-changes to record branch boundaries before select-change
+        enforces them.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G002-dtc-branch-boundary-fields
+      completed_at: 2026-05-21
+      evidence:
+        - skills/decompose-to-changes/SKILL.md
+        - skills/decompose-to-changes/references/decomposition-protocol.md
+        - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/decompose-to-changes"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G003
+    status: done
+    title: Add branch and dirty-tree guards to select-change
+    purpose: >
+      Teach select-change to verify the current branch and working tree before
+      selecting a candidate so one selected change does not blur into another
+      uncommitted change or the wrong feat branch.
+    scope:
+      includes:
+        - current branch check against queue_policy.branch_boundary
+        - dirty-tree guard for uncommitted previous selected change work
+        - explicit allowed exceptions for planning-only queue maintenance
+        - completion expectation that the selected candidate lands as one commit
+      excludes:
+        - automatic commit creation
+        - branch switching
+        - PR creation
+        - validator implementation
+    owned_paths:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/
+    dependencies:
+      - G001
+    unlocks:
+      - G004
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - select-change checks whether the current branch matches the queue branch boundary.
+      - select-change stops or reports when an unrelated dirty tree would contaminate a new selected change.
+      - select-change does not perform git mutations itself.
+      - selection artifacts describe the expected commit boundary.
+    selection:
+      selected_change_id: G003-select-branch-dirty-guards
+      reason: >
+        G003 is ready after G001 and follows G002 because select-change can now
+        enforce branch boundaries that decompose-to-changes records.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G003-select-branch-dirty-guards
+      completed_at: 2026-05-21
+      evidence:
+        - skills/select-change/SKILL.md
+        - skills/select-change/references/selection-protocol.md
+        - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/select-change"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G004
+    status: done
+    title: Validate git governance fields and completion evidence
+    purpose: >
+      Extend repository validation so planning queues can enforce required git
+      governance fields and completed candidates can carry commit evidence in a
+      consistent shape.
+    scope:
+      includes:
+        - validation for queue_policy.branch_boundary when present
+        - validation for selected candidate completion commit evidence when done
+        - negative runtime-surface coverage for malformed git governance fields
+        - compatibility with existing queues that predate branch governance
+      excludes:
+        - forcing every historical queue to add branch fields immediately
+        - git command execution
+        - PR creation
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/
+    dependencies:
+      - G001
+      - G002
+      - G003
+    unlocks:
+      - G006
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Repository validation accepts the new M71 queue shape.
+      - Repository validation catches malformed branch boundary fields in generated fixtures.
+      - Runtime-surface verification includes at least one negative case for git governance metadata.
+      - Historical queues remain valid unless they opt into the new fields incorrectly.
+    selection:
+      selected_change_id: G004-git-governance-validation
+      reason: >
+        G004 is ready after G002 and G003 and provides mechanical validation
+        before later fixtures rely on branch-governed queue metadata.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G004-git-governance-validation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G005
+    status: done
+    title: Define feat completion and PR-ready summary artifact
+    purpose: >
+      Create a lightweight artifact contract for completing a candidate queue as
+      a feat branch and preparing a PR summary without requiring the agent to
+      open a PR automatically.
+    scope:
+      includes:
+        - FEATURE_SUMMARY.md or PR_READY_SUMMARY.md contract
+        - completed, deferred, blocked, and high-risk candidate summary fields
+        - validation command evidence expectations
+        - branch and commit list expectations
+      excludes:
+        - GitHub API usage
+        - automatic PR creation
+        - release automation
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/
+    dependencies:
+      - G001
+    unlocks:
+      - G006
+      - G007
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A PR-ready summary contract exists and is linked from planning contracts.
+      - The contract explains how to summarize candidate completion status.
+      - The contract records branch name, commit evidence, validation evidence, and unresolved risks.
+      - The contract does not require automatic PR creation.
+    selection:
+      selected_change_id: G005-pr-ready-summary-contract
+      reason: >
+        G005 is the next recommended candidate after G004 and defines the
+        review handoff artifact needed before branch-per-feat dogfood fixtures.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G005-pr-ready-summary-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G006
+    status: done
+    title: Add dogfood fixtures for branch-per-feat workflow
+    purpose: >
+      Add focused dogfood fixtures and examples that show a clean feat branch,
+      selected change commit, completion evidence, and PR-ready summary flow.
+    scope:
+      includes:
+        - example queue metadata with branch boundary
+        - example completed candidate with commit evidence
+        - example PR-ready summary or summary linkage
+        - validation fixtures that protect against stale or contradictory metadata
+      excludes:
+        - changing actual git history
+        - opening PRs
+        - broad generated-surface regeneration
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/
+    dependencies:
+      - G002
+      - G003
+      - G004
+      - G005
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Runtime-surface verification exercises branch-per-feat metadata.
+      - Fixtures prove a completed selected change can be audited back to a commit.
+      - Fixtures prove a feat summary can be audited back to the candidate queue.
+      - The fixture scope remains planning-only and does not mutate git history.
+    selection:
+      selected_change_id: G006-branch-per-feat-dogfood-fixtures
+      reason: >
+        G006 is ready after G002, G003, G004, and G005 and adds dogfood
+        verification for the branch-per-feat workflow without mutating git
+        history.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G006-branch-per-feat-dogfood-fixtures
+      completed_at: 2026-05-21
+      evidence:
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G007
+    status: done
+    title: Decide whether OW should automate git and gh mutation operations
+    purpose: >
+      Produce a high-risk decision packet for any future move from planning
+      guidance into automated git or GitHub mutations, including branch
+      creation, commits, pushes, issue edits, issue closure, and PR creation.
+    scope:
+      includes:
+        - trust and safety risks for automated local git mutations
+        - trust and safety risks for authenticated gh remote mutations
+        - user approval models for branch creation, commit, push, issue edits, issue closure, and PR creation
+        - recommended default of report-first or explicit-approval-only behavior
+        - guardrails for destructive or remote operations
+      excludes:
+        - implementing git or gh automation
+        - invoking GitHub APIs
+        - pushing branches
+        - editing or closing GitHub Issues
+        - opening PRs
+    owned_paths:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G007-git-automation-high-risk-decision/
+    dependencies:
+      - G001
+      - G005
+      - G009
+    unlocks: []
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - A high-risk decision report exists before any git or gh mutation automation is selected.
+      - The report separates branch creation, local commit, push, issue mutation, and PR creation decisions.
+      - The report defines explicit user approval conditions and stop criteria.
+      - No automated git or gh mutation implementation is performed by this candidate.
+    completion:
+      completed_by_change_id: G007-git-automation-high-risk-decision-report
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+        - "approved: Option B plus narrowed local automation path"
+        - "remote operations still require explicit user approval"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G008
+    status: done
+    title: Formalize Issue governance and source-of-truth rules
+    purpose: >
+      Define how OW relates external Issues to local planning queues, including
+      when local issue artifacts are git-tracked and when GitHub Issues should
+      remain the remote source of truth.
+    scope:
+      includes:
+        - Issue to CANDIDATE_CHANGES relationship model
+        - local issue backlog policy when gh is absent or unauthorized
+        - GitHub Issue source-of-truth policy when gh is configured
+        - linkage fields from issues to plan ids, candidate ids, commits, branches, and PRs
+        - drift prevention rules for remote issue bodies and local audit artifacts
+      excludes:
+        - implementing gh commands
+        - creating or editing issues
+        - changing select-change behavior
+        - changing validator implementation
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/
+    dependencies:
+      - G001
+    unlocks:
+      - G009
+      - G010
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Issue is defined as an intent or problem source, not as a direct selected change.
+      - The contract defines when local issue artifacts are tracked in git.
+      - The contract defines GitHub Issues as the source of truth when gh is authorized and configured.
+      - The contract defines local linkage artifacts that can audit decomposition without duplicating remote issue bodies.
+    selection:
+      selected_change_id: G008-issue-governance-source-of-truth
+      reason: >
+        G008 is ready after G001 and defines the Issue source-of-truth model
+        needed before gh risk boundaries or cross-queue analysis can depend on
+        Issue metadata without creating local/remote drift.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G008-issue-governance-source-of-truth
+      completed_at: 2026-05-21
+      evidence:
+        - references/planning-artifact-contracts.md
+        - references/git-version-control-governance.md
+        - references/issue-governance.md
+        - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G009
+    status: done
+    title: Define gh issue and PR operation risk boundaries
+    purpose: >
+      Define which gh operations OW may treat as read-only, evidence-writing,
+      or high-risk mutation so future GitHub integration can be governed before
+      implementation.
+    scope:
+      includes:
+        - read-only gh operations for issues and PRs
+        - medium-risk evidence operations such as comments, labels, or PR body suggestions
+        - high-risk mutation operations such as issue creation, body edits, closure, push, PR creation, and merge
+        - explicit authorization and configuration prerequisites
+        - local audit expectations for every remote mutation
+      excludes:
+        - implementing gh commands
+        - opening PRs
+        - creating, editing, or closing issues
+        - replacing the high-risk report gate for mutation automation
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - references/gh-operation-governance.md
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/
+    dependencies:
+      - G001
+      - G008
+    unlocks:
+      - G007
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - gh operations are classified into read-only, evidence-writing, and mutation tiers.
+      - The contract requires user authorization and configured gh before any gh-dependent workflow.
+      - High-risk remote mutations remain behind HIGH_RISK_DECISION_REPORT.md and explicit approval.
+      - Local audit artifacts remain the OW-owned record even when GitHub is the remote source of truth.
+    selection:
+      selected_change_id: G009-gh-operation-risk-boundaries
+      reason: >
+        G009 is ready after G001 and G008 and classifies gh operation risk
+        before the queue reaches the high-risk automation decision.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G009-gh-operation-risk-boundaries
+      completed_at: 2026-05-21
+      evidence:
+        - references/git-version-control-governance.md
+        - references/issue-governance.md
+        - references/gh-operation-governance.md
+        - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G010
+    status: done
+    title: Create analyze-changes skill for cross-queue priority analysis
+    purpose: >
+      Add a read-only planning skill that compares multiple active
+      CANDIDATE_CHANGES queues and recommends the next plan id and candidate id
+      without selecting or implementing it.
+    scope:
+      includes:
+        - skill boundary between decompose-to-changes, analyze-changes, and select-change
+        - cross-queue readiness, dependency, risk, branch, dirty-tree, and unlock analysis
+        - CHANGE_ANALYSIS.yaml and CHANGE_ANALYSIS.md artifact expectations
+        - handoff shape that select-change can consume
+        - high-risk stop reporting when the best next candidate is high risk
+      excludes:
+        - implementing selected changes
+        - mutating candidate queues except for optional analysis evidence links
+        - performing git or gh mutations
+        - replacing select-change selection artifacts
+    owned_paths:
+      - skills/analyze-changes/SKILL.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/
+    dependencies:
+      - G001
+      - G008
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/analyze-changes
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - analyze-changes is defined as read-only priority analysis across one or more candidate queues.
+      - The skill outputs a recommended target_plan_id and target_candidate_id with rejected alternatives.
+      - The skill reports branch and dirty-tree constraints before recommending implementation.
+      - The skill hands off to select-change without creating SELECTED_CHANGE.yaml itself.
+    selection:
+      selected_change_id: G010-analyze-changes-skill
+      reason: >
+        G010 is ready after G001 and G008. It directly improves dogfood
+        scheduling by adding a read-only cross-queue priority step before
+        select-change consumes a concrete target.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G010-analyze-changes-skill
+      completed_at: 2026-05-21
+      evidence:
+        - skills/analyze-changes/SKILL.md
+        - skills/analyze-changes/references/analysis-protocol.md
+        - references/planning-artifact-contracts.md
+        - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+        - "validation: quick_validate.py skills/analyze-changes"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G011
+    status: done
+    title: Formalize approved local git automation command contract
+    purpose: >
+      Define the command-level contract for future `ow:git-automation`, with a
+      strict split between approved local automation and separately approved
+      remote mutation.
+    scope:
+      includes:
+        - local branch creation and checkout boundary
+        - selected-change commit boundary
+        - local PR-ready summary generation boundary
+        - dry-run and preview expectations
+        - explicit exclusion of push, merge, and gh mutation without approval
+      excludes:
+        - implementing the command
+        - running git mutation commands
+        - pushing branches
+        - creating remote PRs
+    owned_paths:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/
+    dependencies:
+      - G007
+    unlocks:
+      - G012
+      - G013
+      - G014
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The approved local automation boundary is documented.
+      - The future command contract separates local automation from remote mutation.
+      - The contract requires preview or dry-run behavior before mutation.
+      - Remote push, PR creation, Issue mutation, and merge remain explicit-approval operations.
+    selection:
+      selected_change_id: G011-local-git-automation-contract
+      reason: >
+        G011 is the next recommended candidate after the approved G007 decision
+        and must define local automation boundaries before implementation
+        candidates proceed.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G011-local-git-automation-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/git-version-control-governance.md
+        - references/gh-operation-governance.md
+        - references/planning-artifact-contracts.md
+        - changes/M71-git-version-control-governance/G011-local-git-automation-contract/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G012
+    status: done
+    title: Implement local feat branch creation for candidate queues
+    purpose: >
+      Add local-only automation that creates or checks out the branch recorded
+      by a queue's `queue_policy.branch_boundary` when starting a new feat.
+    scope:
+      includes:
+        - local branch existence check
+        - local branch creation from the current base when approved by command contract
+        - refusal on dirty-tree or branch-boundary mismatch
+        - audit evidence written to local planning artifacts
+      excludes:
+        - pushing branches
+        - deleting branches
+        - rebasing or resetting
+        - remote PR creation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/
+    dependencies:
+      - G011
+    unlocks:
+      - G013
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Local branch automation only uses the recorded branch boundary.
+      - The command stops on dirty-tree risk.
+      - No remote operation is performed.
+      - Audit evidence records branch action and queue id.
+    selection:
+      selected_change_id: G012-local-feat-branch-automation
+      reason: >
+        G012 is the next recommended candidate after G011 and implements the
+        approved local-only branch primitive before commit automation depends on
+        it.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G012-local-feat-branch-automation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G013
+    status: done
+    title: Implement selected-change local commit automation
+    purpose: >
+      Add local-only automation that commits at least one completed selected
+      change after validation evidence is present.
+    scope:
+      includes:
+        - one selected change to at least one local commit
+        - commit message using plan id and candidate id
+        - validation evidence gate before commit
+        - completion evidence update with commit hash after the primary commit
+        - optional follow-up evidence commit without amend
+      excludes:
+        - committing dirty unrelated paths
+        - amending previous commits
+        - pushing commits
+        - remote PR creation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/
+    dependencies:
+      - G011
+      - G012
+    unlocks:
+      - G014
+      - G015
+    risk: medium
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Commit automation refuses unrelated dirty paths.
+      - Commit message includes plan id and candidate id.
+      - Commit hash can be recorded as completion evidence without amending the primary commit.
+      - No push or remote mutation occurs.
+    selection:
+      selected_change_id: G013-selected-change-commit-automation
+      reason: >
+        G013 is ready after G012 and adds selected-change local commit
+        automation before PR-ready summaries depend on commit evidence.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G013-selected-change-commit-automation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - references/git-version-control-governance.md
+        - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+        - "commit: fb003d7346ce027e08a9f149718caadf82755ad6"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G014
+    status: done
+    title: Implement local PR-ready summary generation for completed queues
+    purpose: >
+      Add local-only automation that creates `PR_READY_SUMMARY.md` for a fully
+      implemented and validated `CANDIDATE_CHANGES` queue.
+    scope:
+      includes:
+        - completed, deferred, blocked, and high-risk candidate summary
+        - branch and commit evidence summary
+        - validation evidence summary
+        - explicit remote PR non-creation notice
+      excludes:
+        - creating a remote PR
+        - pushing a branch
+        - editing GitHub PR body
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/
+    dependencies:
+      - G011
+      - G013
+    unlocks:
+      - G015
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - PR_READY_SUMMARY.md is generated locally from queue evidence.
+      - The summary states no remote PR was opened.
+      - Missing validation or incomplete candidates are reported clearly.
+      - No remote mutation occurs.
+    selection:
+      selected_change_id: G014-pr-ready-summary-generation
+      reason: >
+        G014 is ready after G013 and produces a local PR-ready review packet
+        before any high-risk command shell or remote operation is considered.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G014-pr-ready-summary-generation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/git/prReadySummary.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+        - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+        - "commit: c8d48b1dc387f40d1aae27193155e5fc3847f912"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G015
+    status: done
+    title: Add ow:git-automation command shell with remote approval gates
+    purpose: >
+      Introduce the command surface for approved local git automation while
+      requiring explicit user approval before push, remote PR creation, Issue
+      mutation, or merge.
+    scope:
+      includes:
+        - command registry entry
+        - generated skill or command guidance
+        - local-only modes for branch, commit, and PR-ready summary
+        - remote operation refusal unless explicit approval is provided
+        - remote operation plan with ordered local commits for approved handoff
+      excludes:
+        - implementing remote push by default
+        - implementing merge automation
+        - bypassing high-risk approval for gh mutation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/
+      - skills/
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/
+    dependencies:
+      - G011
+      - G012
+      - G013
+      - G014
+    unlocks:
+      - G016
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - A command surface exists for approved local git automation.
+      - Remote operations require explicit user approval and preview.
+      - Generated command surfaces remain in sync.
+      - The command refuses unsafe dirty-tree or branch-boundary states.
+      - Managed remote handoff includes ordered local commits and operation sequence.
+    selection:
+      selected_change_id: G015-ow-git-automation-command-shell
+      reason: >
+        The user approved the managed command shell scheme: local automation is
+        exposed, remote operations are gated with operation plans, and
+        autonomous mode is split into a follow-up high-risk candidate.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G015-ow-git-automation-command-shell
+      completed_at: 2026-05-21
+      evidence:
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/core/src/commands/registry.ts
+        - packages/core/src/onboarding/agentsGuide.ts
+        - references/git-automation-governance.md
+        - .agents/skills/ow-git-automation/SKILL.md
+        - .agents/openworkflow-adapter.yaml
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+        - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+        - "commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G016
+    status: done
+    title: Define autonomous git automation lifecycle
+    purpose: >
+      Plan the fully autonomous git automation mode that can push, create or
+      update PRs, handle merge readiness, and merge without per-step approval
+      after explicit configuration and safety policy are accepted.
+    scope:
+      includes:
+        - autonomous mode configuration contract
+        - allowed remote operation matrix
+        - evidence and rollback requirements for every git or gh mutation
+        - conflict-resolution and merge-readiness gates
+        - repository protection and recovery expectations
+      excludes:
+        - implementing autonomous push, PR, or merge execution in this candidate queue without a new high-risk approval
+        - bypassing repository protection
+        - force-push or destructive history rewrite by default
+    owned_paths:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/
+    dependencies:
+      - G015
+    unlocks:
+      - G017
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Autonomous mode has an explicit enablement contract.
+      - Every remote mutation class has evidence and rollback requirements.
+      - Merge-readiness and conflict-resolution rules are documented.
+      - Implementation remains blocked until a separate high-risk approval is granted.
+    selection:
+      selected_change_id: G016-autonomous-git-automation-lifecycle
+      reason: >
+        The user approved G016 Option B from the high-risk decision report:
+        define autonomous mode contracts without implementing remote mutation.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G016-autonomous-git-automation-lifecycle
+      completed_at: 2026-05-21
+      evidence:
+        - references/git-automation-governance.md
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+        - "commit: 94ddaa74596a6428eacad297faf1a851bceb1e10"
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G017
+    status: done
+    title: Build read-only autonomous git simulator
+    purpose: >
+      Simulate autonomous git automation from local and remote-readable state,
+      producing the push, PR, conflict, merge, evidence, and rollback plan
+      without performing remote mutation.
+    scope:
+      includes:
+        - read-only local git state inspection
+        - read-only remote metadata inspection when available
+        - ordered commit and base-ref analysis
+        - simulated push, PR, checks, conflict, merge, and rollback plan
+        - evidence artifact for autonomous dry runs
+      excludes:
+        - pushing branches
+        - creating or updating PRs
+        - merging PRs
+        - mutating GitHub Issues
+        - resolving conflicts automatically
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/
+    dependencies:
+      - G016
+    unlocks:
+      - G018
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Simulator produces a complete autonomous operation plan without mutation.
+      - Simulator handles large local commit ranges through ordered commit evidence.
+      - Simulator reports merge blockers, conflict risk, missing validation, and rollback plan gaps.
+      - Remote mutation remains impossible from simulator mode.
+    selection:
+      selected_change_id: G017-autonomous-git-simulator
+      reason: >
+        The user approved proceeding to the Option C simulator stage after the
+        G016 autonomous contract. G017 proves planning and evidence without
+        remote mutation.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G017-autonomous-git-simulator
+      completed_at: 2026-05-21
+      primary_commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282
+      evidence:
+        - "commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282"
+        - packages/core/src/git/autonomousSimulator.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/core/src/commands/registry.ts
+        - references/git-automation-governance.md
+        - .agents/skills/ow-git-automation/SKILL.md
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G018
+    status: done
+    title: Plan narrow autonomous remote pilot
+    purpose: >
+      Decide and design the first narrow autonomous remote mutation pilot after
+      simulator evidence exists, such as draft PR creation or branch push only.
+    scope:
+      includes:
+        - high-risk decision report for the exact pilot operation
+        - repository, branch, payload, evidence, and rollback constraints
+        - simulator evidence requirements before pilot execution
+        - explicit exclusions for merge, Issue mutation, and destructive history operations
+      excludes:
+        - implementing the pilot without separate approval
+        - full autonomous lifecycle
+        - force-push, reset, rebase, or destructive branch deletion
+    owned_paths:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/
+      - references/git-automation-governance.md
+    dependencies:
+      - G017
+    unlocks:
+      - G019
+      - G020
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The first autonomous remote pilot operation is explicitly scoped.
+      - Merge and Issue mutation remain excluded unless separately approved.
+      - Simulator evidence requirements are documented.
+      - The next implementation step is remote read-only planning, not mutation.
+    selection:
+      selected_change_id: G018-narrow-autonomous-remote-pilot
+      reason: >
+        The user approved the staged B -> C path: first remote read-only
+        planning, then a narrow draft PR mutation pilot as a later candidate.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G018-narrow-autonomous-remote-pilot
+      completed_at: 2026-05-21
+      primary_commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c
+      evidence:
+        - "commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c"
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+        - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
+        - references/git-automation-governance.md
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: G019
+    status: done
+    title: Implement remote read-only PR-ready planning
+    purpose: >
+      Add a non-mutating remote planning path that reads remote refs and PR
+      metadata, compares them to local queue evidence, and emits a PR-ready
+      remote operation plan.
+    scope:
+      includes:
+        - explicit target remote and target base identity checks
+        - read-only remote branch/base/PR metadata collection
+        - stale-plan blockers when local HEAD or remote refs change
+        - local plan artifact or JSON output for push and draft PR sequencing
+        - runtime coverage proving no mutation occurs
+      excludes:
+        - git push
+        - creating, editing, closing, or merging PRs
+        - Issue mutation
+        - force-push, reset, rebase, or destructive branch deletion
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/
+    dependencies:
+      - G018
+    unlocks:
+      - G020
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Remote reads are explicit and non-mutating.
+      - Output includes target identity, remote refs, PR metadata when available, ordered commits, blockers, and rollback guidance.
+      - The command refuses or warns on stale local HEAD, unknown base, dirty tree, or missing simulator evidence.
+      - No push, PR mutation, merge, or Issue mutation code path is introduced.
+    selection:
+      selected_change_id: G019-remote-readonly-pr-plan
+      reason: >
+        G019 is the approved B step after G018: read remote refs and PR
+        metadata without mutation before any draft PR pilot.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G019-remote-readonly-pr-plan
+      completed_at: 2026-05-21
+      primary_commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e
+      evidence:
+        - "commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e"
+        - packages/core/src/git/remoteReadonlyPlanner.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/core/src/commands/registry.ts
+        - references/git-automation-governance.md
+        - .agents/skills/ow-git-automation/SKILL.md
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+  - id: G020
+    status: done
+    title: Pilot draft PR remote mutation
+    purpose: >
+      Implement the first narrow autonomous remote mutation pilot after remote
+      read-only planning is validated, limited to draft PR creation or managed
+      body update.
+    scope:
+      includes:
+        - explicit config gate for draft PR mutation
+        - dry-run payload preview
+        - managed PR body section and digest tracking
+        - before and after evidence record
+        - rollback guidance for closing the draft PR or restoring the body
+      excludes:
+        - PR merge
+        - ready-for-review transition
+        - Issue mutation
+        - force-push, reset, rebase, or destructive branch deletion
+        - full autonomous lifecycle
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/
+    dependencies:
+      - G019
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - git diff --check
+      - npm run verify:runtime-surface
+    acceptance:
+      - Draft PR mutation is disabled by default and requires explicit config.
+      - Dry-run output fully previews target repo, branch, base, title, body digest, and rollback.
+      - The implementation records before and after evidence for every mutation.
+      - Merge, Issue mutation, and destructive git operations remain impossible from this pilot.
+    selection:
+      selected_change_id: G020-draft-pr-remote-pilot
+      reason: >
+        G020 is the approved C step after G019: add a disabled-by-default draft
+        PR pilot with dry-run preview and explicit --allow-draft-pr mutation gate.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: G020-draft-pr-remote-pilot
+      completed_at: 2026-05-21
+      primary_commit: 768bb16e2d107305c780fcc9c16e5e451209efea
+      evidence:
+        - "commit: 768bb16e2d107305c780fcc9c16e5e451209efea"
+        - packages/core/src/git/draftPrPilot.ts
+        - packages/core/src/git/remoteReadonlyPlanner.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/index.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - packages/core/src/commands/registry.ts
+        - references/git-automation-governance.md
+        - .agents/skills/ow-git-automation/SKILL.md
+        - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+        - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml
+        - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml
+        - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+        - "validation: npm run verify:runtime-surface"
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - G001
+      - G002
+      - G003
+      - G004
+      - G005
+      - G006
+      - G007
+    actor: agent
+    reason: Initial decomposition of commit, feat, branch, and PR governance into commit-sized candidates.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: Expand the high-risk automation decision from local git mutations to include authenticated gh remote mutations.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP003
+    operation_type: add
+    target_candidate_ids:
+      - G008
+      - G009
+      - G010
+    actor: agent
+    reason: Add Issue governance, gh operation risk boundaries, and cross-queue analyze-changes planning after user review of git governance scope.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.md
+      - changes/M71-git-version-control-governance/SUMMARY.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: Select G001 because it is ready, dependency-free, and defines the version-control contract required by downstream governance changes.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - G001
+    actor: agent
+    reason: Complete G001 after adding the git governance reference, linking planning contracts, and validating the repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - G008
+    actor: agent
+    reason: Select G008 because it is ready after G001 and defines Issue source-of-truth rules before gh and cross-queue analysis behavior.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - G008
+    actor: agent
+    reason: Complete G008 after adding Issue governance, linking existing contracts, and validating the repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G008-issue-governance-source-of-truth/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - G010
+    actor: agent
+    reason: Select G010 because it is ready after G001 and G008 and closes the cross-queue priority analysis gap discovered during dogfood use.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - G010
+    actor: agent
+    reason: Complete G010 after adding analyze-changes, defining CHANGE_ANALYSIS artifacts, and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/analyze-changes/SKILL.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/analyze-changes"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: Select G002 because DTC must record branch boundaries before select-change can enforce branch fit.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - G002
+    actor: agent
+    reason: Complete G002 after adding branch-boundary guidance to decompose-to-changes and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/decompose-to-changes/SKILL.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G002-dtc-branch-boundary-fields/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/decompose-to-changes"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: Select G003 because select-change must enforce branch and dirty-tree guards after DTC starts recording branch boundaries.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - G003
+    actor: agent
+    reason: Complete G003 after adding branch and dirty-tree guards to select-change and validating the skill and repository.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/select-change/SKILL.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G003-select-branch-dirty-guards/ATOM_TASKS.yaml
+      - "validation: quick_validate.py skills/select-change"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP014
+    operation_type: select
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: Select G004 because DTC and select-change now both emit or consume branch governance and need validation coverage.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - G004
+    actor: agent
+    reason: Complete G004 after adding branch-governance validation and runtime negative coverage.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G004-git-governance-validation/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - G005
+    actor: agent
+    reason: Select G005 because PR-ready summary semantics should be defined before dogfood fixtures model a branch-per-feat handoff.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - G005
+    actor: agent
+    reason: Complete G005 after defining PR_READY_SUMMARY.md and linking it from git governance.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP018
+    operation_type: select
+    target_candidate_ids:
+      - G006
+    actor: agent
+    reason: Select G006 because branch-per-feat governance now has source contracts and validation, so dogfood fixtures can lock the behavior down.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP019
+    operation_type: complete
+    target_candidate_ids:
+      - G006
+    actor: agent
+    reason: Complete G006 after adding branch-per-feat fixtures and runtime verification checks.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP020
+    operation_type: select
+    target_candidate_ids:
+      - G009
+    actor: agent
+    reason: Select G009 because gh operation tiers must be defined before G007 can produce a high-risk automation decision report.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP021
+    operation_type: complete
+    target_candidate_ids:
+      - G009
+    actor: agent
+    reason: Complete G009 after defining gh operation governance and validating planning artifacts.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - references/gh-operation-governance.md
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP022
+    operation_type: query
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: High-risk stop converted into a decision report before any git or gh mutation automation is selected.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP023
+    operation_type: update
+    target_candidate_ids:
+      - G007
+    actor: agent
+    reason: Record user approval of Option B plus narrowed local automation and complete the high-risk decision candidate without implementing mutation automation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: done
+    evidence:
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+      - "approved: Option B plus narrowed local automation path"
+  - operation_id: OP024
+    operation_type: add
+    target_candidate_ids:
+      - G011
+      - G012
+      - G013
+      - G014
+      - G015
+    actor: agent
+    reason: Decompose the approved path into local automation contract, local branch automation, selected-change commit automation, PR-ready summary generation, and a high-risk command-shell candidate.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: candidate
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP025
+    operation_type: select
+    target_candidate_ids:
+      - G011
+    actor: agent
+    reason: Select G011 because approved local automation needs a command contract before implementation candidates.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP026
+    operation_type: complete
+    target_candidate_ids:
+      - G011
+    actor: agent
+    reason: Complete G011 after documenting local git automation boundaries and remote approval gates.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/git-version-control-governance.md
+      - references/gh-operation-governance.md
+      - references/planning-artifact-contracts.md
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G011-local-git-automation-contract/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP027
+    operation_type: select
+    target_candidate_ids:
+      - G012
+    actor: agent
+    reason: Select G012 because it is the next approved local-only automation primitive after the G011 contract.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP028
+    operation_type: complete
+    target_candidate_ids:
+      - G012
+    actor: agent
+    reason: Complete G012 after adding local branch automation and runtime-surface coverage for create, checkout preview, and dirty-tree refusal.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/LOCAL_BRANCH_AUTOMATION_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G012-local-feat-branch-automation/ATOM_TASKS.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP029
+    operation_type: select
+    target_candidate_ids:
+      - G013
+    actor: agent
+    reason: Select G013 because local branch automation is complete and commit evidence is required before PR-ready summary generation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP030
+    operation_type: complete
+    target_candidate_ids:
+      - G013
+    actor: agent
+    reason: Complete G013 after adding selected-change commit automation with validation, branch, allowed-path, and evidence-commit guards.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G013-selected-change-commit-automation/ATOM_TASKS.yaml
+      - "commit: fb003d7346ce027e08a9f149718caadf82755ad6"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP031
+    operation_type: select
+    target_candidate_ids:
+      - G014
+    actor: agent
+    reason: Select G014 because selected-change commit evidence is available and local PR-ready summaries can now be generated without remote mutation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP032
+    operation_type: complete
+    target_candidate_ids:
+      - G014
+    actor: agent
+    reason: Complete G014 after adding local PR-ready summary generation and runtime coverage for preview, local write, warnings, and remote non-creation wording.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G014-pr-ready-summary-generation/ATOM_TASKS.yaml
+      - "commit: c8d48b1dc387f40d1aae27193155e5fc3847f912"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP033
+    operation_type: select
+    target_candidate_ids:
+      - G015
+    actor: agent
+    reason: Select G015 after user approved the managed command shell scheme with remote operation planning and autonomous mode deferred.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP034
+    operation_type: complete
+    target_candidate_ids:
+      - G015
+    actor: agent
+    reason: Complete G015 after adding the managed git-automation CLI and generated skill with local automation, remote refusal, and ordered commit handoff planning.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - references/git-automation-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .agents/openworkflow-adapter.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G015-ow-git-automation-command-shell/ATOM_TASKS.yaml
+      - "commit: 47b708131bc87a1175c3603f0a9643c6f21b0e2e"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP035
+    operation_type: add
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Add a follow-up high-risk candidate for fully autonomous git automation after G015 intentionally limited itself to managed mode.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+  - operation_id: OP036
+    operation_type: query
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Create a high-risk decision report before selecting or implementing autonomous git automation lifecycle work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP037
+    operation_type: select
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Select G016 after user approved Option B, design-only autonomous contract.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP038
+    operation_type: complete
+    target_candidate_ids:
+      - G016
+    actor: agent
+    reason: Complete G016 after defining autonomous mode enablement, operation matrix, evidence, merge-readiness, conflict, rollback, and implementation path.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/ATOM_TASKS.yaml
+      - "commit: 94ddaa74596a6428eacad297faf1a851bceb1e10"
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP039
+    operation_type: add
+    target_candidate_ids:
+      - G017
+    actor: agent
+    reason: Add the recommended Option C follow-up as a read-only autonomous simulator before any full autonomous remote mutation implementation.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - references/git-automation-governance.md
+  - operation_id: OP040
+    operation_type: select
+    target_candidate_ids:
+      - G017
+    actor: agent
+    reason: Select G017 after user approved the read-only autonomous simulator stage.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP041
+    operation_type: complete
+    target_candidate_ids:
+      - G017
+    actor: agent
+    reason: Complete G017 after adding read-only autonomous simulation, CLI simulate action, generated skill guidance, and runtime coverage for no-mutation planning.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - "commit: 5a5d2e21008b9e31456a9b8b9810cf1014dca282"
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - references/git-automation-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G017-autonomous-git-simulator/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP042
+    operation_type: add
+    target_candidate_ids:
+      - G018
+    actor: agent
+    reason: Add the next high-risk step for a narrow autonomous remote pilot after simulator implementation.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - references/git-automation-governance.md
+  - operation_id: OP043
+    operation_type: select
+    target_candidate_ids:
+      - G018
+    actor: agent
+    reason: Select G018 after the user approved the staged B -> C path for autonomous remote automation.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP044
+    operation_type: complete
+    target_candidate_ids:
+      - G018
+    actor: agent
+    reason: Complete G018 by recording the B -> C high-risk decision, narrowing the first remote pilot to draft PR mutation, and adding read-only remote planning as the next step.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - "commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c"
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
+      - references/git-automation-governance.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP045
+    operation_type: add
+    target_candidate_ids:
+      - G019
+      - G020
+    actor: agent
+    reason: Add follow-up candidates for the approved staged path, with G019 as read-only remote planning and G020 as the later draft PR mutation pilot.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: ready
+    evidence:
+      - changes/M71-git-version-control-governance/CANDIDATE_CHANGES.yaml
+      - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+      - references/git-automation-governance.md
+  - operation_id: OP046
+    operation_type: select
+    target_candidate_ids:
+      - G019
+    actor: agent
+    reason: Select G019 as the approved B step for remote read-only PR-ready planning.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP047
+    operation_type: complete
+    target_candidate_ids:
+      - G019
+    actor: agent
+    reason: Complete G019 after adding read-only remote planning, CLI remote-plan action, generated skill guidance, and runtime coverage with a local bare remote fixture.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - "commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e"
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - references/git-automation-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"
+  - operation_id: OP048
+    operation_type: select
+    target_candidate_ids:
+      - G020
+    actor: agent
+    reason: Select G020 as the approved C step for the disabled-by-default draft PR pilot.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP049
+    operation_type: complete
+    target_candidate_ids:
+      - G020
+    actor: agent
+    reason: Complete G020 after adding draft-pr preview, explicit allow gate, managed body digest, rollback guidance, and runtime coverage for preview plus blocked write.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - "commit: 768bb16e2d107305c780fcc9c16e5e451209efea"
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/index.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - references/git-automation-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/SELECTED_CHANGE.yaml
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/ATOM_TASKS.yaml
+      - changes/M71-git-version-control-governance/G020-draft-pr-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+      - "validation: npm run verify:runtime-surface"

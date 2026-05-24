@@ -1,0 +1,43 @@
+schema_version: 0.1.0
+contract_id: selected_change:M59-proto-redesign-planning-dogfood
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M59-proto-redesign-planning-dogfood
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C005
+title: Dogfood planning skills on the /ow:proto redesign roadmap
+status: active
+selection_reason:
+  - C002 and C003 are complete, so both planning source skills can be used.
+  - This change produces real proto redesign planning evidence before runtime exposure.
+  - It keeps implementation out of scope while preparing the first selected implementation change.
+rejected_alternatives:
+  - id: C004
+    reason: Planning skill runtime exposure can wait until the skills are dogfooded on a real roadmap.
+scope:
+  includes:
+    - candidate changes for /ow:proto image-only redesign
+    - selection of the first proto redesign implementation change
+    - atom tasks and implementation brief for the selected proto redesign change
+  excludes:
+    - implementing the proto redesign itself
+    - adding /ow:proto2html
+    - changing validation behavior beyond planning notes
+owned_paths:
+  - changes/M59-proto-redesign-planning-dogfood/
+  - changes/M60-proto-redesign-artifact-contracts/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - The proto redesign candidate queue is created by the new decomposition skill.
+  - The selected first proto redesign change is chosen by the new selection skill.
+  - The resulting atom tasks keep implementation focused on one module or feature slice.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js handoff --root . --json
+created_at: 2026-05-21
+updated_at: 2026-05-21

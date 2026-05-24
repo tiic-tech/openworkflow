@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: change:M57-select-change-skill
+contract_type: change
+title: M57 Select change source skill
+status: draft
+source_artifacts:
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - references/planning-artifact-contracts.md
+  - skills/decompose-to-changes/SKILL.md
+depends_on:
+  - change:M55-planning-artifact-contracts
+  - change:M56-decompose-to-changes-skill
+produces:
+  - selected_change:M57-select-change-skill
+  - atom_tasks:M57-select-change-skill
+  - work_items:M57-select-change-skill
+summary: >
+  Add the repo-local select-change source skill so a candidate queue can be
+  converted into one focused implementation change with atom tasks and a brief.
+problem: >
+  Candidate queues are useful only if an Agent can reliably choose one next
+  change, preserve the reason for that choice, and hand off a bounded set of
+  atom tasks without widening scope or starting implementation prematurely.
+goals:
+  - Add `skills/select-change/SKILL.md`.
+  - Add selection reference guidance for candidate filtering, rationale,
+    queue updates, atom tasks, and implementation briefs.
+  - Dogfood selection against the M56 proto redesign candidate queue.
+  - Update M54 candidate status with completion evidence.
+non_goals:
+  - Do not execute the selected change implementation.
+  - Do not expose new `/ow:*` runtime commands.
+  - Do not add autonomous loop or archive completion behavior.
+  - Do not edit generated `.agents` or `.openworkflow` surfaces.
+affected_paths:
+  - skills/select-change/
+  - changes/M57-select-change-skill/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+acceptance:
+  - Skill selects one candidate by stable id with explicit rationale.
+  - Skill marks selection state without deleting other candidates.
+  - Skill emits atom tasks with owned paths and done_when criteria.
+  - Skill creates an implementation brief that lets an Agent start with low context.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+  - manual dogfood selection from a sample CANDIDATE_CHANGES.yaml
+created_at: 2026-05-21
+updated_at: 2026-05-21

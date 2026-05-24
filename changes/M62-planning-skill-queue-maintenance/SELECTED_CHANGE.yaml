@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:M62-planning-skill-queue-maintenance
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M62-planning-skill-queue-maintenance
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C006
+title: Harden planning skills with queue maintenance operations
+status: completed
+selection_reason:
+  - The user identified existing queue CRUD as a hard capability for auditability.
+  - M59-M61 dogfood exposed repeated queue status and priority edits.
+  - The change is bounded to source planning skills, schema, and references.
+rejected_alternatives:
+  - id: C004
+    reason: Runtime exposure should wait until queue maintenance semantics are hardened.
+scope:
+  includes:
+    - existing queue add, query, update, status, priority, split, merge, and soft-delete guidance
+    - targeted candidate readiness review
+    - top-level operations audit contract
+    - candidate changes schema operations support
+  excludes:
+    - runtime command exposure
+    - CLI implementation
+    - generated adapter changes
+    - proto redesign source behavior
+owned_paths:
+  - skills/decompose-to-changes/
+  - skills/select-change/
+  - schemas/candidate-changes.schema.json
+  - references/planning-artifact-contracts.md
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M62-planning-skill-queue-maintenance/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - Existing CANDIDATE_CHANGES queues can be maintained by stable candidate id.
+  - Mutating queue operations have an auditable top-level operations entry.
+  - select-change can perform targeted candidate readiness review.
+  - Queue deletion semantics prefer superseded, deferred, or blocked over hard deletion.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: selected_change:S002-generated-skill-metadata
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: S002-generated-skill-metadata
+source_plan_id: M69-skill-system-lifecycle-planning
+source_candidate_id: S002
+title: Add structured generated metadata to Codex skill output
+status: done
+selection_reason: >
+  S001 completed the native skill lifecycle contract, so generated Codex skills
+  can now gain structured metadata while preserving the existing generated
+  marker and repo-local delivery model.
+rejected_alternatives:
+  - candidate_ref: S004
+    reason: Validation hardening should follow the generated metadata it needs to validate.
+  - candidate_ref: M68/H003
+    reason: Proto2html runtime exposure remains higher risk and should wait until generated skill metadata is stable.
+scope:
+  includes:
+    - generatedBy or generated_by metadata in runtime skill frontmatter
+    - template id and adapter version metadata policy
+    - source command id and semantic trigger metadata
+    - generated skill fixture or snapshot expectations
+  excludes:
+    - multi-platform adapter support
+    - changing command semantics
+    - manual edits to existing generated files outside sync
+owned_paths:
+  - packages/adapters/codex/src/constants.ts
+  - packages/adapters/codex/src/generateSkills.ts
+  - packages/adapters/codex/src/generatedFiles.ts
+  - packages/adapters/codex/src/manifest.ts
+  - packages/adapters/codex/src/templates.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/
+  - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - skills/**
+acceptance:
+  - Generated Codex skills include structured metadata that identifies generator, adapter, template, and command.
+  - Runtime verification checks the metadata on generated skill surfaces.
+  - Generated files are refreshed through sync rather than direct edits.
+  - Existing semantic command invocation remains unchanged.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/adapters/codex/src/constants.ts
+    - packages/adapters/codex/src/generateSkills.ts
+    - packages/adapters/codex/src/generatedFiles.ts
+    - packages/adapters/codex/src/manifest.ts
+    - packages/adapters/codex/src/templates.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - .agents/openworkflow-adapter.yaml
+    - .agents/skills/ow-proto/SKILL.md
+    - "validation: npm run validate"
+    - "validation: npm run verify:runtime-surface"
+    - "validation: git diff --check"

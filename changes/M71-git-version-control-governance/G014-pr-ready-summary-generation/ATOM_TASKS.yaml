@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G014-pr-ready-summary-generation
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G014-pr-ready-summary-generation
+title: Atom tasks for local PR-ready summary generation
+status: done
+tasks:
+  - task_id: T001
+    title: Implement local summary generator
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/git/prReadySummary.ts
+    done_when:
+      - The generator reads CANDIDATE_CHANGES.yaml.
+      - The generator summarizes completed, remaining, and high-risk candidates.
+      - The generator summarizes validation and commit evidence.
+      - The generator can preview or write a local markdown file.
+  - task_id: T002
+    title: Add runtime-surface coverage
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers preview generation.
+      - Runtime verification covers local file writing.
+      - Runtime verification checks remote PR non-creation wording.
+  - task_id: T003
+    title: Generate M71 review packet
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/PR_READY_SUMMARY.md
+    done_when:
+      - The local summary is generated from the M71 queue.
+      - The summary reports remaining high-risk command shell work.
+  - task_id: T004
+    title: Validate implementation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

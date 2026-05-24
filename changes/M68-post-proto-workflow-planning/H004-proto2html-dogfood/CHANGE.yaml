@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: change:H004-proto2html-dogfood
+contract_type: change
+title: H004 Proto2html dogfood
+status: completed
+source_artifacts:
+  - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+  - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+  - references/proto2html-artifact-contracts.md
+  - skills/proto2html/SKILL.md
+depends_on:
+  - change:H001-proto2html-artifact-contracts
+  - change:H002-proto2html-source-behavior
+produces:
+  - selected_change:H004-proto2html-dogfood
+  - atom_tasks:H004-proto2html-dogfood
+  - html_prototype:H004-proto2html-dogfood
+summary: >
+  Dogfood proto2html source behavior by reconstructing the accepted D02
+  Prototype Discovery Flight Deck benchmark-style screen group into a single
+  HTML artifact and fidelity report.
+problem: >
+  H003 runtime exposure is high risk without evidence that the source behavior
+  and artifact contract can be consumed by an agent. A bounded dogfood fixture
+  should prove the reconstruction handoff before command surfaces are exposed.
+goals:
+  - Create an accepted benchmark-style input fixture from M66 prototype evidence.
+  - Draft a single-file HTML reconstruction inside the dogfood folder.
+  - Record fidelity matches, gaps, known limits, and next recommendation.
+non_goals:
+  - Do not expose runtime command or adapter surfaces.
+  - Do not create html2spec outputs.
+  - Do not change product direction or generate new prototype images.
+affected_paths:
+  - changes/M68-post-proto-workflow-planning/
+  - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/
+acceptance:
+  - Dogfood output proves the contract is usable by a first-consumer agent.
+  - Fidelity gaps are explicit and reviewable.
+  - Follow-up runtime work remains selectable by stable id.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

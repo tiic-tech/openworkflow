@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: selected_change:G005-pr-ready-summary-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G005-pr-ready-summary-contract
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G005
+title: Define feat completion and PR-ready summary artifact
+status: done
+selection_reason: >
+  G005 is the next recommended candidate after G004. It defines the handoff
+  artifact that summarizes a completed feat branch without opening or mutating
+  a remote PR.
+rejected_alternatives:
+  - candidate_ref: G006
+    reason: dogfood fixtures should follow the PR-ready summary contract.
+  - candidate_ref: G009
+    reason: gh operation boundaries can follow local PR-ready artifact semantics.
+  - candidate_ref: G007
+    reason: high-risk automation decisions should wait for gh operation boundaries.
+scope:
+  includes:
+    - PR_READY_SUMMARY.md contract
+    - completed, deferred, blocked, and high-risk candidate summary fields
+    - validation command evidence expectations
+    - branch and commit list expectations
+  excludes:
+    - GitHub API usage
+    - automatic PR creation
+    - release automation
+owned_paths:
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/
+forbidden_paths:
+  - skills/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - A PR-ready summary contract exists and is linked from planning contracts.
+  - The contract explains how to summarize candidate completion status.
+  - The contract records branch name, commit evidence, validation evidence, and unresolved risks.
+  - The contract does not require automatic PR creation.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/planning-artifact-contracts.md
+    - references/git-version-control-governance.md
+    - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G005-pr-ready-summary-contract/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"

@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: work_items:M61-proto-validation-consumption-policy
+contract_type: work_items
+title: M61 Proto validation consumption policy work items
+status: completed
+change_contract: changes/M61-proto-validation-consumption-policy/CHANGE.yaml
+items:
+  - task_id: M61-T001
+    title: Define validation consumption policy
+    status: completed
+    owned_paths:
+      - references/proto-redesign-artifact-contracts.md
+      - changes/M61-proto-validation-consumption-policy/VALIDATION_CONSUMPTION_POLICY.yaml
+    acceptance:
+      - VISION-only behavior is explicit.
+      - Validation-present behavior is explicit.
+      - Automatic validation is reserved for a future change.
+  - task_id: M61-T002
+    title: Update proto redesign queue
+    status: completed
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    acceptance:
+      - P004 is marked done with evidence.
+      - P002 becomes the next ready candidate.
+  - task_id: M61-T003
+    title: Validate policy artifacts
+    status: completed
+    owned_paths:
+      - references/proto-redesign-artifact-contracts.md
+      - changes/M61-proto-validation-consumption-policy/
+    acceptance:
+      - "`npm run validate` passes."

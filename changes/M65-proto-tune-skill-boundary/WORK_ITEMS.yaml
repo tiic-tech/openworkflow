@@ -1,0 +1,38 @@
+schema_version: 0.1.0
+contract_id: work_items:M65-proto-tune-skill-boundary
+contract_type: work_items
+title: M65 Proto tune skill boundary work items
+status: completed
+change_contract: changes/M65-proto-tune-skill-boundary/CHANGE.yaml
+items:
+  - task_id: M65-T001
+    title: Update queue with temporary P007
+    status: completed
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/
+    acceptance:
+      - P007 is recorded as added, selected, completed, and P005 is restored as next recommended.
+  - task_id: M65-T002
+    title: Narrow build-prototype
+    status: completed
+    owned_paths:
+      - skills/build-prototype/
+    acceptance:
+      - build-prototype no longer owns refinement source behavior.
+  - task_id: M65-T003
+    title: Add tune-prototype
+    status: completed
+    owned_paths:
+      - skills/tune-prototype/
+    acceptance:
+      - tune-prototype is valid and owns refined prompt pack behavior.
+  - task_id: M65-T004
+    title: Validate
+    status: completed
+    owned_paths:
+      - skills/build-prototype/
+      - skills/tune-prototype/
+      - changes/M65-proto-tune-skill-boundary/
+    acceptance:
+      - skill quick validation passes for both skills.
+      - "`npm run validate` passes."

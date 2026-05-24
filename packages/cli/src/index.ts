@@ -6,6 +6,7 @@ import { cleanCommand } from "./commands/clean.js";
 import { contextCommand } from "./commands/context.js";
 import { doctorCommand } from "./commands/doctor.js";
 import { draftCommand } from "./commands/draft.js";
+import { gitAutomationCommand } from "./commands/gitAutomation.js";
 import { handoffCommand } from "./commands/handoff.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
@@ -79,6 +80,10 @@ async function main(): Promise<number> {
     return summarizeCommand(parsed.flags);
   }
 
+  if (parsed.command === "git-automation") {
+    return gitAutomationCommand(parsed.positional, parsed.flags);
+  }
+
   console.error(`Unknown command: ${parsed.command}`);
   printHelp();
   return 1;
@@ -102,6 +107,7 @@ Usage:
   openworkflow check <ow-command> --root <folder> [--json]
   openworkflow summaries --root <folder> [--strict] [--json]
   openworkflow summarize --root <folder> (--artifact <path>|--all) [--write] [--json]
+  openworkflow git-automation <branch|commit|summary|remote|simulate|remote-plan|draft-pr> --root <folder> --queue <CANDIDATE_CHANGES.yaml> [--write] [--json]
   openworkflow clean --root <folder> --tools codex [--yes] [--force]
 
 Commands:
@@ -119,6 +125,7 @@ Commands:
   check      Check readiness for a repo-local /ow:* workflow command.
   summaries  Inspect summary/current-slice health for workflow artifacts.
   summarize  Dry-run or write deterministic SUMMARY.yaml refreshes.
+  git-automation  Managed git lifecycle shell, read-only remote planning, and autonomous simulator; remote mutation is gated.
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
@@ -154,6 +161,12 @@ Two command surfaces:
     check      Verify required/forbidden context, output boundaries, and current artifact usability before starting a /ow:* command.
     summaries  Check summary freshness and source quality before raw evidence; requires an initialized .openworkflow root. Add --strict to fail on current-but-thin source quality.
     summarize  Preview SUMMARY.yaml refreshes; pass --write to update summary files without touching source artifacts.
+    git-automation  Preview or apply managed local git operations. In managed mode,
+               branch, commit, and summary actions are local-only; remote push,
+               PR creation, Issue mutation, and merge require explicit approval
+               and are refused by this command shell. Use remote-plan for
+               remote read-only PR-ready planning, draft-pr for the disabled-by-default
+               draft PR pilot, and simulate for read-only autonomous push/PR/merge planning.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
   Agent-readable JSON:
@@ -178,6 +191,7 @@ Two command surfaces:
     /ow:spec        write production-ready implementation specs
     /ow:change      plan a concrete implementation change
     /ow:team        execute an approved change with runtime tracking
+    /ow:git-automation  operate the managed git lifecycle shell with remote approval gates
 
 Lazy creation boundary:
   openworkflow init creates only the minimal .openworkflow setup. Stage artifacts

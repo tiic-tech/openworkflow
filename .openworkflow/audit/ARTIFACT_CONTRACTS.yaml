@@ -1,0 +1,715 @@
+schema_version: 0.1.0
+contract_id: audit:artifact-contracts
+contract_type: workflow
+title: OpenWorkflow artifact contracts
+status: active
+source_of_truth: .openworkflow
+artifacts:
+  - artifact_type: vision_session
+    contract_type: vision
+    command: /ow:vision
+    title: Vision session
+    source_of_truth_path: .openworkflow/vision/sessions/<id>/VISION_SESSION.yaml
+    template_path: .openworkflow/vision/_templates/VISION_SESSION.yaml
+    index_path: .openworkflow/vision/VISION_CONTRACT.yaml
+    index_collection_key: sessions
+    note_path: .openworkflow/vision/sessions/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - current_question
+      - stable_answers
+      - unresolved_questions
+      - vision_delta
+      - handoff
+    read_policy:
+      load_by_default: true
+      agent_read_order: 20
+      max_yaml_lines: 90
+      max_note_lines: 40
+      raw_evidence: never_by_default
+    active_pointer:
+      index_path: .openworkflow/vision/VISION_CONTRACT.yaml
+      pointer_key: current_session
+      collection_key: sessions
+      id_key: session_id
+      path_key: path
+    evidence_policy: Reference human notes when intent needs explanation; do not embed long
+      brainstorming transcript.
+    handoff_key: handoff.next_command
+    summary_policy:
+      strategy: current_slice
+      path: vision_delta
+      load_before_full: true
+      refresh_when: Update the current slice when stable_answers or unresolved_questions change.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: vision:<id>
+      contract_type: vision
+      artifact_type: vision_session
+      title: <short vision session title>
+      status: draft
+      current_question: ""
+      stable_answers:
+        []
+      unresolved_questions:
+        []
+      vision_delta:
+        one_sentence: ""
+        goals:
+          []
+        non_goals:
+          []
+        users:
+          []
+        quality_bar:
+          []
+      handoff:
+        ready: false
+        next_command: null
+      updated_at: null
+    conditional_packets:
+      []
+  - artifact_type: validation_target
+    contract_type: validation
+    command: /ow:validation
+    title: Validation target
+    source_of_truth_path: .openworkflow/validation/<id>/VALIDATION.yaml
+    template_path: .openworkflow/validation/_templates/VALIDATION.yaml
+    index_path: .openworkflow/validation/VALIDATION_INDEX.yaml
+    index_collection_key: validations
+    note_path: .openworkflow/validation/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - core_question
+      - feature_classification
+      - critical_assumptions
+      - prototype_scope
+      - acceptance
+      - decision_options
+    read_policy:
+      load_by_default: true
+      agent_read_order: 30
+      max_yaml_lines: 120
+      max_note_lines: 40
+      raw_evidence: never_by_default
+    active_pointer:
+      index_path: .openworkflow/validation/VALIDATION_INDEX.yaml
+      pointer_key: current_validation
+      collection_key: validations
+      id_key: validation_id
+      path_key: path
+    evidence_policy: Rank features and assumptions in YAML; keep rationale compact and defer examples to NOTE.md.
+    handoff_key: prototype_scope
+    summary_policy:
+      strategy: current_slice
+      path: core_question + prototype_scope + acceptance
+      load_before_full: true
+      refresh_when: Update the current slice when validation scope, acceptance, or decision options change.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: validation:<id>
+      contract_type: validation
+      artifact_type: validation_target
+      title: <short validation target title>
+      status: draft
+      core_question: ""
+      feature_classification:
+        existential:
+          []
+        supporting:
+          []
+        later:
+          []
+        out_of_scope:
+          []
+      critical_assumptions:
+        []
+      prototype_scope:
+        include:
+          []
+        exclude:
+          []
+      acceptance:
+        []
+      decision_options:
+        - continue
+        - revise
+        - pivot
+        - stop
+        - needs_more_evidence
+      updated_at: null
+    conditional_packets:
+      []
+  - artifact_type: prototype_evidence
+    contract_type: prototype
+    command: /ow:proto
+    title: Prototype evidence
+    source_of_truth_path: .openworkflow/prototypes/<id>/EVIDENCE.yaml
+    template_path: .openworkflow/prototypes/_templates/EVIDENCE.yaml
+    index_path: .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+    index_collection_key: prototypes
+    note_path: .openworkflow/prototypes/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - validation_target
+      - core_question
+      - prototype_mode
+      - prompt_pack_type
+      - validation_input
+      - source
+      - negative_constraints
+      - review_plan
+      - result
+      - handoff
+    read_policy:
+      load_by_default: true
+      agent_read_order: 40
+      max_yaml_lines: 190
+      max_note_lines: 50
+      raw_evidence: only_when_referenced
+    active_pointer:
+      index_path: .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      pointer_key: current_prototype
+      collection_key: prototypes
+      id_key: prototype_id
+      path_key: path
+    evidence_policy: Reference strategic prompt packs, refined prompt packs, generated images, review
+      notes, and decision evidence by path; keep image binaries out of YAML and do not turn prompt
+      packs into production tasks.
+    handoff_key: handoff.next_command
+    summary_policy:
+      strategy: summary_file
+      path: .openworkflow/prototypes/<id>/SUMMARY.yaml
+      load_before_full: true
+      refresh_when: Refresh after prompt pack, review evidence, result, or handoff changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: prototype:<id>
+      contract_type: prototype
+      artifact_type: prototype_evidence
+      title: <short prototype evidence title>
+      status: draft
+      validation_target: null
+      core_question: ""
+      prototype_mode: image_prompt_pack
+      prompt_pack_type: strategic_proto_prompt_pack
+      validation_input:
+        mode: vision_only|validation_present|internally_derived
+        refs:
+          []
+        notes:
+          []
+      source:
+        refs:
+          []
+        target_tool: image_generation
+        output_language: ""
+      normalized_input:
+        {}
+      strategic_core:
+        {}
+      directions:
+        []
+      build_recommendation:
+        {}
+      baseline_audit:
+        []
+      product_system:
+        {}
+      delta_rules:
+        must_inherit:
+          []
+        must_add:
+          []
+        must_remove:
+          []
+        flexible_change:
+          []
+      screen_manifest:
+        []
+      global_design_prompt: ""
+      screen_prompts:
+        []
+      negative_constraints:
+        []
+      review_plan:
+        {}
+      observations:
+        []
+      evidence:
+        []
+      generated_images:
+        []
+      known_limits:
+        []
+      result: not_reviewed
+      handoff:
+        next_command: /ow:tune
+      updated_at: null
+    conditional_packets:
+      []
+  - artifact_type: decision_record
+    contract_type: decision
+    command: /ow:decision
+    title: Decision record
+    source_of_truth_path: .openworkflow/decisions/<id>/DECISION.yaml
+    template_path: .openworkflow/decisions/_templates/DECISION.yaml
+    index_path: .openworkflow/decisions/DECISION_INDEX.yaml
+    index_collection_key: decisions
+    note_path: .openworkflow/decisions/<id>/NOTE.md
+    review_path: .openworkflow/decisions/<id>/review.html
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - reviewed_evidence
+      - outcome
+      - rationale
+      - accepted_scope
+      - rejected_scope
+      - revision_scope
+      - next_command
+      - follow_up_questions
+    read_policy:
+      load_by_default: true
+      agent_read_order: 50
+      max_yaml_lines: 120
+      max_note_lines: 50
+      raw_evidence: human_review_only
+    active_pointer:
+      index_path: .openworkflow/decisions/DECISION_INDEX.yaml
+      pointer_key: current_decision
+      collection_key: decisions
+      id_key: decision_id
+      path_key: path
+    evidence_policy: Reference reviewed evidence and user feedback; summarize rationale without copying
+      full review transcripts.
+    handoff_key: next_command
+    summary_policy:
+      strategy: current_slice
+      path: outcome + rationale + next_command + follow_up_questions
+      load_before_full: true
+      refresh_when: Update whenever the decision outcome or next command changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: decision:<id>
+      contract_type: decision
+      artifact_type: decision_record
+      title: <short decision title>
+      status: draft
+      reviewed_evidence:
+        []
+      outcome: needs_more_evidence
+      rationale: ""
+      accepted_scope:
+        []
+      rejected_scope:
+        []
+      revision_scope:
+        []
+      next_command: null
+      follow_up_questions:
+        []
+      updated_at: null
+    conditional_packets:
+      []
+  - artifact_type: product_design
+    contract_type: design
+    command: /ow:design
+    title: Product design
+    source_of_truth_path: .openworkflow/design/<id>/PRODUCT_DESIGN.yaml
+    template_path: .openworkflow/design/_templates/PRODUCT_DESIGN.yaml
+    index_path: .openworkflow/design/DESIGN_INDEX.yaml
+    index_collection_key: designs
+    note_path: .openworkflow/design/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - accepted_prototype_evidence
+      - personas
+      - journey_map
+      - user_stories
+      - feature_matrix
+      - kano_classification
+      - behavior_model
+      - ux_states
+      - scope
+      - open_questions
+      - conditional_packets
+      - spec_readiness
+    read_policy:
+      load_by_default: true
+      agent_read_order: 60
+      max_yaml_lines: 220
+      max_note_lines: 60
+      raw_evidence: only_when_referenced
+    active_pointer:
+      index_path: .openworkflow/design/DESIGN_INDEX.yaml
+      pointer_key: current_design
+      collection_key: designs
+      id_key: design_id
+      path_key: path
+    evidence_policy: Reference accepted prototype evidence and decision records by path; keep product
+      design decisions in PRODUCT_DESIGN.yaml.
+    handoff_key: spec_readiness.next_command
+    summary_policy:
+      strategy: summary_file
+      path: .openworkflow/design/<id>/SUMMARY.yaml
+      load_before_full: true
+      refresh_when: Refresh after product design scope, open questions, or spec readiness changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: design:<id>
+      contract_type: design
+      artifact_type: product_design
+      title: <short product design title>
+      status: draft
+      accepted_prototype_evidence:
+        []
+      personas:
+        []
+      journey_map:
+        []
+      user_stories:
+        []
+      feature_matrix:
+        []
+      kano_classification:
+        must_have:
+          []
+        performance:
+          []
+        delighters:
+          []
+        indifferent:
+          []
+        reverse:
+          []
+      behavior_model:
+        entities:
+          []
+        states:
+          []
+        transitions:
+          []
+        rules:
+          []
+      ux_states:
+        empty:
+          []
+        loading:
+          []
+        success:
+          []
+        error:
+          []
+        edge_cases:
+          []
+      scope:
+        in:
+          []
+        out:
+          []
+        deferred:
+          []
+      open_questions:
+        []
+      conditional_packets:
+        []
+      spec_readiness:
+        ready: false
+        blockers:
+          []
+        next_command: null
+      updated_at: null
+    conditional_packets:
+      - artifactType: tech_spec
+        path: .openworkflow/design/<id>/TECH_SPEC.yaml
+        requiredByDefault: false
+        when: Use when implementation constraints, architecture, integrations, or non-functional
+          requirements must be clarified before /ow:spec.
+      - artifactType: frontend_spec
+        path: .openworkflow/design/<id>/FRONTEND_SPEC.yaml
+        requiredByDefault: false
+        when: Use when UI structure, component behavior, visual states, or accessibility details need a
+          dedicated packet.
+      - artifactType: backend_spec
+        path: .openworkflow/design/<id>/BACKEND_SPEC.yaml
+        requiredByDefault: false
+        when: Use when server behavior, jobs, services, permissions, or operational boundaries need a
+          dedicated packet.
+      - artifactType: api_contract
+        path: .openworkflow/design/<id>/API_CONTRACT.yaml
+        requiredByDefault: false
+        when: Use when external or internal API request, response, error, or compatibility contracts are
+          needed.
+      - artifactType: db_schema_model
+        path: .openworkflow/design/<id>/DB_SCHEMA_MODEL.yaml
+        requiredByDefault: false
+        when: Use when persistent entities, relationships, migrations, or retention rules need explicit
+          modeling.
+  - artifact_type: production_spec
+    contract_type: spec
+    command: /ow:spec
+    title: Production spec
+    source_of_truth_path: .openworkflow/specs/<id>/SPEC.yaml
+    template_path: .openworkflow/specs/_templates/SPEC.yaml
+    index_path: .openworkflow/specs/SPEC_INDEX.yaml
+    index_collection_key: specs
+    note_path: .openworkflow/specs/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - source_design
+      - goal
+      - scope
+      - requirements
+      - interfaces
+      - acceptance
+      - verification
+      - risks
+      - change_readiness
+    read_policy:
+      load_by_default: true
+      agent_read_order: 70
+      max_yaml_lines: 220
+      max_note_lines: 60
+      raw_evidence: only_when_referenced
+    active_pointer:
+      index_path: .openworkflow/specs/SPEC_INDEX.yaml
+      pointer_key: current_spec
+      collection_key: specs
+      id_key: spec_id
+      path_key: path
+    evidence_policy: Reference product design and conditional design packets by path; keep
+      implementation requirements concrete and bounded.
+    handoff_key: change_readiness.next_command
+    summary_policy:
+      strategy: summary_file
+      path: .openworkflow/specs/<id>/SUMMARY.yaml
+      load_before_full: true
+      refresh_when: Refresh after scope, interfaces, acceptance, verification, risks, or change readiness
+        changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: spec:<id>
+      contract_type: spec
+      artifact_type: production_spec
+      title: <short production spec title>
+      status: draft
+      source_design: ""
+      goal: ""
+      scope:
+        in:
+          []
+        out:
+          []
+      requirements:
+        user_facing:
+          []
+        functional:
+          []
+        non_functional:
+          []
+      interfaces:
+        ui:
+          []
+        api:
+          []
+        data:
+          []
+        integrations:
+          []
+      acceptance:
+        []
+      verification:
+        commands:
+          []
+        manual_checks:
+          []
+      risks:
+        []
+      change_readiness:
+        ready: false
+        blockers:
+          []
+        next_command: null
+      updated_at: null
+    conditional_packets:
+      []
+  - artifact_type: production_change
+    contract_type: change
+    command: /ow:change
+    title: Production change
+    source_of_truth_path: .openworkflow/changes/<id>/CHANGE.yaml
+    template_path: .openworkflow/changes/_templates/CHANGE.yaml
+    index_path: .openworkflow/changes/CHANGE_INDEX.yaml
+    index_collection_key: changes
+    note_path: .openworkflow/changes/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - source_spec
+      - problem
+      - goals
+      - non_goals
+      - affected_paths
+      - acceptance
+      - validation
+      - work_items
+      - risks
+      - runtime_readiness
+    read_policy:
+      load_by_default: true
+      agent_read_order: 80
+      max_yaml_lines: 220
+      max_note_lines: 60
+      raw_evidence: only_when_referenced
+    active_pointer:
+      index_path: .openworkflow/changes/CHANGE_INDEX.yaml
+      pointer_key: current_change
+      collection_key: changes
+      id_key: change_id
+      path_key: path
+    evidence_policy: Reference the source spec and repo inspection notes; keep implementation planning
+      traceable and scoped.
+    handoff_key: runtime_readiness.next_command
+    summary_policy:
+      strategy: summary_file
+      path: .openworkflow/changes/<id>/SUMMARY.yaml
+      load_before_full: true
+      refresh_when: Refresh after affected paths, work items, validation, risks, or runtime readiness changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: change:<id>
+      contract_type: change
+      artifact_type: production_change
+      title: <short production change title>
+      status: draft
+      source_spec: ""
+      problem: ""
+      goals:
+        []
+      non_goals:
+        []
+      affected_paths:
+        []
+      acceptance:
+        []
+      validation:
+        []
+      work_items:
+        path: .openworkflow/changes/<id>/WORK_ITEMS.yaml
+        summary:
+          []
+      risks:
+        []
+      runtime_readiness:
+        ready: false
+        blockers:
+          []
+        next_command: null
+      updated_at: null
+    conditional_packets:
+      - artifactType: work_items
+        path: .openworkflow/changes/<id>/WORK_ITEMS.yaml
+        requiredByDefault: true
+        when: Use for ordered implementation tasks with owned paths, dependencies, acceptance, and
+          verification.
+  - artifact_type: team_runtime
+    contract_type: runtime
+    command: /ow:team
+    title: Team runtime
+    source_of_truth_path: .openworkflow/runtime/<id>/STATE.yaml
+    template_path: .openworkflow/runtime/_templates/STATE.yaml
+    index_path: .openworkflow/runtime/RUNTIME_INDEX.yaml
+    index_collection_key: runs
+    note_path: .openworkflow/runtime/<id>/NOTE.md
+    review_path: null
+    disclosure_level: 2
+    required_keys:
+      - artifact_type
+      - source_change
+      - active_work_item
+      - execution_mode
+      - work_queue
+      - agents
+      - verification
+      - issues
+      - checkpoints
+      - handoff
+    read_policy:
+      load_by_default: true
+      agent_read_order: 90
+      max_yaml_lines: 220
+      max_note_lines: 80
+      raw_evidence: only_when_referenced
+    active_pointer:
+      index_path: .openworkflow/runtime/RUNTIME_INDEX.yaml
+      pointer_key: current_run
+      collection_key: runs
+      id_key: run_id
+      path_key: path
+    evidence_policy: Reference change, work items, verification logs, issues, and checkpoints by path;
+      keep current execution state compact.
+    handoff_key: handoff.next_action
+    summary_policy:
+      strategy: summary_file
+      path: .openworkflow/runtime/<id>/SUMMARY.yaml
+      load_before_full: true
+      refresh_when: Refresh after active work item, verification, issues, checkpoints, or handoff changes.
+    lazy_create: true
+    template:
+      schema_version: 0.1.0
+      contract_id: runtime:<id>
+      contract_type: runtime
+      artifact_type: team_runtime
+      title: <short runtime title>
+      status: active
+      source_change: ""
+      active_work_item: null
+      execution_mode: single_agent|agent_team|reconcile|qa_fix
+      work_queue:
+        []
+      agents:
+        []
+      verification:
+        commands:
+          []
+        results:
+          []
+      issues:
+        []
+      checkpoints:
+        []
+      handoff:
+        status: in_progress
+        next_action: null
+        blockers:
+          []
+      updated_at: null
+    conditional_packets:
+      - artifactType: runtime_issues
+        path: .openworkflow/runtime/<id>/ISSUES.yaml
+        requiredByDefault: false
+        when: Use when implementation or verification finds blockers, regressions, or follow-up issues.
+      - artifactType: runtime_checkpoints
+        path: .openworkflow/runtime/<id>/CHECKPOINTS.yaml
+        requiredByDefault: false
+        when: Use when recording commits, verification gates, QA checkpoints, or release readiness.
+updated_at: null

@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: selected_change:M66-proto-redesign-source-dogfood
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M66-proto-redesign-source-dogfood
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P005
+title: Dogfood image-first proto flow on OpenWorkflow
+status: completed
+selection_reason:
+  - P005 is next_recommended_candidate_id and all dependencies are done.
+  - It validates the redesigned source-level proto flow before runtime exposure.
+  - Its owned paths are limited to dogfood artifacts and queue maintenance.
+rejected_alternatives:
+  - id: P006
+    reason: Runtime exposure depends on dogfood evidence from P005.
+scope:
+  includes:
+    - OpenWorkflow vision input
+    - strategic prototype prompt pack
+    - selected first prototype direction
+    - review and tuning evidence
+  excludes:
+    - production implementation
+    - runtime command exposure
+    - HTML conversion
+owned_paths:
+  - changes/M66-proto-redesign-source-dogfood/
+  - changes/M59-proto-redesign-planning-dogfood/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+acceptance:
+  - The redesigned proto flow produces actionable image-generation prompt artifacts.
+  - Evidence records what should be accepted or tuned.
+  - Follow-up production work remains selectable by stable id.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js handoff --root . --json
+created_at: 2026-05-21
+updated_at: 2026-05-21

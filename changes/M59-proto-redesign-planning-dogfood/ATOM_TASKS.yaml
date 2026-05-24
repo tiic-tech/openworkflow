@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M59-proto-redesign-planning-dogfood
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M59-proto-redesign-planning-dogfood
+title: M59 Proto redesign planning dogfood atom tasks
+status: active
+tasks:
+  - task_id: M59-A001
+    title: Decompose proto redesign roadmap
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    done_when:
+      - Candidate queue includes focused proto redesign changes.
+      - Queue uses stable ids, dependencies, owned paths, validation, and acceptance.
+      - Queue keeps HTML conversion and runtime exposure separate.
+  - task_id: M59-A002
+    title: Select first proto redesign implementation change
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M60-proto-redesign-artifact-contracts/
+    done_when:
+      - Selected change references P001 by stable id.
+      - Atom tasks and implementation brief are ready for the next implementation pass.
+      - No implementation files for the proto redesign are created.
+  - task_id: M59-A003
+    title: Validate and update parent queue
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M59-proto-redesign-planning-dogfood/
+    done_when:
+      - "`npm run validate` passes."
+      - "`node dist/cli/src/index.js handoff --root . --json` passes."
+      - M54 C005 is marked done with evidence.

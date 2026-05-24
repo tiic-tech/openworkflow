@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: selected_change:G009-gh-operation-risk-boundaries
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G009-gh-operation-risk-boundaries
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G009
+title: Define gh issue and PR operation risk boundaries
+status: done
+selection_reason: >
+  G009 is ready after G001 and G008. It classifies gh operations before the
+  queue can safely stop on the high-risk git and gh mutation decision.
+rejected_alternatives:
+  - candidate_ref: G007
+    reason: high-risk automation decision depends on gh operation boundaries.
+scope:
+  includes:
+    - read-only gh operations for issues and PRs
+    - medium-risk evidence operations such as comments, labels, or PR body suggestions
+    - high-risk mutation operations such as issue creation, body edits, closure, push, PR creation, and merge
+    - explicit authorization and configuration prerequisites
+    - local audit expectations for every remote mutation
+  excludes:
+    - implementing gh commands
+    - opening PRs
+    - creating, editing, or closing issues
+    - replacing the high-risk report gate for mutation automation
+owned_paths:
+  - references/git-version-control-governance.md
+  - references/issue-governance.md
+  - references/gh-operation-governance.md
+  - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/
+forbidden_paths:
+  - skills/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - gh operations are classified into read-only, evidence-writing, and mutation tiers.
+  - The contract requires user authorization and configured gh before any gh-dependent workflow.
+  - High-risk remote mutations remain behind HIGH_RISK_DECISION_REPORT.md and explicit approval.
+  - Local audit artifacts remain the OW-owned record even when GitHub is the remote source of truth.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/git-version-control-governance.md
+    - references/issue-governance.md
+    - references/gh-operation-governance.md
+    - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G009-gh-operation-risk-boundaries/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"

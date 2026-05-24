@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: selected_change:G010-analyze-changes-skill
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G010-analyze-changes-skill
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G010
+title: Create analyze-changes skill for cross-queue priority analysis
+status: done
+selection_reason: >
+  G010 is ready after G001 and G008. It directly improves the dogfood workflow
+  by giving agents a read-only cross-queue priority step before select-change
+  consumes a concrete target.
+rejected_alternatives:
+  - candidate_ref: G002
+    reason: branch field behavior remains important, but cross-queue analysis addresses the newly discovered scheduling gap.
+  - candidate_ref: G003
+    reason: select-change guard behavior can follow once analysis can recommend targets across queues.
+  - candidate_ref: G009
+    reason: gh operation risk boundaries are less urgent than the read-only analysis skill.
+scope:
+  includes:
+    - skill boundary between decompose-to-changes, analyze-changes, and select-change
+    - cross-queue readiness, dependency, risk, branch, dirty-tree, and unlock analysis
+    - CHANGE_ANALYSIS.yaml and CHANGE_ANALYSIS.md artifact expectations
+    - handoff shape that select-change can consume
+    - high-risk stop reporting when the best next candidate is high risk
+  excludes:
+    - implementing selected changes
+    - mutating candidate queues except for optional analysis evidence links
+    - performing git or gh mutations
+    - replacing select-change selection artifacts
+owned_paths:
+  - skills/analyze-changes/SKILL.md
+  - skills/analyze-changes/references/analysis-protocol.md
+  - references/planning-artifact-contracts.md
+  - changes/M71-git-version-control-governance/G010-analyze-changes-skill/
+forbidden_paths:
+  - skills/decompose-to-changes/**
+  - skills/select-change/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - analyze-changes is defined as read-only priority analysis across one or more candidate queues.
+  - The skill outputs a recommended target_plan_id and target_candidate_id with rejected alternatives.
+  - The skill reports branch and dirty-tree constraints before recommending implementation.
+  - The skill hands off to select-change without creating SELECTED_CHANGE.yaml itself.
+validation:
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/analyze-changes
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - skills/analyze-changes/SKILL.md
+    - skills/analyze-changes/references/analysis-protocol.md
+    - references/planning-artifact-contracts.md
+    - changes/M71-git-version-control-governance/G010-analyze-changes-skill/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G010-analyze-changes-skill/ATOM_TASKS.yaml
+    - "validation: quick_validate.py skills/analyze-changes"
+    - "validation: npm run validate"
+    - "validation: git diff --check"

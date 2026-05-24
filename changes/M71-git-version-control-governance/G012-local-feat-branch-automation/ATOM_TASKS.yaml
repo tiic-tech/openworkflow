@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G012-local-feat-branch-automation
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G012-local-feat-branch-automation
+title: Atom tasks for local feat branch automation
+status: done
+tasks:
+  - task_id: T001
+    title: Implement local branch automation primitive
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+    done_when:
+      - The primitive validates the supplied branch boundary.
+      - The primitive refuses dirty working trees.
+      - The primitive can preview and execute local create or checkout actions.
+      - The primitive does not implement push, reset, rebase, merge, delete, PR, or Issue mutation.
+  - task_id: T002
+    title: Add runtime-surface coverage
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers dry-run create preview.
+      - Runtime verification covers local branch creation.
+      - Runtime verification covers existing-branch checkout preview.
+      - Runtime verification covers dirty-tree refusal.
+  - task_id: T003
+    title: Record queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - Local branch action evidence records the queue id and allowed action surface.
+      - G012 selection and completion evidence are recorded.
+      - G013 becomes the next recommended candidate.
+  - task_id: T004
+    title: Validate implementation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.
+      - npm run verify:runtime-surface passes.

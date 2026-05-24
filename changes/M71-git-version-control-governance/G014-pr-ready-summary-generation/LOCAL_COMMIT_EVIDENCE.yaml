@@ -1,0 +1,19 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G014-pr-ready-summary-generation
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G014 PR-ready summary generation
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G014
+selected_change_id: G014-pr-ready-summary-generation
+branch_boundary: codex/m71-git-version-governance
+primary_commit: c8d48b1dc387f40d1aae27193155e5fc3847f912
+validation_evidence:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+audit_notes:
+  - The primary commit implemented local PR-ready summary generation.
+  - This evidence file is recorded by a follow-up evidence commit rather than amending the primary commit.
+  - Remote PR creation or mutation was not performed.

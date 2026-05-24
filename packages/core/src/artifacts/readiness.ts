@@ -10,7 +10,7 @@ export interface ArtifactReadinessResult {
 
 export async function assessStageReadiness(root: string, command: string, currentState: Record<string, unknown> | null): Promise<ArtifactReadinessResult> {
   if (command === "/ow:proto") {
-    return assessCurrentArtifact(root, currentState, "current_validation", validationTargetChecks);
+    return assessOptionalCurrentArtifact(root, currentState, "current_validation", validationTargetChecks);
   }
   if (command === "/ow:design") {
     return assessCurrentArtifact(root, currentState, "current_prototype", prototypeEvidenceChecks);
@@ -25,6 +25,31 @@ export async function assessStageReadiness(root: string, command: string, curren
     return assessCurrentArtifact(root, currentState, "current_change", productionChangeChecks);
   }
   return { ok: true, blockers: [], warnings: [] };
+}
+
+async function assessOptionalCurrentArtifact(
+  root: string,
+  currentState: Record<string, unknown> | null,
+  pointerKey: string,
+  check: (path: string, artifact: Record<string, unknown>) => ArtifactReadinessResult,
+): Promise<ArtifactReadinessResult> {
+  const artifactPath = stringValue(currentState?.[pointerKey]);
+  if (!artifactPath) {
+    return {
+      ok: true,
+      blockers: [],
+      warnings: [`CURRENT_STATE.${pointerKey} is not set; /ow:proto should derive validation_input.mode from vision-only context`],
+    };
+  }
+  const artifact = await readArtifact(root, artifactPath);
+  if (!artifact) {
+    return {
+      ok: false,
+      blockers: [`CURRENT_STATE.${pointerKey} references missing or unreadable artifact: ${artifactPath}`],
+      warnings: [],
+    };
+  }
+  return check(artifactPath, artifact);
 }
 
 async function assessCurrentArtifact(

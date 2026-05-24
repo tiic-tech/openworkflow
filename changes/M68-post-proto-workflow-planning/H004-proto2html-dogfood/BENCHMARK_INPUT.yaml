@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: benchmark_input:H004-proto2html-dogfood
+contract_type: benchmark_input
+title: Accepted D02 benchmark-style screen group
+status: accepted
+source_artifacts:
+  - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+  - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md
+  - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+accepted_source:
+  direction_id: D02
+  name: Prototype Discovery Flight Deck
+  acceptance_basis:
+    - M66 selected D02 as the first generation direction.
+    - The dogfood purpose is source-behavior validation, not visual finality.
+    - No binary image exists yet, so the accepted benchmark is represented as a screen-group fixture from the accepted prompt.
+benchmark:
+  kind: screen_group
+  refs:
+    - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml#directions.D02
+  selected_ref: changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml#D02
+  screens:
+    - screen_id: SCREEN_PIPELINE_MAP
+      name: Discovery Pipeline Map
+      must_preserve:
+        - left-to-right workflow from Vision to Proto to Tune to Decision to Spec/Build/Change
+        - each stage shows status, source artifacts, allowed outputs, forbidden outputs, and next command
+        - visible vision_only validation state
+    - screen_id: SCREEN_PROMPT_WORKSPACE
+      name: Proto Prompt Pack Workspace
+      must_preserve:
+        - three strategic directions with hypothesis, validation target, main risk, prompt preview, and recommendation
+        - D02 is visibly selected as first-generation recommendation
+    - screen_id: SCREEN_TUNE_BOUNDARY
+      name: Tune Boundary Workspace
+      must_preserve:
+        - accepted baseline direction
+        - MUST_INHERIT, MUST_ADD, MUST_REMOVE, FLEXIBLE_CHANGE panels
+        - handoff to tune-prototype
+    - screen_id: SCREEN_DECISION_LEDGER
+      name: Decision Evidence Ledger
+      must_preserve:
+        - accepted and rejected elements
+        - tune requests
+        - no HTML until benchmark image is accepted rule
+reconstruction_scope:
+  include:
+    - desktop single-page reconstruction of the D02 screen group
+    - central pipeline, prompt workspace, tune boundary, and evidence ledger areas
+    - static interaction affordances only
+  exclude:
+    - production application architecture
+    - backend, auth, persistence, deployment, or package scaffolding
+    - html2spec outputs
+    - new product direction beyond D02

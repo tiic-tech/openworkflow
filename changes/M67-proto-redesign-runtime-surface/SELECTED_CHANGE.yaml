@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:M67-proto-redesign-runtime-surface
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M67-proto-redesign-runtime-surface
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P006
+title: Expose proven proto redesign through runtime surfaces
+status: completed
+selection_reason:
+  - P006 is next_recommended_candidate_id and all dependencies are done.
+  - P005 dogfood produced accepted prompt-pack evidence before runtime exposure.
+  - The remaining work is bounded to command, artifact, adapter, and verification surfaces.
+rejected_alternatives:
+  - id: automatic-validation-trigger
+    reason: Validation automation is an explicit non-goal for P006 and remains a future product decision.
+  - id: proto-html-conversion
+    reason: HTML conversion is outside the accepted image-first proto/tune boundary.
+scope:
+  includes:
+    - command registry updates
+    - artifact registry and schema updates
+    - generated Codex adapter surface
+    - runtime-surface and agent-e2e verification updates
+  excludes:
+    - source behavior discovery
+    - validation product decision
+    - HTML conversion
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/
+  - schemas/prototype-evidence.schema.json
+  - references/artifact-authoring-templates.md
+  - .agents/skills/
+  - .openworkflow/audit/
+  - changes/M67-proto-redesign-runtime-surface/
+  - changes/M59-proto-redesign-planning-dogfood/
+forbidden_paths:
+  - skills/build-prototype/
+  - skills/tune-prototype/
+  - .openworkflow/prototypes/
+  - .openworkflow/specs/
+  - .openworkflow/runtime/
+acceptance:
+  - Runtime surfaces expose the accepted proto redesign behavior.
+  - Generated adapter output is produced through generation paths.
+  - Existing init, sync, handoff, and context behavior remains healthy.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+created_at: 2026-05-21
+updated_at: 2026-05-21

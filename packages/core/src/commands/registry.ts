@@ -64,15 +64,15 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
   command(
     "proto",
     ["build-prototype", "ow:prototype"],
-    "Build the smallest prototype needed to validate the current core feature.",
+    "Create image-first strategic prototype prompt packs from vision or validation context.",
     "prototype",
     [".openworkflow/prototypes/"],
     prototypeProtocol(),
   ),
   command(
     "tune",
-    ["ow:tune:proto"],
-    "Revise the current prototype and record the decision audit automatically.",
+    ["tune-prototype", "ow:tune:proto"],
+    "Refine accepted prototype screens or prompt packs and record the decision audit automatically.",
     "prototype",
     [".openworkflow/prototypes/", ".openworkflow/decisions/"],
     tuneProtocol(),
@@ -118,6 +118,14 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     [".openworkflow/runtime/"],
     teamProtocol(),
   ),
+  command(
+    "git-automation",
+    [],
+    "Operate the managed git lifecycle shell for local branch, commit, PR-ready summary, and remote approval gates.",
+    "governance",
+    ["changes/<plan_id>/CANDIDATE_CHANGES.yaml", "changes/<plan_id>/PR_READY_SUMMARY.md"],
+    gitAutomationProtocol(),
+  ),
 ] as const;
 
 export function getWorkflowCommands(): readonly WorkflowCommand[] {
@@ -143,6 +151,95 @@ function command(
     visibility,
     targetArtifacts,
     protocol,
+  };
+}
+
+function gitAutomationProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "managed-git-lifecycle-shell",
+    requiredContext: [
+      "references/git-version-control-governance.md",
+      "references/gh-operation-governance.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml",
+    ],
+    optionalContext: [
+      "changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md",
+      "changes/<plan_id>/PR_READY_SUMMARY.md",
+      "changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml",
+    ],
+    forbiddenContext: [],
+    allowedOutputs: [
+      "local branch checkout or creation through openworkflow git-automation branch",
+      "local selected-change commit through openworkflow git-automation commit",
+      "local PR_READY_SUMMARY.md through openworkflow git-automation summary",
+      "remote operation plan through openworkflow git-automation remote",
+      "remote read-only PR-ready plan through openworkflow git-automation remote-plan",
+      "draft PR pilot preview or explicitly gated mutation through openworkflow git-automation draft-pr",
+      "local evidence artifacts under changes/<plan_id>/",
+    ],
+    conditionalOutputs: [
+      "high-risk decision report when remote mutation or autonomous mode is requested",
+      "follow-up CANDIDATE_CHANGES entry for autonomous git automation",
+    ],
+    forbiddenOutputs: [
+      "git push without explicit operation-level user approval",
+      "gh pr create/edit/merge without explicit operation-level user approval",
+      "gh issue create/edit/close without explicit operation-level user approval",
+      "git reset, rebase, force-push, or destructive branch deletion",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Read the queue branch boundary and confirm current git state.",
+        "Confirm whether the requested mode is managed or autonomous.",
+        "Stop on autonomous or remote mutation requests unless a high-risk approval exists for exact operations.",
+      ],
+      during: [
+        "Use dry-run or preview before any local mutation.",
+        "Record plan id, candidate id, branch, dirty paths, command preview, validation evidence, and affected paths.",
+        "Keep local branch, commit, and summary actions scoped to the selected queue.",
+      ],
+      after: [
+        "Record commit hash and evidence path when a local commit is created.",
+        "Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.",
+        "Report remote operations as gated and include ordered commit or queue evidence for push, PR, and merge planning.",
+      ],
+    },
+    antiPatterns: [
+      "Do not treat git-automation enabled as permission to push, merge, or mutate GitHub in this G015 shell.",
+      "Do not hide dirty paths or omit command previews from evidence.",
+      "Do not create a selected change with no local commit when implementation changed files.",
+      "Do not amend only to force a commit to contain its own hash.",
+    ],
+    handoffCommands: [
+      "openworkflow git-automation branch --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
+      "openworkflow git-automation commit --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --candidate <id> --message <msg> --validation-evidence <cmds> --json",
+      "openworkflow git-automation summary --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --json",
+      "openworkflow git-automation simulate --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --json",
+      "openworkflow git-automation remote-plan --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base <branch> --json",
+      "openworkflow git-automation draft-pr --root . --queue changes/<plan_id>/CANDIDATE_CHANGES.yaml --base <base-ref> --remote <remote> --target-base <branch> --json",
+    ],
+    internalSections: [
+      {
+        tag: "mode_policy",
+        items: [
+          "managed mode may perform approved local branch, commit, and summary operations with previews and evidence.",
+          "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
+          "remote-plan mode may read remote refs and PR metadata, but must not push, create PRs, edit PRs, merge, or mutate Issues.",
+          "draft-pr mode is disabled by default; mutation requires --write, --allow-draft-pr, current remote-plan evidence, and rollback guidance.",
+          "autonomous mode is a future high-risk path and is not implemented by the G015 command shell.",
+        ],
+      },
+      {
+        tag: "evidence_policy",
+        items: [
+          "Every git operation must be traceable to a plan id, candidate id, command preview, before and after state, and validation evidence when applicable.",
+          "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+          "A selected change must have at least one local commit when implementation changed files.",
+          "Follow-up evidence commits are allowed when they preserve the selected-change HEAD relationship.",
+        ],
+      },
+    ],
   };
 }
 
@@ -294,117 +391,99 @@ function validationProtocol(): CommandProtocol {
 function prototypeProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "classified-prototype-creation",
+    interactionMode: "image-first-strategic-proto-prompt-pack",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
-      ".openworkflow/validation/VALIDATION_INDEX.yaml",
     ],
     optionalContext: [
-      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
-      ".openworkflow/validation/**/VALIDATION.yaml",
       ".openworkflow/vision/VISION_CONTRACT.yaml",
+      ".openworkflow/vision/VISION.md",
+      ".openworkflow/validation/VALIDATION_INDEX.yaml",
+      ".openworkflow/validation/**/VALIDATION.yaml",
+      ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/context/CONTEXT.md",
+      ".openworkflow/context/CONTEXT_MAP.yaml",
       "package.json",
     ],
     forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
     allowedOutputs: [
       ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.md",
+      ".openworkflow/prototypes/<id>/REVIEW_PLAN.md",
       ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
       ".openworkflow/prototypes/<id>/NOTE.md",
-      ".openworkflow/prototypes/<id>/review.html",
-      ".openworkflow/prototypes/<id>/evidence/**",
+      ".openworkflow/prototypes/<id>/images/**",
       ".openworkflow/decisions/DECISION_INDEX.yaml",
       ".openworkflow/decisions/<id>/DECISION.yaml",
       ".openworkflow/decisions/<id>/NOTE.md",
-      ".openworkflow/decisions/<id>/review.html",
     ],
-    forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
     auditCheckpoints: {
       before: [
-        "Confirm validation target exists.",
-        "Classify prototype mode before implementation: visual, interaction, technical feasibility, 3D/material, workflow, or data/logic.",
-        "Detect reference inputs: image, URL, screenshot, HTML/CSS source, existing artifact, or design-system hint.",
+        "Load vision and optional validation context; validation is optional but must be consumed when present.",
+        "Record validation_input.mode as vision_only or validation_present; do not silently auto-generate validation.",
+        "Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.",
       ],
       during: [
-        "For visual-first prototypes, extract reference patterns and create a high-fidelity static concept with image generation before HTML unless the user explicitly skips it.",
-        "Derive a compact visual direction and token packet before implementation.",
-        "Build only what answers the validation question and keep one command or URL to run the prototype.",
-        "Verify rendered prototypes with browser and screenshot checks before handoff.",
+        "Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.",
+        "Make directions differ by product form, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.",
+        "Write concrete high-fidelity image-generation prompts with screens, journey, interactions, AI/system behavior, trust controls, anti-goals, and sample content.",
+        "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
       after: [
-        "Record reference analysis, static concept evidence, runnable implementation evidence, verification, self-critique, and known limits separately.",
-        "Write a decision audit record internally after prototype evidence changes.",
-        "Write evidence and result artifacts.",
+        "Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact EVIDENCE.yaml.",
+        "Record review evidence and a decision audit record internally after prompt-pack evidence changes.",
         "Refresh prototype SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_prototype, last_decision, and next_command.",
-        "Confirm no design, spec, change, team, persistence, or production hardening was created.",
+        "Confirm no HTML, design, spec, change, team, persistence, or production hardening was created.",
       ],
     },
     antiPatterns: [
-      "Do not jump directly to HTML for a visual-first prototype before a visual direction or static concept unless the user explicitly skips it.",
-      "Do not ignore user-provided reference images, URLs, screenshots, or HTML/CSS source.",
-      "Do not force image generation for logic-only, data-flow, API, or technical feasibility prototypes.",
-      "Do not polish the prototype into production code.",
-      "Do not add persistence unless persistence is the validation question.",
-      "Do not create design, specs, changes, or teams from unaccepted prototype work.",
+      "Do not generate HTML, CSS, local runnable apps, or implementation tasks from /ow:proto.",
+      "Do not treat visual style variants as strategic directions.",
+      "Do not hide missing validation; record vision_only mode when validation artifacts are absent.",
+      "Do not convert prompt packs into production specs or change backlogs.",
+      "Do not create design, specs, changes, or teams from unaccepted prompt-pack evidence.",
       "Do not ask the user to manually invoke /ow:decision after prototype work; record the decision audit internally.",
     ],
     internalSections: [
       {
-        tag: "prototype_classification",
+        tag: "validation_consumption",
         items: [
-          "Classify the prototype as visual, interaction, technical feasibility, 3D/material, workflow, or data/logic before choosing tools or writing files.",
-          "Name the validation question, the riskiest assumption, and the smallest success signal.",
-          "If classification is ambiguous, ask one clarifying question; otherwise proceed with the most likely mode and record the assumption.",
+          "If validation artifacts are absent but a vision exists, proceed in vision_only mode.",
+          "If VALIDATION.yaml and PROTOTYPE_BRIEF.md exist, consume them and preserve their include/exclude boundaries.",
+          "If validation conflicts with vision, stop for a decision instead of broadening scope silently.",
         ],
       },
       {
-        tag: "reference_extraction",
+        tag: "strategic_prompt_pack",
         items: [
-          "When the user provides a target image, URL, screenshot, HTML/CSS, or reference artifact, perform reference-pattern extraction before visual generation or HTML implementation.",
-          "Extract transferable patterns: information architecture, layout rhythm, component grammar, typography posture, palette, motion, interaction details, and anti-patterns to avoid.",
-          "Record reference analysis as evidence by path or URL; do not paste bulky source or screenshots into YAML.",
+          "Write prompt_pack_type: strategic_proto_prompt_pack.",
+          "Normalize product domain, primary user, current alternative, core pain, behavior change, success signal, differentiator, emotional value, trust constraints, and non-goals.",
+          "Represent strategic_core as target user plus behavior change plus mechanism plus differentiator plus boundary conditions.",
+          "Each direction must include direction_id, name, strategic_hypothesis, validates, main_risk, prototype_prompt, and pm_judgment.",
         ],
       },
       {
-        tag: "visual_first_path",
+        tag: "image_only_boundary",
         items: [
-          "For visual, product-experience, 3D/material, and aesthetic-sensitive interaction prototypes, default to a high-fidelity static concept before runnable HTML.",
-          "Use image generation as the default first visual pass for composition, mood, material, visual hierarchy, and brand direction unless the user asks to skip image generation.",
-          "Record visual_concept_policy.image_generation as generated, skipped_by_user, or not_applicable; skipped_by_user requires a concrete skip reason.",
-          "Discuss or confirm the static concept before spending implementation effort when the user is actively collaborating; if the user asked for autonomous execution, proceed after the concept establishes clear direction.",
-          "Do not require image generation for data/logic, API, or pure technical feasibility prototypes.",
+          "/ow:proto creates prompt packs for high-fidelity static prototype images.",
+          "Do not write HTML, CSS, runnable prototypes, production code, deployment config, auth, persistence, or team runtime.",
+          "Hand off to /ow:tune when generated images or accepted baseline screens need refinement.",
         ],
       },
       {
-        tag: "design_seed_protocol",
+        tag: "review_evidence",
         items: [
-          "Do not design from a blank aesthetic when a direction, design system, template seed, or reference exists.",
-          "Derive a compact visual packet before implementation: background, surface, foreground, muted, border, accent, display font, body font, radius, spacing, motion, and density.",
-          "Choose domain-appropriate posture: operational tools should be dense and restrained, editorial surfaces can be expressive, games can be playful, and dashboards should avoid marketing hero treatment.",
-        ],
-      },
-      {
-        tag: "implementation_protocol",
-        items: [
-          "Implement the smallest runnable artifact that validates the current question, not a production app.",
-          "For HTML prototypes, keep final review surfaces free of designer-only controls unless those controls are part of the validation target.",
-          "Keep generated assets, screenshots, logs, and review HTML in the prototype evidence folder.",
-        ],
-      },
-      {
-        tag: "verification_protocol",
-        items: [
-          "For rendered HTML or 3D prototypes, run browser verification and capture screenshots or notes for desktop and mobile when practical.",
-          "Verify that the page is nonblank, core interactions work, primary assets render, text does not overlap, and responsive layout remains coherent.",
-          "Record known limits separately from observations so downstream decision work can judge evidence quality.",
-        ],
-      },
-      {
-        tag: "self_critique",
-        items: [
-          "Before handoff, critique the prototype across philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior.",
-          "Any weak dimension must trigger one repair pass before evidence handoff unless the weakness is intentionally out of scope for the validation question.",
-          "Record critique findings and repairs as compact evidence references or YAML summary fields.",
+          "Record selected direction, user feedback, accepted elements, rejected elements, tune requests, and recommendation.",
+          "Use recommendation continue, tune, pivot, stop, or needs_more_evidence.",
+          "Reference generated images by path when present; do not embed large binary evidence.",
         ],
       },
       {
@@ -423,7 +502,7 @@ function prototypeProtocol(): CommandProtocol {
 function tuneProtocol(): CommandProtocol {
   return {
     depth: "deep",
-    interactionMode: "prototype-revision-orchestration",
+    interactionMode: "screen-bound-prototype-refinement",
     requiredContext: [
       ".openworkflow/workflow/WORKFLOW_INDEX.yaml",
       ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
@@ -433,6 +512,8 @@ function tuneProtocol(): CommandProtocol {
       ".openworkflow/validation/**/VALIDATION.yaml",
       ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
       ".openworkflow/prototypes/**/EVIDENCE.yaml",
+      ".openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/**/REFINED_PROTO_PROMPT_PACK.yaml",
       ".openworkflow/prototypes/**/NOTE.md",
       ".openworkflow/decisions/DECISION_INDEX.yaml",
       ".openworkflow/decisions/**/DECISION.yaml",
@@ -441,30 +522,37 @@ function tuneProtocol(): CommandProtocol {
     forbiddenContext: [".openworkflow/runtime/**", ".openworkflow/changes/**", ".openworkflow/specs/**"],
     allowedOutputs: [
       ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml",
+      ".openworkflow/prototypes/<id>/REFINED_PROTO_PROMPT_PACK.yaml",
+      ".openworkflow/prototypes/<id>/REFINED_PROTO_PROMPT_PACK.md",
+      ".openworkflow/prototypes/<id>/REVIEW_PLAN.md",
       ".openworkflow/prototypes/<id>/EVIDENCE.yaml",
       ".openworkflow/prototypes/<id>/NOTE.md",
-      ".openworkflow/prototypes/<id>/review.html",
-      ".openworkflow/prototypes/<id>/evidence/**",
+      ".openworkflow/prototypes/<id>/images/**",
       ".openworkflow/decisions/DECISION_INDEX.yaml",
       ".openworkflow/decisions/<id>/DECISION.yaml",
       ".openworkflow/decisions/<id>/NOTE.md",
-      ".openworkflow/decisions/<id>/review.html",
     ],
-    forbiddenOutputs: [".openworkflow/specs/**", ".openworkflow/changes/**", ".openworkflow/runtime/**"],
+    forbiddenOutputs: [
+      ".openworkflow/prototypes/<id>/review.html",
+      ".openworkflow/specs/**",
+      ".openworkflow/changes/**",
+      ".openworkflow/runtime/**",
+    ],
     auditCheckpoints: {
       before: [
-        "Resolve tune target: /ow:tune and /ow:tune:proto default to the current prototype.",
-        "If no current prototype exists but a current validation target exists, orchestrate prototype creation through /ow:proto behavior.",
-        "Load only the current prototype evidence, relevant validation target, and latest decision audit context.",
+        "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted baseline screen group.",
+        "Require baseline screens, screenshots, screen descriptions, generated images, or an accepted PROTO_PROMPT_PACK plus a tune request.",
+        "Load only the baseline prompt pack, current prototype evidence, relevant validation or vision context, and latest decision audit context.",
       ],
       during: [
-        "Apply exactly one focused revision loop from user feedback.",
-        "Preserve M16 prototype evidence separation for concept, implementation, verification, self-critique, and known limits.",
-        "Run required verification for changed rendered artifacts.",
+        "Audit the full baseline screen group before writing refined prompts.",
+        "Extract the product system and preserve product thesis, primary loop, component vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.",
+        "Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per target screen.",
+        "Bind every refined prompt to target screen id, source screen id(s), generation scope, target form factor, negative constraints, and acceptance criteria.",
         "Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.",
       ],
       after: [
-        "Write updated prototype evidence and review artifacts.",
+        "Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact EVIDENCE.yaml.",
         "Write or update the internal decision audit record.",
         "Refresh prototype SUMMARY.yaml and CURRENT_STATE.yaml after the revision outcome is known.",
         "Show the user only the tuning result, unresolved question if any, and the next user-facing command.",
@@ -472,33 +560,44 @@ function tuneProtocol(): CommandProtocol {
     },
     antiPatterns: [
       "Do not ask the user to manually invoke /ow:decision during a tune loop.",
-      "Do not restart full prototype discovery when a focused revision is enough.",
+      "Do not restart full strategic prototype discovery when a focused refinement is enough.",
+      "Do not tune from one representative screen when the input is a screen group unless the user explicitly limits scope.",
+      "Do not silently drop accepted baseline controls, privacy affordances, memory controls, or non-goals.",
+      "Do not generate HTML, CSS, or runnable app work from /ow:tune.",
       "Do not create design, specs, changes, or runtime work from unaccepted tune evidence.",
-      "Do not tune outside the current validation scope unless the user explicitly changes the target or validation.",
+      "Do not ignore the current validation scope when one is explicitly present and accepted for the prototype.",
     ],
     internalSections: [
       {
         tag: "target_resolution",
         items: [
-          "/ow:tune resolves to the current prototype by default.",
+          "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.",
           "/ow:tune:proto is an explicit alias for tuning the current prototype.",
-          "/ow:tune:<target> reserves routing for explicit future artifact targets; in M17, implement prototype target behavior and record unsupported targets as unresolved.",
+          "If no baseline prototype exists, return to /ow:proto instead of inventing refinement context.",
         ],
       },
       {
-        tag: "proto_orchestration",
+        tag: "baseline_screen_audit",
         items: [
-          "When no current prototype exists but a current validation target exists, use /ow:proto behavior to create the first prototype evidence before tuning.",
-          "When a current prototype exists, revise it in place unless the user explicitly requests a new prototype branch.",
-          "Keep the revision scoped to the user's feedback and the active validation question.",
+          "For each source screen, record screen id, screen name, journey stage, user goal, system state, components, copy tone, represented feature, AI/system behavior, trust controls, visual cues, must-preserve elements, platform artifacts to transform or remove, and assumptions.",
+          "Treat the screen group as one product system, not unrelated images.",
+          "State excluded source screens explicitly when the user limits scope.",
         ],
       },
       {
-        tag: "revision_protocol",
+        tag: "inheritance_delta_rules",
         items: [
-          "Treat user feedback as the tune brief; ask one clarifying question only when the requested revision is ambiguous or unsafe.",
-          "Update the smallest artifact set needed: prototype evidence, note, review surface, and evidence files.",
-          "Preserve visual concept policy, evidence refs, verification, and self-critique integrity from the prototype evidence contract.",
+          "Build MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE buckets before writing prompts.",
+          "Requested removals must appear in global negative constraints, per-screen negative constraints, and acceptance checks.",
+          "Flexible changes must remain inside the product thesis, brand promise, non-goals, and screen purpose.",
+        ],
+      },
+      {
+        tag: "screen_manifest",
+        items: [
+          "Preserve target screen ids across rounds unless screens are deleted, split, merged, or explicitly renamed.",
+          "Every screen prompt must include prompt_id, target_screen_id, screen_name, source_screen_ids, target form factor, generation scope, dependencies, prompt, negative prompt, and acceptance criteria.",
+          "Do not output anonymous prompts that downstream generation cannot map back to screens.",
         ],
       },
       {

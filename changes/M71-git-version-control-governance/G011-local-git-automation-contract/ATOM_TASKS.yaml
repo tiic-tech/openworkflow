@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G011-local-git-automation-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G011-local-git-automation-contract
+title: Atom tasks for approved local git automation contract
+status: done
+tasks:
+  - task_id: T001
+    title: Define local git automation command contract
+    status: done
+    type: edit
+    owned_paths:
+      - references/git-version-control-governance.md
+    done_when:
+      - Local branch, local commit, and local PR-ready summary boundaries are documented.
+      - The contract requires preview or dry-run behavior before mutation.
+  - task_id: T002
+    title: Preserve remote approval gates
+    status: done
+    type: edit
+    owned_paths:
+      - references/gh-operation-governance.md
+      - references/planning-artifact-contracts.md
+    done_when:
+      - Remote push, PR creation, Issue mutation, and merge remain explicit-approval operations.
+      - Planning contracts point future command behavior to the approved local boundary.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G011 selection and completion evidence are recorded.
+      - G012 becomes the next recommended candidate.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - references/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

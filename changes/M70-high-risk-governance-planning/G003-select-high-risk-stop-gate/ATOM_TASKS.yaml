@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G003-select-high-risk-stop-gate
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G003-select-high-risk-stop-gate
+title: Atom tasks for select-change high-risk stop gate
+status: done
+tasks:
+  - task_id: T001
+    title: Add high-risk gate to select-change workflow
+    status: done
+    type: document
+    owned_paths:
+      - skills/select-change/SKILL.md
+    done_when:
+      - The workflow stops before selecting risk: high candidates without explicit approval.
+      - Targeted review includes high-risk report status and resume criteria.
+  - task_id: T002
+    title: Add protocol rules for overrides and reports
+    status: done
+    type: document
+    owned_paths:
+      - skills/select-change/references/selection-protocol.md
+    done_when:
+      - The protocol defines required report behavior, explicit approval semantics, and selection evidence for overrides.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - G003 selection and completion evidence are recorded.
+      - G004 readiness is updated because G002 and G003 are complete.
+  - task_id: T004
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - skills/select-change/
+      - changes/M70-high-risk-governance-planning/
+    done_when:
+      - quick_validate.py passes for skills/select-change.
+      - npm run validate passes.
+      - git diff --check passes.

@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.team
+interface:
+  display_name: "ow:team"
+  short_description: "Execute approved production work through the Agent Team runtime."
+  default_prompt: "Use /ow:team for this OpenWorkflow repository."

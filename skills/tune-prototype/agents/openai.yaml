@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tune Prototype"
+  short_description: "Refine screen-bound prototype prompt packs"
+  default_prompt: "Use /ow:tune to turn baseline prototype screens and tuning feedback into refined screen-bound prompt packs."

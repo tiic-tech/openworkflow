@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.vision
+interface:
+  display_name: "ow:vision"
+  short_description: "Create or refine the product vision contract through focused collaboration."
+  default_prompt: "Use /ow:vision for this OpenWorkflow repository."

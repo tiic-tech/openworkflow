@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:S005-generated-surface-drift-tests
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: S005-generated-surface-drift-tests
+title: Atom tasks for generated surface drift and parity tests
+status: done
+tasks:
+  - task_id: T001
+    title: Validate audit and manifest parity
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Repository validation compares command registry entries to COMMAND_AUDIT_INDEX.yaml.
+      - Repository validation compares command registry entries to CONTEXT_PACKETS.yaml.
+      - Repository validation compares command registry entries to the Codex adapter manifest.
+  - task_id: T002
+    title: Validate generated file list and markers
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Codex manifest generated_files includes every declared skill and interface path.
+      - Generated file diagnostics tell agents to update source and run sync.
+  - task_id: T003
+    title: Add drift negative coverage
+    status: done
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime surface verification proves validator catches Codex manifest drift.
+      - Runtime surface verification proves validator catches command audit drift.
+  - task_id: T004
+    title: Run validation
+    status: done
+    type: verify
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - npm run validate passes.
+      - npm run verify:runtime-surface passes.
+      - git diff --check passes.

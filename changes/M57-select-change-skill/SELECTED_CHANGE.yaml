@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: selected_change:M57-select-change-skill
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M57-select-change-skill
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C003
+title: Implement select-change source skill
+status: active
+selection_reason:
+  - C001 defined the planning artifact contracts.
+  - C002 added decompose-to-changes and sample candidate queues.
+  - select-change unlocks dogfood planning for the /ow:proto redesign before runtime exposure.
+rejected_alternatives:
+  - id: C004
+    reason: Runtime exposure should wait until both source planning skills are proven.
+  - id: C005
+    reason: Depends on select-change existing as a source skill.
+scope:
+  includes:
+    - skills/select-change/SKILL.md
+    - selection policy and atom task reference guidance
+    - SELECTED_CHANGE.yaml output behavior
+    - ATOM_TASKS.yaml output behavior
+    - IMPLEMENTATION_BRIEF.md output behavior
+    - dogfood selection from a sample candidate queue
+  excludes:
+    - executing the implementation itself
+    - archive completion behavior
+    - autonomous loop runtime
+    - generated /ow:* command exposure
+owned_paths:
+  - skills/select-change/
+  - changes/M57-select-change-skill/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+acceptance:
+  - Skill selects one candidate by stable id with explicit rationale.
+  - Skill marks selection state without deleting other candidates.
+  - Skill emits atom tasks with owned paths and done_when criteria.
+  - Skill creates an implementation brief that lets an Agent start with low context.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+  - manual dogfood selection from a sample CANDIDATE_CHANGES.yaml
+created_at: 2026-05-21
+updated_at: 2026-05-21

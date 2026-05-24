@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: planning_summary:M69-skill-system-lifecycle-planning
+contract_type: planning
+title: M69 Skill system lifecycle planning summary
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    Decomposes the OpenSpec built-in skill lifecycle research into focused
+    OpenWorkflow changes for native skill format, generated metadata, adapter
+    lifecycle, validation, drift detection, and dynamic instruction envelopes.
+  refs:
+    - "session: 2026-05-21 OpenSpec built-in skill lifecycle research"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/shared/skill-generation.ts"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/command-generation/registry.ts"
+    - packages/adapters/codex/src/generateSkills.ts
+    - packages/adapters/codex/src/generateCommands.ts
+    - packages/core/src/commands/registry.ts
+outputs:
+  candidate_queue: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  readable_view: changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.md
+  high_risk_decision_report: changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+candidate_count: 7
+completed_candidate_id: S004
+completed_change_id: S004-skill-format-validation
+completed_contract_candidate_id: S001
+completed_contract_change_id: S001-skill-lifecycle-contract
+completed_metadata_candidate_id: S002
+completed_metadata_change_id: S002-generated-skill-metadata
+completed_drift_candidate_id: S005
+completed_drift_change_id: S005-generated-surface-drift-tests
+completed_envelope_candidate_id: S006
+completed_envelope_change_id: S006-dynamic-instruction-envelope
+next_recommended_candidate_id: null
+unresolved_questions:
+  - Whether dynamic artifact instruction envelopes should become a CLI command, a summary output, or only a design pattern.
+  - Whether multi-adapter support should start as dry-run verification before any generated non-Codex files are committed.
+  - Whether generated metadata belongs only in frontmatter or also in `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`.
+validation_commands:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - git diff --check
+notes:
+  - S001 is recommended first because later generator, validator, and adapter work needs a stable native skill format contract.
+  - S003 and S007 are high risk because they touch delivery architecture and multi-adapter boundaries.
+  - The queue intentionally keeps proto2html runtime exposure in M68 and does not mix it into skill-system lifecycle work.
+  - Cross-queue selection preferred M69/S001 before M68/H003 because H003 changes high-risk generated runtime surfaces.
+  - S001 completed the native skill lifecycle contract and unblocked generated metadata work in S002.
+  - S002 completed generated Codex skill metadata and runtime-surface metadata verification.
+  - S004 completed generated skill format validation with negative runtime-surface coverage.
+  - S005 completed generated-surface drift and parity checks.
+  - S006 completed the dynamic instruction envelope design without adding runtime behavior.
+  - Remaining candidates S003 and S007 are high risk and require explicit confirmation.
+  - A high-risk decision report was created for S003 and S007 before any implementation.

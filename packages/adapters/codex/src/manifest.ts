@@ -1,8 +1,8 @@
 import { join, relative } from "node:path";
 import { COMMAND_NAMESPACE, getWorkflowCommands } from "../../../core/src/commands/registry.js";
 import { dumpYaml } from "../../../core/src/contracts/yaml.js";
+import { CODEX_ADAPTER_VERSION } from "./constants.js";
 import { codexSkillInterfacePath, codexSkillName, codexSkillPath } from "./generateSkills.js";
-import { CODEX_ADAPTER_VERSION } from "./templates.js";
 
 export const CODEX_MANIFEST_PATH = ".agents/openworkflow-adapter.yaml";
 export const LEGACY_CODEX_MANIFEST_PATHS = [
@@ -23,7 +23,16 @@ export function codexManifest(root: string, files: string[]): string {
       directory: ".agents/skills",
       path_pattern: ".agents/skills/ow-<id>/SKILL.md",
       interface_metadata: "agents/openai.yaml",
-      frontmatter: ["name", "description"],
+      frontmatter: ["name", "description", "metadata"],
+      metadata_fields: [
+        "generated_by",
+        "adapter",
+        "adapter_version",
+        "template_id",
+        "source_command_id",
+        "semantic_trigger",
+        "skill_name",
+      ],
     },
     commands: getWorkflowCommands().map((command) => ({
       id: command.id,

@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: workflow:openworkflow
+contract_type: workflow
+title: OpenWorkflow workflow index
+status: active
+workflow_root: .openworkflow
+active_change: null
+tools:
+  - codex
+contracts:
+  - contract_id: workflow:openworkflow
+    contract_type: workflow
+    path: .openworkflow/workflow/WORKFLOW_INDEX.yaml
+    status: active
+  - contract_id: workflow:current-state
+    contract_type: workflow
+    path: .openworkflow/CURRENT_STATE.yaml
+    status: active
+  - contract_id: audit:command-index
+    contract_type: workflow
+    path: .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    status: active
+  - contract_id: audit:context-packets
+    contract_type: workflow
+    path: .openworkflow/audit/CONTEXT_PACKETS.yaml
+    status: active
+  - contract_id: audit:artifact-contracts
+    contract_type: workflow
+    path: .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    status: active
+  - contract_id: audit:disclosure-levels
+    contract_type: workflow
+    path: .openworkflow/audit/DISCLOSURE_LEVELS.yaml
+    status: active
+updated_at: null

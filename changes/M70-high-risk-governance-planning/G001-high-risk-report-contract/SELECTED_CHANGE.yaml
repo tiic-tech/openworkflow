@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:G001-high-risk-report-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G001-high-risk-report-contract
+source_plan_id: M70-high-risk-governance-planning
+source_candidate_id: G001
+title: Formalize high-risk decision report contract
+status: done
+selection_reason: >
+  G001 is the next recommended candidate and has no dependencies. It creates
+  the report artifact contract needed before decompose-to-changes and
+  select-change can reliably enforce high-risk stop behavior.
+rejected_alternatives:
+  - candidate_ref: G002
+    reason: decompose-to-changes behavior should reference a stable report contract first.
+  - candidate_ref: G003
+    reason: select-change stop-gate behavior should reference a stable report contract first.
+scope:
+  includes:
+    - high-risk report purpose and required sections
+    - output location policy under the owning candidate queue
+    - queue operation expectations when report generation stops implementation
+    - explicit resume condition requiring user decision
+  excludes:
+    - changing source skill behavior
+    - implementing validation code
+    - selecting S003 or S007
+owned_paths:
+  - references/planning-artifact-contracts.md
+  - changes/M70-high-risk-governance-planning/G001-high-risk-report-contract/
+forbidden_paths:
+  - skills/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Planning contracts define HIGH_RISK_DECISION_REPORT.md and its required sections.
+  - The contract states that implementation resumes only after explicit user approval of an option.
+  - The contract explains how the report is referenced from SUMMARY.yaml and operation logs.
+  - Existing planning artifacts remain valid.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/planning-artifact-contracts.md
+    - "validation: npm run validate"
+    - "validation: git diff --check"

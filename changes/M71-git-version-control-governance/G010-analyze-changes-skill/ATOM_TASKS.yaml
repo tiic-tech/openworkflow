@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G010-analyze-changes-skill
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G010-analyze-changes-skill
+title: Atom tasks for analyze-changes skill
+status: done
+tasks:
+  - task_id: T001
+    title: Author analyze-changes skill
+    status: done
+    type: edit
+    owned_paths:
+      - skills/analyze-changes/SKILL.md
+      - skills/analyze-changes/agents/openai.yaml
+    done_when:
+      - The skill is read-only and cross-queue focused.
+      - The skill says it hands off to select-change and does not select directly.
+  - task_id: T002
+    title: Define analysis artifact protocol
+    status: done
+    type: edit
+    owned_paths:
+      - skills/analyze-changes/references/analysis-protocol.md
+      - references/planning-artifact-contracts.md
+    done_when:
+      - CHANGE_ANALYSIS.yaml and CHANGE_ANALYSIS.md expectations are documented.
+      - High-risk analysis behavior is documented.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G010 selection and completion evidence are recorded.
+      - The next recommended candidate is updated.
+  - task_id: T004
+    title: Validate skill and repository
+    status: done
+    type: verify
+    owned_paths:
+      - skills/analyze-changes/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - quick_validate.py passes for analyze-changes.
+      - npm run validate passes.
+      - git diff --check passes.

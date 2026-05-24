@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/selected-change.schema.json",
+  "title": "OpenWorkflow Selected Change",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "planning_artifact_type",
+    "selected_change_id",
+    "source_plan_id",
+    "source_candidate_id",
+    "title",
+    "status",
+    "selection_reason",
+    "scope",
+    "owned_paths",
+    "forbidden_paths",
+    "acceptance",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "planning"
+    },
+    "planning_artifact_type": {
+      "const": "selected_change"
+    },
+    "selected_change_id": {
+      "type": "string"
+    },
+    "source_plan_id": {
+      "type": "string"
+    },
+    "source_candidate_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed",
+        "blocked",
+        "superseded",
+        "archived"
+      ]
+    },
+    "selection_reason": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rejected_alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "includes",
+        "excludes"
+      ]
+    },
+    "owned_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,428 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M68-post-proto-workflow-planning
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M68-post-proto-workflow-planning
+title: Candidate changes for post-proto workflow closure
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - changes/M59-proto-redesign-planning-dogfood/SUMMARY.yaml
+    - skills/decompose-to-changes/SKILL.md
+    - skills/select-change/SKILL.md
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable H-prefixed ids are assigned once and referenced by select-change.
+  feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat; each candidate is a commit-sized change inside this folder.
+  selected_artifact_location: changes/M68-post-proto-workflow-planning/<candidate-id>-<slug>/
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - artifact contracts before source behavior
+    - source behavior before runtime command exposure
+    - one workflow boundary per change
+    - HTML reconstruction only after accepted benchmark prototype evidence
+    - focused owned paths with automated validation
+  avoid:
+    - mixing proto2html with html2spec or build planning
+    - adding user-facing commands before contracts exist
+    - turning proto or tune back into HTML implementation loops
+    - broad autonomous runtime changes before production-stage contracts are clear
+next_recommended_candidate_id: H003
+changes:
+  - id: H001
+    status: done
+    title: Define proto2html artifact contracts
+    purpose: >
+      Define the durable artifact vocabulary for converting an accepted
+      benchmark prototype image into a single HTML reconstruction with fidelity
+      evidence.
+    scope:
+      includes:
+        - HTML prototype source-of-truth contract
+        - fidelity report contract
+        - accepted benchmark image input rules
+        - explicit non-goals for product exploration, specs, and production build
+      excludes:
+        - source skill implementation
+        - runtime command registry exposure
+        - generated Codex adapter surfaces
+        - html2spec or build planning contracts
+    owned_paths:
+      - references/proto2html-artifact-contracts.md
+      - schemas/html-prototype.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/
+    dependencies: []
+    unlocks:
+      - H002
+      - H003
+      - H004
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+    acceptance:
+      - Proto2html artifacts require an accepted benchmark image or screen group input.
+      - HTML output, screenshot evidence, fidelity gaps, and known limits are structured.
+      - The contract states that proto2html reconstructs; it does not explore product direction or create specs.
+    selection:
+      selected_change_id: H001-proto2html-artifact-contracts
+      reason: H001 is the root unblocker for the post-proto workflow and keeps runtime exposure out of scope.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H001-proto2html-artifact-contracts
+      completed_at: 2026-05-21
+      evidence:
+        - references/proto2html-artifact-contracts.md
+        - schemas/html-prototype.schema.json
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
+        - "validation: npm run validate"
+  - id: H002
+    status: done
+    title: Implement proto2html source skill behavior
+    purpose: >
+      Add source guidance for reconstructing an accepted benchmark image into a
+      single HTML prototype with fidelity checks and bounded evidence.
+    scope:
+      includes:
+        - proto2html source skill guidance
+        - benchmark input resolution
+        - single-file HTML reconstruction rules
+        - screenshot and fidelity-report evidence rules
+      excludes:
+        - runtime command exposure
+        - html2spec extraction
+        - production application implementation
+    owned_paths:
+      - skills/proto2html/
+      - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/
+    dependencies:
+      - H001
+    unlocks:
+      - H003
+      - H004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - quick_validate.py skills/proto2html
+    acceptance:
+      - Source guidance requires accepted benchmark prototype input.
+      - HTML reconstruction is single-file and fidelity-oriented.
+      - Evidence captures screenshots, fidelity gaps, and known limits.
+    selection:
+      selected_change_id: H002-proto2html-source-behavior
+      reason: H002 is ready after H001 and defines source behavior before dogfood or runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H002-proto2html-source-behavior
+      completed_at: 2026-05-21
+      evidence:
+        - skills/proto2html/SKILL.md
+        - skills/proto2html/references/proto2html-protocol.md
+        - skills/proto2html/agents/openai.yaml
+        - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/CHANGE.yaml
+        - "validation: quick_validate.py skills/proto2html"
+        - "validation: npm run validate"
+  - id: H003
+    status: ready
+    title: Expose proto2html runtime command surface
+    purpose: >
+      Add `/ow:proto2html` to runtime command, artifact, generated adapter, and
+      verification surfaces after source behavior is defined.
+    scope:
+      includes:
+        - command registry entry
+        - artifact registry entry
+        - generated Codex adapter surface
+        - runtime and workflow verification updates
+      excludes:
+        - source skill discovery
+        - html2spec contracts
+        - production build execution
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/dev/
+      - .agents/skills/
+      - .openworkflow/audit/
+      - changes/M68-post-proto-workflow-planning/H003-proto2html-runtime-surface/
+    dependencies:
+      - H002
+      - H004
+    unlocks:
+      - H005
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:e2e-workflow
+      - npm run verify:agent-e2e
+    acceptance:
+      - Runtime exposes proto2html only as benchmark-to-HTML reconstruction.
+      - Generated adapter surfaces are produced through sync.
+      - Existing proto and tune image-only boundaries remain intact.
+  - id: H004
+    status: done
+    title: Dogfood proto2html reconstruction contract
+    purpose: >
+      Exercise proto2html source behavior on an accepted benchmark-style
+      prototype input before runtime exposure.
+    scope:
+      includes:
+        - benchmark input fixture or current prototype evidence
+        - HTML reconstruction artifact draft
+        - fidelity report evidence
+        - decision audit notes for acceptance or tune
+      excludes:
+        - runtime command exposure
+        - html2spec extraction
+        - production implementation
+    owned_paths:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/
+    dependencies:
+      - H001
+      - H002
+    unlocks:
+      - H003
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+    acceptance:
+      - Dogfood output proves the contract is usable by a first-consumer agent.
+      - Fidelity gaps are explicit and reviewable.
+      - Follow-up runtime work remains selectable by stable id.
+    selection:
+      selected_change_id: H004-proto2html-dogfood
+      reason: H004 is ready after H001 and H002 and provides dogfood evidence before H003 runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: H004-proto2html-dogfood
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/BENCHMARK_INPUT.yaml
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/prototype.html
+        - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+        - "validation: npm run validate"
+  - id: H005
+    status: candidate
+    title: Define html2spec artifact contracts
+    purpose: >
+      Define the contract for deriving engineering specs from a locked HTML
+      prototype without inventing a parallel product direction.
+    scope:
+      includes:
+        - TECH_SPEC contract
+        - FRONTEND_SPEC contract
+        - BACKEND_SPEC and API_SPEC contract boundaries
+        - observable fact versus inferred architecture rules
+      excludes:
+        - source skill implementation
+        - build milestone planning
+        - runtime command exposure
+    owned_paths:
+      - references/html2spec-artifact-contracts.md
+      - schemas/html-derived-specs.schema.json
+      - changes/M68-post-proto-workflow-planning/H005-html2spec-artifact-contracts/
+    dependencies:
+      - H003
+    unlocks:
+      - H006
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Specs are grounded in locked HTML prototype evidence.
+      - Unknowns that cannot be inferred from HTML are explicit.
+      - Build planning is excluded until specs are defined.
+  - id: H006
+    status: candidate
+    title: Define build milestone planning contracts
+    purpose: >
+      Define how approved specs become a milestone plan, work item queue, and
+      next-change selection model.
+    scope:
+      includes:
+        - MILESTONE_SPEC contract
+        - BUILD_PLAN contract
+        - NEXT_CHANGE selection artifact
+        - dependency and verification gates
+      excludes:
+        - autonomous loop runtime
+        - implementation execution
+        - review/archive/devlog governance
+    owned_paths:
+      - references/build-milestone-contracts.md
+      - schemas/build-plan.schema.json
+      - schemas/milestone-spec.schema.json
+      - changes/M68-post-proto-workflow-planning/H006-build-milestone-contracts/
+    dependencies:
+      - H005
+    unlocks:
+      - H007
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Milestone plans can answer the next smallest valuable change.
+      - Work item dependencies, owned paths, and verification are structured.
+      - "`/ow:build` remains planning-only and does not implement code."
+  - id: H007
+    status: candidate
+    title: Design lifecycle transaction mechanism
+    purpose: >
+      Design a transaction layer that lets agents complete a workflow step
+      without forgetting register, pointer, summary, and handoff maintenance.
+    scope:
+      includes:
+        - transaction JSON effect model
+        - register/update/summarize/handoff sequence contract
+        - stop and rollback conditions
+        - first-consumer recovery expectations
+      excludes:
+        - proto2html or html2spec command behavior
+        - autonomous loop implementation
+        - multi-platform adapter recovery
+    owned_paths:
+      - references/lifecycle-transactions.md
+      - schemas/workflow-transaction.schema.json
+      - changes/M68-post-proto-workflow-planning/H007-lifecycle-transaction-design/
+    dependencies:
+      - H001
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Transaction design names exact inputs, effects, blockers, and JSON output.
+      - It reduces fragile manual maintenance after artifact creation.
+      - It stays design-level and does not change command behavior yet.
+operations:
+  - operation_id: OP001
+    operation_type: select
+    target_candidate_ids:
+      - H001
+    actor: agent
+    reason: H001 is ready, has no dependencies, and unlocks proto2html source, dogfood, and runtime exposure.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/SELECTED_CHANGE.yaml
+  - operation_id: OP002
+    operation_type: complete
+    target_candidate_ids:
+      - H001
+    actor: agent
+    reason: Proto2html reference and HTML prototype schema were added and repository validation passed.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/proto2html-artifact-contracts.md
+      - schemas/html-prototype.schema.json
+      - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/CHANGE.yaml
+      - "validation: npm run validate"
+  - operation_id: OP003
+    operation_type: priority_change
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: H002 becomes ready after H001 defines the proto2html artifact contract.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: H002 is next recommended, ready, and bounded to source skill behavior.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H002-proto2html-source-behavior/SELECTED_CHANGE.yaml
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - H002
+    actor: agent
+    reason: Proto2html source skill guidance, protocol reference, and interface metadata were added and validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/proto2html/SKILL.md
+      - skills/proto2html/references/proto2html-protocol.md
+      - skills/proto2html/agents/openai.yaml
+      - "validation: quick_validate.py skills/proto2html"
+      - "validation: npm run validate"
+  - operation_id: OP006
+    operation_type: priority_change
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: H004 becomes ready after H001 and H002; dogfood evidence is required before H003 runtime exposure.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: H004 is ready and provides dogfood evidence before high-risk H003 runtime exposure.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/SELECTED_CHANGE.yaml
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - H004
+    actor: agent
+    reason: Proto2html source behavior produced a benchmark fixture, HTML reconstruction, and fidelity evidence.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/HTML_PROTOTYPE.yaml
+      - changes/M68-post-proto-workflow-planning/H004-proto2html-dogfood/FIDELITY_REPORT.yaml
+      - "validation: npm run validate"
+  - operation_id: OP009
+    operation_type: priority_change
+    target_candidate_ids:
+      - H003
+    actor: agent
+    reason: H003 becomes ready after H002 source behavior and H004 dogfood evidence are complete, but remains high risk.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M68-post-proto-workflow-planning/CANDIDATE_CHANGES.yaml

@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/proto-prompt-pack.schema.json",
+  "title": "OpenWorkflow Proto Prompt Pack",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "title",
+    "status",
+    "prompt_pack_type",
+    "source",
+    "negative_constraints",
+    "review_plan"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "prototype"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "ready_for_generation",
+        "reviewed",
+        "accepted",
+        "superseded",
+        "archived"
+      ]
+    },
+    "prompt_pack_type": {
+      "type": "string",
+      "enum": [
+        "strategic_proto_prompt_pack",
+        "refined_proto_prompt_pack",
+        "proto_review_evidence"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "validation_input": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "vision_only",
+            "validation_present",
+            "internally_derived"
+          ]
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "normalized_input": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "strategic_core": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "directions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "direction_id",
+          "name",
+          "strategic_hypothesis",
+          "validates",
+          "main_risk",
+          "prototype_prompt",
+          "pm_judgment"
+        ],
+        "properties": {
+          "direction_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "strategic_hypothesis": {
+            "type": "string"
+          },
+          "validates": {
+            "type": "string"
+          },
+          "main_risk": {
+            "type": "string"
+          },
+          "prototype_prompt": {
+            "type": "string"
+          },
+          "pm_judgment": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "build_recommendation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "baseline_audit": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "product_system": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "delta_rules": {
+      "type": "object",
+      "properties": {
+        "must_inherit": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_add": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_remove": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flexible_change": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "screen_manifest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target_screen_id",
+          "screen_name",
+          "generation_order"
+        ],
+        "properties": {
+          "target_screen_id": {
+            "type": "string"
+          },
+          "screen_name": {
+            "type": "string"
+          },
+          "source_screen_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "generation_order": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "global_design_prompt": {
+      "type": "string"
+    },
+    "screen_prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "prompt_id",
+          "target_screen_id",
+          "screen_name",
+          "prompt",
+          "acceptance_criteria"
+        ],
+        "properties": {
+          "prompt_id": {
+            "type": "string"
+          },
+          "target_screen_id": {
+            "type": "string"
+          },
+          "screen_name": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "negative_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_plan": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "review_evidence": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

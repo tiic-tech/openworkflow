@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.workflow
+interface:
+  display_name: "ow:workflow"
+  short_description: "Initialize or reconcile OpenWorkflow contracts."
+  default_prompt: "Use /ow:workflow for this OpenWorkflow repository."

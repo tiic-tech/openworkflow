@@ -1,0 +1,618 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M69-skill-system-lifecycle-planning
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M69-skill-system-lifecycle-planning
+title: Candidate changes for OpenWorkflow skill system lifecycle design
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - "session: 2026-05-21 OpenSpec built-in skill lifecycle research"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/shared/skill-generation.ts"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/templates/workflows/"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/command-generation/registry.ts"
+    - "external:/Users/archy/Projects/GitClone/OpenSpec/src/core/config.ts"
+    - packages/core/src/commands/registry.ts
+    - packages/core/src/artifacts/registry.ts
+    - packages/adapters/codex/src/generateSkills.ts
+    - packages/adapters/codex/src/generateCommands.ts
+    - .agents/skills/ow-proto/SKILL.md
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable S-prefixed ids are assigned once and referenced by select-change.
+  feat_boundary: This CANDIDATE_CHANGES queue is the top-level feat; each candidate is a commit-sized change inside this folder.
+  selected_artifact_location: changes/M69-skill-system-lifecycle-planning/<candidate-id>-<slug>/
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - source contracts before runtime generation changes
+    - static skill format contract before platform adapter expansion
+    - validator and drift evidence for every generated-surface change
+    - repo-local reproducibility over global prompt installation
+    - agent-readable XML-like protocol blocks for OpenWorkflow trust boundaries
+  avoid:
+    - copying OpenSpec's lightweight Markdown-only skill format wholesale
+    - moving Codex command exposure to global prompts
+    - editing generated .agents or .openworkflow surfaces directly
+    - mixing skill lifecycle architecture with proto2html runtime exposure
+    - broad multi-platform adapter work before the format contract is stable
+next_recommended_candidate_id: null
+changes:
+  - id: S001
+    status: done
+    title: Document native skill format and lifecycle contract
+    purpose: >
+      Define OpenWorkflow's first-class skill system contract after the
+      OpenSpec research, including source-of-truth ownership, static skill
+      file shape, XML-like protocol block semantics, generated-surface rules,
+      and non-goals.
+    scope:
+      includes:
+        - native skill format reference
+        - frontmatter field policy including generated metadata
+        - XML-like block taxonomy for user behavior, agent protocol, context, outputs, audit, and handoff
+        - source registry to generated skill lifecycle narrative
+        - explicit divergence from OpenSpec global Codex prompt installation
+      excludes:
+        - runtime generator implementation changes
+        - new platform adapters
+        - proto2html command exposure
+        - changing existing generated skill files
+    owned_paths:
+      - references/skill-system-lifecycle.md
+      - references/planning-artifact-contracts.md
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/
+    dependencies: []
+    unlocks:
+      - S002
+      - S003
+      - S004
+      - S006
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The reference states that OW skills are YAML frontmatter plus Markdown plus XML-like protocol blocks, not full XML documents.
+      - The reference names source registries and generated surfaces and forbids direct generated-surface edits.
+      - The reference explains what OW borrows from OpenSpec and what it rejects.
+      - The contract is usable as read-first context for later generator and validator work.
+    selection:
+      selected_change_id: S001-skill-lifecycle-contract
+      reason: >
+        Cross-queue selection compared M68/H003 and M69/S001. S001 is the
+        safer next step because it creates the native skill lifecycle contract
+        needed before more high-risk runtime and generated-surface changes.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S001-skill-lifecycle-contract
+      completed_at: 2026-05-21
+      evidence:
+        - references/skill-system-lifecycle.md
+        - references/planning-artifact-contracts.md
+        - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: S002
+    status: done
+    title: Add structured generated metadata to Codex skill output
+    purpose: >
+      Make generated skill files self-identifying through structured
+      frontmatter metadata so doctor, sync, and tests can detect stale or
+      mismatched skill surfaces without relying only on comments.
+    scope:
+      includes:
+        - generatedBy or generated_by metadata in runtime skill frontmatter
+        - template id and adapter version metadata policy
+        - source command id and semantic trigger metadata
+        - generated skill fixture or snapshot expectations
+      excludes:
+        - multi-platform adapter support
+        - changing command semantics
+        - manual edits to existing generated files outside sync
+    owned_paths:
+      - packages/adapters/codex/src/constants.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/generatedFiles.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/templates.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/
+    dependencies:
+      - S001
+    unlocks:
+      - S004
+      - S005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - git diff --check
+    acceptance:
+      - Generated Codex skills include structured metadata that identifies generator, adapter, template, and command.
+      - Runtime verification checks the metadata on generated skill surfaces.
+      - Generated files are refreshed through sync rather than direct edits.
+      - Existing semantic command invocation remains unchanged.
+    selection:
+      selected_change_id: S002-generated-skill-metadata
+      reason: S001 completed the skill lifecycle contract, so generated metadata can be added before validation hardening.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S002-generated-skill-metadata
+      completed_at: 2026-05-21
+      evidence:
+        - packages/adapters/codex/src/constants.ts
+        - packages/adapters/codex/src/generateSkills.ts
+        - packages/adapters/codex/src/manifest.ts
+        - packages/adapters/codex/src/generatedFiles.ts
+        - packages/adapters/codex/src/templates.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - .agents/skills/ow-proto/SKILL.md
+        - .agents/openworkflow-adapter.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
+  - id: S003
+    status: candidate
+    title: Introduce skill registry and adapter delivery model
+    purpose: >
+      Separate "which OW workflows exist" from "how they are delivered" so
+      future tools can install skills, commands, or both without baking Codex
+      assumptions into the core workflow registry.
+    scope:
+      includes:
+        - skill registry or delivery metadata layer
+        - adapter capability model for skills versus commands
+        - repo-local delivery policy
+        - compatibility mapping for existing Codex generated surfaces
+      excludes:
+        - implementing non-Codex adapters
+        - changing artifact contracts
+        - global user-home prompt installation
+        - selecting profile subsets
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/
+      - packages/core/src/workflow/syncOpenWorkflow.ts
+      - packages/core/src/workflow/initOpenWorkflow.ts
+      - references/skill-system-lifecycle.md
+      - changes/M69-skill-system-lifecycle-planning/S003-skill-registry-delivery-model/
+    dependencies:
+      - S001
+    unlocks:
+      - S007
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:e2e-workflow
+      - git diff --check
+    acceptance:
+      - Core workflow definitions remain semantic and do not hardcode one agent platform's path rules.
+      - Codex remains repo-local and backward compatible.
+      - Delivery metadata can express skill-only, command-only, or both without changing individual workflow semantics.
+      - The change does not create non-Codex generated surfaces yet.
+  - id: S004
+    status: done
+    title: Validate generated skill format and protocol blocks
+    purpose: >
+      Add automated checks that generated OW skills conform to the native skill
+      format contract, including frontmatter, generated metadata, required
+      XML-like protocol blocks, and forbidden malformed top-level XML wrappers.
+    scope:
+      includes:
+        - generated SKILL.md frontmatter validation
+        - required protocol block presence checks
+        - block ordering or uniqueness checks where useful
+        - malformed wrapper and missing metadata diagnostics
+      excludes:
+        - artifact schema validation changes unrelated to skill files
+        - source skill quick validation for root skills/
+        - new adapter delivery model
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/
+    dependencies:
+      - S001
+      - S002
+    unlocks:
+      - S005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - git diff --check
+    acceptance:
+      - Validation fails when a generated OW skill lacks required frontmatter or protocol blocks.
+      - Validation keeps generated skill files as Markdown skill files, not full XML documents.
+      - Diagnostics explain whether to update source registry or run sync.
+      - Existing generated skills pass after sync.
+    selection:
+      selected_change_id: S004-skill-format-validation
+      reason: >
+        S001 defined the native skill format contract and S002 added generated
+        metadata, so validation can now enforce the generated Codex skill
+        surface without changing command semantics.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S004-skill-format-validation
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
+  - id: S005
+    status: done
+    title: Add generated-surface drift and parity tests
+    purpose: >
+      Detect when command registry, artifact contracts, generated skill files,
+      audit indexes, and adapter manifests drift apart, using an OpenSpec-style
+      generatedBy and parity testing approach adapted to OW.
+    scope:
+      includes:
+        - generated skill parity checks
+        - audit index parity checks
+        - stale generated-surface diagnostics
+        - clean sync verification coverage
+      excludes:
+        - adding new workflow commands
+        - changing skill protocol contents
+        - multi-platform adapter expansion
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/adapters/codex/src/generatedFiles.ts
+      - .openworkflow/audit/
+      - .agents/skills/
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/
+    dependencies:
+      - S002
+      - S004
+    unlocks: []
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:agent-e2e
+      - git diff --check
+    acceptance:
+      - Verification catches stale generated skill metadata or missing generated skill files.
+      - Verification catches registry entries missing from adapter manifest or audit indexes.
+      - The checks tell agents to update source and run sync, not hand-edit generated files.
+      - Current generated surfaces pass after regeneration.
+    selection:
+      selected_change_id: S005-generated-surface-drift-tests
+      reason: >
+        S004 made generated skill shape a repository contract; S005 should now
+        enforce parity across registry, audit indexes, Codex manifest, and
+        generated file lists before higher-risk delivery model work.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S005-generated-surface-drift-tests
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: git diff --check"
+  - id: S006
+    status: done
+    title: Design dynamic instruction envelope model
+    purpose: >
+      Decide whether OW should add an OpenSpec-like dynamic instruction output
+      layer for selected artifacts while keeping static runtime skills focused
+      on command protocol and context boundaries.
+    scope:
+      includes:
+        - comparison between static skill protocol blocks and dynamic artifact instruction envelopes
+        - candidate envelope tags such as task, context, rules, dependencies, output, template, and success criteria
+        - boundaries for avoiding protocol leakage into produced artifacts
+        - decision on whether this belongs in CLI commands, summaries, or skills
+      excludes:
+        - implementing a new CLI instruction command
+        - changing existing runtime skill generation
+        - changing artifact schemas
+    owned_paths:
+      - references/skill-system-lifecycle.md
+      - references/artifact-instruction-envelope.md
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/
+    dependencies:
+      - S001
+    unlocks:
+      - S007
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - The design clearly separates static skill protocol from dynamic per-artifact instruction output.
+      - The design states when XML-like envelope tags are useful and when Markdown or YAML is better.
+      - The design includes leakage prevention rules for generated artifacts.
+      - The design does not implement a new runtime command.
+    selection:
+      selected_change_id: S006-dynamic-instruction-envelope
+      reason: >
+        S006 is the last non-high-risk item in the queue and can clarify future
+        instruction envelope boundaries before any high-risk adapter delivery
+        or multi-platform work.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: S006-dynamic-instruction-envelope
+      completed_at: 2026-05-21
+      evidence:
+        - references/artifact-instruction-envelope.md
+        - references/skill-system-lifecycle.md
+        - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/SELECTED_CHANGE.yaml
+        - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+        - "validation: git diff --check"
+  - id: S007
+    status: candidate
+    title: Prototype multi-adapter skill delivery without changing runtime semantics
+    purpose: >
+      Spike a narrow adapter abstraction that can render the same OW skill
+      contract for another local agent skill directory while preserving the
+      current Codex behavior and avoiding global installation.
+    scope:
+      includes:
+        - one experimental adapter boundary
+        - path and frontmatter policy for a second local skill target
+        - dry-run or verification-only output plan
+        - risk report for platform-specific behavior
+      excludes:
+        - publishing non-Codex generated files by default
+        - changing user-facing `/ow:*` command semantics
+        - global prompt installation
+        - broad profile UI
+    owned_paths:
+      - packages/adapters/
+      - packages/cli/src/dev/
+      - references/skill-system-lifecycle.md
+      - changes/M69-skill-system-lifecycle-planning/S007-multi-adapter-skill-delivery-spike/
+    dependencies:
+      - S003
+      - S006
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - git diff --check
+    acceptance:
+      - The spike proves adapter boundaries without changing Codex output semantics.
+      - No new generated platform surface is committed unless explicitly accepted.
+      - The result identifies what must be formalized before multi-platform support becomes product behavior.
+operations:
+  - operation_id: OP001
+    operation_type: select
+    target_candidate_ids:
+      - S001
+    actor: agent
+    reason: >
+      Cross-queue selection preferred M69/S001 over M68/H003 because H003 is a
+      high-risk generated runtime surface and S001 establishes the skill
+      lifecycle contract that should guide it.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP002
+    operation_type: complete
+    target_candidate_ids:
+      - S001
+    actor: agent
+    reason: Native skill lifecycle contract reference was written and linked from planning contracts.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/skill-system-lifecycle.md
+      - references/planning-artifact-contracts.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP003
+    operation_type: status_change
+    target_candidate_ids:
+      - S002
+    actor: agent
+    reason: S001 completed the contract dependency required before generated metadata work.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - references/skill-system-lifecycle.md
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - S002
+    actor: agent
+    reason: S002 is ready after S001 and unlocks metadata validation work.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S002-generated-skill-metadata/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - S002
+    actor: agent
+    reason: Generated Codex skills now include structured metadata and runtime verification checks it.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/adapters/codex/src/constants.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/manifest.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/openworkflow-adapter.yaml
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP006
+    operation_type: status_change
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: S001 and S002 are complete, satisfying the generated skill format validation dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: S004 is ready after S001 and S002 and is the next non-high-risk validation hardening change.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - S004
+    actor: agent
+    reason: Repository contract validation now enforces generated Codex skill frontmatter, metadata, generated markers, and protocol blocks.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: S002 and S004 are complete, satisfying generated-surface drift and parity test dependencies.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: S005 is ready after S002 and S004 and is the next non-high-risk generated-surface hardening change.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S005-generated-surface-drift-tests/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - S005
+    actor: agent
+    reason: Repository validation now checks generated surface parity across registry, audit indexes, Codex manifest, and generated_files.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: git diff --check"
+  - operation_id: OP012
+    operation_type: status_change
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: S006 depends only on S001, which is complete, and is the remaining non-high-risk queue item.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/CANDIDATE_CHANGES.yaml
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: S006 is ready and is the remaining non-high-risk design item in the queue.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/SELECTED_CHANGE.yaml
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/ATOM_TASKS.yaml
+      - changes/M69-skill-system-lifecycle-planning/S006-dynamic-instruction-envelope/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - S006
+    actor: agent
+    reason: Dynamic instruction envelope design was documented without adding runtime command or adapter behavior.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - references/artifact-instruction-envelope.md
+      - references/skill-system-lifecycle.md
+      - "validation: npm run validate"
+      - "validation: git diff --check"
+  - operation_id: OP015
+    operation_type: query
+    target_candidate_ids:
+      - S003
+      - S007
+    actor: agent
+    reason: >
+      High-risk stop converted into a decision report before implementation,
+      covering concrete risks, options, recommended path, guardrails, and
+      go/stop criteria.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: candidate
+    evidence:
+      - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md

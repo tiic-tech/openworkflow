@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G016-autonomous-git-automation-lifecycle
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G016-autonomous-git-automation-lifecycle
+title: Atom tasks for autonomous git automation lifecycle contract
+status: done
+tasks:
+  - task_id: T001
+    title: Record approved high-risk option
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/G016-autonomous-git-automation-lifecycle/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - The report records approval of Option B.
+      - The report states that remote mutation implementation remains out of scope.
+  - task_id: T002
+    title: Define autonomous lifecycle contract
+    status: done
+    type: document
+    owned_paths:
+      - references/git-automation-governance.md
+    done_when:
+      - Autonomous enablement configuration is documented.
+      - Operation matrix, evidence records, merge gates, conflict policy, and rollback are documented.
+      - The implementation path names simulator and narrow pilot stages before full autonomous mode.
+  - task_id: T003
+    title: Update candidate queue
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G016 selection and completion evidence are recorded.
+      - G017 read-only simulator candidate is added as the next recommended candidate.
+  - task_id: T004
+    title: Validate contract-only change
+    status: done
+    type: verify
+    owned_paths:
+      - references/git-automation-governance.md
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

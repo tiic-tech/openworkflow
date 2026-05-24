@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: selected_change:G006-branch-per-feat-dogfood-fixtures
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G006-branch-per-feat-dogfood-fixtures
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G006
+title: Add dogfood fixtures for branch-per-feat workflow
+status: done
+selection_reason: >
+  G006 is ready after G002, G003, G004, and G005. It adds fixture evidence that
+  the branch-per-feat workflow can be audited by runtime verification without
+  mutating git history.
+rejected_alternatives:
+  - candidate_ref: G009
+    reason: gh operation boundaries can follow local branch-per-feat fixture coverage.
+  - candidate_ref: G007
+    reason: high-risk automation decisions are still blocked on G009.
+scope:
+  includes:
+    - example queue metadata with branch boundary
+    - example completed candidate with commit evidence
+    - example PR-ready summary or summary linkage
+    - validation fixtures that protect against stale or contradictory metadata
+  excludes:
+    - changing actual git history
+    - opening PRs
+    - broad generated-surface regeneration
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/
+forbidden_paths:
+  - packages/core/**
+  - skills/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - Runtime-surface verification exercises branch-per-feat metadata.
+  - Fixtures prove a completed selected change can be audited back to a commit.
+  - Fixtures prove a feat summary can be audited back to the candidate queue.
+  - The fixture scope remains planning-only and does not mutate git history.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/BRANCH_PER_FEAT_FIXTURE.md
+    - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/EXAMPLE_PR_READY_SUMMARY.md
+    - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G006-branch-per-feat-dogfood-fixtures/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"

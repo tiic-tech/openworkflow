@@ -4,10 +4,26 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
+import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 
 const CURRENT_FILE = fileURLToPath(import.meta.url);
 const REPO_ROOT = resolve(dirname(CURRENT_FILE), "../../../..");
 const CLI = join(REPO_ROOT, "dist", "cli", "src", "index.js");
+const SKILL_NAMES = [
+  "ow-workflow",
+  "ow-context",
+  "ow-vision",
+  "ow-validation",
+  "ow-proto",
+  "ow-tune",
+  "ow-decision",
+  "ow-design",
+  "ow-spec",
+  "ow-change",
+  "ow-team",
+  "ow-git-automation",
+] as const;
 
 async function main(): Promise<number> {
   await assertFile(CLI);
@@ -41,6 +57,12 @@ async function main(): Promise<number> {
     await rm(tempRoot, { recursive: true, force: true });
   }
 
+  await verifyGeneratedSkillRepositoryValidation();
+  await verifyGitGovernanceDogfoodFixtures();
+  await verifyLocalFeatBranchAutomation();
+  await verifySelectedChangeCommitAutomation();
+  await verifyPrReadySummaryGeneration();
+  await verifyGitAutomationManagedShell();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -109,6 +131,49 @@ async function runCapture(command: string[], env: NodeJS.ProcessEnv): Promise<st
   });
 }
 
+async function runInCwd(cwd: string, command: string[]): Promise<void> {
+  await new Promise<void>((resolvePromise, reject) => {
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd,
+      env: process.env,
+      stdio: "ignore",
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise();
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}`));
+      }
+    });
+  });
+}
+
+async function runCaptureInCwd(cwd: string, command: string[]): Promise<string> {
+  return new Promise<string>((resolvePromise, reject) => {
+    let output = "";
+    const child = spawn(command[0] ?? "", command.slice(1), {
+      cwd,
+      env: process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    child.stdout.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise(output);
+      } else {
+        reject(new Error(`command failed (${code ?? "signal"}): ${command.join(" ")}\n${output}`));
+      }
+    });
+  });
+}
+
 async function verifyAgentsGuide(root: string): Promise<void> {
   const guide = await read(join(root, "AGENTS.md"));
   for (const required of [
@@ -143,6 +208,7 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
+    "/ow:git-automation",
     "Respect lazy creation",
   ]) {
     assert(guide.includes(required), `AGENTS.md missing onboarding guidance: ${required}`);
@@ -171,6 +237,7 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
     "/ow:team",
+    "/ow:git-automation",
     "Lazy creation boundary",
     "Sync safety",
     "status",
@@ -194,6 +261,8 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "--strict",
     "summarize",
     "pass --write to update summary files",
+    "git-automation",
+    "Managed git lifecycle shell",
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
@@ -422,10 +491,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(entries), "summary health entries must be array");
   assert(entries.some((entry) => record(entry, "summary entry").artifact_type === "prototype_evidence" && record(entry, "summary entry").status === "missing"), "summary health did not report missing prototype summary");
   const missingCheckStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(missingCheckStatus.code !== 0, "proto check should fail without required validation context");
+  assert(missingCheckStatus.code === 0, "proto check should stay ready when only prototype summary health is missing");
   const missingCheck = parseJsonReport(missingCheckStatus.output, "check");
+  assert(missingCheck.ok === true, "proto check should report ok=true when summary health is only advisory");
   assert(Array.isArray(missingCheck.warnings) && missingCheck.warnings.some((item) => String(item).includes("summary health for prototype_evidence")), "check warnings missing summary health promotion");
-  assert(nonEmptyArray(missingCheck.health_errors), "blocked check should expose health_errors");
+  assert(Array.isArray(missingCheck.health_errors) && missingCheck.health_errors.length === 0, "advisory proto check should not expose blocker health_errors");
 
   const dryRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--json"], env), "summarize");
   const dryEffects = record(dryRun.effects, "summarize dry-run effects");
@@ -452,7 +522,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(currentPrototypeItem !== undefined, "summary health missing prototype item");
   const currentPrototypeRecord = record(currentPrototypeItem, "prototype summary item");
   assert(currentPrototypeRecord.quality_status === "current_but_thin", "fresh thin prototype summary should report current_but_thin quality");
-  assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prototype_artifact"), "thin prototype summary should report empty key fields");
+  assert(Array.isArray(currentPrototypeRecord.empty_key_fields) && currentPrototypeRecord.empty_key_fields.includes("prompt_pack_type"), "thin prototype summary should report empty key fields");
   assert(Array.isArray(currentPrototypeRecord.quality_warnings) && currentPrototypeRecord.quality_warnings.some((item) => String(item).includes("empty handoff fields")), "thin prototype summary should report quality warnings");
   assert(currentAfterWrite.ok === true, "current but thin summary should not fail freshness health");
   const strictSummaryStatus = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--strict", "--json"], env);
@@ -536,7 +606,7 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
   assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "current"), "summary health did not report current validation current_slice");
   const protoContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:proto", "--json"], env);
-  assert(protoContextStatus.code !== 0, "proto context should return nonzero while readiness blockers exist");
+  assert(protoContextStatus.code === 0, "proto context should stay ready with vision-only semantics when no current validation pointer is set");
   const protoContext = parseJsonReport(protoContextStatus.output, "context");
   const protoContextData = record(protoContext.data, "proto context data");
   assert(Array.isArray(protoContextData.included) && protoContextData.included.some((item) => record(item, "included proto context").source === "current_slice" && record(item, "included proto context").path === ".openworkflow/validation/val-1/VALIDATION.yaml"), "proto context should include validation current_slice");
@@ -585,9 +655,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(nonEmptyArray(inspect.health_errors), "inspect should expose health_errors when health fails");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(checkStatus.code !== 0, "proto check should fail without required validation context");
+  assert(checkStatus.code === 0, "proto check should stay ready when summary health is advisory");
   const check = parseJsonReport(checkStatus.output, "check");
   const checkData = record(check.data, "check data");
+  assert(check.ok === true, "proto check should report ok=true without current validation blockers");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
 
 }
@@ -698,10 +769,10 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(currentIndex.includes("current_validation: val-draft"), "register current did not update index pointer");
 
   const draftProtoCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(draftProtoCheck.code !== 0, "proto check should block when current validation is still a draft scaffold");
+  assert(draftProtoCheck.code !== 0, "proto check should block when optional current validation is still a draft scaffold");
   const draftProtoReport = parseJsonReport(draftProtoCheck.output, "check");
   const draftProtoData = record(draftProtoReport.data, "draft proto check data");
-  assert(draftProtoReport.ok === false, "draft current validation should make proto check ok=false");
+  assert(draftProtoReport.ok === false, "draft optional current validation should make proto check ok=false");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("status must be beyond draft")), "proto check missing draft status blocker");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("core_question must be non-empty")), "proto check missing core_question readiness blocker");
 
@@ -848,13 +919,20 @@ async function verifyConfig(root: string): Promise<void> {
 }
 
 async function verifyNoDefaultPrompts(codexHome: string): Promise<void> {
-  for (const name of ["ow-vision.md", "ow-validation.md", "ow-proto.md", "ow-tune.md", "ow-design.md", "ow-spec.md", "ow-change.md", "ow-team.md"]) {
-    assert(!(await exists(join(codexHome, "prompts", name))), `default global prompt generated unexpectedly: ${name}`);
+  for (const name of SKILL_NAMES) {
+    const promptName = `${name}.md`;
+    assert(!(await exists(join(codexHome, "prompts", promptName))), `default global prompt generated unexpectedly: ${promptName}`);
   }
 }
 
 async function verifySkills(root: string): Promise<void> {
-  for (const name of ["ow-vision", "ow-validation", "ow-proto", "ow-tune", "ow-decision", "ow-design", "ow-spec", "ow-change", "ow-team"]) {
+  const manifest = await read(join(root, ".agents", "openworkflow-adapter.yaml"));
+  assert(manifest.includes("metadata_fields:"), "Codex manifest missing skill metadata fields");
+  assert(manifest.includes("generated_by"), "Codex manifest missing generated_by metadata field");
+  assert(manifest.includes("source_command_id"), "Codex manifest missing source command metadata field");
+  assert(manifest.includes("semantic_trigger"), "Codex manifest missing semantic trigger metadata field");
+
+  for (const name of SKILL_NAMES) {
     const skill = join(root, ".agents", "skills", name, "SKILL.md");
     const interfaceFile = join(root, ".agents", "skills", name, "agents", "openai.yaml");
     await assertFile(skill);
@@ -864,6 +942,14 @@ async function verifySkills(root: string): Promise<void> {
     assert(skillContent.startsWith("---\n"), `${name} missing SKILL.md frontmatter`);
     assert(skillContent.includes(`name: "${name}"`), `${name} missing skill name`);
     assert(skillContent.includes("description:"), `${name} missing skill description`);
+    assert(skillContent.includes("metadata:"), `${name} missing generated metadata`);
+    assert(skillContent.includes('generated_by: "openworkflow"'), `${name} missing generated_by metadata`);
+    assert(skillContent.includes('adapter: "codex"'), `${name} missing adapter metadata`);
+    assert(skillContent.includes('adapter_version: "0.1.0"'), `${name} missing adapter_version metadata`);
+    assert(skillContent.includes(`template_id: "codex.skill.ow.${name.replace("ow-", "")}"`), `${name} missing template_id metadata`);
+    assert(skillContent.includes(`source_command_id: "${name.replace("ow-", "")}"`), `${name} missing source_command_id metadata`);
+    assert(skillContent.includes(`semantic_trigger: "/ow:${name.replace("ow-", "")}"`), `${name} missing semantic_trigger metadata`);
+    assert(skillContent.includes(`skill_name: "${name}"`), `${name} missing skill_name metadata`);
     assert(skillContent.includes("generated-by: openworkflow"), `${name} missing generated marker`);
     assert(skillContent.includes("<user_behavior>"), `${name} missing user behavior block`);
     assert(skillContent.includes("<agent_protocol>"), `${name} missing agent protocol block`);
@@ -896,12 +982,458 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-team") {
       verifyTeamSkill(skillContent);
     }
+    if (name === "ow-git-automation") {
+      verifyGitAutomationSkill(skillContent);
+    }
     const semanticCommand = `/${name.replace("ow-", "ow:")}`;
     const displayName = semanticCommand.slice(1);
     assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
     assert(!hasYamlScalar(interfaceContent, "display_name", semanticCommand), `${name} display name includes semantic slash`);
     assert(skillContent.includes(`Semantic command: ${semanticCommand}`), `${name} missing semantic command`);
     assert(interfaceContent.includes("default_prompt:"), `${name} missing default prompt`);
+  }
+}
+
+async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
+  const skill = join(REPO_ROOT, ".agents", "skills", "ow-proto", "SKILL.md");
+  const manifest = join(REPO_ROOT, ".agents", "openworkflow-adapter.yaml");
+  const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
+  const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
+  const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
+  const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
+  const original = await read(skill);
+  const originalManifest = await read(manifest);
+  const originalCommandAudit = await read(commandAudit);
+  const originalHighRiskReport = await read(highRiskReport);
+  const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
+  try {
+    await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
+    const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingMetadata.code !== 0, "validate passed after generated skill metadata was removed");
+    assert(missingMetadata.output.includes("metadata.generated_by"), "missing metadata validation did not explain generated metadata failure");
+
+    await writeFile(skill, original.replace("# /ow:proto", "<skill>\n# /ow:proto\n</skill>"), "utf8");
+    const malformedWrapper = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedWrapper.code !== 0, "validate passed after generated skill was wrapped in <skill>");
+    assert(malformedWrapper.output.includes("must not use a top-level <skill> XML wrapper"), "malformed wrapper validation did not explain skill wrapper failure");
+
+    await writeFile(manifest, originalManifest.replace("  - .agents/skills/ow-proto/SKILL.md\n", ""), "utf8");
+    const missingGeneratedFile = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingGeneratedFile.code !== 0, "validate passed after Codex manifest generated_files drifted");
+    assert(missingGeneratedFile.output.includes("generated_files missing .agents/skills/ow-proto/SKILL.md"), "generated_files drift validation did not explain missing generated file");
+
+    await writeFile(commandAudit, originalCommandAudit.replace("    trigger: /ow:proto\n", "    trigger: /ow:proto-drift\n"), "utf8");
+    const commandAuditDrift = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(commandAuditDrift.code !== 0, "validate passed after command audit trigger drifted");
+    assert(commandAuditDrift.output.includes("COMMAND_AUDIT_INDEX.yaml proto trigger must be /ow:proto"), "command audit drift validation did not explain trigger mismatch");
+
+    await writeFile(highRiskReport, originalHighRiskReport.replace("## Validation Expectations", "## Validation Notes"), "utf8");
+    const missingHighRiskSection = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingHighRiskSection.code !== 0, "validate passed after high-risk report section was removed");
+    assert(missingHighRiskSection.output.includes("missing high-risk report section: Validation Expectations"), "high-risk report validation did not explain missing section");
+
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue.replace("branch_boundary: codex/m71-git-version-governance", "branch_boundary: bad branch with spaces"), "utf8");
+    const malformedBranchBoundary = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedBranchBoundary.code !== 0, "validate passed after branch boundary was malformed");
+    assert(malformedBranchBoundary.output.includes("queue_policy.branch_boundary"), "branch boundary validation did not explain malformed branch boundary");
+  } finally {
+    await writeFile(skill, original, "utf8");
+    await writeFile(manifest, originalManifest, "utf8");
+    await writeFile(commandAudit, originalCommandAudit, "utf8");
+    await writeFile(highRiskReport, originalHighRiskReport, "utf8");
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+  }
+}
+
+async function verifyGitGovernanceDogfoodFixtures(): Promise<void> {
+  const queue = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml"));
+  const fixture = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "G006-branch-per-feat-dogfood-fixtures", "BRANCH_PER_FEAT_FIXTURE.md"));
+  const prReadyExample = await read(join(REPO_ROOT, "changes", "M71-git-version-control-governance", "G006-branch-per-feat-dogfood-fixtures", "EXAMPLE_PR_READY_SUMMARY.md"));
+
+  assert(queue.includes("branch_boundary: codex/m71-git-version-governance"), "M71 queue missing branch boundary fixture");
+  assert(queue.includes("completed_by_change_id: G004-git-governance-validation"), "M71 queue missing completed selected-change evidence");
+  assert(fixture.includes("selected change -> commit"), "branch-per-feat fixture missing commit boundary");
+  assert(fixture.includes("CANDIDATE_CHANGES -> feat branch"), "branch-per-feat fixture missing feat branch boundary");
+  assert(prReadyExample.includes("## Completed Changes"), "PR-ready example missing completed changes section");
+  assert(prReadyExample.includes("## Validation"), "PR-ready example missing validation section");
+  assert(prReadyExample.includes("does not mean a PR was opened"), "PR-ready example must avoid implying remote PR mutation");
+}
+
+async function verifyLocalFeatBranchAutomation(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-local-git-automation-"));
+  try {
+    const gitRoot = join(tempRoot, "local-branch-automation");
+    await mkdir(gitRoot, { recursive: true });
+    await runInCwd(gitRoot, ["git", "init"]);
+    await runInCwd(gitRoot, ["git", "-c", "user.name=OpenWorkflow Test", "-c", "user.email=openworkflow@example.invalid", "commit", "--allow-empty", "-m", "initial"]);
+
+    const preview = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(preview.ok, `local branch preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.action === "create_branch", "local branch preview should create missing branch");
+    assert(preview.preview?.args.join(" ") === "switch -c codex/m71-local-branch-fixture", "local branch preview command mismatch");
+
+    const created = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: false,
+    });
+    assert(created.ok, `local branch creation failed: ${created.errors.join(", ")}`);
+    assert(created.currentBranch === "codex/m71-local-branch-fixture", "local branch automation did not switch to created branch");
+
+    await runInCwd(gitRoot, ["git", "switch", "-c", "scratch"]);
+    const checkoutExisting = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(checkoutExisting.ok, `existing branch preview failed: ${checkoutExisting.errors.join(", ")}`);
+    assert(checkoutExisting.action === "checkout_existing_branch", "existing branch preview should checkout branch");
+
+    await writeFile(join(gitRoot, "dirty.txt"), "dirty\n", "utf8");
+    const dirty = await ensureLocalFeatBranch({
+      root: gitRoot,
+      branchBoundary: "codex/m71-local-branch-fixture",
+      dryRun: true,
+    });
+    assert(!dirty.ok, "local branch automation should refuse dirty trees");
+    assert(dirty.dirtyPaths.length > 0, "dirty-tree refusal should report dirty paths");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifySelectedChangeCommitAutomation(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-local-commit-automation-"));
+  try {
+    const gitRoot = join(tempRoot, "selected-change-commit");
+    await mkdir(gitRoot, { recursive: true });
+    await runInCwd(gitRoot, ["git", "init"]);
+    await runInCwd(gitRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(gitRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(gitRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(gitRoot, ["git", "switch", "-c", "codex/m71-commit-fixture"]);
+
+    await mkdir(join(gitRoot, "allowed"), { recursive: true });
+    await writeFile(join(gitRoot, "allowed", "change.txt"), "selected change\n", "utf8");
+    await writeFile(join(gitRoot, "unrelated.txt"), "unrelated\n", "utf8");
+
+    const unrelated = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(!unrelated.ok, "commit automation should refuse unrelated dirty paths");
+    assert(unrelated.unrelatedDirtyPaths.includes("unrelated.txt"), "commit automation should report unrelated dirty path");
+
+    await unlink(join(gitRoot, "unrelated.txt"));
+    const preview = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(preview.ok, `commit automation preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.preview?.args.join(" ") === "commit -m M71-git-version-control-governance/G013 Commit selected change fixture", "commit preview command mismatch");
+
+    const committed = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      evidencePath: "changes/G013/LOCAL_COMMIT_EVIDENCE.yaml",
+      commitEvidence: true,
+      dryRun: false,
+    });
+    assert(committed.ok, `commit automation execution failed: ${committed.errors.join(", ")}`);
+    assert(/^[0-9a-f]{40}$/i.test(committed.primaryCommit ?? ""), "commit automation did not return primary commit hash");
+    assert(/^[0-9a-f]{40}$/i.test(committed.evidenceCommit ?? ""), "commit automation did not return evidence commit hash");
+    assert(committed.headCommit === committed.evidenceCommit, "commit automation should report evidence commit as final HEAD");
+
+    const evidence = await read(join(gitRoot, "changes", "G013", "LOCAL_COMMIT_EVIDENCE.yaml"));
+    assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
+    const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
+    assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifyPrReadySummaryGeneration(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-pr-ready-summary-"));
+  try {
+    const queuePath = "changes/M71-fixture/CANDIDATE_CHANGES.yaml";
+    await mkdir(join(tempRoot, "changes", "M71-fixture"), { recursive: true });
+    await writeFile(join(tempRoot, queuePath), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-fixture",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-fixture",
+      "title: Candidate changes for fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-fixture",
+      "validation:",
+      "  commands_run:",
+      "    - npm run validate",
+      "changes:",
+      "  - id: G001",
+      "    status: done",
+      "    title: Completed fixture change",
+      "    risk: low",
+      "    selection:",
+      "      selected_change_id: G001-fixture",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "        - 'validation: git diff --check'",
+      "  - id: G002",
+      "    status: blocked",
+      "    title: Blocked fixture change",
+      "    risk: medium",
+      "  - id: G003",
+      "    status: ready",
+      "    title: High-risk fixture command",
+      "    risk: high",
+      "",
+    ].join("\n"), "utf8");
+
+    const preview = await generatePrReadySummary({ root: tempRoot, queuePath, dryRun: true });
+    assert(preview.ok, `PR-ready summary preview failed: ${preview.errors.join(", ")}`);
+    assert(preview.content.includes("This is a local review handoff artifact"), "PR-ready preview must state local-only boundary");
+    assert(preview.content.includes("commit: abcdef1"), "PR-ready preview missing commit evidence");
+    assert(preview.content.includes("G002"), "PR-ready preview missing blocked candidate");
+    assert(preview.content.includes("G003"), "PR-ready preview missing high-risk candidate");
+    assert(preview.warnings.length > 0, "PR-ready preview should warn when queue is not fully complete");
+
+    const written = await generatePrReadySummary({ root: tempRoot, queuePath, dryRun: false });
+    assert(written.ok, `PR-ready summary write failed: ${written.errors.join(", ")}`);
+    const output = await read(join(tempRoot, "changes", "M71-fixture", "PR_READY_SUMMARY.md"));
+    assert(output.includes("Remote PR creation or mutation requires separate gh operation governance"), "PR-ready summary missing remote approval boundary");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function verifyGitAutomationManagedShell(): Promise<void> {
+  const tempRoot = await mkdtemp(join(tmpdir(), "openworkflow-git-automation-shell-"));
+  const remoteRoot = `${tempRoot}-remote.git`;
+  try {
+    await runInCwd(tempRoot, ["git", "init"]);
+    await runInCwd(tempRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(tempRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(tempRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(tempRoot, ["git", "switch", "-c", "codex/m71-shell-fixture"]);
+    await writeFile(join(tempRoot, "change.txt"), "change\n", "utf8");
+    await runInCwd(tempRoot, ["git", "add", "change.txt"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "M71/G015 shell fixture"]);
+    await runInCwd(tempRoot, ["git", "init", "--bare", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "remote", "add", "origin", remoteRoot]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "master"]);
+    await runInCwd(tempRoot, ["git", "push", "origin", "codex/m71-shell-fixture"]);
+    await mkdir(join(tempRoot, "changes", "M71-shell"), { recursive: true });
+    await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-shell",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-shell",
+      "title: Candidate changes for shell fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-shell-fixture",
+      "changes:",
+      "  - id: G015",
+      "    status: done",
+      "    title: Shell fixture",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "",
+    ].join("\n"), "utf8");
+
+    const remote = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "remote",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--operation",
+      "pr",
+      "--base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(remote.code !== 0, "managed remote operation should be refused without approval");
+    const remoteReport = parseJsonReport(remote.output, "git-automation remote");
+    const data = record(remoteReport.data, "git-automation remote data");
+    assert(data.refused === true, "managed remote report should mark operation refused");
+    assert(Array.isArray(data.remote_operation_plan), "managed remote report missing operation plan");
+    assert(Array.isArray(data.ordered_local_commits), "managed remote report missing ordered local commits");
+    assert((data.ordered_local_commits as unknown[]).length > 0, "managed remote report should include ordered commits from base");
+    assert(remote.output.includes("does not execute it"), "managed remote report missing non-execution reason");
+
+    await writeFile(join(tempRoot, "changes", "M71-shell", "PR_READY_SUMMARY.md"), "# PR Ready\n", "utf8");
+    const simulate = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "simulate",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(simulate.code !== 0, "simulator should report blockers when validation evidence is missing");
+    const simulateReport = parseJsonReport(simulate.output, "git-automation simulate");
+    const simulateData = record(simulateReport.data, "git-automation simulate data");
+    const simulateResult = record(simulateData.result, "git-automation simulate result");
+    assert(simulateResult.mutation_performed === false, "simulator must report no mutation");
+    assert(Array.isArray(simulateResult.orderedLocalCommits), "simulator missing ordered local commits");
+    assert((simulateResult.orderedLocalCommits as unknown[]).length > 0, "simulator should include ordered local commits");
+    assert(Array.isArray(simulateResult.rollbackPlan), "simulator missing rollback plan");
+    assert(Array.isArray(simulateResult.blockers), "simulator missing blockers");
+    assert(simulate.output.includes("validation evidence is missing"), "simulator should report missing validation blocker");
+
+    await writeFile(join(tempRoot, "changes", "M71-shell", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M71-shell",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M71-shell",
+      "title: Candidate changes for shell fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m71-shell-fixture",
+      "changes:",
+      "  - id: G017",
+      "    status: done",
+      "    title: Build read-only autonomous git simulator",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: feed017'",
+      "        - 'validation: npm run verify:runtime-surface'",
+      "  - id: G019",
+      "    status: done",
+      "    title: Remote readonly plan fixture",
+      "    risk: high",
+      "    completion:",
+      "      evidence:",
+      "        - 'commit: abcdef1'",
+      "        - 'validation: npm run validate'",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(tempRoot, ["git", "add", "changes/M71-shell/CANDIDATE_CHANGES.yaml", "changes/M71-shell/PR_READY_SUMMARY.md"]);
+    await runInCwd(tempRoot, ["git", "commit", "-m", "M71/G019 remote plan fixture evidence"]);
+    const remotePlan = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "remote-plan",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(remotePlan.code === 0, `remote-plan should succeed with read-only fixture evidence: ${remotePlan.output}`);
+    const remotePlanReport = parseJsonReport(remotePlan.output, "git-automation remote-plan");
+    const remotePlanData = record(remotePlanReport.data, "git-automation remote-plan data");
+    const remotePlanResult = record(remotePlanData.result, "git-automation remote-plan result");
+    assert(remotePlanResult.mutation_performed === false, "remote-plan must report no mutation");
+    const targetIdentity = record(remotePlanResult.targetIdentity, "remote-plan target identity");
+    assert(targetIdentity.remote === "origin", "remote-plan should record target remote");
+    const remoteState = record(remotePlanResult.remoteState, "remote-plan remote state");
+    assert(typeof remoteState.baseHead === "string", "remote-plan should read remote base head");
+    assert(typeof remoteState.branchHead === "string", "remote-plan should read remote branch head");
+    assert(Array.isArray(remotePlanResult.readOnlyPlan), "remote-plan missing read-only plan");
+    assert(remotePlan.output.includes("did not push"), "remote-plan should state non-mutation boundary");
+
+    const draftPreview = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--json",
+    ], process.env);
+    assert(draftPreview.code === 0, `draft-pr preview should succeed without mutation: ${draftPreview.output}`);
+    const draftPreviewReport = parseJsonReport(draftPreview.output, "git-automation draft-pr");
+    const draftPreviewData = record(draftPreviewReport.data, "git-automation draft-pr data");
+    const draftPreviewResult = record(draftPreviewData.result, "git-automation draft-pr result");
+    assert(draftPreviewResult.mutation_performed === false, "draft-pr preview must not mutate");
+    assert(typeof draftPreviewResult.bodyDigest === "string", "draft-pr preview should include body digest");
+    const draftPreviewCommand = record(draftPreviewResult.preview, "draft-pr preview command");
+    assert(Array.isArray(draftPreviewCommand.args), "draft-pr preview missing command args");
+    assert((draftPreviewCommand.args as unknown[]).includes("--draft"), "draft-pr preview should create a draft PR");
+
+    const draftWriteBlocked = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "draft-pr",
+      "--root",
+      tempRoot,
+      "--queue",
+      "changes/M71-shell/CANDIDATE_CHANGES.yaml",
+      "--base",
+      "master",
+      "--remote",
+      "origin",
+      "--target-base",
+      "master",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(draftWriteBlocked.code !== 0, "draft-pr write should be blocked without --allow-draft-pr");
+    assert(draftWriteBlocked.output.includes("requires --allow-draft-pr"), "draft-pr write blocker should name allow flag");
+  } finally {
+    await rm(tempRoot, { recursive: true, force: true });
+    await rm(remoteRoot, { recursive: true, force: true });
   }
 }
 
@@ -945,6 +1477,24 @@ function verifyTeamSkill(content: string): void {
   }
 }
 
+function verifyGitAutomationSkill(content: string): void {
+  for (const required of [
+    "managed-git-lifecycle-shell",
+    "<mode_policy>",
+    "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
+    "<evidence_policy>",
+    "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+    "openworkflow git-automation branch",
+    "openworkflow git-automation commit",
+    "openworkflow git-automation summary",
+    "openworkflow git-automation simulate",
+    "openworkflow git-automation remote-plan",
+    "openworkflow git-automation draft-pr",
+  ]) {
+    assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
+  }
+}
+
 function hasYamlScalar(content: string, key: string, value: string): boolean {
   return content.includes(`${key}: ${value}`) || content.includes(`${key}: "${value}"`);
 }
@@ -970,42 +1520,39 @@ function verifyVisionSkill(content: string): void {
 
 function verifyProtoSkill(content: string): void {
   for (const required of [
-    "<prototype_classification>",
-    "prototype mode",
-    "visual, interaction, technical feasibility, 3D/material, workflow, or data/logic",
-    "<reference_extraction>",
-    "reference-pattern extraction",
-    "target image, URL, screenshot, HTML/CSS",
-    "<visual_first_path>",
-    "high-fidelity static concept",
-    "image generation",
-    "visual_concept_policy.image_generation",
-    "<design_seed_protocol>",
-    "design system, template seed",
-    "<verification_protocol>",
-    "browser verification",
-    "screenshot",
-    "<self_critique>",
-    "philosophy, hierarchy, execution, specificity, restraint, accessibility, and responsive behavior",
-    "repair pass before evidence handoff",
+    "image-first-strategic-proto-prompt-pack",
+    "<validation_consumption>",
+    "validation_input.mode",
+    "<strategic_prompt_pack>",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "Each direction must include direction_id",
+    "<image_only_boundary>",
+    "Do not write HTML, CSS, runnable prototypes",
+    "<review_evidence>",
+    "Record selected direction",
+    "PROTO_PROMPT_PACK.yaml",
   ]) {
-    assert(content.includes(required), `ow-proto missing M16 guidance: ${required}`);
+    assert(content.includes(required), `ow-proto missing image-first prompt guidance: ${required}`);
   }
 }
 
 function verifyTuneSkill(content: string): void {
   for (const required of [
+    "screen-bound-prototype-refinement",
     "<target_resolution>",
-    "/ow:tune resolves to the current prototype by default.",
+    "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.",
     "/ow:tune:proto is an explicit alias",
-    "<proto_orchestration>",
-    "no current prototype exists but a current validation target exists",
-    "<revision_protocol>",
+    "<baseline_screen_audit>",
+    "Treat the screen group as one product system",
+    "<inheritance_delta_rules>",
+    "MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE",
+    "<screen_manifest>",
+    "Every screen prompt must include prompt_id",
     "<internal_decision_audit>",
     "Every tune pass must write or update a decision audit record internally.",
     "Do not expose /ow:decision as the next manual user step",
   ]) {
-    assert(content.includes(required), `ow-tune missing M17 guidance: ${required}`);
+    assert(content.includes(required), `ow-tune missing refined prompt guidance: ${required}`);
   }
 }
 
@@ -1068,7 +1615,11 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
+  assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
+  assert(extractBlock(protoSection, "forbidden_outputs").includes("review.html"), "proto forbidden outputs missing HTML review surface");
   assert(!extractBlock(tuneSection, "handoff_commands").includes("/ow:decision"), "tune exposes manual decision handoff");
+  assert(extractBlock(tuneSection, "allowed_outputs").includes("REFINED_PROTO_PROMPT_PACK.yaml"), "tune allowed outputs missing refined prompt pack");
+  assert(extractBlock(tuneSection, "forbidden_outputs").includes("review.html"), "tune forbidden outputs missing HTML review surface");
   assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");

@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
+import { getWorkflowCommands, type WorkflowCommand } from "../commands/registry.js";
 import { SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound } from "../fs/index.js";
@@ -18,6 +19,7 @@ const REQUIRED_FILES = [
   "references/discovery-artifact-contracts.md",
   "references/artifact-authoring-templates.md",
   "references/runtime-command-surface.md",
+  "references/proto2html-artifact-contracts.md",
   "schemas/openworkflow-contract.schema.json",
   "schemas/current-state.schema.json",
   "schemas/workflow-index.schema.json",
@@ -27,6 +29,7 @@ const REQUIRED_FILES = [
   "schemas/vision-session.schema.json",
   "schemas/validation-target.schema.json",
   "schemas/prototype-evidence.schema.json",
+  "schemas/html-prototype.schema.json",
   "schemas/decision-record.schema.json",
   "schemas/product-design.schema.json",
   "schemas/change.schema.json",
@@ -197,6 +200,33 @@ const REQUIRED_FILES = [
 
 const IGNORED_DIRS = new Set([".git", "node_modules", "dist", "build", "coverage"]);
 const COMMON_REQUIRED = ["schema_version", "contract_id", "contract_type", "title", "status"];
+const CODEX_SKILL_METADATA_FIELDS = [
+  "generated_by",
+  "adapter",
+  "adapter_version",
+  "template_id",
+  "source_command_id",
+  "semantic_trigger",
+  "skill_name",
+] as const;
+const REQUIRED_CODEX_SKILL_BLOCKS = [
+  "user_behavior",
+  "agent_protocol",
+  "working_protocol",
+  "artifact_checkpoint",
+  "codex_skill",
+] as const;
+const HIGH_RISK_REPORT_SECTIONS = [
+  "Trigger",
+  "Change",
+  "Concrete Risks",
+  "Decision Options",
+  "Recommended Path",
+  "Guardrails",
+  "Go Criteria",
+  "Stop Criteria",
+  "Validation Expectations",
+] as const;
 
 export async function validateRepositoryContracts(rootInput: string): Promise<ValidationResult> {
   const root = resolve(rootInput);
@@ -204,6 +234,9 @@ export async function validateRepositoryContracts(rootInput: string): Promise<Va
   await validateRequiredFiles(root, errors);
   await validateJsonSchemas(root, errors);
   await validateYamlContracts(root, errors);
+  await validateGeneratedCodexSkills(root, errors);
+  await validateGeneratedSurfaceParity(root, errors);
+  await validateHighRiskDecisionReports(root, errors);
   return { ok: errors.length === 0, errors };
 }
 
@@ -260,8 +293,518 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
+      validateCandidateChanges(root, path, data, errors);
     }
   }
+}
+
+async function validateGeneratedCodexSkills(root: string, errors: string[]): Promise<void> {
+  const manifestPath = join(root, ".agents", "openworkflow-adapter.yaml");
+  if (!(await exists(manifestPath))) {
+    return;
+  }
+
+  const label = relative(root, manifestPath);
+  let manifest: unknown;
+  try {
+    manifest = parseYaml(await readFile(manifestPath, "utf8"));
+  } catch (error) {
+    errors.push(`${label} is not valid YAML for generated skill validation: ${messageFor(error)}`);
+    return;
+  }
+  if (!isRecord(manifest)) {
+    errors.push(`${label} must be a mapping`);
+    return;
+  }
+  if (manifest.generated_by !== "openworkflow") {
+    errors.push(`${label} generated_by must be openworkflow for Codex skill validation`);
+  }
+  if (manifest.adapter !== "codex") {
+    errors.push(`${label} adapter must be codex for Codex skill validation`);
+  }
+  const adapterVersion = typeof manifest.adapter_version === "string" ? manifest.adapter_version : null;
+  if (!adapterVersion) {
+    errors.push(`${label} adapter_version must be a non-empty string`);
+  }
+  const namespace = typeof manifest.command_namespace === "string" ? manifest.command_namespace : "ow";
+  validateManifestSkillSurface(label, manifest.skill_surface, errors);
+
+  const commands = manifest.commands;
+  if (!Array.isArray(commands) || commands.length === 0) {
+    errors.push(`${label} commands must be a non-empty list`);
+    return;
+  }
+  for (const [index, command] of commands.entries()) {
+    if (!isRecord(command)) {
+      errors.push(`${label} command ${index} must be a mapping`);
+      continue;
+    }
+    await validateGeneratedCodexSkill(root, label, command, namespace, adapterVersion ?? "", errors);
+  }
+}
+
+function validateManifestSkillSurface(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} skill_surface must be a mapping`);
+    return;
+  }
+  const frontmatter = value.frontmatter;
+  if (!Array.isArray(frontmatter) || !["name", "description", "metadata"].every((field) => frontmatter.includes(field))) {
+    errors.push(`${label} skill_surface.frontmatter must include name, description, and metadata`);
+  }
+  const metadataFields = value.metadata_fields;
+  if (!Array.isArray(metadataFields)) {
+    errors.push(`${label} skill_surface.metadata_fields must list generated metadata fields`);
+    return;
+  }
+  for (const field of CODEX_SKILL_METADATA_FIELDS) {
+    if (!metadataFields.includes(field)) {
+      errors.push(`${label} skill_surface.metadata_fields missing ${field}`);
+    }
+  }
+}
+
+async function validateGeneratedCodexSkill(
+  root: string,
+  manifestLabel: string,
+  command: Record<string, unknown>,
+  namespace: string,
+  adapterVersion: string,
+  errors: string[],
+): Promise<void> {
+  const commandId = stringField(command, "id");
+  const trigger = stringField(command, "trigger");
+  const skillName = stringField(command, "skill_name");
+  const skillPath = stringField(command, "skill_path");
+  const commandLabel = `${manifestLabel} command ${commandId || "<unknown>"}`;
+  if (!commandId || !trigger || !skillName || !skillPath) {
+    errors.push(`${commandLabel} must include id, trigger, skill_name, and skill_path`);
+    return;
+  }
+  const absoluteSkillPath = join(root, skillPath);
+  if (!existsSyncSafe(absoluteSkillPath)) {
+    errors.push(`${commandLabel} references missing generated skill ${skillPath}; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+
+  let content: string;
+  try {
+    if (!statSync(absoluteSkillPath).isFile()) {
+      errors.push(`${skillPath} must be a generated skill file`);
+      return;
+    }
+    content = await readFile(absoluteSkillPath, "utf8");
+  } catch (error) {
+    errors.push(`${skillPath} could not be read for generated skill validation: ${messageFor(error)}`);
+    return;
+  }
+  const frontmatter = parseSkillFrontmatter(skillPath, content, errors);
+  if (!frontmatter) {
+    return;
+  }
+  validateSkillFrontmatter(skillPath, frontmatter, {
+    adapterVersion,
+    commandId,
+    namespace,
+    skillName,
+    trigger,
+  }, errors);
+  validateSkillGeneratedMarker(skillPath, content, namespace, commandId, errors);
+  validateSkillProtocolBlocks(skillPath, content, errors);
+}
+
+function parseSkillFrontmatter(
+  skillPath: string,
+  content: string,
+  errors: string[],
+): Record<string, unknown> | null {
+  if (!content.startsWith("---\n")) {
+    errors.push(`${skillPath} missing SKILL.md frontmatter; update adapter source and run openworkflow sync --tools codex`);
+    return null;
+  }
+  const frontmatterEnd = content.indexOf("\n---\n", 4);
+  if (frontmatterEnd === -1) {
+    errors.push(`${skillPath} has unterminated SKILL.md frontmatter`);
+    return null;
+  }
+  let frontmatter: unknown;
+  try {
+    frontmatter = parseYaml(content.slice(4, frontmatterEnd));
+  } catch (error) {
+    errors.push(`${skillPath} has invalid SKILL.md frontmatter YAML: ${messageFor(error)}`);
+    return null;
+  }
+  if (!isRecord(frontmatter)) {
+    errors.push(`${skillPath} SKILL.md frontmatter must be a mapping`);
+    return null;
+  }
+  return frontmatter;
+}
+
+function validateSkillFrontmatter(
+  skillPath: string,
+  frontmatter: Record<string, unknown>,
+  expected: {
+    adapterVersion: string;
+    commandId: string;
+    namespace: string;
+    skillName: string;
+    trigger: string;
+  },
+  errors: string[],
+): void {
+  if (frontmatter.name !== expected.skillName) {
+    errors.push(`${skillPath} frontmatter.name must be ${expected.skillName}`);
+  }
+  if (!nonEmptyString(frontmatter.description)) {
+    errors.push(`${skillPath} frontmatter.description must be a non-empty string`);
+  }
+  const metadata = frontmatter.metadata;
+  if (!isRecord(metadata)) {
+    errors.push(`${skillPath} missing generated metadata; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+  const expectedMetadata: Record<string, string> = {
+    generated_by: "openworkflow",
+    adapter: "codex",
+    adapter_version: expected.adapterVersion,
+    template_id: `codex.skill.${expected.namespace}.${expected.commandId}`,
+    source_command_id: expected.commandId,
+    semantic_trigger: expected.trigger,
+    skill_name: expected.skillName,
+  };
+  for (const field of CODEX_SKILL_METADATA_FIELDS) {
+    if (metadata[field] !== expectedMetadata[field]) {
+      errors.push(`${skillPath} metadata.${field} must be ${expectedMetadata[field]}`);
+    }
+  }
+}
+
+function validateSkillGeneratedMarker(
+  skillPath: string,
+  content: string,
+  namespace: string,
+  commandId: string,
+  errors: string[],
+): void {
+  if (!content.includes("generated-by: openworkflow")) {
+    errors.push(`${skillPath} missing generated marker; update adapter source and run openworkflow sync --tools codex`);
+  }
+  const templateMarker = `template-id: codex.skill.${namespace}.${commandId}`;
+  if (!content.includes(templateMarker)) {
+    errors.push(`${skillPath} missing generated marker ${templateMarker}`);
+  }
+}
+
+function validateSkillProtocolBlocks(skillPath: string, content: string, errors: string[]): void {
+  if (/<\/?skill(?:\s|>)/.test(content)) {
+    errors.push(`${skillPath} must not use a top-level <skill> XML wrapper; generated skills are Markdown with YAML frontmatter and XML-like protocol blocks`);
+  }
+  for (const tag of REQUIRED_CODEX_SKILL_BLOCKS) {
+    validateRequiredSkillBlock(skillPath, content, tag, errors);
+  }
+}
+
+function validateRequiredSkillBlock(skillPath: string, content: string, tag: string, errors: string[]): void {
+  const openTag = `<${tag}>`;
+  const closeTag = `</${tag}>`;
+  const openCount = countOccurrences(content, openTag);
+  const closeCount = countOccurrences(content, closeTag);
+  if (openCount === 0 || closeCount === 0 || openCount !== closeCount) {
+    errors.push(`${skillPath} must contain a balanced <${tag}> protocol block`);
+    return;
+  }
+  if (tag !== "artifact_checkpoint" && (openCount !== 1 || closeCount !== 1)) {
+    errors.push(`${skillPath} must contain exactly one <${tag}> protocol block`);
+    return;
+  }
+  if (content.indexOf(openTag) > content.indexOf(closeTag)) {
+    errors.push(`${skillPath} <${tag}> protocol block closes before it opens`);
+  }
+}
+
+function countOccurrences(content: string, needle: string): number {
+  return content.split(needle).length - 1;
+}
+
+function stringField(record: Record<string, unknown>, key: string): string | null {
+  const value = record[key];
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+async function validateGeneratedSurfaceParity(root: string, errors: string[]): Promise<void> {
+  const commands = [...getWorkflowCommands()];
+  const commandAudit = await readYamlRecordForParity(root, ".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", errors);
+  if (commandAudit) {
+    validateCommandAuditParity(".openworkflow/audit/COMMAND_AUDIT_INDEX.yaml", commandAudit.commands, commands, errors);
+  }
+  const contextPackets = await readYamlRecordForParity(root, ".openworkflow/audit/CONTEXT_PACKETS.yaml", errors);
+  if (contextPackets) {
+    validateContextPacketParity(".openworkflow/audit/CONTEXT_PACKETS.yaml", contextPackets.packets, commands, errors);
+  }
+  const codexManifest = await readYamlRecordForParity(root, ".agents/openworkflow-adapter.yaml", errors);
+  if (codexManifest) {
+    await validateCodexManifestParity(root, ".agents/openworkflow-adapter.yaml", codexManifest, commands, errors);
+  }
+}
+
+async function readYamlRecordForParity(
+  root: string,
+  relativePath: string,
+  errors: string[],
+): Promise<Record<string, unknown> | null> {
+  const path = join(root, relativePath);
+  if (!(await exists(path))) {
+    return null;
+  }
+  try {
+    const data = parseYaml(await readFile(path, "utf8"));
+    if (isRecord(data)) {
+      return data;
+    }
+    errors.push(`${relativePath} must be a mapping for generated-surface parity validation`);
+  } catch (error) {
+    errors.push(`${relativePath} is not valid YAML for generated-surface parity validation: ${messageFor(error)}`);
+  }
+  return null;
+}
+
+function validateCommandAuditParity(
+  label: string,
+  value: unknown,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  const records = recordsById(label, "commands", value, "id", errors);
+  if (!records) {
+    return;
+  }
+  assertCommandIds(label, records, commands, errors);
+  for (const command of commands) {
+    const actual = records.get(command.id);
+    if (!actual) {
+      continue;
+    }
+    assertField(label, command.id, actual, "trigger", command.trigger, errors);
+    assertField(label, command.id, actual, "stage", command.stage, errors);
+    assertField(label, command.id, actual, "visibility", command.visibility, errors);
+    assertField(label, command.id, actual, "depth", command.protocol?.depth ?? "shallow", errors);
+    assertField(label, command.id, actual, "context_packet", `context:${command.id}`, errors);
+    assertStringArray(label, command.id, actual, "allowed_outputs", command.protocol?.allowedOutputs ?? command.targetArtifacts, errors);
+    assertStringArray(label, command.id, actual, "conditional_outputs", command.protocol?.conditionalOutputs ?? [], errors);
+    assertStringArray(label, command.id, actual, "forbidden_outputs", command.protocol?.forbiddenOutputs ?? [], errors);
+    assertStringArray(label, command.id, actual, "handoff_commands", command.protocol?.handoffCommands ?? [], errors);
+  }
+}
+
+function validateContextPacketParity(
+  label: string,
+  value: unknown,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  const records = recordsById(label, "packets", value, "packet_id", errors);
+  if (!records) {
+    return;
+  }
+  const expectedIds = new Set(commands.map((command) => `context:${command.id}`));
+  assertIdSet(label, "packets", records, expectedIds, errors);
+  for (const command of commands) {
+    const packetId = `context:${command.id}`;
+    const actual = records.get(packetId);
+    if (!actual) {
+      continue;
+    }
+    assertField(label, packetId, actual, "command", command.trigger, errors);
+    assertField(label, packetId, actual, "visibility", command.visibility, errors);
+    assertStringArray(label, packetId, actual, "required", command.protocol?.requiredContext ?? [".openworkflow/workflow/WORKFLOW_INDEX.yaml"], errors);
+    assertStringArray(label, packetId, actual, "optional", command.protocol?.optionalContext ?? [], errors);
+    assertStringArray(label, packetId, actual, "forbidden", command.protocol?.forbiddenContext ?? [], errors);
+    assertStringArray(label, packetId, actual, "conditional_outputs", command.protocol?.conditionalOutputs ?? [], errors);
+  }
+}
+
+async function validateCodexManifestParity(
+  root: string,
+  label: string,
+  manifest: Record<string, unknown>,
+  commands: WorkflowCommand[],
+  errors: string[],
+): Promise<void> {
+  const records = recordsById(label, "commands", manifest.commands, "id", errors);
+  if (!records) {
+    return;
+  }
+  assertCommandIds(label, records, commands, errors);
+  const expectedGeneratedFiles = new Set<string>();
+  for (const command of commands) {
+    const actual = records.get(command.id);
+    if (!actual) {
+      continue;
+    }
+    const skillName = `ow-${command.id}`;
+    const skillPath = `.agents/skills/${skillName}/SKILL.md`;
+    const interfacePath = `.agents/skills/${skillName}/agents/openai.yaml`;
+    expectedGeneratedFiles.add(skillPath);
+    expectedGeneratedFiles.add(interfacePath);
+    assertField(label, command.id, actual, "trigger", command.trigger, errors);
+    assertField(label, command.id, actual, "visibility", command.visibility, errors);
+    assertField(label, command.id, actual, "skill_name", skillName, errors);
+    assertField(label, command.id, actual, "explicit_invocation", `$${skillName}`, errors);
+    assertField(label, command.id, actual, "skill_path", skillPath, errors);
+    assertField(label, command.id, actual, "interface_path", interfacePath, errors);
+    assertStringArray(label, command.id, actual, "legacy_triggers", command.legacyTriggers, errors);
+  }
+  await validateManifestGeneratedFiles(root, label, manifest.generated_files, expectedGeneratedFiles, errors);
+}
+
+async function validateManifestGeneratedFiles(
+  root: string,
+  label: string,
+  value: unknown,
+  expectedGeneratedFiles: Set<string>,
+  errors: string[],
+): Promise<void> {
+  if (!Array.isArray(value)) {
+    errors.push(`${label} generated_files must be a list; update adapter source and run openworkflow sync --tools codex`);
+    return;
+  }
+  const actual = new Set<string>();
+  for (const item of value) {
+    if (typeof item !== "string") {
+      errors.push(`${label} generated_files contains a non-string path`);
+      continue;
+    }
+    actual.add(item);
+    const path = join(root, item);
+    if (!existsSyncSafe(path)) {
+      errors.push(`${label} generated_files references missing ${item}; update adapter source and run openworkflow sync --tools codex`);
+      continue;
+    }
+    const content = await readFile(path, "utf8");
+    if (!content.includes("generated-by: openworkflow")) {
+      errors.push(`${label} generated_files ${item} is missing generated marker; update adapter source and run openworkflow sync --tools codex`);
+    }
+  }
+  for (const expected of expectedGeneratedFiles) {
+    if (!actual.has(expected)) {
+      errors.push(`${label} generated_files missing ${expected}; update adapter source and run openworkflow sync --tools codex`);
+    }
+  }
+}
+
+function recordsById(
+  label: string,
+  collectionName: string,
+  value: unknown,
+  idKey: string,
+  errors: string[],
+): Map<string, Record<string, unknown>> | null {
+  if (!Array.isArray(value)) {
+    errors.push(`${label} ${collectionName} must be a list for generated-surface parity validation`);
+    return null;
+  }
+  const records = new Map<string, Record<string, unknown>>();
+  value.forEach((item, index) => {
+    if (!isRecord(item)) {
+      errors.push(`${label} ${collectionName}[${index}] must be a mapping`);
+      return;
+    }
+    const id = item[idKey];
+    if (typeof id !== "string" || id.length === 0) {
+      errors.push(`${label} ${collectionName}[${index}] missing ${idKey}`);
+      return;
+    }
+    if (records.has(id)) {
+      errors.push(`${label} ${collectionName} duplicate ${idKey} ${id}`);
+      return;
+    }
+    records.set(id, item);
+  });
+  return records;
+}
+
+function assertCommandIds(
+  label: string,
+  records: Map<string, Record<string, unknown>>,
+  commands: WorkflowCommand[],
+  errors: string[],
+): void {
+  assertIdSet(label, "commands", records, new Set(commands.map((command) => command.id)), errors);
+}
+
+function assertIdSet(
+  label: string,
+  collectionName: string,
+  records: Map<string, Record<string, unknown>>,
+  expectedIds: Set<string>,
+  errors: string[],
+): void {
+  for (const expected of expectedIds) {
+    if (!records.has(expected)) {
+      errors.push(`${label} ${collectionName} missing ${expected}; update source registry and run openworkflow sync --tools codex`);
+    }
+  }
+  for (const actual of records.keys()) {
+    if (!expectedIds.has(actual)) {
+      errors.push(`${label} ${collectionName} has unexpected ${actual}; update source registry and run openworkflow sync --tools codex`);
+    }
+  }
+}
+
+function assertField(
+  label: string,
+  id: string,
+  record: Record<string, unknown>,
+  field: string,
+  expected: string,
+  errors: string[],
+): void {
+  if (record[field] !== expected) {
+    errors.push(`${label} ${id} ${field} must be ${expected}; update source registry and run openworkflow sync --tools codex`);
+  }
+}
+
+function assertStringArray(
+  label: string,
+  id: string,
+  record: Record<string, unknown>,
+  field: string,
+  expected: readonly string[],
+  errors: string[],
+): void {
+  const actual = record[field];
+  if (!Array.isArray(actual) || !actual.every((item) => typeof item === "string")) {
+    errors.push(`${label} ${id} ${field} must be a string list; update source registry and run openworkflow sync --tools codex`);
+    return;
+  }
+  if (!stringArraysEqual(actual, expected)) {
+    errors.push(`${label} ${id} ${field} drifted from source registry; update source registry and run openworkflow sync --tools codex`);
+  }
+}
+
+function stringArraysEqual(actual: string[], expected: readonly string[]): boolean {
+  return actual.length === expected.length && actual.every((item, index) => item === expected[index]);
+}
+
+async function validateHighRiskDecisionReports(root: string, errors: string[]): Promise<void> {
+  for (const path of await findFiles(root, (entry) => entry === "HIGH_RISK_DECISION_REPORT.md")) {
+    const label = relative(root, path);
+    const content = await readFile(path, "utf8");
+    for (const section of HIGH_RISK_REPORT_SECTIONS) {
+      if (!hasMarkdownHeading(content, section)) {
+        errors.push(`${label} missing high-risk report section: ${section}`);
+      }
+    }
+    if (!content.includes("explicit") || !content.includes("approval")) {
+      errors.push(`${label} must state that implementation resumes only after explicit approval`);
+    }
+  }
+}
+
+function hasMarkdownHeading(content: string, heading: string): boolean {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^#{2,4}\\s+.*${escaped}.*$`, "m").test(content);
 }
 
 function validateConfig(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
@@ -300,6 +843,72 @@ function validateCurrentState(root: string, path: string, data: Record<string, u
   }
   if (!isRecord(data.last_decision)) {
     errors.push(`${label} last_decision must be a mapping`);
+  }
+}
+
+function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "CANDIDATE_CHANGES.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  if (data.planning_artifact_type !== "candidate_changes") {
+    return;
+  }
+  const queuePolicy = data.queue_policy;
+  if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
+    validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
+  }
+  if (!Array.isArray(data.changes)) {
+    errors.push(`${label} changes must be a list`);
+    return;
+  }
+  for (const candidate of data.changes) {
+    if (!isRecord(candidate)) {
+      errors.push(`${label} changes entries must be mappings`);
+      continue;
+    }
+    validateCandidateCompletionEvidence(label, candidate, errors);
+  }
+}
+
+function validateBranchBoundary(label: string, value: unknown, errors: string[]): void {
+  if (!nonEmptyString(value)) {
+    errors.push(`${label} queue_policy.branch_boundary must be a non-empty string when present`);
+    return;
+  }
+  const branch = String(value).trim();
+  if (branch !== value || branch.includes(" ") || branch.startsWith("/") || branch.endsWith("/")) {
+    errors.push(`${label} queue_policy.branch_boundary must be a branch-like string without spaces or leading/trailing slashes`);
+  }
+}
+
+function validateCandidateCompletionEvidence(
+  label: string,
+  candidate: Record<string, unknown>,
+  errors: string[],
+): void {
+  if (candidate.status !== "done") {
+    return;
+  }
+  const id = typeof candidate.id === "string" ? candidate.id : "<unknown>";
+  const completion = candidate.completion;
+  if (!isRecord(completion)) {
+    errors.push(`${label} ${id} done candidate must include completion evidence`);
+    return;
+  }
+  const evidence = completion.evidence;
+  if (!Array.isArray(evidence) || evidence.length === 0) {
+    errors.push(`${label} ${id} completion.evidence must be a non-empty list`);
+    return;
+  }
+  for (const item of evidence) {
+    if (typeof item !== "string") {
+      errors.push(`${label} ${id} completion.evidence values must be strings`);
+      continue;
+    }
+    if (item.startsWith("commit:") && !/^commit:\s+[0-9a-f]{7,40}$/i.test(item)) {
+      errors.push(`${label} ${id} completion commit evidence must use 'commit: <7-40 hex chars>'`);
+    }
   }
 }
 
@@ -617,18 +1226,11 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
       "validation_target",
       "core_question",
       "prototype_mode",
-      "reference_analysis",
-      "visual_direction",
-      "visual_concept_policy",
-      "concept_evidence",
-      "prototype_artifact",
-      "run",
-      "implementation_evidence",
-      "observations",
-      "evidence",
-      "verification",
-      "self_critique",
-      "known_limits",
+      "prompt_pack_type",
+      "validation_input",
+      "source",
+      "negative_constraints",
+      "review_plan",
       "result",
       "handoff",
     ],
@@ -746,7 +1348,7 @@ function validatePrototypeTodo(label: string, value: unknown, errors: string[]):
 }
 
 function validatePrototypeEvidence(root: string, label: string, data: Record<string, unknown>, errors: string[]): void {
-  if (!["visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(String(data.prototype_mode))) {
+  if (!["image_prompt_pack", "visual", "interaction", "technical_feasibility", "3d_material", "workflow", "data_logic"].includes(String(data.prototype_mode))) {
     errors.push(`${label} has invalid prototype_mode ${String(data.prototype_mode)}`);
   }
   for (const key of ["reference_analysis", "concept_evidence", "implementation_evidence", "known_limits"]) {
@@ -757,7 +1359,9 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   if ("visual_direction" in data && !isRecord(data.visual_direction)) {
     errors.push(`${label} visual_direction must be a mapping`);
   }
-  validateVisualConceptPolicy(label, data, errors);
+  if ("visual_concept_policy" in data) {
+    validateVisualConceptPolicy(label, data, errors);
+  }
   if ("verification" in data && !isRecord(data.verification)) {
     errors.push(`${label} verification must be a mapping`);
   }
@@ -776,6 +1380,30 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
     validateLocalRef(root, label, "prototype_artifact.path", prototypeArtifact.path, errors);
   }
   validateEvidenceRefs(root, label, data, errors);
+  if ("validation_input" in data && !isRecord(data.validation_input)) {
+    errors.push(`${label} validation_input must be a mapping`);
+  }
+  if ("source" in data && !isRecord(data.source)) {
+    errors.push(`${label} source must be a mapping`);
+  }
+  if ("negative_constraints" in data && !Array.isArray(data.negative_constraints)) {
+    errors.push(`${label} negative_constraints must be an array`);
+  }
+  if ("review_plan" in data && !isRecord(data.review_plan)) {
+    errors.push(`${label} review_plan must be a mapping`);
+  }
+  if ("directions" in data && !Array.isArray(data.directions)) {
+    errors.push(`${label} directions must be an array`);
+  }
+  if ("screen_manifest" in data && !Array.isArray(data.screen_manifest)) {
+    errors.push(`${label} screen_manifest must be an array`);
+  }
+  if ("screen_prompts" in data && !Array.isArray(data.screen_prompts)) {
+    errors.push(`${label} screen_prompts must be an array`);
+  }
+  if ("prompt_pack_type" in data && !["strategic_proto_prompt_pack", "refined_proto_prompt_pack", "proto_review_evidence"].includes(String(data.prompt_pack_type))) {
+    errors.push(`${label} has invalid prompt_pack_type ${String(data.prompt_pack_type)}`);
+  }
   if (!["pass", "fail", "unclear", "not_reviewed"].includes(String(data.result))) {
     errors.push(`${label} has invalid result ${String(data.result)}`);
   }

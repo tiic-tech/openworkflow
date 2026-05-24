@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:G003-select-high-risk-stop-gate
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G003-select-high-risk-stop-gate
+source_plan_id: M70-high-risk-governance-planning
+source_candidate_id: G003
+title: Add high-risk stop gate to select-change
+status: done
+selection_reason: >
+  G003 is the next recommended candidate after G002. It completes the paired
+  planning-skill governance behavior by preventing select-change from silently
+  selecting high-risk candidates.
+rejected_alternatives:
+  - candidate_ref: G005
+    reason: delivery-boundary design should wait until select-change can enforce high-risk stop behavior.
+  - candidate_ref: G004
+    reason: validation fixtures depend on both planning skills having the behavior first.
+scope:
+  includes:
+    - high-risk readiness review behavior
+    - refusal to silently select risk: high candidates
+    - instructions to produce or reference HIGH_RISK_DECISION_REPORT.md
+    - explicit override and resume criteria
+  excludes:
+    - decompose-to-changes queue creation behavior
+    - implementation of high-risk candidates
+    - runtime adapter changes
+owned_paths:
+  - skills/select-change/SKILL.md
+  - skills/select-change/references/selection-protocol.md
+  - changes/M70-high-risk-governance-planning/G003-select-high-risk-stop-gate/
+forbidden_paths:
+  - skills/decompose-to-changes/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - select-change reports blockers and decision options for risk: high candidates.
+  - select-change does not create SELECTED_CHANGE.yaml for risk: high candidates without explicit user approval.
+  - select-change names the required high-risk report path and resume criteria.
+  - Targeted candidate review includes high-risk decision report status.
+validation:
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - skills/select-change/SKILL.md
+    - skills/select-change/references/selection-protocol.md
+    - "validation: quick_validate.py skills/select-change"
+    - "validation: npm run validate"
+    - "validation: git diff --check"

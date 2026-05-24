@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M66-proto-redesign-source-dogfood
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M66-proto-redesign-source-dogfood
+title: M66 Proto redesign source dogfood atom tasks
+status: completed
+tasks:
+  - task_id: M66-A001
+    title: Normalize OpenWorkflow vision input
+    status: completed
+    type: read
+    owned_paths:
+      - build_system_vision.md
+      - docs/OW_DEVELOP_PLAN.md
+    done_when:
+      - Product domain, primary user, pain, behavior change, success signal, differentiator, and non-goals are captured.
+  - task_id: M66-A002
+    title: Generate strategic proto prompt pack
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md
+    done_when:
+      - Prompt pack follows the strategic proto prompt pack contract.
+      - Directions differ by strategic hypothesis, not only visual style.
+  - task_id: M66-A003
+    title: Record review and tune evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+      - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+    done_when:
+      - First direction is selected.
+      - Accepted elements, tune requests, and negative constraints are explicit.
+  - task_id: M66-A004
+    title: Update queue and validate
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/
+      - changes/M66-proto-redesign-source-dogfood/
+    done_when:
+      - P005 is completed and P006 becomes ready.
+      - "`npm run validate` passes."
+      - "`node dist/cli/src/index.js handoff --root . --json` passes."

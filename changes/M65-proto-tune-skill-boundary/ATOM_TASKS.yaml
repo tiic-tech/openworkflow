@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M65-proto-tune-skill-boundary
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M65-proto-tune-skill-boundary
+title: M65 Proto tune skill boundary atom tasks
+status: completed
+tasks:
+  - task_id: M65-A001
+    title: Add temporary queue candidate
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+    done_when:
+      - P007 is added with stable id and operation audit entries.
+      - P005 remains available after P007 completion.
+  - task_id: M65-A002
+    title: Narrow build-prototype boundary
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/agents/openai.yaml
+    done_when:
+      - build-prototype owns strategic prototype prompt packs from vision or validation context.
+      - build-prototype hands tune requests to tune-prototype.
+  - task_id: M65-A003
+    title: Create tune-prototype skill
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/tune-prototype/
+    done_when:
+      - tune-prototype owns baseline audit, product-system extraction, delta rules, screen manifests, and refined prompt packs.
+  - task_id: M65-A004
+    title: Validate split skills
+    status: completed
+    type: verify
+    owned_paths:
+      - skills/build-prototype/
+      - skills/tune-prototype/
+      - changes/M65-proto-tune-skill-boundary/
+    done_when:
+      - both skills pass quick validation.
+      - "`npm run validate` passes."

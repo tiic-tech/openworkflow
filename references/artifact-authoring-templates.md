@@ -56,18 +56,20 @@ artifacts out of context until requested.
 
 ## Prototype Evidence Shape
 
-Prototype evidence should keep creative direction and runnable proof separate.
-For `/ow:proto`, record reference analysis, static concept assets, runnable
-implementation evidence, browser or screenshot verification, self-critique, and
-known limits in their own fields. The generic `evidence` list may still point to
-the most important files, but downstream agents should not have to infer whether
-an image was a concept, a screenshot, or an implementation artifact.
+Prototype evidence should keep prompt-pack intent, review evidence, and
+downstream implementation work separate. For `/ow:proto`, record
+`prototype_mode: image_prompt_pack`, `prompt_pack_type`,
+`validation_input.mode`, source refs, strategic directions, negative
+constraints, review plan, generated image refs, result, and handoff. The generic
+`evidence` list may still point to the most important files, but downstream
+agents should not have to infer whether an artifact is a strategic prompt pack,
+a refined prompt pack, a generated image, or review evidence.
 
-When a visual prototype does not use image generation, record
-`visual_concept_policy.image_generation: skipped_by_user` plus a concrete
-`skip_reason`. Otherwise local `ref` values in concept, implementation,
-verification, or generic evidence fields should point to existing files inside
-the workflow root.
+`/ow:proto` and `/ow:tune` should not write HTML, CSS, runnable prototypes,
+production specs, or changes. If no validation artifact exists, record
+`validation_input.mode: vision_only` or `internally_derived`; if a validation
+artifact is explicitly present, record `validation_present` and include local
+refs to the consumed validation artifacts.
 
 ## Decision Audit
 

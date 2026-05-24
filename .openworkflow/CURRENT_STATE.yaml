@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: workflow:current-state
+contract_type: workflow
+title: OpenWorkflow current state
+status: active
+project:
+  slug: openworkflow
+  title: OpenWorkflow
+workflow_root: .openworkflow
+active_stage: workflow
+current_vision: null
+current_validation: null
+current_prototype: null
+current_decision: null
+current_design: null
+current_spec: null
+current_change: null
+current_run: null
+last_decision:
+  outcome: null
+  path: null
+next_command: /ow:vision
+blocked_by:
+  []
+read_this_first:
+  - .openworkflow/CURRENT_STATE.yaml
+  - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+updated_at: null

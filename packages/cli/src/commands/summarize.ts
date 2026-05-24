@@ -199,6 +199,10 @@ function renderSummary(
 function keyFields(source: Record<string, unknown>): Record<string, unknown> {
   const preferred = [
     "core_question",
+    "prompt_pack_type",
+    "validation_input",
+    "build_recommendation",
+    "review_plan",
     "prototype_scope",
     "acceptance",
     "result",

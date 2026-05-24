@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:S004-skill-format-validation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: S004-skill-format-validation
+source_plan_id: M69-skill-system-lifecycle-planning
+source_candidate_id: S004
+title: Validate generated skill format and protocol blocks
+status: done
+selection_reason: >
+  S001 defined the native skill format and S002 added structured generated
+  metadata, so validation can now enforce generated Codex skill shape and
+  protocol blocks as a repository contract.
+rejected_alternatives:
+  - candidate_ref: S005
+    reason: Drift and parity tests should build on the concrete skill format validation.
+  - candidate_ref: S003
+    reason: Delivery model changes are high risk and should wait until the current Codex skill surface is validated.
+scope:
+  includes:
+    - generated SKILL.md frontmatter validation
+    - required protocol block presence checks
+    - block ordering or uniqueness checks where useful
+    - malformed wrapper and missing metadata diagnostics
+  excludes:
+    - artifact schema validation changes unrelated to skill files
+    - source skill quick validation for root skills/
+    - new adapter delivery model
+owned_paths:
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M69-skill-system-lifecycle-planning/S004-skill-format-validation/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/codex/src/generateSkills.ts
+  - skills/**
+acceptance:
+  - Validation fails when a generated OW skill lacks required frontmatter or protocol blocks.
+  - Validation keeps generated skill files as Markdown skill files, not full XML documents.
+  - Diagnostics explain whether to update source registry or run sync.
+  - Existing generated skills pass after sync.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - "validation: npm run validate"
+    - "validation: npm run verify:runtime-surface"
+    - "validation: git diff --check"

@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M55-planning-artifact-contracts
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M55-planning-artifact-contracts
+title: M55 Planning artifact contract atom tasks
+status: active
+tasks:
+  - task_id: M55-A001
+    title: Add planning artifact schemas
+    status: completed
+    type: edit
+    owned_paths:
+      - schemas/candidate-changes.schema.json
+      - schemas/selected-change.schema.json
+      - schemas/atom-tasks.schema.json
+      - schemas/openworkflow-contract.schema.json
+    done_when:
+      - Candidate, selected change, and atom task schemas define required fields.
+      - Common contract schema accepts planning contracts.
+  - task_id: M55-A002
+    title: Add planning artifact reference
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-artifact-contracts.md
+    done_when:
+      - Reference explains YAML source-of-truth and Markdown readable-view rules.
+      - Reference explains candidate selection and completion status updates.
+      - Reference defines IMPLEMENTATION_BRIEF.md required sections.
+  - task_id: M55-A003
+    title: Dogfood selected change artifacts
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M55-planning-artifact-contracts/
+    done_when:
+      - SELECTED_CHANGE.yaml references M54 C001.
+      - ATOM_TASKS.yaml breaks M55 into focused atom tasks.
+      - IMPLEMENTATION_BRIEF.md gives a low-context implementation entry.
+  - task_id: M55-A004
+    title: Validate contract additions
+    status: completed
+    type: verify
+    owned_paths:
+      - schemas/
+      - references/planning-artifact-contracts.md
+      - changes/M55-planning-artifact-contracts/
+    done_when:
+      - "`npm run validate` passes."

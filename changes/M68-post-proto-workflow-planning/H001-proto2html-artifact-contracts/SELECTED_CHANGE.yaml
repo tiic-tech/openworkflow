@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: selected_change:H001-proto2html-artifact-contracts
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: H001-proto2html-artifact-contracts
+source_plan_id: M68-post-proto-workflow-planning
+source_candidate_id: H001
+title: Define proto2html artifact contracts
+status: completed
+selection_reason:
+  - H001 has no dependencies and unlocks proto2html source, dogfood, and runtime exposure.
+  - It keeps the change focused on contracts and avoids premature command exposure.
+  - It protects the new proto/tune image-only boundary by making HTML reconstruction a separate artifact family.
+rejected_alternatives:
+  - id: H002
+    reason: Source behavior depends on the proto2html artifact contract.
+  - id: H003
+    reason: Runtime exposure should wait for source behavior and dogfood evidence.
+scope:
+  includes:
+    - HTML prototype source-of-truth contract
+    - fidelity report contract
+    - accepted benchmark image input rules
+    - explicit non-goals for product exploration, specs, and production build
+  excludes:
+    - source skill implementation
+    - runtime command registry exposure
+    - generated Codex adapter surfaces
+    - html2spec or build planning contracts
+owned_paths:
+  - references/proto2html-artifact-contracts.md
+  - schemas/html-prototype.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M68-post-proto-workflow-planning/H001-proto2html-artifact-contracts/
+forbidden_paths:
+  - skills/proto2html/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Proto2html artifacts require an accepted benchmark image or screen group input.
+  - HTML output, screenshot evidence, fidelity gaps, and known limits are structured.
+  - The contract states that proto2html reconstructs; it does not explore product direction or create specs.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

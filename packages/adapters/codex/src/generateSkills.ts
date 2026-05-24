@@ -1,4 +1,5 @@
 import type { CodexTemplate } from "./templates.js";
+import { CODEX_ADAPTER_VERSION } from "./constants.js";
 import { getWorkflowCommands, type WorkflowCommand } from "../../../core/src/commands/registry.js";
 import { commandDoc } from "./generateCommands.js";
 
@@ -35,6 +36,7 @@ export function legacyCodexSkillPaths(): string[] {
 
 function codexSkill(command: WorkflowCommand): string {
   const skillName = codexSkillName(command);
+  const templateId = codexSkillTemplateId(command);
   const description =
     command.visibility === "internal"
       ? `${command.description} Internal audit skill for ${command.trigger} in OpenWorkflow repositories.`
@@ -42,6 +44,14 @@ function codexSkill(command: WorkflowCommand): string {
   return `---
 name: ${yamlString(skillName)}
 description: ${yamlString(description)}
+metadata:
+  generated_by: ${yamlString("openworkflow")}
+  adapter: ${yamlString("codex")}
+  adapter_version: ${yamlString(CODEX_ADAPTER_VERSION)}
+  template_id: ${yamlString(templateId)}
+  source_command_id: ${yamlString(command.id)}
+  semantic_trigger: ${yamlString(command.trigger)}
+  skill_name: ${yamlString(skillName)}
 ---
 ${commandDoc(command)}
 
@@ -51,6 +61,10 @@ ${commandDoc(command)}
 - Semantic command: ${command.trigger}
 </codex_skill>
 `;
+}
+
+function codexSkillTemplateId(command: WorkflowCommand): string {
+  return `codex.skill.${command.namespace}.${command.id}`;
 }
 
 function codexSkillInterface(command: WorkflowCommand): string {

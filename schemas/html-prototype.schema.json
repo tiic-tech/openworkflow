@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/html-prototype.schema.json",
+  "title": "OpenWorkflow HTML Prototype Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "artifact_type",
+    "title",
+    "status",
+    "source_prototype",
+    "benchmark",
+    "reconstruction_scope",
+    "html_artifact",
+    "render_targets",
+    "fidelity",
+    "known_limits",
+    "result",
+    "handoff"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "html_prototype"
+    },
+    "artifact_type": {
+      "const": "html_prototype"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "reviewed",
+        "accepted",
+        "superseded",
+        "archived"
+      ]
+    },
+    "source_prototype": {
+      "type": "object",
+      "required": [
+        "evidence_ref",
+        "accepted_decision_ref"
+      ],
+      "properties": {
+        "evidence_ref": {
+          "type": "string"
+        },
+        "prompt_pack_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "accepted_decision_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "benchmark": {
+      "type": "object",
+      "required": [
+        "kind",
+        "refs"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "benchmark_image",
+            "image_set",
+            "screen_group"
+          ]
+        },
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selected_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "acceptance_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "reconstruction_scope": {
+      "type": "object",
+      "required": [
+        "include",
+        "exclude"
+      ],
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "html_artifact": {
+      "type": "object",
+      "required": [
+        "path",
+        "type",
+        "entrypoint"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "type": {
+          "const": "single_file_html"
+        },
+        "entrypoint": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "render_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target_id",
+          "width",
+          "height"
+        ],
+        "properties": {
+          "target_id": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "device": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "fidelity": {
+      "type": "object",
+      "required": [
+        "benchmark_refs",
+        "screenshot_refs",
+        "matched_elements",
+        "gaps"
+      ],
+      "properties": {
+        "benchmark_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "screenshot_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "matched_elements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "gap_id",
+              "severity",
+              "description"
+            ],
+            "properties": {
+              "gap_id": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high",
+                  "blocking"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "disposition": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "browser_checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "implementation_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "known_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "needs_reconstruction",
+        "return_to_tune",
+        "blocked"
+      ]
+    },
+    "handoff": {
+      "type": "object",
+      "required": [
+        "next_command"
+      ],
+      "properties": {
+        "next_command": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: selected_change:G018-narrow-autonomous-remote-pilot
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G018-narrow-autonomous-remote-pilot
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G018
+title: Plan narrow autonomous remote pilot
+status: done
+selection_reason: >
+  The user approved the staged B -> C path: first implement remote read-only
+  planning, then advance to a narrow draft-PR remote mutation pilot after the
+  read-only evidence is proven.
+approved_path:
+  option_b:
+    title: Remote read-only plus PR-ready remote plan
+    next_candidate_id: G019
+    mutation_allowed: false
+  option_c:
+    title: Narrow draft PR remote mutation pilot
+    follow_up_candidate_id: G020
+    mutation_allowed: draft_pr_only_after_separate_candidate
+scope:
+  includes:
+    - high-risk decision report for staged remote automation
+    - exact first mutation pilot class
+    - remote read-only preflight requirements
+    - simulator evidence requirements
+    - rollback and recovery constraints for the later pilot
+  excludes:
+    - implementing remote mutation in G018
+    - merging PRs
+    - mutating GitHub Issues
+    - force-push, reset, rebase, or destructive branch deletion
+owned_paths:
+  - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/
+  - references/git-automation-governance.md
+forbidden_paths:
+  - packages/**
+  - .openworkflow/runtime/**
+acceptance:
+  - The first autonomous remote pilot operation is explicitly scoped.
+  - Merge and Issue mutation remain excluded unless separately approved.
+  - Simulator evidence requirements are documented.
+  - The next implementation step is remote read-only planning, not mutation.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  primary_commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c
+  evidence:
+    - "commit: a853ae5581e3a21d8f0ff7e865fb480b92df433c"
+    - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/HIGH_RISK_DECISION_REPORT.md
+    - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/ATOM_TASKS.yaml
+    - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/IMPLEMENTATION_BRIEF.md
+    - changes/M71-git-version-control-governance/G018-narrow-autonomous-remote-pilot/LOCAL_COMMIT_EVIDENCE.yaml
+    - references/git-automation-governance.md
+    - "validation: npm run validate"
+    - "validation: git diff --check"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze Changes"
+  short_description: "Prioritize across candidate change queues."
+  default_prompt: "Analyze one or more CANDIDATE_CHANGES queues and recommend the next plan id and candidate id without selecting or implementing it."

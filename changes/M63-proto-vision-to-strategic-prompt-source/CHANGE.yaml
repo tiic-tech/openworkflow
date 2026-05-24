@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: change:M63-proto-vision-to-strategic-prompt-source
+contract_type: change
+title: M63 Proto vision to strategic prompt source behavior
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - references/proto-redesign-artifact-contracts.md
+  - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+depends_on:
+  - change:M60-proto-redesign-artifact-contracts
+  - change:M61-proto-validation-consumption-policy
+produces:
+  - selected_change:M63-proto-vision-to-strategic-prompt-source
+  - atom_tasks:M63-proto-vision-to-strategic-prompt-source
+summary: >
+  Update the source prototype skill so `/ow:proto` can consume vision or
+  validation context and produce strategic high-fidelity prototype prompt packs.
+problem: >
+  Existing prototype guidance is validation-artifact-first and local-demo
+  oriented. The proto redesign needs source-level behavior for vision-only
+  strategic prompt packs before tune behavior, dogfood, or runtime exposure.
+goals:
+  - Update build-prototype source guidance for image-first strategic prompt packs.
+  - Add a protocol reference for hypothesis generation, prompt pack structure,
+    build recommendation, and quality gates.
+  - Preserve validation consumption policy from M61.
+  - Keep runtime and generated adapter surfaces unchanged.
+non_goals:
+  - Do not implement tune/refinement behavior.
+  - Do not expose runtime command surfaces.
+  - Do not add validation automation.
+  - Do not add HTML conversion.
+affected_paths:
+  - skills/build-prototype/
+  - changes/M63-proto-vision-to-strategic-prompt-source/
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+acceptance:
+  - "`/ow:proto` source behavior can operate from VISION-only input."
+  - Output directions differ by strategic hypothesis, not visual skin.
+  - Prompt packs are concrete enough for downstream image generation.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+created_at: 2026-05-21
+updated_at: 2026-05-21

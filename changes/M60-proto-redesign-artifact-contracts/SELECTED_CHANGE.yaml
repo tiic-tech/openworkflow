@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:M60-proto-redesign-artifact-contracts
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M60-proto-redesign-artifact-contracts
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P001
+title: Define proto redesign artifact contracts
+status: completed
+selection_reason:
+  - P001 is dependency-free and selected by the M59 queue.
+  - It unlocks source proto behavior, tune behavior, and validation policy.
+  - It avoids runtime exposure and implementation before contracts are stable.
+rejected_alternatives:
+  - id: P002
+    reason: Depends on the artifact contracts.
+  - id: P003
+    reason: Depends on first-pass source behavior and shared prompt contracts.
+  - id: P006
+    reason: Runtime exposure should wait for source behavior and dogfood evidence.
+scope:
+  includes:
+    - vision-to-strategic-prototype prompt pack contract
+    - prototype tune/refined prompt pack contract
+    - optional validation artifact consumption rules
+    - review evidence and decision handoff rules
+    - explicit non-goals for HTML generation and runtime exposure
+  excludes:
+    - source skill implementation
+    - command registry exposure
+    - generated Codex adapter surfaces
+    - removing ow:validation
+    - implementing /ow:proto2html
+owned_paths:
+  - references/proto-redesign-artifact-contracts.md
+  - schemas/proto-prompt-pack.schema.json
+  - changes/M60-proto-redesign-artifact-contracts/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - skills/build-prototype/
+acceptance:
+  - Image-first proto artifacts define required and optional inputs.
+  - Validation artifact consumption is explicit when present or absent.
+  - Tune/refinement prompt packs preserve baseline prototype intent.
+  - HTML conversion and runtime exposure are excluded.
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

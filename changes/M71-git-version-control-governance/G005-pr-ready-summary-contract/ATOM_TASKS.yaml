@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:G005-pr-ready-summary-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: G005-pr-ready-summary-contract
+title: Atom tasks for PR-ready summary contract
+status: done
+tasks:
+  - task_id: T001
+    title: Add PR-ready summary contract
+    status: done
+    type: edit
+    owned_paths:
+      - references/planning-artifact-contracts.md
+    done_when:
+      - PR_READY_SUMMARY.md required sections are documented.
+      - The contract states it does not create or mutate PRs.
+  - task_id: T002
+    title: Link PR-ready summary from git governance
+    status: done
+    type: edit
+    owned_paths:
+      - references/git-version-control-governance.md
+    done_when:
+      - PR boundary references PR_READY_SUMMARY.md.
+      - Branch, commit, candidate status, validation, and risk summary expectations are documented.
+  - task_id: T003
+    title: Update queue evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - G005 selection and completion evidence are recorded.
+      - G006 becomes ready after dependencies are satisfied.
+  - task_id: T004
+    title: Validate planning artifacts
+    status: done
+    type: verify
+    owned_paths:
+      - references/
+      - changes/M71-git-version-control-governance/
+    done_when:
+      - npm run validate passes.
+      - git diff --check passes.

@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: work_items:M55-planning-artifact-contracts
+contract_type: work_items
+title: M55 Planning artifact contracts work items
+status: draft
+change_contract: changes/M55-planning-artifact-contracts/CHANGE.yaml
+items:
+  - task_id: M55-T001
+    title: Add planning artifact schemas
+    status: completed
+    owned_paths:
+      - schemas/
+    acceptance:
+      - Candidate, selected change, and atom task schemas exist.
+      - Common contract schema accepts planning contracts.
+  - task_id: M55-T002
+    title: Add planning artifact reference
+    status: completed
+    owned_paths:
+      - references/planning-artifact-contracts.md
+    acceptance:
+      - Reference explains YAML source-of-truth and Markdown readable-view rules.
+      - Reference explains candidate selection and completion status updates.
+  - task_id: M55-T003
+    title: Dogfood selected change artifacts
+    status: completed
+    owned_paths:
+      - changes/M55-planning-artifact-contracts/
+    acceptance:
+      - SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, and IMPLEMENTATION_BRIEF.md exist.
+  - task_id: M55-T004
+    title: Validate contract additions
+    status: completed
+    owned_paths:
+      - schemas/
+      - references/planning-artifact-contracts.md
+      - changes/M55-planning-artifact-contracts/
+    acceptance:
+      - "`npm run validate` passes."

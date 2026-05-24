@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openworkflow.local/schemas/candidate-changes.schema.json",
+  "title": "OpenWorkflow Candidate Changes",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "contract_id",
+    "contract_type",
+    "planning_artifact_type",
+    "plan_id",
+    "title",
+    "status",
+    "source",
+    "queue_policy",
+    "selection_policy",
+    "changes"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_type": {
+      "const": "planning"
+    },
+    "planning_artifact_type": {
+      "const": "candidate_changes"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed",
+        "superseded",
+        "archived"
+      ]
+    },
+    "source": {
+      "type": "object"
+    },
+    "queue_policy": {
+      "type": "object"
+    },
+    "selection_policy": {
+      "type": "object"
+    },
+    "next_recommended_candidate_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "title",
+          "purpose",
+          "scope",
+          "owned_paths",
+          "dependencies",
+          "unlocks",
+          "risk",
+          "size",
+          "validation",
+          "acceptance"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*[0-9]{3}$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "ready",
+              "selected",
+              "in_progress",
+              "done",
+              "blocked",
+              "deferred",
+              "superseded"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "object",
+            "required": [
+              "includes",
+              "excludes"
+            ]
+          },
+          "owned_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unlocks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "risk": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "validation": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "selection": {
+            "type": "object"
+          },
+          "completion": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "operation_id",
+          "operation_type",
+          "target_candidate_ids",
+          "actor",
+          "reason",
+          "changed_at"
+        ],
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "pattern": "^OP[0-9]{3}$"
+          },
+          "operation_type": {
+            "type": "string",
+            "enum": [
+              "query",
+              "add",
+              "update",
+              "status_change",
+              "split",
+              "merge",
+              "priority_change",
+              "select",
+              "complete",
+              "remove"
+            ]
+          },
+          "target_candidate_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actor": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "changed_at": {
+            "type": "string"
+          },
+          "before_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "after_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:G004-high-risk-report-validation-fixtures
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G004-high-risk-report-validation-fixtures
+source_plan_id: M70-high-risk-governance-planning
+source_candidate_id: G004
+title: Add high-risk report validation and dogfood fixtures
+status: done
+selection_reason: >
+  G004 is the next recommended candidate after both planning skills gained
+  high-risk report behavior. It adds reproducible validation evidence before
+  the workflow relies on the behavior for future high-risk stops.
+rejected_alternatives:
+  - candidate_ref: G005
+    reason: delivery-boundary design should follow validation evidence for high-risk governance behavior.
+  - candidate_ref: G006
+    reason: second-adapter research depends on G005 and should wait.
+scope:
+  includes:
+    - fixture or example queue containing a high-risk stop
+    - validation expectations for required report sections
+    - regression evidence for decompose-to-changes and select-change docs
+    - summary of manual dogfood behavior if code validation is too broad
+  excludes:
+    - full schema enforcement for all Markdown reports if too heavy
+    - changing risk classification semantics
+    - implementing S003 or S007
+owned_paths:
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+  - changes/M70-high-risk-governance-planning/G004-high-risk-report-validation-fixtures/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - There is reproducible evidence that required report sections are checked or manually verified.
+  - Skill validation passes for both planning skills after the new behavior.
+  - A high-risk report linked from a queue is treated as evidence, not implementation approval.
+  - Diagnostics or fixture notes tell agents not to bypass user approval.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/decompose-to-changes
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M69-skill-system-lifecycle-planning/HIGH_RISK_DECISION_REPORT.md
+    - "validation: npm run validate"
+    - "validation: npm run verify:runtime-surface"
+    - "validation: quick_validate.py skills/decompose-to-changes"
+    - "validation: quick_validate.py skills/select-change"
+    - "validation: git diff --check"

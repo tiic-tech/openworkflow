@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M67-proto-redesign-runtime-surface
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M67-proto-redesign-runtime-surface
+title: M67 Proto redesign runtime surface atom tasks
+status: completed
+tasks:
+  - task_id: M67-A001
+    title: Update command runtime protocols
+    status: completed
+    type: code
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/readiness.ts
+    done_when:
+      - "`/ow:proto` exposes image-first strategic prompt pack guidance."
+      - "`/ow:tune` exposes screen-bound refined prompt pack guidance."
+      - Proto can start from vision-only context, while an explicit current validation must be consumable when present.
+  - task_id: M67-A002
+    title: Update artifact and schema contracts
+    status: completed
+    type: code
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/validators/
+      - packages/core/src/workflow/summaryHealth.ts
+      - schemas/prototype-evidence.schema.json
+      - references/artifact-authoring-templates.md
+    done_when:
+      - Prototype evidence required fields match prompt-pack artifacts.
+      - Summary quality checks key off prompt-pack fields.
+      - Validators accept image prompt pack evidence.
+  - task_id: M67-A003
+    title: Update verification coverage
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - packages/cli/src/dev/verifyCleanCommand.ts
+      - packages/cli/src/commands/summarize.ts
+    done_when:
+      - Runtime and workflow checks assert the new proto/tune boundaries.
+      - Existing clean, handoff, summary, and check behavior remains covered.
+  - task_id: M67-A004
+    title: Regenerate managed surfaces and validate
+    status: completed
+    type: generate
+    owned_paths:
+      - .agents/skills/
+      - .openworkflow/audit/
+      - changes/M59-proto-redesign-planning-dogfood/
+      - changes/M67-proto-redesign-runtime-surface/
+    done_when:
+      - Generated files are updated through `openworkflow sync`.
+      - P006 is completed in the candidate queue with operation evidence.
+      - Required validation commands pass.

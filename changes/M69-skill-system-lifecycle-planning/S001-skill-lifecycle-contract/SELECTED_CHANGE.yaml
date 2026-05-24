@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: selected_change:S001-skill-lifecycle-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: S001-skill-lifecycle-contract
+source_plan_id: M69-skill-system-lifecycle-planning
+source_candidate_id: S001
+title: Document native skill format and lifecycle contract
+status: done
+selection_reason: >
+  Select M69/S001 before M68/H003. H003 is a high-risk runtime/generated
+  surface change, while S001 is a focused contract change that clarifies the
+  native skill format and lifecycle rules needed before touching more generated
+  command and adapter surfaces.
+rejected_alternatives:
+  - candidate_ref: M68/H003
+    reason: >
+      Ready but high risk; it exposes proto2html through command, artifact,
+      generated adapter, and audit surfaces before the skill lifecycle contract
+      is written down.
+scope:
+  includes:
+    - native skill format reference
+    - frontmatter field policy including generated metadata
+    - XML-like block taxonomy for user behavior, agent protocol, context, outputs, audit, and handoff
+    - source registry to generated skill lifecycle narrative
+    - explicit divergence from OpenSpec global Codex prompt installation
+  excludes:
+    - runtime generator implementation changes
+    - new platform adapters
+    - proto2html command exposure
+    - changing existing generated skill files
+owned_paths:
+  - references/skill-system-lifecycle.md
+  - references/planning-artifact-contracts.md
+  - changes/M69-skill-system-lifecycle-planning/S001-skill-lifecycle-contract/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - skills/**
+acceptance:
+  - The reference states that OW skills are YAML frontmatter plus Markdown plus XML-like protocol blocks, not full XML documents.
+  - The reference names source registries and generated surfaces and forbids direct generated-surface edits.
+  - The reference explains what OW borrows from OpenSpec and what it rejects.
+  - The contract is usable as read-first context for later generator and validator work.
+validation:
+  - npm run validate
+  - git diff --check

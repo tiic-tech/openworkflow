@@ -1,0 +1,25 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:G016-autonomous-git-automation-lifecycle
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for G016 autonomous git contract
+status: current
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G016
+selected_change_id: G016-autonomous-git-automation-lifecycle
+branch_boundary: codex/m71-git-version-governance
+primary_commit: 94ddaa74596a6428eacad297faf1a851bceb1e10
+approved_option:
+  option: G016 Option B - Design-Only Autonomous Contract
+  approved_at: 2026-05-21
+validation_evidence:
+  - npm run validate
+  - git diff --check
+autonomous_scope:
+  implemented_remote_mutation: false
+  next_candidate: G017
+  next_candidate_purpose: read-only autonomous simulator
+audit_notes:
+  - The primary commit defined autonomous lifecycle contracts only.
+  - No push, PR creation, PR update, merge, or GitHub Issue mutation was implemented.
+  - Full autonomous mode remains blocked until simulator and later high-risk approvals prove safety.

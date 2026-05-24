@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: selected_change:G019-remote-readonly-pr-plan
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G019-remote-readonly-pr-plan
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G019
+title: Implement remote read-only PR-ready planning
+status: done
+selection_reason: >
+  G019 is the approved B step from G018: read remote refs and PR metadata to
+  produce a PR-ready operation plan without mutation before any draft PR pilot.
+scope:
+  includes:
+    - remote read-only planner core
+    - git-automation remote-plan CLI action
+    - generated ow-git-automation guidance
+    - runtime coverage with a local bare remote fixture
+    - governance updates for the read-only boundary
+  excludes:
+    - git push
+    - PR creation, edit, close, or merge
+    - Issue mutation
+    - force-push, reset, rebase, or destructive branch deletion
+owned_paths:
+  - packages/core/src/git/remoteReadonlyPlanner.ts
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/index.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/commands/registry.ts
+  - references/git-automation-governance.md
+  - .agents/skills/ow-git-automation/
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/
+forbidden_paths:
+  - packages/adapters/**
+  - .openworkflow/runtime/**
+acceptance:
+  - Remote reads are explicit and non-mutating.
+  - Output includes target identity, remote refs, PR metadata when available, ordered commits, blockers, and rollback guidance.
+  - The command refuses or warns on stale local HEAD, unknown base, dirty tree, or missing simulator evidence.
+  - No push, PR mutation, merge, or Issue mutation code path is introduced.
+validation:
+  - npm run validate
+  - git diff --check
+  - npm run verify:runtime-surface
+completion:
+  completed_at: 2026-05-21
+  primary_commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e
+  evidence:
+    - "commit: 55e62cd3615b047b44705b0dd81be540dc3a1e2e"
+    - packages/core/src/git/remoteReadonlyPlanner.ts
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/cli/src/index.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - packages/core/src/commands/registry.ts
+    - references/git-automation-governance.md
+    - .agents/skills/ow-git-automation/SKILL.md
+    - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+    - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/ATOM_TASKS.yaml
+    - changes/M71-git-version-control-governance/G019-remote-readonly-pr-plan/LOCAL_COMMIT_EVIDENCE.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
+    - "validation: npm run verify:runtime-surface"

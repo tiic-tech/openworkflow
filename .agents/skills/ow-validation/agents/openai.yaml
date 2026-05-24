@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.validation
+interface:
+  display_name: "ow:validation"
+  short_description: "Prioritize the core feature or assumption that must be validated first."
+  default_prompt: "Use /ow:validation for this OpenWorkflow repository."

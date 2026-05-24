@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:M65-proto-tune-skill-boundary
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M65-proto-tune-skill-boundary
+source_plan_id: M59-proto-redesign-planning-dogfood
+source_candidate_id: P007
+title: Split prototype tuning into dedicated tune-prototype skill
+status: completed
+selection_reason:
+  - User approved inserting this temporary change before P005 dogfood.
+  - P007 has a focused boundary-cleanup scope and depends only on completed P003.
+  - Dogfood should validate explicit proto and tune source skills rather than a mixed skill.
+rejected_alternatives:
+  - id: P005
+    reason: P005 should wait until the skill boundary is clarified.
+  - id: P006
+    reason: Runtime exposure still depends on dogfood evidence.
+scope:
+  includes:
+    - tune-prototype skill source guidance
+    - refined prompt pack protocol relocation
+    - build-prototype boundary cleanup
+    - queue maintenance evidence for temporary change insertion
+  excludes:
+    - runtime command exposure
+    - generated adapter surfaces
+    - HTML conversion
+    - changing proto prompt pack schema
+owned_paths:
+  - skills/build-prototype/
+  - skills/tune-prototype/
+  - changes/M59-proto-redesign-planning-dogfood/
+  - changes/M65-proto-tune-skill-boundary/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/codex/src/
+acceptance:
+  - build-prototype no longer owns tune/refinement source behavior.
+  - tune-prototype owns baseline audit, delta rules, and refined prompt packs.
+  - P005 dogfood depends on the split boundary before proceeding.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/tune-prototype
+created_at: 2026-05-21
+updated_at: 2026-05-21

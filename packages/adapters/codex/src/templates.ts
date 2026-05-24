@@ -1,6 +1,5 @@
 import { generateSkillTemplates } from "./generateSkills.js";
-
-export const CODEX_ADAPTER_VERSION = "0.1.0";
+import { CODEX_ADAPTER_VERSION } from "./constants.js";
 
 export interface CodexTemplate {
   id: string;

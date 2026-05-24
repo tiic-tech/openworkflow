@@ -1,0 +1,600 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M59-proto-redesign-planning-dogfood
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M59-proto-redesign-planning-dogfood
+title: Candidate changes for ow:proto image-first redesign
+status: active
+source:
+  kind: mixed
+  refs:
+    - user discussion about ow:proto, validation visibility, and image-first prototype prompts
+    - skills/decompose-to-changes/SKILL.md
+    - skills/select-change/SKILL.md
+    - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+queue_policy:
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable P-prefixed ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - clarifies artifact contracts before source behavior
+    - keeps validation consumption explicit
+    - separates first-pass prototype generation from tuning
+    - avoids runtime exposure before source behavior is proven
+    - focused owned paths
+  avoid:
+    - implementing generated adapter surfaces directly
+    - mixing prompt contract design with CLI runtime changes
+    - treating validation removal as an implicit side effect
+    - adding HTML conversion to the proto redesign scope
+next_recommended_candidate_id: null
+changes:
+  - id: P001
+    status: done
+    title: Define proto redesign artifact contracts
+    purpose: >
+      Define the artifact vocabulary for image-first `/ow:proto`: strategic
+      prototype prompt packs, screen-bound tune prompt packs, validation input
+      policy, review evidence, and explicit boundaries before source behavior
+      changes begin.
+    scope:
+      includes:
+        - vision-to-strategic-prototype prompt pack contract
+        - prototype tune/refined prompt pack contract
+        - optional validation artifact consumption rules
+        - review evidence and decision handoff rules
+        - explicit non-goals for HTML generation and runtime exposure
+      excludes:
+        - source skill implementation
+        - command registry exposure
+        - generated Codex adapter surfaces
+        - removing ow:validation
+        - implementing /ow:proto2html
+    owned_paths:
+      - references/proto-redesign-artifact-contracts.md
+      - schemas/proto-prompt-pack.schema.json
+      - changes/M60-proto-redesign-artifact-contracts/
+    dependencies: []
+    unlocks:
+      - P002
+      - P003
+      - P004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Image-first proto artifacts define required and optional inputs.
+      - Validation artifact consumption is explicit when present or absent.
+      - Tune/refinement prompt packs preserve baseline prototype intent.
+      - HTML conversion and runtime exposure are excluded.
+    selection:
+      selected_change_id: M60-proto-redesign-artifact-contracts
+      reason: This contract change unlocks source proto behavior, tune behavior, and validation policy without implementing any of them.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M60-proto-redesign-artifact-contracts
+      completed_at: 2026-05-21
+      evidence:
+        - references/proto-redesign-artifact-contracts.md
+        - schemas/proto-prompt-pack.schema.json
+        - changes/M60-proto-redesign-artifact-contracts/CHANGE.yaml
+        - changes/M60-proto-redesign-artifact-contracts/ATOM_TASKS.yaml
+        - "validation: npm run validate"
+  - id: P002
+    status: done
+    title: Implement vision-to-strategic prototype source behavior
+    purpose: >
+      Update source prototype guidance so `/ow:proto` can consume a vision and
+      produce multiple strategic high-fidelity prototype prompt directions.
+    scope:
+      includes:
+        - source prototype skill guidance
+        - strategic hypothesis generation
+        - prompt pack output rules
+        - build-order recommendation behavior
+      excludes:
+        - tune/refinement behavior
+        - runtime command exposure
+        - validation automation
+        - HTML conversion
+    owned_paths:
+      - skills/build-prototype/
+      - changes/proto-vision-to-strategic-prompt-source/
+    dependencies:
+      - P001
+      - P004
+    unlocks:
+      - P005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - manual dogfood with OpenWorkflow VISION input
+    acceptance:
+      - "`/ow:proto` source behavior can operate from VISION-only input."
+      - Output directions differ by strategic hypothesis, not visual skin.
+      - Prompt packs are concrete enough for downstream image generation.
+    selection:
+      selected_change_id: M63-proto-vision-to-strategic-prompt-source
+      reason: P002 is ready, recommended, and unlocks tune behavior plus source dogfood.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M63-proto-vision-to-strategic-prompt-source
+      completed_at: 2026-05-21
+      evidence:
+        - skills/build-prototype/SKILL.md
+        - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+        - skills/build-prototype/agents/openai.yaml
+        - changes/M63-proto-vision-to-strategic-prompt-source/CHANGE.yaml
+        - "validation: quick_validate.py skills/build-prototype"
+        - "validation: npm run validate"
+  - id: P003
+    status: done
+    title: Implement prototype tune to refined prompt source behavior
+    purpose: >
+      Update tune guidance so a baseline prototype screen group and user
+      feedback can become screen-bound refined prompt packs without product
+      drift.
+    scope:
+      includes:
+        - source tune skill guidance
+        - baseline screen audit rules
+        - inheritance and delta rules
+        - screen-bound prompt manifest behavior
+      excludes:
+        - first-pass strategic prototype generation
+        - runtime command exposure
+        - HTML conversion
+    owned_paths:
+      - skills/build-prototype/
+      - changes/proto-tune-refined-prompt-source/
+    dependencies:
+      - P001
+      - P002
+    unlocks:
+      - P005
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - manual tune dogfood with baseline screen descriptions
+    acceptance:
+      - Tune behavior preserves product system and accepted baseline screens.
+      - Each refined prompt is bound to a target screen id.
+      - MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE are explicit.
+    selection:
+      selected_change_id: M64-proto-tune-refined-prompt-source
+      reason: P003 is ready after P001 and P002, completes source-level tune behavior before dogfood, and keeps runtime exposure out of scope.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M64-proto-tune-refined-prompt-source
+      completed_at: 2026-05-21
+      evidence:
+        - skills/build-prototype/SKILL.md
+        - skills/build-prototype/references/refined-prompt-pack-protocol.md
+        - skills/build-prototype/agents/openai.yaml
+        - changes/M64-proto-tune-refined-prompt-source/CHANGE.yaml
+        - "validation: quick_validate.py skills/build-prototype"
+        - "validation: npm run validate"
+  - id: P004
+    status: done
+    title: Clarify validation consumption for proto
+    purpose: >
+      Decide and encode how `/ow:proto` should behave when validation artifacts
+      are present, missing, or internally derived after vision creation.
+    scope:
+      includes:
+        - validation consumption decision record
+        - VISION-only fallback behavior
+        - rules for consuming VALIDATION and PROTOTYPE_BRIEF when present
+        - follow-up notes for possible automatic validation
+      excludes:
+        - removing ow:validation command surfaces
+        - implementing automatic validation triggers
+        - source proto prompt generation changes
+    owned_paths:
+      - changes/proto-validation-consumption-policy/
+      - references/proto-redesign-artifact-contracts.md
+    dependencies:
+      - P001
+    unlocks:
+      - P002
+      - P005
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+    acceptance:
+      - Proto behavior is defined for VISION-only input.
+      - Proto behavior is defined when validation artifacts exist.
+      - Automatic validation remains a separate follow-up, not an implicit change.
+    selection:
+      selected_change_id: M61-proto-validation-consumption-policy
+      reason: P004 is the only ready candidate after P001 and unlocks source proto behavior.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M61-proto-validation-consumption-policy
+      completed_at: 2026-05-21
+      evidence:
+        - references/proto-redesign-artifact-contracts.md
+        - changes/M61-proto-validation-consumption-policy/VALIDATION_CONSUMPTION_POLICY.yaml
+        - changes/M61-proto-validation-consumption-policy/CHANGE.yaml
+        - "validation: npm run validate"
+  - id: P005
+    status: done
+    title: Dogfood image-first proto flow on OpenWorkflow
+    purpose: >
+      Exercise the redesigned source-level proto flow on OpenWorkflow's own
+      product vision and record evidence for acceptance, tuning, or pivot.
+    scope:
+      includes:
+        - OpenWorkflow vision input
+        - strategic prototype prompt pack
+        - selected first prototype direction
+        - review and tuning evidence
+      excludes:
+        - production implementation
+        - runtime command exposure
+        - HTML conversion
+    owned_paths:
+      - changes/proto-redesign-source-dogfood/
+    dependencies:
+      - P002
+      - P003
+      - P004
+      - P007
+    unlocks:
+      - P006
+    risk: low
+    size: small
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js handoff --root . --json
+    acceptance:
+      - The redesigned proto flow produces actionable image-generation prompt artifacts.
+      - Evidence records what should be accepted or tuned.
+      - Follow-up production work remains selectable by stable id.
+    selection:
+      selected_change_id: M66-proto-redesign-source-dogfood
+      reason: P005 is the next recommended candidate, all dependencies are done, and source-level dogfood is required before runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M66-proto-redesign-source-dogfood
+      completed_at: 2026-05-21
+      evidence:
+        - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+        - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.md
+        - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+        - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+        - "validation: npm run validate"
+        - "validation: node dist/cli/src/index.js handoff --root . --json"
+  - id: P006
+    status: done
+    title: Expose proven proto redesign through runtime surfaces
+    purpose: >
+      Promote the proven source-level proto redesign into command, artifact,
+      and generated Codex adapter surfaces after dogfood evidence is accepted.
+    scope:
+      includes:
+        - command registry updates
+        - artifact registry updates
+        - generated Codex adapter surface
+        - runtime-surface and agent-e2e verification updates
+      excludes:
+        - source behavior discovery
+        - validation product decision
+        - HTML conversion
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/artifacts/readiness.ts
+      - packages/core/src/validators/
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/adapters/codex/src/
+      - packages/cli/src/
+      - schemas/prototype-evidence.schema.json
+      - references/artifact-authoring-templates.md
+      - changes/M67-proto-redesign-runtime-surface/
+    dependencies:
+      - P005
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - npm run validate
+      - npm run verify:runtime-surface
+      - npm run verify:agent-e2e
+      - npm run verify:e2e-workflow
+      - npm run verify:clean
+    acceptance:
+      - Runtime surfaces expose the accepted proto redesign behavior.
+      - Generated adapter output is produced through generation paths.
+      - Existing init, sync, handoff, and context behavior remains healthy.
+    selection:
+      selected_change_id: M67-proto-redesign-runtime-surface
+      reason: P006 is ready, next recommended, and P005 dogfood evidence proved the source behavior before runtime exposure.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M67-proto-redesign-runtime-surface
+      completed_at: 2026-05-21
+      evidence:
+        - packages/core/src/commands/registry.ts
+        - packages/core/src/artifacts/registry.ts
+        - schemas/prototype-evidence.schema.json
+        - .agents/skills/ow-proto/SKILL.md
+        - .agents/skills/ow-tune/SKILL.md
+        - changes/M67-proto-redesign-runtime-surface/CHANGE.yaml
+        - "validation: npm run validate"
+        - "validation: npm run verify:runtime-surface"
+        - "validation: npm run verify:agent-e2e"
+        - "validation: npm run verify:e2e-workflow"
+        - "validation: npm run verify:clean"
+  - id: P007
+    status: done
+    title: Split prototype tuning into dedicated tune-prototype skill
+    purpose: >
+      Separate first-pass strategic prototype generation from refinement/tuning
+      so `/ow:proto` maps to build-prototype and `/ow:tune` maps to a focused
+      tune-prototype source skill before dogfood validates the full flow.
+    scope:
+      includes:
+        - tune-prototype skill source guidance
+        - refined prompt pack protocol relocation
+        - build-prototype boundary cleanup
+        - queue maintenance evidence for temporary change insertion
+      excludes:
+        - runtime command exposure
+        - generated adapter surfaces
+        - HTML conversion
+        - changing proto prompt pack schema
+    owned_paths:
+      - skills/build-prototype/
+      - skills/tune-prototype/
+      - changes/M65-proto-tune-skill-boundary/
+      - changes/M59-proto-redesign-planning-dogfood/
+    dependencies:
+      - P003
+    unlocks:
+      - P005
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/build-prototype
+      - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/tune-prototype
+    acceptance:
+      - build-prototype no longer owns tune/refinement source behavior.
+      - tune-prototype owns baseline audit, delta rules, and refined prompt packs.
+      - P005 dogfood depends on the split boundary before proceeding.
+    selection:
+      selected_change_id: M65-proto-tune-skill-boundary
+      reason: User approved a temporary inserted change to clarify skill boundaries before P005 dogfood.
+      selected_at: 2026-05-21
+    completion:
+      completed_by_change_id: M65-proto-tune-skill-boundary
+      completed_at: 2026-05-21
+      evidence:
+        - skills/build-prototype/SKILL.md
+        - skills/tune-prototype/SKILL.md
+        - skills/tune-prototype/references/refined-prompt-pack-protocol.md
+        - changes/M65-proto-tune-skill-boundary/CHANGE.yaml
+        - "validation: quick_validate.py skills/build-prototype"
+        - "validation: quick_validate.py skills/tune-prototype"
+        - "validation: npm run validate"
+operations:
+  - operation_id: OP001
+    operation_type: select
+    target_candidate_ids:
+      - P002
+    actor: agent
+    reason: P002 is ready and next_recommended_candidate_id points to it.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M63-proto-vision-to-strategic-prompt-source/SELECTED_CHANGE.yaml
+  - operation_id: OP002
+    operation_type: complete
+    target_candidate_ids:
+      - P002
+    actor: agent
+    reason: Vision-to-strategic prompt source behavior was added to build-prototype and validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M63-proto-vision-to-strategic-prompt-source/CHANGE.yaml
+      - "validation: quick_validate.py skills/build-prototype"
+      - "validation: npm run validate"
+  - operation_id: OP003
+    operation_type: priority_change
+    target_candidate_ids:
+      - P003
+    actor: agent
+    reason: P003 becomes ready after P002 completion and is the next focused source behavior change.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - P003
+    actor: agent
+    reason: P003 is ready after P002 and completes the source-level tune/refinement behavior required before dogfood.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M64-proto-tune-refined-prompt-source/SELECTED_CHANGE.yaml
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - P003
+    actor: agent
+    reason: Refined prompt source behavior was added to build-prototype and validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/refined-prompt-pack-protocol.md
+      - changes/M64-proto-tune-refined-prompt-source/CHANGE.yaml
+      - "validation: quick_validate.py skills/build-prototype"
+      - "validation: npm run validate"
+  - operation_id: OP006
+    operation_type: priority_change
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: P005 becomes ready after P002, P003, and P004 are complete; it is the next dogfood step.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP007
+    operation_type: add
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: User approved inserting a temporary boundary clarification change before P005 dogfood.
+    changed_at: 2026-05-21
+    before_status: none
+    after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: priority_change
+    target_candidate_ids:
+      - P007
+      - P005
+    actor: agent
+    reason: P007 should run before P005 so dogfood validates separate proto and tune source skills.
+    changed_at: 2026-05-21
+    before_status: P005 ready
+    after_status: P007 ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: P007 is ready, has focused source-skill owned paths, and directly addresses the approved boundary concern.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M65-proto-tune-skill-boundary/SELECTED_CHANGE.yaml
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - P007
+    actor: agent
+    reason: tune-prototype was created, build-prototype was narrowed, and both skills plus repository contracts validated.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/tune-prototype/SKILL.md
+      - changes/M65-proto-tune-skill-boundary/CHANGE.yaml
+      - "validation: quick_validate.py skills/build-prototype"
+      - "validation: quick_validate.py skills/tune-prototype"
+      - "validation: npm run validate"
+  - operation_id: OP011
+    operation_type: priority_change
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: P005 becomes the next ready dogfood step after the temporary P007 boundary change is complete.
+    changed_at: 2026-05-21
+    before_status: P007 done
+    after_status: P005 ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP012
+    operation_type: select
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: P005 is ready, next recommended, and validates source-level proto/tune behavior before runtime exposure.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M66-proto-redesign-source-dogfood/SELECTED_CHANGE.yaml
+  - operation_id: OP013
+    operation_type: complete
+    target_candidate_ids:
+      - P005
+    actor: agent
+    reason: OpenWorkflow source dogfood produced a strategic prompt pack, selected first generation direction, and review/tune evidence.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+      - changes/M66-proto-redesign-source-dogfood/REVIEW_PLAN.md
+      - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+      - "validation: npm run validate"
+      - "validation: node dist/cli/src/index.js handoff --root . --json"
+  - operation_id: OP014
+    operation_type: priority_change
+    target_candidate_ids:
+      - P006
+    actor: agent
+    reason: P006 becomes ready after P005 dogfood evidence is complete.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP015
+    operation_type: select
+    target_candidate_ids:
+      - P006
+    actor: agent
+    reason: P006 is ready, next recommended, and depends only on completed P005 dogfood evidence.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M67-proto-redesign-runtime-surface/SELECTED_CHANGE.yaml
+  - operation_id: OP016
+    operation_type: complete
+    target_candidate_ids:
+      - P006
+    actor: agent
+    reason: Runtime command, artifact, schema, generated adapter, and verification surfaces now expose the accepted proto redesign.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - schemas/prototype-evidence.schema.json
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-tune/SKILL.md
+      - changes/M67-proto-redesign-runtime-surface/CHANGE.yaml
+      - "validation: npm run validate"
+      - "validation: npm run verify:runtime-surface"
+      - "validation: npm run verify:agent-e2e"
+      - "validation: npm run verify:e2e-workflow"
+      - "validation: npm run verify:clean"

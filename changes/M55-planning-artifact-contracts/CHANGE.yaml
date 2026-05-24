@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: change:M55-planning-artifact-contracts
+contract_type: change
+title: M55 Planning artifact contracts
+status: draft
+source_artifacts:
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+depends_on:
+  - change:M54-decompose-select-change-planning
+produces:
+  - selected_change:M55-planning-artifact-contracts
+  - atom_tasks:M55-planning-artifact-contracts
+  - work_items:M55-planning-artifact-contracts
+summary: >
+  Define the shared artifact vocabulary for candidate change queues, selected
+  changes, atom tasks, and implementation briefs before implementing the
+  decompose-to-changes and select-change skills.
+problem: >
+  The two planning skills need a stable machine-readable contract. Without it,
+  each skill could invent different fields for candidate ids, status updates,
+  selected change boundaries, and atom tasks, making repeated selection and
+  completion tracking unreliable.
+goals:
+  - Add schemas for candidate change queues, selected changes, and atom tasks.
+  - Add a concise reference describing update rules and implementation brief shape.
+  - Dogfood the selected change and atom task artifacts for this change.
+  - Keep the change limited to artifact vocabulary and documentation.
+non_goals:
+  - Do not implement decompose-to-changes.
+  - Do not implement select-change.
+  - Do not expose new /ow:* commands or generated Codex adapter surfaces.
+  - Do not redesign /ow:proto or /ow:tune.
+affected_paths:
+  - schemas/
+  - references/planning-artifact-contracts.md
+  - changes/M55-planning-artifact-contracts/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+acceptance:
+  - Candidate and selected change artifacts have stable required fields.
+  - Candidate status updates are specified without deleting historical entries.
+  - select-change can query candidates by id and status.
+  - Markdown readable views are explicitly non-authoritative.
+  - "`npm run validate` passes."
+validation:
+  - npm run validate
+created_at: 2026-05-21
+updated_at: 2026-05-21

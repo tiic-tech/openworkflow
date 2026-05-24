@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.context
+interface:
+  display_name: "ow:context"
+  short_description: "Map the repo context needed for vision and downstream workflow decisions."
+  default_prompt: "Use /ow:context for this OpenWorkflow repository."

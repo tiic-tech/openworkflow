@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: change:M67-proto-redesign-runtime-surface
+contract_type: change
+title: M67 Proto redesign runtime surface
+status: completed
+source_artifacts:
+  - changes/M59-proto-redesign-planning-dogfood/CANDIDATE_CHANGES.yaml
+  - changes/M66-proto-redesign-source-dogfood/PROTO_PROMPT_PACK.yaml
+  - changes/M66-proto-redesign-source-dogfood/EVIDENCE.md
+  - references/proto-redesign-artifact-contracts.md
+depends_on:
+  - change:M66-proto-redesign-source-dogfood
+produces:
+  - selected_change:M67-proto-redesign-runtime-surface
+  - atom_tasks:M67-proto-redesign-runtime-surface
+  - runtime_surface:M67-proto-redesign-runtime-surface
+summary: >
+  Promote the proven image-first proto and tune behavior into runtime command
+  surfaces, artifact contracts, schemas, generated Codex skills, and regression
+  verification.
+problem: >
+  The source skills can now produce strategic and refined prototype prompt packs,
+  but the installed OpenWorkflow runtime still exposes the older runnable
+  prototype and HTML review contract. Agents using `/ow:proto` or `/ow:tune`
+  need the generated surfaces to match the accepted dogfood behavior.
+goals:
+  - Expose image-first strategic prompt pack behavior through `/ow:proto`.
+  - Expose screen-bound refined prompt behavior through `/ow:tune`.
+  - Update prototype evidence contracts and summaries for prompt-pack artifacts.
+  - Regenerate adapter-managed surfaces through the sync path.
+  - Verify runtime, workflow, agent, clean, and repository validation behavior.
+non_goals:
+  - Do not redesign source skill behavior.
+  - Do not remove `/ow:validation`.
+  - Do not add automatic validation triggers.
+  - Do not add HTML conversion or production implementation behavior.
+affected_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/
+  - schemas/prototype-evidence.schema.json
+  - references/artifact-authoring-templates.md
+  - .agents/skills/
+  - .openworkflow/audit/
+  - changes/M67-proto-redesign-runtime-surface/
+  - changes/M59-proto-redesign-planning-dogfood/
+acceptance:
+  - Runtime surfaces expose the accepted proto redesign behavior.
+  - Generated adapter output is produced through generation paths.
+  - Existing init, sync, handoff, check, and context behavior remains healthy.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - npm run verify:e2e-workflow
+  - npm run verify:clean
+created_at: 2026-05-21
+updated_at: 2026-05-21

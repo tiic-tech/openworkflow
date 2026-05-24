@@ -1,0 +1,4 @@
+interface:
+  display_name: "Proto2html"
+  short_description: "Reconstruct accepted prototype benchmarks into single-file HTML"
+  default_prompt: "Use /ow:proto2html source behavior to reconstruct an accepted benchmark prototype image or screen group into a single-file HTML prototype with fidelity evidence."

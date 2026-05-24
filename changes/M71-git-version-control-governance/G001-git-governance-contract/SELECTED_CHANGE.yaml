@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:G001-git-governance-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: G001-git-governance-contract
+source_plan_id: M71-git-version-control-governance
+source_candidate_id: G001
+title: Formalize git governance hierarchy in planning contracts
+status: done
+selection_reason: >
+  G001 is the next recommended candidate and has no dependencies. It creates
+  the shared version-control contract that later decompose-to-changes,
+  select-change, Issue, gh, and PR governance changes need to reference.
+rejected_alternatives:
+  - candidate_ref: G002
+    reason: decompose-to-changes branch behavior needs the contract first.
+  - candidate_ref: G003
+    reason: select-change branch guards need the contract first.
+  - candidate_ref: G008
+    reason: Issue governance should reuse the shared git governance hierarchy.
+scope:
+  includes:
+    - version control hierarchy and naming conventions
+    - commit message expectations for selected candidates
+    - branch ownership expectations for each candidate queue
+    - PR scope and summary expectations for completed feat queues
+    - explicit non-destructive git operation policy
+  excludes:
+    - changing decompose-to-changes behavior
+    - changing select-change behavior
+    - adding runtime git automation
+    - creating PRs
+owned_paths:
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - changes/M71-git-version-control-governance/G001-git-governance-contract/
+forbidden_paths:
+  - skills/decompose-to-changes/**
+  - skills/select-change/**
+  - packages/**
+  - .agents/**
+  - .openworkflow/**
+acceptance:
+  - A durable reference defines selected change as commit-sized work.
+  - The planning contracts define CANDIDATE_CHANGES as a feat boundary.
+  - The contracts state that a feat should have an owning branch.
+  - The contracts state that PRs summarize feat branches, not individual atom tasks.
+  - The contracts prohibit destructive git operations unless the user explicitly requests them.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-21
+  evidence:
+    - references/planning-artifact-contracts.md
+    - references/git-version-control-governance.md
+    - changes/M71-git-version-control-governance/G001-git-governance-contract/SELECTED_CHANGE.yaml
+    - changes/M71-git-version-control-governance/G001-git-governance-contract/ATOM_TASKS.yaml
+    - "validation: npm run validate"
+    - "validation: git diff --check"
