@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M130-remaining-pr5-pr7-merge-governance:C003
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C003
+selected_change_path: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+created_at: 2026-05-25T01:49:56+08:00
+branch: codex/m130-remaining-pr5-pr7-merge-governance
+primary_commit:
+  hash: 8fc7490244112747c2a60bf126e37c5516d6ed50
+  subject: M130-remaining-pr5-pr7-merge-governance C003 prepare PR7 merge packet
+  scope: >
+    Prepared C003 local high-risk decision evidence for PR #7, including the
+    selected change artifacts, atom tasks, implementation brief, queue updates,
+    summary updates, readable queue view, and HIGH_RISK_DECISION_REPORT.md.
+evidence_commit:
+  expected: true
+  reason: >
+    This evidence file is recorded after the primary commit so it can reference
+    the actual commit hash without amending history.
+changed_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/SUMMARY.yaml
+validation_evidence:
+  read_only_remote_refresh:
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote origin refs/heads/main refs/heads/codex/m101-build-proto-prompt-command-split
+    - git fetch origin main codex/m101-build-proto-prompt-command-split
+    - git merge-base origin/main f8bf087211316506f48155859f3e18edbc7224e4
+    - git rev-list --count origin/main..f8bf087211316506f48155859f3e18edbc7224e4
+    - git rev-list --count f8bf087211316506f48155859f3e18edbc7224e4..origin/main
+    - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
+  local_validation:
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+remote_mutation_performed: false
+forbidden_operations_not_performed:
+  - gh pr merge
+  - git push
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - branch surgery
+  - destructive git operation

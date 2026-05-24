@@ -92,6 +92,7 @@ completion:
     mutation, branch surgery, or other remote mutation was performed.
   evidence:
     - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+    - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for M130 C003 planning evidence
   implementation_changed_files: true
