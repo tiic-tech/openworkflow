@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: summary:M134-git-governance-baseline-closure
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M134-git-governance-baseline-closure
+title: "Summary for git governance baseline closure"
+status: active
+source:
+  kind: mixed
+  summary: >
+    M134 starts after PR #5 merged into main at
+    6612aa3e06996ad0151e3686d0c972677fc892c6. It closes remaining OW git
+    governance before formal code development resumes: inventory remaining
+    local governance branches, extract necessary M131/M132 deltas onto a fresh
+    branch, decide PR #8 disposition, prepare publication gates, and record a
+    final baseline handoff.
+  refs:
+    - user_input:2026-05-25-complete-remaining-git-governance
+    - changes/M133-remaining-pr5-merge-governance/M133_FINAL_AUDIT_HANDOFF.md
+scope_boundary: >
+  Git governance baseline closure after PR #5 merged.
+branch_boundary: codex/m134-git-governance-baseline-closure
+target_base:
+  remote: origin
+  branch: main
+  head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
+candidate_count: 8
+completed_candidate_id: null
+completed_change_id: null
+next_recommended_candidate_id: C001
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.md
+  summary: changes/M134-git-governance-baseline-closure/SUMMARY.yaml
+key_dependencies:
+  - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
+  - "PR #8 remains open and draft."
+  - "M131/M132 local governance branches are not ancestors of origin/main."
+risks:
+  - id: R001
+    level: high
+    description: Extracting M131/M132 deltas from stacked branches can accidentally import stale historical governance artifacts.
+    mitigation: Use rebase-free source comparison and apply only necessary deltas onto M134.
+  - id: R002
+    level: high
+    description: PR #8 disposition and M134 publication are remote mutations.
+    mitigation: Require high-risk decision packets and exact operation-level approval.
+  - id: R003
+    level: medium
+    description: Generated .agents/.openworkflow surfaces can drift if patched manually.
+    mitigation: Update source contracts/templates and regenerate with approved commands only.
+unresolved_questions: []
+deferred_features:
+  - formal-code-development-after-baseline
+validation:
+  commands_run:
+    - node dist/cli/src/index.js resume --root . --json
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 30
+    - git branch --list --format='%(refname:short) %(objectname:short) %(upstream:short)'
+    - git switch -c codex/m134-git-governance-baseline-closure origin/main
+    - git status --short --branch
+  notes: |
+    - M134 branch was created from current origin/main, not from M130/M131/M132/M133 stacked branches.
+    - No remote mutation was performed while creating M134.
+    - C001 is the next recommended candidate.
