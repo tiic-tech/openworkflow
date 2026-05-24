@@ -9,7 +9,7 @@ M134 starts from `origin/main` at `6612aa3e06996ad0151e3686d0c972677fc892c6`, th
 - Branch boundary: `codex/m134-git-governance-baseline-closure`
 - Branch base: `origin/main`
 - Current base commit: `6612aa3e06996ad0151e3686d0c972677fc892c6`
-- Next recommended candidate: `C004`
+- Next recommended candidate: `C005`
 
 In scope: post-merge git/PR inventory, extracting necessary M131/M132 git-governance deltas onto a fresh branch, PR #8 disposition planning, M134 publication planning, and final baseline handoff.
 
@@ -108,7 +108,7 @@ Result:
 
 ### C004 - Decide PR #8 disposition after PR #5 merge
 
-Status: ready
+Status: done
 Risk: high
 
 Prepare a local decision packet for PR #8.
@@ -119,9 +119,15 @@ Acceptance:
 - Future PR #8 mutation has exact approval text and stop gates.
 - No remote mutation occurs in C004.
 
+Result:
+
+- PR #8 remains an open draft M130 audit PR.
+- PR #5 has since merged and M134 supersedes the remaining governance baseline closure.
+- Decision: do not merge PR #8; after M134 publication exists, close PR #8 as superseded without deleting its branch.
+
 ### C005 - Prepare M134 baseline publication packet
 
-Status: candidate
+Status: ready
 Risk: high
 
 Prepare the push/draft-PR decision packet for M134.

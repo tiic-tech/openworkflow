@@ -107,7 +107,7 @@ observed_state:
     - branch: codex/m133-remaining-pr5-merge-governance
       head: 040f20e
       note: Contains local M133 audit evidence after PR
-next_recommended_candidate_id: C004
+next_recommended_candidate_id: C005
 changes:
   - id: C001
     status: done
@@ -308,7 +308,7 @@ changes:
         - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
         - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: ready
+    status: done
     title: "Decide PR #8 disposition after PR #5 merge"
     purpose: >
       Produce a local decision packet for the only remaining open PR, PR #8, after PR #5 merged and
@@ -339,8 +339,30 @@ changes:
       - "PR #8 disposition is explicit."
       - "Any future PR #8 mutation has exact approval text and stop gates."
       - No remote mutation occurs in C004.
+    selection:
+      selected_change_id: C004
+      selected_at: 2026-05-25T03:31:00+08:00
+      reason: >
+        C004 is the next ready M134 candidate after local M131/M132 governance source deltas were
+        extracted and committed. It records the PR #8 disposition decision without mutating the
+        remote PR.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:31:00+08:00
+      implementation_changed_files: true
+      result: >
+        PR #8 is an open draft M130 audit PR whose body and branch describe a pre-PR-#5
+        merge-governance handoff. PR #5 has since merged into main and M134 supersedes the
+        remaining git-governance baseline closure. C004 recommends leaving PR #8 untouched until
+        M134 publication exists, then closing PR #8 as superseded with a local audit record. No
+        remote mutation was performed in C004.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
   - id: C005
-    status: candidate
+    status: ready
     title: Prepare M134 baseline publication packet
     purpose: >
       Prepare a high-risk publication decision packet for the M134 baseline branch after local
@@ -630,3 +652,43 @@ operations:
     after_status: ready
     evidence:
       - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 was the next ready candidate after M134 local source governance deltas were extracted
+      and strict handoff was clean.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      PR #8 was classified as a stale draft M130 audit PR superseded by M134 after PR #5 merged.
+      C004 recorded the future close handle and did not mutate the remote PR.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+  - operation_id: OP013
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C004 resolved PR #8 disposition planning, so M134 baseline publication can be prepared.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md

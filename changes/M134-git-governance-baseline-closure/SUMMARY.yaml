@@ -25,9 +25,9 @@ target_base:
   branch: main
   head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
 candidate_count: 8
-completed_candidate_id: C003
-completed_change_id: C003
-next_recommended_candidate_id: C004
+completed_candidate_id: C004
+completed_change_id: C004
+next_recommended_candidate_id: C005
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -48,6 +48,11 @@ outputs:
   atom_tasks_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/ATOM_TASKS.yaml
   implementation_brief_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/IMPLEMENTATION_BRIEF.md
   m132_delta_extraction_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+  local_commit_evidence_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+  atom_tasks_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+  implementation_brief_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+  pr8_disposition_decision_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
 key_dependencies:
   - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
   - "PR #8 remains open and draft."
@@ -86,4 +91,5 @@ validation:
     - M131/M132 contain source deltas that must be extracted onto M134.
     - C002 extracted the M131 selected-change commit-evidence gate onto M134.
     - C003 extracted the M132 strict git lifecycle branch and PR gate onto M134.
-    - C004 is the next recommended candidate.
+    - C004 decided PR #8 should be closed as superseded after M134 publication exists.
+    - C005 is the next recommended candidate.
