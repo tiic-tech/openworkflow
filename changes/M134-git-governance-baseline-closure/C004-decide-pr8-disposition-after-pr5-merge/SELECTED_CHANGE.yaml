@@ -8,9 +8,8 @@ title: "Decide PR #8 disposition after PR #5 merge"
 status: done
 selected_at: 2026-05-25T03:31:00+08:00
 selection_reason: >
-  C004 is the next ready M134 candidate after local M131/M132 governance source
-  deltas were extracted and committed. It records the PR #8 disposition decision
-  without mutating the remote PR.
+  C004 is the next ready M134 candidate after local M131/M132 governance source deltas were
+  extracted and committed. It records the PR #8 disposition decision without mutating the remote PR.
 source_candidate:
   id: C004
   status_at_selection: ready
@@ -20,7 +19,8 @@ source_candidate:
 scope:
   includes:
     - "refresh PR #8 metadata and compare against current main"
-    - "decide whether PR #8 should remain draft, be updated, be closed as superseded, or be replaced by M134 publication"
+    - "decide whether PR #8 should remain draft, be updated, be closed as superseded, or be replaced
+      by M134 publication"
     - record exact approval text for any future remote mutation
   excludes:
     - "editing, closing, marking ready, merging, or commenting on PR #8"
@@ -32,23 +32,24 @@ acceptance:
   - "Any future PR #8 mutation has exact approval text and stop gates."
   - No remote mutation occurs in C004.
 validation:
-  - gh pr view 8 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup,body,createdAt,updatedAt
+  - gh pr view 8 --repo tiic-tech/openworkflow --json
+    number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup,body,createdAt,updatedAt
   - git merge-base --is-ancestor d69eefca8b7d9ae3d510ed47f3e4815a07b74613 origin/main
-  - git log --oneline --left-right --cherry-pick origin/main...d69eefca8b7d9ae3d510ed47f3e4815a07b74613
+  - git log --oneline --left-right --cherry-pick
+    origin/main...d69eefca8b7d9ae3d510ed47f3e4815a07b74613
   - git diff --name-status origin/main..d69eefca8b7d9ae3d510ed47f3e4815a07b74613
   - git diff --check
 completion:
   completed_at: 2026-05-25T03:31:00+08:00
   implementation_changed_files: true
   result: >
-    PR #8 is an open draft M130 audit PR whose body and branch describe a
-    pre-PR-#5 merge-governance handoff. PR #5 has since merged into main and
-    M134 supersedes the remaining git-governance baseline closure. C004
-    recommends leaving PR #8 untouched until M134 publication exists, then
-    closing PR #8 as superseded with a local audit record. No remote mutation
-    was performed in C004.
+    PR #8 is an open draft M130 audit PR whose body and branch describe a pre-PR-#5 merge-governance
+    handoff. PR #5 has since merged into main and M134 supersedes the remaining git-governance
+    baseline closure. C004 recommends leaving PR #8 untouched until M134 publication exists, then
+    closing PR #8 as superseded with a local audit record. No remote mutation was performed in C004.
   evidence:
     - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+    - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for C004 decision evidence, plus a follow-up evidence commit
   implementation_changed_files: true

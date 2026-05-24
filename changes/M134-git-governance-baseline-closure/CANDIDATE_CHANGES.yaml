@@ -355,12 +355,13 @@ changes:
       implementation_changed_files: true
       result: >
         PR #8 is an open draft M130 audit PR whose body and branch describe a pre-PR-#5
-        merge-governance handoff. PR #5 has since merged into main and M134 supersedes the
-        remaining git-governance baseline closure. C004 recommends leaving PR #8 untouched until
-        M134 publication exists, then closing PR #8 as superseded with a local audit record. No
-        remote mutation was performed in C004.
+        merge-governance handoff. PR #5 has since merged into main and M134 supersedes the remaining
+        git-governance baseline closure. C004 recommends leaving PR #8 untouched until M134
+        publication exists, then closing PR #8 as superseded with a local audit record. No remote
+        mutation was performed in C004.
       evidence:
         - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
     status: ready
     title: Prepare M134 baseline publication packet
@@ -658,8 +659,8 @@ operations:
       - C004
     actor: agent
     reason: >
-      C004 was the next ready candidate after M134 local source governance deltas were extracted
-      and strict handoff was clean.
+      C004 was the next ready candidate after M134 local source governance deltas were extracted and
+      strict handoff was clean.
     changed_at: 2026-05-25T03:31:00+08:00
     before_status: ready
     after_status: selected
@@ -685,7 +686,7 @@ operations:
     target_candidate_ids:
       - C005
     actor: agent
-    reason: >
+    reason: |
       C004 resolved PR #8 disposition planning, so M134 baseline publication can be prepared.
     changed_at: 2026-05-25T03:31:00+08:00
     before_status: candidate
