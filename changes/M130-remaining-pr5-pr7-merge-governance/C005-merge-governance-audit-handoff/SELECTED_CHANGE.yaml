@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M130-remaining-pr5-pr7-merge-governance:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C005
+title: "Complete PR #5/#7 merge governance audit handoff"
+status: done
+selected_at: 2026-05-25T02:03:08+08:00
+selection_reason: >
+  User asked to advance C005. C005 is the next recommended ready candidate
+  after C004 merged PR #7 and owns the final M130 local audit handoff and the
+  next safe governance boundary for remaining PR #5.
+source_candidate:
+  id: C005
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - summarize C001-C004 evidence
+    - record final PR states and unauthorized operations not performed
+    - recommend the next queue for any remaining PR merge or blocker
+  excludes:
+    - new merge execution
+    - PR edit, Issue mutation, push, branch surgery, revert, or product source change
+owned_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/
+forbidden_operations:
+  - gh pr merge
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - git push
+  - git reset
+  - git rebase
+  - branch deletion
+  - force-push
+acceptance:
+  - M130 final audit explains whether merge remains blocked, deferred, or completed.
+  - Remaining open PRs are explicitly handed off to follow-up governance.
+  - No unauthorized operation is recorded.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+evidence:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/M130_MERGE_GOVERNANCE_AUDIT.md
+completion:
+  completed_at: 2026-05-25T02:03:08+08:00
+  implementation_changed_files: true
+  result: >
+    C005 recorded the final M130 audit handoff. M130 merged exactly PR #7 with
+    explicit approval, left PR #5 open and untouched, and recommends a follow-up
+    queue to refresh PR #5 against main at
+    f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444 before any additional merge
+    governance.
+  evidence:
+    - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/M130_MERGE_GOVERNANCE_AUDIT.md
+commit_boundary:
+  expected: one coherent local commit for M130 C005 audit handoff
+  implementation_changed_files: true

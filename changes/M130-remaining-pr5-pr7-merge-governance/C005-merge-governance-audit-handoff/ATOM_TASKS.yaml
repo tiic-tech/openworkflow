@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M130-remaining-pr5-pr7-merge-governance:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C005
+title: Atom tasks for C005 M130 merge governance audit handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Refresh final open PR and remote ref state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      Current open PR list and remote main/remaining head refs are captured
+      after the C004 PR #7 merge.
+  - task_id: T002
+    title: Summarize C001 through C004 evidence
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/
+    done_when: >
+      Final audit records each completed candidate, the approved merge, and
+      the evidence path that supports it.
+  - task_id: T003
+    title: Record remaining PR #5 boundary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/
+    done_when: >
+      PR #5 is explicitly handed off to a follow-up queue with the required
+      base refresh against current remote main.
+  - task_id: T004
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C005 is marked done, the queue records local handoff completion, and the
+      summary/readable view point to the final audit.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      OpenWorkflow validation passes, summary strict check passes, and git diff
+      whitespace is clean.

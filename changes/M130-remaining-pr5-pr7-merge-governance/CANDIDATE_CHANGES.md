@@ -4,13 +4,13 @@ Source of truth: `CANDIDATE_CHANGES.yaml`.
 
 M130 starts after M129 merged PR #4 into `main` at `b77418e2fe9b1f6eda213e52f495364bb1861e94`. It owns the next refreshed merge-governance slice for PR #5 and PR #7.
 
-C004 executed the approved PR #7 merge. PR #5 remains open and requires refreshed governance before any later merge.
+C005 recorded the final local audit handoff. PR #5 remains open and requires refreshed governance before any later merge.
 
 ## Boundary
 
 - Branch boundary: `codex/m130-remaining-pr5-pr7-merge-governance`
 - Current branch exception: planning was created on `codex/m122-m71-historical-stack-publication`
-- Next recommended candidate: `C005`
+- Next recommended candidate: none
 - Priority: active resume target on `codex/m130-remaining-pr5-pr7-merge-governance`
 - Remote/base: `origin` / `main`
 - Current remote main: `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`
@@ -23,10 +23,10 @@ Out of scope: merge during DTC, push, PR edits, retargeting, closing, review req
 
 | PR | Branch | State | Draft | Mergeable | Note |
 | --- | --- | --- | --- | --- | --- |
-| #5 | `codex/m117-git-automation-remote-readiness` | OPEN | false | UNKNOWN | Needs refresh against `main` after PR #7 merge |
+| #5 | `codex/m117-git-automation-remote-readiness` | OPEN | false | MERGEABLE | Needs refreshed governance against `main` after PR #7 merge |
 | #7 | `codex/m101-build-proto-prompt-command-split` | MERGED | false | UNKNOWN | Merged by C004 at `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444` |
 
-GitHub PR metadata currently reports the older base OID for these PRs. C001 must refresh against the actual remote `main` head before any target choice.
+GitHub PR metadata still reports the older base OID for PR #5. A follow-up queue must refresh PR #5 against the actual remote `main` head before any additional merge packet.
 
 ## Candidates
 
@@ -129,7 +129,7 @@ Result:
 - PR #7 is now MERGED.
 - Merge commit: `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`
 - Remote `main` now points to `f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444`.
-- PR #5 remains open and untouched, with mergeability reported as UNKNOWN after the main branch changed.
+- PR #5 remains open and untouched. It initially reported UNKNOWN after the main branch changed; the C005 refresh reports MERGEABLE, with old base metadata still present.
 
 Run only the exact approved merge command for the selected PR if the user later provides exact approval.
 
@@ -141,8 +141,23 @@ Acceptance:
 
 ### C005 - Complete PR #5/#7 merge governance audit handoff
 
-Status: ready
+Status: done
 Risk: medium
+
+Selected change artifacts:
+
+- `C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml`
+- `C005-merge-governance-audit-handoff/ATOM_TASKS.yaml`
+- `C005-merge-governance-audit-handoff/IMPLEMENTATION_BRIEF.md`
+- `C005-merge-governance-audit-handoff/M130_MERGE_GOVERNANCE_AUDIT.md`
+
+Result:
+
+- Final M130 audit handoff is recorded.
+- M130 merged exactly PR #7.
+- PR #5 remains open and untouched.
+- Recommended follow-up queue: `M133-remaining-pr5-merge-governance`.
+- No new merge, push, PR edit, Issue mutation, or branch surgery was performed in C005.
 
 Record final M130 audit state and the next safe governance boundary.
 
@@ -151,6 +166,12 @@ Acceptance:
 - M130 final audit explains whether merge remains blocked, deferred, or completed.
 - Remaining open PRs are explicitly handed off to follow-up governance.
 - No unauthorized operation is recorded.
+
+## Completion Boundary
+
+All M130 local candidates are done. The queue is not marked complete and no PR
+is created from this local branch because remote PR creation requires separate
+explicit operation-level approval.
 
 ## Deferred
 
