@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M105-m104-direct-trust-gate-fixes:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M105-C004-reconcile-owned-path-output-guidance
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C004
+status: completed
+tasks:
+  - task_id: T001
+    title: Locate dirty-path refusal diagnostics
+    status: completed
+    type: investigate
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+    done_when: >
+      The git-automation path that refuses unrelated dirty paths is identified.
+  - task_id: T002
+    title: Add OW output path guidance
+    status: completed
+    type: implementation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+    done_when: >
+      Refusals for likely OW pointer/index/summary output paths include
+      actionable owned_paths guidance while still refusing the commit.
+  - task_id: T003
+    title: Add runtime regression coverage
+    status: completed
+    type: test
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification exercises a dirty SUMMARY/CURRENT_STATE
+      output omitted from owned_paths and checks the diagnostic.
+  - task_id: T004
+    title: Validate and record completion
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M105-m104-direct-trust-gate-fixes/
+    done_when: >
+      build, runtime-surface verification, validate, summaries --strict,
+      handoff, and diff-check pass, then local commit evidence is recorded.

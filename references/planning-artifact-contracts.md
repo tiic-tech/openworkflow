@@ -138,6 +138,73 @@ quality are separate trust signals. Use `openworkflow summaries --json` or
 handoff/inspect quality fields for summary trust rather than treating
 `validate` alone as proof that a summary is sufficient.
 
+## Agent Resume Packet Contract
+
+`resume --json` is a read-only Agent recovery packet. It aggregates existing
+trust gates and planning evidence into one startup cockpit without repairing
+state, selecting candidates, updating summaries, creating commits, or changing
+workflow pointers.
+
+The JSON command must use the standard OpenWorkflow report envelope:
+
+- `schema_version`
+- `command: resume`
+- `ok`
+- `root`
+- `data`
+- `warnings`
+- `errors`
+- `health_errors`
+- `effects`
+- `next_actions`
+
+The `data` packet should include these top-level sections:
+
+- `resume_version`: contract version for the packet shape.
+- `command_boundary`: read-only semantics, planned writes, forbidden writes,
+  and deferred non-goals.
+- `trust`: handoff-quality and readiness signals sourced from existing
+  handoff, inspect, summaries, and check models.
+- `workflow`: active stage, active pointers, current next command, and read
+  order.
+- `active_queue`: the most relevant planning queue when one can be identified,
+  including plan id, queue path, branch boundary, queue status, selected
+  candidate, completed candidate, next recommended candidate, and uncertainty.
+- `current_work_item`: selected candidate or atom-task context when available,
+  including selected-change id, status, title, risk, owned paths, atom task
+  path, and implementation brief path.
+- `actions`: recommended next action plus allowed actions, forbidden actions,
+  and stop conditions derived from trust gates and queue boundaries.
+- `evidence`: primary, auxiliary, comparison, and missing evidence paths.
+- `git`: branch, cleanliness, dirty paths, and commit-evidence state when
+  available without mutation.
+- `sources`: source commands and files consulted to build the packet.
+
+Text output should be a concise human-readable rendering of the same packet:
+trust status, active queue/current work item, next action, blockers, and the
+smallest read order. Text output must not hide JSON-only blockers.
+
+Read-only boundary:
+
+- The command may read `.openworkflow/CURRENT_STATE.yaml`, summary/current-slice
+  artifacts, handoff/inspect/summaries/check models, planning queue summaries,
+  selected-change artifacts, atom tasks, and git status.
+- The command must not write workflow artifacts, summarize files, queue
+  statuses, generated adapters, git evidence, branches, commits, or remote
+  state.
+- The command must report uncertainty instead of selecting work when multiple
+  active queues compete or when queue evidence is stale.
+
+Deferred work:
+
+- Base aggregation and executable CLI entrypoint belong to the implementation
+  candidate after the contract boundary.
+- Active queue scanning beyond obvious current planning evidence belongs to a
+  separate candidate.
+- Detailed action/evidence classification belongs to a later candidate.
+- Artifact lineage graph, prompt2proto strategy, provider/fallback metadata,
+  and a write preflight compiler are out of scope for the resume packet.
+
 Selected-change commit gate:
 
 - New or actively touched branch-governed queues may opt into
@@ -342,6 +409,35 @@ Required fields for new evidence files:
 - `selected_change_id`
 - `primary_commit`
 - `validation_evidence`
+
+Optional `coder_evidence` fields may be embedded in
+`LOCAL_COMMIT_EVIDENCE.yaml` when an implementation change needs to bind
+`/ow:coder` evidence beyond the guidance-only `coder_gate` state:
+
+```yaml
+coder_evidence:
+  status: recorded # recorded | skipped | not_applicable
+  enforcement: guidance_only
+  preflight:
+    - checked owned paths and validation ladder
+  red_evidence:
+    - failing structural assertion before implementation
+  green_evidence:
+    - passing structural assertion after implementation
+  self_check:
+    - reviewed generated surfaces and trust boundaries
+  validation_ladder:
+    - npm run build
+    - npm run verify:runtime-surface
+  lessons:
+    - promote only repeated quality lessons into source policy
+  notes: Optional concise context for later Agents.
+```
+
+`coder_evidence` is optional. Validators must accept missing coder evidence and
+must reject malformed present coder evidence. Standalone `CODE_EVIDENCE.yaml`
+or `CODER_EVIDENCE.yaml` is intentionally deferred to a separate future
+candidate change.
 
 Historical evidence files may use older field names such as `plan_id`,
 `candidate_id`, `change_id`, and `implementation_commit`; validators accept

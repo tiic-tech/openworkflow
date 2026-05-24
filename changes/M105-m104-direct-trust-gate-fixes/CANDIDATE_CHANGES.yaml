@@ -1,0 +1,519 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M105-m104-direct-trust-gate-fixes
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M105-m104-direct-trust-gate-fixes
+title: Candidate changes for M104 direct trust-gate and evidence fixes
+status: complete
+source:
+  kind: mixed
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M104_FOURTH_DISCOVERY_E2E_ARTIFACT_AUDIT_REPORT.md
+    - changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
+    - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+  summary: >
+    M104 smart_city_copilot fourth-round E2E exposed several direct OpenWorkflow source defects that
+    affected Agent trust gates, handoff interpretation, and local commit evidence closure. This
+    queue captures the immediately actionable fixes before broader interview-derived product
+    scenarios such as resume, lineage graph, and prompt2proto strategy engine.
+queue_policy:
+  branch_boundary: codex/m101-build-proto-prompt-command-split
+  branch_note: >
+    Queue is created on the current continuation branch because the user asked to recover M104
+    dogfood intelligence and immediately advance fixes from the current OW mother-repo workspace. A
+    later git-automation branch action may move this queue if branch governance requires it.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Start with C001 because M104 directly proved that summarize --write can create a SUMMARY.yaml
+    shape that validate then rejects. This is a self-contained trust-gate contradiction with the
+    smallest source surface.
+  high_risk_rule: >
+    Changes to validate, summaries --strict, handoff, or git-automation trust semantics are high
+    risk when they can newly block existing queues. C001 is medium risk because it should make
+    writer output match existing validator expectations without changing enforcement policy.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Direct M104 trust-gate and evidence-closure defects that blocked or confused the fourth-round
+    target-repo dogfood run.
+  boundary_type: workflow_trust_gate_bugfix_slice
+  in_scope_rule: >
+    Include only fixes that M104 directly exercised: summary writer/validator shape, current vision
+    pointer reporting, git commit evidence backfill, and selected-change owned-path/pointer output
+    reconciliation.
+  out_of_scope_rule: >
+    Do not implement the broader interview roadmap in this queue: no resume cockpit, no full
+    artifact lineage graph, no full prompt2proto strategy engine, no provider-backed image
+    benchmark, no proto2html, and no remote git or PR mutation.
+  deferred_features:
+    - title: Agent resume cockpit
+      reason: >
+        High-value interview scenario but broader than direct M104 bug fixes. Needs its own DTC
+        queue and read-model design.
+      suggested_plan_id: M106-agent-resume-cockpit
+    - title: Artifact lineage graph for prototype evidence
+      reason: >
+        M104 showed the need, but a graph spans schema, validators, evidence model, and prompt2proto
+        semantics. Keep separate from trust-gate bugfixes.
+      suggested_plan_id: M107-artifact-lineage-graph
+    - title: Consistency-first split-later prompt2proto strategy
+      reason: >
+        M104 produced strong prompt-template intelligence, but implementation belongs in a dedicated
+        prompt2proto generation-strategy queue.
+      suggested_plan_id: M108-consistency-first-prompt2proto-strategy
+    - title: Provider and fallback generation mode metadata
+      reason: >
+        Related to image generation evidence and should be designed with prompt2proto strategy, not
+        mixed into trust-gate bug fixes.
+      suggested_plan_id: M109-provider-fallback-generation-metadata
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Align summarize output shape with validate expectations
+    purpose: >
+      Fix the direct M104 contradiction where `openworkflow summarize --write` generated a prototype
+      SUMMARY.yaml with `contract_type: summary` and no `status`, then `validate --json` rejected
+      that file as an invalid source artifact.
+    scope:
+      includes:
+        - locate the deterministic summary writer for artifact summaries
+        - emit a validation-compatible summary header for SUMMARY.yaml files
+        - add or update regression coverage proving summarize --write output does not make validate
+          fail
+        - preserve summaries --strict freshness and quality semantics
+      excludes:
+        - changing the meaning of artifact summaries
+        - weakening validate for real source artifacts
+        - broad summary schema redesign
+        - prompt2proto image evidence changes
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/planning-artifact-contracts.md
+      - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+      - changes/M105-m104-direct-trust-gate-fixes/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js summarize --root <fixture> --artifact <prototype-evidence>
+        --write --json
+      - node dist/cli/src/index.js validate --root <fixture> --json
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - summarize --write emits summary files that include the required validation-compatible
+        contract keys.
+      - validate no longer rejects summary files produced by summarize --write.
+      - The fix is covered by a runtime-surface or focused CLI regression.
+      - Existing source-artifact validation remains strict.
+    selection:
+      selected_change_id: M105-C001-align-summarize-output-shape
+      selected_at: 2026-05-23
+      reason: >
+        Selected as the smallest directly exposed M104 trust-gate bug. The selected change also owns
+        docs/M104_AGENT_CONSUMER_INTERVIEW.md because that uncommitted interview record is source
+        evidence for this queue.
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/cli/src/commands/summarize.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+      summary: >
+        Fixed summarize --write to emit validation-compatible artifact summary headers using
+        contract_type workflow and status current, and added runtime-surface assertions for the
+        generated summary header.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
+  - id: C002
+    status: done
+    title: Fix current vision pointer reporting after vision session registration
+    purpose: >
+      Resolve the M104 observation that vision registration made VISION_CONTRACT current_session
+      usable while CURRENT_STATE and handoff active_pointers still displayed current_vision as null.
+    scope:
+      includes:
+        - inspect register/current-state handling for vision_session artifacts
+        - align CURRENT_STATE.current_vision or active_pointers reporting with current_session
+          semantics
+        - add regression coverage for handoff and summaries identifying the same current vision
+      excludes:
+        - redesigning the vision artifact contract
+        - changing validation/prototype registration semantics
+        - creating new vision workflow stages
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M105-m104-direct-trust-gate-fixes/
+    dependencies:
+      - C001
+    unlocks:
+      []
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+    acceptance:
+      - After registering a vision session current, handoff active_pointers does not misleadingly
+        show current_vision as null.
+      - summaries and CURRENT_STATE/current pointer reporting agree or the handoff packet explicitly
+        explains current_session.
+      - Regression coverage captures the M104 failure mode.
+    selection:
+      selected_change_id: M105-C002-fix-current-vision-pointer-reporting
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C001 completed. C002 is the next direct M104 Agent-facing defect and focuses
+        on pointer reporting, not broader resume/read-model redesign.
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/cli/src/commands/brief.ts
+        - packages/cli/src/commands/check.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+      summary: >
+        Handoff and check active pointer read models now report CURRENT_STATE.current_session as
+        current_vision when no explicit current_vision path is present. Runtime-surface coverage
+        registers a current vision session and verifies handoff/check expose the pointer.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
+  - id: C003
+    status: done
+    title: Auto-backfill commit evidence into selected-change completion
+    purpose: >
+      Reduce the manual repair loop M104 exposed when LOCAL_COMMIT_EVIDENCE needed to exist and be
+      referenced from queue/selected-change completion before strict handoff would pass.
+    scope:
+      includes:
+        - make git-automation commit evidence creation update the selected-change completion
+          evidence when safe
+        - make queue completion evidence link the created LOCAL_COMMIT_EVIDENCE path when safe
+        - preserve explicit no-commit reason handling for planning-only changes
+        - emit precise warnings when automatic backfill cannot be performed
+      excludes:
+        - remote push, PR creation, merge, or Issue mutation
+        - changing the strict commit gate policy from M102
+        - rewriting historical queues
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+      - references/planning-artifact-contracts.md
+      - changes/M105-m104-direct-trust-gate-fixes/
+    dependencies:
+      - C001
+    unlocks:
+      []
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - git-automation commit with --commit-evidence can create evidence and link it into completion
+        records without manual queue edits.
+      - Strict summaries and handoff pass after the evidence commit when no other blockers exist.
+      - Runtime coverage includes the M104-style missing evidence repair loop.
+    selection:
+      selected_change_id: M105-C003-auto-backfill-commit-evidence
+      selected_at: 2026-05-23
+      reason: >
+        Selected after explicit user approval of high-risk Option A. The implementation is
+        constrained to narrow safe backfill and must not create completion sections or change
+        candidate status automatically.
+      risk_decision:
+        approved_option: Option A - Narrow Safe Backfill
+        decision_report: changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        git-automation commit now performs narrow safe completion evidence backfill after the
+        primary commit and before the evidence commit, adding LOCAL_COMMIT_EVIDENCE.yaml to existing
+        queue and selected-change completion evidence arrays only when the approved preconditions
+        hold.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
+  - id: C004
+    status: done
+    title: Reconcile selected-change owned paths with command pointer and summary outputs
+    purpose: >
+      Prevent implementation candidates from failing git-automation scope checks only after the
+      Agent has already made expected pointer or summary updates, as happened when C005 needed to
+      refresh proto-m104 SUMMARY.yaml.
+    scope:
+      includes:
+        - identify command outputs that commonly mutate CURRENT_STATE, index, summary, and decision
+          files
+        - make select-change or git-automation report missing owned paths before commit time where
+          possible
+        - document or encode candidate-owned pointer output expectations
+      excludes:
+        - allowing broad `.openworkflow/**` ownership by default
+        - weakening dirty-path scope enforcement
+        - generated adapter changes
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+      - skills/select-change/
+      - references/planning-artifact-contracts.md
+      - changes/M105-m104-direct-trust-gate-fixes/
+    dependencies:
+      - C001
+    unlocks:
+      []
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Agents get earlier, clearer guidance when selected-change owned paths omit expected pointer
+        or summary outputs.
+      - Dirty-path scope enforcement remains strict.
+      - M104 C005-style summary refresh is represented as an expected owned output or clear warning.
+    selection:
+      selected_change_id: M105-C004-reconcile-owned-path-output-guidance
+      selected_at: 2026-05-23
+      reason: >
+        Selected after C003 completed. C004 is the remaining direct M104 trust-gate fix and is
+        constrained to diagnostics, not relaxed scope enforcement.
+      artifacts:
+        selected_change: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml
+        atom_tasks: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml
+        implementation_brief: changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-23
+      implementation_changed_files: true
+      evidence:
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/LOCAL_COMMIT_EVIDENCE.yaml
+      summary: >
+        git-automation commit now keeps strict dirty-path refusal while adding actionable warnings
+        when unrelated dirty paths look like OpenWorkflow command outputs that may need explicit
+        selected-change owned_paths.
+      validation:
+        - npm run build
+        - npm run verify:runtime-surface
+        - node dist/cli/src/index.js validate --root . --json
+        - node dist/cli/src/index.js summaries --root . --strict --json
+        - node dist/cli/src/index.js handoff --root . --json
+        - git diff --check
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Decomposed direct M104 fourth-round E2E dogfood defects into a bounded trust-gate and
+      evidence-closure bugfix queue.
+    changed_at: 2026-05-23
+    evidence:
+      - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M104_FOURTH_DISCOVERY_E2E_ARTIFACT_AUDIT_REPORT.md
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Selected C001 to begin fixing the direct M104 summarize/validate contradiction before broader
+      trust-gate work.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed the summarize writer output fix and regression assertion after build,
+      runtime-surface verification, validate, summaries --strict, handoff, and diff-check passed.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/summarize.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Selected the current vision pointer reporting bug after C001 restored trust gates and unlocked
+      dependent direct M104 fixes.
+    changed_at: 2026-05-23
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: |
+      Implemented and verified the M104 current vision pointer reporting fix.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/brief.ts
+      - packages/cli/src/commands/check.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M105-m104-direct-trust-gate-fixes/C002-fix-current-vision-pointer-reporting/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: high_risk_decision
+    target_candidate_ids:
+      - C003
+    actor: user
+    reason: >
+      User approved Option A from HIGH_RISK_DECISION_REPORT.md for the high-risk git-automation
+      evidence backfill change.
+    changed_at: 2026-05-23
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Selected C003 after high-risk approval, constrained to narrow safe backfill of existing
+      completion evidence arrays.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Implemented and verified narrow safe completion evidence backfill for git-automation commit
+      evidence creation.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: |
+      Selected the last direct M104 trust-gate fix after C003 completed and strict handoff passed.
+    changed_at: 2026-05-23
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/SELECTED_CHANGE.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/ATOM_TASKS.yaml
+      - changes/M105-m104-direct-trust-gate-fixes/C004-reconcile-owned-path-output-guidance/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: |
+      Implemented and verified owned-path diagnostics for out-of-scope OpenWorkflow command outputs.
+    changed_at: 2026-05-23
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts

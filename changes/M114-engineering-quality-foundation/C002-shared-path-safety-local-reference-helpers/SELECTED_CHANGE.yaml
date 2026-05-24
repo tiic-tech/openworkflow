@@ -1,0 +1,98 @@
+schema_version: 0.1.0
+contract_id: selected_change:M114-engineering-quality-foundation:C002
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M114-C002-shared-path-safety-local-reference-helpers
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C002
+title: Introduce shared path-safety and local-reference helpers
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after M115 completed because C001 established validation trust
+  domains and C002 is the next recommended dependency-ready M114 candidate.
+  The slice is narrow: introduce one shared helper, prove path escape and
+  prefix-collision behavior with targeted evidence, and replace one validator
+  call site without changing public diagnostics.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Add a small core fs helper for root-contained path and local-reference
+    resolution, then replace one existing validator path check. Do not change
+    public CLI JSON shape, broad validator policy, generated surfaces, or
+    unrelated validator domains.
+scope:
+  includes:
+    - add one audited helper for root-contained paths and local refs
+    - cover relative escapes, prefix collisions, absolute paths, external refs, missing files, and valid refs
+    - replace one narrow validator call site without changing behavior-compatible diagnostics
+  excludes:
+    - broad validator rewrite
+    - public CLI JSON changes
+    - generated surface changes
+    - fixing historical validation debt outside the targeted helper path
+owned_paths:
+  - packages/core/src/fs/
+  - packages/core/src/validators/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M114-engineering-quality-foundation/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/core/src/commands/**
+  - packages/core/src/artifacts/**
+  - packages/adapters/**
+acceptance:
+  - A single helper owns root containment semantics for the touched path.
+  - Targeted tests cover escape and prefix-collision cases.
+  - Existing validation diagnostics remain behavior-compatible for the replaced call site.
+validation:
+  - npm run build
+  - targeted path-safety fixture or npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+coder_governance:
+  required: true
+  protocol_source: skills/coder/SKILL.md
+  quality_benchmark: /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
+  required_evidence:
+    - trust recovery
+    - owner/file/dependency map
+    - RED evidence before production edits
+    - GREEN evidence after edits
+    - post-write self-check
+    - honest validation ladder
+    - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
+expected_commit_boundary: >
+  C002 should complete as one local implementation commit containing selection
+  artifacts, helper and validator changes, targeted verification evidence,
+  queue updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+    - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Added shared core fs helpers for root-contained path resolution,
+    external-reference classification, and local-reference existence checks.
+    Replaced the repository-contract validator local-ref call site with the
+    helper while preserving behavior-compatible path-outside-root and missing
+    path diagnostics.
+  validation:
+    - "RED: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs failed because dist/core/src/fs/index.js did not export resolveLocalReference"
+    - npm run build
+    - "GREEN: node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs"
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  post_write_self_check:
+    - Source truth stays in packages/core/src/fs/ for root containment and local-reference resolution.
+    - One narrow validator call site was replaced; broad validator behavior and public CLI JSON were not changed.
+    - Generated .agents/** and .openworkflow/** surfaces were intentionally untouched.
+    - Validation ladder matched helper and validator scope, with targeted RED/GREEN plus OW trust checks.

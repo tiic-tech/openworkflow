@@ -30,6 +30,7 @@ const SKILL_NAMES = [
   "ow-analyze-changes",
   "ow-select-change",
   "ow-git-automation",
+  "ow-coder",
 ] as const;
 
 async function main(): Promise<number> {
@@ -51,6 +52,7 @@ async function main(): Promise<number> {
     await verifyHelpSurface(env);
     await verifyBriefStatus(target, tempRoot, env);
     await verifyJsonReports(target, tempRoot, env);
+    await verifyResumePlanningQueueDetection(tempRoot, env);
     await verifyCommandCheck(target, env);
     await verifySummaryHealth(tempRoot, env);
     await verifyConfig(target);
@@ -193,6 +195,13 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "template-id: openworkflow.agents-guide.v1",
     "openworkflow --help",
     "ok:false",
+    "openworkflow resume --root . --json",
+    "first recovery command",
+    "network loss",
+    "context overflow",
+    "compaction failure",
+    "unexpected termination",
+    "minimal-context precision entrypoint",
     "openworkflow handoff --root . --json",
     "strict Agent trust gate",
     "handoff_quality_ok",
@@ -211,6 +220,10 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "openworkflow register --root . --artifact <path> --json",
     "openworkflow brief --root .",
     "openworkflow status --root .",
+    "interrupted-session recovery",
+    "generic autonomous retry loop",
+    "ranked atom-task continuation",
+    "product-alignment",
     "openworkflow check /ow:<command> --root . --json",
     "openworkflow summaries --root . --json",
     "draft/thin source quality return `ok:false`",
@@ -223,6 +236,8 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:analyze-changes",
     "/ow:select-change",
     "/ow:git-automation",
+    "SOUL.md",
+    "MEMORY.md",
     "Respect lazy creation",
   ]) {
     assert(guide.includes(required), `AGENTS.md missing onboarding guidance: ${required}`);
@@ -241,6 +256,15 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
   const help = await runCapture(["node", CLI, "--help"], env);
   for (const required of [
     "Agent quick start",
+    "openworkflow resume --root . --json first",
+    "network loss",
+    "context overflow",
+    "compaction failure",
+    "unexpected termination",
+    "active queue/work item",
+    "behavior boundaries",
+    "smallest correct OW-maintained next action",
+    "Status and brief are lightweight summaries",
     "Two command surfaces",
     "CLI maintenance commands",
     "Doctor confirms managed surface health, not handoff quality",
@@ -280,6 +304,19 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     "pass --write to update summary files",
     "git-automation",
     "Managed git lifecycle shell",
+    "openworkflow resume --root <folder> [--tools auto|codex] [--json]",
+    "resume",
+    "Read-only Agent recovery cockpit",
+    "interrupted-session recovery",
+    "generic autonomous retry loop",
+    "Contract-defined read-only recovery",
+    "planning queue",
+    "corrected, ranked atom-task continuation",
+    "broad free-form replanning",
+    "data.command_boundary",
+    "data.current_work_item",
+    "SOUL.md",
+    "MEMORY.md",
     "SUMMARY.yaml freshness is checked by summaries",
     "requires an initialized .openworkflow root",
     "Every command supports --json",
@@ -347,6 +384,27 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   parseJsonReport(await runCapture(["node", CLI, "sync", "--root", root, "--json"], env), "sync");
   parseJsonReport(await runCapture(["node", CLI, "doctor", "--root", root, "--json"], env), "doctor");
   parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
+  const resumeReport = parseJsonReport(await runCapture(["node", CLI, "resume", "--root", root, "--json"], env), "resume");
+  const resumeData = record(resumeReport.data, "resume data");
+  const resumeBoundary = record(resumeData.command_boundary, "resume command_boundary");
+  const resumeTrust = record(resumeData.trust, "resume trust");
+  const resumeQueue = record(resumeData.active_queue, "resume active_queue");
+  const resumeWorkItem = record(resumeData.current_work_item, "resume current_work_item");
+  const resumeGit = record(resumeData.git, "resume git");
+  assert(resumeReport.ok === true, "fresh resume should pass handoff trust");
+  assert(resumeData.resume_version === "0.1.0", "resume json missing version");
+  for (const required of ["command_boundary", "trust", "workflow", "active_queue", "current_work_item", "actions", "evidence", "git", "sources"]) {
+    assert(required in resumeData, `resume json missing data key ${required}`);
+  }
+  assert(resumeBoundary.read_only === true, "resume command boundary must be read-only");
+  assert(Array.isArray(resumeBoundary.writes) && resumeBoundary.writes.length === 0, "resume command boundary must have no writes");
+  assert(Array.isArray(resumeBoundary.deferred_capabilities) && resumeBoundary.deferred_capabilities.includes("project-local SOUL.md and MEMORY.md learning artifacts"), "resume boundary should keep SOUL/MEMORY deferred");
+  assert(!String(resumeBoundary.deferred_capabilities).includes("runtime documentation beyond the executable CLI surface"), "resume boundary should not describe runtime docs as deferred");
+  assert(resumeTrust.handoff_ok === true, "resume trust should expose handoff_ok");
+  assert(resumeQueue.status === "unknown", "fresh resume without changes should report unknown active queue");
+  assert(Array.isArray(resumeQueue.uncertainty) && resumeQueue.uncertainty.some((item) => String(item).includes("changes/")), "fresh resume should explain missing planning queue");
+  assert(resumeWorkItem.status === "unknown", "fresh resume without changes should report unknown current work item");
+  assert(resumeGit.available === false, "resume git state should reuse brief git state");
   const validateReport = parseJsonReport(await runCapture(["node", CLI, "validate", "--root", root, "--json"], env), "validate");
   const validateData = record(validateReport.data, "validate data");
   const validateScope = record(validateData.scope, "validate scope");
@@ -365,6 +423,191 @@ async function verifyJsonReports(root: string, tempRoot: string, env: NodeJS.Pro
   const summarizeStatus = await runCaptureStatus(["node", CLI, "summarize", "--root", root, "--all", "--json"], env);
   assert(summarizeStatus.code === 0, "summarize --all dry-run should succeed");
   parseJsonReport(summarizeStatus.output, "summarize");
+}
+
+async function verifyResumePlanningQueueDetection(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const root = join(tempRoot, "resume-queue-detection");
+  await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
+  const queueRoot = join(root, "changes", "M900-resume-queue-fixture");
+  const selectedRoot = join(queueRoot, "C001-active-selection");
+  await mkdir(selectedRoot, { recursive: true });
+  await writeFile(join(queueRoot, "SUMMARY.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: summary:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: summary",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "branch_boundary: null",
+    "candidate_count: 2",
+    "completed_candidate_id: null",
+    "completed_change_id: null",
+    "selected_candidate_id: C001",
+    "selected_change_id: M900-C001-active-selection",
+    "next_recommended_candidate_id: null",
+    "outputs:",
+    "  candidate_changes_yaml: changes/M900-resume-queue-fixture/CANDIDATE_CHANGES.yaml",
+    "key_dependencies: []",
+    "risks: []",
+    "unresolved_questions: []",
+    "validation:",
+    "  commands_run: []",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(queueRoot, "CANDIDATE_CHANGES.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "queue_policy:",
+    "  selected_change_commit_gate: strict",
+    "next_recommended_candidate_id: null",
+    "changes:",
+    "  - id: C001",
+    "    status: selected",
+    "    title: Active resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/cli/src/commands/",
+    "    selection:",
+    "      selected_change_id: M900-C001-active-selection",
+    "      artifacts:",
+    "        selected_change: changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml",
+    "        atom_tasks: changes/M900-resume-queue-fixture/C001-active-selection/ATOM_TASKS.yaml",
+    "        implementation_brief: changes/M900-resume-queue-fixture/C001-active-selection/IMPLEMENTATION_BRIEF.md",
+    "  - id: C002",
+    "    status: ready",
+    "    title: Next resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/core/src/workflow/",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "SELECTED_CHANGE.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: selected_change:M900-resume-queue-fixture:C001",
+    "contract_type: planning",
+    "planning_artifact_type: selected_change",
+    "selected_change_id: M900-C001-active-selection",
+    "source_plan_id: M900-resume-queue-fixture",
+    "source_candidate_id: C001",
+    "title: Active resume fixture",
+    "status: selected",
+    "owned_paths:",
+    "  - packages/cli/src/commands/",
+    "forbidden_paths:",
+    "  - .openworkflow/**",
+    "validation:",
+    "  - npm run build",
+    "acceptance:",
+    "  - Resume fixture exposes boundary fields.",
+    "scope:",
+    "  includes:",
+    "    - classify fixture action",
+    "  excludes:",
+    "    - mutate workflow state",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "ATOM_TASKS.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: atom_tasks:M900-resume-queue-fixture:C001",
+    "contract_type: planning",
+    "planning_artifact_type: atom_tasks",
+    "selected_change_id: M900-C001-active-selection",
+    "source_plan_id: M900-resume-queue-fixture",
+    "source_candidate_id: C001",
+    "title: Active resume fixture tasks",
+    "status: pending",
+    "tasks:",
+    "  - task_id: T001",
+    "    title: Continue selected fixture",
+    "    status: pending",
+    "    type: edit",
+    "",
+  ].join("\n"), "utf8");
+  await writeFile(join(selectedRoot, "IMPLEMENTATION_BRIEF.md"), "# Active resume fixture\n", "utf8");
+
+  const selectedResume = parseJsonReport(await runCapture(["node", CLI, "resume", "--root", root, "--json"], env), "resume");
+  const selectedData = record(selectedResume.data, "selected resume data");
+  const selectedQueue = record(selectedData.active_queue, "selected resume active_queue");
+  const selectedWorkItem = record(selectedData.current_work_item, "selected resume current_work_item");
+  const selectedActions = record(selectedData.actions, "selected resume actions");
+  const selectedEvidence = record(selectedData.evidence, "selected resume evidence");
+  const selectedProductAlignment = record(selectedData.product_alignment, "selected resume product_alignment");
+  assert(selectedQueue.status === "found", "resume should find an active planning queue");
+  assert(selectedQueue.plan_id === "M900-resume-queue-fixture", "resume active queue plan mismatch");
+  assert(record(selectedQueue.breakpoint, "selected breakpoint").status === "selected_candidate", "resume should report selected candidate breakpoint");
+  assert(selectedWorkItem.status === "selected", "resume current work item should be selected");
+  assert(selectedWorkItem.candidate_id === "C001", "resume current work item candidate mismatch");
+  assert(Array.isArray(selectedWorkItem.forbidden_paths) && selectedWorkItem.forbidden_paths.includes(".openworkflow/**"), "resume should expose selected-change forbidden paths");
+  assert(Array.isArray(selectedWorkItem.validation_commands) && selectedWorkItem.validation_commands.includes("npm run build"), "resume should expose validation commands");
+  assert(Array.isArray(selectedWorkItem.acceptance) && selectedWorkItem.acceptance.length === 1, "resume should expose acceptance checks");
+  assert(record(selectedWorkItem.commit_evidence, "selected commit evidence").expected_path === "changes/M900-resume-queue-fixture/C001-active-selection/LOCAL_COMMIT_EVIDENCE.yaml", "resume should expose expected local commit evidence path");
+  const selectedCoderGate = record(selectedWorkItem.coder_gate, "selected coder gate");
+  assert(selectedCoderGate.status === "pending", "resume should expose pending coder gate state for selected source-edit work");
+  assert(selectedCoderGate.enforcement === "guidance_only", "coder gate state should be guidance-only before enforcement is defined");
+  assert(selectedCoderGate.evidence_path === "changes/M900-resume-queue-fixture/C001-active-selection/LOCAL_COMMIT_EVIDENCE.yaml", "coder gate should point at local commit evidence binding");
+  assert(Array.isArray(selectedWorkItem.incomplete_atom_tasks) && selectedWorkItem.incomplete_atom_tasks.length === 1, "resume should expose incomplete atom tasks");
+  assert(Array.isArray(selectedActions.allowed_actions) && selectedActions.allowed_actions.some((item) => String(item).includes("continue selected change C001")), "resume should classify allowed actions");
+  assert(Array.isArray(selectedActions.forbidden_actions) && selectedActions.forbidden_actions.some((item) => String(item).includes(".openworkflow/**")), "resume should classify forbidden actions");
+  assert(Array.isArray(selectedEvidence.primary) && selectedEvidence.primary.includes("changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml"), "resume should classify primary evidence");
+  assert(Array.isArray(selectedEvidence.auxiliary) && selectedEvidence.auxiliary.includes("changes/M900-resume-queue-fixture/SUMMARY.yaml"), "resume should classify auxiliary evidence");
+  assert(Array.isArray(selectedEvidence.comparison), "resume should include comparison evidence array");
+  assert(Array.isArray(selectedProductAlignment.missing_context), "resume should expose product alignment context");
+  assert(Array.isArray(selectedResume.next_actions) && selectedResume.next_actions.includes("continue selected change C001"), "resume should rank selected-change continuation");
+
+  await writeFile(join(queueRoot, "CANDIDATE_CHANGES.yaml"), [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M900-resume-queue-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M900-resume-queue-fixture",
+    "title: Resume queue fixture",
+    "status: active",
+    "queue_policy:",
+    "  selected_change_commit_gate: strict",
+    "next_recommended_candidate_id: C002",
+    "changes:",
+    "  - id: C001",
+    "    status: done",
+    "    title: Active resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/cli/src/commands/",
+    "    selection:",
+    "      selected_change_id: M900-C001-active-selection",
+    "      artifacts:",
+    "        selected_change: changes/M900-resume-queue-fixture/C001-active-selection/SELECTED_CHANGE.yaml",
+    "        atom_tasks: changes/M900-resume-queue-fixture/C001-active-selection/ATOM_TASKS.yaml",
+    "        implementation_brief: changes/M900-resume-queue-fixture/C001-active-selection/IMPLEMENTATION_BRIEF.md",
+    "    completion:",
+    "      implementation_changed_files: true",
+    "      evidence:",
+    "        - packages/cli/src/commands/resume.ts",
+    "  - id: C002",
+    "    status: ready",
+    "    title: Next resume fixture",
+    "    risk: medium",
+    "    owned_paths:",
+    "      - packages/core/src/workflow/",
+    "",
+  ].join("\n"), "utf8");
+  const missingEvidenceStatus = await runCaptureStatus(["node", CLI, "resume", "--root", root, "--json"], env);
+  assert(missingEvidenceStatus.code !== 0, "resume should fail handoff trust when selected-change commit evidence is missing");
+  const missingEvidenceResume = parseJsonReport(missingEvidenceStatus.output, "resume");
+  const missingData = record(missingEvidenceResume.data, "missing evidence resume data");
+  const missingQueue = record(missingData.active_queue, "missing evidence active_queue");
+  const missingWorkItem = record(missingData.current_work_item, "missing evidence work item");
+  const missingCommitEvidence = record(missingQueue.commit_evidence, "commit evidence").missing;
+  assert(record(missingQueue.breakpoint, "missing evidence breakpoint").status === "missing_commit_evidence", "resume should expose missing commit evidence breakpoint");
+  assert(missingWorkItem.status === "missing_evidence", "resume current work item should point at missing evidence");
+  assert(record(missingWorkItem.coder_gate, "missing evidence coder gate").status === "missing", "resume should expose missing coder gate guidance on completed source-edit work without evidence");
+  assert(Array.isArray(missingCommitEvidence) && missingCommitEvidence.length === 1, "resume should list missing commit evidence");
+  assert(Array.isArray(missingEvidenceResume.health_errors) && missingEvidenceResume.health_errors.some((item) => String(item).includes("LOCAL_COMMIT_EVIDENCE.yaml")), "resume should preserve commit evidence health error");
 }
 
 async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -420,6 +663,10 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   await run(["node", CLI, "init", draftRoot, "--tools", "codex", "--force"], env);
   await verifyDraftCommand(draftRoot, env);
   await verifyRegisterCommand(draftRoot, env);
+
+  const visionPointerRoot = join(tempRoot, "vision-pointer-handoff");
+  await run(["node", CLI, "init", visionPointerRoot, "--tools", "codex", "--force"], env);
+  await verifyVisionPointerHandoff(visionPointerRoot, env);
 
   const root = join(tempRoot, "summary-health");
   await run(["node", CLI, "init", root, "--tools", "codex", "--force"], env);
@@ -602,7 +849,11 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const writeRun = parseJsonReport(await runCapture(["node", CLI, "summarize", "--root", root, "--artifact", ".openworkflow/prototypes/proto-1/EVIDENCE.yaml", "--write", "--json"], env), "summarize");
   const writeEffects = record(writeRun.effects, "summarize write effects");
   assert(Array.isArray(writeEffects.written) && writeEffects.written.includes(".openworkflow/prototypes/proto-1/SUMMARY.yaml"), "summarize write did not report summary write");
-  assert(await exists(join(artifactDir, "SUMMARY.yaml")), "summarize --write did not create SUMMARY.yaml");
+  const writtenSummaryPath = join(artifactDir, "SUMMARY.yaml");
+  assert(await exists(writtenSummaryPath), "summarize --write did not create SUMMARY.yaml");
+  const writtenSummary = await readFile(writtenSummaryPath, "utf8");
+  assert(writtenSummary.includes("contract_type: workflow"), "summarize --write summary must use a validate-compatible contract_type");
+  assert(writtenSummary.includes("status: current"), "summarize --write summary must include status for common contract validation");
   const currentAfterWrite = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const currentEntries = record(currentAfterWrite.data, "summary health data").entries;
   assert(Array.isArray(currentEntries), "summary health entries must be array");
@@ -1278,6 +1529,47 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(mismatchReport.ok === false, "register mismatch should report ok=false");
 }
 
+async function verifyVisionPointerHandoff(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const visionPath = ".openworkflow/vision/sessions/vision-pointer/VISION_SESSION.yaml";
+  await mkdir(dirname(join(root, visionPath)), { recursive: true });
+  await writeFile(join(root, visionPath), visionSessionYaml({
+    id: "vision-pointer",
+    status: "active",
+    oneSentence: "A proto-ready vision used to verify current pointer reporting.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+
+  const register = parseJsonReport(await runCapture([
+    "node",
+    CLI,
+    "register",
+    "--root",
+    root,
+    "--artifact",
+    visionPath,
+    "--current",
+    "--next-command",
+    "/ow:validation",
+    "--write",
+    "--json",
+  ], env), "register");
+  assert(register.ok === true, "vision register current should be ok");
+  const currentState = await read(join(root, ".openworkflow", "CURRENT_STATE.yaml"));
+  assert(currentState.includes(`current_session: ${visionPath}`), "vision register current did not write current_session");
+
+  const handoff = parseJsonReport(await runCapture(["node", CLI, "handoff", "--root", root, "--json"], env), "handoff");
+  const handoffData = record(handoff.data, "vision pointer handoff data");
+  const activePointers = record(handoffData.active_pointers, "vision pointer active_pointers");
+  assert(handoff.ok === true, "vision pointer handoff should stay ok");
+  assert(activePointers.current_vision === visionPath, "handoff active_pointers.current_vision should report current_session");
+
+  const check = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:validation", "--root", root, "--json"], env), "check");
+  const checkData = record(check.data, "vision pointer check data");
+  const checkPointers = record(checkData.active_pointers, "vision pointer check active_pointers");
+  assert(checkPointers.current_vision === visionPath, "check active_pointers.current_vision should report current_session");
+}
+
 async function assertNoStageArtifacts(root: string): Promise<void> {
   for (const forbiddenPath of [
     ".openworkflow/vision",
@@ -1451,6 +1743,9 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-git-automation") {
       verifyGitAutomationSkill(skillContent);
     }
+    if (name === "ow-coder") {
+      verifyCoderSkill(skillContent);
+    }
     const semanticCommand = `/${name.replace("ow-", "ow:")}`;
     const displayName = semanticCommand.slice(1);
     assert(hasYamlScalar(interfaceContent, "display_name", displayName), `${name} missing slashless display name`);
@@ -1467,6 +1762,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
   const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
   const selectedCommitGateQueue = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "CANDIDATE_CHANGES.yaml");
+  const selectedCommitGateEvidence = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "C001-selected-change-commit-enforcement-policy", "LOCAL_COMMIT_EVIDENCE.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
@@ -1474,6 +1770,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const originalHighRiskReport = await read(highRiskReport);
   const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
   const originalSelectedCommitGateQueue = await read(selectedCommitGateQueue);
+  const originalSelectedCommitGateEvidence = await read(selectedCommitGateEvidence);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -1561,6 +1858,18 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const validCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(!validCommitEvidence.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid local commit evidence fixture reported missing no-commit reason");
     assert(!validCommitEvidence.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid local commit evidence fixture reported missing commit evidence");
+
+    const absentCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!absentCoderEvidence.output.includes("coder_evidence"), "missing optional coder_evidence should remain valid");
+
+    await writeFile(selectedCommitGateEvidence, `${originalSelectedCommitGateEvidence}\ncoder_evidence:\n  status: recorded\n  preflight: should-be-list\n`, "utf8");
+    const malformedCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(malformedCoderEvidence.code !== 0, "validate passed after malformed present coder_evidence");
+    assert(malformedCoderEvidence.output.includes("coder_evidence.preflight must be a list of non-empty strings"), "malformed coder_evidence validation did not explain list shape");
+
+    await writeFile(selectedCommitGateEvidence, `${originalSelectedCommitGateEvidence}\ncoder_evidence:\n  status: recorded\n  enforcement: guidance_only\n  preflight:\n    - checked owned paths\n`, "utf8");
+    const validCoderEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validCoderEvidence.output.includes("coder_evidence"), "valid optional coder_evidence should not emit validation errors");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
@@ -1568,6 +1877,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
     await writeFile(selectedCommitGateQueue, originalSelectedCommitGateQueue, "utf8");
+    await writeFile(selectedCommitGateEvidence, originalSelectedCommitGateEvidence, "utf8");
   }
 }
 
@@ -1693,6 +2003,40 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
 
     await mkdir(join(gitRoot, "allowed"), { recursive: true });
     await writeFile(join(gitRoot, "allowed", "change.txt"), "selected change\n", "utf8");
+    const staleBranchIdentity = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M114-engineering-quality-foundation",
+      candidateId: "C008",
+      selectedChangeId: "M114-C008-enforce-feat-scoped-branch-identity",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: branch identity fixture"],
+      commitMessage: "M114-engineering-quality-foundation C008 branch identity fixture",
+      dryRun: true,
+    });
+    assert(!staleBranchIdentity.ok, "commit automation should refuse branch boundaries that name another plan id");
+    assert(staleBranchIdentity.errors.some((item) => item.includes("branch identity mismatch")), "branch identity mismatch should be explicit");
+
+    const explicitContinuation = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M114-engineering-quality-foundation",
+      candidateId: "C008",
+      selectedChangeId: "M114-C008-enforce-feat-scoped-branch-identity",
+      branchBoundary: "codex/m71-commit-fixture",
+      branchIdentityException: {
+        mode: "temporary_continuation_branch",
+        approved: true,
+        allowedOperations: ["commit"],
+        reason: "runtime fixture exercises the explicit temporary continuation branch exception",
+      },
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: branch identity fixture"],
+      commitMessage: "M114-engineering-quality-foundation C008 branch identity fixture",
+      dryRun: true,
+    });
+    assert(explicitContinuation.ok, `explicit temporary continuation exception should allow commit preview: ${explicitContinuation.errors.join(", ")}`);
+    assert(explicitContinuation.warnings.some((item) => item.includes("temporary continuation exception")), "branch identity exception should be reported as a warning");
+
     await writeFile(join(gitRoot, "unrelated.txt"), "unrelated\n", "utf8");
 
     const unrelated = await commitSelectedChange({
@@ -1709,7 +2053,27 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(!unrelated.ok, "commit automation should refuse unrelated dirty paths");
     assert(unrelated.unrelatedDirtyPaths.includes("unrelated.txt"), "commit automation should report unrelated dirty path");
 
+    await mkdir(join(gitRoot, ".openworkflow"), { recursive: true });
+    await writeFile(join(gitRoot, ".openworkflow", "CURRENT_STATE.yaml"), "next_command: /ow:validation\n", "utf8");
+    await runInCwd(gitRoot, ["git", "add", "-N", ".openworkflow/CURRENT_STATE.yaml"]);
+    const workflowOutputScope = await commitSelectedChange({
+      root: gitRoot,
+      planId: "M71-git-version-control-governance",
+      candidateId: "G013",
+      selectedChangeId: "G013-selected-change-commit-automation",
+      branchBoundary: "codex/m71-commit-fixture",
+      allowedPaths: ["allowed"],
+      validationEvidence: ["validation: npm run validate"],
+      commitMessage: "M71-git-version-control-governance/G013 Commit selected change fixture",
+      dryRun: true,
+    });
+    assert(!workflowOutputScope.ok, "commit automation should still refuse out-of-scope workflow outputs");
+    assert(workflowOutputScope.warnings.some((item) => item.includes("OpenWorkflow command outputs")), "workflow output scope warning missing command-output guidance");
+    assert(workflowOutputScope.warnings.some((item) => item.includes("owned_paths")), "workflow output scope warning missing owned_paths guidance");
+
     await unlink(join(gitRoot, "unrelated.txt"));
+    await runInCwd(gitRoot, ["git", "reset", "--", ".openworkflow/CURRENT_STATE.yaml"]);
+    await rm(join(gitRoot, ".openworkflow"), { recursive: true, force: true });
     const preview = await commitSelectedChange({
       root: gitRoot,
       planId: "M71-git-version-control-governance",
@@ -1744,6 +2108,8 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
 
     const evidence = await read(join(gitRoot, "changes", "G013", "LOCAL_COMMIT_EVIDENCE.yaml"));
     assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
+    assert(evidence.includes("coder_gate:"), "commit evidence missing coder gate binding point");
+    assert(evidence.includes("enforcement: guidance_only"), "commit evidence coder gate should be guidance-only");
     const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
     assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
 
@@ -1821,8 +2187,100 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(cliResult.evidencePath === "changes/M102-cli-fixture/C004-git-automation/LOCAL_COMMIT_EVIDENCE.yaml", "git-automation commit did not infer selected-change evidence path");
     const cliEvidence = await read(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "LOCAL_COMMIT_EVIDENCE.yaml"));
     assert(cliEvidence.includes("source_candidate_id: C004"), "CLI commit evidence missing source candidate id");
+    assert(cliEvidence.includes("coder_gate:"), "CLI commit evidence missing coder gate binding point");
     const cliCleanStatus = await runCaptureInCwd(cliRoot, ["git", "status", "--porcelain"]);
     assert(cliCleanStatus.trim().length === 0, "CLI commit evidence fixture should finish clean");
+
+    const backfillRoot = join(tempRoot, "selected-change-evidence-backfill");
+    await mkdir(join(backfillRoot, "allowed"), { recursive: true });
+    await mkdir(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill"), { recursive: true });
+    await runInCwd(backfillRoot, ["git", "init"]);
+    await runInCwd(backfillRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(backfillRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\n", "utf8");
+    await writeFile(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill", "SELECTED_CHANGE.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: selected_change:M105-backfill:C003",
+      "contract_type: planning",
+      "planning_artifact_type: selected_change",
+      "selected_change_id: M105-C003-evidence-backfill",
+      "source_plan_id: M105-backfill",
+      "source_candidate_id: C003",
+      "title: Evidence backfill selected change fixture",
+      "status: done",
+      "completion:",
+      "  completed_at: 2026-05-23",
+      "  implementation_changed_files: true",
+      "  evidence:",
+      "    - packages/core/src/git/localGitAutomation.ts",
+      "",
+    ].join("\n"), "utf8");
+    await writeFile(join(backfillRoot, "changes", "M105-backfill", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M105-backfill",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M105-backfill",
+      "title: Candidate changes for evidence backfill fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m105-backfill",
+      "changes:",
+      "  - id: C003",
+      "    status: done",
+      "    title: Evidence backfill fixture",
+      "    risk: high",
+      "    owned_paths:",
+      "      - allowed/",
+      "      - changes/M105-backfill/",
+      "    selection:",
+      "      selected_change_id: M105-C003-evidence-backfill",
+      "      artifacts:",
+      "        selected_change: changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
+      "    completion:",
+      "      completed_at: 2026-05-23",
+      "      implementation_changed_files: true",
+      "      evidence:",
+      "        - packages/core/src/git/localGitAutomation.ts",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(backfillRoot, ["git", "add", "."]);
+    await runInCwd(backfillRoot, ["git", "commit", "-m", "M105-backfill initial"]);
+    await runInCwd(backfillRoot, ["git", "switch", "-c", "codex/m105-backfill"]);
+    await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\nafter\n", "utf8");
+    const backfillCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      backfillRoot,
+      "--queue",
+      "changes/M105-backfill/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C003",
+      "--message",
+      "M105-backfill/C003 evidence backfill fixture",
+      "--validation-evidence",
+      "validation: fixture",
+      "--commit-evidence",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(backfillCommit.code === 0, `git-automation commit should backfill completion evidence: ${backfillCommit.output}`);
+    const backfillReport = parseJsonReport(backfillCommit.output, "git-automation commit");
+    const backfillData = record(backfillReport.data, "git-automation backfill data");
+    const backfillResult = record(backfillData.result, "git-automation backfill result");
+    const backfilledPaths = backfillResult.evidenceBackfilledPaths;
+    assert(Array.isArray(backfilledPaths) && backfilledPaths.includes("changes/M105-backfill/CANDIDATE_CHANGES.yaml"), "backfill result missing queue path");
+    assert(Array.isArray(backfilledPaths) && backfilledPaths.includes("changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml"), "backfill result missing selected-change path");
+    const backfillEvidencePath = "changes/M105-backfill/C003-evidence-backfill/LOCAL_COMMIT_EVIDENCE.yaml";
+    const backfilledQueue = await read(join(backfillRoot, "changes", "M105-backfill", "CANDIDATE_CHANGES.yaml"));
+    const backfilledSelectedChange = await read(join(backfillRoot, "changes", "M105-backfill", "C003-evidence-backfill", "SELECTED_CHANGE.yaml"));
+    assert(backfilledQueue.includes(backfillEvidencePath), "queue completion evidence was not backfilled");
+    assert(backfilledSelectedChange.includes(backfillEvidencePath), "selected-change completion evidence was not backfilled");
+    const backfillCleanStatus = await runCaptureInCwd(backfillRoot, ["git", "status", "--porcelain"]);
+    assert(backfillCleanStatus.trim().length === 0, "backfill fixture should finish clean");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -2109,6 +2567,9 @@ function verifyChangeSkill(content: string): void {
     "create it together with the first change artifact during /ow:change",
     "<planning_quality_bar>",
     "owned_paths",
+    "<coder_preflight>",
+    "coder preflight from skills/coder/SKILL.md",
+    "RED/GREEN evidence",
     "Do not hand off to /ow:team until CHANGE.yaml and WORK_ITEMS.yaml agree on scope and verification.",
   ]) {
     assert(content.includes(required), `ow-change missing production guidance: ${required}`);
@@ -2122,6 +2583,11 @@ function verifyTeamSkill(content: string): void {
     "Create RUNTIME_INDEX.yaml and the first runtime state only when /ow:team begins approved execution.",
     "<execution_quality_bar>",
     "Track active change, active work item",
+    "<coder_execution_gate>",
+    "RED evidence when applicable",
+    "GREEN evidence after edits",
+    "post-write self-check",
+    "LOCAL_COMMIT_EVIDENCE.yaml",
     "When work is incomplete, leave the next action and blocker explicit in runtime state.",
   ]) {
     assert(content.includes(required), `ow-team missing production guidance: ${required}`);
@@ -2146,6 +2612,29 @@ function verifyGitAutomationSkill(content: string): void {
     "openworkflow git-automation draft-pr",
   ]) {
     assert(content.includes(required), `ow-git-automation missing managed git guidance: ${required}`);
+  }
+}
+
+function verifyCoderSkill(content: string): void {
+  for (const required of [
+    "internal-agent-code-execution-governance",
+    "<command_visibility>internal</command_visibility>",
+    "<internal_command_boundary>",
+    "/ow:coder is internal and Agent-only.",
+    "not a normal user-facing coding command",
+    "skills/coder/SKILL.md",
+    "references/internal-coder-protocol.md",
+    "<preflight_owner_map>",
+    "Identify source truth before edits",
+    "<red_green_evidence>",
+    "prefer RED evidence before production edits",
+    "<validation_ladder>",
+    "narrowest honest validation ladder",
+    "<evidence_binding>",
+    "LOCAL_COMMIT_EVIDENCE.yaml",
+    "Do not batch multiple completed selected changes into one checkpoint commit.",
+  ]) {
+    assert(content.includes(required), `ow-coder missing internal coder guidance: ${required}`);
   }
 }
 
@@ -2238,7 +2727,9 @@ function verifyProtoSkill(content: string): void {
   for (const required of [
     "image-first-strategic-proto-prompt-pack",
     "<internal_proto_pipeline>",
-    "/ow:vision2prompt and /ow:prompt2proto are internal commands",
+    "/ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands",
+    "/ow:build-proto-prompt",
+    "build-prototype consumes the ready pack and must not recompile vision into prompt text",
     "<validation_consumption>",
     "trigger.mode: agent_auto",
     "missing_current_validation",
@@ -2329,6 +2820,11 @@ function verifyPrompt2ProtoSkill(content: string): void {
     "post_validate.status pass or skipped",
     "prototype_system_contract",
     "stable_app_shell",
+    "Chief PM plus Principal UI/UX",
+    "information hierarchy",
+    "density calibration",
+    "UI/UX credibility",
+    "visible, grouped, collapsed, delayed, or drilled into",
     "prompt_text_manifest.paragraph_quality_status pass",
     "Refuse prompt packs whose prompt_text_manifest.paragraph_quality_status is not pass",
     "journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling",
@@ -2336,6 +2832,10 @@ function verifyPrompt2ProtoSkill(content: string): void {
     "Every generated image must record image_id",
     "source_prompt_ref",
     "Do not expose /ow:prompt2proto as a user-facing workflow step",
+    "<build_prototype_consumption_boundary>",
+    "build-prototype consumes ready prompt-pack artifacts through prompt2proto",
+    "build-prototype must not compile prompt packs from vision or validation",
+    "Refuse thin, missing, or incoherent prompt packs before image generation",
   ]) {
     assert(content.includes(required), `ow-prompt2proto missing internal image guidance: ${required}`);
   }
@@ -2442,6 +2942,7 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const buildProtoPromptSection = commandIndex.split("trigger: /ow:build-proto-prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const vision2PromptSection = commandIndex.split("trigger: /ow:vision2prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const prompt2ProtoSection = commandIndex.split("trigger: /ow:prompt2proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const coderSection = commandIndex.split("trigger: /ow:coder", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
   assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
@@ -2454,6 +2955,8 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(buildProtoPromptSection.includes("visibility: internal"), "build-proto-prompt command is not internal");
   assert(vision2PromptSection.includes("visibility: internal"), "vision2prompt command is not internal");
   assert(prompt2ProtoSection.includes("visibility: internal"), "prompt2proto command is not internal");
+  assert(coderSection.includes("visibility: internal"), "coder command is not internal");
+  assert(extractBlock(coderSection, "handoff_commands").includes("- []") || !extractBlock(coderSection, "handoff_commands").includes("/ow:coder"), "coder exposes itself as a handoff");
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:vision2prompt"), "proto exposes vision2prompt as user-facing handoff");
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:prompt2proto"), "proto exposes prompt2proto as user-facing handoff");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
@@ -2461,8 +2964,11 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
   const buildProtoPromptPacket = contextPackets.split("command: /ow:build-proto-prompt", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   const prompt2ProtoPacket = contextPackets.split("command: /ow:prompt2proto", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  const coderPacket = contextPackets.split("command: /ow:coder", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(buildProtoPromptPacket.includes("prototype_system_contract"), "build-proto-prompt context packet missing prototype system contract guidance");
   assert(prompt2ProtoPacket.includes("prototype_system_contract"), "prompt2proto context packet missing prototype system contract readiness gate");
+  assert(coderPacket.includes("skills/coder/SKILL.md"), "coder context packet missing source skill context");
+  assert(coderPacket.includes("references/internal-coder-protocol.md"), "coder context packet missing protocol reference");
   const tunePacket = contextPackets.split("command: /ow:tune", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(!extractBlock(tunePacket, "required").includes("PROTOTYPE_INDEX.yaml"), "tune requires prototype index");
   assert(extractBlock(tunePacket, "optional").includes("PROTOTYPE_INDEX.yaml"), "tune optional context missing prototype index");

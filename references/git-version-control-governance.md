@@ -52,6 +52,19 @@ The queue should record the branch in `queue_policy.branch_boundary` when the
 queue opts into branch governance. Work for selected candidates should happen on
 that branch unless the user explicitly approves an exception.
 
+For new branch-governed queues, the branch boundary should carry the same
+feat identity as the queue plan id, normally the leading milestone token such
+as `M114` in both `M114-engineering-quality-foundation` and
+`codex/m114-engineering-quality-foundation`. A branch boundary that names
+another plan id is not feat ownership even when it equals the current branch.
+If a queue must temporarily continue on an older branch, record an explicit
+`queue_policy.branch_identity_exception` with:
+
+- `mode: temporary_continuation_branch`
+- `approved: true`
+- `allowed_operations` limited to the specific local operations being allowed
+- `reason` explaining why the exception is temporary
+
 Queue maintenance can happen before strict branch validation exists, but the
 maintenance operation should record the current branch and reason when it
 touches a branch-governed queue from a different branch.
@@ -140,6 +153,8 @@ The command must refuse local mutation when:
 
 - the working tree contains unrelated dirty paths
 - the current branch conflicts with the queue's branch boundary
+- the queue branch boundary names another plan id and no explicit temporary
+  continuation exception allows the local operation
 - the selected change is not complete
 - required validation evidence is missing
 - the operation would require push, remote PR creation, Issue mutation, or merge

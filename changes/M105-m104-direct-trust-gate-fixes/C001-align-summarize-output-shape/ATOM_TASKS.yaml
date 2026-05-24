@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M105-m104-direct-trust-gate-fixes:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M105-C001-align-summarize-output-shape
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C001
+status: completed
+tasks:
+  - task_id: T001
+    title: Locate summary writer and validator expectations
+    status: completed
+    type: investigate
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+    done_when: >
+      The code path that writes artifact SUMMARY.yaml files and the validation
+      path that rejected M104's summary shape are identified.
+  - task_id: T002
+    title: Align summary contract header
+    status: completed
+    type: implementation
+    owned_paths:
+      - packages/core/src/
+      - packages/cli/src/
+    done_when: >
+      summarize --write emits a validation-compatible summary header without
+      weakening source-artifact validation.
+  - task_id: T003
+    title: Add regression coverage
+    status: completed
+    type: test
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime verification covers the summarize --write then validate path for
+      a prototype evidence summary.
+  - task_id: T004
+    title: Validate and record completion
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M105-m104-direct-trust-gate-fixes/
+    done_when: >
+      build, runtime-surface verification, validate, summaries --strict, and
+      git diff --check pass, then C001 completion evidence is recorded.

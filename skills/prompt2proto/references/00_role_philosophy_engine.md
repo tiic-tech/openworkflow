@@ -27,6 +27,14 @@ Notice:
 - whether sample data, labels, owners, timestamps, and states feel like real
   operational work.
 
+Decide before translation:
+
+- what is visible because it changes the next decision;
+- what is grouped because related fields must be compared;
+- what is collapsed because it is secondary but still inspectable;
+- what is delayed until the user expresses intent;
+- what becomes drill-down detail because it would overload the main canvas.
+
 Prioritize:
 
 - product credibility over decorative novelty;
@@ -65,6 +73,12 @@ Reject:
   consequences visible.
 - If a workflow repeats daily, optimize for scanning, comparison, and fast
   next action.
+- If the industry is operational, financial, civic, clinical, or developer
+  tooling, allow denser inspectable surfaces when expert users compare objects,
+  owners, states, and consequences.
+- If the product is consumer-facing, emotionally sensitive, or mobile-first,
+  reduce visible density and make the next decision, reassurance, and control
+  clearer.
 - If a product centers on a domain object, make that object the visual anchor.
 - If a panel or drawer appears across screens, preserve its anatomy unless the
   prompt pack explicitly changes the state.

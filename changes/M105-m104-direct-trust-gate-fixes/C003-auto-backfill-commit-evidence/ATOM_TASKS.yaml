@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M105-m104-direct-trust-gate-fixes:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M105-C003-auto-backfill-commit-evidence
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C003
+status: completed
+tasks:
+  - task_id: T001
+    title: Locate commit evidence write flow
+    status: completed
+    type: investigate
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      The code path that writes LOCAL_COMMIT_EVIDENCE and commits it is
+      identified, including where warnings/results should surface.
+  - task_id: T002
+    title: Implement narrow evidence backfill
+    status: completed
+    type: implementation
+    owned_paths:
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      Existing completion evidence arrays are updated only when Option A
+      preconditions hold, and skipped backfills produce precise warnings.
+  - task_id: T003
+    title: Add runtime regression coverage
+    status: completed
+    type: test
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification includes an M104-style selected-change
+      evidence flow where git-automation fills missing completion evidence.
+  - task_id: T004
+    title: Validate and record completion
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M105-m104-direct-trust-gate-fixes/
+    done_when: >
+      build, runtime-surface verification, validate, summaries --strict,
+      handoff, and diff-check pass, then local commit evidence is recorded.

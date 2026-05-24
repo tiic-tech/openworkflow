@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M101-build-proto-prompt-command-split:C007
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C007-narrow-build-prototype-to-prompt2proto
+title: Atom tasks for build-prototype prompt2proto narrowing
+status: completed
+tasks:
+  - task_id: M101-C007-A001
+    title: Inspect current proto and build-prototype responsibilities
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/prompt2proto/
+    done_when:
+      - Current compilation, orchestration, readiness, and prompt2proto boundaries are mapped before edits.
+  - task_id: M101-C007-A002
+    title: Narrow build-prototype source guidance
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/prompt2proto/
+    done_when:
+      - build-prototype consumes ready prompt-pack artifacts through prompt2proto instead of compiling prompt packs from vision.
+      - The guidance preserves /ow:proto orchestration compatibility.
+  - task_id: M101-C007-A003
+    title: Update command protocol and generated runtime assertions
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - /ow:proto remains user-facing and orchestrates internal readiness before prompt2proto.
+      - Runtime-surface assertions fail if readiness, coherence, or philosophy gates are absent.
+  - task_id: M101-C007-A004
+    title: Verify and record selected-change evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/
+    done_when:
+      - Required validation commands pass.
+      - C007 completion records LOCAL_COMMIT_EVIDENCE.yaml.

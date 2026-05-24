@@ -78,18 +78,19 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Confirm an approved or active change plan and work items exist.
 - Audit git status, relevant source files, and any existing runtime state before execution.
+- Recover coder governance expectations from the change plan before source edits: owner map, RED/GREEN target, self-check, validation ladder, and evidence binding.
 - Lazy-create runtime state only when /ow:team is invoked for an approved change.
 </before>
 <during>
 - Execute work items in dependency order and keep runtime state current.
 - Delegate only when the task can run independently with clear owned paths and acceptance.
-- Record issues, verification results, checkpoints, and residual risks as development proceeds.
+- Preserve RED/GREEN evidence, post-write self-check notes, verification results, checkpoints, and residual risks as development proceeds.
 </during>
 <after>
 - Update runtime state, issues, and checkpoints.
 - Refresh runtime SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_run, blockers, and next action.
 - Run the verification named by the change plan when practical.
-- Report changed artifacts, verification result, and remaining blockers.
+- Report changed artifacts, coder evidence status, verification result, and remaining blockers.
 </after>
 </audit_checkpoints>
 
@@ -121,6 +122,13 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Track active change, active work item, assigned owner or agent, status, verification, issues, and checkpoints.
 - Keep implementation and QA evidence linked to the change plan.
 </execution_quality_bar>
+
+<coder_execution_gate>
+- For source-edit work, follow skills/coder/SKILL.md before completion: owner/file/dependency map, RED evidence when applicable, GREEN evidence after edits, and post-write self-check.
+- Bind coder validation evidence to runtime checkpoints, issues, or the selected-change LOCAL_COMMIT_EVIDENCE.yaml when implementation files changed.
+- Missing coder evidence is guidance at this stage, not a hard failure; record the reason when RED evidence is not applicable.
+- /ow:team remains execution governance and must not turn /ow:coder into a user-facing command.
+</coder_execution_gate>
 
 <handoff_gate>
 - When work is incomplete, leave the next action and blocker explicit in runtime state.

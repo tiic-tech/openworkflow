@@ -1,0 +1,19 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M105-C003-auto-backfill-commit-evidence
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M105-C003-auto-backfill-commit-evidence
+status: current
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C003
+selected_change_id: M105-C003-auto-backfill-commit-evidence
+primary_commit: 34180f00d5eb42409212e2242d3b1966629b8150
+validation_evidence:
+  - "npm run build: pass; npm run verify:runtime-surface: pass; validate --json: pass; summaries
+    --strict --json: blocked only by missing C003 LOCAL_COMMIT_EVIDENCE before commit; handoff
+    --json: blocked only by missing C003 LOCAL_COMMIT_EVIDENCE before commit; git diff --check:
+    pass"
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

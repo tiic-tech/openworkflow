@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: summary:M117-git-automation-remote-readiness
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M117-git-automation-remote-readiness
+title: Summary for git automation remote readiness governance
+status: active
+source:
+  kind: discussion_and_repo_audit
+  summary: >
+    This queue captures the follow-up CC requested after reviewing
+    git-automation against the prior governance decision: complete local
+    automation first, avoid silent push or merge, but make the future fully
+    managed git path explicit enough for Agents to publish branches, open or
+    update PRs, handle checks and conflicts, merge only after approval, and
+    record rollback evidence. The audit found that local branch and commit
+    automation is mostly established, while remote readiness still needs shared
+    LOCAL_COMMIT_EVIDENCE.yaml readers, branch identity propagation, draft PR
+    approval/audit hardening, and structured merge-conflict checkpoints.
+  refs:
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/core/src/git/remoteReadonlyPlanner.ts
+    - packages/core/src/git/autonomousSimulator.ts
+    - packages/core/src/git/draftPrPilot.ts
+    - packages/core/src/git/prReadySummary.ts
+scope_boundary: >
+  Git-automation remote readiness only. The queue strengthens evidence,
+  branch identity, read-only remote planning, draft PR gating, conflict
+  checkpoints, and verifier coverage without enabling autonomous push, merge,
+  rebase, force-push, ready-for-review PR mutation, or Issue mutation.
+branch_boundary: codex/m117-git-automation-remote-readiness
+candidate_count: 5
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+outputs:
+  candidate_changes_yaml: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M117-git-automation-remote-readiness/CANDIDATE_CHANGES.md
+  summary: changes/M117-git-automation-remote-readiness/SUMMARY.yaml
+key_dependencies:
+  - C001 must land first because PR summaries, remote-plan, and simulator need a shared modern evidence reader before later remote-readiness gates can be trusted.
+  - C002 depends on C001 so branch identity reports can be attached to the same queue/remote readiness packet.
+  - C003 and C004 are high-risk and require a decision report before selection.
+  - C005 depends on the prior candidates to verify the full non-mutating remote-readiness story.
+risks:
+  - id: R001
+    level: high
+    description: Draft PR pilot can mutate GitHub state if write mode is approved too loosely.
+    mitigation: C003 requires explicit high-risk approval evidence and local operation evidence before any write-mode draft PR mutation.
+  - id: R002
+    level: high
+    description: Merge conflict handling could become unsafe if future automation treats prose guidance as executable policy.
+    mitigation: C004 creates a structured read-only conflict checkpoint before any future merge execution queue.
+  - id: R003
+    level: medium
+    description: Remote readiness can report false confidence if it misses LOCAL_COMMIT_EVIDENCE.yaml records.
+    mitigation: C001 makes modern local commit evidence the shared source for PR summaries, remote plans, and simulators.
+  - id: R004
+    level: medium
+    description: The queue was created on the existing M101 continuation branch.
+    mitigation: Branch boundary is recorded as codex/m117-git-automation-remote-readiness; branch automation or explicit continuation approval is required before implementation.
+unresolved_questions:
+  - Should draft PR write-mode approval be expressed as a high-risk report path, a CLI flag naming approval evidence, or both?
+  - Should merge conflict probes use `git merge-tree`, an isolated temporary worktree, or both?
+  - Should future autonomous execution be one queue after C005, or split into push/PR/merge queues?
+deferred_features:
+  - M118-autonomous-git-remote-execution
+  - M119-gh-issue-source-of-truth-operations
+validation:
+  commands_run:
+    - node dist/cli/src/index.js resume --root . --json
+    - git status --short --branch
+  notes:
+    - Current repo trust is green and working tree was clean before creating the planning queue.
+    - No implementation code, generated .agents surface, .openworkflow surface, git push, PR mutation, or merge was performed.

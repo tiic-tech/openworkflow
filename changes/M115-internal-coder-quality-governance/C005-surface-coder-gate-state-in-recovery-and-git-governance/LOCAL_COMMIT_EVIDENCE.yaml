@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C005-surface-coder-gate-state-in-recovery-and-git-governance
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C005-surface-coder-gate-state-in-recovery-and-git-governance
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C005
+selected_change_id: C005-surface-coder-gate-state-in-recovery-and-git-governance
+primary_commit: b5adcf482cc39a047bc5e0f97cf931d5f2095ddd
+validation_evidence:
+  - RED/GREEN resume coder_gate assertion
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - ruby -ryaml C005 planning artifacts
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

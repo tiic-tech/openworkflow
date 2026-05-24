@@ -374,7 +374,15 @@ function activePointers(currentState: Record<string, unknown> | null): Record<st
     "current_change",
     "current_run",
   ];
-  return Object.fromEntries(keys.map((key) => [key, stringOrNull(currentState?.[key])]));
+  return Object.fromEntries(keys.map((key) => [key, currentPointerValue(currentState, key)]));
+}
+
+function currentPointerValue(currentState: Record<string, unknown> | null, key: string): string | null {
+  const direct = stringOrNull(currentState?.[key]);
+  if (direct || key !== "current_vision") {
+    return direct;
+  }
+  return stringOrNull(currentState?.current_session);
 }
 
 function stringList(value: unknown): string[] {

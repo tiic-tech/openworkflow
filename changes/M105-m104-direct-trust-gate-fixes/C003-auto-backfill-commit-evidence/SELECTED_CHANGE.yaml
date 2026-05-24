@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: selected_change:M105-m104-direct-trust-gate-fixes:C003
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M105-C003-auto-backfill-commit-evidence
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C003
+title: Auto-backfill commit evidence into selected-change completion
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after user approval of the high-risk Option A. M104 exposed a manual repair loop where
+  LOCAL_COMMIT_EVIDENCE had to be pre-linked into completion records before strict summaries and
+  handoff would pass, even though git-automation creates that evidence during the commit flow.
+risk_decision:
+  risk: high
+  approved_option: Option A - Narrow Safe Backfill
+  approval_source: user approval on 2026-05-23
+  decision_report: changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+scope:
+  includes:
+    - add conservative completion evidence backfill to git-automation commit
+    - require existing done/completion state before any queue mutation
+    - emit explicit skip warnings for unmet backfill preconditions
+    - cover the M104-style missing-evidence repair loop in runtime verification
+  excludes:
+    - creating completion sections automatically
+    - changing candidate status automatically
+    - weakening selected-change strict commit gate
+    - remote push, PR, merge, or historical queue rewrites
+owned_paths:
+  - packages/core/src/git/
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - references/git-version-control-governance.md
+  - references/planning-artifact-contracts.md
+  - changes/M105-m104-direct-trust-gate-fixes/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - skills/**
+  - changes/M101-build-proto-prompt-command-split/**
+  - changes/M102-selected-change-commit-gate/**
+acceptance:
+  - git-automation commit with --commit-evidence links the evidence path into existing queue and
+    selected-change completion evidence arrays when all Option A preconditions hold.
+  - Backfill is skipped with precise warnings when required completion/status/path preconditions are
+    not met.
+  - The command does not create completion sections or change candidate status.
+  - Runtime coverage captures the M104 missing-evidence repair loop.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C003 should complete as one local implementation commit containing the git-automation backfill
+  implementation, runtime regression coverage, high-risk decision report, selection artifacts, queue
+  updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M105-m104-direct-trust-gate-fixes/C003-auto-backfill-commit-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check

@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C006
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C006
+change_id: C006-introduce-optional-coder-evidence-artifact-contract
+title: Atom tasks for optional embedded coder evidence
+status: completed
+tasks:
+  - id: T001
+    title: Document optional embedded coder_evidence contract
+    type: document
+    status: completed
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/internal-coder-protocol.md
+      - skills/coder/SKILL.md
+    done_when:
+      - LOCAL_COMMIT_EVIDENCE.yaml documents optional coder_evidence fields.
+      - Standalone CODE_EVIDENCE.yaml is explicitly deferred to a future CC.
+  - id: T002
+    title: Validate malformed present coder_evidence
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Missing coder_evidence remains valid.
+      - Present malformed coder_evidence fails with precise validation errors.
+  - id: T003
+    title: Add runtime-surface fixture coverage
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verifier proves absent optional evidence is valid.
+      - Runtime verifier proves malformed present evidence is rejected.
+  - id: T004
+    title: Complete C006 with validation and evidence
+    type: document
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Queue completion records implementation evidence and validation.
+      - LOCAL_COMMIT_EVIDENCE.yaml is produced by git-automation.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+results:
+  passed:
+    - RED targeted malformed coder_evidence fixture was not rejected before validator implementation.
+    - GREEN targeted malformed coder_evidence fixture is rejected with precise errors.
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  failed: []

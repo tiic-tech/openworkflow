@@ -55,7 +55,7 @@ export async function handoffCommand(flags: Map<string, string | boolean>): Prom
   return model.handoff_ok ? 0 : 1;
 }
 
-function buildHandoffModel(
+export function buildHandoffModel(
   brief: BriefModel,
   nextCommandCheck: ReadinessModel | null,
   readOrder: ReadOrder,

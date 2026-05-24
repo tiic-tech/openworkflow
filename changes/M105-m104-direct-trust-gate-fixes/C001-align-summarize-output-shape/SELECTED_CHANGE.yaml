@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: selected_change:M105-m104-direct-trust-gate-fixes:C001
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M105-C001-align-summarize-output-shape
+source_plan_id: M105-m104-direct-trust-gate-fixes
+source_candidate_id: C001
+title: Align summarize output shape with validate expectations
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  C001 is the dependency-free, smallest direct M104 bugfix. The target-repo
+  audit proved summarize --write can generate a SUMMARY.yaml shape that the
+  same CLI's validate command rejects, so writer output and validator
+  expectations must be aligned before broader trust-gate work.
+risk_decision:
+  risk: medium
+  selected_option: Fix writer output to match existing validation-compatible summary shape.
+scope:
+  includes:
+    - locate the artifact summary writer
+    - emit validation-compatible contract keys for SUMMARY.yaml files
+    - add regression coverage for summarize --write followed by validate
+    - preserve summary freshness and strict source-artifact validation
+  excludes:
+    - broad summary schema redesign
+    - weakening validation for real source artifacts
+    - prompt2proto image evidence strategy changes
+    - current vision pointer fixes
+    - commit evidence auto-backfill
+owned_paths:
+  - packages/core/src/
+  - packages/cli/src/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - references/planning-artifact-contracts.md
+  - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+  - changes/M105-m104-direct-trust-gate-fixes/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - skills/**
+  - changes/M101-build-proto-prompt-command-split/**
+  - changes/M102-selected-change-commit-gate/**
+acceptance:
+  - summarize --write emits summary files with validation-compatible contract keys.
+  - validate no longer rejects summary files produced by summarize --write.
+  - Regression coverage captures the M104 summarize/validate failure mode.
+  - Existing source-artifact validation remains strict.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+expected_commit_boundary: >
+  C001 should complete as one local implementation commit containing the
+  summary writer fix, regression coverage, M105 planning artifacts, and the
+  M104 interview doc used as source evidence, followed by LOCAL_COMMIT_EVIDENCE.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M105-m104-direct-trust-gate-fixes/C001-align-summarize-output-shape/LOCAL_COMMIT_EVIDENCE.yaml
+    - packages/cli/src/commands/summarize.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check

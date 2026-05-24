@@ -76,17 +76,18 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 <before>
 - Confirm a focused production spec exists.
 - Inspect the repository just enough to identify affected paths, integration points, and verification commands.
+- Apply coder preflight before finalizing selected implementation boundaries: identify source truth, owned paths, forbidden paths, generated surfaces, and the honest validation ladder.
 - Lazy-create the changes index, change artifact, and work items only when /ow:change is invoked.
 </before>
 <during>
 - Convert the spec into one bounded implementation change with non-goals and rollback notes.
-- Split work into ordered items with owned paths, dependencies, acceptance, and verification.
+- Split work into ordered items with owned paths, dependencies, acceptance, verification, and coder evidence expectations when source edits are likely.
 - Record unresolved implementation risks instead of expanding scope.
 </during>
 <after>
 - Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.
 - Refresh change SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_change and runtime readiness.
-- Hand off to /ow:team only when work items are implementable and verification is explicit.
+- Hand off to /ow:team only when work items are implementable, verification is explicit, and coder preflight expectations are visible to the execution agent.
 - Confirm no runtime artifacts were created.
 </after>
 </audit_checkpoints>
@@ -119,6 +120,13 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 - Prefer small coherent work items with explicit owned_paths and verification over broad task buckets.
 - Keep the user-facing summary short and keep detailed implementation intelligence in the artifacts.
 </planning_quality_bar>
+
+<coder_preflight>
+- Before work items are ready for implementation, apply coder preflight from skills/coder/SKILL.md.
+- Record source truth, derived generated surfaces, owned_paths, forbidden paths, and validation ladder expectations in the change artifacts.
+- For behavior, validator, CLI report, generated-surface, summary, queue, or git-evidence changes, require the implementation agent to plan RED/GREEN evidence or explicitly mark RED not applicable.
+- /ow:change remains planning; coder governance constrains the future source edits and does not execute them.
+</coder_preflight>
 
 <readiness_gate>
 - Do not hand off to /ow:team until CHANGE.yaml and WORK_ITEMS.yaml agree on scope and verification.

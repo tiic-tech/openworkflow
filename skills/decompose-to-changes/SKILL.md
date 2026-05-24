@@ -38,6 +38,9 @@ selection artifacts inside the existing feat folder.
 When creating a new feat queue, capture the current branch from
 `git status --short --branch` and decide the intended feat branch. Record it in
 `queue_policy.branch_boundary` and in `SUMMARY.yaml`.
+The branch boundary should carry the same feat identity as the queue `plan_id`
+when practical; for example, `M114-engineering-quality-foundation` should
+normally use a branch containing `m114`.
 
 Do not automatically create or switch branches from this skill. If the agent or
 user already created the branch, record it. If the queue is being planned before
@@ -47,6 +50,11 @@ needs to be created before implementation begins.
 For queue maintenance, preserve the existing branch boundary. If the current
 branch differs, record the observation in the operation reason or summary notes
 instead of silently changing the boundary.
+If the branch boundary names another plan id, do not silently treat it as the
+owning feat branch. Record a narrow `queue_policy.branch_identity_exception`
+only when the user has explicitly approved temporary continuation on that
+branch, with `mode: temporary_continuation_branch`, `approved: true`,
+operation-scoped `allowed_operations`, and a reason.
 
 ## Read First
 

@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: summary:M105-m104-direct-trust-gate-fixes
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M105-m104-direct-trust-gate-fixes
+title: Summary for M104 direct trust-gate and evidence fixes
+status: complete
+source:
+  kind: mixed
+  summary: >
+    M104 smart_city_copilot fourth-round E2E exposed direct OW source defects
+    in summary writing, pointer reporting, commit evidence closure, and owned
+    path reconciliation. This queue captures the immediate bugfix slice before
+    broader interview-derived product scenarios.
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M104_FOURTH_DISCOVERY_E2E_ARTIFACT_AUDIT_REPORT.md
+scope_boundary: >
+  Direct M104 trust-gate and evidence-closure defects only; larger resume,
+  lineage, and prompt2proto strategy work is deferred to separate queues.
+branch_boundary: codex/m101-build-proto-prompt-command-split
+candidate_count: 4
+active_candidate_count: 4
+completed_candidate_id: C004
+completed_change_id: M105-C004-reconcile-owned-path-output-guidance
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+outputs:
+  candidate_changes_yaml: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.md
+  summary: changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+key_dependencies:
+  - M104 target-repo audit identified summarize/validate mismatch as a direct trust-gate bug.
+  - M104 interview doc records Agent-consumer impact and recommended source-level fixes.
+  - M102 already introduced strict selected-change commit evidence gates; C003 builds on that policy.
+  - C001 fixed the direct summarize --write versus validate contradiction and unlocked C002.
+risks:
+  - id: R001
+    level: medium
+    description: Summary writer fixes could accidentally weaken validate or summary trust semantics.
+    mitigation: Start with a focused summarize/validate regression and preserve strict source-artifact validation.
+  - id: R002
+    level: high
+    description: Commit evidence auto-backfill changes governance behavior and may affect historical queues.
+    mitigation: Defer to C003 and require focused runtime-surface coverage before implementation.
+unresolved_questions:
+  - Should C002 set CURRENT_STATE.current_vision to a session path, or should handoff active_pointers explicitly understand current_session?
+  - Should C003 update both queue and selected-change completion evidence in one evidence commit, or stage a two-commit repair similar to current git-automation behavior?
+deferred_features:
+  - M106-agent-resume-cockpit
+  - M107-artifact-lineage-graph
+  - M108-consistency-first-prompt2proto-strategy
+  - M109-provider-fallback-generation-metadata
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - git diff --check
+  notes:
+    - DTC created planning artifacts only; no source implementation was performed by decomposition.
+    - Current worktree already had uncommitted docs/M104_AGENT_CONSUMER_INTERVIEW.md, used as source evidence.
+    - C001 is the next recommended candidate because it is the smallest direct trust-gate contradiction from M104.
+    - C001 was selected for implementation under /ow:select-change boundaries.
+    - C001 implementation passed build, runtime-surface verification, validate, summaries --strict, handoff, and git diff --check.
+    - C002 was selected to fix the current vision pointer reporting bug exposed by M104.
+    - C002 implementation passed build and runtime-surface verification before commit evidence creation.
+    - C003 high-risk Option A was approved and selected for narrow safe evidence backfill.
+    - C003 implementation passed build and runtime-surface verification before commit evidence creation.
+    - C004 was selected to improve owned-path diagnostics for expected OW output files.
+    - C004 implementation passed build and runtime-surface verification before commit evidence creation.

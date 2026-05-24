@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C007
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C007
+change_id: C007-add-coder-continuous-growth-loop-for-reusable-lessons
+title: Atom tasks for coder continuous growth loop
+status: completed
+tasks:
+  - id: T001
+    title: Define durable lesson promotion policy
+    type: document
+    status: completed
+    owned_paths:
+      - references/coder-continuous-growth-loop.md
+    done_when:
+      - Promotion criteria, evidence requirements, source targets, and review gates are explicit.
+  - id: T002
+    title: Link coder skill to growth-loop policy
+    type: edit
+    status: completed
+    owned_paths:
+      - skills/coder/SKILL.md
+    done_when:
+      - The coder skill points Agents to the growth-loop reference before promoting lessons.
+  - id: T003
+    title: Record C007 completion evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Queue artifacts record C007 completion and local commit evidence.
+verification:
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+  - git diff --check
+results:
+  passed:
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C007-add-coder-continuous-growth-loop-for-reusable-lessons/ATOM_TASKS.yaml
+    - git diff --check
+  failed: []

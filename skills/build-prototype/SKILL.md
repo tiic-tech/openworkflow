@@ -1,54 +1,73 @@
 ---
 name: build-prototype
-description: Compile proto-ready vision and durable validation targets into image-first strategic prototype prompt packs. Use when /ow:proto needs to generate high-quality prompt directions for design/image tools before tune, proto2html, specs, changes, Agent Teams, runtime state, or production implementation plans.
+description: Consume ready PROTO_PROMPT_PACK artifacts through prompt2proto and translate them into credible UI/UX prototype instructions and evidence. Use after build-proto-prompt has produced ready prompt text and before tune, proto2html, specs, changes, Agent Teams, runtime state, or production implementation plans.
 ---
 
 # Build Prototype
 
 ## Purpose
 
-Compile prototype discovery artifacts without starting production
-implementation. The preferred source behavior is image-first: consume durable
-validation plus proto-ready vision, extract the product strategy, and turn that
-strategy into strategic prototype prompt packs that can be reviewed, generated,
-tuned, or handed off.
+Consume ready prototype prompt-pack artifacts without starting production
+implementation. The preferred source behavior is image-first: accept a ready
+`PROTO_PROMPT_PACK`, verify its readiness and coherence gates, then use
+prompt2proto to translate the prompt pack into credible UI/UX prototype
+instructions, evidence, and downstream handoff facts.
 
 Prototype work answers a product uncertainty. It should not become a hidden
 production implementation plan.
 
-`/ow:proto` is a strategy-to-prompt compiler. It should not merely describe a
-screen or create visual variants. Its job is to preserve the product intent
-from vision and validation, create strategically distinct prototype directions,
-and write prompts concrete enough for high-quality image prototype generation.
+`/ow:proto` remains the user-facing orchestration command. It may run
+build-proto-prompt internally when a ready prompt pack is missing, then hand the
+ready prompt pack to build-prototype/prompt2proto. `build-prototype` itself is
+not the vision-to-prompt-pack compiler.
 
-The engine behind strategic prompt generation is a co-founder plus senior
-product-manager perspective: interpret the vision with product judgment, design
-philosophy, and willingness to imagine materially different product forms. The
-references are tools for that perspective, not a checklist whose completion
-alone proves quality.
+The engine behind ready prompt-pack compilation belongs to build-proto-prompt:
+co-founder plus senior product-manager judgment generates strategically
+different prompt directions. Build-prototype starts after that point. Its
+engine is Chief PM plus Principal UI/UX judgment that translates the ready
+prompt pack into a credible prototype surface.
+
+Before any downstream prompt2proto handoff or visual prototype translation,
+switch from prompt-pack strategy generation into the build-prototype philosophy
+engine: Chief PM plus Principal UI/UX judgment. The Chief PM protects product
+intent, user decision context, domain fit, and evidence value. The Principal
+UI/UX lead protects visual hierarchy, density calibration, affordance clarity,
+interaction believability, and prototype credibility. This judgment layer
+decides what information is visible, grouped, collapsed, delayed, or drilled
+into based on industry, user role, task risk, screen size, task frequency, and
+reviewer attention.
 
 ## Inputs
 
 Required:
 
-- `.openworkflow/vision/VISION_CONTRACT.yaml`, `.openworkflow/vision/VISION.md`,
-  or direct user vision
-- `.openworkflow/validation/<validation_id>/VALIDATION.yaml`
+- `.openworkflow/prototypes/<prototype_id>/PROTO_PROMPT_PACK.yaml` or an
+  equivalent ready prompt pack artifact
+- `prompt_text_manifest.status: ready_for_image_generation`
+- `prompt_text_manifest.paragraph_quality_status: pass`
+- `prompt_pack_integrity_gate.status: pass`
+- `prototype_reality_gate.status: pass`
+- `quality_rubric.prompt_executability.status: pass`
+- `prototype_system_contract` when multiple screens share a product shell
+- `post_validate.status: pass` for multi-direction packs, or `skipped` for an
+  explicit single-direction pack
 
-If a current validation artifact is missing but a vision exists, `/ow:proto`
-must first trigger the same artifact-producing `/ow:validation` pass and write
-durable validation artifacts before prototype prompt generation. Do not proceed
-with ephemeral `vision_only` context.
+If a ready prompt pack is missing, thin, stale, or incoherent, build-prototype
+must refuse and route back to `/ow:build-proto-prompt` or the compatible
+`/ow:vision2prompt` compiler path. Do not repair strategic prompt text inside
+build-prototype.
 
 Optional:
 
 - `.openworkflow/context/CONTEXT_MAP.yaml` or `.codex/context/CONTEXT_MAP.yaml`
-- direct user constraints about prototype medium, target tool, direction count,
-  language, platform, brand, or acceptance bar
+- direct user constraints about selected direction, prototype medium, target
+  tool, viewport, language, platform, brand, or acceptance bar
 - `references/proto-redesign-artifact-contracts.md`
-- `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
-- `skills/build-prototype/references/vision2prompt/01_input_contract.md`
-  through `skills/build-prototype/references/vision2prompt/07_quality_rubric.md`
+- `skills/build-prototype/references/philosophy-engine.md`
+- `skills/prompt2proto/SKILL.md`
+- `skills/prompt2proto/references/01_input_contract.md`
+- `skills/prompt2proto/references/02_prompt_pack_readiness.md`
+- `skills/prompt2proto/references/03_visual_translation_workflow.md`
 
 Do not load unrelated specs, changes, runtime state, reviews, archives, or
 implementation history unless the prototype question explicitly depends on
@@ -56,17 +75,17 @@ them.
 
 ## Output
 
-For image-first planning, write prototype artifacts under the active prototype
-or change path chosen by the workflow. The core artifact is a proto prompt pack
-matching `schemas/proto-prompt-pack.schema.json`.
+For image-first planning, write prototype translation artifacts under the active
+prototype or change path chosen by the workflow. The ready prompt pack remains
+the input artifact, not something build-prototype recreates.
 
-Expected prompt-pack files:
+Expected build-prototype output families:
 
 ```txt
-PROTO_PROMPT_PACK.yaml
-PROTO_PROMPT_PACK.md
-REVIEW_PLAN.md
-EVIDENCE.md
+PROMPT2PROTO_TRANSLATION_PLAN.md
+PROMPT2PROTO_EVIDENCE.yaml
+NOTE.md
+EVIDENCE.yaml updates that reference accepted prompt-pack inputs
 ```
 
 For local runnable prototypes, the legacy artifact shape remains valid:
@@ -83,83 +102,81 @@ For local runnable prototypes, the legacy artifact shape remains valid:
 
 ## Workflow
 
-1. Choose the source mode:
-   - `strategic` when the input is durable validation plus vision context
-   - `local_runnable` only when the user asks to execute a prototype or the
-     validation question requires interaction
-2. Load the mode-specific inputs.
-3. For `strategic` mode, use
-   `skills/build-prototype/references/strategic-prompt-pack-protocol.md`
-   and run the `references/vision2prompt/` files in numeric order before
-   marking prompt text ready for image generation.
-4. If the user asks to tune accepted baseline screens or an accepted prompt
+1. Load the ready prompt pack and prompt2proto input/readiness references.
+2. Refuse missing, thin, stale, or incoherent prompt packs. Route repair to
+   `/ow:build-proto-prompt` or compatible `/ow:vision2prompt`; do not invent
+   strategy in build-prototype.
+3. Verify prompt-pack readiness, paragraph quality, prototype reality,
+   screen_manifest linkage, prototype_system_contract, and post_validate before
+   visual translation.
+4. Use prompt2proto to preserve product strategy and technical screen
+   coherence while translating the ready prompt pack into UI/UX prototype
+   instructions and evidence.
+5. Before accepting prototype instructions, use
+   `skills/build-prototype/references/philosophy-engine.md` to calibrate
+   density, information hierarchy, domain object emphasis, trust controls, and
+   UI/UX credibility.
+6. If the user asks to tune accepted baseline screens or an accepted prompt
    pack, hand off to `skills/tune-prototype/SKILL.md`.
-5. Run `npm run validate` when the repository validator exists.
+7. Run `npm run validate` when the repository validator exists.
 
-## Strategic Workflow
+## Ready Prompt-Pack Consumption
 
-1. Load the vision or validation inputs.
-2. Apply the validation consumption policy:
-   - if validation is absent, run artifact-producing validation first
-   - if validation exists, consume it and preserve its include/exclude boundaries
-   - if validation conflicts with vision, stop for a decision instead of
-     widening the prototype scope
-3. Extract the normalized strategy: product domain, primary user, usage
-   context, current alternative, core pain, desired behavior change, success
-   signal, differentiator, emotional value, functional value, trust and privacy
-   requirements, non-goals, future opportunities, and validation target.
-4. Adopt the perspective engine before generating directions: act as a
-   co-founder and 15-year senior product manager who asks what product should
-   exist, why this prototype matters, what user transformation it should create,
-   and what form best expresses the vision.
-5. Represent the strategic core as target user plus behavior change plus
-   mechanism plus differentiator plus boundary conditions.
-6. Infer the product experience model before directions: product archetype,
-   primary canvas, information architecture, domain objects, task loop,
-   interaction states, data realism, visual language, and anti-generic
-   constraints.
-7. Decide whether source concepts are distinct product forms or modules,
-   scenarios, layers, workflows, or states inside one product shell.
-8. Generate 5-8 candidate strategic hypotheses.
-9. Select the requested number of directions, defaulting to 3.
-10. Write each direction as a concrete high-fidelity prototype prompt with
-   `screen_prompts` tied to `screen_manifest.target_screen_id` values.
-11. Set `prompt_text_manifest.status: ready_for_image_generation` only after
-    `prompt_pack_integrity_gate.status`, `prototype_reality_gate.status`, and
-    `quality_rubric.prompt_executability.status` are `pass`, and after
-    `prompt_text_manifest.paragraph_quality_status` confirms dailin-grade
-    prompt paragraph quality.
-12. Keep `image_generation.status: not_started` and repair through
-    `/ow:vision2prompt` when integrity, reality, executability, or
-    post-validation gates are missing or failing.
-13. Recommend the first direction to generate based on risk reduction,
-   observability, feasibility, and closeness to the success signal.
-14. Record review evidence and next action guidance.
+1. Accept only prompt packs whose prompt text is ready for image generation and
+   whose integrity, reality, executability, paragraph quality, and
+   post-validation gates pass.
+2. Preserve the prompt-pack strategy: product thesis, target user
+   transformation, primary loop, non-goals, trust boundaries, and direction
+   reasons to exist.
+3. Preserve `prototype_system_contract` as the source of technical screen
+   coherence: stable app shell, navigation taxonomy, data vocabulary, object
+   anatomy, action bar, audit pattern, copy tone, and allowed screen deltas.
+4. Apply the Chief PM plus Principal UI/UX philosophy engine to decide visual
+   hierarchy, density, affordances, interaction believability, and UI/UX
+   credibility.
+5. Write provider-agnostic prototype instructions and evidence. Keep provider
+   image generation, human visual review, visual parity, proto2html, specs,
+   changes, teams, and runtime work out of scope.
+
+## Build-Prototype Philosophy Engine
+
+Use this engine after strategic prompt assets are ready and before downstream
+visual translation is accepted:
+
+- Chief PM lens: decide what the prototype must prove, what user decision is at
+  stake, which domain objects matter, what trust boundary must be visible, and
+  what information would change the next action.
+- Principal UI/UX lens: decide the screen's hierarchy, density, layout anatomy,
+  scan path, affordance clarity, interaction feedback, and inspection quality.
+- Density is not a prompt length target. It is a product/design decision:
+  operational users may need dense comparison surfaces, while sensitive or
+  consumer flows may need fewer visible choices and stronger reassurance.
+- Use `prototype_system_contract` for technical screen coherence. Use this
+  philosophy engine for density and visual information judgment.
+
+Reject both sparse mockups that hide the operating decision and overstuffed
+concept posters that make everything equally important.
 
 ## Strategic Direction Rules
 
-- Directions must differ by product form, initiation trigger, interaction
-  model, emotional driver, retention mechanism, validation metric, or main
-  risk.
-- Every direction must include a product thesis, target user transformation,
-  reason-to-exist, and explicit PM judgment about why this form deserves a
-  prototype.
-- Source scenarios, modules, layers, workflows, and interaction states are not
-  strategic directions by themselves; keep them inside one product shell unless
-  they imply materially different product forms or product loops.
-- Do not create variants that differ only by visual style.
+- Strategic direction generation belongs to build-proto-prompt. Build-prototype
+  may choose which already-ready direction or screens to translate, but must
+  not create new strategic directions.
+- If ready directions differ only by visual style, route back to
+  build-proto-prompt repair instead of treating them as valid prototype
+  strategy.
 - Preserve explicit non-goals, trust boundaries, privacy requirements, and user
   controls.
-- Convert category anti-patterns into negative constraints, especially generic
-  AI dashboards, consulting-report screens, or card walls when the product
-  category calls for a richer operational shell.
-- Prompts must specify screens, journeys, interactions, states, AI/system
-  behavior, trust controls, privacy boundaries, visual direction, anti-goals,
-  desired user feeling, and concrete sample content.
+- Convert category anti-patterns into negative visual constraints, especially
+  generic AI dashboards, consulting-report screens, or card walls when the
+  product category calls for a richer operational shell.
+- Consumed prompts must already specify screens, journeys, interactions,
+  states, AI/system behavior, trust controls, privacy boundaries, visual
+  direction, anti-goals, desired user feeling, and concrete sample content.
 - The prompt text itself must pass paragraph quality; adjacent YAML fields do
   not rescue a terse `screen_prompts[].prompt`.
-- The output is a prompt pack and review plan, not a production spec or task
-  backlog.
+- The output is prototype translation evidence, not a new prompt pack,
+  production spec, or task backlog.
 
 ## Local Prototype Path
 

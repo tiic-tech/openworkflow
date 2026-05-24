@@ -4,7 +4,7 @@ import { basename, join, relative, resolve } from "node:path";
 import { getWorkflowCommands, type WorkflowCommand } from "../commands/registry.js";
 import { SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
-import { isNotFound } from "../fs/index.js";
+import { isExternalReference, isNotFound, resolveLocalReference } from "../fs/index.js";
 import type { ValidationResult } from "./validateOpenWorkflow.js";
 
 const REQUIRED_FILES = [
@@ -865,6 +865,9 @@ async function validateCandidateChanges(root: string, path: string, data: Record
   if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
     validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
   }
+  if (isRecord(queuePolicy) && "branch_identity_exception" in queuePolicy) {
+    validateBranchIdentityException(label, queuePolicy.branch_identity_exception, errors);
+  }
   const strictCommitGate = isRecord(queuePolicy) && queuePolicy.selected_change_commit_gate === "strict";
   if (!Array.isArray(data.changes)) {
     errors.push(`${label} changes must be a list`);
@@ -876,6 +879,25 @@ async function validateCandidateChanges(root: string, path: string, data: Record
       continue;
     }
     validateCandidateCompletionEvidence(root, label, candidate, errors, { strictCommitGate });
+  }
+}
+
+function validateBranchIdentityException(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} queue_policy.branch_identity_exception must be a mapping when present`);
+    return;
+  }
+  if (value.mode !== "temporary_continuation_branch") {
+    errors.push(`${label} queue_policy.branch_identity_exception.mode must be temporary_continuation_branch`);
+  }
+  if (value.approved !== true) {
+    errors.push(`${label} queue_policy.branch_identity_exception.approved must be true`);
+  }
+  if (!Array.isArray(value.allowed_operations) || !value.allowed_operations.every((item) => typeof item === "string")) {
+    errors.push(`${label} queue_policy.branch_identity_exception.allowed_operations must be a string list`);
+  }
+  if (!nonEmptyString(value.reason)) {
+    errors.push(`${label} queue_policy.branch_identity_exception.reason must explain the temporary continuation branch`);
   }
 }
 
@@ -1001,6 +1023,7 @@ function validateLocalCommitEvidence(root: string, path: string, data: Record<st
   if (!hasValidationEvidence(data)) {
     errors.push(`${label} must include validation_evidence, validations, or validation.commands_run`);
   }
+  validateOptionalCoderEvidence(label, data.coder_evidence, errors);
 }
 
 function hasValidationEvidence(data: Record<string, unknown>): boolean {
@@ -1012,6 +1035,53 @@ function hasValidationEvidence(data: Record<string, unknown>): boolean {
   }
   const validation = recordField(data, "validation");
   return Array.isArray(validation.commands_run) && validation.commands_run.some((item) => typeof item === "string" && item.trim().length > 0);
+}
+
+function validateOptionalCoderEvidence(label: string, value: unknown, errors: string[]): void {
+  if (value === undefined || value === null) {
+    return;
+  }
+  if (!isRecord(value)) {
+    errors.push(`${label} coder_evidence must be a mapping when present`);
+    return;
+  }
+  const status = stringField(value, "status");
+  if (!status) {
+    errors.push(`${label} coder_evidence.status must be recorded, skipped, or not_applicable`);
+  } else if (!["recorded", "skipped", "not_applicable"].includes(status)) {
+    errors.push(`${label} coder_evidence.status has invalid value ${status}`);
+  }
+  const enforcement = stringField(value, "enforcement");
+  if (enforcement && enforcement !== "guidance_only") {
+    errors.push(`${label} coder_evidence.enforcement must be guidance_only when present`);
+  }
+  const evidenceKeys = ["preflight", "red_evidence", "green_evidence", "self_check", "validation_ladder", "lessons"];
+  let hasEvidence = false;
+  for (const key of evidenceKeys) {
+    const field = value[key];
+    if (field === undefined || field === null) {
+      continue;
+    }
+    if (!Array.isArray(field)) {
+      errors.push(`${label} coder_evidence.${key} must be a list of non-empty strings when present`);
+      continue;
+    }
+    for (const item of field) {
+      if (!nonEmptyString(item)) {
+        errors.push(`${label} coder_evidence.${key} values must be non-empty strings`);
+      }
+    }
+    if (field.some((item) => nonEmptyString(item))) {
+      hasEvidence = true;
+    }
+  }
+  if (status === "recorded" && !hasEvidence) {
+    errors.push(`${label} coder_evidence.status recorded requires at least one evidence list entry`);
+  }
+  const notes = value.notes;
+  if (notes !== undefined && notes !== null && !nonEmptyString(notes)) {
+    errors.push(`${label} coder_evidence.notes must be a non-empty string when present`);
+  }
 }
 
 function validateCommonContract(root: string, path: string, data: unknown, errors: string[]): void {
@@ -2696,21 +2766,24 @@ function validateEvidenceRefs(root: string, label: string, data: Record<string, 
 }
 
 function validateLocalRef(root: string, label: string, field: string, value: unknown, errors: string[]): void {
-  if (typeof value !== "string" || value.length === 0 || isExternalRef(value)) {
+  if (typeof value !== "string") {
     return;
   }
-  const resolved = resolve(root, value);
-  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+  const ref = resolveLocalReference(root, value, { exists: existsSyncSafe });
+  if (ref.kind === "empty" || ref.kind === "external") {
+    return;
+  }
+  if (ref.kind === "outside-root") {
     errors.push(`${label} ${field} references path outside root: ${value}`);
     return;
   }
-  if (!existsSyncSafe(resolved)) {
+  if (!ref.exists) {
     errors.push(`${label} ${field} references missing path ${value}`);
   }
 }
 
 function isExternalRef(value: string): boolean {
-  return /^[a-z][a-z0-9+.-]*:/i.test(value);
+  return isExternalReference(value);
 }
 
 function nonEmptyString(value: unknown): boolean {

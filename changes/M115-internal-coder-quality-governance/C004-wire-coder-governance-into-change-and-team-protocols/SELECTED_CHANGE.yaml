@@ -1,0 +1,93 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C004
+change_id: C004-wire-coder-governance-into-change-and-team-protocols
+title: Wire coder governance into change and team protocols
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 because C001 defined the internal coder governance boundary, C002
+  created the repo-owned source skill, and C003 registered `/ow:coder` as an
+  internal command protocol. The next dependency-ready step is wiring that
+  governance into `/ow:change` planning and `/ow:team` execution.
+rejected_alternatives:
+  - id: C005
+    reason: Depends on C004 change/team protocol wiring and touches recovery and git governance surfaces.
+  - id: C006
+    reason: Depends on C005 and would define evidence shape before the protocol is proven in read models.
+  - id: C007
+    reason: Lower unlock value than integrating coder governance into implementation flows.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/select-change/
+  - skills/run-team/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-change/
+  - .agents/skills/ow-team/
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - schemas/**
+  - packages/cli/src/commands/**
+  - packages/core/src/workflow/**
+dependencies:
+  - C002
+  - C003
+scope:
+  includes:
+    - update `/ow:change` protocol to require coder preflight thinking before selected implementation boundaries
+    - update `/ow:team` protocol to require RED/GREEN evidence and post-write self-check before completion
+    - keep `/ow:change` responsible for planning and `/ow:team` responsible for execution
+    - add runtime-surface checks for the references
+    - regenerate expected `.agents` and audit surfaces only through source-driven sync
+  excludes:
+    - changing command identities
+    - adding hard blocking evidence enforcement
+    - changing public JSON output
+    - exposing `/ow:coder` as a user-facing handoff command
+acceptance:
+  - Change planning references coder preflight without becoming execution.
+  - Team execution references RED/GREEN/self-check without replacing team runtime.
+  - Generated skills remain source-driven and aligned with registry protocol.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 is medium risk because it updates internal protocol guidance for
+    existing commands without changing command identities, public JSON output,
+    or hard evidence enforcement.
+expected_commit_boundary: >
+  Complete C004 as one coherent implementation commit plus local commit
+  evidence after source protocol updates, sync, runtime-surface verification,
+  and diff checks.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - packages/core/src/commands/registry.ts
+    - skills/select-change/SKILL.md
+    - skills/run-team/SKILL.md
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - .agents/skills/ow-change/SKILL.md
+    - .agents/skills/ow-team/SKILL.md
+    - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    - changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - node - <<'NODE' generated change/team coder governance assertion
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/ATOM_TASKS.yaml
+    - git diff --check

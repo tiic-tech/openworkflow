@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M106-agent-resume-cockpit:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M106-C005-expose-resume-in-runtime-surface-and-documentation
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C005
+title: Atom tasks for M106 C005 runtime surface and documentation exposure
+status: completed
+tasks:
+  - task_id: T001
+    title: Inspect runtime guidance and verification surfaces
+    status: completed
+    type: read
+    owned_paths:
+      - AGENTS.md
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/commands/resume.ts
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - docs/
+    done_when: >
+      The source-generated Agent guidance, command registry, runtime-surface
+      assertions, and existing docs paths relevant to resume are known.
+  - task_id: T002
+    title: Update Agent-facing source guidance
+    status: completed
+    type: edit
+    owned_paths:
+      - AGENTS.md
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/commands/resume.ts
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/
+    done_when: >
+      Source guidance tells fresh Agents to use `resume --json` as the first
+      interrupted-session recovery command and distinguishes it from handoff,
+      context, inspect, and status.
+  - task_id: T003
+    title: Document zero-thought recovery
+    status: completed
+    type: document
+    owned_paths:
+      - docs/
+      - AGENTS.md
+    done_when: >
+      Documentation describes resume recovery after network loss, context
+      overflow, compaction failure, and unexpected termination as ranked
+      atom-task continuation with explicit correction and product-alignment
+      boundaries.
+  - task_id: T004
+    title: Add runtime-surface coverage
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification asserts resume help, JSON shape, and
+      generated Agent guidance availability.
+  - task_id: T005
+    title: Validate and record completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Build, runtime-surface verification, direct resume JSON command, handoff,
+      validate, summaries, and diff-check pass, then completion and local
+      commit evidence are recorded.

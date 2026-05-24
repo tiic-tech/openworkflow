@@ -1,0 +1,307 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M113-spicyclaw-rename-and-compatibility
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M113-spicyclaw-rename-and-compatibility
+title: Candidate changes for SpicyClaw rename and compatibility
+status: active
+source:
+  kind: planning_discussion
+  refs:
+    - "user_input:2026-05-23-openworkflow-name-too-plain"
+    - "user_input:2026-05-23-spicyclaw-name-and-future-r-backend"
+    - "availability_snapshot:2026-05-23-npm-github-dns-quick-check"
+  summary: >
+    The product should move from the working name OpenWorkflow toward the
+    brand SpicyClaw. The current project is still a Codex coding kit, but the
+    long-term direction is an independent product comparable to OpenClaw or
+    hermes-agent, with its own design philosophy and runtime mechanism. The
+    future independent product may use an R backend for analysis, governance,
+    drift measurement, and agent-development intelligence.
+availability_snapshot:
+  checked_at: 2026-05-23
+  npm:
+    spicyclaw: not_found
+    "@tiic-tech/spicyclaw": not_found
+  github:
+    spicyclaw_user_or_org: not_found
+    spicyclaw_spicyclaw_repo: not_found
+    tiic_tech_spicyclaw_repo: not_found
+  dns:
+    spicyclaw_com: has_dns
+    likely_available_by_dns_probe:
+      - spicyclaw.dev
+      - spicyclaw.ai
+      - spicyclaw.sh
+      - spicyclaw.run
+      - spicyclaw.io
+      - spicyclaw.app
+      - spicyclaw.tools
+  caveat: >
+    DNS and registry probes are not legal clearance. Re-check package, GitHub,
+    registrar, and trademark availability before public launch or package
+    publication.
+queue_policy:
+  branch_boundary: codex/m101-build-proto-prompt-command-split
+  branch_note: >
+    Queue is created on the current continuation branch as planning follow-up
+    while M106 remains the active implementation queue. A later git-automation
+    branch action may move this queue if rename governance requires it.
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Start with C001 only after M106 resume reaches a stable checkpoint, because
+    rename work needs a compatibility contract before touching source names,
+    package names, generated surfaces, or repository metadata.
+  high_risk_rule: >
+    Any change that publishes npm packages, renames the GitHub repository,
+    changes the default workflow root directory, removes `openworkflow`
+    compatibility, or commits to the R backend runtime architecture is high
+    risk and needs an explicit decision report before selection.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Product rename, compatibility migration, and future independent SpicyClaw
+    product direction.
+  boundary_type: product_identity_and_migration
+  in_scope_rule: >
+    Capture the brand decision, compatibility stages, source/package/git
+    migration plan, and future R backend product direction.
+  out_of_scope_rule: >
+    Do not implement runtime rename, publish npm packages, rename remotes,
+    migrate `.openworkflow/`, or start R backend implementation from this
+    planning queue.
+  deferred_features:
+    - title: R backend independent runtime
+      reason: >
+        The future independent SpicyClaw product may use R for analysis,
+        governance scoring, artifact quality, and vision-product drift
+        measurement, but that architecture needs its own product/runtime queue.
+      suggested_plan_id: M114-spicyclaw-r-backend-runtime
+    - title: Project SOUL/MEMORY product layer
+      reason: >
+        Project-local Agent Soul and memory should align with SpicyClaw's
+        independent product identity, but the artifact contract belongs to
+        M112 before brand packaging.
+      suggested_plan_id: M112-project-soul-memory
+    - title: Workflow root directory migration
+      reason: >
+        `.openworkflow/` is a large compatibility surface. A `.spicyclaw/`
+        migration should be separate and should preserve legacy roots.
+      suggested_plan_id: M115-spicyclaw-root-compatibility
+next_recommended_candidate_id: C001
+changes:
+  - id: C001
+    status: ready
+    title: Define SpicyClaw rename and compatibility contract
+    purpose: >
+      Establish the product naming contract, migration phases, compatibility
+      guarantees, and stop conditions before any source, package, CLI, or repo
+      rename work begins.
+    scope:
+      includes:
+        - define public product name SpicyClaw and technical package spelling spicyclaw
+        - define compatibility rules for openworkflow CLI, npm package, and `.openworkflow/`
+        - define rename phases and rollback points
+        - record availability snapshot and revalidation requirements
+      excludes:
+        - changing source code names
+        - publishing packages
+        - renaming GitHub repository or remotes
+        - changing generated adapter surfaces
+    owned_paths:
+      - changes/M113-spicyclaw-rename-and-compatibility/
+      - references/
+      - docs/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - node dist/cli/src/index.js handoff --root . --json
+      - git diff --check
+    acceptance:
+      - The rename contract names SpicyClaw as the product target without breaking existing OpenWorkflow usage.
+      - Compatibility guarantees are explicit for CLI, npm package, workflow root, generated surfaces, and docs.
+      - Public availability checks are recorded as a snapshot with a required recheck before publication.
+  - id: C002
+    status: candidate
+    title: Update brand language in source-owned docs
+    purpose: >
+      Start a low-risk brand transition by updating source-owned docs and
+      marketing-facing language to present SpicyClaw as the product identity
+      while preserving OpenWorkflow as the current technical compatibility name.
+    scope:
+      includes:
+        - update README and docs references where product brand is user-facing
+        - explain current Codex coding kit status and future independent product direction
+        - keep command examples compatible with existing openworkflow CLI
+      excludes:
+        - renaming package names
+        - changing binary command names
+        - changing generated `.agents/**` files by hand
+    owned_paths:
+      - README.md
+      - docs/
+      - references/
+      - changes/M113-spicyclaw-rename-and-compatibility/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Public-facing language can describe SpicyClaw without implying an already-complete package or CLI rename.
+      - OpenWorkflow compatibility remains clear in commands and migration notes.
+      - No generated surfaces are hand-edited.
+  - id: C003
+    status: candidate
+    title: Add npm and CLI alias compatibility plan
+    purpose: >
+      Prepare the technical migration path for `@tiic-tech/spicyclaw` and a
+      `spicyclaw` CLI alias while keeping `@tiic-tech/openworkflow`,
+      `openworkflow`, and `.openworkflow/` usable.
+    scope:
+      includes:
+        - define package publication order
+        - define CLI binary alias behavior
+        - define deprecation and migration messaging
+        - add tests or runtime-surface expectations for alias compatibility when implemented
+      excludes:
+        - npm publish
+        - removing openworkflow command support
+        - changing `.openworkflow/` default root
+    owned_paths:
+      - package.json
+      - packages/cli/src/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - docs/
+      - changes/M113-spicyclaw-rename-and-compatibility/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Alias behavior is defined and tested before any public package migration.
+      - Old and new command names can coexist during migration.
+      - npm publication remains explicitly gated and is not performed by implementation.
+  - id: C004
+    status: candidate
+    title: Migrate generated guidance and adapter branding
+    purpose: >
+      Update source-generated Agent guidance, managed docs, and adapter
+      templates so generated surfaces can say SpicyClaw while preserving
+      OpenWorkflow compatibility and avoiding manual generated edits.
+    scope:
+      includes:
+        - update source templates or registries that render managed branding
+        - run sync only after source-owned changes are in place
+        - verify doctor/sync detect expected managed output
+      excludes:
+        - hand-editing generated `.agents/**` or `AGENTS.md`
+        - changing `.openworkflow/` root semantics
+        - publishing npm packages
+    owned_paths:
+      - packages/core/src/onboarding/
+      - packages/core/src/commands/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - docs/
+      - changes/M113-spicyclaw-rename-and-compatibility/
+    dependencies:
+      - C003
+    unlocks:
+      - C005
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --tools codex --json
+      - node dist/cli/src/index.js doctor --root . --tools codex --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated branding is source-driven and reproducible through sync.
+      - `openworkflow` compatibility remains visible during migration.
+      - Generated outputs are not patched by hand.
+  - id: C005
+    status: deferred
+    title: Design future SpicyClaw R backend product architecture
+    purpose: >
+      Explore the future independent product architecture where SpicyClaw uses
+      an R backend for analysis, governance, artifact quality, product drift,
+      and Agent development intelligence.
+    scope:
+      includes:
+        - define what belongs in R versus TypeScript CLI/runtime
+        - identify APIs between coding kit, R backend, and future product service
+        - define how SOUL/MEMORY, resume, lineage, and drift metrics feed the backend
+      excludes:
+        - implementing R services
+        - replacing current TypeScript CLI
+        - changing packaging or runtime dependencies
+    owned_paths:
+      - docs/
+      - references/
+      - changes/M113-spicyclaw-rename-and-compatibility/
+    dependencies:
+      - C001
+    unlocks: []
+    risk: high
+    size: large
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Architecture separates current Codex coding kit from future independent product runtime.
+      - R backend responsibilities are specific and justified by SpicyClaw's differentiating mechanisms.
+      - Implementation is deferred to a dedicated product/runtime queue.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      Created a bounded rename and compatibility queue after the user selected
+      SpicyClaw as the future product name and clarified that the current
+      repository remains a Codex coding kit while the future product may become
+      independent with an R backend.
+    changed_at: 2026-05-23
+    evidence:
+      - "user_input:2026-05-23-spicyclaw-name-and-future-r-backend"
+      - "availability_snapshot:2026-05-23-npm-github-dns-quick-check"

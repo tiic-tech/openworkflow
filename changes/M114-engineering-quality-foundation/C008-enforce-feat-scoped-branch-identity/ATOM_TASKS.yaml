@@ -1,0 +1,82 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M114-engineering-quality-foundation:C008
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M114-C008-enforce-feat-scoped-branch-identity
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C008
+title: Atom tasks for M114 C008 branch identity governance
+status: completed
+tasks:
+  - task_id: T001
+    title: Map branch identity source truth and current failure
+    status: completed
+    type: read
+    owned_paths:
+      - references/git-version-control-governance.md
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      The current false-trust path is documented: M114 plan id, M101 branch
+      boundary, resume branch_matches_current behavior, and git-automation
+      commit boundary enforcement.
+  - task_id: T002
+    title: Add RED branch-identity fixture
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      A targeted fixture fails because a queue whose branch_boundary names a
+      different feat is not surfaced as a branch identity problem.
+  - task_id: T003
+    title: Implement minimum branch identity rule and reporting
+    status: completed
+    type: edit
+    owned_paths:
+      - references/git-version-control-governance.md
+      - skills/decompose-to-changes/
+      - skills/select-change/
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/git/
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      Resume and git automation distinguish branch string equality from
+      feat-scoped branch ownership, and the policy names the explicit temporary
+      branch exception path.
+  - task_id: T004
+    title: Run GREEN and validation ladder
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/workflow/planningQueueResume.ts
+      - packages/core/src/git/
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when: >
+      The RED fixture is green, runtime surface verification passes, repo-local
+      resume and validate commands pass for their intended domains, and diff
+      check is clean.
+  - task_id: T005
+    title: Complete queue and bind commit evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      Queue, selected-change artifacts, LOCAL_COMMIT_EVIDENCE.yaml, and coder
+      evidence record C008 completion and leave C003 as the next candidate.
+verification:
+  red:
+    - "RED: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs failed because commitSelectedChange accepted a stale branch identity"
+  green:
+    - npm run build
+    - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check

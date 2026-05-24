@@ -1,0 +1,20 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-define-internal-coder-protocol-contract-and-command-boundary
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001-define-internal-coder-protocol-contract-and-command-boundary
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C001
+selected_change_id: C001-define-internal-coder-protocol-contract-and-command-boundary
+primary_commit: 1cd62e45d3a092fab3405bb6da9b0c691d448149
+validation_evidence:
+  - ruby YAML parse passed
+  - node dist/cli/src/index.js handoff passed before commit-evidence gate
+  - node dist/cli/src/index.js inspect --strict passed before commit-evidence gate
+  - node dist/cli/src/index.js resume --json passed before commit-evidence gate
+  - git diff --check passed
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

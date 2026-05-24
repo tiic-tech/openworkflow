@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M115-internal-coder-quality-governance:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C002
+change_id: C002-migrate-code-quality-governor-into-ow-source-coder-skill
+title: Migrate code-quality governor into OW source coder skill
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 because C001 established the internal `/ow:coder` protocol
+  boundary, making source skill ownership the next dependency-ready step before
+  registry, generated-surface, change/team, or read-model integration can
+  proceed.
+rejected_alternatives:
+  - id: C003
+    reason: Depends on repo-owned source skill material from C002.
+  - id: C004
+    reason: Depends on source skill and internal registry boundary from C002/C003.
+  - id: C005
+    reason: Depends on command/protocol integration and is high risk.
+  - id: C006
+    reason: Depends on proven read-model integration and is high risk.
+  - id: C007
+    reason: Depends on C002 source skill ownership.
+owned_paths:
+  - skills/
+  - references/
+  - packages/core/src/onboarding/
+  - changes/M115-internal-coder-quality-governance/
+forbidden_paths:
+  - .agents/skills/**
+  - .openworkflow/**
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/adapters/**
+  - packages/cli/src/**
+  - schemas/**
+dependencies:
+  - C001
+scope:
+  includes:
+    - add a repo source skill such as `skills/coder/SKILL.md` or `skills/code-quality-governor/SKILL.md`
+    - migrate only the durable OW-specific quality rules from the system skill
+    - keep generated `.agents/**` updates source-driven through sync
+    - preserve references for quality model, refactor protocol, validation ladder, and continuous growth loop
+  excludes:
+    - hand-editing `.agents/skills/**`
+    - registering `/ow:coder` in the command registry
+    - changing change/team/git behavior
+acceptance:
+  - OW owns the durable coder governance source skill.
+  - Generated surfaces are updated only through the repo-local sync path.
+  - The migrated guidance is narrower than the system skill and specific to OW source execution.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 adds repo-owned source skill guidance and does not register a new
+    command, hand-edit generated surfaces, change runtime behavior, or alter
+    public CLI JSON output.
+expected_commit_boundary: >
+  Complete C002 as one coherent commit after adding the source coder skill,
+  running sync through the repo-local CLI, reviewing generated-surface effects,
+  and recording local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - skills/coder/SKILL.md
+    - changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - git diff --check

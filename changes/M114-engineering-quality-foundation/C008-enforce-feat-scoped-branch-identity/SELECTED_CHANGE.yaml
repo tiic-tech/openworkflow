@@ -1,0 +1,124 @@
+schema_version: 0.1.0
+contract_id: selected_change:M114-engineering-quality-foundation:C008
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M114-C008-enforce-feat-scoped-branch-identity
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C008
+title: Enforce feat-scoped branch identity for candidate queues and git automation
+status: completed
+selected_at: 2026-05-23
+selection_reason: >
+  Selected before C003 because M114 C002 exposed a git-governance trust defect:
+  queue_policy.branch_boundary can point at an unrelated continuation branch while resume and
+  git-automation still treat current-branch equality as enough. Branch-per-feat ownership must be
+  made explicit before more M114 implementation candidates commit on the wrong feat branch.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Add a narrow branch identity invariant, targeted fixture coverage, and runtime/report guidance.
+    Do not rewrite history, push, open PRs, migrate all historical queues, or change selected-change
+    commit evidence semantics beyond branch identity checks.
+scope:
+  includes:
+    - define the branch identity invariant for candidate queues
+    - add validation or runtime guidance when plan_id and branch_boundary are semantically mismatched
+    - update resume or git-automation reporting so branch_matches_current does not imply feat
+      ownership when the boundary is stale
+    - add a targeted fixture covering a queue whose branch_boundary points at another plan id
+    - document the explicit exception path for temporary continuation branches
+  excludes:
+    - rewriting git history
+    - pushing, opening PRs, or mutating remote state
+    - migrating every historical queue branch in the same candidate
+    - changing selected-change commit evidence semantics beyond branch identity checks
+owned_paths:
+  - references/git-version-control-governance.md
+  - skills/decompose-to-changes/
+  - skills/select-change/
+  - packages/core/src/git/
+  - packages/core/src/workflow/planningQueueResume.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M114-engineering-quality-foundation/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+acceptance:
+  - New branch-governed queues have an enforceable feat-scoped branch identity rule.
+  - A queue whose branch_boundary names another plan id is surfaced as a branch identity warning or
+    validation failure.
+  - git-automation commit cannot silently bless a stale continuation branch as the owning feat
+    branch.
+  - resume distinguishes current-branch equality from feat-branch ownership.
+  - The policy defines a narrow explicit exception for temporary continuation branches without
+    making it the default.
+validation:
+  - npm run build
+  - targeted branch-identity fixture
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+coder_governance:
+  required: true
+  protocol_source: skills/coder/SKILL.md
+  quality_benchmark: /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
+  required_evidence:
+    - trust recovery
+    - owner/file/dependency map
+    - RED branch-identity evidence before production edits
+    - GREEN branch-identity evidence after edits
+    - post-write self-check
+    - honest validation ladder
+    - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
+expected_commit_boundary: >
+  C008 should complete as one local implementation commit plus local commit evidence, containing the
+  branch identity invariant, one targeted fixture, the minimum runtime/validator/git-automation
+  changes needed to prevent false branch trust, queue updates, and coder evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs
+    - changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Added a shared branch identity assessment for plan-token ownership, surfaced stale branch
+    ownership separately from current-branch equality in resume, made git-automation commit fail
+    closed unless an explicit temporary continuation exception applies, documented the policy, and
+    added RED/GREEN fixture coverage.
+  validation:
+    - "RED: node
+      changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_i\
+      dentity_fixture.mjs failed because commitSelectedChange accepted a stale branch identity"
+    - npm run build
+    - "GREEN: node
+      changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_i\
+      dentity_fixture.mjs"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  coder_evidence:
+    status: recorded
+    enforcement: guidance_only
+    preflight:
+      - Recovered trust with repo-local resume, context, and git status before source edits.
+      - Confirmed owned paths and forbidden paths from M114 C008 selected-change artifacts.
+      - Identified packages/core/src/git/branchIdentity.ts as the shared source helper for branch
+        identity.
+    red_green:
+      - RED fixture showed stale branch identity was accepted by commitSelectedChange.
+      - GREEN fixture passed after branch identity assessment was enforced by commit automation.
+    self_check:
+      - Durable changes are in source helpers, CLI/core runtime, validators, source skills,
+        references, and queue artifacts.
+      - No generated .agents or .openworkflow surfaces were hand-edited.
+      - Resume now distinguishes branch string equality from feat ownership.
+stop_conditions:
+  - Fix requires rewriting existing local git history.
+  - Fix requires push, PR, merge, or remote mutation.
+  - Scope expands into migrating every stale historical queue boundary.
+  - Generated .agents/** or .openworkflow/** surfaces would need manual patching as the durable fix.

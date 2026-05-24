@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C002
+change_id: C002-migrate-code-quality-governor-into-ow-source-coder-skill
+title: Atom tasks for repo-owned coder source skill migration
+status: completed
+tasks:
+  - id: T001
+    title: Inspect source skill conventions and coder protocol references
+    type: read
+    status: completed
+    owned_paths:
+      - skills/
+      - references/
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Existing source skill shape and C001 internal coder protocol boundaries are understood.
+  - id: T002
+    title: Add repo-owned coder source skill
+    type: edit
+    status: completed
+    owned_paths:
+      - skills/
+      - references/
+    done_when:
+      - "`skills/coder/SKILL.md` exists with OW-specific quality governance rules."
+      - The skill references the internal coder protocol and related repo references.
+      - The skill remains narrower than the system-level quality governor.
+  - id: T003
+    title: Run sync and review generated-surface effects
+    type: verify
+    status: completed
+    owned_paths:
+      - skills/
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - "`node dist/cli/src/index.js sync --root . --tools codex --json` has been run."
+      - Any generated-surface changes are source-driven and reviewed, or sync reports no generated changes.
+  - id: T004
+    title: Verify and complete C002
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+      - skills/
+      - references/
+    done_when:
+      - Required validation commands pass.
+      - Queue artifacts record C002 completion and local commit evidence.
+verification:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C002-migrate-code-quality-governor-into-ow-source-coder-skill/ATOM_TASKS.yaml
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - git diff --check
+  failed: []

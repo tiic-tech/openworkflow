@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M114-engineering-quality-foundation:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M114-C001-define-validation-trust-domains-and-report-taxonomy
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C001
+title: Atom tasks for M114 C001 validation trust domains
+status: completed
+tasks:
+  - task_id: T001
+    title: Capture current trust and validation baseline
+    status: completed
+    type: read
+    owned_paths:
+      - docs/OW_ENGINEERING_QUALITY_CC_BASIS.md
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      The passing handoff/inspect commands, failing npm validate classes, and
+      quality snapshot risk patterns are recorded as baseline evidence.
+  - task_id: T002
+    title: Define validation trust-domain taxonomy
+    status: completed
+    type: document
+    owned_paths:
+      - references/validation-trust-domains.md
+    done_when: >
+      The reference names trust domains, command ownership, non-domains, report
+      categories, and interpretation rules for green narrow signals with red
+      broader domains.
+  - task_id: T003
+    title: Validate taxonomy-only change
+    status: completed
+    type: verify
+    owned_paths:
+      - references/validation-trust-domains.md
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      Build, OW trust commands, strict summaries, known-red validate baseline,
+      and diff check have been run and recorded honestly.
+  - task_id: T004
+    title: Record completion and commit evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      Queue, selected-change, atom tasks, and local commit evidence identify
+      C001 completion and the validation baseline.

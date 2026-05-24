@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M101-build-proto-prompt-command-split:C006
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C006-build-prototype-philosophy-engine
+title: Atom tasks for build-prototype philosophy engine
+status: completed
+tasks:
+  - task_id: M101-C006-A001
+    title: Inspect existing prompt2proto and build-prototype guidance
+    status: completed
+    type: read
+    owned_paths:
+      - skills/prompt2proto/
+      - skills/build-prototype/
+    done_when:
+      - Existing Chief PM, Principal UI/UX, density, hierarchy, and coherence guidance is mapped before edits.
+  - task_id: M101-C006-A002
+    title: Add philosophy engine guidance
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/prompt2proto/
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/
+    done_when:
+      - build-prototype starts from Chief PM plus Principal UI/UX judgment before visual translation.
+      - Density calibration is framed as product/design judgment, not prompt cosmetics.
+  - task_id: M101-C006-A003
+    title: Wire source guidance and runtime assertions
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Runtime-surface assertions prove generated guidance names density, information hierarchy, and UI/UX credibility boundaries.
+      - Any generated surfaces are produced by sync, not hand-edited.
+  - task_id: M101-C006-A004
+    title: Verify and record selected-change evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/
+    done_when:
+      - Required validation commands pass.
+      - Completion records LOCAL_COMMIT_EVIDENCE.yaml for C006.

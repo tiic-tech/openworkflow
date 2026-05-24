@@ -1,0 +1,26 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C003-register-internal-ow-coder-command-protocol
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C003-register-internal-ow-coder-command-protocol
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C003
+selected_change_id: C003-register-internal-ow-coder-command-protocol
+primary_commit: c9830ae1bf96326570fe8f48e82eb52f5210b6eb
+validation_evidence:
+  - npm run build
+  - "ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }'
+    changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml
+    changes/M115-internal-coder-quality-governance/SUMMARY.yaml
+    changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol\
+    /SELECTED_CHANGE.yaml
+    changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol\
+    /ATOM_TASKS.yaml"
+  - git diff --check
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run verify:runtime-surface
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

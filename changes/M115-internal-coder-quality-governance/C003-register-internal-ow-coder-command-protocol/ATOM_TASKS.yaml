@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C003
+change_id: C003-register-internal-ow-coder-command-protocol
+title: Atom tasks for internal coder command registration
+status: completed
+tasks:
+  - id: T001
+    title: Inspect registry and generated-surface verification patterns
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/adapters/codex/src/
+    done_when:
+      - Internal command registration and generated skill verification patterns are clear.
+  - id: T002
+    title: Register internal coder command protocol
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when:
+      - "`/ow:coder` is registered with `visibility: internal`."
+      - The protocol points to `skills/coder/SKILL.md` and `references/internal-coder-protocol.md`.
+      - The protocol covers preflight, RED/GREEN, self-check, validation ladder, and evidence binding.
+  - id: T003
+    title: Verify generated runtime surface
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/
+    done_when:
+      - Runtime verifier asserts coder is internal and generated output is source-driven.
+      - Sync generates or refreshes only expected coder surfaces.
+  - id: T004
+    title: Complete C003
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Required validation commands pass.
+      - Queue artifacts record C003 completion and local commit evidence.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - node dist/cli/src/index.js inspect --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C003-register-internal-ow-coder-command-protocol/ATOM_TASKS.yaml
+    - git diff --check
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - npm run verify:runtime-surface
+  failed: []

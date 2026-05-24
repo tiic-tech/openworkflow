@@ -2,7 +2,7 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m101-build-proto-prompt-command-split`
 
@@ -57,8 +57,8 @@ quality comparable to the M100 vision2prompt skill.
 | C003 | done | high | Introduce build-proto-prompt command and source skill boundary | C001 |
 | C004 | done | high | Create prompt2proto source skill foundation | C001, C002 |
 | C005 | done | high | Add prototype system coherence contract to build-proto-prompt | C001, C003 |
-| C006 | ready | high | Inject Chief PM and Principal UI/UX philosophy engine into build-prototype | C001, C002, C004 |
-| C007 | candidate | high | Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto | C001, C003, C004, C005, C006 |
+| C006 | done | high | Inject Chief PM and Principal UI/UX philosophy engine into build-prototype | C001, C002, C004 |
+| C007 | done | high | Narrow build-prototype to consume ready prompt-pack artifacts through prompt2proto | C001, C003, C004, C005, C006 |
 
 ## Current Status
 
@@ -96,11 +96,11 @@ Current completed artifacts:
 The C005 managed `.agents/**` and `.openworkflow/audit/**` updates were
 regenerated from source by `node dist/cli/src/index.js sync --root . --json`.
 
-## Next Recommendation
+## Completion
 
-Select `C006` next to wire the Chief PM plus Principal UI/UX philosophy engine
-and density calibration guidance into `build-prototype`. `C007` remains blocked
-until C006 is complete.
+M101 is complete. `C007` narrowed `build-prototype` to consume ready prompt-pack
+artifacts through prompt2proto while preserving the approved `/ow:proto`
+orchestration path.
 
 ## Key Split
 

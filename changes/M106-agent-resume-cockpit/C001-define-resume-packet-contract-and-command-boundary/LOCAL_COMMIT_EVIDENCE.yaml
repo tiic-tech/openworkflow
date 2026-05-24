@@ -1,0 +1,21 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M106-C001-define-resume-packet-contract
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M106-C001-define-resume-packet-contract
+status: current
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C001
+selected_change_id: M106-C001-define-resume-packet-contract
+primary_commit: 2a6ee474d9265640931e2763a694653e31010aa0
+validation_evidence:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

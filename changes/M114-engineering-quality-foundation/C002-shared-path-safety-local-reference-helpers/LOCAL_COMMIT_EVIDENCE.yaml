@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M114-C002-shared-path-safety-local-reference-helpers
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M114-C002-shared-path-safety-local-reference-helpers
+status: current
+source_plan_id: M114-engineering-quality-foundation
+source_candidate_id: C002
+selected_change_id: M114-C002-shared-path-safety-local-reference-helpers
+primary_commit: 88a0fc4f06bad5b69da605ddea911b7890de0cc6
+validation_evidence:
+  - npm run build
+  - node
+    changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+coder_evidence:
+  status: recorded
+  enforcement: guidance_only
+  preflight:
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js inspect --root . --strict --json
+    - git status --short --branch
+    - Read skills/coder/SKILL.md and ow-code-quality-governor quality model, refactor protocol, and validation ladder.
+  owner_file_dependency_map:
+    source_truth:
+      - packages/core/src/fs/index.ts
+    validator_consumer:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    targeted_fixture:
+      - changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+    planning_evidence:
+      - changes/M114-engineering-quality-foundation/
+    forbidden_surfaces:
+      - .agents/**
+      - .openworkflow/**
+    dependency_order:
+      - RED fixture
+      - fs helper
+      - validator call site
+      - GREEN fixture
+      - OW trust validation
+      - git commit evidence
+  red_evidence:
+    - node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs failed before production edits because dist/core/src/fs/index.js did not provide resolveLocalReference.
+  green_evidence:
+    - node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs passed after shared fs helper exports were added.
+  self_check:
+    - No generated .agents/** or .openworkflow/** surfaces changed.
+    - Root containment now uses resolve plus relative path containment, avoiding raw prefix checks for the replaced call site.
+    - Only one validator call site was migrated; broad validator rewrite remains out of scope.
+    - Public CLI JSON shape and behavior-compatible diagnostics were preserved.
+  validation_ladder:
+    - npm run build
+    - node changes/M114-engineering-quality-foundation/C002-shared-path-safety-local-reference-helpers/path_safety_fixture.mjs
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  lessons:
+    - Git automation currently records coder_gate automatically; richer coder_evidence still needs manual binding or a future source change.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

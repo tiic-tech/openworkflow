@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M115-internal-coder-quality-governance:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M115-internal-coder-quality-governance
+candidate_id: C004
+change_id: C004-wire-coder-governance-into-change-and-team-protocols
+title: Atom tasks for coder governance wiring into change and team
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current change and team protocol surfaces
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/select-change/
+      - skills/run-team/
+      - .agents/skills/ow-change/
+      - .agents/skills/ow-team/
+    done_when:
+      - Existing planning and execution protocol ownership is clear.
+      - Generated skill text is understood as sync output, not source truth.
+  - id: T002
+    title: Add coder governance references to source protocols
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/select-change/
+      - skills/run-team/
+    done_when:
+      - "`/ow:change` or selected-change planning references coder preflight before implementation boundaries."
+      - "`/ow:team` execution references RED/GREEN evidence and post-write self-check before completion."
+      - "`/ow:change` and `/ow:team` retain their existing responsibilities."
+  - id: T003
+    title: Verify generated surfaces and runtime checks
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-change/
+      - .agents/skills/ow-team/
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Runtime verifier asserts the coder governance references exist.
+      - Sync regenerates only expected generated surfaces.
+  - id: T004
+    title: Complete C004 with validation and local commit evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M115-internal-coder-quality-governance/
+    done_when:
+      - Required validation commands pass.
+      - Queue artifacts record C004 completion and local commit evidence.
+verification:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - git diff --check
+results:
+  passed:
+    - node - <<'NODE' generated change/team coder governance assertion
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - ruby -ryaml -e "ARGV.each { |f| YAML.load_file(f); puts \"ok #{f}\" }" changes/M115-internal-coder-quality-governance/CANDIDATE_CHANGES.yaml changes/M115-internal-coder-quality-governance/SUMMARY.yaml changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/SELECTED_CHANGE.yaml changes/M115-internal-coder-quality-governance/C004-wire-coder-governance-into-change-and-team-protocols/ATOM_TASKS.yaml
+    - git diff --check
+  failed: []

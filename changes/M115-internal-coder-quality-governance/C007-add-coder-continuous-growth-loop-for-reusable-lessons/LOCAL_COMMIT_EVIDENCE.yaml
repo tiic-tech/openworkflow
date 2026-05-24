@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C007-add-coder-continuous-growth-loop-for-reusable-lessons
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C007-add-coder-continuous-growth-loop-for-reusable-lessons
+status: current
+source_plan_id: M115-internal-coder-quality-governance
+source_candidate_id: C007
+selected_change_id: C007-add-coder-continuous-growth-loop-for-reusable-lessons
+primary_commit: 14bae9e79d267b818ecc7d7605f60d21cd09e59f
+validation_evidence:
+  - ruby -ryaml C007 planning artifacts
+  - git diff --check
+  - inspect/summaries rerun after commit evidence
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

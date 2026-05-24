@@ -1,0 +1,83 @@
+schema_version: 0.1.0
+contract_id: selected_change:M106-agent-resume-cockpit:C002
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M106-C002-implement-base-resume-aggregator
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C002
+title: Implement base resume aggregator
+status: done
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after C001 completed the resume packet contract and command
+  boundary. C002 is the next recommended, dependency-ready, medium-risk slice:
+  implement the read-only executable resume command and base packet before
+  adding active queue scanning or richer action/evidence classification.
+risk_decision:
+  risk: medium
+  selected_option: >
+    Implement the read-only base aggregator only; keep active queue detection
+    uncertainty explicit until C003.
+scope:
+  includes:
+    - add the resume CLI command entrypoint
+    - reuse existing handoff, inspect, summaries, check, and git-state logic where practical
+    - support `--json` with an Agent-safe report envelope
+    - include a zero-thought recovery summary with project overview, trust state, git state, and smallest safe next action
+    - report unknown queue/work-item context explicitly until C003 implements active queue detection
+    - prefer least-sufficient context surfaces over broad repository scans
+    - keep command read-only
+  excludes:
+    - queue scanning heuristics beyond current obvious queue inputs
+    - mutating CURRENT_STATE or summaries
+    - implementing write preflight checks
+owned_paths:
+  - packages/cli/src/
+  - packages/core/src/workflow/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M106-agent-resume-cockpit/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - changes/M107-artifact-lineage-graph/**
+  - changes/M108-consistency-first-later-prompt2proto/**
+  - changes/M109-provider-fallback-generation-metadata/**
+  - changes/M110-boundary-preflight-compiler/**
+  - changes/M112-project-soul-memory/**
+  - changes/M113-spicyclaw-rename-and-compatibility/**
+acceptance:
+  - "`resume --json` returns one packet with project overview, trust state, next action, and git cleanliness."
+  - The packet is sufficient for a new Agent to decide whether it can continue or must stop for missing context.
+  - Unknown active queue or current work item is represented as explicit uncertainty, not omitted or guessed.
+  - Resume favors existing OW trust surfaces and does not require whole-repo rediscovery for a healthy initialized project.
+  - The command does not write or update files.
+  - Runtime coverage verifies fresh and initialized repo behavior.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C002 should complete as one local implementation commit containing the
+  read-only resume command, base packet model, runtime-surface coverage, queue
+  updates, and local commit evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - packages/cli/src/commands/resume.ts
+    - packages/cli/src/commands/handoff.ts
+    - packages/cli/src/index.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M106-agent-resume-cockpit/C002-implement-base-resume-aggregator/LOCAL_COMMIT_EVIDENCE.yaml
+  validation:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - node dist/cli/src/index.js handoff --root . --json
+    - git diff --check

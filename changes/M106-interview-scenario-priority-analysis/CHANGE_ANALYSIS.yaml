@@ -1,0 +1,141 @@
+schema_version: 0.1.0
+contract_id: change_analysis:M106-interview-scenario-priority-analysis
+contract_type: planning
+planning_artifact_type: change_analysis
+analysis_id: M106-interview-scenario-priority-analysis
+title: M104 interview scenario priority analysis
+status: complete
+source:
+  kind: mixed
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+    - changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
+    - user_input:2026-05-23-project-soul-memory-scenario
+  queues:
+    - changes/M105-m104-direct-trust-gate-fixes/CANDIDATE_CHANGES.yaml
+  summary: >
+    The interview identified five high-value OW development scenarios, and
+    later planning added a sixth differentiating scenario: project-local
+    SOUL.md and MEMORY.md under .openworkflow that evolve from auditable
+    development records into reusable expert Agent Soul for similar projects.
+    M105 has already completed the direct commit-evidence closure and
+    owned-path diagnostic slice, so the next best feature boundary remains the
+    Agent resume cockpit exposed as resume --json.
+git_state:
+  branch: codex/m101-build-proto-prompt-command-split
+  dirty: false
+recommendation:
+  target_plan_id: M106-agent-resume-cockpit
+  target_candidate_id: C001
+  action: handoff_to_decompose_to_changes
+  reason: >
+    resume --json has the highest immediate Agent-consumer value, depends on
+    the trust gates repaired in M105, and can ship as a read-only command
+    before heavier lineage or prompt2proto strategy work.
+scenario_scores:
+  - scenario_id: S001
+    title: Agent resume cockpit / resume --json
+    suggested_plan_id: M106-agent-resume-cockpit
+    status: recommended
+    priority: 1
+    risk: medium
+    readiness: high
+    reason: >
+      Directly solves the temporary Agent handoff pain from M104 by aggregating
+      handoff, inspect, summaries, check, queue, and git state into one
+      actionable recovery packet.
+  - scenario_id: S002
+    title: Automatic commit evidence closure
+    suggested_plan_id: M105-m104-direct-trust-gate-fixes
+    status: completed
+    priority: 2
+    risk: high
+    readiness: complete
+    reason: >
+      Completed in M105 C003 with narrow safe backfill. No new queue is needed
+      unless post-check rerun automation is later requested.
+  - scenario_id: S003
+    title: Artifact lineage graph
+    suggested_plan_id: M107-artifact-lineage-graph
+    status: deferred
+    priority: 3
+    risk: high
+    readiness: medium
+    reason: >
+      High product value but spans schema, validators, evidence semantics,
+      decision references, and prototype image roles. It should follow the
+      resume read model so Agents can recover the active chain first.
+  - scenario_id: S004
+    title: Prompt2Proto strategy engine with consistency-first split-later
+    suggested_plan_id: M108-consistency-first-split-later-prompt2proto
+    status: deferred
+    priority: 4
+    risk: high
+    readiness: medium
+    reason: >
+      The two-step board/split prompt intelligence is valuable, but it depends
+      on clearer lineage and provider capability metadata to avoid claiming
+      unsupported image-to-image generation.
+  - scenario_id: S005
+    title: Boundary preflight compiler
+    suggested_plan_id: M110-boundary-preflight-compiler
+    status: deferred
+    priority: 5
+    risk: medium
+    readiness: medium
+    reason: >
+      M105 C004 improved commit-time diagnostics, but a full write preflight
+      command should be designed after resume establishes the current work
+      packet and queue boundary model.
+  - scenario_id: S006
+    title: Project SOUL.md and MEMORY.md evolution
+    suggested_plan_id: M112-project-soul-memory
+    status: deferred
+    priority: 6
+    risk: high
+    readiness: medium
+    reason: >
+      Creates project-local `.openworkflow/SOUL.md` and
+      `.openworkflow/MEMORY.md` that evolve from auditable OW development
+      records, linear governance, high-value implementation patterns, emergent
+      Agent capabilities, and major mistake prevention. This is a differentiator
+      from generic human preference memory: OW Soul should be trained by
+      development evidence, not by user habit logs. It should follow resume and
+      trust-surface foundations because capture, promotion, pruning, privacy,
+      and reuse rules need a reliable audit model before they affect every
+      initialized repo.
+rejected_alternatives:
+  - plan_id: M107-artifact-lineage-graph
+    candidate_id: future
+    reason: >
+      More foundational for image evidence, but too broad to select before
+      Agents have a single trustworthy resume packet.
+  - plan_id: M108-consistency-first-split-later-prompt2proto
+    candidate_id: future
+    reason: >
+      Strong M104 visual learning, but requires strategy and provenance model
+      decisions that are downstream of lineage/provider capability design.
+  - plan_id: M110-boundary-preflight-compiler
+    candidate_id: future
+    reason: >
+      Useful, but partially reduced by M105 C004 and less urgent than solving
+      cross-session recovery.
+  - plan_id: M112-project-soul-memory
+    candidate_id: future
+    reason: >
+      Strategically important and strongly differentiating, but high risk
+      because it creates persistent project personality and reusable Agent
+      expertise. It needs a dedicated queue after the resume/trust model can
+      identify which discoveries are evidence-backed, durable, and safe to
+      promote into SOUL or MEMORY.
+high_risk_stop:
+  required: false
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+  notes:
+    - Analysis is advisory and does not select or implement a candidate.
+    - M105 is complete and unblocks the resume cockpit queue.
+    - Added S006 as a deferred project SOUL/MEMORY scenario from later planning input.

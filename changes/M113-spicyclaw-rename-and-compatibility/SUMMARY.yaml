@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: summary:M113-spicyclaw-rename-and-compatibility
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M113-spicyclaw-rename-and-compatibility
+title: Summary for SpicyClaw rename and compatibility
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    The user selected SpicyClaw as the future product name. The current
+    repository remains the Codex coding kit, while the future product may become
+    an independent system like OpenClaw or hermes-agent with its own design
+    philosophy, runtime mechanism, and an R backend for analysis, governance,
+    artifact quality, product drift, and Agent development intelligence.
+  refs:
+    - "user_input:2026-05-23-openworkflow-name-too-plain"
+    - "user_input:2026-05-23-spicyclaw-name-and-future-r-backend"
+    - "availability_snapshot:2026-05-23-npm-github-dns-quick-check"
+scope_boundary: >
+  Product rename and compatibility planning only. Do not publish packages,
+  rename Git remotes, remove OpenWorkflow compatibility, migrate
+  `.openworkflow/`, or implement the R backend from this queue.
+branch_boundary: codex/m101-build-proto-prompt-command-split
+candidate_count: 5
+active_candidate_count: 4
+completed_candidate_id: null
+completed_change_id: null
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: C001
+outputs:
+  candidate_changes_yaml: changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.md
+  summary: changes/M113-spicyclaw-rename-and-compatibility/SUMMARY.yaml
+key_dependencies:
+  - M106 resume should remain the active implementation priority before rename work begins.
+  - SpicyClaw naming should preserve OpenWorkflow compatibility until migration is tested.
+  - Package, GitHub, domain, and trademark availability must be rechecked before publication.
+risks:
+  - id: R001
+    level: medium
+    description: Renaming too early could disrupt active dogfood work and resume trust gates.
+    mitigation: Start with a compatibility contract and defer source/package rename until M106 reaches a stable checkpoint.
+  - id: R002
+    level: high
+    description: npm, CLI, generated adapter, or repository rename could break existing users and generated surfaces.
+    mitigation: Keep OpenWorkflow aliases, run sync/doctor/runtime verification, and gate public publication separately.
+  - id: R003
+    level: high
+    description: Future R backend architecture could blur the current coding kit scope.
+    mitigation: Keep R backend design deferred to a dedicated product/runtime queue.
+unresolved_questions:
+  - Should the public CLI eventually become `spicyclaw`, or should it remain `openworkflow` with SpicyClaw as product brand for longer?
+  - Should `.openworkflow/` ever migrate to `.spicyclaw/`, or remain as a permanent compatibility root?
+  - Which domain should be reserved before public rename?
+deferred_features:
+  - M112-project-soul-memory
+  - M114-spicyclaw-r-backend-runtime
+  - M115-spicyclaw-root-compatibility
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+  notes:
+    - Created planning artifacts only; no source rename, package publish, remote rename, or generated-surface update was performed.
+    - Return to M106 C002 after this queue is recorded.

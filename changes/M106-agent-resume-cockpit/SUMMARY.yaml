@@ -1,0 +1,91 @@
+schema_version: 0.1.0
+contract_id: summary:M106-agent-resume-cockpit
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M106-agent-resume-cockpit
+title: Summary for Agent resume cockpit
+status: completed
+source:
+  kind: mixed
+  summary: >
+    M106 implements the highest-priority remaining M104 interview scenario:
+    a read-only Agent resume cockpit exposed as `resume --json`. The refined
+    first-consumer standard is zero-thought recovery: after interruption, a
+    human opens a new session, tells a fresh Agent to use OW resume and continue,
+    and the Agent receives enough context to proceed safely without further
+    human explanation. The broader north-star is that OW should not become a
+    generic Ralf Loop; it should support minimal-context precise action,
+    interruption recovery, corrected and ranked atom-task continuation, and
+    vision-product drift minimization.
+  refs:
+    - docs/M104_AGENT_CONSUMER_INTERVIEW.md
+    - changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+    - changes/M105-m104-direct-trust-gate-fixes/SUMMARY.yaml
+    - user_input:2026-05-23-resume-zero-thought-recovery-standard
+    - user_input:2026-05-23-ow-not-ordinary-ralf-loop-north-star
+    - user_input:2026-05-23-project-soul-memory-scenario
+scope_boundary: >
+  Read-only resume packet only. Artifact lineage, prompt2proto strategy,
+  provider metadata, and full write preflight are deferred.
+branch_boundary: codex/m101-build-proto-prompt-command-split
+candidate_count: 5
+active_candidate_count: 0
+completed_candidate_id: C005
+completed_change_id: M106-C005-expose-resume-in-runtime-surface-and-documentation
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+outputs:
+  candidate_changes_yaml: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M106-agent-resume-cockpit/CANDIDATE_CHANGES.md
+  summary: changes/M106-agent-resume-cockpit/SUMMARY.yaml
+  change_analysis_yaml: changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.yaml
+  change_analysis_md: changes/M106-interview-scenario-priority-analysis/CHANGE_ANALYSIS.md
+key_dependencies:
+  - M104 interview identified resume --json as the top remaining Agent-consumer scenario.
+  - M105 completed direct trust-gate and evidence-closure fixes needed before resume can aggregate trustworthy signals.
+  - Existing handoff, inspect, summaries, check, and git status commands provide the initial signal sources.
+  - First-consumer Agent expectation requires resume to recover project overview, current task boundary, breakpoint, behavior boundaries, allowed work, validation expectations, and the smallest safe OW next action.
+  - OW north-star expectation requires resume to preserve least-sufficient context, ranked corrective atom-task continuation, and available product-alignment signals instead of broad free-form replanning.
+risks:
+  - id: R001
+    level: medium
+    description: Resume could duplicate or diverge from existing handoff/inspect/check semantics.
+    mitigation: Keep resume read-only and aggregate existing signals before adding new policy.
+  - id: R002
+    level: medium
+    description: Queue scanning could become too broad or noisy.
+    mitigation: Start with obvious active planning queues and record uncertainty instead of selecting work.
+  - id: R003
+    level: medium
+    description: Resume could create false confidence if a fresh Agent receives an incomplete packet that hides uncertainty.
+    mitigation: Require explicit unknowns, blockers, and stop conditions whenever project, queue, breakpoint, or behavior-boundary facts cannot be established.
+unresolved_questions:
+  - Should resume become the default first command in generated Agent guidance after the command stabilizes?
+  - How much queue scanning should resume perform before it becomes too expensive for low-context startup?
+deferred_features:
+  - M107-artifact-lineage-graph
+  - M108-consistency-first-split-later-prompt2proto
+  - M109-provider-fallback-generation-metadata
+  - M110-boundary-preflight-compiler
+  - M111-vision-product-drift-minimization
+  - M112-project-soul-memory
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+  notes:
+    - Created cross-scenario analysis before DTC queue creation.
+    - No source implementation was performed by this decomposition.
+    - C001 was selected and completed as the resume packet contract and read-only command boundary slice.
+    - C002 is now dependency-ready for the base resume aggregator implementation.
+    - DTC maintenance updated C002-C005 success criteria around zero-thought recovery for a fresh Agent after interrupted sessions.
+    - DTC maintenance added the north-star constraint that OW recovery should not degrade into a generic Ralf Loop; it should support minimal-context precise action and minimize vision-product drift through ranked atom tasks.
+    - Scenario analysis maintenance added S006 for project-local SOUL.md and MEMORY.md evolution as a deferred M112 feature, separate from the resume cockpit implementation queue.
+    - C002 implemented the executable read-only `resume` base aggregator with a standard JSON report envelope, explicit command boundary, trust/workflow/git/action/evidence fields, and active_queue/current_work_item uncertainty deferred to C003.
+    - C003 implemented active planning queue and current-work-item detection for resume, including queue ranking, selected/completed/next-ready candidates, atom-task breakpoints, missing commit evidence, and queue-local next action.
+    - C004 added Agent-facing action and evidence classification to resume: allowed/forbidden actions, stop conditions, evidence classes, validation expectations, commit-evidence expectations, git-governance constraints, and product-alignment pointer context.
+    - C005 exposed resume in runtime guidance and documentation, completing the M106 queue.
+    - Source-generated AGENTS.md guidance now points fresh Agents to resume as the first interrupted-session recovery command.
+    - Documentation now frames resume as minimal-context precision recovery into ranked atom-task continuation, with SOUL/MEMORY deferred.
+    - Runtime-surface verification covers resume help, generated guidance, JSON shape, and deferred-boundary wording.

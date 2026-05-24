@@ -185,6 +185,15 @@ export const WORKFLOW_COMMANDS: readonly WorkflowCommand[] = [
     ["changes/<plan_id>/CANDIDATE_CHANGES.yaml", "changes/<plan_id>/PR_READY_SUMMARY.md"],
     gitAutomationProtocol(),
   ),
+  command(
+    "coder",
+    ["code-quality-governor", "engineering-quality"],
+    "Govern source edits with internal Agent-only code quality preflight, RED/GREEN evidence, self-check, validation, and evidence binding.",
+    "execution",
+    [],
+    coderProtocol(),
+    "internal",
+  ),
 ] as const;
 
 export function getWorkflowCommands(): readonly WorkflowCommand[] {
@@ -494,6 +503,127 @@ function gitAutomationProtocol(): CommandProtocol {
   };
 }
 
+function coderProtocol(): CommandProtocol {
+  return {
+    depth: "deep",
+    interactionMode: "internal-agent-code-execution-governance",
+    requiredContext: [
+      "references/internal-coder-protocol.md",
+      "skills/coder/SKILL.md",
+      "changes/<plan_id>/CANDIDATE_CHANGES.yaml when queue-driven",
+      "changes/<plan_id>/<candidate-id>-<slug>/SELECTED_CHANGE.yaml when selected-change-driven",
+      "git status --short --branch",
+    ],
+    optionalContext: [
+      "references/validation-trust-domains.md",
+      "references/skill-system-lifecycle.md",
+      "references/git-version-control-governance.md",
+      "changes/<plan_id>/<candidate-id>-<slug>/ATOM_TASKS.yaml",
+      "changes/<plan_id>/<candidate-id>-<slug>/IMPLEMENTATION_BRIEF.md",
+      "changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml",
+    ],
+    forbiddenContext: [
+      ".openworkflow/runtime/** unless the active task is /ow:team execution",
+      "generated .agents/** as source truth",
+    ],
+    allowedOutputs: [
+      "source edits already allowed by the current selected change",
+      "test, fixture, verifier, or reference edits already allowed by the current selected change",
+      "selected-change evidence updates under changes/<plan_id>/<candidate-id>-<slug>/",
+      "source-driven generated surfaces only after sync when the selected change owns them",
+    ],
+    conditionalOutputs: [
+      "LOCAL_COMMIT_EVIDENCE.yaml through openworkflow git-automation commit when implementation files changed",
+      "future optional CODER_EVIDENCE.yaml only after a later selected change defines the artifact contract",
+    ],
+    forbiddenOutputs: [
+      "user-facing command handoff to /ow:coder",
+      "new mandatory CODER_EVIDENCE.yaml",
+      "generated .agents/** hand edits",
+      ".openworkflow/** mutation unless the active user-facing command owns that output",
+      "git push, PR creation, Issue mutation, merge, reset, rebase, force-push, or destructive branch operations",
+    ],
+    auditCheckpoints: {
+      before: [
+        "Recover trust with repo-local resume, handoff, inspect --strict, and git status before source edits.",
+        "Identify selected plan id, candidate id, selected-change artifact, owned paths, forbidden paths, and validation commands when queue-driven.",
+        "Build an owner/file/dependency map that names source truth, derived surfaces, validators, tests or fixtures, public report surfaces, and docs or skills.",
+        "Decide whether RED evidence is required for the change type; for docs-only or contract-only work, record why RED is not applicable.",
+      ],
+      during: [
+        "Change the source owner first and regenerate derived surfaces only through the repo-local sync path when generated surfaces are in scope.",
+        "For behavior, validator, CLI report, generated-surface, path-safety, summary, queue, or git-evidence changes, produce RED evidence before production edits when practical.",
+        "After edits, rerun the RED evidence or nearest equivalent and record GREEN evidence for the touched trust domain.",
+        "Keep /ow:change responsible for selected-change boundaries and /ow:team responsible for managed execution; coder governance constrains source edits but does not replace either command.",
+      ],
+      after: [
+        "Run the post-write self-check from skills/coder/SKILL.md before final validation.",
+        "Run the narrowest honest validation ladder for the touched trust domain.",
+        "Bind validation evidence to SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, IMPLEMENTATION_BRIEF.md, or LOCAL_COMMIT_EVIDENCE.yaml as appropriate.",
+        "Report generated surfaces as source-driven or intentionally untouched; do not present /ow:coder as a normal user-facing next step.",
+      ],
+    },
+    antiPatterns: [
+      "Do not expose /ow:coder as a normal user-facing workflow entrypoint.",
+      "Do not use /ow:coder to bypass /ow:change selected-change boundaries or /ow:team execution governance.",
+      "Do not patch generated .agents surfaces as the durable fix.",
+      "Do not require CODER_EVIDENCE.yaml before a later candidate defines and proves the evidence contract.",
+      "Do not treat npm run build alone as sufficient validation for behavior, validator, generated-surface, summary, or git-evidence changes.",
+      "Do not hide historical validation debt; classify it separately from active-change failures.",
+    ],
+    internalSections: [
+      {
+        tag: "internal_command_boundary",
+        items: [
+          "/ow:coder is internal and Agent-only.",
+          "It is not a normal user-facing coding command and must not appear as the recommended handoff for product work.",
+          "It constrains source-edit quality inside /ow:change, /ow:team, git-automation, and other implementation flows.",
+          "Its source behavior lives in skills/coder/SKILL.md and references/internal-coder-protocol.md.",
+        ],
+      },
+      {
+        tag: "preflight_owner_map",
+        items: [
+          "Identify source truth before edits: command registry, artifact registry, schema, validator, adapter template, source skill, or planning queue.",
+          "Identify derived surfaces such as .agents/**, .openworkflow/audit/**, summaries, fixtures, and readable Markdown views.",
+          "Name forbidden paths and dependency order before writing across multiple concerns.",
+          "If two owners define the same rule, either collapse the duplication or record a temporary compatibility boundary.",
+        ],
+      },
+      {
+        tag: "red_green_evidence",
+        items: [
+          "For behavior, validator, CLI report, generated-surface, path-safety, summary, queue, or git-evidence changes, prefer RED evidence before production edits.",
+          "Valid RED evidence can be a failing parsed JSON/YAML assertion, fixture, generated-surface parity check, summary or resume health assertion, compile failure, or runtime verifier failure.",
+          "After edits, rerun the RED evidence or nearest equivalent and record GREEN evidence.",
+          "For docs-only, contract-only, mechanical rename, or exploratory work, mark RED not applicable and use the nearest structural check.",
+        ],
+      },
+      {
+        tag: "validation_ladder",
+        items: [
+          "Use the narrowest honest validation ladder for the touched trust domain.",
+          "Source skill or generated protocol work requires build, sync, generated diff review, strict inspect, and diff check.",
+          "Command registry or generated runtime surface work requires build, sync, runtime-surface verification, and generated diff review.",
+          "Artifact, schema, or validator work requires build, validate, and targeted valid/invalid fixtures.",
+          "Git evidence work requires git-automation preview/write plus strict read-model commands.",
+        ],
+      },
+      {
+        tag: "evidence_binding",
+        items: [
+          "Bind scope and acceptance to SELECTED_CHANGE.yaml.",
+          "Bind task status and verification results to ATOM_TASKS.yaml.",
+          "Bind handoff instructions to IMPLEMENTATION_BRIEF.md.",
+          "Bind local commit hashes and validation evidence to LOCAL_COMMIT_EVIDENCE.yaml when implementation files changed.",
+          "Do not batch multiple completed selected changes into one checkpoint commit.",
+        ],
+      },
+    ],
+    handoffCommands: [],
+  };
+}
+
 function visionProtocol(): CommandProtocol {
   return {
     depth: "deep",
@@ -741,7 +871,7 @@ function prototypeProtocol(): CommandProtocol {
     ],
     auditCheckpoints: {
       before: [
-        "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.",
+        "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.",
         "Load vision and current validation context; validation is required before prototype generation.",
         "If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.",
         "Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.",
@@ -750,15 +880,15 @@ function prototypeProtocol(): CommandProtocol {
         "Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.",
       ],
       during: [
-        "Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.",
+        "Before strategic directions, require /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.",
         "Before /ow:prompt2proto, require prototype_system_contract so stable app shell, navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed deltas are explicit.",
         "Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.",
-        "Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
+        "Internally trigger /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.",
         "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
         "Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.",
         "Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.",
-        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.",
-        "Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.",
+        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, prototype_system_contract, paragraph quality, or philosophy readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt repair instead of starting image generation.",
+        "Internally trigger /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist; build-prototype consumes the ready pack and must not recompile vision into prompt text.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
       after: [
@@ -780,10 +910,10 @@ function prototypeProtocol(): CommandProtocol {
       {
         tag: "internal_proto_pipeline",
         items: [
-          "/ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.",
-          "Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.",
-          "Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.",
-          "Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.",
+          "/ow:proto is the only user-facing command in this chain; /ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands.",
+          "Run proto-preflight first, then /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.",
+          "Record internal_pipeline.stages with stage ids proto-preflight, build-proto-prompt or vision2prompt-compatible compiler, and prompt2proto in EVIDENCE.yaml.",
+          "Do not expose /ow:build-proto-prompt, /ow:vision2prompt, or /ow:prompt2proto as normal user-facing handoffs.",
         ],
       },
       {
@@ -1224,12 +1354,16 @@ function prompt2ProtoProtocol(): CommandProtocol {
     auditCheckpoints: {
       before: [
         "Run only as an internal stage after /ow:vision2prompt has written prompt_text_manifest.status ready_for_image_generation, prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or skipped.",
+        "Treat prompt2proto as the internal build-prototype consumption boundary: consume ready PROTO_PROMPT_PACK artifacts and do not recompile vision or validation into prompt text.",
         "Load prepared prompt text and verify every selected direction has screen_prompts before image generation.",
         "Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass, prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass, prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before image generation.",
+        "Apply the build-prototype philosophy engine before image generation: Chief PM plus Principal UI/UX judgment must set product intent, information hierarchy, density calibration, affordance clarity, and UI/UX credibility boundaries.",
         "Block image generation when prototype_system_contract, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage, or post_validate is fail or missing.",
       ],
       during: [
         "Batch-generate high-fidelity prototype images by direction_id and prompt_id.",
+        "Calibrate prototype instructions so information is visible, grouped, collapsed, delayed, or drilled into based on industry, user role, task risk, screen size, task frequency, and the user's next decision.",
+        "If the prompt pack is missing, thin, stale, incoherent, or lacks prompt2proto philosophy readiness, refuse and route repair back to /ow:build-proto-prompt or compatible /ow:vision2prompt.",
         "Write one metadata record for every generated image with image_id, direction_id, prompt_id, screen_name, path, source_prompt_ref, generator, and status.",
         "Do not revise product strategy or prompt text during image generation.",
       ],
@@ -1251,6 +1385,15 @@ function prompt2ProtoProtocol(): CommandProtocol {
     ],
     internalSections: [
       {
+        tag: "build_prototype_consumption_boundary",
+        items: [
+          "build-prototype consumes ready prompt-pack artifacts through prompt2proto.",
+          "build-prototype must not compile prompt packs from vision or validation.",
+          "Missing or incoherent prompt packs repair through /ow:build-proto-prompt or compatible /ow:vision2prompt, not inside prompt2proto.",
+          "Refuse thin, missing, or incoherent prompt packs before image generation.",
+        ],
+      },
+      {
         tag: "prompt_pack_readiness_gate",
         items: [
           "Refuse prompt packs whose prompt_pack_integrity_gate.status is not pass.",
@@ -1261,6 +1404,17 @@ function prompt2ProtoProtocol(): CommandProtocol {
           "Refuse prompt packs whose screen_prompts[].prompt paragraphs omit journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling, or concrete content.",
           "Refuse prompt packs whose direction screen_prompts do not resolve to screen_manifest target_screen_id values.",
           "When a prompt pack is refused, keep image_generation.status: not_started and hand back to /ow:vision2prompt repair.",
+        ],
+      },
+      {
+        tag: "build_prototype_philosophy_engine",
+        items: [
+          "Chief PM plus Principal UI/UX judgment must run before visual translation.",
+          "The Chief PM protects product intent, user decision context, domain fit, workflow priority, and evidence value.",
+          "The Principal UI/UX lead protects information hierarchy, density calibration, layout anatomy, affordance clarity, interaction believability, and UI/UX credibility.",
+          "Density calibration is product and design judgment, not a mechanical prompt dimension or paragraph length target.",
+          "Use prototype_system_contract for technical screen coherence; use this philosophy engine for visual information judgment.",
+          "Reject under-specified mockups that hide operational decisions and overstuffed concept posters that make every element equally important.",
         ],
       },
       {
@@ -1699,17 +1853,18 @@ function changeProtocol(): CommandProtocol {
       before: [
         "Confirm a focused production spec exists.",
         "Inspect the repository just enough to identify affected paths, integration points, and verification commands.",
+        "Apply coder preflight before finalizing selected implementation boundaries: identify source truth, owned paths, forbidden paths, generated surfaces, and the honest validation ladder.",
         "Lazy-create the changes index, change artifact, and work items only when /ow:change is invoked.",
       ],
       during: [
         "Convert the spec into one bounded implementation change with non-goals and rollback notes.",
-        "Split work into ordered items with owned paths, dependencies, acceptance, and verification.",
+        "Split work into ordered items with owned paths, dependencies, acceptance, verification, and coder evidence expectations when source edits are likely.",
         "Record unresolved implementation risks instead of expanding scope.",
       ],
       after: [
         "Write CHANGE.yaml, WORK_ITEMS.yaml, and CHANGE_INDEX.yaml.",
         "Refresh change SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_change and runtime readiness.",
-        "Hand off to /ow:team only when work items are implementable and verification is explicit.",
+        "Hand off to /ow:team only when work items are implementable, verification is explicit, and coder preflight expectations are visible to the execution agent.",
         "Confirm no runtime artifacts were created.",
       ],
     },
@@ -1734,6 +1889,15 @@ function changeProtocol(): CommandProtocol {
           "A change plan must let an implementation agent start with bounded files, ordered tasks, acceptance checks, and rollback awareness.",
           "Prefer small coherent work items with explicit owned_paths and verification over broad task buckets.",
           "Keep the user-facing summary short and keep detailed implementation intelligence in the artifacts.",
+        ],
+      },
+      {
+        tag: "coder_preflight",
+        items: [
+          "Before work items are ready for implementation, apply coder preflight from skills/coder/SKILL.md.",
+          "Record source truth, derived generated surfaces, owned_paths, forbidden paths, and validation ladder expectations in the change artifacts.",
+          "For behavior, validator, CLI report, generated-surface, summary, queue, or git-evidence changes, require the implementation agent to plan RED/GREEN evidence or explicitly mark RED not applicable.",
+          "/ow:change remains planning; coder governance constrains the future source edits and does not execute them.",
         ],
       },
       {
@@ -1778,18 +1942,19 @@ function teamProtocol(): CommandProtocol {
       before: [
         "Confirm an approved or active change plan and work items exist.",
         "Audit git status, relevant source files, and any existing runtime state before execution.",
+        "Recover coder governance expectations from the change plan before source edits: owner map, RED/GREEN target, self-check, validation ladder, and evidence binding.",
         "Lazy-create runtime state only when /ow:team is invoked for an approved change.",
       ],
       during: [
         "Execute work items in dependency order and keep runtime state current.",
         "Delegate only when the task can run independently with clear owned paths and acceptance.",
-        "Record issues, verification results, checkpoints, and residual risks as development proceeds.",
+        "Preserve RED/GREEN evidence, post-write self-check notes, verification results, checkpoints, and residual risks as development proceeds.",
       ],
       after: [
         "Update runtime state, issues, and checkpoints.",
         "Refresh runtime SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_run, blockers, and next action.",
         "Run the verification named by the change plan when practical.",
-        "Report changed artifacts, verification result, and remaining blockers.",
+        "Report changed artifacts, coder evidence status, verification result, and remaining blockers.",
       ],
     },
     antiPatterns: [
@@ -1813,6 +1978,15 @@ function teamProtocol(): CommandProtocol {
           "Team runtime must preserve enough state for another agent to continue without reading the full conversation.",
           "Track active change, active work item, assigned owner or agent, status, verification, issues, and checkpoints.",
           "Keep implementation and QA evidence linked to the change plan.",
+        ],
+      },
+      {
+        tag: "coder_execution_gate",
+        items: [
+          "For source-edit work, follow skills/coder/SKILL.md before completion: owner/file/dependency map, RED evidence when applicable, GREEN evidence after edits, and post-write self-check.",
+          "Bind coder validation evidence to runtime checkpoints, issues, or the selected-change LOCAL_COMMIT_EVIDENCE.yaml when implementation files changed.",
+          "Missing coder evidence is guidance at this stage, not a hard failure; record the reason when RED evidence is not applicable.",
+          "/ow:team remains execution governance and must not turn /ow:coder into a user-facing command.",
         ],
       },
       {

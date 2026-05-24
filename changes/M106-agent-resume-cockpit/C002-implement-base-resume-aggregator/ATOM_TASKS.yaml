@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M106-agent-resume-cockpit:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M106-C002-implement-base-resume-aggregator
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C002
+title: Atom tasks for M106 C002 base resume aggregator
+status: completed
+tasks:
+  - task_id: T001
+    title: Inspect existing read-model builders
+    status: completed
+    type: read
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/workflow/
+    done_when: >
+      The reusable handoff, inspect, summaries, check, and git-state read
+      surfaces needed for the base resume packet are identified.
+  - task_id: T002
+    title: Add resume command and packet model
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/workflow/
+    done_when: >
+      `node dist/cli/src/index.js resume --root . --json` returns the standard
+      report envelope with project overview, trust state, workflow state, git
+      state, explicit queue/work-item uncertainty, and next actions.
+  - task_id: T003
+    title: Add runtime coverage
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface verification covers the resume command help or JSON shape
+      on an initialized project and confirms the command remains read-only.
+  - task_id: T004
+    title: Validate and record completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Build, runtime-surface verification, direct resume JSON command, and
+      diff-check pass, then completion and local commit evidence are recorded.

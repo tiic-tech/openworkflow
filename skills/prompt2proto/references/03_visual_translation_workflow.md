@@ -11,7 +11,11 @@ instructions.
    replace it with a generic dashboard or chatbot unless justified there.
 3. Build the screen system: stable layout, navigation, object anatomy,
    repeated panels, action zones, and trust surfaces.
-4. For each screen, define:
+4. Apply the build-prototype philosophy engine before screen-by-screen work:
+   Chief PM identifies the user decision, product risk, domain object, and
+   evidence value; Principal UI/UX identifies the hierarchy, density, scan
+   path, affordances, and UI/UX credibility bar.
+5. For each screen, define:
    - user goal and journey stage;
    - visible domain objects;
    - hierarchy from primary decision to supporting detail;
@@ -22,13 +26,13 @@ instructions.
    - trust, privacy, approval, or audit controls;
    - concrete sample data and copy;
    - negative visual constraints.
-5. Calibrate density:
+6. Calibrate density:
    - visible when it changes the user's next decision;
    - grouped when related fields need comparison;
    - collapsed when secondary but still inspectable;
    - delayed when it belongs after user intent;
    - drilled into when it would overload the main canvas.
-6. Write provider-agnostic prototype instructions that preserve prompt-pack
+7. Write provider-agnostic prototype instructions that preserve prompt-pack
    strategy and add UI/UX specificity.
 
 ## Density Calibration Rules

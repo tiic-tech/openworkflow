@@ -180,8 +180,9 @@ function renderSummary(
   return dumpYaml({
     schema_version: "0.1.0",
     contract_id: `summary:${contract.artifact_type}:${artifactIdForPath(artifactPath, contract.source_of_truth_path) ?? basename(dirname(summaryPath))}`,
-    contract_type: "summary",
+    contract_type: "workflow",
     artifact_type: "artifact_summary",
+    status: "current",
     source_artifact_type: contract.artifact_type,
     source_path: artifactPath,
     source_command: contract.command,

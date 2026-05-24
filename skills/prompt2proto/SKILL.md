@@ -12,10 +12,11 @@ prototype instructions and evidence records. This skill is the source method
 behind the internal `/ow:prompt2proto` stage, but it does not by itself call an
 image provider or claim visual quality.
 
-`prompt2proto` starts where `vision2prompt` ends. It consumes a ready
-`PROTO_PROMPT_PACK`, preserves the product strategy and screen coherence
-contracts, and turns them into a concrete prototype translation plan that a
-design or image-generation stage can execute without inventing product intent.
+`prompt2proto` starts where build-proto-prompt or its compatible vision2prompt
+compiler path ends. It consumes a ready `PROTO_PROMPT_PACK`, preserves the
+product strategy and screen coherence contracts, and turns them into a concrete
+prototype translation plan that build-prototype can use without inventing
+product intent.
 
 ## Role Engine
 
@@ -33,6 +34,12 @@ Operate as:
 The role engine is required. A structurally complete translation still fails if
 it reads like a generic image prompt, a decorative dashboard, a card wall, or a
 concept poster rather than a plausible product interface.
+
+Use this role engine as the build-prototype philosophy engine: Chief PM plus
+Principal UI/UX judgment must come before visual translation. The Chief PM
+decides product intent, domain fit, user decision context, and evidence value;
+the Principal UI/UX lead decides information hierarchy, density calibration,
+affordance clarity, interaction believability, and UI/UX credibility.
 
 ## Inputs
 
@@ -96,18 +103,29 @@ translation and evidence contract; it does not start provider generation.
 4. Preserve technical screen coherence from the prompt pack: app shell,
    navigation taxonomy, domain objects, screen ids, state model, data
    vocabulary, and allowed screen-specific deltas.
-5. Translate each selected direction into a prototype system plan: screen
+5. Apply the philosophy engine before translating screens: decide what must be
+   visible, grouped, collapsed, delayed, or drilled into based on industry,
+   role, risk, screen size, task frequency, and the user's next decision.
+6. Translate each selected direction into a prototype system plan: screen
    sequence, hierarchy, density, component anatomy, state behavior,
    interaction affordances, sample data, trust controls, and negative visual
    constraints.
-6. Calibrate information density as design judgment, not prompt length:
+7. Calibrate information density as design judgment, not prompt length:
    decide what is visible, grouped, collapsed, delayed, or drilled into based
    on industry, role, risk, screen size, task frequency, and user attention.
-7. Write translation evidence that names accepted inputs, refusals, output
+8. Write translation evidence that names accepted inputs, refusals, output
    refs, limitations, and the next authorized handoff.
-8. Stop before provider-backed generation, human visual review, visual parity,
+9. Stop before provider-backed generation, human visual review, visual parity,
    proto2html, storyboard, motion, specs, changes, or runtime work unless a
    later selected candidate explicitly authorizes that surface.
+
+## Build-Prototype Consumption Boundary
+
+`build-prototype` consumes prompt2proto; it must not re-run vision-to-prompt
+compilation, invent strategic directions, or repair prompt paragraphs. When a
+prompt pack is not ready, route repair back to `/ow:build-proto-prompt` or the
+compatible `/ow:vision2prompt` compiler path and keep image generation or
+visual acceptance evidence out of scope.
 
 ## Refusal Rules
 

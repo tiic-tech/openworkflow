@@ -11,6 +11,7 @@ import { handoffCommand } from "./commands/handoff.js";
 import { initCommand } from "./commands/init.js";
 import { inspectCommand } from "./commands/inspect.js";
 import { registerCommand } from "./commands/register.js";
+import { resumeCommand } from "./commands/resume.js";
 import { summariesCommand } from "./commands/summaries.js";
 import { summarizeCommand } from "./commands/summarize.js";
 import { syncCommand } from "./commands/sync.js";
@@ -42,6 +43,10 @@ async function main(): Promise<number> {
 
   if (parsed.command === "handoff") {
     return handoffCommand(parsed.flags);
+  }
+
+  if (parsed.command === "resume") {
+    return resumeCommand(parsed.flags);
   }
 
   if (parsed.command === "clean") {
@@ -98,6 +103,7 @@ Usage:
   openworkflow sync --root <folder> [--tools auto|codex] [--force]
   openworkflow doctor --root <folder> [--tools auto|codex]
   openworkflow handoff --root <folder> [--tools auto|codex] [--json]
+  openworkflow resume --root <folder> [--tools auto|codex] [--json]
   openworkflow status --root <folder> [--json]
   openworkflow brief --root <folder> [--json]
   openworkflow inspect --root <folder> [--strict] [--json]
@@ -116,6 +122,7 @@ Commands:
   sync       Non-destructively refresh workflow contracts and detected adapters.
   doctor     Check managed workflow and adapter files for missing or stale templates.
   handoff    Strict Agent trust gate for deciding whether current repo context is safe to continue.
+  resume     Read-only Agent recovery cockpit for one low-context continuation packet.
   status     Print a low-context Agent read model for current workflow state.
   brief      Alias for status, named for Agent entry and handoff.
   inspect    Aggregate Agent entry context, health, next-command readiness, and read order.
@@ -129,12 +136,19 @@ Commands:
   clean      Remove OpenWorkflow-managed/generated files while preserving source artifacts. Dry-run unless --yes is passed.
 
 Agent quick start:
-  Read AGENTS.md, then run openworkflow handoff --root . --json. Handoff is
-  the strict Agent trust gate before context loading. If you need the packet
-  and the trust gate in one call, run openworkflow context --root . --handoff --json.
-  Otherwise, run openworkflow context --root . --json after handoff passes. Inspect starts
-  from .openworkflow/CURRENT_STATE.yaml and returns read_order before loading
-  full evidence. Doctor confirms managed surface health, not handoff quality.
+  Read AGENTS.md. If this is a fresh Agent continuing after network loss,
+  context overflow, compaction failure, or unexpected termination, run
+  openworkflow resume --root . --json first. Resume gives one low-context
+  recovery packet with project overview, trust state, active queue/work item,
+  breakpoint, behavior boundaries, allowed work, validation expectations,
+  git state, and the smallest correct OW-maintained next action.
+  Run openworkflow handoff --root . --json when you only need the strict Agent
+  trust gate before context loading. If you need a command-specific packet and
+  the trust gate in one call, run openworkflow context --root . --handoff --json.
+  Otherwise, run openworkflow context --root . --json after handoff passes.
+  Inspect starts from .openworkflow/CURRENT_STATE.yaml and returns read_order
+  before loading full evidence. Status and brief are lightweight summaries.
+  Doctor confirms managed surface health, not handoff quality.
   Prefer SUMMARY.yaml/current_slice guidance when a long artifact offers it,
   but check summary quality fields before treating a current summary
   as a complete handoff. In context --json and doctor --json, read
@@ -151,6 +165,12 @@ Two command surfaces:
     validate   Check .openworkflow contract shape and source-of-truth artifacts; SUMMARY.yaml freshness is checked by summaries.
     doctor     Report missing or stale generated surfaces, and separately report summary freshness and handoff quality.
     handoff    Strict read-only Agent trust gate; aggregates doctor-style surface health, inspect --strict quality, summaries --strict quality, and next-command readiness.
+    resume     Read-only Agent recovery cockpit; aggregates handoff, inspect,
+               summaries, check, current pointers, read order, evidence boundaries,
+               active planning queue/work item, action boundaries, validation
+               expectations, and git state into one continuation packet.
+               Use it as the first command for interrupted-session recovery,
+               not as a generic autonomous retry loop.
     inspect    Recommended Agent entry command; aggregates state, health, readiness, and read order. Add --strict to fail on current-but-thin summaries.
     context    Read-only packet materializer for Agent startup. Defaults to CURRENT_STATE.next_command and compact mode with a structured command_audit slice plus quality_summary; add --handoff to fail on strict handoff-quality blockers, or use --for /ow:<command>, --max-bytes, and --mode full when needed.
     draft      Preview a contract-shaped source artifact; pass --write to create it and --force only to replace an existing draft.
@@ -169,6 +189,15 @@ Two command surfaces:
                draft PR pilot, and simulate for read-only autonomous push/PR/merge planning.
     clean      Remove generated OpenWorkflow surfaces and managed metadata without touching user content or source artifacts.
 
+  Contract-defined read-only recovery:
+    resume     Agent startup cockpit. The \`resume --json\` packet aggregates
+               existing handoff, inspect, summaries, check, current pointers,
+               read-order, planning queue, current work item, action/evidence
+               boundaries, product-alignment signals, and git signals without
+               mutating workflow state. It should route a fresh Agent into
+               corrected, ranked atom-task continuation with explicit stop
+               conditions instead of broad free-form replanning.
+
   Agent-readable JSON:
     Every command supports --json. In JSON mode stdout is a single report object
     with schema_version, command, ok, root, data, warnings, errors,
@@ -181,6 +210,12 @@ Two command surfaces:
     inspect --strict --json at repo entry, when draft/thin sources must block trust.
     Use context --handoff --json when an Agent needs a bounded context packet and
     strict handoff-quality blocking in the same command.
+    The resume packet contract uses the same report envelope and reserves
+    data.command_boundary, data.trust, data.workflow, data.active_queue,
+    data.current_work_item, data.actions, data.evidence, data.git, and
+    data.sources for the read-only recovery model. Future project-local
+    SOUL.md and MEMORY.md learning artifacts are separate governed features;
+    resume does not create or evolve persistent project personality or memory.
 
   Repo-local workflow commands are Agent skills, not CLI subcommands:
     /ow:vision      clarify product vision through conversation-first discovery

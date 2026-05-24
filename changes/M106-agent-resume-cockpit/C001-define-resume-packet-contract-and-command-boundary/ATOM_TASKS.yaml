@@ -1,0 +1,64 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M106-agent-resume-cockpit:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M106-C001-define-resume-packet-contract
+source_plan_id: M106-agent-resume-cockpit
+source_candidate_id: C001
+title: Atom tasks for M106 C001 resume packet contract
+status: completed
+tasks:
+  - task_id: T001
+    title: Inspect existing command and read-model surfaces
+    status: completed
+    type: read
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/
+    done_when: >
+      Existing command registration, help output, and Agent onboarding surfaces
+      relevant to a read-only resume command are identified.
+  - task_id: T002
+    title: Define resume packet contract
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      The expected `resume --json` packet fields, trust semantics, action
+      guidance, evidence classes, and deferred non-goals are documented without
+      adding full aggregation behavior.
+  - task_id: T003
+    title: Expose read-only command boundary
+    status: completed
+    type: implementation
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/onboarding/
+    done_when: >
+      Source command/help surfaces can name `resume` as a read-only recovery
+      command without implying mutation or shipping the later aggregator scope.
+  - task_id: T004
+    title: Verify contract and runtime surface
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/
+      - packages/core/src/commands/registry.ts
+      - references/planning-artifact-contracts.md
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Build, runtime-surface verification, validate, summaries --strict,
+      handoff, and diff-check pass or any failure is recorded as a blocker.
+  - task_id: T005
+    title: Record completion evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M106-agent-resume-cockpit/
+    done_when: >
+      Queue completion and local commit evidence are recorded after C001 is
+      implemented and committed through git governance.
