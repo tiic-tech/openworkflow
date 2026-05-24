@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M130-remaining-pr5-pr7-merge-governance:C004
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C004
+selected_change_path: changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+created_at: 2026-05-25T01:56:58+08:00
+branch: codex/m130-remaining-pr5-pr7-merge-governance
+primary_commit:
+  hash: 14330a4d30ba8bc936cfd6e379dfed7f94eca2f4
+  subject: M130-remaining-pr5-pr7-merge-governance C004 merge PR7
+  scope: >
+    Recorded the approved PR #7 merge execution, selected change artifacts,
+    atom tasks, implementation brief, merge evidence, queue updates, summary
+    updates, and readable queue view.
+evidence_commit:
+  expected: true
+  reason: >
+    This evidence file is recorded after the primary commit so it can reference
+    the actual commit hash without amending history.
+approved_remote_operation:
+  approval_text: >
+    Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+    tiic-tech/openworkflow --merge --match-head-commit
+    f8bf087211316506f48155859f3e18edbc7224e4
+  executed_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+  exit_code: 0
+  merged_pr: 7
+  merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+  remote_main_after_merge: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+changed_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/SELECTED_CHANGE.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/ATOM_TASKS.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/IMPLEMENTATION_BRIEF.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/SUMMARY.yaml
+validation_evidence:
+  pre_merge:
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+    - git ls-remote origin refs/heads/main refs/heads/codex/m101-build-proto-prompt-command-split
+    - node dist/cli/src/index.js summaries --root . --strict --json
+  merge:
+    - gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+  post_merge:
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+    - gh pr view 5 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,reviewDecision
+    - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+    - git fetch origin main
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+unauthorized_operations_not_performed:
+  - merge additional PRs
+  - git push
+  - force-push
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - branch surgery
+  - destructive git operation

@@ -61,6 +61,7 @@ validation:
   - git diff --check
 evidence:
   - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/MERGE_EVIDENCE.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/C004-execute-approved-selected-pr-merge/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for M130 C004 merge evidence
   implementation_changed_files: true
