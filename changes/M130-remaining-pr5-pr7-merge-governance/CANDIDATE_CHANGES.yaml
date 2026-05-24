@@ -190,6 +190,7 @@ changes:
         proceed to decide the next merge target or stop with blockers.
       evidence:
         - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+        - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
     status: ready
     title: "Decide next PR #5/#7 merge target and stop gates"

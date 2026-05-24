@@ -74,6 +74,7 @@ completion:
     decide the next merge target or stop with blockers.
   evidence:
     - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+    - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for M130 C001 governance evidence if the user requests commit
   implementation_changed_files: true
