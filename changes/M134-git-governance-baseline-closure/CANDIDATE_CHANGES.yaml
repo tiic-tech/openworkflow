@@ -401,8 +401,8 @@ changes:
       selected_change_id: C005
       selected_at: 2026-05-25T03:36:00+08:00
       reason: >
-        C005 is the next ready candidate after C004 decided PR #8 disposition. It prepares the
-        local publication packet and exact remote operation handle without pushing or creating a PR.
+        C005 is the next ready candidate after C004 decided PR #8 disposition. It prepares the local
+        publication packet and exact remote operation handle without pushing or creating a PR.
       artifacts:
         - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
         - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
@@ -411,12 +411,13 @@ changes:
       completed_at: 2026-05-25T03:36:00+08:00
       implementation_changed_files: true
       result: >
-        C005 generated the M134 local PR-ready summary and publication packet. It records exact
-        push and draft PR creation commands, states that merge is not authorized, and leaves all
-        remote mutation to C006.
+        C005 generated the M134 local PR-ready summary and publication packet. It records exact push
+        and draft PR creation commands, states that merge is not authorized, and leaves all remote
+        mutation to C006.
       evidence:
         - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
         - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C006
     status: ready
     title: Execute approved M134 baseline publication
@@ -748,8 +749,8 @@ operations:
       - C006
     actor: agent
     reason: >
-      C005 prepared the publication packet and exact approved remote handle, so C006 can execute
-      the approved branch push and draft PR creation.
+      C005 prepared the publication packet and exact approved remote handle, so C006 can execute the
+      approved branch push and draft PR creation.
     changed_at: 2026-05-25T03:36:00+08:00
     before_status: candidate
     after_status: ready
