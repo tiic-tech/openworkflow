@@ -1,0 +1,24 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001
+status: current
+source_plan_id: M130-remaining-pr5-pr7-merge-governance
+source_candidate_id: C001
+selected_change_id: C001
+primary_commit: 24f730053d1500387e4f29d53c87115dd1c46e25
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
