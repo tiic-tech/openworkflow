@@ -1,0 +1,66 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-build-vision-delayed-compile-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-build-vision-delayed-compile-contract
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C001
+title: Define /ow:vision delayed-compile contract and native build-vision skill
+status: done
+selection_reason: >
+  C001 is the dependency-free first step for the vision reconstruction. It
+  defines the interaction contract before schema and generated adapter changes,
+  and it fills the missing native skills/build-vision source skill so future
+  /ow:vision work has a maintainable source behavior.
+scope:
+  includes:
+    - /ow:vision interaction mode definitions
+    - interview mode no-durable-write rule
+    - checkpoint mode trigger rules
+    - compile mode readiness requirements
+    - auditability and interruption risk guardrails
+    - native skills/build-vision source skill
+    - build-vision references for interview protocol and proto-readiness
+  excludes:
+    - implementing schema or generated skill changes
+    - validation, proto, or tune behavior
+    - runtime command exposure
+owned_paths:
+  - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+  - skills/build-vision/
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M84-vision-delayed-compile-proto-readiness/
+forbidden_paths:
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+  - .openworkflow/specs/**
+  - .openworkflow/changes/**
+  - .openworkflow/runtime/**
+  - skills/build-validation/**
+  - skills/build-prototype/**
+  - skills/tune-prototype/**
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - generated .agents/** or .openworkflow/** changes
+acceptance:
+  - The delayed-compile modes are explicitly defined.
+  - The contract says normal interview mode must not write durable vision files after every answer.
+  - Checkpoint and compile mode preserve audit evidence without breaking conversation flow.
+  - Compile mode requires user confirmation and proto-readiness.
+  - skills/build-vision/SKILL.md exists as the native source skill for vision discovery.
+  - Repository validation treats build-vision as a required native source skill.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one coherent local commit unless the build-vision source skill
+  reveals a need to split source behavior from planning artifacts.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml

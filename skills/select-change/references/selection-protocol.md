@@ -12,6 +12,7 @@ Required:
 Optional:
 
 - `CANDIDATE_CHANGES.md` as a readable view
+- `CHANGE_ANALYSIS.yaml` as read-only cross-queue recommendation evidence
 - upstream source artifacts named by the queue
 - user constraints such as "choose C004" or "avoid runtime changes"
 - top-level queue `operations` for audit history
@@ -21,6 +22,16 @@ If the user names a candidate id, verify that its dependencies are satisfied
 before selecting it. If the id is blocked, not ready, or `risk: high`, report
 why and stop unless the user explicitly approves the relevant risk or decision
 option.
+
+If the user provides multiple queues, first decide whether the request is a
+read-only comparison or an actual selection. Read-only comparison belongs to
+`analyze-changes`. Selection may consume a prior `CHANGE_ANALYSIS.yaml`, but it
+must still write artifacts inside one target queue.
+
+If there is only one active queue, do not require `analyze-changes`.
+`select-change` owns ranking within that queue: it should inspect candidate
+status, dependencies, risk, unlock value, selection policy, owned paths, and
+validation realism before selecting one candidate.
 
 ## Feat And Commit Cadence
 
@@ -65,6 +76,53 @@ Selection artifacts should state the expected commit boundary: the selected
 candidate should complete as one coherent commit unless it is split or
 superseded before implementation continues.
 
+## Cross-Queue Arbitration
+
+The normal path is one active `CANDIDATE_CHANGES.yaml` queue. Cross-queue
+arbitration is an explicit exception for moments when multiple active queues
+compete for the next selected change.
+
+Trigger cross-queue arbitration when:
+
+- the user supplies multiple queue paths
+- the user asks which active queue should go next
+- a `CHANGE_ANALYSIS.yaml` recommends a target plan and candidate
+- a legacy queue is being reactivated and must be compared against current work
+
+Do not silently scan all `changes/*/CANDIDATE_CHANGES.yaml` files during a
+single-queue selection. Broad discovery belongs to `analyze-changes` unless the
+user explicitly asks select-change to consume that global context.
+
+When consuming `CHANGE_ANALYSIS.yaml`:
+
+1. Treat it as advisory evidence, not as permission to select.
+2. Verify `recommendation.target_plan_id` and
+   `recommendation.target_candidate_id` against the target queue.
+3. Re-check status, dependencies, branch boundary, dirty tree, and high-risk
+   gates from current files.
+4. If the recommendation is stale, stop and name the queue maintenance or fresh
+   analysis needed.
+5. If the recommendation is still valid, create the selected-change folder
+   inside `changes/<target_plan_id>/`.
+
+Record cross-queue rejected alternatives in `SELECTED_CHANGE.yaml` with this
+shape:
+
+```yaml
+rejected_alternatives:
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: High risk and missing a local high-risk decision report.
+```
+
+Use `id` only for alternatives from the same source queue when the surrounding
+artifact already names the source plan. Use `plan_id` plus `candidate_id` for
+cross-queue alternatives.
+
+Create a meta-selection or analysis artifact only when the user's requested
+output is the decision record itself. Do not use meta-selection artifacts as a
+shortcut around selecting one implementable candidate in its owning queue.
+
 ## Targeted Candidate Review
 
 For point-to-point review, inspect only the requested candidate plus the
@@ -92,12 +150,18 @@ the recommended operation to be applied.
 2. Stop on unrelated dirty-tree work that would blur the commit boundary.
 3. Exclude `done`, `blocked`, `deferred`, and `superseded` candidates.
 4. Prefer `ready` candidates over plain `candidate` entries.
-5. Honor `next_recommended_candidate_id` when it is ready and coherent.
-6. Prefer candidates that unlock other candidates.
-7. Prefer focused owned paths over cross-module changes.
-8. Prefer clear validation over unclear or manual-only acceptance.
-9. Prefer lower-risk dogfood or source behavior before runtime exposure.
-10. Stop on `risk: high` unless explicit user approval names a concrete decision
+5. When cross-queue arbitration is active, honor a current
+   `CHANGE_ANALYSIS.yaml` recommendation only after verifying it against the
+   target queue.
+6. In the normal single-queue path, honor `next_recommended_candidate_id` when
+   it is ready and coherent.
+7. Prefer candidates that unlock other candidates.
+8. Prefer focused owned paths over cross-module changes.
+9. Prefer clear validation over unclear or manual-only acceptance.
+10. Prefer lower-risk dogfood or source behavior before runtime exposure.
+11. Prefer the user's latest explicit sequencing when it does not violate risk
+   or dependency gates.
+12. Stop on `risk: high` unless explicit user approval names a concrete decision
    option.
 
 When two candidates are close, pick the one that produces better evidence for
@@ -137,7 +201,8 @@ Include:
 
 - source plan id and source candidate id
 - concise selection reasons
-- rejected alternatives when the choice is not obvious
+- rejected alternatives when the choice is not obvious; use `plan_id` and
+  `candidate_id` for cross-queue alternatives
 - includes and excludes copied from the selected candidate
 - owned paths copied from the selected candidate
 - forbidden paths inferred from the candidate exclusions and repo rules

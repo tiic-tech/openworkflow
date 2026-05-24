@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C001-build-validation-prototype-target-contract
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C001-build-validation-prototype-target-contract
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C001
+title: Atom tasks for build-validation prototype target contract
+status: complete
+tasks:
+  - task_id: T001
+    title: Rewrite build-validation source behavior
+    status: done
+    type: edit
+    owned_paths:
+      - skills/build-validation/SKILL.md
+    done_when: >
+      The skill defines validation as prototype validation target compilation
+      and names the required source inputs, outputs, gates, and boundaries.
+  - task_id: T002
+    title: Add validation compiler references
+    status: done
+    type: edit
+    owned_paths:
+      - skills/build-validation/references/
+    done_when: >
+      Reference files capture the experiment brief rubric and return-to-vision
+      gate for future generated protocol work.
+  - task_id: T003
+    title: Validate source contract boundary
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M85-validation-proto-target-contract/
+    done_when: >
+      Validation passes and C001 remains source-skill only.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

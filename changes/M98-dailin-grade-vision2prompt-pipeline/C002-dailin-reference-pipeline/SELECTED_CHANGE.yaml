@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: selected_change:M98-dailin-grade-vision2prompt-pipeline:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C002
+change_id: C002-dailin-reference-pipeline
+title: Migrate dailin reference pipeline into OW vision2prompt references
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M98-dailin-grade-vision2prompt-pipeline/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 after C001 completion. It is dependency-free and gives C003 a
+  concrete OW-owned reference pipeline for screen-bound prompt-pack schema work.
+rejected_alternatives:
+  - id: C003
+    reason: Depends on C001 and C002.
+  - id: C004
+    reason: Depends on C002 and C003.
+  - id: C005
+    reason: Depends on C001-C004.
+  - id: C006
+    reason: Depends on C003-C005.
+owned_paths:
+  - skills/build-prototype/references/vision2prompt/
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+dependencies: []
+scope:
+  includes:
+    - OW-native reference files for input contract, vision decomposition, strategic hypothesis generation, product system extraction, prototype prompt schema, output templates, and quality rubric
+    - preservation of dailin's emphasis on strategy before UI, distinct hypotheses, complete journeys, concrete copy/data, AI behavior, trust controls, anti-goals, and PM recommendation
+    - removal of English Friend-specific assumptions from the generic protocol
+    - source refs back to dailin artifacts for audit
+  excludes:
+    - schema or validator enforcement beyond what later candidates own
+    - generated .agents surfaces until protocol wiring is selected
+    - smart city replay
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - schemas/**
+  - packages/core/src/validators/**
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+acceptance:
+  - OW references expose the same pipeline density as dailin's 01-06 reference set without binding to Pocket English Friend.
+  - The strategic prompt-pack protocol tells agents to run the reference pipeline in order before prompt text is marked ready.
+  - The protocol explicitly forbids collapsing vision into a single image prompt when a product prototype prompt pack is required.
+validation:
+  - npm run build
+  - npm run validate
+  - rg -n "vision2prompt|dailin-grade|screen_manifest|quality_rubric" skills/build-prototype/references
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 is source reference authoring only. It does not change schemas,
+    validators, generated adapters, remote operations, or runtime execution.
+expected_commit_boundary: >
+  Complete C002 as one coherent commit after adding OW-owned references,
+  updating the strategic prompt-pack protocol, and recording local evidence.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml

@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M102-selected-change-commit-gate:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M102-C003-commit-evidence-trust-gates
+title: Atom tasks for commit evidence trust gates
+status: completed
+tasks:
+  - task_id: M102-C003-A001
+    title: Add planning queue trust audit to summary health
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/commands/summaries.ts
+    done_when:
+      - summaries --strict fails with a clear selected-change commit evidence remediation path.
+      - non-strict summaries can surface migration warnings without failing historical queues.
+  - task_id: M102-C003-A002
+    title: Propagate audit through handoff inspect and context
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/handoff.ts
+      - packages/cli/src/commands/inspect.ts
+      - packages/cli/src/commands/context.ts
+    done_when:
+      - handoff fails when strict queue evidence is missing.
+      - inspect and context include trust guidance for missing commit evidence.
+  - task_id: M102-C003-A003
+    title: Add runtime trust-gate regressions
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers summaries --strict, handoff, inspect, and context behavior for missing evidence.
+  - task_id: M102-C003-A004
+    title: Verify C003 and record evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/
+    done_when:
+      - npm run build passes.
+      - npm run verify:runtime-surface passes.
+      - node dist/cli/src/index.js validate --root . --json passes.
+      - node dist/cli/src/index.js summaries --root . --strict --json passes.
+      - node dist/cli/src/index.js handoff --root . --json passes.
+      - git diff --check passes.

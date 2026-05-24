@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C002
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C002
+change_id: C002-dailin-reference-pipeline
+title: Local evidence for dailin reference pipeline migration
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Migrated the dailin-grade vision_to_strategic_prototype_prompt method into
+  OW-owned build-prototype references and updated the strategic prompt-pack
+  protocol to require the reference pipeline before prompt text is marked ready.
+changed_paths:
+  - skills/build-prototype/references/vision2prompt/01_input_contract.md
+  - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+  - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+  - skills/build-prototype/references/vision2prompt/04_product_system_extraction.md
+  - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+  - skills/build-prototype/references/vision2prompt/06_output_templates.md
+  - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Added OW-native input normalization guidance for durable vision, validation, direction count policy, target tool, and missing-input handling.
+  - Added vision decomposition guidance for target user, behavior change, success signal, differentiator, trust/privacy requirements, non-goals, and central uncertainty.
+  - Added strategic hypothesis generation guidance that rejects visual-skin directions and scenario-only splits.
+  - Added product system extraction guidance for product_experience_model, screen_manifest, domain object model, state model, data fields, trust controls, and anti-generic constraints.
+  - Added prototype prompt schema guidance for screen groups, states, actions, system behavior, example content, negative prompts, and acceptance criteria.
+  - Added output template guidance that keeps PROTO_PROMPT_PACK.yaml as source of truth and Markdown as readable view.
+  - Added quality rubric guidance for strategic differentiation, prompt executability, product specificity, trust/safety, and integrity readiness.
+  - Updated strategic-prompt-pack-protocol.md to require the vision2prompt reference pipeline before prompt_text_manifest.status becomes ready_for_image_generation.
+verification:
+  passed:
+    - npm run build
+    - node dist/cli/src/index.js validate --root . --json
+    - rg -n "vision2prompt|dailin-grade|screen_manifest|quality_rubric" skills/build-prototype/references
+    - git diff --check
+  known_unrelated_failure:
+    command: npm run validate
+    reason: >
+      Repository validation still fails on pre-existing M97 planning artifacts:
+      C003 and C004 ATOM_TASKS.yaml missing title, and M97 C001-C004 done
+      candidates missing completion evidence. These paths are outside the C002
+      owned paths and were already failing before C002 implementation.
+next_recommended_candidate_id: C003

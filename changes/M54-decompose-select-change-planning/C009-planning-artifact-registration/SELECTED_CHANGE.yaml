@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:C009-planning-artifact-registration
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C009-planning-artifact-registration
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C009
+title: Define planning artifact registration and summary contract
+status: completed
+selection_reason:
+  - C008 completed the runtime exposure design boundary.
+  - C009 is the next non-high-risk follow-up because it stays in contracts and references.
+  - C009 gives future runtime and verification work a summary-first artifact model before registry or adapter changes.
+rejected_alternatives:
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    reason: Full runtime exposure remains high risk.
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C010
+    reason: Command or capability registry semantics are high risk until the contract boundary is proven.
+scope:
+  includes:
+    - planning artifact registration contract
+    - summary/read-model fields for planning queues, analyses, selections, and evidence
+    - validation expectations for summary-first planning artifacts
+    - fixture or reference-only examples when needed
+  excludes:
+    - runtime command registry edits
+    - Codex adapter generation changes
+    - generated .agents or .openworkflow changes
+    - full C004 runtime exposure
+owned_paths:
+  - references/planning-skill-runtime-exposure.md
+  - references/planning-artifact-contracts.md
+  - changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Planning artifact registration contract is explicit and summary-first.
+  - Candidate queues, change analyses, selected changes, atom tasks, and evidence have clear read-model roles.
+  - Runtime command and adapter generation remain out of scope.
+  - Future C010/C012 work can use the contract without loading full planning history by default.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

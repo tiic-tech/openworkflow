@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C013-runtime-exposure-reassessment
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C013-runtime-exposure-reassessment
+title: C013 runtime exposure reassessment atom tasks
+status: completed
+tasks:
+  - task_id: C013-A001
+    title: Reconcile DTC AC SC with workflow blueprint
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+    done_when:
+      - DTC, AC, and SC are explicitly placed inside /ow:change.
+      - The main workflow chain remains visible and separate.
+  - task_id: C013-A002
+    title: Record remaining runtime surfaces
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+    done_when:
+      - proto2html, html2spec, build, archive, review, build-agent, and build-skill are listed as remaining work.
+      - C004 is classified as only partially complete.
+  - task_id: C013-A003
+    title: Close M54 queue evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - C013 selection and completion are recorded.
+      - Next work is redirected to a new workflow blueprint alignment queue.
+  - task_id: C013-A004
+    title: Validate reassessment-only change
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

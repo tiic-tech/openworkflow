@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M92-smart-city-real-discovery-e2e-dogfood:C002
+contract_type: planning
+artifact_type: local_commit_evidence
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C002
+change_id: C002-audit-smart-city-discovery-artifacts
+title: Local evidence for discovery loop artifact audit
+status: complete
+target_repo:
+  path: /Users/archy/Projects/StartUp/smart_city_copilot
+  branch: codex/smart-city-copilot-discovery-e2e
+  commit: 2b977be
+audit_report: /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+key_findings:
+  strengths:
+    - "Strategic clarity before prototype generation."
+    - "Recoverability through CURRENT_STATE, handoff, and summaries."
+    - "Traceability from vision to validation to prompt pack to images."
+  dangerous_capabilities:
+    - "PATH openworkflow can be stale relative to dist CLI."
+    - "handoff can pass while validate fails source-artifact schema in an intermediate state."
+    - "summarize --write generated a summary shape that validate rejected until patched."
+  next_dtc_candidates:
+    - C003 summarize/validate contract alignment
+    - C004 handoff strict source-schema gate
+    - C005 proto generator provenance and visual review contract
+    - C006 CLI source/version warning
+validation:
+  result: pass
+  evidence:
+    - "Target repo validate, summaries --strict, and handoff passed after repairs."
+updated_at: 2026-05-22T15:18:00+08:00

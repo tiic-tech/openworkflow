@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M92-smart-city-real-discovery-e2e-dogfood:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C001
+change_id: C001-run-smart-city-discovery-e2e
+title: Atom tasks for smart city discovery E2E
+status: ready
+tasks:
+  - id: T001
+    title: Initialize target repo and copy raw input
+    type: execute
+    status: pending
+  - id: T002
+    title: Simulate vision interview and write discovery artifacts
+    type: execute
+    status: pending
+  - id: T003
+    title: Generate first prototype image batch
+    type: execute
+    status: pending
+  - id: T004
+    title: Validate OpenWorkflow and git evidence
+    type: verify
+    status: pending
+verification:
+  - openworkflow validate
+  - openworkflow handoff
+  - target git log/status
+  - prototype image files exist

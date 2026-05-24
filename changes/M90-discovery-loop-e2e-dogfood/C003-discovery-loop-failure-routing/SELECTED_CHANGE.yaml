@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M90-discovery-loop-e2e-dogfood:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C003
+change_id: C003-discovery-loop-failure-routing
+title: Verify discovery-loop failure routing
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 through ow-select-change single-queue ranking. C001 and C002
+  proved the canonical fixture and happy path; C003 is the next ready candidate
+  to prove bad discovery-loop artifacts stop at the correct repair route
+  instead of continuing downstream.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M90-discovery-loop-e2e-dogfood/
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - thin or conflicted vision returns to /ow:vision
+    - validation blocks proto when the prototype target is not actionable
+    - post_validate fail blocks prompt2proto and routes to /ow:vision2prompt
+    - tune drift or missing baseline inheritance fails before handoff
+  excludes:
+    - full human interview transcript simulation
+    - generated images
+    - browser visual review
+    - production implementation
+forbidden_paths:
+  - human interview transcript simulation
+  - generated prototype image assets
+  - browser visual review
+  - production implementation artifacts
+acceptance:
+  - Thin vision cannot silently proceed to proto.
+  - Blocked validation cannot silently proceed to prompt generation.
+  - Failed prompt post-validation cannot silently proceed to image generation.
+  - Tune artifacts missing inheritance or latest-baseline data cannot silently proceed.
+  - Each failure reports the repair command or artifact section.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 is medium risk because it adds local negative verification fixtures and
+    repair-route assertions only. It does not call external services or alter
+    runtime execution.
+completion:
+  completed_at: 2026-05-22
+  commit: 986727d
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml

@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C012-workflow-stage-graph
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C012-workflow-stage-graph
+status: current
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C012
+selected_change_id: C012-workflow-stage-graph
+primary_commit: 192777e41f8f170224a6042498bc73df07ea0b3d
+validation_evidence:
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+  - npm run validate
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

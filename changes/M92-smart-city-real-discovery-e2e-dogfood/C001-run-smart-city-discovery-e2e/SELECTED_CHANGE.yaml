@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: selected_change:M92-smart-city-real-discovery-e2e-dogfood:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C001
+change_id: C001-run-smart-city-discovery-e2e
+title: Run smart city discovery E2E dogfood
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: large
+selection_source:
+  queue: changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.yaml
+owned_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/
+  - changes/M92-smart-city-real-discovery-e2e-dogfood/
+acceptance:
+  - Target repo is initialized with current local OpenWorkflow.
+  - Raw HTML plan is copied into target docs.
+  - Discovery artifacts exist for vision, validation, and proto.
+  - First high-fidelity prototype image batch exists as local PNG files with metadata.
+  - Target git history contains sensible local commits on a feat branch.
+validation:
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - git -C /Users/archy/Projects/StartUp/smart_city_copilot status --short --branch
+high_risk:
+  approval_required: false
+  reason: >
+    C001 writes local target-repo artifacts and local git commits only. It does
+    not mutate remote git or enter proto2html.

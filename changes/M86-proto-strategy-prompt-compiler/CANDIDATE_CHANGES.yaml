@@ -1,0 +1,557 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M86-proto-strategy-prompt-compiler
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M86-proto-strategy-prompt-compiler
+title: Candidate changes for proto strategy prompt compiler
+status: completed
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M85-validation-proto-target-contract/SUMMARY.yaml
+    - skills/build-prototype/SKILL.md
+    - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    - user_direction:2026-05-22-continue-after-validation
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - makes /ow:proto a strategy-to-prompt compiler that consumes durable validation artifacts
+    - absorbs the vision-to-strategic-prototype reference skill into native OW source behavior
+    - preserves M85 validation as source truth instead of re-inventing the experiment target
+    - produces prompt packs that are specific enough for high-quality image prototype generation
+    - keeps /ow:proto image-first and out of HTML, design, spec, change, team, or production work
+  avoid:
+    - adding /ow:tune inheritance behavior to this queue
+    - creating generated prototype images or HTML in this queue
+    - allowing vision_only or ephemeral validation paths after M85
+    - broadening into discovery-loop E2E dogfood
+    - turning prompt packs into implementation backlogs
+scope_control:
+  current_boundary: >
+    Upgrade /ow:proto as a strategy-to-prompt compiler: consume durable
+    validation targets and proto-ready vision, extract strategic product
+    structure, generate distinct prototype directions, and emit high-quality
+    image-first prompt packs for downstream generation and review.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include only candidates needed to define, encode, generate, and verify the
+    /ow:proto command and prototype prompt-pack artifact as the next stage after
+    /ow:validation.
+  out_of_scope_rule: >
+    Record tune inheritance, proto2html, html2spec, full discovery-loop read
+    model, and E2E dogfood as deferred refs. Do not include them in M86.
+  deferred_features:
+    - title: Align /ow:tune with product-system inheritance
+      reason: >
+        Tune depends on accepted prototype prompt packs or baseline image groups.
+      suggested_plan_id: M87-tune-product-system-inheritance
+    - title: Define discovery-loop read model
+      reason: >
+        Cross-command read models should wait until vision, validation, proto,
+        and tune command contracts are stable.
+      suggested_plan_id: M88-discovery-loop-read-model
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        End-to-end pressure testing belongs after command-specific contracts land.
+      suggested_plan_id: M89-discovery-loop-e2e-dogfood
+    - title: Rebuild proto2html around benchmark prototype input
+      reason: >
+        Proto2html should consume the selected benchmark prototype after prompt
+        generation and tuning stabilize.
+      suggested_plan_id: M90-proto2html-benchmark-input
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Align native build-prototype strategy compiler contract
+    purpose: >
+      Absorb the vision-to-strategic-prototype reference skill into OW's native
+      build-prototype behavior and remove stale vision_only validation guidance.
+    scope:
+      includes:
+        - build-prototype role and input policy updates
+        - durable validation consumption after M85
+        - strategic input normalization dimensions
+        - strategic hypothesis and prompt-pack quality bar
+        - image-only and no-production boundaries
+      excludes:
+        - changing artifact schemas
+        - changing generated /ow:proto skill output
+        - adding tune inheritance behavior
+        - generating prototype images
+    owned_paths:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - build-prototype defines /ow:proto as a strategy-to-prompt compiler.
+      - build-prototype forbids ephemeral vision_only validation after M85.
+      - The reference protocol names the normalized strategy fields needed by prototype prompts.
+      - The protocol requires strategically distinct directions and concrete prompt contents.
+    selection:
+      selected_change_id: C001-build-prototype-strategy-compiler
+      reason: >
+        AC recommended M86 C001 as the current discovery-loop continuation
+        because it is dependency-free, medium risk, and aligns native proto
+        behavior before schema or generated protocol changes.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-build-prototype-strategy-compiler
+      completed_at: 2026-05-22
+      commit: d277697
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Strengthen strategic prototype prompt-pack artifacts
+    purpose: >
+      Make the prototype evidence and prompt-pack schemas/templates enforce the
+      fields /ow:proto needs for agent-grade prompt generation.
+    scope:
+      includes:
+        - preflight quality gate for vision and validation artifact existence and quality
+        - direction count policy with askUserQuestion and default 3 behavior
+        - validation_input mode values aligned to durable validation
+        - normalized_input required strategic fields
+        - strategic_core required fields
+        - directions with distinction rationale and screen prompt requirements
+        - build_recommendation signals
+        - prompt text manifest and image generation collection fields
+      excludes:
+        - /ow:tune refined prompt pack schema work
+        - generated /ow:proto protocol wording
+        - generated images or HTML prototypes
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Artifacts can record whether vision and validation quality are sufficient for high-quality prototype prompts.
+      - Artifacts can represent askUserQuestion for missing strategic direction count and default to 3 when the user delegates to the agent.
+      - Prompt-pack artifacts cannot declare ephemeral vision_only validation.
+      - Prompt-pack artifacts separate prompt text readiness from image generation and collection status.
+      - Templates expose normalized input, strategic core, directions, build recommendation, constraints, and review plan.
+      - Validators catch thin strategic prompt packs.
+      - Summary health reports missing strategy and direction fields.
+    selection:
+      selected_change_id: C002-strategic-prompt-pack-artifacts
+      reason: >
+        Select C002 directly within M86 because C001 is complete and C002
+        encodes the source behavior requirements into artifact schema,
+        templates, validators, and summary quality.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-strategic-prompt-pack-artifacts
+      completed_at: 2026-05-22
+      commit: b00a12b
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
+    purpose: >
+      Make generated /ow:proto guidance and context packets consume the
+      strengthened native build-prototype behavior and prompt-pack artifact
+      shape.
+    scope:
+      includes:
+        - command registry protocol updates
+        - generated ow-proto skill guidance through sync
+        - context packet drift checks
+        - verification for validation consumption and strategic directions
+        - askUserQuestion behavior for missing strategic direction count
+        - batch image generation and evidence collection after prompt text is ready
+      excludes:
+        - artifact schema changes
+        - tune behavior
+        - external image API integration
+        - HTML or proto2html generation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated /ow:proto says it compiles validated strategy into prompt packs.
+      - Generated /ow:proto checks vision and validation quality and routes back to /ow:vision when either is insufficient.
+      - Generated /ow:proto asks for strategic direction count when absent and uses 3 only when the user delegates that decision.
+      - Generated /ow:proto writes multi-direction prompt text before starting image generation.
+      - Generated /ow:proto batch-generates prototype images and records collected outputs.
+      - Generated /ow:proto preserves M85 durable validation behavior.
+      - Context packets include the strategic prompt-pack quality gates.
+      - Verification catches generated-surface drift.
+    selection:
+      selected_change_id: C003-proto-generated-protocol
+      reason: >
+        Select C003 directly inside M86 because C001 and C002 are complete and
+        the generated /ow:proto protocol now needs to execute the artifact
+        behavior encoded by C002.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-proto-generated-protocol
+      completed_at: 2026-05-22
+      commit: d67d05a
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C004
+    status: done
+    title: Add strategic prompt-pack stress fixtures
+    purpose: >
+      Pressure-test /ow:proto against weak, style-only, and high-quality
+      strategic prompt-pack outputs before handing off to tune work.
+    scope:
+      includes:
+        - thin prompt-pack fixture
+        - style-only direction fixture
+        - proto-ready strategic prompt-pack fixture
+        - runtime or E2E assertions for prompt quality gates
+      excludes:
+        - generated prototype images
+        - browser or visual inspection
+        - tune refined prompt pack fixtures
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies:
+      - C001
+      - C002
+      - C003
+      - C005
+    unlocks:
+      - M87-tune-product-system-inheritance
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests cover prompt packs that are too thin for downstream generation.
+      - Tests reject directions that only differ by visual style.
+      - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
+      - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+    selection:
+      selected_change_id: C004-strategic-prompt-pack-stress-fixtures
+      reason: >
+        Select C004 directly inside the current M86 queue because it is the
+        only active candidate, all dependencies are complete, and it pressure
+        tests the decomposed proto pipeline before tune work begins.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-strategic-prompt-pack-stress-fixtures
+      completed_at: 2026-05-22
+      commit: 18bd294
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C005
+    status: done
+    title: Define internal proto pipeline and image metadata
+    purpose: >
+      Split /ow:proto into internal command-sized stages so agents can execute
+      preflight, vision-to-prompt compilation, and prompt-to-prototype
+      generation without one oversized command drifting in intent.
+    scope:
+      includes:
+        - internal /ow:vision2prompt command registration
+        - internal /ow:prompt2proto command registration
+        - /ow:proto orchestration guidance
+        - prototype internal_pipeline artifact fields
+        - per-image metadata requirements
+        - generated internal skills and context packets through sync
+        - verification for internal command visibility and image metadata
+      excludes:
+        - user-facing exposure of the internal commands
+        - /ow:tune internal pipeline implementation
+        - external image API integration
+        - proto2html or HTML generation
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - C004
+      - M87-tune-product-system-inheritance
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:vision2prompt and /ow:prompt2proto are registered as internal commands, not user-facing handoffs.
+      - /ow:proto remains the user-facing orchestrator for preflight, vision2prompt, and prompt2proto.
+      - Prototype artifacts record internal_pipeline stage ownership and outputs.
+      - Every generated image entry requires image_id, direction_id, prompt_id, path, and metadata.
+      - Generated skills and context packets include the internal pipeline boundary.
+      - Verification catches accidental user-facing exposure of internal proto commands.
+    selection:
+      selected_change_id: C005-internal-proto-pipeline-image-metadata
+      reason: >
+        User and agent agreed that internal command decomposition will reduce
+        per-command output pressure and drift. C005 must precede C004 because
+        stress fixtures should target the decomposed pipeline shape.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C005-internal-proto-pipeline-image-metadata
+      completed_at: 2026-05-22
+      commit: c766f8f
+      evidence:
+        - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for upgrading /ow:proto as the next
+      discovery-loop command after M85 validation, while deferring tune,
+      proto2html, read-model, and E2E dogfood work.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.md
+      - changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 after cross-queue analysis recommended M86 as the direct
+      continuation from M85 and identified no high-risk approval requirement.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/A01-discovery-loop-next-queue/CHANGE_ANALYSIS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 aligned native build-prototype behavior with the M85 durable
+      validation gate and absorbed strategic prompt-pack quality requirements.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M86-proto-strategy-prompt-compiler/C001-build-prototype-strategy-compiler/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 directly inside the current M86 queue after C001 completed;
+      no high-risk approval is required.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 strengthened strategic prompt-pack artifacts with preflight quality
+      gates, direction-count policy, durable validation modes, prompt text
+      readiness, image-generation collection status, summary quality, and
+      validator checks.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C002-strategic-prompt-pack-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 directly inside M86 after C002 completed; no high-risk
+      approval is required.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 upgraded generated /ow:proto protocol with source quality preflight,
+      direction-count askUserQuestion/default delegation, prompt text readiness,
+      batch image generation, and evidence collection guidance.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C003-proto-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP008
+    operation_type: add
+    target_candidate_ids:
+      - C005
+    actor: user+agent
+    reason: >
+      Add internal proto pipeline split after user proposed decomposing
+      /ow:proto into internal vision2prompt and prompt2proto stages to reduce
+      output pressure and intent drift.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 registered the internal /ow:vision2prompt and /ow:prompt2proto
+      stages, kept /ow:proto as the user-facing orchestrator, added internal
+      pipeline artifact metadata, and required per-image generation metadata.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C005-internal-proto-pipeline-image-metadata/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the only active remaining M86 candidate after C005
+      completed; no cross-queue analyze-changes run is needed for a single
+      active queue.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added strategic prompt-pack stress fixtures and validator coverage
+      for thin packs, style-only directions, and proto-ready packs with
+      concrete screens, interactions, AI behavior, trust controls, and sample
+      content.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M86-proto-strategy-prompt-compiler/C004-strategic-prompt-pack-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

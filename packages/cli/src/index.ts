@@ -191,6 +191,9 @@ Two command surfaces:
     /ow:spec        write production-ready implementation specs
     /ow:change      plan a concrete implementation change
     /ow:team        execute an approved change with runtime tracking
+    /ow:decompose-to-changes  create or maintain candidate change queues
+    /ow:analyze-changes       recommend the next candidate without selecting it
+    /ow:select-change         prepare one selected change for implementation
     /ow:git-automation  operate the managed git lifecycle shell with remote approval gates
 
 Lazy creation boundary:

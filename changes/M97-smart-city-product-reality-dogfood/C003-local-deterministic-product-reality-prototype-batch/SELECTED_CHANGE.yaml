@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: selected_change:M97-smart-city-product-reality-dogfood:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M97-smart-city-product-reality-dogfood
+candidate_id: C003
+change_id: C003-local-deterministic-product-reality-prototype-batch
+title: Generate local deterministic product-reality prototype batch
+status: done
+selected_at: 2026-05-22
+selection_reason: >
+  C002 passed the prompt-pack product reality gate, so the next bounded check
+  was to generate local deterministic D1-D3 visual evidence and audit whether
+  the shared map-first smart city product topology survived image generation.
+scope:
+  includes:
+    - local deterministic SVG and PNG prototype images for D1-D3
+    - image_generation metadata in proto-m97 evidence
+    - internal decision audit for C003 outcome
+  excludes:
+    - provider-backed image calls
+    - automated visual quality classifier claims
+    - proto2html or production implementation
+owned_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/**
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/decisions/dec-m97-c003/**
+validation:
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - git -C /Users/archy/Projects/StartUp/smart_city_copilot diff --check
+result: pass
+next_recommended_candidate_id: C004

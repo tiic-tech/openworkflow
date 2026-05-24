@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: selected_change:M86-proto-strategy-prompt-compiler:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C003
+change_id: C003-proto-generated-protocol
+title: Upgrade generated /ow:proto protocol for strategy-to-prompt compilation
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  C003 is the next dependency after C002 and makes generated /ow:proto guidance
+  execute the preflight, direction-count question, prompt-text landing, and
+  image-generation collection behavior encoded by the artifact contract.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+dependencies:
+  - C001
+  - C002
+acceptance:
+  - Generated /ow:proto says it compiles validated strategy into prompt packs.
+  - Generated /ow:proto checks vision and validation quality and routes back to /ow:vision when either is insufficient.
+  - Generated /ow:proto asks for strategic direction count when absent and uses 3 only when the user delegates that decision.
+  - Generated /ow:proto writes multi-direction prompt text before starting image generation.
+  - Generated /ow:proto batch-generates prototype images and records collected outputs.
+  - Generated /ow:proto preserves M85 durable validation behavior.
+  - Context packets include the strategic prompt-pack quality gates.
+  - Verification catches generated-surface drift.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rollback:
+  - Revert command registry protocol, generated surfaces, verification, and C003 planning artifact edits if validation fails.
+high_risk:
+  approval_required: false
+  reason: >
+    This is a medium-risk generated protocol update. It does not add a new
+    runtime command, external image API integration, or downstream production
+    implementation.

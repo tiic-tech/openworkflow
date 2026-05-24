@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C003
+title: Introduce build-proto-prompt command and source skill boundary
+status: completed
+selection_reason: >
+  C003 is the queue's next recommended ready candidate after C001 approved the
+  internal split direction and C002/C004 closed the prompt2proto skill gap. The
+  selected migration keeps /ow:vision2prompt intact for compatibility while
+  adding /ow:build-proto-prompt as the new internal prompt-pack compiler
+  command and source skill boundary. Final orchestration narrowing remains for
+  later candidates.
+scope:
+  includes:
+    - command registry entry for build-proto-prompt or approved trigger name
+    - source skill for build-proto-prompt prompt-pack compilation
+    - generated adapter sync for the new command
+    - context packet and command audit updates
+    - runtime-surface assertions for generated skill presence and boundaries
+  excludes:
+    - prompt2proto visual translation skill implementation
+    - provider image generation
+    - visual review
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/build-proto-prompt/
+  - .agents/skills/ow-build-proto-prompt/
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - provider-backed image generation implementation
+  - human visual review artifacts
+  - visual reference parity scoring
+  - proto2html implementation
+  - storyboard or motion modeling
+acceptance:
+  - The new command is generated as an owned skill with a clear prompt-pack compiler boundary.
+  - Generated guidance does not consume provider images or prototype review artifacts.
+  - Runtime-surface verification proves the command exists and is ordered before build-prototype consumption.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C006
+    reason: C006 can wire design-density philosophy into build-prototype, but C003 first creates the prompt compiler command boundary that C005 and C007 depend on.
+  - id: C007
+    reason: Final build-prototype narrowing depends on C003, C005, and C006.

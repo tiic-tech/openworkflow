@@ -1,4 +1,4 @@
-# Candidate Changes: Decompose and Select Change Skills
+# Candidate Changes: Decompose, Analyze, and Select Change Skills
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
@@ -14,7 +14,11 @@ Avoid broad workflow rewrites, unclear acceptance, mixed planning and
 implementation, and manual edits to generated `.agents` or `.openworkflow`
 surfaces.
 
-Next recommended candidate: `C007`
+Next recommended candidate: none in this queue. Start a new workflow blueprint alignment queue.
+
+Branch boundary: `codex/m54-decompose-select-change-planning`
+
+Latest completed candidate: `C013`
 
 ## C001 - Define Planning Artifact Contracts
 
@@ -122,7 +126,7 @@ Completion evidence:
 
 ## C004 - Expose Planning Skills Through Runtime Surfaces
 
-Status: `ready`
+Status: `done`
 
 Purpose: promote proven source skills into OpenWorkflow command and adapter
 surfaces so future repositories can invoke them consistently.
@@ -231,9 +235,246 @@ Acceptance:
 - Cross-queue decisions record rejected alternatives by plan id and candidate id.
 - The `M68/H003` versus `M69/S001` dogfood decision is captured as evidence.
 
+Completion evidence:
+
+- `skills/select-change/SKILL.md`
+- `skills/select-change/references/selection-protocol.md`
+- `references/planning-artifact-contracts.md`
+- `changes/M54-decompose-select-change-planning/C007-cross-queue-selection/DOGFOOD_CROSS_QUEUE_EVIDENCE.md`
+- `changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml`
+- `quick_validate.py skills/select-change`
+- `npm run validate`
+- `git diff --check`
+
+## C004 High-Risk Stop
+
+`C004` is dependency-satisfied after `C007`, but remains high risk because it
+would expose planning skills through runtime and generated adapter surfaces.
+
+Decision report: `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+
+Recommended option: Option B, design-only boundary first.
+
+Approved option: Option B, design-only boundary first.
+
+## C008 - Design Planning Skill Runtime Exposure Boundary
+
+Status: `done`
+
+Purpose: convert the approved C004 Option B path into a design-only boundary
+for later planning skill runtime exposure.
+
+Owned paths:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/`
+- M54 queue and summary artifacts
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+
+Depends on: `C007`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+Acceptance:
+
+- Design documents core, artifact, adapter, generated-surface, read-model, and validation boundaries.
+- Design preserves repo-local delivery and summary-first context consumption.
+- Design splits C004 follow-up work into smaller implementation candidates.
+- No runtime registry, artifact registry, adapter generation, or generated-surface files are edited.
+
+Completion evidence:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/IMPLEMENTATION_BRIEF.md`
+- `changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `git diff --check`
+
+## C009 - Define Planning Artifact Registration And Summary Contract
+
+Status: `done`
+
+Purpose: define the contract and validator expectations for registering
+planning artifacts in read models without exposing runtime command or adapter
+generation changes.
+
+Owned paths:
+
+- `references/planning-skill-runtime-exposure.md`
+- `references/planning-artifact-contracts.md`
+- `schemas/`
+- `changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/`
+
+Depends on: `C008`
+
+Validation:
+
+- `npm run validate`
+- `git diff --check`
+
+Acceptance:
+
+- Planning artifact registration contract is explicit and summary-first.
+- Candidate queues, change analyses, selected changes, atom tasks, and evidence have clear read-model roles.
+- Runtime command and adapter generation remain out of scope.
+- Future C010/C012 work can use the contract without loading full planning history by default.
+
+Completion evidence:
+
+- `references/planning-artifact-contracts.md`
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/C009-planning-artifact-registration/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `git diff --check`
+
+## C010 - Define Planning Command Or Capability Registry Semantics
+
+Status: `done`
+
+Risk: `high`
+
+Purpose: decide whether planning skills should become semantic commands,
+capability registry entries, or remain source skills before adapter generation.
+
+Approved command semantics:
+
+- `/ow:decompose-to-changes`
+- `/ow:analyze-changes`
+- `/ow:select-change`
+
+Completion evidence:
+
+- `references/planning-skill-runtime-exposure.md`
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C010-planning-registry-semantics/IMPLEMENTATION_BRIEF.md`
+- `npm run validate`
+- `git diff --check`
+
+Generated adapter delivery remains gated by `C011`.
+
+## C011 - Add Codex Adapter Generation For Accepted Planning Surfaces
+
+Status: `done`
+
+Risk: `high`
+
+Purpose: generate accepted planning runtime surfaces through the Codex adapter
+only after the semantic registry boundary is approved.
+
+Generated command surfaces:
+
+- `.agents/skills/ow-decompose-to-changes/SKILL.md`
+- `.agents/skills/ow-analyze-changes/SKILL.md`
+- `.agents/skills/ow-select-change/SKILL.md`
+
+Completion evidence:
+
+- `packages/core/src/commands/registry.ts`
+- `references/planning-skill-runtime-exposure.md`
+- `.agents/openworkflow-adapter.yaml`
+- `.openworkflow/audit/COMMAND_AUDIT_INDEX.yaml`
+- `.openworkflow/audit/CONTEXT_PACKETS.yaml`
+- `changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/SELECTED_CHANGE.yaml`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
+
+## C012 - Add Planning Artifact Read-Model Verification Fixtures
+
+Status: `done`
+
+Purpose: add verification fixtures for the planning artifact registration
+contract without changing runtime command semantics or adapter generation.
+
+Owned paths:
+
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/cli/src/dev/verifyAgentE2E.ts`
+- `references/planning-artifact-contracts.md`
+- `changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/`
+
+Depends on: `C009`
+
+Validation:
+
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
+
+Acceptance:
+
+- Verification covers planning artifact summary-first expectations.
+- Verification does not add generated surfaces or adapter behavior.
+- Full candidate queues are not required for default low-context read models.
+
+Completion evidence:
+
+- `packages/cli/src/dev/verifyRuntimeSurface.ts`
+- `packages/cli/src/dev/verifyAgentE2E.ts`
+- `changes/M54-decompose-select-change-planning/C012-planning-read-model-verification/LOCAL_COMMIT_EVIDENCE.yaml`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `npm run verify:agent-e2e`
+- `git diff --check`
+
+## C013 - Reassess Full Planning Skill Runtime Exposure
+
+Status: `done`
+
+Risk: `high`
+
+Purpose: reassess C004 after registration, semantic registry, adapter, and
+verification boundaries have been proven or blocked.
+
+Conclusion:
+
+- DTC, AC, and SC are complete for the `/ow:change` planning command slice.
+- They do not replace the full workflow blueprint.
+- Remaining runtime alignment should move to a new queue covering
+  `/ow:proto2html`, `/ow:html2spec`, `/ow:build`, `/ow:review`,
+  `/ow:archive`, `/ow:build-agent`, and `/ow:build-skill`.
+
+Completion evidence:
+
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/SELECTED_CHANGE.yaml`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/ATOM_TASKS.yaml`
+- `changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/IMPLEMENTATION_BRIEF.md`
+- `changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md`
+- `npm run validate`
+- `git diff --check`
+
 ## Operation Audit
 
 - `OP001`: add `C006`
 - `OP002`: select `C006`
 - `OP003`: complete `C006`
 - `OP004`: add `C007`
+- `OP005`: update queue branch boundary to `codex/m54-decompose-select-change-planning`
+- `OP006`: select `C007`
+- `OP007`: complete `C007`
+- `OP008`: query `C004` high-risk stop and create decision report
+- `OP009`: add `C008`
+- `OP010`: select `C008`
+- `OP011`: complete `C008`
+- `OP012`: add `C009`
+- `OP013`: select `C009`
+- `OP014`: complete `C009`
+- `OP015`: add `C010`, `C011`, `C012`, and `C013`
+- `OP016`: select `C012`
+- `OP017`: complete `C012`
+- `OP018`: select `C010`
+- `OP019`: complete `C010`
+- `OP020`: select `C011`
+- `OP021`: complete `C011`
+- `OP022`: select `C013`
+- `OP023`: complete `C013`

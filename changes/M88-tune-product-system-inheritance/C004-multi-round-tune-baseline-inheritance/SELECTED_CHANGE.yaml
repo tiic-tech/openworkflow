@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: selected_change:M88-tune-product-system-inheritance:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C004
+change_id: C004-multi-round-tune-baseline-inheritance
+title: Support multi-round tune baseline inheritance
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 through ow-select-change single-queue ranking. C001, C002, and
+  C003 are complete, C004 is the only ready M88 candidate, and multi-round
+  latest-baseline inheritance completes the bounded /ow:tune product-system
+  inheritance queue before later async or dogfood work.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M88-tune-product-system-inheritance/
+dependencies:
+  - C001
+  - C002
+  - C003
+scope:
+  includes:
+    - latest baseline resolution guidance
+    - locked element carry-forward fields
+    - accepted improvement preservation
+    - cumulative drift guard
+    - generated-surface verification for multi-round tune behavior
+  excludes:
+    - async subagent runtime
+    - image generation execution
+    - visual diff tooling
+    - production design/spec work
+forbidden_paths:
+  - async subagent runtime
+  - generated prototype image assets
+  - visual diff tooling
+  - production design/spec artifacts
+acceptance:
+  - Tune artifacts can identify the latest approved baseline group.
+  - Locked screens or elements carry forward unless explicitly unlocked.
+  - Accepted improvements from prior tune passes are preserved.
+  - Multi-round tune guidance forbids cumulative product drift.
+  - Generated /ow:tune surfaces expose the latest-baseline rule.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 is medium risk because it extends local artifact fields, command
+    guidance, and generated-surface verification only. It does not call
+    external generation services or introduce async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: cdc0114
+  evidence:
+    - changes/M88-tune-product-system-inheritance/C004-multi-round-tune-baseline-inheritance/LOCAL_COMMIT_EVIDENCE.yaml

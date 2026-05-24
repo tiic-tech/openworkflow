@@ -1,6 +1,6 @@
 ---
 name: "ow-validation"
-description: "Prioritize the core feature or assumption that must be validated first. Use this skill for /ow:validation in OpenWorkflow repositories."
+description: "Compile proto-ready vision into one prototype validation target. Use this skill for /ow:validation in OpenWorkflow repositories."
 metadata:
   generated_by: "openworkflow"
   adapter: "codex"
@@ -13,7 +13,7 @@ metadata:
 <!-- generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill.ow.validation -->
 # /ow:validation
 
-Prioritize the core feature or assumption that must be validated first.
+Compile proto-ready vision into one prototype validation target.
 
 <user_behavior>
 Keep visible responses concise and outcome-focused.
@@ -28,7 +28,7 @@ Report only meaningful decisions, blockers, artifacts changed, and the next hand
 <source_of_truth>.openworkflow/</source_of_truth>
 <stage>validation</stage>
 <command_visibility>user</command_visibility>
-<interaction_mode>audit-and-rank</interaction_mode>
+<interaction_mode>prototype-validation-target-compiler</interaction_mode>
 
 <inner_thinking>
 Use this protocol for private reasoning, classification, critique, and scope checks.
@@ -64,7 +64,7 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </conditional_outputs>
 
 <artifact_contracts>
-- validation_target: template .openworkflow/validation/_templates/VALIDATION.yaml, source .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml, note .openworkflow/validation/&lt;id&gt;/NOTE.md, review none, load_by_default true, max_yaml_lines 120, summary_policy current_slice at core_question + prototype_scope + acceptance
+- validation_target: template .openworkflow/validation/_templates/VALIDATION.yaml, source .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml, note .openworkflow/validation/&lt;id&gt;/NOTE.md, review none, load_by_default true, max_yaml_lines 120, summary_policy current_slice at core_question + central_uncertainty + target_behavior + prototype_experiment + observable_signals + decision_rules + agent_readiness_gate
 </artifact_contracts>
 
 <forbidden_outputs>
@@ -76,16 +76,21 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Confirm a vision contract exists.
+- Confirm a vision contract exists and is proto-ready enough to validate.
 - Load CURRENT_STATE.yaml when present.
-- Load only vision and validation index context.
+- Load only vision, validation index, and build-validation context.
+- Return to /ow:vision when missing vision fields would force /ow:proto to invent product strategy.
 </before>
 <during>
-- Classify features as existential, supporting, later, or out of scope.
-- Name the single highest-risk validation question.
+- Select exactly one central uncertainty for the next prototype to reduce.
+- Define target_behavior and the minimum prototype_experiment needed to observe it.
+- Write observable_signals for pass, fail, and ambiguous evidence.
+- Write decision_rules for continue, revise, pivot, stop, and needs_more_evidence.
+- Record vision_gaps and agent_readiness_gate without generating prototype artifacts.
 </during>
 <after>
-- Record the validation target and prototype brief.
+- Record central_uncertainty, hypothesis, target_behavior, prototype_experiment, observable_signals, decision_rules, vision_gaps, and agent_readiness_gate.
+- Set agent_readiness_gate.status to ready_for_proto, thin_validation, stale_validation, or return_to_vision.
 - Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next command.
 - Mark superseded validation targets accordingly when a new validation target replaces them.
 - Confirm no prototype, spec, change, or runtime artifacts were created.
@@ -112,9 +117,10 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 
 
 <anti_patterns>
-- Do not turn feature ranking into a production task list.
-- Do not prototype before naming the validation question.
-- Do not treat supporting features as blockers for existential validation.
+- Do not treat feature classification or backlog ranking as the validation outcome.
+- Do not generate prototype prompts, images, HTML, specs, changes, or runtime artifacts.
+- Do not hide missing vision evidence by writing a polished but unsupported validation target.
+- Do not select multiple unrelated validation targets in one artifact.
 </anti_patterns>
 
 <handoff>

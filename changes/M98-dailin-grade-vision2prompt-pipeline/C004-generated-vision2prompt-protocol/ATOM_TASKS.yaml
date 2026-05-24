@@ -1,0 +1,93 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C004
+change_id: C004-generated-vision2prompt-protocol
+title: Atom tasks for generated vision2prompt protocol
+status: completed
+tasks:
+  - id: T001
+    title: Inspect generated protocol source path
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/templates.ts
+      - skills/build-prototype/SKILL.md
+    done_when:
+      - Source registry and generated skill rendering path are mapped.
+      - Managed .agents files are confirmed as generated sync output.
+  - id: T002
+    title: Add dailin-grade vision2prompt reference load order
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+    done_when:
+      - /ow:vision2prompt generated protocol names the strategic prompt-pack protocol and numbered vision2prompt reference pipeline before PROTO_PROMPT_PACK writing.
+      - Protocol guidance records required intermediate outputs before prompt text readiness.
+  - id: T003
+    title: Add prompt-pack handoff gates
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+    done_when:
+      - /ow:vision2prompt blocks ready_for_image_generation when integrity, reality, screen linkage, or prompt executability gates fail.
+      - /ow:prompt2proto refuses prompt packs whose integrity, reality, screen linkage, or prompt executability gates fail.
+      - /ow:proto orchestrator repeats the same handoff gate before internally triggering /ow:prompt2proto.
+  - id: T004
+    title: Regenerate Codex and managed workflow surfaces
+    type: generated
+    status: completed
+    owned_paths:
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - dist CLI sync writes generated files from source registry/templates.
+      - Generated .agents surfaces contain the new reference pipeline and readiness gate text.
+  - id: T005
+    title: Align agent e2e validation fixture
+    type: test
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyAgentE2E.ts
+    done_when:
+      - verify:agent-e2e fixture validation artifact satisfies current /ow:proto readiness fields.
+      - The e2e test continues to cover strict handoff blocking for thin prototype evidence.
+  - id: T006
+    title: Verify C004 and record evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or known unrelated failures are documented.
+      - C004 local evidence records behavior, changed paths, generated sync output, and verification results.
+verification:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run validate
+  - npm run verify:agent-e2e
+  - rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - npm run verify:agent-e2e
+    - rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.

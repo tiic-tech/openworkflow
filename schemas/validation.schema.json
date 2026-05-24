@@ -9,12 +9,21 @@
     "contract_type",
     "title",
     "status",
+    "trigger",
     "core_question",
+    "central_uncertainty",
+    "hypothesis",
+    "target_behavior",
     "feature_classification",
     "critical_assumptions",
     "prototype_scope",
+    "prototype_experiment",
+    "observable_signals",
     "acceptance",
-    "decision_options"
+    "decision_rules",
+    "decision_options",
+    "vision_gaps",
+    "agent_readiness_gate"
   ],
   "properties": {
     "schema_version": {
@@ -32,7 +41,43 @@
     "status": {
       "type": "string"
     },
+    "trigger": {
+      "type": "object",
+      "required": [
+        "mode",
+        "requested_command",
+        "reason"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "user_explicit",
+            "agent_auto"
+          ]
+        },
+        "requested_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
     "core_question": {
+      "type": "string"
+    },
+    "central_uncertainty": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "target_behavior": {
       "type": "string"
     },
     "feature_classification": {
@@ -99,11 +144,109 @@
       },
       "additionalProperties": true
     },
+    "prototype_experiment": {
+      "type": "object",
+      "required": [
+        "scenario",
+        "must_show",
+        "must_not_show"
+      ],
+      "properties": {
+        "scenario": {
+          "type": "string"
+        },
+        "must_show": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_show": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "observable_signals": {
+      "type": "object",
+      "required": [
+        "pass",
+        "fail",
+        "ambiguous"
+      ],
+      "properties": {
+        "pass": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fail": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ambiguous": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
     "acceptance": {
       "type": "array",
       "items": {
         "type": "string"
       }
+    },
+    "decision_rules": {
+      "type": "object",
+      "required": [
+        "continue",
+        "revise",
+        "pivot",
+        "stop",
+        "needs_more_evidence"
+      ],
+      "properties": {
+        "continue": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "revise": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pivot": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "needs_more_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
     },
     "decision_options": {
       "type": "array",
@@ -117,6 +260,49 @@
           "needs_more_evidence"
         ]
       }
+    },
+    "vision_gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agent_readiness_gate": {
+      "type": "object",
+      "required": [
+        "status",
+        "blockers",
+        "warnings",
+        "write_authority"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "missing_validation",
+            "thin_validation",
+            "stale_validation",
+            "ready_for_proto",
+            "return_to_vision"
+          ]
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "write_authority": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
     }
   },
   "additionalProperties": true

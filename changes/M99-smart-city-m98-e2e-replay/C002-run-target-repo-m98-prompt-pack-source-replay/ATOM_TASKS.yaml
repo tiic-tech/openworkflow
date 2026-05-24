@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M99-smart-city-m98-e2e-replay:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C002
+change_id: C002-run-target-repo-m98-prompt-pack-source-replay
+title: Atom tasks for target-repo M98 prompt-pack source replay
+status: completed
+tasks:
+  - id: T001
+    title: Refresh target command surface
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.agents/
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/audit/
+    done_when:
+      - Target repo sync refreshes stale M98 /ow:vision2prompt, /ow:proto, and /ow:prompt2proto managed surfaces.
+      - CURRENT_STATE is preserved.
+  - id: T002
+    title: Replay prompt-pack source
+    type: edit
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/
+    done_when:
+      - PROTO_PROMPT_PACK.yaml includes prototype_brief, product_experience_model, screen_manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+      - EVIDENCE.yaml mirrors the source-complete replay result.
+      - image_generation.status remains not_started.
+  - id: T003
+    title: Verify target replay
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/
+    done_when:
+      - Target validate passes.
+      - Target summaries --strict passes.
+      - Target handoff passes and reports trusted handoff quality.
+      - Field scan confirms the required M98 prompt-pack source fields are present.
+  - id: T004
+    title: Commit target replay
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/
+    done_when:
+      - Target branch has a local replay commit.
+      - Target worktree is clean after commit.
+  - id: T005
+    title: Update M99 queue evidence
+    type: edit
+    status: completed
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+    done_when:
+      - C002 selection and local evidence artifacts exist.
+      - CANDIDATE_CHANGES and SUMMARY record C002 completion and C003 as next.
+verification:
+  passed:
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js sync --root . --tools codex --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root . --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root . --strict --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root . --json
+    - target git diff --check
+    - target git status --short --branch
+  repaired_during_replay:
+    - Direction count policy was changed from delegated default to explicit single source-completeness replay so validation did not require a fresh 3-direction image batch.
+    - SUMMARY.yaml metadata was normalized to the repo-accepted summary shape after summarize --write generated a validate-incompatible summary header.

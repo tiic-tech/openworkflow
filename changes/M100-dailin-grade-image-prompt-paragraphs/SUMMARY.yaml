@@ -1,0 +1,151 @@
+schema_version: 0.1.0
+contract_id: summary:M100-dailin-grade-image-prompt-paragraphs
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M100-dailin-grade-image-prompt-paragraphs
+title: Summary for dailin-grade image prompt paragraphs
+status: complete
+source:
+  kind: mixed
+  summary: >
+    User requires /ow:vision2prompt generated image prompt paragraphs to match
+    or exceed dailin OUTPUT_PROMPT quality. M98/M99 source completeness is not
+    enough: the actual prompt text must become full high-fidelity prototype
+    generation briefs.
+  refs:
+    - user_direction:2026-05-23-require-vision2prompt-image-prompts-match-dailin-output
+    - changes/M98-dailin-grade-vision2prompt-pipeline/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+    - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md
+    - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/reference/
+    - user_direction:2026-05-23-inject-senior-pm-philosophy-engine
+scope_boundary: >
+  One workflow slice: /ow:vision2prompt image-generation prompt paragraph
+  quality. The queue upgrades direction-level and screen-level prompt text from
+  terse screen-state descriptions into dailin-grade high-fidelity prototype
+  generation briefs. The queue now explicitly treats the dailin references as
+  tools for a co-founder and senior product-manager perspective engine, not as
+  a checklist that alone creates quality.
+branch_boundary: codex/m100-dailin-grade-image-prompt-paragraphs
+candidate_count: 7
+active_candidate_count: 0
+completed_candidate_id: C006
+completed_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+selected_candidate_id: C006
+selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+next_recommended_candidate_id: null
+deferred_feature_refs:
+  - M101-provider-image-generation-benchmark
+  - M102-prototype-visual-reference-parity-gate
+  - M103-prototype-storyboard-motion-model
+outputs:
+  candidate_changes_yaml: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.md
+  summary: changes/M100-dailin-grade-image-prompt-paragraphs/SUMMARY.yaml
+  c001_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/SELECTED_CHANGE.yaml
+  c001_mapping_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md
+  c002_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_BRIEF.md
+  c002_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C002-enforce-long-form-generation-prompt-structure/IMPLEMENTATION_EVIDENCE.md
+  c007_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/SELECTED_CHANGE.yaml
+  c007_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/ATOM_TASKS.yaml
+  c007_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+  c007_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+  c003_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/SELECTED_CHANGE.yaml
+  c003_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/ATOM_TASKS.yaml
+  c003_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_BRIEF.md
+  c003_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt/IMPLEMENTATION_EVIDENCE.md
+  c004_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_BRIEF.md
+  c004_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions/IMPLEMENTATION_EVIDENCE.md
+  c005_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/SELECTED_CHANGE.yaml
+  c005_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/ATOM_TASKS.yaml
+  c005_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_BRIEF.md
+  c005_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md
+  c006_selected_change: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/SELECTED_CHANGE.yaml
+  c006_atom_tasks: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/ATOM_TASKS.yaml
+  c006_implementation_brief: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_BRIEF.md
+  c006_handoff_report: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/HANDOFF_REPORT.md
+  c006_implementation_evidence: changes/M100-dailin-grade-image-prompt-paragraphs/C006-record-no-go-criteria-for-future-visual-parity-work/IMPLEMENTATION_EVIDENCE.md
+key_dependencies:
+  - C001 is complete; the dailin skill workflow and reference instructions are now mapped into an explicit OW prompt paragraph contract before schemas or generated protocols enforce it.
+  - C002 is complete; validators now enforce paragraph anatomy and failure dimensions.
+  - C007 is complete; the senior product-manager perspective engine is now in source guidance, generated /ow:vision2prompt protocol, and runtime-surface assertions.
+  - C003 is complete; generated /ow:vision2prompt and /ow:prompt2proto guidance now require paragraph-quality gates before image handoff.
+  - C004 is complete; runtime fixtures now prove positive dailin-grade paragraph quality and negative terse/strategyless prompt behavior.
+  - C005 is complete; the real smart_city_copilot target replay now carries dailin-grade prompt paragraphs and target commit 66f6a38 records the upgraded artifacts.
+  - C006 is complete; downstream visual/provider work now has explicit go/no-go criteria and M100 is closed as a prompt-text-quality queue.
+risks:
+  - id: R001
+    level: medium
+    description: >
+      The queue could accidentally drift back into visual reference parity or
+      provider image generation.
+    mitigation: Keep provider generation, visual review, proto2html, and storyboard/motion explicitly out of scope.
+  - id: R002
+    level: medium
+    description: >
+      Text-quality validation could become too subjective for deterministic
+      runtime checks.
+    mitigation: Enforce structural paragraph anatomy and required dimensions, then record direct dailin comparison as evidence.
+  - id: R003
+    level: medium
+    description: >
+      Requiring longer prompt text could break existing prompt-pack fixtures or
+      refined prompt-pack compatibility.
+    mitigation: Add fixtures incrementally, preserve M98 gates, and keep /ow:tune compatibility checks in runtime verification where touched.
+  - id: R004
+    level: medium
+    description: >
+      The initial planning commit lived on codex/m99-smart-city-m98-e2e-replay
+      while this queue's intended branch boundary is
+      codex/m100-dailin-grade-image-prompt-paragraphs.
+    mitigation: C001 implementation switched to codex/m100-dailin-grade-image-prompt-paragraphs before selection and source edits.
+unresolved_questions: []
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
+    - rg -n "dailin-grade image prompt|paragraph anatomy|journey|system response|vision_to_strategic_prototype_prompt" skills/build-prototype/references
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+    - sed -n '1,260p' .agents/skills/ow-decompose-to-changes/SKILL.md
+    - sed -n '1,260p' references/planning-artifact-contracts.md
+    - sed -n '1,260p' skills/decompose-to-changes/references/decomposition-protocol.md
+    - node dist/cli/src/index.js sync --root . --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /tmp/smart-city-m99-e2e-worktree --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /tmp/smart-city-m99-e2e-worktree --strict --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /tmp/smart-city-m99-e2e-worktree --json
+    - git diff --check
+  notes:
+    - C001 completed as contract/reference mapping only; no schema, validator, generated adapter, provider image generation, visual review, or target replay was executed.
+    - C002 completed deterministic prompt paragraph enforcement only; no generated skill sync, provider image generation, visual review, or target replay was executed.
+    - Current implementation branch is codex/m100-dailin-grade-image-prompt-paragraphs, matching the queue branch boundary.
+    - Direct quality target is prompt paragraph quality, not source completeness.
+    - User clarified that dailin vision_to_strategic_prototype_prompt SKILL and its detailed reference instructions are the foundation for raising /ow:vision2prompt quality.
+    - M99 smart city target prompt pack is source-complete but its prompt paragraphs are shorter and less journey-rich than dailin OUTPUT_PROMPT.
+    - C001 names dailin OUTPUT_PROMPT as the minimum paragraph benchmark and adds long-form prompt anatomy plus thin-prompt failure modes to OW-owned references.
+    - C002 adds schema support, validator checks, runtime regressions, and summary-health fields for prompt paragraph quality. The stored M98 smart city replay fixture is now expected to fail M100 paragraph quality until C004 upgrades or duplicates a positive fixture.
+    - DTC OP008 added C007 as a temporary prerequisite before C003 to inject the co-founder and senior product-manager philosophy engine that originally produced dailin OUTPUT_PROMPT from only VISION.md plus a high-level product prompt.
+    - Select-change OP009 selected C007 and created implementation-ready artifacts.
+    - C007 completed the perspective engine injection and re-unlocked C003 as the next recommended candidate.
+    - Select-change OP011 selected C003 and created implementation-ready artifacts.
+    - C003 completed generated guidance wiring for dailin-grade prompt paragraph quality and re-unlocked C004 as the next recommended candidate.
+    - Select-change OP013 selected C004 and created implementation-ready artifacts.
+    - C004 completed fixture/regression evidence and made C005 the next recommended candidate.
+    - Select-change OP015 selected C005 and created implementation-ready artifacts.
+    - C005 completed real smart_city_copilot target replay evidence, target validate/summaries/handoff passed, and target commit 66f6a38 records the dailin-grade prompt paragraphs.
+    - Select-change OP017 selected C006 and created implementation-ready artifacts.
+    - C006 completed the downstream handoff report and M97 synthesis update, closing M100 without provider image generation, visual review, visual parity scoring, proto2html, or storyboard work.
+    - M101-build-proto-prompt-command-split was created as a separate high-risk command-boundary queue and was not implemented inside M100.

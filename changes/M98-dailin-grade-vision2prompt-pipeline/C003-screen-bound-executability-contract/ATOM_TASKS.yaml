@@ -1,0 +1,76 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C003
+change_id: C003-screen-bound-executability-contract
+title: Atom tasks for screen-bound executability contract
+status: completed
+tasks:
+  - id: T001
+    title: Inspect strategic prompt-pack schema and validators
+    type: read
+    status: completed
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    done_when:
+      - Existing strategic prompt-pack shape, readiness checks, integrity checks, and refined prompt compatibility points are mapped.
+  - id: T002
+    title: Add screen-bound schema fields
+    type: edit
+    status: completed
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+    done_when:
+      - Strategic prompt packs can express prototype_brief, direction_map, screen_manifest, global design system prompts, screen prompts, and quality rubric fields.
+      - Existing refined prompt-pack fields remain accepted by the schema.
+  - id: T003
+    title: Enforce generation-ready executability
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when:
+      - Generation-ready strategic prompt packs fail without screen-bound manifest and prompt fields.
+      - Screen prompt refs resolve to screen_manifest ids.
+      - Each screen_manifest entry includes components, state/data, actions, AI behavior or explicit non-AI rationale, and acceptance criteria.
+  - id: T004
+    title: Align protocol reference with contract
+    type: edit
+    status: completed
+    owned_paths:
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    done_when:
+      - Protocol guidance names the required screen-bound executability fields before prompt text can be ready for image generation.
+  - id: T005
+    title: Verify C003 and record evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or known unrelated failures are documented.
+      - C003 local evidence records behavior, changed paths, and verification results.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.

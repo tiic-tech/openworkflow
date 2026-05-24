@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.vision2prompt
+interface:
+  display_name: "ow:vision2prompt"
+  short_description: "Internally compile ready vision and validation into strategic prototype prompt text. Internal audit only."
+  default_prompt: "Use /ow:vision2prompt for this OpenWorkflow repository."

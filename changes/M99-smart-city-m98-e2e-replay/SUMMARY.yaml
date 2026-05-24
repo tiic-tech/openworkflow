@@ -1,0 +1,95 @@
+schema_version: 0.1.0
+contract_id: summary:M99-smart-city-m98-e2e-replay
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M99-smart-city-m98-e2e-replay
+title: Summary for smart city M98 E2E replay
+status: active
+source:
+  kind: mixed
+  summary: >
+    M98 C006 proved smart city prompt-pack source completeness with a stored
+    replay fixture. M99 owns the clean real target-repo replay in
+    smart_city_copilot before visual parity work starts.
+  refs:
+    - user_direction:2026-05-22-create-e2e-branch-before-smart-city-copilot-test
+    - changes/M98-dailin-grade-vision2prompt-pipeline/SUMMARY.yaml
+    - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml
+    - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+    - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+scope_boundary: >
+  Clean target-repo replay of M98 prompt-pack source completeness in
+  smart_city_copilot, before downstream image generation or visual parity.
+branch_boundary: codex/m99-smart-city-m98-e2e-replay
+candidate_count: 3
+active_candidate_count: 0
+completed_candidate_id: C003
+completed_change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+deferred_feature_refs:
+  - M100-prototype-visual-reference-parity-gate
+  - M101-prototype-storyboard-motion-model
+  - M102-provider-image-generation-benchmark
+outputs:
+  candidate_changes_yaml: changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.md
+  summary: changes/M99-smart-city-m98-e2e-replay/SUMMARY.yaml
+key_dependencies:
+  - C001 must run first so smart_city_copilot replay starts from a named branch and known dirty-tree baseline.
+  - C002 depends on C001 because target replay evidence must not mix with old artifacts or parallel work.
+  - C003 depends on C002 because comparison needs the real target prompt pack output.
+risks:
+  - id: R001
+    level: medium
+    description: >
+      The target repo replay could accidentally enter image generation or visual
+      parity review.
+    mitigation: Keep image generation, visual review, proto2html, and motion/storyboard explicitly out of scope.
+  - id: R002
+    level: medium
+    description: >
+      Target repo dirty state or parallel work could contaminate E2E evidence.
+    mitigation: Start with C001 branch/readiness baseline and record any pre-existing state before replay.
+  - id: R003
+    level: medium
+    description: >
+      The C006 stored fixture may be source-complete while real /ow:vision2prompt
+      output remains thin.
+    mitigation: C003 must compare real output against C006 and route to generator repair if needed.
+unresolved_questions: []
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js handoff --root . --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /tmp/openworkflow-m99-e2e-worktree --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /tmp/openworkflow-m99-e2e-worktree --strict --json
+    - git diff --check
+  notes:
+    - M98 C006 was committed as 2396c13 and archived at /tmp/openworkflow-archives/m98-c006-smart-city-replay-2396c13.tar.gz before this queue was created.
+    - This queue was created on branch codex/m99-smart-city-m98-e2e-replay from the M98 C006 commit.
+    - New worktree validation used the already-built dist CLI from /Users/archy/Projects/StartUp/openworkflow because /tmp/openworkflow-m99-e2e-worktree does not contain local dist build output.
+    - The first selected candidate should prepare the smart_city_copilot branch and baseline before any target replay commands run.
+    - C001 was selected and completed as the clean smart_city_copilot target worktree baseline before any real replay commands run.
+    - C001 confirmed /tmp/smart-city-m99-e2e-worktree exists on branch codex/m99-smart-city-m98-e2e-replay at HEAD 2b977be with a clean dirty-tree baseline.
+    - C001 confirmed the original smart_city_copilot worktree remains separate on codex/smart-city-product-reality-e2e and was not cleaned, reset, or switched.
+    - C001 discovered the target repo OpenWorkflow surface through AGENTS.md, .openworkflow/, and .agents/skills/ow-*/SKILL.md.
+    - C001 target handoff/readiness checks were intentionally recorded as baseline failures: handoff and strict summaries fail on current-but-thin prototype_evidence, and validate fails on missing M98 source-completeness fields.
+    - C001 scanned the existing target PROTO_PROMPT_PACK.yaml and found directions/screen_prompts present but prototype_brief, screen_manifest, global design prompt, negative prompts, quality_rubric, prompt_pack_integrity_gate, and prototype_reality_gate absent at baseline.
+    - C001 did not run real target replay, provider-backed image generation, visual review, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
+    - C002 is now the next recommended candidate to run the real target-repo M98 prompt-pack source replay.
+    - C002 was selected and completed after C001 to replay the real smart_city_copilot prompt-pack source through the current M98 command surface.
+    - C002 refreshed target managed surfaces with the main repo dist CLI so target /ow:vision2prompt, /ow:proto, /ow:prompt2proto, CONTEXT_PACKETS, and ARTIFACT_CONTRACTS carried current M98 gates.
+    - C002 target commit 9a609cf901217cd1324e589459c90dfcddbad687 updates proto-001 PROTO_PROMPT_PACK, EVIDENCE, REVIEW_PLAN, NOTE, SUMMARY, and generated command surfaces.
+    - C002 target PROTO_PROMPT_PACK now contains prototype_brief, product_experience_model, screen_manifest, global_design_system_prompt, screen prompts, negative prompts, quality_rubric, prompt_pack_integrity_gate, and prototype_reality_gate.
+    - C002 models map-shell, planning-review, incident-response, and capacity-monitor as states/modules inside one coherent map-first CityFlow Copilot product shell.
+    - C002 kept image_generation.status not_started and did not run provider-backed image generation, visual review, visual parity scoring, proto2html, storyboard/motion modeling, or OpenWorkflow source code changes.
+    - C002 target validate, strict summaries, handoff, diff check, and git status passed after the local target commit.
+    - C003 is now the next recommended candidate to compare the real target replay against the M98 C006 fixture and M97 gap notes.
+    - C003 was selected and completed on 2026-05-23 to compare the real target replay against the M98 C006 fixture, M97 gap notes, and /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md.
+    - C003 found the real target replay source-complete for M98: the target prompt pack includes product brief, product experience model, screen manifest, global design prompt, screen prompts, negative prompts, quality rubric, integrity gate, and reality gate.
+    - C003 found the M97 formal prompt-pack source gap repaired in the real target repo at target commit 9a609cf901217cd1324e589459c90dfcddbad687.
+    - C003 found dailin-quality alignment for coherent product hypothesis, screen-bound product states, direct generatability, concrete copy/data/trust controls, and negative constraints.
+    - C003 kept remaining dailin-style full journey richness, visual reference parity, and storyboard/motion progression as downstream work rather than /ow:vision2prompt source-completeness repair.
+    - C003 recommendation: proceed to a dedicated visual reference parity gate; do not repair /ow:vision2prompt for M98 source completeness based on this evidence.

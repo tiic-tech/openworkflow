@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:M93-proto-product-archetype-reality-gate:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C004
+change_id: C004-smart-city-product-reality-fixture
+title: Add smart city product-reality regression fixture
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 after C001-C003 completed the contract, protocol, and gate. It is
+  the final dependency-satisfied medium-risk candidate and encodes the smart
+  city failure as a deterministic regression fixture.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M93-proto-product-archetype-reality-gate/
+dependencies:
+  - C001
+  - C002
+  - C003
+scope:
+  includes:
+    - smart city fixture source derived from M92 and the rejected first image batch
+    - expected product_experience_model assertions for map-first smart city operations dashboard
+    - expected prompt constraints for city operations taxonomy, map pins, layers, detail panel, selected state, operational metrics, and HIL as a workflow control
+    - negative assertions against white-card generic AI governance dashboards and scenario-only directions
+  excludes:
+    - generating new images
+    - modifying smart_city_copilot repo artifacts
+    - full M97 dogfood rerun
+    - proto2html or runnable prototype work
+forbidden_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/**
+  - external image generation calls
+  - generated prototype image assets
+  - proto2html or production implementation artifacts
+acceptance:
+  - Smart city fixture expects a map-first operations dashboard archetype.
+  - Fixture expects planning, incident, and capacity to be represented as modules, layers, states, or workflows inside the same product shell unless a prompt explicitly justifies separate product forms.
+  - Fixture requires concrete city operations domain objects and sample operational data.
+  - Fixture fails when the prompt pack centers generic HIL/audit/citation cards without a credible smart city dashboard topology.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:e2e-workflow
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 adds deterministic local fixtures only. It does not modify the target
+    smart_city_copilot repo, generate images, or call external services.

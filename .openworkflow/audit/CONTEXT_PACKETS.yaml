@@ -61,17 +61,26 @@ packets:
       before:
         - Confirm workflow and context indexes exist.
         - Load CURRENT_STATE.yaml when present to avoid stale stage routing.
-        - Start in conversation mode and ask the next useful vision question before writing
-          artifacts.
+        - Enter interview mode as product partner, requirements interrogator, and intent compiler.
+        - Ask the next useful vision question before writing artifacts; do not start by creating or
+          updating durable vision files.
+        - If resuming, load only current vision/context state needed to continue the conversation
+          and identify any stale current_question.
       during:
         - Ask one focused question at a time and make each question depend on the previous answer.
-        - Cover mandatory vision dimensions before validation handoff.
+        - Keep brainstorming in conversation memory until a meaningful checkpoint, pause request, or
+          compile readiness boundary.
+        - Challenge thin, generic, contradictory, or implementation-shaped answers until the
+          strategic product intent is clear.
+        - Cover mandatory vision and proto-readiness dimensions before validation handoff.
         - Provide concrete examples or options when the user is stuck.
       after:
-        - Persist artifacts only after stable answers, explicit save request, or readiness
-          checkpoint.
-        - Handoff to validation only after mandatory coverage, unresolved blockers are named, and
-          the user confirms readiness.
+        - Persist artifacts only in checkpoint mode or compile mode after stable answers, explicit
+          save request, or readiness checkpoint.
+        - Compile durable VISION artifacts only after proto_readiness.status can be ready or
+          blockers are explicit and the user confirms the interview can stop.
+        - Handoff to validation only after mandatory coverage, proto-readiness, unresolved blockers,
+          and user readiness are explicit.
         - When handing off, mark the vision session active or reviewed, clear stale current_question
           when answered, and update CURRENT_STATE.yaml.
         - Confirm no validation, prototype, spec, change, or runtime artifacts were created.
@@ -94,18 +103,236 @@ packets:
       []
     audit_checkpoints:
       before:
-        - Confirm a vision contract exists.
+        - Confirm a vision contract exists and is proto-ready enough to validate.
         - Load CURRENT_STATE.yaml when present.
-        - Load only vision and validation index context.
+        - Load only vision, validation index, and build-validation context.
+        - Return to /ow:vision when missing vision fields would force /ow:proto to invent product
+          strategy.
       during:
-        - Classify features as existential, supporting, later, or out of scope.
-        - Name the single highest-risk validation question.
+        - Select exactly one central uncertainty for the next prototype to reduce.
+        - Define target_behavior and the minimum prototype_experiment needed to observe it.
+        - Write observable_signals for pass, fail, and ambiguous evidence.
+        - Write decision_rules for continue, revise, pivot, stop, and needs_more_evidence.
+        - Record vision_gaps and agent_readiness_gate without generating prototype artifacts.
       after:
-        - Record the validation target and prototype brief.
+        - Record central_uncertainty, hypothesis, target_behavior, prototype_experiment,
+          observable_signals, decision_rules, vision_gaps, and agent_readiness_gate.
+        - Set agent_readiness_gate.status to ready_for_proto, thin_validation, stale_validation, or
+          return_to_vision.
         - Update CURRENT_STATE.yaml with current_validation, active_stage validation, and the next
           command.
         - Mark superseded validation targets accordingly when a new validation target replaces them.
         - Confirm no prototype, spec, change, or runtime artifacts were created.
+  - packet_id: context:build-proto-prompt
+    command: /ow:build-proto-prompt
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/**/VALIDATION.yaml
+    optional:
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - skills/build-proto-prompt/SKILL.md
+      - skills/build-proto-prompt/references/prompt-pack-compiler-protocol.md
+      - skills/build-proto-prompt/references/output-boundary.md
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal prompt-pack compiler stage after /ow:proto preflight has confirmed
+          vision and validation are ready.
+        - Load skills/build-proto-prompt/SKILL.md and its references before compiling
+          PROTO_PROMPT_PACK.
+        - Adopt the Co-Founder plus Chief PM / senior product strategist perspective engine before
+          generating directions.
+        - Resolve direction_count_policy before writing prompt text; do not silently default the
+          direction count.
+        - Prepare to infer product_experience_model before strategic directions, including product
+          archetype, primary canvas, information architecture, domain objects, state model, data
+          realism, visual language, anti-generic constraints, and category quality bar.
+        - Prepare to write prototype_system_contract before screen prompts, covering stable app
+          shell, navigation taxonomy, data vocabulary, object anatomy, action bar, audit pattern,
+          copy tone, and allowed screen deltas.
+        - Prepare to write dailin-grade long-form prompt paragraphs; prompt text must include
+          journey, interaction behavior, system response, trust controls, anti-goals, visual
+          direction, desired user feeling, and concrete content.
+      during:
+        - Compile durable vision and validation into strategic_core, prototype_brief,
+          product_experience_model, prototype_system_contract, screen_manifest,
+          global_design_system_prompt, directions, screen_prompts, review_plan, and readiness gates.
+        - Each selected direction must carry product_thesis, user_transformation, differentiated
+          product form, reason_to_exist, and pm_judgment before screen prompt anatomy.
+        - Decide whether source concepts are separate strategic product forms or modules, layers,
+          workflows, or states inside one product shell; do not split directions by scenario labels
+          alone.
+        - Write prototype_system_contract cross-screen invariants before complete multi-image prompt
+          text so downstream prompt2proto preserves technical screen coherence instead of inventing
+          it from visual judgment.
+        - Write complete multi-image prompt text for every selected direction with screen_prompts,
+          negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
+          target_screen_id values.
+        - Populate prompt_pack_integrity_gate, prototype_reality_gate,
+          quality_rubric.prompt_executability, quality_rubric.prompt_paragraph_quality,
+          prompt_text_manifest.paragraph_quality_status, and post_validate before handoff.
+        - "Keep image_generation.status: not_started while this compiler stage runs."
+      after:
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
+          prototype_system_contract and prompt_text_manifest.status ready_for_image_generation only
+          when all readiness gates pass.
+        - Hand internally to /ow:prompt2proto only when prototype_system_contract is present,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass,
+          quality_rubric.prompt_executability.status is pass,
+          prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or
+          skipped.
+        - If any readiness gate fails, keep handoff blocked and repair prompt directions through
+          /ow:build-proto-prompt.
+        - Do not generate images; do not consume provider image output or prototype review artifacts.
+  - packet_id: context:vision2prompt
+    command: /ow:vision2prompt
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/vision/VISION_CONTRACT.yaml
+      - .openworkflow/vision/VISION.md
+      - .openworkflow/validation/**/VALIDATION.yaml
+    optional:
+      - .openworkflow/context/CONTEXT.md
+      - .openworkflow/context/CONTEXT_MAP.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal stage after /ow:proto preflight has confirmed vision and
+          validation are ready.
+        - Consume durable VISION and VALIDATION artifacts; do not ask broad product questions or
+          generate images.
+        - Adopt the co-founder plus senior product-manager perspective engine before running
+          references; the references are tools, not a checklist that proves quality by itself.
+        - Load skills/build-prototype/references/strategic-prompt-pack-protocol.md, then run
+          references/vision2prompt/01_input_contract.md through 07_quality_rubric.md in order before
+          writing PROTO_PROMPT_PACK.
+        - Resolve direction_count_policy before writing prompt text; use resolved_count from
+          /ow:proto preflight.
+        - Prepare to infer product_experience_model before strategic directions; do not start
+          directions from scenario labels or visual style variants.
+        - Prepare to write prototype_system_contract before screen prompt text so stable app shell,
+          navigation taxonomy, data vocabulary, object anatomy, action bar, audit pattern, copy
+          tone, and allowed screen deltas are explicit.
+        - Prepare to write dailin-grade long-form prompt paragraphs; direction and screen prompt
+          text must include journey, interaction behavior, system response, trust controls,
+          anti-goals, visual direction, desired user feeling, and concrete content.
+        - Prepare to run prompt_pack_integrity_gate, prototype_reality_gate,
+          quality_rubric.prompt_executability, and post_validate after prompt assets are complete;
+          do not hand off to /ow:prompt2proto while any required gate is missing or failing.
+      during:
+        - Apply the OW vision2prompt reference pipeline inside OW artifacts and keep intermediate
+          reasoning outputs compactly represented in PROTO_PROMPT_PACK.yaml or NOTE.md.
+        - "Record the intermediate pipeline outputs: perspective engine, normalized input contract,
+          vision decomposition, candidate strategic hypotheses, product experience model,
+          prototype_system_contract, screen_manifest, prototype prompt schema, output manifest, and
+          quality rubric."
+        - Each selected direction must carry product_thesis, user_transformation, reason_to_exist,
+          differentiated product form, and pm_judgment before screen prompt anatomy.
+        - "Infer product_experience_model from VISION and VALIDATION: product archetype, primary
+          canvas, information architecture, domain object model, primary task loop, interaction
+          state model, data realism requirements, visual language, anti-generic constraints, and
+          category quality bar."
+        - Decide whether scenario names are separate strategic product forms or modules, layers,
+          workflows, or states inside one product shell; do not split directions by scenario labels
+          alone.
+        - Generate more candidate hypotheses than needed and select the resolved direction count for
+          maximum strategic diversity.
+        - Only select directions that differ by product form, product loop, initiation trigger,
+          interaction model, emotional driver, retention mechanism, validation metric, or main risk.
+        - Write prototype_system_contract cross-screen invariants before complete multi-image prompt
+          text so downstream prompt2proto preserves technical screen coherence instead of inventing
+          it from visual judgment.
+        - Write complete multi-image prompt text for every selected direction with screen_prompts,
+          negative_prompt, example_copy, and acceptance criteria tied to screen_manifest
+          target_screen_id values.
+        - Populate quality_rubric.prompt_paragraph_quality and
+          prompt_text_manifest.paragraph_quality_status before handoff; fail closed when
+          paragraph_quality_dimensions are missing.
+        - Do not set prompt_text_manifest.status to ready_for_image_generation until
+          prompt_pack_integrity_gate.status, prototype_reality_gate.status,
+          quality_rubric.prompt_executability.status, and
+          prompt_text_manifest.paragraph_quality_status are pass.
+        - After prompt text is ready, run the deterministic post_validate gate over
+          strategic_fingerprint dimensions when resolved_count is 2 or more.
+        - "When the user explicitly requested exactly one strategic direction, set
+          post_validate.status: skipped and record the skip reason instead of running diversity
+          comparison."
+      after:
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and EVIDENCE.yaml with
+          product_experience_model, prototype_system_contract, screen_manifest, screen_prompts,
+          prompt_pack_integrity_gate, prototype_reality_gate, quality_rubric,
+          prompt_text_manifest.status ready_for_image_generation, and post_validate status.
+        - Hand internally to /ow:prompt2proto only when prototype_system_contract is present,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass,
+          quality_rubric.prompt_executability.status is pass,
+          prompt_text_manifest.paragraph_quality_status is pass, and post_validate.status is pass or
+          skipped.
+        - If any readiness gate fails, keep handoff blocked and repair prompt directions through
+          /ow:vision2prompt.
+        - Record internal_pipeline stage vision2prompt status and outputs.
+        - Do not generate images; hand internally to /ow:prompt2proto.
+  - packet_id: context:prompt2proto
+    command: /ow:prompt2proto
+    visibility: internal
+    required:
+      - .openworkflow/workflow/WORKFLOW_INDEX.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .openworkflow/prototypes/**/PROTO_PROMPT_PACK.yaml
+      - .openworkflow/prototypes/**/EVIDENCE.yaml
+    optional:
+      - .openworkflow/validation/**/VALIDATION.yaml
+      - .openworkflow/prototypes/PROTOTYPE_INDEX.yaml
+      - .openworkflow/prototypes/**/NOTE.md
+    forbidden:
+      - .openworkflow/runtime/**
+      - .openworkflow/changes/**
+      - .openworkflow/specs/**
+    conditional_outputs:
+      []
+    audit_checkpoints:
+      before:
+        - Run only as an internal stage after /ow:vision2prompt has written
+          prompt_text_manifest.status ready_for_image_generation,
+          prompt_text_manifest.paragraph_quality_status pass, and post_validate.status pass or
+          skipped.
+        - Load prepared prompt text and verify every selected direction has screen_prompts before
+          image generation.
+        - "Verify prototype_system_contract, prompt_pack_integrity_gate.status: pass,
+          prototype_reality_gate.status: pass, quality_rubric.prompt_executability.status: pass,
+          prompt_text_manifest.paragraph_quality_status: pass, and screen_manifest linkage before
+          image generation."
+        - Block image generation when prototype_system_contract, prompt_pack_integrity_gate,
+          prototype_reality_gate, prompt executability, paragraph quality, screen_manifest linkage,
+          or post_validate is fail or missing.
+      during:
+        - Batch-generate high-fidelity prototype images by direction_id and prompt_id.
+        - Write one metadata record for every generated image with image_id, direction_id,
+          prompt_id, screen_name, path, source_prompt_ref, generator, and status.
+        - Do not revise product strategy or prompt text during image generation.
+      after:
+        - Update image_generation.status, generated_images, collection_notes, and internal_pipeline
+          stage prompt2proto outputs.
+        - Record decision audit internally after image evidence changes.
+        - Hand the user-facing flow back to /ow:proto for summary and next command.
   - packet_id: context:proto
     command: /ow:proto
     visibility: user
@@ -126,26 +353,60 @@ packets:
       - .openworkflow/changes/**
       - .openworkflow/specs/**
     conditional_outputs:
-      []
+      - .openworkflow/validation/VALIDATION_INDEX.yaml
+      - .openworkflow/validation/<id>/VALIDATION.yaml
+      - .openworkflow/validation/<id>/NOTE.md
     audit_checkpoints:
       before:
-        - Load vision and optional validation context; validation is optional but must be consumed
-          when present.
-        - Record validation_input.mode as vision_only or validation_present; do not silently
-          auto-generate validation.
+        - "Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight,
+          /ow:vision2prompt, then /ow:prompt2proto."
+        - Load vision and current validation context; validation is required before prototype
+          generation.
+        - If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml,
+          NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command
+          /ow:proto, and reason missing_current_validation.
+        - Proceed only after validation_input.mode can reference a durable validation artifact; do
+          not use ephemeral vision_only validation context.
+        - Verify vision and validation artifact quality before prompt work; if either is missing,
+          thin, stale, or not strong enough for high-quality prototype prompts, route back to
+          /ow:vision with focused follow-up questions instead of generating prompts.
+        - If the user has not specified the number of strategically different prototype directions,
+          askUserQuestion for the count; use 3 only when the user explicitly delegates that decision
+          to the agent.
         - "Extract the strategic core: target user, behavior change, mechanism, differentiator,
           boundary conditions, and central uncertainty."
       during:
-        - Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
-        - Make directions differ by product form, initiation trigger, interaction model, emotional
-          driver, retention mechanism, validation metric, or main risk.
-        - Write concrete high-fidelity image-generation prompts with screens, journey, interactions,
-          AI/system behavior, trust controls, anti-goals, and sample content.
+        - "Before strategic directions, require /ow:vision2prompt to infer product_experience_model:
+          product archetype, primary canvas, information architecture, domain objects, task loop,
+          interaction states, data realism, visual language, and anti-generic constraints."
+        - Before /ow:prompt2proto, require prototype_system_contract so stable app shell,
+          navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and
+          allowed deltas are explicit.
+        - Treat scenarios such as planning, incident, or capacity as possible modules, layers,
+          workflows, or states inside one product shell unless they truly imply different product
+          forms.
+        - Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses,
+          select the resolved direction count, and write all multi-direction, multi-image prompt
+          text.
+        - Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is
+          ready_for_image_generation and every selected direction has concrete screen prompts.
+        - Do not internally trigger /ow:prompt2proto until prototype_system_contract exists,
+          prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and
+          quality_rubric.prompt_executability is pass.
+        - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for
+          resolved_count 2 or more, or skipped when the user explicitly requested exactly one
+          strategic direction.
+        - If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt
+          executability fails, route back through /ow:vision2prompt prompt repair instead of
+          starting image generation.
+        - Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared
+          prompt text and collect generated image paths, direction ids, prompt ids, metadata, and
+          notes into EVIDENCE.yaml.
         - Recommend the first direction to generate based on risk reduction, observability,
           feasibility, and closeness to the success signal.
       after:
-        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact
-          EVIDENCE.yaml.
+        - Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, compact EVIDENCE.yaml,
+          prompt_text_manifest, and image_generation collection state.
         - Record review evidence and a decision audit record internally after prompt-pack evidence
           changes.
         - Refresh prototype SUMMARY.yaml when summary_policy is configured and update
@@ -177,20 +438,40 @@ packets:
       []
     audit_checkpoints:
       before:
-        - "Resolve tune target: /ow:tune defaults to the current prototype prompt pack or accepted
-          baseline screen group."
+        - "Resolve tune target: /ow:tune defaults to the latest approved prototype prompt pack,
+          refined prompt pack, or accepted baseline screen group."
         - Require baseline screens, screenshots, screen descriptions, generated images, or an
           accepted PROTO_PROMPT_PACK plus a tune request.
+        - "Normalize tune inputs before baseline audit: baseline source type, baseline refs, tune
+          request, target form factor, regeneration scope, screen count, locked screens, locked
+          elements, and constraints."
+        - "Record baseline_resolution before auditing: latest approved baseline group id, latest
+          approved baseline ref, lineage, resolution rule, and stale source guard."
+        - Assign stable source screen ids and target screen ids when the baseline or request does
+          not provide them.
         - Load only the baseline prompt pack, current prototype evidence, relevant validation or
           vision context, and latest decision audit context.
       during:
         - Audit the full baseline screen group before writing refined prompts.
+        - Carry forward locked screens, locked elements, and accepted improvements from previous
+          tune passes unless the current user request explicitly unlocks them.
         - Extract the product system and preserve product thesis, primary loop, component
           vocabulary, copy tone, AI/system behavior, trust boundaries, and user controls.
+        - Interpret the tune request as visual refinement, brand alignment, screen-specific
+          correction, feature addition, feature removal, form-factor transformation, group
+          expansion, group compression, IA adaptation, copy/localization adjustment,
+          interaction-state coverage, design-system pass, or selected-screen regeneration.
+        - Detect conflicts between the tune request, locked elements, product boundaries, non-goals,
+          privacy controls, safety boundaries, and accepted prototype evidence before prompt
+          writing.
         - Write MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE rules globally and per
           target screen.
+        - Build a screen_delta_matrix that binds each target screen to source screen ids,
+          preserve/add/remove/transform/flexible rules, and acceptance criteria.
         - Bind every refined prompt to target screen id, source screen id(s), generation scope,
           target form factor, negative constraints, and acceptance criteria.
+        - Write generation_order and acceptance_checklist so downstream generation agents can run
+          the refined prompt pack without guessing.
         - Record decision audit outcome as revise, continue, pivot, stop, or needs_more_evidence.
       after:
         - Write REFINED_PROTO_PROMPT_PACK.yaml, REFINED_PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and
@@ -372,6 +653,114 @@ packets:
           CURRENT_STATE.yaml with current_run, blockers, and next action.
         - Run the verification named by the change plan when practical.
         - Report changed artifacts, verification result, and remaining blockers.
+  - packet_id: context:decompose-to-changes
+    command: /ow:decompose-to-changes
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+    optional:
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+      - docs/OW_DEVELOP_PLAN.md
+      - docs/OW_DEVELOP_PLAN_Phase2.md
+      - user-provided planning source
+    forbidden:
+      []
+    conditional_outputs:
+      - "high-risk decision report when a risk: high candidate becomes the next actionable work"
+      - queue maintenance operation entries for add, update, split, merge, defer, block, supersede,
+        restore, or complete
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and record branch and dirty-tree state.
+        - Decide whether this is new decomposition or maintenance of an existing queue.
+        - "Run the queue scope gate: choose one feature, bounded module, command surface, artifact
+          family, or workflow slice for this queue."
+        - Read existing queue YAML before changing candidate ids or statuses.
+      during:
+        - Preserve stable candidate ids and branch_boundary when updating an existing queue.
+        - Record features outside the current queue boundary as deferred refs instead of current
+          candidates.
+        - Keep candidates focused, dependency-aware, and bounded by owned paths.
+        - Append an operation entry for every queue maintenance edit.
+      after:
+        - Refresh CANDIDATE_CHANGES.md as a readable view of YAML source truth.
+        - Refresh SUMMARY.yaml with candidate count, next recommended candidate, risks, and
+          validation evidence.
+        - "Stop with a high-risk report instead of selecting or implementing risk: high candidates."
+  - packet_id: context:analyze-changes
+    command: /ow:analyze-changes
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/analyze-changes/references/analysis-protocol.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - references/git-version-control-governance.md
+      - references/issue-governance.md
+      - changes/*/CANDIDATE_CHANGES.yaml when the user asks for global or cross-queue analysis
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+    forbidden:
+      []
+    conditional_outputs:
+      - high-risk stop recommendation that points to the needed HIGH_RISK_DECISION_REPORT.md
+      - queue maintenance recommendation when no candidate is safe to select
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and record branch and dirty-tree state.
+        - Confirm this is a cross-queue decision; when only one queue is active, hand off to
+          select-change.
+        - Discover only user-provided queues, or obvious changes/*/CANDIDATE_CHANGES.yaml files when
+          global analysis is requested.
+        - Read YAML queues as source truth and Markdown views only as aids.
+      during:
+        - Score candidates by readiness, dependency unlock value, risk, branch fit, dirty-tree fit,
+          Issue linkage, validation realism, and user recency.
+        - Treat high-risk candidates as stop recommendations unless a concrete high-risk option is
+          already approved.
+        - Recommend exactly one target plan id and candidate id only when evidence supports
+          selection.
+      after:
+        - Write CHANGE_ANALYSIS.yaml before CHANGE_ANALYSIS.md.
+        - Record rejected alternatives with plan id, candidate id, and concise reasons.
+        - Hand off to select-change without mutating selection artifacts.
+  - packet_id: context:select-change
+    command: /ow:select-change
+    visibility: user
+    required:
+      - references/planning-artifact-contracts.md
+      - skills/select-change/references/selection-protocol.md
+      - changes/<plan_id>/CANDIDATE_CHANGES.yaml
+    optional:
+      - changes/<plan_id>/CANDIDATE_CHANGES.md
+      - changes/<analysis_id>/CHANGE_ANALYSIS.yaml only for cross-queue recommendations
+      - changes/<plan_id>/SUMMARY.yaml
+      - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
+    forbidden:
+      []
+    conditional_outputs:
+      - rejected alternatives copied from CHANGE_ANALYSIS.yaml when consuming cross-queue analysis
+      - targeted readiness report when the user asks to inspect a candidate without selecting it
+    audit_checkpoints:
+      before:
+        - Run git status --short --branch and compare current branch with
+          queue_policy.branch_boundary.
+        - Check dirty-tree state and stop if unrelated work would contaminate the selected change.
+        - For a single active queue, rank candidates directly without requiring analyze-changes.
+        - Confirm candidate dependencies, readiness, risk, owned paths, validation, and acceptance.
+      during:
+        - Use next_recommended_candidate_id, dependency satisfaction, unlock value,
+          selection_policy, risk, owned paths, and validation realism to choose inside one queue.
+        - Select exactly one candidate inside the owning queue folder.
+        - "Re-check high-risk approval before writing selection artifacts for risk: high candidates."
+        - Keep atom tasks small enough for one focused implementation pass.
+      after:
+        - Update candidate status to selected and append a selection operation.
+        - Refresh the readable Markdown queue view.
+        - Stop before implementation unless the user explicitly asks to continue.
   - packet_id: context:git-automation
     command: /ow:git-automation
     visibility: user
@@ -382,7 +771,7 @@ packets:
     optional:
       - changes/<plan_id>/HIGH_RISK_DECISION_REPORT.md
       - changes/<plan_id>/PR_READY_SUMMARY.md
-      - changes/<plan_id>/<candidate-id>/LOCAL_COMMIT_EVIDENCE.yaml
+      - changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml
     forbidden:
       []
     conditional_outputs:
@@ -399,8 +788,12 @@ packets:
         - Record plan id, candidate id, branch, dirty paths, command preview, validation evidence,
           and affected paths.
         - Keep local branch, commit, and summary actions scoped to the selected queue.
+        - When committing implementation work, write LOCAL_COMMIT_EVIDENCE.yaml under the
+          selected-change folder and reference it from completion evidence.
       after:
         - Record commit hash and evidence path when a local commit is created.
+        - "Confirm the selected candidate completion records implementation_changed_files: true and
+          a repo-relative LOCAL_COMMIT_EVIDENCE.yaml path."
         - Regenerate PR_READY_SUMMARY.md after commit evidence changes when appropriate.
         - Report remote operations as gated and include ordered commit or queue evidence for push,
           PR, and merge planning.

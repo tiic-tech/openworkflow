@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: selected_change:C013-change-planning-intelligence-boundary
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C013-change-planning-intelligence-boundary
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C013
+title: Define /ow:change planning intelligence boundary
+status: selected
+selection_reason:
+  - SC selected C013 directly from the single active M73 queue; AC was not needed.
+  - C011 and C012 are complete, satisfying C013 dependencies.
+  - C013 is medium risk, design-only, and unlocks the C014 deferred feature handoff map.
+rejected_alternatives:
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C014
+    reason: Depends on C013 /ow:change planning intelligence boundary.
+scope:
+  includes:
+    - /ow:change relationship to DTC, AC, and SC
+    - inputs and outputs at the planning-loop level
+    - high-risk stop and approval handoff expectations
+    - boundary against full /ow:change runtime implementation
+  excludes:
+    - implementing /ow:change orchestration
+    - changing DTC, AC, or SC source skills
+    - async review or archive transactions
+owned_paths:
+  - references/workflow-blueprint-runtime-alignment.md
+  - changes/M73-workflow-blueprint-runtime-alignment/C013-change-planning-intelligence-boundary/
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - DTC, AC, and SC are explicitly subordinate to /ow:change.
+  - High-risk report behavior remains a planning-loop stop, not approval.
+  - /ow:change implementation remains a deferred feature ref.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M86-proto-strategy-prompt-compiler:C003
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C003
+change_id: C003-proto-generated-protocol
+title: Local commit evidence for proto generated protocol
+status: complete
+implemented_at: 2026-05-22
+implementation_commit: d67d05a
+evidence_commit: pending
+branch: codex/m73-workflow-blueprint-runtime-alignment
+files_changed:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+acceptance:
+  - criterion: Generated /ow:proto says it compiles validated strategy into prompt packs.
+    status: pass
+  - criterion: Generated /ow:proto checks vision and validation quality and routes back to /ow:vision when either is insufficient.
+    status: pass
+  - criterion: Generated /ow:proto asks for strategic direction count when absent and uses 3 only when the user delegates that decision.
+    status: pass
+  - criterion: Generated /ow:proto writes multi-direction prompt text before starting image generation.
+    status: pass
+  - criterion: Generated /ow:proto batch-generates prototype images and records collected outputs.
+    status: pass
+  - criterion: Generated /ow:proto preserves M85 durable validation behavior.
+    status: pass
+  - criterion: Context packets include the strategic prompt-pack quality gates.
+    status: pass
+  - criterion: Verification catches generated-surface drift.
+    status: pass
+notes:
+  - C003 made the generated proto command follow the reference skill flow within OW artifacts.
+  - No high-risk approval was required.

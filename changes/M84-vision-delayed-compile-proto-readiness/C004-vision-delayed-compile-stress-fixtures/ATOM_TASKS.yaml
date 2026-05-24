@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C004-vision-delayed-compile-stress-fixtures
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C004-vision-delayed-compile-stress-fixtures
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C004
+title: Atom tasks for vision delayed-compile stress fixtures
+status: completed
+tasks:
+  - task_id: T001
+    title: Add vision summary quality fixtures
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when: >
+      Runtime verification covers thin, blocked, and ready vision session
+      artifacts and asserts their summary quality status.
+  - task_id: T002
+    title: Strengthen generated-surface drift checks
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Verification fails if /ow:vision generated guidance drops no-eager-write,
+      delayed compile, or proto-readiness guidance.
+  - task_id: T003
+    title: Validate C004 boundary
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M84-vision-delayed-compile-proto-readiness/
+    done_when: >
+      Planning artifacts record the AC drift as deferred and C004 as a
+      vision-only stress fixture change.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d

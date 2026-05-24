@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-build-validation-prototype-target-contract
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-build-validation-prototype-target-contract
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C001
+title: Define native build-validation prototype-target compiler contract
+status: complete
+selection_reason: >
+  C001 establishes the source behavior for /ow:validation before schema,
+  generated skill, or verification changes. It keeps M85 focused on validation
+  as the bridge between proto-ready vision and /ow:proto.
+scope:
+  includes:
+    - build-validation role model and purpose
+    - vision readiness and return-to-vision gate
+    - central uncertainty and experiment brief requirements
+    - observable evidence and decision rule requirements
+    - no-prototype and no-production boundary
+  excludes:
+    - changing validation artifact schema
+    - changing generated /ow:validation skill
+    - changing /ow:proto behavior
+owned_paths:
+  - skills/build-validation/SKILL.md
+  - skills/build-validation/references/
+  - changes/M85-validation-proto-target-contract/
+forbidden_paths:
+  - packages/core/src/artifacts/registry.ts
+  - packages/core/src/commands/registry.ts
+  - .agents/skills/ow-validation/SKILL.md
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+acceptance:
+  - build-validation defines validation as prototype validation target compilation.
+  - The skill says validation must return to /ow:vision when vision is not proto-ready.
+  - The skill names central uncertainty, prototype experiment boundary, observable evidence, and decision rules.
+  - The skill forbids prototype prompt generation and production planning during validation.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: 0acbf94
+  evidence:
+    - changes/M85-validation-proto-target-contract/C001-build-validation-prototype-target-contract/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary: >
+  Complete as one local commit because this is a source skill contract update
+  plus planning evidence only.

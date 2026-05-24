@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../../../core/src/contracts/yaml.js";
 import { simulateAutonomousGit } from "../../../core/src/git/autonomousSimulator.js";
@@ -87,6 +87,14 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
   const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
   const allowedPaths = listFlag(flags, "allowed-paths");
   const candidateOwnedPaths = array(candidate.owned_paths).map(String);
+  const commitEvidence = booleanFlag(flags, "commit-evidence");
+  const evidencePath = stringFlag(flags, "evidence-path") ?? (commitEvidence ? inferLocalCommitEvidencePath(candidate) : undefined);
+  if (commitEvidence && !evidencePath) {
+    return finishGitAutomationError(root, json, "commit evidence requires --evidence-path or selection evidence ending in SELECTED_CHANGE.yaml", [
+      "record selection.evidence with the selected-change artifact path",
+      "or rerun with --evidence-path changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml",
+    ]);
+  }
   const result = await commitSelectedChange({
     root,
     planId,
@@ -96,8 +104,8 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
     allowedPaths: allowedPaths.length > 0 ? allowedPaths : candidateOwnedPaths,
     validationEvidence,
     commitMessage,
-    evidencePath: stringFlag(flags, "evidence-path"),
-    commitEvidence: booleanFlag(flags, "commit-evidence"),
+    evidencePath,
+    commitEvidence,
     dryRun: !write,
   });
   return finishGitAutomationResult(root, json, "git-automation commit", result.ok, {
@@ -320,6 +328,12 @@ function array(value: unknown): unknown[] {
 
 function stringValue(value: unknown): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function inferLocalCommitEvidencePath(candidate: Record<string, unknown>): string | undefined {
+  const selectionEvidence = array(record(candidate.selection).evidence).map(String);
+  const selectedChangePath = selectionEvidence.find((item) => item.endsWith("/SELECTED_CHANGE.yaml"));
+  return selectedChangePath ? join(dirname(selectedChangePath), "LOCAL_COMMIT_EVIDENCE.yaml") : undefined;
 }
 
 async function readOrderedCommits(root: string, baseRef: string): Promise<Array<Record<string, string>>> {

@@ -32,6 +32,45 @@ candidate is too broad when it owns multiple unrelated modules, mixes source
 skill authoring with runtime command exposure, or requires both product design
 and production implementation.
 
+## Queue Scope Control
+
+Before creating or maintaining candidates, decide the queue boundary separately
+from the source discussion. The source may contain a full product vision,
+multi-stage roadmap, or several future features; the queue must still remain a
+reasonable development scope.
+
+A valid queue usually covers exactly one of:
+
+- one feature outcome
+- one bounded module
+- one command surface
+- one artifact family
+- one workflow slice
+
+A queue is too broad when it contains multiple independent features, a large
+module family, or candidates that would naturally require separate milestone
+branches. In that case, choose the smallest current feature boundary that can
+move development forward and record the rest outside the active `changes` list.
+
+Use top-level `scope_control` for this decision:
+
+```yaml
+scope_control:
+  current_boundary: Workflow command taxonomy and stage graph only.
+  boundary_type: workflow_slice
+  in_scope_rule: Include only candidates needed to complete this boundary.
+  out_of_scope_rule: Record later features as deferred refs; do not include them as current candidates.
+  deferred_features:
+    - title: proto2html runtime contract
+      reason: Separate command surface; needs its own DTC pass after taxonomy.
+      suggested_plan_id: M74-proto2html-runtime-contract
+```
+
+`deferred_features` are not candidates and must not be referenced as
+dependencies or unlocks. They are planning memory for future DTC passes. When a
+deferred feature becomes active, create a new `CANDIDATE_CHANGES.yaml` queue
+for that feature and cite the original queue as source evidence.
+
 ## Feat And Commit Cadence
 
 The queue is the feat. `changes/<plan_id>/CANDIDATE_CHANGES.yaml` defines the
@@ -193,6 +232,8 @@ report unless the new high-risk stop concerns a materially different decision.
 - `source`
 - `queue_policy`
 - `selection_policy`
+- `scope_control` when the source discussion spans more than one feature,
+  command surface, artifact family, module, or workflow slice
 - `queue_policy.branch_boundary` for new branch-governed queues
 - `next_recommended_candidate_id` when appropriate
 - `changes`
@@ -209,6 +250,7 @@ report unless the new high-risk stop concerns a materially different decision.
 `SUMMARY.yaml` should include:
 
 - source summary
+- scope boundary summary and deferred feature refs when present
 - output paths
 - branch boundary when present
 - candidate count
@@ -221,6 +263,10 @@ report unless the new high-risk stop concerns a materially different decision.
 Check that:
 
 - every candidate has focused `owned_paths`
+- the queue itself covers one feature, bounded module, command surface, artifact
+  family, or workflow slice
+- later or adjacent features are captured as deferred refs, not current
+  candidates
 - includes and excludes are both present
 - dependencies reference stable candidate ids
 - validation commands are realistic for this repo

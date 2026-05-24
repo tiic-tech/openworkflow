@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: selected_change:M87-vision2prompt-post-validate-gate:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C003
+change_id: C003-generated-protocol-post-validate-gate
+title: Wire post-validate gate into generated vision2prompt protocol
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 through ow-select-change single-queue ranking. C001 and C002 are
+  complete, C003 is the next ready candidate, and generated command protocol
+  wiring is required before broader post-validate stress fixtures.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M87-vision2prompt-post-validate-gate/
+dependencies:
+  - C001
+  - C002
+scope:
+  includes:
+    - command registry protocol updates
+    - generated ow-vision2prompt skill guidance through sync
+    - context packet drift checks
+    - /ow:proto orchestration guidance that respects post_validate status
+    - bypass guidance when user asks for one direction
+  excludes:
+    - artifact schema design
+    - evaluator algorithm changes
+    - tune behavior
+    - external image API integration
+forbidden_paths:
+  - direct manual edits to generated .agents skills or .openworkflow audit surfaces
+  - external image generation calls
+  - /ow:tune command behavior
+acceptance:
+  - Generated /ow:vision2prompt says post_validate is required when resolved_count is 2 or more.
+  - Generated /ow:vision2prompt says post_validate is skipped when the user explicitly requests exactly one direction.
+  - Generated /ow:vision2prompt does not hand off to /ow:prompt2proto when post_validate fails.
+  - Generated /ow:proto orchestration waits for post_validate pass or skipped before image generation.
+  - Verification catches generated-surface drift.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 updates generated command protocol source and sync output. It does not
+    change artifact schemas, call external services, or generate prototype
+    images.
+completion:
+  completed_at: 2026-05-22
+  commit: 4221206
+  evidence:
+    - changes/M87-vision2prompt-post-validate-gate/C003-generated-protocol-post-validate-gate/LOCAL_COMMIT_EVIDENCE.yaml

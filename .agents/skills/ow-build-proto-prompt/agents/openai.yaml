@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.build-proto-prompt
+interface:
+  display_name: "ow:build-proto-prompt"
+  short_description: "Internally compile ready vision and validation into ready prototype prompt packs. Internal audit only."
+  default_prompt: "Use /ow:build-proto-prompt for this OpenWorkflow repository."

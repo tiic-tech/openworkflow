@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:C002-design-prompt2proto-skill-contract-and-reference-architecture
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C002-design-prompt2proto-skill-contract-and-reference-architecture
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C002
+title: Design prompt2proto skill contract and reference architecture
+status: completed
+selection_reason: >
+  C002 became eligible after C001 approved the design-only internal split.
+  It is required before C004 because prompt2proto must have a real contract,
+  role engine, reference architecture, input readiness policy, output evidence
+  shape, and quality rubric before a source skill foundation is created.
+scope:
+  includes:
+    - define prompt2proto input contract from ready PROTO_PROMPT_PACK artifacts
+    - define visual decomposition steps for product system, screen states, UI hierarchy, density, and interaction affordances
+    - define Chief PM plus Principal UI/UX philosophy engine for visual translation
+    - define output artifacts and handoff evidence expected from build-prototype
+    - define quality rubric for realistic UI/UX prototype translation without claiming visual parity
+  excludes:
+    - command registry edits
+    - generated adapter sync
+    - provider-backed image generation
+    - human visual review
+owned_paths:
+  - changes/M101-build-proto-prompt-command-split/
+  - skills/build-prototype/references/
+  - skills/prompt2proto/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/**
+  - .openworkflow/**
+  - provider-backed image generation implementation
+  - human visual review artifacts
+  - visual reference parity scoring
+acceptance:
+  - The prompt2proto design maps ready prompt-pack inputs into UI/UX prototype translation steps.
+  - The design explicitly separates technical multi-screen consistency from design judgment about density and information hierarchy.
+  - The design names Chief PM and Principal UI/UX perspectives as the build-prototype philosophy engine.
+  - The design does not claim provider image quality, human visual review, visual parity, proto2html, storyboard, or motion modeling.
+validation:
+  - rg -n "prompt2proto|Principal UI|Chief PM|density|coherence" skills changes/M101-build-proto-prompt-command-split
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C003
+    reason: build-proto-prompt command implementation can wait until prompt2proto design is no longer a gap.
+  - id: C004
+    reason: source skill creation depends on the C002 design contract.

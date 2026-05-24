@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M98-dailin-grade-vision2prompt-pipeline:C001
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C001
+change_id: C001-prompt-pack-integrity-gate
+title: Local evidence for prompt-pack integrity gate
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added a deterministic prompt_pack_integrity_gate for strategic prompt packs.
+  Generation-ready prompt packs now validate direction count agreement,
+  prompt_text_manifest refs, generated image direction/prompt ids, and generated
+  image source_prompt_ref linkage before image generation can proceed.
+changed_paths:
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M98-dailin-grade-vision2prompt-pipeline/
+behavior_changes:
+  - Strategic prompt packs can record prompt_pack_integrity_gate status, trigger, required dimensions, failures, outcome notes, and repair route.
+  - Generation-ready prompt packs fail when directions length differs from direction_count_policy.resolved_count.
+  - Generation-ready prompt packs fail when prompt_text_manifest.direction_count differs from directions length.
+  - Prompt text refs must resolve to an existing direction_id or screen prompt_id.
+  - Generated image metadata must reference existing direction_id, prompt_id, and source_prompt_ref linkage.
+  - Failed prompt_pack_integrity_gate blocks image_generation from starting.
+  - Prototype evidence summary health now includes prompt_pack_integrity_gate status and dimensions.
+verification:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    command: npm run validate
+    reason: >
+      Repository validation still fails on pre-existing M97 planning artifacts:
+      C003 and C004 ATOM_TASKS.yaml missing title, and M97 C001-C004 done
+      candidates missing completion evidence. These paths are outside the C001
+      owned paths and were already failing before C001 implementation.
+next_recommended_candidate_id: C002

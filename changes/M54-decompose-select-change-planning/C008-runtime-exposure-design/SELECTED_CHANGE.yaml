@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:C008-runtime-exposure-design
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C008-runtime-exposure-design
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C008
+title: Design planning skill runtime exposure boundary
+status: completed
+selection_reason:
+  - User approved C004 Option B from the high-risk report.
+  - C008 is medium risk because it is design-only and explicitly excludes runtime registry, adapter generation, and generated-surface edits.
+  - C008 creates the boundary needed before any smaller runtime exposure follow-up can be selected.
+rejected_alternatives:
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    reason: Full runtime exposure remains high risk and should not be selected directly.
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: Runtime exposure for proto2html is high risk and needs its own report before selection.
+scope:
+  includes:
+    - runtime exposure boundary and invariants for planning skills
+    - generated-surface ownership rules
+    - summary-first read-model expectations for planning artifacts
+    - validation gates for future runtime exposure slices
+    - follow-up candidate split for safer implementation
+  excludes:
+    - command registry edits
+    - artifact registry edits
+    - Codex adapter generation changes
+    - generated .agents or .openworkflow changes
+    - selecting or implementing C004 full runtime exposure
+owned_paths:
+  - references/planning-skill-runtime-exposure.md
+  - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+  - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyAgentE2E.ts
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Design documents core, artifact, adapter, generated-surface, read-model, and validation boundaries.
+  - Design preserves repo-local delivery and summary-first context consumption.
+  - Design splits C004 follow-up work into smaller implementation candidates.
+  - No runtime registry, artifact registry, adapter generation, or generated-surface files are edited.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

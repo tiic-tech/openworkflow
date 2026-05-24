@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C005-agent-auto-validation-artifacts
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+selected_change_id: C005-agent-auto-validation-artifacts
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C005
+title: Local commit evidence for C005 agent-auto validation artifacts
+status: complete
+completed_at: 2026-05-22
+commit: c21b560
+summary: >
+  Corrected validation from ephemeral read-only proto context to durable
+  agent-auto validation artifacts. Missing current_validation before /ow:proto
+  now blocks prototype generation and instructs the agent to auto-run
+  /ow:validation with trigger.mode agent_auto.
+changed_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - packages/core/src/artifacts/readiness.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js check /ow:proto --root . --json
+    - git diff --check
+  result: pass
+risk:
+  level: medium
+  high_risk_report: not_applicable

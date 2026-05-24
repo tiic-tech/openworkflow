@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: selected_change:C013-runtime-exposure-reassessment
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C013-runtime-exposure-reassessment
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C013
+title: Reassess full planning skill runtime exposure against workflow blueprint
+status: completed
+selection_reason:
+  - User approved proceeding with C013 under the principle that DTC, AC, and SC must not eclipse the overall OW workflow blueprint.
+  - C013 is a reassessment report, not another runtime implementation change.
+  - The reassessment must position DTC/AC/SC inside /ow:change and preserve proto2html, html2spec, build, review, archive, build-agent, and build-skill as separate workflow surfaces.
+rejected_alternatives:
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    reason: Full C004 should not be declared complete because only the DTC/AC/SC planning command slice is delivered.
+scope:
+  includes:
+    - final readiness decision for the M54 planning command runtime exposure slice
+    - workflow blueprint alignment against OW_DEVELOP_PLAN
+    - recommended next queue for full workflow runtime alignment
+  excludes:
+    - new runtime command implementation
+    - generated adapter surface changes
+    - artifact registry implementation for proto2html, html2spec, build, review, or archive
+owned_paths:
+  - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+  - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Reassessment records that DTC/AC/SC are inside /ow:change, not the full workflow.
+  - Reassessment lists the remaining workflow surfaces from OW_DEVELOP_PLAN.
+  - Reassessment recommends a new queue for full workflow blueprint runtime alignment.
+  - No generated or runtime source surfaces are changed.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

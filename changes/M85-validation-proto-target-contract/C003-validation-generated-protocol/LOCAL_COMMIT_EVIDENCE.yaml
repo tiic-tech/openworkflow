@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C003-validation-generated-protocol
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+selected_change_id: C003-validation-generated-protocol
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C003
+title: Local commit evidence for C003 validation generated protocol
+status: complete
+completed_at: 2026-05-22
+commit: 4e2f19f
+summary: >
+  Upgraded source and generated /ow:validation protocol to prototype validation
+  target compiler behavior with return-to-vision gating and no-prototype
+  boundaries.
+changed_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - .agents/skills/ow-validation/SKILL.md
+  - .agents/skills/ow-validation/agents/openai.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+risk:
+  level: medium
+  high_risk_report: not_applicable

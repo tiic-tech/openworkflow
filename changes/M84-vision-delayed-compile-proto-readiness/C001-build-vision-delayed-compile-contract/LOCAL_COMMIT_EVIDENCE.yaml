@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-build-vision-delayed-compile-contract
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001-build-vision-delayed-compile-contract
+status: current
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C001
+selected_change_id: C001-build-vision-delayed-compile-contract
+primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+validation_evidence:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+audit_notes:
+  - C001 adds the missing native skills/build-vision source skill.
+  - C001 defines delayed compile as source behavior without modifying generated adapter surfaces.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

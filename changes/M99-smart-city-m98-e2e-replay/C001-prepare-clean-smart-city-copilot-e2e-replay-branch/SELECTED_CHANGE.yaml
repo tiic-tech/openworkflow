@@ -1,0 +1,74 @@
+schema_version: 0.1.0
+contract_id: selected_change:M99-smart-city-m98-e2e-replay:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C001
+change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
+title: Prepare clean smart_city_copilot E2E replay branch
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: small
+selection_source:
+  queue: changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 first because it is dependency-free and establishes the clean
+  smart_city_copilot branch/readiness baseline needed before any real M98
+  prompt-pack replay runs.
+rejected_alternatives:
+  - id: C002
+    reason: C002 depends on C001 baseline evidence so replay output is not mixed with older target-repo artifacts or parallel work.
+  - id: C003
+    reason: C003 depends on real target replay output from C002 before comparison against C006 and M97 notes.
+owned_paths:
+  - changes/M99-smart-city-m98-e2e-replay/
+  - /tmp/smart-city-m99-e2e-worktree/
+  - /Users/archy/Projects/StartUp/smart_city_copilot/
+dependencies: []
+scope:
+  includes:
+    - confirm OpenWorkflow main repo handoff, summary, and queue state
+    - record clean target worktree path, branch, HEAD, and dirty-tree baseline
+    - identify target repo OpenWorkflow command surface and AGENTS.md guidance
+    - run target repo handoff/readiness or equivalent checks without replay mutation
+    - scan the existing target PROTO_PROMPT_PACK source for M98 completeness fields
+  excludes:
+    - running real target replay commands
+    - provider-backed image generation
+    - human visual review
+    - proto2html
+    - storyboard or motion modeling
+    - OpenWorkflow source code changes
+    - deleting or overwriting target repo user work
+forbidden_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.git/**
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/**
+  - /tmp/smart-city-m99-e2e-worktree/.openworkflow/**
+  - provider-backed image generation artifacts
+  - visual parity review artifacts
+acceptance:
+  - Target repo E2E branch is named and recorded.
+  - Dirty-tree state is captured before replay.
+  - No unrelated target artifacts are removed or overwritten.
+  - Replay can proceed from a known baseline.
+validation:
+  - git status --short --branch
+  - node dist/cli/src/index.js handoff --root . --json
+  - target repo git status --short --branch
+  - target repo handoff/readiness command
+  - target repo PROTO_PROMPT_PACK field scan
+high_risk:
+  approval_required: false
+  reason: >
+    C001 records local baseline evidence only. It does not mutate remotes,
+    delete target evidence, run external providers, publish artifacts, or
+    change OpenWorkflow production semantics.
+expected_commit_boundary: >
+  Complete C001 as one local evidence commit after selection artifacts,
+  baseline evidence, and M99 queue status are updated.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M99-smart-city-m98-e2e-replay/C001-prepare-clean-smart-city-copilot-e2e-replay-branch/LOCAL_CHANGE_EVIDENCE.yaml

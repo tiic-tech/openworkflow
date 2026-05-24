@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M90-discovery-loop-e2e-dogfood:C001
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C001
+change_id: C001-canonical-discovery-loop-dogfood-fixture
+title: Local commit evidence for canonical discovery-loop dogfood fixture
+status: completed
+completed_at: 2026-05-22
+commit: aae8ed1
+summary: >
+  Added a canonical runtime-surface dogfood fixture chain that validates one
+  text-first discovery-loop case from proto-ready vision through validation,
+  strategic prompt pack, generated image metadata, refined tune prompt pack,
+  and benchmark decision evidence.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+acceptance_results:
+  - acceptance: A single dogfood fixture validates vision, validation, strategic prompt pack, generated image metadata, refined tune prompt pack, and decision evidence together.
+    result: pass
+    evidence: npm run verify:runtime-surface
+  - acceptance: Fixture artifact ids and refs make the chain traceable without reading unrelated repository state.
+    result: pass
+    evidence: runtime assertions for validation, proto, tune, and decision refs
+  - acceptance: The fixture remains text-first and does not require external image generation.
+    result: pass
+    evidence: generated image evidence is metadata-only fixture data
+  - acceptance: Validation failures identify the artifact section that needs repair.
+    result: pass
+    evidence: CLI validate surfaced current-contract validation errors while fixture was being aligned
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C001 is medium risk and required no high-risk approval.
+  - C002 is now ready to verify happy-path command handoff using the canonical fixture chain.

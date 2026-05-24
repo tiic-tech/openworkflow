@@ -1,81 +1,163 @@
 ---
 name: build-validation
-description: Create validation-first prioritization artifacts from a product vision or change idea. Use when the user asks what should be prioritized, what must be proven first, which feature is core versus supporting, or when a broad idea needs a prototype brief before /ow:change, /ow:team, or implementation work.
+description: Compile a proto-ready vision into one prototype validation target. Use when the user invokes /ow:validation, asks what the prototype must prove first, or needs to turn product intent into an experiment brief before /ow:proto.
 ---
 
 # Build Validation
 
 ## Purpose
 
-Identify the smallest proof needed to make a vision credible before converting
-it into implementation scope. This skill ranks assumptions, not backlog tasks.
+Turn proto-ready vision into a single prototype validation target.
 
-It answers:
+This skill is the native source behavior for `/ow:validation`. It is not a
+feature ranking helper, backlog planner, or prototype generator. It exists
+between `/ow:vision` and `/ow:proto` to decide what the next prototype must
+prove before prototype prompts are written.
 
-- Which feature is existential to the vision?
-- Which features support the core experience?
-- Which features are later, operational, or out of scope for validation?
-- What is the smallest prototype that can prove or disprove the core assumption?
-- What evidence decides whether to continue, pivot, stop, or gather more data?
+`build-validation` acts as:
+
+- assumption auditor
+- experiment designer
+- prototype target compiler
+
+It should protect `/ow:proto` from generating attractive prototype directions
+that do not reduce the most important product uncertainty.
 
 ## Inputs
 
-Read only the relevant upstream contracts:
+Required:
 
-- `.codex/workflow/WORKFLOW_INDEX.yaml`
-- `.codex/workflow/CONTRACT_GRAPH.yaml`
-- `.codex/context/CONTEXT_MAP.yaml` when present and relevant
-- `.codex/vision/VISION_CONTRACT.yaml` or the user's product vision
-- `.codex/decisions/DECISION_INDEX.yaml` when decisions constrain the prototype
-- `.codex/spec/SPEC_INDEX.yaml` only for directly relevant binding constraints
+- `.openworkflow/vision/VISION_CONTRACT.yaml`
+- `.openworkflow/vision/VISION.md` or the active vision session summary
 
-Avoid loading archives, unrelated specs, reviews, or runtime state unless the
-user asks for historical evidence.
+Optional:
 
-## Output
+- `.openworkflow/context/CONTEXT.md`
+- `.openworkflow/context/CONTEXT_MAP.yaml`
+- `.openworkflow/context/GLOSSARY.yaml`
+- `.openworkflow/validation/VALIDATION_INDEX.yaml`
+- `skills/build-validation/references/prototype-validation-target-rubric.md`
+- `skills/build-validation/references/return-to-vision-gate.md`
 
-Write validation artifacts under:
+Avoid loading prototype, spec, change, runtime, or implementation artifacts
+unless the user explicitly asks to reconcile with historical evidence.
 
-```txt
-.codex/validation/<validation_id>/
-  VALIDATION.yaml
-  PROTOTYPE_BRIEF.md
-  RESULT.md
-  archive/
+## Core Job
+
+Given a vision, answer:
+
+- What is the central uncertainty that the next prototype must reduce?
+- What user behavior would make the product thesis more credible?
+- What prototype scene, journey, or interaction must be shown to observe that
+  behavior?
+- What evidence would count as pass, revise, pivot, stop, or needs_more_evidence?
+- What vision gaps make a valid validation target impossible?
+
+If those answers are not available, return to `/ow:vision` instead of forcing a
+weak validation target.
+
+## Vision Readiness Gate
+
+Before writing validation artifacts, check that vision provides enough evidence
+for:
+
+- target user
+- usage context
+- current alternative
+- desired behavior change
+- core mechanism
+- differentiator
+- trust, privacy, safety, and user-control boundaries
+- strongest success signal
+- failure signals
+- prototype direction seeds
+- prompt constraints
+
+When the missing information would cause `/ow:proto` to invent product strategy,
+record the gap and hand back to `/ow:vision`.
+
+## Output Contract
+
+Write validation artifacts only when the target is coherent:
+
+```text
+.openworkflow/validation/VALIDATION_INDEX.yaml
+.openworkflow/validation/<id>/VALIDATION.yaml
+.openworkflow/validation/<id>/NOTE.md
 ```
 
-`RESULT.md` may remain a placeholder until a prototype is tested.
+The validation target should preserve:
+
+```yaml
+core_question:
+central_uncertainty:
+hypothesis:
+target_behavior:
+prototype_scope:
+  include:
+  exclude:
+prototype_experiment:
+  scenario:
+  must_show:
+  must_not_show:
+observable_signals:
+  pass:
+  fail:
+  ambiguous:
+decision_rules:
+  continue:
+  revise:
+  pivot:
+  stop:
+  needs_more_evidence:
+vision_gaps:
+```
+
+Until the artifact schema formally exposes every field, keep the same
+information in the existing `core_question`, `critical_assumptions`,
+`prototype_scope`, `acceptance`, and `NOTE.md` fields without losing the
+experiment logic.
 
 ## Workflow
 
-1. Restate the vision in one sentence.
-2. Build a feature landscape:
-   - `existential`: without this, the vision does not hold
-   - `supporting`: makes the core feature useful
-   - `later`: valuable after the core assumption is proven
-   - `out_of_scope`: explicitly excluded from validation
-3. Identify critical assumptions and rank the riskiest first.
-4. Define one minimum prototype scope.
-5. Define acceptance as evidence questions, not implementation completeness.
-6. Initialize artifacts with `scripts/init_validation.py`.
-7. Validate with `npm run validate` when the repository validator exists.
+1. Load current vision and current validation index, if any.
+2. Extract the candidate uncertainties from the vision.
+3. Rank uncertainties by existential risk, observability in prototype,
+   decision leverage, and cost of learning.
+4. Select exactly one central uncertainty for the next validation target.
+5. Define one minimum prototype experiment.
+6. Convert success and failure signals into observable evidence criteria.
+7. Define decision rules for continue, revise, pivot, stop, and
+   needs_more_evidence.
+8. Write validation artifacts only after the target is coherent.
 
-## Boundaries
+## Prototype Handoff
 
-- Do not create full implementation tasks.
-- Do not write large product specs.
-- Do not solve authentication, persistence, deployment, billing, or admin work
-  unless those are the existential assumption.
-- Do not treat feature count as progress.
-- Prefer a small prototype brief over a broad spec when uncertainty is high.
+`/ow:proto` should be able to consume the validation target as an experiment
+brief. It should not need to infer:
+
+- which uncertainty matters most
+- which screen or journey moments are required
+- which user behavior is being observed
+- which anti-goals and trust boundaries constrain the prototype
+- what evidence changes the next decision
+
+When validation is present, `/ow:proto` should treat it as the target of the
+prototype prompt pack.
+
+## Forbidden Defaults
+
+- Do not generate prototype prompts.
+- Do not create prototype images or prototype evidence.
+- Do not produce production specs, changes, tasks, or implementation plans.
+- Do not turn supporting features into blockers for the central uncertainty.
+- Do not select multiple unrelated validation targets in one artifact.
+- Do not hide vision gaps by writing a polished but unsupported target.
 
 ## Handoff
 
-If validation is planned, hand off to `/ow:prototype` or an implementation
-agent with the prototype brief only.
+Hand off to `/ow:proto` only when the validation target names a central
+uncertainty, prototype scope, observable evidence, and decision rules.
 
-If validation passes, feed `VALIDATION.yaml` and `RESULT.md` into
-`/ow:decision`, `/ow:spec`, or `/ow:change`.
-
-If validation fails, revise the vision or create a new validation contract
-before generating implementation tasks.
+Hand back to `/ow:vision` when the target would require inventing product
+strategy.

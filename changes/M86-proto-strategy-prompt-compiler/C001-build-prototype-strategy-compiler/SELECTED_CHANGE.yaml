@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: selected_change:M86-proto-strategy-prompt-compiler:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C001
+change_id: C001-build-prototype-strategy-compiler
+title: Align native build-prototype strategy compiler contract
+status: selected
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  analysis: changes/A01-discovery-loop-next-queue/CHANGE_ANALYSIS.yaml
+  queue: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  C001 is dependency-free and fixes the native /ow:proto source behavior before
+  artifact schema or generated protocol changes. It is the direct continuation
+  from M85's durable validation target work.
+owned_paths:
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M86-proto-strategy-prompt-compiler/
+dependencies: []
+acceptance:
+  - build-prototype defines /ow:proto as a strategy-to-prompt compiler.
+  - build-prototype forbids ephemeral vision_only validation after M85.
+  - The reference protocol names the normalized strategy fields needed by prototype prompts.
+  - The protocol requires strategically distinct directions and concrete prompt contents.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+rollback:
+  - Revert only C001 source skill and planning artifact edits if validation fails.
+high_risk:
+  approval_required: false
+  reason: >
+    This change is a medium-risk source behavior clarification. It does not
+    expose runtime commands, write generated surfaces, or change artifact
+    schemas.

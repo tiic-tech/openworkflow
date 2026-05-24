@@ -1,0 +1,83 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M98-dailin-grade-vision2prompt-pipeline:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+candidate_id: C001
+change_id: C001-prompt-pack-integrity-gate
+title: Atom tasks for prompt-pack integrity gate
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current prompt-pack validators and fixtures
+    type: read
+    status: completed
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing direction count, prompt manifest, image generation, and prototype evidence validation paths are mapped.
+  - id: T002
+    title: Add integrity gate contract fields
+    type: edit
+    status: completed
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+    done_when:
+      - Strategic prompt packs can record prompt_pack_integrity_gate with status, trigger, dimensions, failures, outcome notes, and repair route.
+      - Evidence or image metadata contracts can be checked against source prompt refs.
+  - id: T003
+    title: Enforce direction and prompt ref integrity
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+    done_when:
+      - Generation-ready prompt packs fail when resolved direction count and directions length diverge.
+      - Prompt text refs and generated image source refs fail when they reference missing direction ids or prompt ids.
+      - Failed integrity gates block image generation.
+  - id: T004
+    title: Surface integrity in summary health
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when:
+      - Low-context summary health can report missing or failing prompt-pack integrity for current prototype artifacts.
+  - id: T005
+    title: Add runtime verification fixtures
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification covers passing integrity, direction-count mismatch, missing prompt ref, and failed-gate image-generation cases.
+  - id: T006
+    title: Verify C001 and record evidence
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    done_when:
+      - Required validation commands pass or unrelated known failures are documented.
+      - C001 local change evidence records changed behavior and verification results.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate fails on pre-existing M97 planning artifacts: two M97 ATOM_TASKS.yaml files missing title and four M97 done candidates missing completion evidence.

@@ -1,0 +1,231 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M92-smart-city-real-discovery-e2e-dogfood
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+title: Candidate changes for smart city real discovery E2E dogfood
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_request:2026-05-22-real-smart-city-discovery-e2e
+    - /Users/archy/Projects/StartUp/JadeAI/docs/smart-city-copilot-demo-plan.html
+    - changes/M90-discovery-loop-e2e-dogfood/SUMMARY.yaml
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  target_repo: /Users/archy/Projects/StartUp/smart_city_copilot
+selection_policy:
+  prefer:
+    - proves OW can run a real discovery loop from raw concept to generated prototype images
+    - audits artifacts from the Agent-first consumer perspective
+    - records git initialization, branch, and commit behavior in the target repo
+    - keeps the loop bounded to vision, validation, proto, and first image batch
+  avoid:
+    - entering M91/proto2html
+    - running tune
+    - creating production implementation or specs
+    - remote git operations
+scope_control:
+  current_boundary: >
+    Real E2E dogfood in a separate smart_city_copilot repo from raw concept
+    input through first high-fidelity prototype image batch, stopping before
+    tune and proto2html.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Initialize the target repo with latest local OpenWorkflow, copy the provided
+    raw planning HTML, simulate vision interview as both user and agent, create
+    durable vision/validation/proto artifacts, generate local high-fidelity
+    prototype images, audit artifacts, and test local git governance.
+  out_of_scope_rule: >
+    Do not run /ow:tune, proto2html, html2spec, build, archive, or remote git.
+    Do not mutate OpenWorkflow source behavior during this dogfood unless a
+    separate DTC queue is created later.
+  deferred_features:
+    - title: proto2html from accepted smart city benchmark image
+      reason: User explicitly blocked M91/proto2html for this turn.
+      suggested_plan_id: M91-proto2html-benchmark-input
+    - title: product changes based on audit findings
+      reason: Findings should become later DTC queues after the real audit.
+      suggested_plan_id: M93-discovery-loop-audit-followups
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Run smart city discovery E2E dogfood
+    purpose: >
+      Execute the real target-repo test from OpenWorkflow initialization and
+      raw concept ingestion through vision, validation, proto prompt pack, and
+      first high-fidelity prototype image batch.
+    scope:
+      includes:
+        - target repo OpenWorkflow initialization
+        - source HTML copy into docs
+        - local git init, feat branch, and commits
+        - simulated vision interview and durable artifacts
+        - validation target and proto prompt pack artifacts
+        - first generated high-fidelity prototype PNG image batch
+        - OpenWorkflow validate/handoff/status checks
+      excludes:
+        - tune
+        - proto2html/html2spec
+        - production build
+        - remote git operations
+    owned_paths:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+    dependencies: []
+    unlocks:
+      - C002
+    risk: medium
+    size: large
+    validation:
+      - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+      - git -C /Users/archy/Projects/StartUp/smart_city_copilot status --short --branch
+      - image files exist under /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/
+    acceptance:
+      - Target repo is initialized with current local OpenWorkflow.
+      - Raw HTML plan is copied into target docs.
+      - Discovery artifacts exist for vision, validation, and proto.
+      - First high-fidelity prototype image batch exists as local PNG files with metadata.
+      - Target git history contains sensible local commits on a feat branch.
+    selection:
+      selected_change_id: C001-run-smart-city-discovery-e2e
+      reason: >
+        Select C001 as the next ready candidate in the single active M92 queue.
+        It performs the real target-repo dogfood requested by the user and
+        unlocks the artifact audit.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-run-smart-city-discovery-e2e
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/LOCAL_COMMIT_EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-01-planning-approval.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-02-incident-response.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-03-asset-capacity.png
+  - id: C002
+    status: done
+    title: Audit real discovery loop artifacts
+    purpose: >
+      Review all target repo artifacts as OW's first Agent consumer and produce
+      a KANO-classified capability audit covering strengths, weak points,
+      dangerous behaviors, and missing capabilities.
+    scope:
+      includes:
+        - artifact completeness audit
+        - Agent-first usability audit
+        - git governance audit
+        - KANO model classification
+        - concrete follow-up recommendations
+      excludes:
+        - modifying OW source behavior
+        - rerunning tune or proto2html
+        - remote publication
+    owned_paths:
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+    dependencies:
+      - C001
+    unlocks:
+      - M93-discovery-loop-audit-followups
+    risk: medium
+    size: medium
+    validation:
+      - audit report exists
+      - audit report names artifact paths, image paths, git evidence, and KANO findings
+    acceptance:
+      - Report clearly separates Agent-first artifact audit from human image review.
+      - Report identifies advantage, weakness, danger, and defect categories.
+      - Report maps findings to KANO categories.
+      - Report recommends concrete next DTC candidates without entering M91.
+    selection:
+      selected_change_id: C002-audit-smart-city-discovery-artifacts
+      reason: >
+        Select C002 after C001 completed the real discovery loop and generated
+        the target repo artifacts required for audit.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-audit-smart-city-discovery-artifacts
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for the user's requested real smart city
+      discovery E2E dogfood, explicitly stopping before tune and M91/proto2html.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/CANDIDATE_CHANGES.md
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 through single-queue select-change ranking; no analyze-changes
+      run is needed.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/SELECTED_CHANGE.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/ATOM_TASKS.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Completed target repo initialization, raw concept ingestion, vision,
+      validation, proto prompt pack, first high-fidelity image batch, and local
+      target repo commit.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C001-run-smart-city-discovery-e2e/LOCAL_COMMIT_EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 produced the concrete artifacts needed for a real
+      first-consumer audit.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/SELECTED_CHANGE.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/ATOM_TASKS.yaml
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Completed the OW discovery loop capability audit and recorded KANO
+      findings, git evidence, dangerous behaviors, and next DTC candidates.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/C002-audit-smart-city-discovery-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+      - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md

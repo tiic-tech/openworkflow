@@ -1,0 +1,35 @@
+$ git log --format='%h %ad %s' --date=iso --since='2026-05-22 00:00' --until='2026-05-22 23:59'
+22985ce 2026-05-22 23:07:25 +0800 Add dailin-grade prompt pack fixtures
+79de8d6 2026-05-22 23:01:44 +0800 Wire generated vision2prompt protocol gates
+b444ede 2026-05-22 22:37:00 +0800 M98-dailin-grade-vision2prompt-pipeline C003 screen-bound executability contract
+c7581a7 2026-05-22 21:29:39 +0800 Add dailin grade vision2prompt references
+8d5107f 2026-05-22 21:24:41 +0800 Add prompt pack integrity gate
+220d324 2026-05-22 20:01:44 +0800 Add prototype product reality gate and dogfood evidence
+bfde4d3 2026-05-22 15:32:38 +0800 M92-smart-city-real-discovery-e2e-dogfood C002 complete artifact audit
+503e2df 2026-05-22 14:26:12 +0800 M92 C001 Select smart city E2E dogfood
+045f999 2026-05-22 14:24:03 +0800 M92 Decompose smart city discovery E2E dogfood
+bdc8d23 2026-05-22 13:52:21 +0800 M90 C004 Record benchmark readiness evidence
+9f0c828 2026-05-22 13:50:58 +0800 M90 C004 Verify benchmark readiness
+986727d 2026-05-22 13:46:22 +0800 M90 C003 Verify discovery failure routing
+c524446 2026-05-22 13:41:31 +0800 M90 C002 Verify discovery-loop handoff
+aae8ed1 2026-05-22 13:36:02 +0800 M90 C001 Add canonical discovery-loop dogfood fixture
+cdc0114 2026-05-22 13:24:11 +0800 M88 C004 Support multi-round tune inheritance
+abc656b 2026-05-22 13:14:16 +0800 M88 C003 Add refined prompt validator fixtures
+9626f3b 2026-05-22 12:59:44 +0800 M88 C002 Wire tune methodology protocol
+75def71 2026-05-22 11:17:17 +0800 M87 C004 Add near-duplicate post-validate fixture
+4221206 2026-05-22 10:22:59 +0800 M87 C003 Wire post-validate protocol gate
+9d4a9ea 2026-05-22 10:08:35 +0800 M87 C002 Implement strategic fingerprint evaluator
+0f451ce 2026-05-22 09:43:10 +0800 M87 C001 Define post-validate prompt contract
+18bd294 2026-05-22 09:20:33 +0800 M86 C004 Add proto prompt-pack stress fixtures
+c766f8f 2026-05-22 07:21:46 +0800 M86 C005 Define internal proto pipeline
+d67d05a 2026-05-22 07:04:41 +0800 M86 C003 Upgrade proto generated protocol
+b00a12b 2026-05-22 06:58:52 +0800 M86 C002 Strengthen proto prompt pack artifacts
+c21b560 2026-05-22 06:36:00 +0800 M85 C005 Make auto validation durable
+c56b3c9 2026-05-22 02:12:53 +0800 M85 C004 Add validation target stress fixtures
+4e2f19f 2026-05-22 02:08:07 +0800 M85 C003 Upgrade validation generated protocol
+30e3a4e 2026-05-22 02:00:43 +0800 M85 C002 Extend validation target experiment fields
+7c6d301 2026-05-22 01:18:03 +0800 M84 C004 Add vision delayed compile stress fixtures
+010ab1a 2026-05-22 01:02:25 +0800 M84 C003 Upgrade vision generated protocol
+83d3acc 2026-05-22 00:48:43 +0800 M84 C002 Add vision proto-readiness artifacts
+0140a01 2026-05-22 00:31:32 +0800 M84 C001 Add build-vision delayed compile contract
+

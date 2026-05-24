@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M87-vision2prompt-post-validate-gate:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C004
+change_id: C004-post-validate-stress-fixtures
+title: Atom tasks for post-validate stress fixtures
+status: completed
+tasks:
+  - id: T001
+    title: Inspect existing post-validate fixtures
+    type: read
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing distinct, duplicate, style-only, and single-direction fixtures are mapped.
+  - id: T002
+    title: Add near-duplicate strategic fixture
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification rejects near-duplicate directions that rephrase the same strategy.
+      - Failure output names threshold and shared dimensions.
+  - id: T003
+    title: Confirm stress matrix coverage
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - Tests cover exact duplicate, near-duplicate, distinct multi-direction, style-only, and single-direction skip outcomes.
+  - id: T004
+    title: Verify final M87 queue
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M87-vision2prompt-post-validate-gate/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

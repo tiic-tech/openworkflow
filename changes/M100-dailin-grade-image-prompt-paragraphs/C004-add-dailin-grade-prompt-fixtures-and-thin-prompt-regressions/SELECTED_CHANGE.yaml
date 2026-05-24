@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-add-dailin-grade-prompt-fixtures-and-thin-prompt-regressions
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C004
+title: Add dailin-grade prompt fixtures and thin-prompt regressions
+status: selected
+selection_reason: >
+  C004 is the next recommended candidate after C003 completed generated
+  paragraph-quality wiring. It proves the final validator and generated
+  guidance behavior with positive dailin-density fixtures, smart city positive
+  prompt text, terse prompt regressions, and strategyless long-form negatives.
+scope:
+  includes:
+    - positive fixture modeled after dailin SKILL workflow and OUTPUT_PROMPT paragraph density
+    - smart city positive fixture with complete long-form generation prompts
+    - negative fixture representing the current M99 short prompt style
+    - negative fixture that has long wording but skips strategic hypothesis or build recommendation structure
+    - runtime verification assertions for pass/fail behavior
+  excludes:
+    - provider-backed image generation
+    - visual quality review
+    - target repo mutation
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+  - examples/
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+forbidden_paths:
+  - provider image generation implementation
+  - generated image review artifacts
+  - target repo mutation outside this repository
+  - M101 command split implementation
+acceptance:
+  - Runtime verification fails a short prompt that only says "Show the same map shell..." without full journey/system-response content.
+  - Runtime verification fails a prompt pack that omits strategic core, distinct hypothesis, or build recommendation evidence required by the dailin SKILL workflow.
+  - Runtime verification passes a dailin-density prompt pack with full screen purpose, actions, system responses, trust controls, anti-goals, visual direction, and user feeling.
+  - Existing smart city fixture is upgraded or duplicated so it demonstrates the new paragraph bar.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C005
+    reason: C005 target replay depends on C004 fixture and regression evidence.
+  - plan_id: M101-build-proto-prompt-command-split
+    candidate_id: C001
+    reason: M101 remains high-risk command-boundary work and should wait until M100 prompt-quality evidence is complete.

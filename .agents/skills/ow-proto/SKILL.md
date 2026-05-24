@@ -71,7 +71,9 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 </allowed_outputs>
 
 <conditional_outputs>
-- None
+- .openworkflow/validation/VALIDATION_INDEX.yaml
+- .openworkflow/validation/&lt;id&gt;/VALIDATION.yaml
+- .openworkflow/validation/&lt;id&gt;/NOTE.md
 </conditional_outputs>
 
 <artifact_contracts>
@@ -88,18 +90,28 @@ Do not expose chain-of-thought, routine checklist results, context-loading trace
 
 <audit_checkpoints>
 <before>
-- Load vision and optional validation context; validation is optional but must be consumed when present.
-- Record validation_input.mode as vision_only or validation_present; do not silently auto-generate validation.
+- Act as the user-facing orchestrator for the internal proto pipeline: proto-preflight, /ow:vision2prompt, then /ow:prompt2proto.
+- Load vision and current validation context; validation is required before prototype generation.
+- If current_validation is missing, auto-run /ow:validation first and write VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml with trigger.mode agent_auto, requested_command /ow:proto, and reason missing_current_validation.
+- Proceed only after validation_input.mode can reference a durable validation artifact; do not use ephemeral vision_only validation context.
+- Verify vision and validation artifact quality before prompt work; if either is missing, thin, stale, or not strong enough for high-quality prototype prompts, route back to /ow:vision with focused follow-up questions instead of generating prompts.
+- If the user has not specified the number of strategically different prototype directions, askUserQuestion for the count; use 3 only when the user explicitly delegates that decision to the agent.
 - Extract the strategic core: target user, behavior change, mechanism, differentiator, boundary conditions, and central uncertainty.
 </before>
 <during>
-- Generate 5-8 strategic prototype hypotheses, then select the strongest prompt directions.
-- Make directions differ by product form, initiation trigger, interaction model, emotional driver, retention mechanism, validation metric, or main risk.
-- Write concrete high-fidelity image-generation prompts with screens, journey, interactions, AI/system behavior, trust controls, anti-goals, and sample content.
+- Before strategic directions, require /ow:vision2prompt to infer product_experience_model: product archetype, primary canvas, information architecture, domain objects, task loop, interaction states, data realism, visual language, and anti-generic constraints.
+- Before /ow:prompt2proto, require prototype_system_contract so stable app shell, navigation, data vocabulary, object anatomy, action bar, audit pattern, copy tone, and allowed deltas are explicit.
+- Treat scenarios such as planning, incident, or capacity as possible modules, layers, workflows, or states inside one product shell unless they truly imply different product forms.
+- Internally trigger /ow:vision2prompt to generate 5-8 strategic prototype hypotheses, select the resolved direction count, and write all multi-direction, multi-image prompt text.
+- Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.
+- Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.
+- Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.
+- If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, or prompt executability fails, route back through /ow:vision2prompt prompt repair instead of starting image generation.
+- Internally trigger /ow:prompt2proto to Batch-generate prototype images from the prepared prompt text and collect generated image paths, direction ids, prompt ids, metadata, and notes into EVIDENCE.yaml.
 - Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.
 </during>
 <after>
-- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, and compact EVIDENCE.yaml.
+- Write PROTO_PROMPT_PACK.yaml, PROTO_PROMPT_PACK.md, REVIEW_PLAN.md, compact EVIDENCE.yaml, prompt_text_manifest, and image_generation collection state.
 - Record review evidence and a decision audit record internally after prompt-pack evidence changes.
 - Refresh prototype SUMMARY.yaml when summary_policy is configured and update CURRENT_STATE.yaml with current_prototype, last_decision, and next_command.
 - Confirm no HTML, design, spec, change, team, persistence, or production hardening was created.
@@ -123,21 +135,77 @@ When a downstream stage supersedes an older question or draft, update lifecycle 
 Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointers, decision outcome, next command, blockers, or handoff status changes.
 </artifact_checkpoint>
 
+<internal_proto_pipeline>
+- /ow:proto is the only user-facing command in this chain; /ow:vision2prompt and /ow:prompt2proto are internal commands.
+- Run proto-preflight first, then /ow:vision2prompt, then /ow:prompt2proto.
+- Record internal_pipeline.stages with stage ids proto-preflight, vision2prompt, and prompt2proto in EVIDENCE.yaml.
+- Do not expose /ow:vision2prompt or /ow:prompt2proto as normal user-facing handoffs.
+</internal_proto_pipeline>
+
 <validation_consumption>
-- If validation artifacts are absent but a vision exists, proceed in vision_only mode.
-- If VALIDATION.yaml and PROTOTYPE_BRIEF.md exist, consume them and preserve their include/exclude boundaries.
+- If validation artifacts are absent but a vision exists, auto-run /ow:validation first and persist VALIDATION.yaml, NOTE.md, and VALIDATION_INDEX.yaml.
+- Auto validation must set trigger.mode: agent_auto, trigger.requested_command: /ow:proto, and trigger.reason: missing_current_validation.
+- If VALIDATION.yaml exists, consume it and preserve central_uncertainty, prototype_experiment, observable_signals, decision_rules, and include/exclude boundaries.
+- Before prompt generation, verify that both VISION.md or VISION_CONTRACT.yaml and VALIDATION.yaml are high-quality enough to produce high-quality prototype prompts.
+- If source quality is insufficient, record preflight_quality_gate.can_proceed false and hand back to /ow:vision with targeted missing questions.
 - If validation conflicts with vision, stop for a decision instead of broadening scope silently.
 </validation_consumption>
 
+<preflight_quality_gate>
+- Set preflight_quality_gate.vision_status and validation_status to missing, thin, or ready before prompt work.
+- Set preflight_quality_gate.can_proceed true only when vision and validation can support high-quality prototype prompt generation without agent invention.
+- When can_proceed is false, set next_command_when_blocked: /ow:vision and include required_followup_questions for the user's supplemental interview.
+</preflight_quality_gate>
+
+<direction_count_policy>
+- If the user did not specify NUMBER_OF_TYPES or a strategic direction count, askUserQuestion before generating prompt directions.
+- If the user answers with a count, set source: user_input and resolved_count to that number.
+- If the user delegates direction count to the agent, set source: agent_default_after_user_delegation and resolved_count: 3.
+- Do not silently default to 3 before the user either provides a count or delegates the choice.
+</direction_count_policy>
+
 <strategic_prompt_pack>
 - Write prompt_pack_type: strategic_proto_prompt_pack.
-- Normalize product domain, primary user, current alternative, core pain, behavior change, success signal, differentiator, emotional value, trust constraints, and non-goals.
+- Normalize product domain, primary user, usage context, current alternative, core pain, desired behavior change, strongest success signal, core differentiator, emotional value, functional value, trust requirements, privacy requirements, non-goals, future opportunities, and validation target.
 - Represent strategic_core as target user plus behavior change plus mechanism plus differentiator plus boundary conditions.
-- Each direction must include direction_id, name, strategic_hypothesis, validates, main_risk, prototype_prompt, and pm_judgment.
+- Write product_experience_model before directions: product_archetype, primary_canvas, information_architecture, domain_object_model, primary_task_loop, interaction_state_model, data_realism_requirements, visual_language, anti_generic_constraints, and category_quality_bar.
+- Use product_experience_model to decide whether source concepts are separate strategic directions or modules, scenarios, layers, states, or workflows inside one product shell.
+- Convert non-goals and category anti-patterns into negative_constraints; explicitly block generic AI dashboards, consulting-report layouts, and card walls when the target product category implies a richer product shell.
+- Generate more candidate hypotheses than needed, then select the resolved direction count with maximum strategic diversity.
+- Each direction must include direction_id, name, strategic_hypothesis, validates, main_risk, distinctness_rationale, prototype_prompt, screen_prompts, and pm_judgment.
 </strategic_prompt_pack>
 
+<prompt_text_manifest>
+- Write complete prompt text for every selected direction before invoking image generation.
+- Each direction should include multi-image screen prompt text with prompt_id, screen_name, image_role, prompt, and acceptance_criteria.
+- Set prompt_text_manifest.status: ready_for_image_generation only after every selected direction has concrete, directly executable prompt text and screen-bound prompt refs.
+- Do not set prompt_text_manifest.status: ready_for_image_generation when prompt_pack_integrity_gate, prototype_reality_gate, screen_manifest coverage, or quality_rubric.prompt_executability is missing or failing.
+</prompt_text_manifest>
+
+<prompt_pack_handoff_gate>
+- Before /ow:prompt2proto, require prompt_pack_integrity_gate.status: pass.
+- Before /ow:prompt2proto, require prototype_reality_gate.status: pass.
+- Before /ow:prompt2proto, require screen_manifest entries and direction screen_prompts to resolve by target_screen_id.
+- Before /ow:prompt2proto, require quality_rubric.prompt_executability.status: pass.
+- If any required gate fails or is missing, keep image_generation.status: not_started and repair inside /ow:vision2prompt.
+</prompt_pack_handoff_gate>
+
+<post_validate_gate>
+- Run prompt asset post-validation after prompt_text_manifest.status is ready_for_image_generation and before /ow:prompt2proto.
+- Require post_validate.status: pass when direction_count_policy.resolved_count is 2 or more.
+- Set post_validate.status: skipped only when direction_count_policy.resolved_count is 1 because the user explicitly requested exactly one strategic direction.
+- Do not start image_generation or invoke /ow:prompt2proto when post_validate.status is fail; route back to /ow:vision2prompt prompt repair.
+</post_validate_gate>
+
+<image_generation>
+- After prompt_text_manifest.status is ready_for_image_generation and post_validate.status is pass or skipped, Batch-generate prototype images from the prepared prompt text.
+- Generate image groups by direction and screen prompt; keep each generated image linked to direction_id and prompt_id.
+- Record image_generation.status, batch_strategy, generated_images, and collection_notes in EVIDENCE.yaml.
+- Do not use image generation as a substitute for missing strategy or incomplete prompt text.
+</image_generation>
+
 <image_only_boundary>
-- /ow:proto creates prompt packs for high-fidelity static prototype images.
+- /ow:proto creates prompt packs and image groups for high-fidelity static prototype images.
 - Do not write HTML, CSS, runnable prototypes, production code, deployment config, auth, persistence, or team runtime.
 - Hand off to /ow:tune when generated images or accepted baseline screens need refinement.
 </image_only_boundary>
@@ -157,7 +225,7 @@ Refresh CURRENT_STATE.yaml and any summary_policy target whenever current pointe
 <anti_patterns>
 - Do not generate HTML, CSS, local runnable apps, or implementation tasks from /ow:proto.
 - Do not treat visual style variants as strategic directions.
-- Do not hide missing validation; record vision_only mode when validation artifacts are absent.
+- Do not hide missing validation or proceed in ephemeral vision_only mode.
 - Do not convert prompt packs into production specs or change backlogs.
 - Do not create design, specs, changes, or teams from unaccepted prompt-pack evidence.
 - Do not ask the user to manually invoke /ow:decision after prototype work; record the decision audit internally.

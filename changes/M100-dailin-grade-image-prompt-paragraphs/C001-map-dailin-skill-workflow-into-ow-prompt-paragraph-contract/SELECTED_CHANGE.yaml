@@ -1,0 +1,89 @@
+schema_version: 0.1.0
+contract_id: selected_change:M100-dailin-grade-image-prompt-paragraphs:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M100-dailin-grade-image-prompt-paragraphs
+candidate_id: C001
+change_id: C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract
+title: Map dailin skill workflow into OW prompt paragraph contract
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 because it is dependency-free, is the queue's recommended first
+  candidate, and converts the dailin skill workflow plus OUTPUT_PROMPT quality
+  bar into OW-owned prompt paragraph references before schemas, validators,
+  generated skill sync, or replay work begins.
+rejected_alternatives:
+  - id: C002
+    reason: Depends on C001's prompt paragraph anatomy and failure dimensions.
+  - id: C003
+    reason: Depends on C001 and C002 before generated command guidance changes.
+  - id: C004
+    reason: Depends on schema/protocol behavior from C002 and C003.
+  - id: C005
+    reason: Depends on generated guidance and fixture evidence.
+  - id: C006
+    reason: Depends on real replay evidence from C005.
+owned_paths:
+  - skills/build-prototype/references/vision2prompt/01_input_contract.md
+  - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+  - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+  - skills/build-prototype/references/vision2prompt/04_product_system_extraction.md
+  - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+  - skills/build-prototype/references/vision2prompt/06_output_templates.md
+  - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+dependencies: []
+scope:
+  includes:
+    - step-by-step OW mapping for dailin input normalization, vision decomposition, hypothesis generation, direction selection, prototype prompt writing, output formatting, and quality rubric
+    - dailin OUTPUT_PROMPT as the minimum paragraph quality benchmark
+    - required long-form paragraph anatomy for direction-level and screen-level generation prompts
+    - thin-prompt failure examples for short state-only prompts
+    - explicit boundary that C001 verifies prompt text contract quality, not generated image quality
+  excludes:
+    - JSON schema changes
+    - validator implementation
+    - generated skill sync
+    - target repo replay
+    - provider-backed image generation
+    - human visual review or visual reference parity scoring
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - schemas/**
+  - packages/core/src/validators/**
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - examples/**
+acceptance:
+  - OW references mirror dailin SKILL steps 1-6: normalize inputs, extract strategic core, generate candidate hypotheses, select N directions, write each prototype prompt, and recommend build order.
+  - OW references name dailin OUTPUT_PROMPT as the minimum paragraph quality benchmark.
+  - Each dailin reference file from 01_input_contract through 06_quality_rubric has an OW-owned equivalent instruction or mapped subsection.
+  - The prompt schema reference requires long-form generation prompt paragraphs with product context, target user, screen purpose, components, states, interactions, system response, example copy, trust controls, visual direction, anti-goals, journey linkage, and desired user feeling.
+  - The quality rubric fails terse one-sentence screen prompts even when YAML fields are present.
+  - The queue remains scoped to prompt text quality and does not claim visual parity.
+validation:
+  - rg -n "dailin-grade image prompt|paragraph anatomy|journey|system response|vision_to_strategic_prototype_prompt" skills/build-prototype/references
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 is contract/reference mapping only. It does not change schemas,
+    validators, generated adapter files, runtime behavior, provider image
+    generation, target repos, or visual review workflow.
+expected_commit_boundary: >
+  Complete C001 as one coherent commit after updating OW-owned references,
+  recording mapping evidence, refreshing queue artifacts, and running
+  validation.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - changes/M100-dailin-grade-image-prompt-paragraphs/C001-map-dailin-skill-workflow-into-ow-prompt-paragraph-contract/MAPPING_EVIDENCE.md

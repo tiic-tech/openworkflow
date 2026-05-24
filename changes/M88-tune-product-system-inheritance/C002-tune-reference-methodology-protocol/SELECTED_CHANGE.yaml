@@ -1,0 +1,71 @@
+schema_version: 0.1.0
+contract_id: selected_change:M88-tune-product-system-inheritance:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C002
+change_id: C002-tune-reference-methodology-protocol
+title: Wire reference methodology into /ow:tune protocol
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M88-tune-product-system-inheritance/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 through ow-select-change single-queue ranking. C001 completed the
+  refined prompt-pack contract, and C002 wires the
+  prototype_tune_to_refined_prompt methodology into generated /ow:tune protocol
+  before validator fixture work.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-tune/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M88-tune-product-system-inheritance/
+dependencies:
+  - C001
+scope:
+  includes:
+    - command registry protocol updates
+    - generated ow-tune skill guidance through sync
+    - context packet drift checks
+    - explicit no-image/no-html boundaries
+    - internal decision audit preservation
+  excludes:
+    - schema or validator design
+    - external image generation
+    - async subagent execution
+    - /ow:proto prompt compiler behavior
+forbidden_paths:
+  - schema or validator design beyond verifier assertions
+  - external image generation calls
+  - /ow:proto prompt compiler behavior
+  - async subagent runtime behavior
+acceptance:
+  - Generated /ow:tune includes input normalization before baseline audit.
+  - Generated /ow:tune includes product-system extraction before refined prompts.
+  - Generated /ow:tune includes tune request interpretation and conflict handling.
+  - Generated /ow:tune includes screen-level delta matrix requirements.
+  - Generated /ow:tune keeps image generation, HTML, and implementation out of scope.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 updates generated command protocol source and synced skill/context
+    surfaces. It does not generate images, call external services, or alter
+    async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: 9626f3b
+  evidence:
+    - changes/M88-tune-product-system-inheritance/C002-tune-reference-methodology-protocol/LOCAL_COMMIT_EVIDENCE.yaml

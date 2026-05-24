@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M86-proto-strategy-prompt-compiler:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C002
+change_id: C002-strategic-prompt-pack-artifacts
+title: Atom tasks for strategic prompt-pack artifacts
+status: ready
+tasks:
+  - id: T001
+    title: Tighten prototype evidence template and schemas
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+    acceptance:
+      - Template and schemas include preflight_quality_gate for vision and validation readiness.
+      - Template and schemas include direction_count_policy with askUserQuestion and default 3 delegation fields.
+      - validation_input no longer permits ephemeral vision_only for strategic prompt packs.
+      - strategic prompt packs require normalized_input, strategic_core, directions, build_recommendation, constraints, and review_plan.
+      - Template and schemas include prompt_text_manifest and image_generation collection status.
+      - Template fields expose the expected strategy and direction structure.
+  - id: T002
+    title: Add strategic prompt-pack validator and summary checks
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Validators report thin strategic cores, weak directions, and missing build recommendations.
+      - Summary health marks missing strategy and direction fields as current-but-thin.
+  - id: T003
+    title: Refresh generated contracts and verification
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - changes/M86-proto-strategy-prompt-compiler/
+    acceptance:
+      - Sync refreshes generated artifact contract output.
+      - Runtime and E2E verification cover the strengthened artifact shape.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

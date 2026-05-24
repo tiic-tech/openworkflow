@@ -1,0 +1,66 @@
+schema_version: 0.1.0
+contract_id: selected_change:C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C007-inject-senior-product-manager-philosophy-engine-into-vision2prompt
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C007
+title: Inject senior product-manager philosophy engine into vision2prompt
+status: selected
+selection_reason: >
+  C007 is the queue's next recommended candidate after the user's clarification
+  that dailin OUTPUT_PROMPT quality came from a co-founder and senior
+  product-manager perspective, with the distilled references serving as tools.
+  It is the necessary prerequisite before C003 wires generated guidance, because
+  otherwise /ow:vision2prompt can become structurally complete but strategically
+  empty.
+scope:
+  includes:
+    - explicit Step 0 perspective engine for /ow:vision2prompt before reference execution
+    - guidance that dailin-derived references are tools used by the senior PM perspective, not the source of taste by themselves
+    - product thesis, strategic hypothesis, user transformation, differentiated product form, and reason-to-exist requirements for each prototype direction
+    - anti-default rules against dashboard/SaaS/screen-inventory outputs when the vision calls for a different form
+    - quality rubric language that fails complete-but-soulless prompt paragraphs
+    - runtime-surface assertions that generated guidance names the perspective engine before paragraph anatomy
+  excludes:
+    - provider image execution
+    - generated image review
+    - proto2html
+    - broad product-management framework redesign outside /ow:vision2prompt prompt text quality
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - skills/build-prototype/references/vision2prompt/02_vision_decomposition.md
+  - skills/build-prototype/references/vision2prompt/03_strategy_hypothesis_generation.md
+  - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+  - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+forbidden_paths:
+  - provider image generation implementation
+  - visual review artifacts
+  - proto2html artifacts or runtime code
+  - unrelated OpenWorkflow command surfaces
+  - generated .agents/** or .openworkflow/** manual edits not produced by sync
+acceptance:
+  - Generated ow-vision2prompt guidance starts from a co-founder plus senior product-manager perspective before executing reference steps.
+  - The protocol states that dailin-derived references are tools of the perspective engine, not a checklist whose completion alone proves quality.
+  - Each generated prototype direction must carry a product thesis, target user transformation, distinct product form, and reason it should exist.
+  - The rubric rejects prompt paragraphs that satisfy structural dimensions but lack strategic judgment, differentiated imagination, or design philosophy.
+  - C003 remains blocked behind this candidate so paragraph wiring cannot proceed without the perspective engine.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C003
+    reason: >
+      C003 is still required, but it should run after C007 so generated wiring
+      inherits the senior product-manager philosophy engine rather than only the
+      structural paragraph checklist.

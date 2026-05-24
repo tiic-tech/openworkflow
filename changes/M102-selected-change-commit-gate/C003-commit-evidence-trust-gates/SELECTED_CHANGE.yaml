@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: selected_change:M102-selected-change-commit-gate:C003
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M102-C003-commit-evidence-trust-gates
+source_plan_id: M102-selected-change-commit-gate
+source_candidate_id: C003
+title: Wire commit evidence enforcement into handoff and summaries strict trust gates
+status: completed
+selection_reason:
+  - C001 approved Option 1, and C002 completed the queue-level evidence validator.
+  - C003 is the next dependency-unlocked change and closes the trust-gate gap that allowed handoff to remain trusted for unauditable queues.
+  - The implementation is limited to summaries, handoff, inspect, context, and runtime verification surfaces.
+approved_option:
+  id: option_1
+  title: Strict Evidence Gate With Migration Mode
+scope:
+  includes:
+    - summaries --strict health errors for missing selected-change commit evidence
+    - handoff quality failure when strict planning queue evidence is missing
+    - inspect and context trust guidance for commit evidence remediation
+    - non-strict warning behavior for migration-mode historical queues
+    - runtime-surface fixtures for summaries, handoff, inspect, and context reports
+  excludes:
+    - remote mutation
+    - automatic commit creation
+    - git-automation evidence examples
+    - generated adapter sync
+owned_paths:
+  - packages/core/src/
+  - packages/cli/src/
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M102-selected-change-commit-gate/
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/git/
+acceptance:
+  - handoff cannot remain trusted when an active queue has a completed implementation selected change without required commit evidence.
+  - summaries --strict reports a clear remediation path.
+  - inspect and context expose guidance that names missing selected-change commit evidence.
+  - Historical queues do not break without an intentional migration decision from C001.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - node dist/cli/src/index.js handoff --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  local_commit_evidence: changes/M102-selected-change-commit-gate/C003-commit-evidence-trust-gates/LOCAL_COMMIT_EVIDENCE.yaml
+created_at: 2026-05-23
+updated_at: 2026-05-23

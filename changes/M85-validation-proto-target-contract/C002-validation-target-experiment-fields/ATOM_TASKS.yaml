@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-validation-target-experiment-fields
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-validation-target-experiment-fields
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C002
+title: Atom tasks for validation target experiment fields
+status: complete
+tasks:
+  - task_id: T001
+    title: Extend validation target schemas and templates
+    status: done
+    type: edit
+    owned_paths:
+      - schemas/validation-target.schema.json
+      - schemas/validation.schema.json
+      - packages/core/src/artifacts/registry.ts
+    done_when: >
+      Validation target artifacts expose central uncertainty, target behavior,
+      prototype experiment, observable signals, decision rules, and vision gaps.
+  - task_id: T002
+    title: Upgrade summary and readiness checks
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/artifacts/readiness.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/commands/check.ts
+    done_when: >
+      Thin validation targets are flagged before proto handoff and readiness
+      can report read-only gate states without writing artifacts.
+  - task_id: T003
+    title: Update workflow verification and synced contracts
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - .agents/skills/ow-validation/SKILL.md
+    done_when: >
+      E2E workflow verification passes and sync refreshes the generated audit
+      contract for validation_target.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

@@ -22,6 +22,18 @@ Each `CANDIDATE_CHANGES.yaml` queue is a feat boundary. The top-level
 `changes/<plan_id>/` folder owns the feature-sized planning source, readable
 view, summary, operation log, and candidate-specific selection artifacts.
 
+The queue boundary is intentionally smaller than a roadmap. A queue may own one
+feature, bounded module, command surface, artifact family, or workflow slice. It
+must not include multiple independent features or a large module family just
+because the source discussion contains a deep product plan.
+
+When planning input contains more features than the current queue should own,
+record the extra features as deferred refs, usually under
+`scope_control.deferred_features` in `CANDIDATE_CHANGES.yaml` and mirrored in
+`SUMMARY.yaml`. Deferred refs are not candidates, do not participate in
+dependencies or unlocks, and require a later `decompose-to-changes` pass before
+selection or implementation.
+
 Each candidate inside that queue is a commit-sized change. A selected candidate
 should normally write its `SELECTED_CHANGE.yaml`, `ATOM_TASKS.yaml`, and
 `IMPLEMENTATION_BRIEF.md` under `changes/<plan_id>/<candidate-id>-<slug>/` and
@@ -70,6 +82,76 @@ delivery, generated `.agents/**` files, or `.openworkflow/audit/**`, read
 defines OpenWorkflow's native skill file shape, XML-like protocol block
 semantics, generated-surface ownership, and drift expectations.
 
+## Planning Artifact Registration
+
+Planning artifacts can appear in Agent read models only through summary-first
+registration. Runtime or adapter exposure must not load full planning history
+by default.
+
+Registration roles:
+
+- `CANDIDATE_CHANGES.yaml`: source of truth for one feat queue. Load only when
+  selecting, maintaining, completing, or auditing that queue.
+- `SUMMARY.yaml`: default queue handoff and read-model artifact. It should name
+  source refs, branch boundary, candidate count, completed candidate, next
+  recommended candidate, high-risk report paths, validation, and unresolved
+  questions.
+- `CHANGE_ANALYSIS.yaml`: advisory cross-queue recommendation evidence. It may
+  recommend a `target_plan_id` and `target_candidate_id`, but it must not
+  mutate queues or authorize high-risk implementation.
+- `SELECTED_CHANGE.yaml`: implementation boundary for one selected candidate.
+  It should be loaded before `ATOM_TASKS.yaml` when executing or reviewing the
+  selected change.
+- `ATOM_TASKS.yaml`: task breakdown for the selected candidate. It is not a
+  source of product scope beyond the selected change.
+- `LOCAL_COMMIT_EVIDENCE.yaml`: local implementation evidence for a selected
+  change. It records commit hashes and validation evidence, but does not imply
+  remote push, PR creation, merge, or Issue mutation.
+- `HIGH_RISK_DECISION_REPORT.md`: stop packet for high-risk candidates. It is
+  evidence, not approval.
+
+Minimum summary fields for planning queues:
+
+- `plan_id`
+- `branch_boundary`
+- `candidate_count`
+- `completed_candidate_id`
+- `completed_change_id`
+- `next_recommended_candidate_id`
+- `outputs`
+- `key_dependencies`
+- `risks`
+- `unresolved_questions`
+- `validation`
+
+Read-model order for planning work:
+
+1. `SUMMARY.yaml`
+2. `HIGH_RISK_DECISION_REPORT.md` only when the next candidate is high risk
+3. `CHANGE_ANALYSIS.yaml` only when consuming a cross-queue recommendation
+4. `SELECTED_CHANGE.yaml`
+5. `ATOM_TASKS.yaml`
+6. `CANDIDATE_CHANGES.yaml` only when source truth is needed
+
+Validators should reject malformed source artifacts, but summary freshness and
+quality are separate trust signals. Use `openworkflow summaries --json` or
+handoff/inspect quality fields for summary trust rather than treating
+`validate` alone as proof that a summary is sufficient.
+
+Selected-change commit gate:
+
+- New or actively touched branch-governed queues may opt into
+  `queue_policy.selected_change_commit_gate: strict`.
+- In strict mode, a `done` selected change must set
+  `completion.implementation_changed_files` to `true` or `false`.
+- When `implementation_changed_files: true`, `completion.evidence` must include
+  a repo-relative `LOCAL_COMMIT_EVIDENCE.yaml` path for that selected change.
+- When `implementation_changed_files: false`, completion must include
+  `commit_not_required_reason` explaining why no implementation commit is
+  required.
+- Historical queues without the strict policy remain migration-mode artifacts
+  until they are touched or intentionally opted into the gate.
+
 ## CANDIDATE_CHANGES.yaml
 
 Purpose: hold one active planning queue for a topic, milestone, or session.
@@ -90,7 +172,22 @@ Required top-level fields:
 
 Optional but recommended after maintenance:
 
+- `scope_control` when the source discussion spans multiple possible features
 - `operations`
+
+Recommended `scope_control` fields:
+
+- `current_boundary`
+- `boundary_type`
+- `in_scope_rule`
+- `out_of_scope_rule`
+- `deferred_features`
+
+Each deferred feature should include:
+
+- `title`
+- `reason`
+- `suggested_plan_id` when a likely future queue name is clear
 
 Each candidate change requires:
 
@@ -164,6 +261,19 @@ The selected change must name rejected alternatives when the choice is not
 obvious. Rejected alternatives should be short and should reference candidate
 ids, not copy the full candidate body.
 
+When selection consumes a cross-queue recommendation, rejected alternatives
+must include both `plan_id` and `candidate_id`:
+
+```yaml
+rejected_alternatives:
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: High risk and missing a local high-risk decision report.
+```
+
+Use a short `id` field only when the rejected candidate belongs to the same
+`source_plan_id` as the selected change.
+
 ## ATOM_TASKS.yaml
 
 Purpose: break one selected change into focused tasks an Agent can execute
@@ -215,6 +325,38 @@ Required sections:
 
 The brief should be short. It should not duplicate the entire candidate queue or
 long product discussion.
+
+## LOCAL_COMMIT_EVIDENCE.yaml
+
+Purpose: record the local commit evidence for one selected change without
+implying any remote operation.
+
+Required fields for new evidence files:
+
+- `schema_version`
+- `contract_id`
+- `contract_type: planning`
+- `planning_artifact_type: implementation_evidence`
+- `source_plan_id`
+- `source_candidate_id`
+- `selected_change_id`
+- `primary_commit`
+- `validation_evidence`
+
+Historical evidence files may use older field names such as `plan_id`,
+`candidate_id`, `change_id`, and `implementation_commit`; validators accept
+those during migration, but new git-automation evidence should use the source
+field names above.
+
+The owning `CANDIDATE_CHANGES.yaml` completion should reference the file in
+`completion.evidence` using a repo-relative path:
+
+```yaml
+completion:
+  implementation_changed_files: true
+  evidence:
+    - changes/<plan_id>/<candidate-id>-<slug>/LOCAL_COMMIT_EVIDENCE.yaml
+```
 
 ## HIGH_RISK_DECISION_REPORT.md
 
@@ -304,6 +446,13 @@ The analysis artifact is advisory. It must not create
 `SELECTED_CHANGE.yaml`, mutate candidate status, or authorize high-risk
 implementation. `select-change` owns selection artifacts after consuming a
 recommended target.
+
+When `select-change` consumes the recommendation, it should create selection
+artifacts inside `changes/<target_plan_id>/`, re-check current readiness gates,
+and copy only the decision-relevant rejected alternatives into
+`SELECTED_CHANGE.yaml`. The analysis folder remains evidence for why the
+cross-queue comparison happened; it is not the owning feat folder for the
+selected candidate.
 
 ## PR_READY_SUMMARY.md
 

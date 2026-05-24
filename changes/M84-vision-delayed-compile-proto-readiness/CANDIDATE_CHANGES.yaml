@@ -1,0 +1,552 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M84-vision-delayed-compile-proto-readiness
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M84-vision-delayed-compile-proto-readiness
+title: Candidate changes for vision delayed compile and proto readiness
+status: completed
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M74-front-chain-command-quality-review/SUMMARY.yaml
+    - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+    - user_direction:2026-05-22-discovery-loop-upgrade
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - fixes /ow:vision interaction flow before downstream command changes
+    - makes VISION.md acceptance depend on proto prompt readiness
+    - preserves auditability without per-answer durable writes
+    - creates verifiable contracts before generated adapter changes
+    - keeps one selected change implementation-sized
+  avoid:
+    - rebuilding vision, validation, proto, and tune in one change
+    - adding downstream proto2html or html2spec behavior
+    - treating artifact completeness as vision quality
+    - creating eager-persistence behavior during interview mode
+scope_control:
+  current_boundary: >
+    Upgrade /ow:vision to use delayed compile and proto-readiness quality gates.
+    This queue owns the first discovery-loop correction: vision should remain
+    conversational during interview, then compile only when it can feed
+    high-quality /ow:proto prompt generation.
+  boundary_type: command_surface
+  in_scope_rule: >
+    Include only candidates needed to define and implement the /ow:vision
+    delayed-compile interaction model, proto-readiness contract, artifact shape,
+    and focused verification.
+  out_of_scope_rule: >
+    Record validation, proto, tune, cross-loop read models, and end-to-end
+    benchmark prototype work as deferred features. Do not include them as
+    current candidates until the vision source contract is stable.
+  deferred_features:
+    - title: Reposition /ow:validation around prototype validation targets
+      reason: >
+        Validation should consume proto-ready vision and sharpen the prototype
+        target; it depends on the new vision contract.
+      suggested_plan_id: M85-validation-proto-target-contract
+    - title: Align /ow:proto as strategy-to-prompt compiler
+      reason: >
+        Proto should consume the new vision and validation contracts to produce
+        strategic prompt packs and absorb the
+        vision_to_strategic_prototype_prompt reference skill; it should be
+        decomposed after vision readiness is stable.
+      suggested_plan_id: M86-proto-strategy-prompt-compiler
+    - title: Align /ow:tune with product-system inheritance
+      reason: >
+        Tune should preserve product system continuity using inheritance and
+        delta rules and absorb the prototype_tune_to_refined_prompt reference
+        skill; it depends on prototype prompt and benchmark evidence contracts.
+      suggested_plan_id: M87-tune-product-system-inheritance
+    - title: Define discovery-loop read model
+      reason: >
+        Agents need one compact view across vision, validation, proto, and tune
+        readiness after the command-specific contracts are stable.
+      suggested_plan_id: M88-discovery-loop-read-model
+    - title: Create discovery-loop E2E dogfood fixture
+      reason: >
+        The upgraded loop should be pressure-tested from long vision interview
+        through benchmark prototype selection after component commands are
+        upgraded.
+      suggested_plan_id: M89-discovery-loop-e2e-dogfood
+    - title: Review /ow:analyze-changes command quality and runtime-surface coverage
+      reason: >
+        During C003 verification, npm run verify:runtime-surface failed because
+        the analyze-changes generated skill no longer contains the legacy
+        expected wording: "Analyze one or more candidate change queues and
+        recommend the next candidate without selecting it." C004 can align the
+        immediate verifier wording to the current generated skill so vision
+        stress fixtures can run, but deeper AC command-quality review remains
+        outside the M84 vision boundary.
+      suggested_plan_id: M90-analyze-changes-command-quality-review
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Define /ow:vision delayed-compile contract and native build-vision skill
+    purpose: >
+      Replace eager per-answer persistence with an explicit interview,
+      checkpoint, and compile mode contract for /ow:vision while preserving
+      auditability and pause/resume expectations. Add the missing native
+      skills/build-vision source behavior so vision has the same source-skill
+      foundation as validation, proto, and tune.
+    scope:
+      includes:
+        - /ow:vision interaction mode definitions
+        - interview mode no-durable-write rule
+        - checkpoint mode trigger rules
+        - compile mode readiness requirements
+        - auditability and interruption risk guardrails
+        - native skills/build-vision source skill
+        - build-vision references for interview protocol and proto-readiness
+      excludes:
+        - implementing schema or generated skill changes
+        - validation, proto, or tune behavior
+        - runtime command exposure
+    owned_paths:
+      - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+      - skills/build-vision/
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - references/
+      - changes/M84-vision-delayed-compile-proto-readiness/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - The delayed-compile modes are explicitly defined.
+      - The contract says normal interview mode must not write durable vision files after every answer.
+      - Checkpoint and compile mode preserve audit evidence without breaking conversation flow.
+      - Compile mode requires user confirmation and proto-readiness.
+      - skills/build-vision/SKILL.md exists as the native source skill for vision discovery.
+      - Repository validation treats build-vision as a required native source skill.
+    selection:
+      selected_change_id: C001-build-vision-delayed-compile-contract
+      reason: >
+        Single-queue SC selected C001 because it establishes the delayed-compile
+        contract and fills the missing native build-vision source skill before
+        schema, generated adapter, or downstream command changes.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-build-vision-delayed-compile-contract
+      completed_at: 2026-05-22
+      primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
+        - skills/build-vision/SKILL.md
+  - id: C002
+    status: done
+    title: Extend vision artifacts with proto-readiness and coverage matrix
+    purpose: >
+      Add structured vision fields that let /ow:proto evaluate whether it can
+      generate high-quality strategic prototype prompts without inventing core
+      strategy.
+    scope:
+      includes:
+        - strategic core fields
+        - product system seed fields
+        - proto_readiness status and missing_for_proto
+        - coverage dimension status with follow-up questions
+        - summary quality checks for nested readiness fields
+      excludes:
+        - changing /ow:proto prompt generation
+        - changing /ow:validation artifact shape
+        - broad discovery-loop read model
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - schemas/vision-session.schema.json
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Vision templates expose strategic_core, product_system_seed, proto_readiness, and coverage structures.
+      - Summary quality reports thin or missing proto-readiness fields.
+      - A low-context Agent can tell what is missing before /ow:proto can generate strong prompts.
+      - Generated artifact contracts refresh from source through sync.
+    selection:
+      selected_change_id: C002-vision-proto-readiness-artifacts
+      reason: >
+        Single-queue SC selected C002 because C001 established the build-vision
+        source contract and C002 is the next required step before the generated
+        /ow:vision protocol can use proto-readiness as a compile gate.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-vision-proto-readiness-artifacts
+      completed_at: 2026-05-22
+      primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/core/src/artifacts/registry.ts
+        - packages/core/src/workflow/summaryHealth.ts
+        - schemas/vision-session.schema.json
+  - id: C003
+    status: done
+    title: Upgrade /ow:vision skill protocol for product partner interrogation
+    purpose: >
+      Encode the product partner, requirements interrogator, and intent compiler
+      role into /ow:vision so it keeps asking until proto-readiness is strong
+      instead of compiling after a shallow question count.
+    scope:
+      includes:
+        - command registry protocol updates for /ow:vision
+        - generated ow-vision skill guidance through sync
+        - anti-patterns against fixed question-count compile
+        - proto-readiness audit before durable artifact generation
+      excludes:
+        - validation, proto, or tune source skill changes
+        - UI or app-level interaction implementation
+        - new command registration
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-vision/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:vision generated skill names the three roles explicitly.
+      - The skill requires deep interview before compile and forbids eager durable writes in interview mode.
+      - The skill uses proto-readiness as a compile gate.
+      - Verification proves generated skill and context packets preserve the new protocol.
+    selection:
+      selected_change_id: C003-vision-generated-protocol
+      reason: >
+        Single-queue SC selected C003 because C002 added the proto-readiness
+        artifact fields and the generated /ow:vision command protocol is the
+        next dependency before stress fixtures.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-vision-generated-protocol
+      completed_at: 2026-05-22
+      primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/core/src/commands/registry.ts
+        - .agents/skills/ow-vision/SKILL.md
+        - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - id: C004
+    status: done
+    title: Add /ow:vision delayed-compile stress tests and fixtures
+    purpose: >
+      Verify that /ow:vision remains low-latency for humans while still
+      producing trustworthy artifacts when compile mode is reached.
+    scope:
+      includes:
+        - fixture or verification coverage for interview mode
+        - fixture or verification coverage for thin proto-readiness
+        - fixture or verification coverage for compile-ready vision
+        - generated surface drift checks after sync
+      excludes:
+        - full validation/proto/tune E2E dogfood
+        - browser UI automation
+        - prototype image generation
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - changes/M84-vision-delayed-compile-proto-readiness/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M85-validation-proto-target-contract
+      - M86-proto-strategy-prompt-compiler
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Tests cover a vision session that is not compile-ready and must remain thin/blocked.
+      - Tests cover a compile-ready vision artifact with proto-readiness fields.
+      - Tests protect the no eager durable write rule at the protocol or generated skill level.
+      - Verification fails clearly if generated vision guidance drops the delayed-compile contract.
+    selection:
+      selected_change_id: C004-vision-delayed-compile-stress-fixtures
+      reason: >
+        Single-queue SC selected C004 because C003 completed generated /ow:vision
+        protocol guidance and C004 is the final M84 candidate needed to
+        pressure-test thin, blocked, and ready vision states.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-vision-delayed-compile-stress-fixtures
+      completed_at: 2026-05-22
+      primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+      evidence:
+        - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for the first discovery-loop upgrade slice:
+      /ow:vision delayed compile and proto-readiness.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.md
+      - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Include the missing native skills/build-vision source skill in the first
+      /ow:vision delayed-compile change.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: ready
+    evidence:
+      - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 directly with SC because M84 is the single active queue and
+      C001 is the dependency-free first implementation boundary.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete the delayed-compile contract and native build-vision source skill
+      change with local commit evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
+      - 0140a0109ff9da718952a37a422cfcf527264b51
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 becomes ready after C001 established the delayed-compile contract and
+      native build-vision source skill foundation.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 directly with SC because C001 is complete and C002 is the next
+      ready candidate in the single active M84 queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete vision artifact proto-readiness structures and summary quality
+      checks with local commit evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+      - 83d3acc4113b45f860c2873649ef397285b361f6
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 becomes ready after C002 added the artifact structures that the
+      generated /ow:vision protocol should reference.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 directly with SC because M84 is still a single active queue
+      and C003 is the next ready candidate after C002 completion.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Complete generated /ow:vision protocol upgrade with source registry,
+      generated skill, context packet, and verification evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+      - 010ab1af29850200987ad80a7023f27024a7e1eb
+  - operation_id: OP011
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 becomes ready after C003 updated generated /ow:vision protocol
+      guidance and baseline verification.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  - operation_id: OP012
+    operation_type: defer
+    target_candidate_ids:
+      - M90-analyze-changes-command-quality-review
+    actor: agent
+    reason: >
+      Record the unrelated AC runtime-surface failure exposed during C003:
+      verify:runtime-surface expected legacy analyze-changes wording that is not
+      present in the generated skill. C004 may align the immediate verifier
+      wording, while deeper AC review stays in a separate queue.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: deferred
+    evidence:
+      - npm run verify:runtime-surface
+      - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 directly with SC because M84 is a single active queue and C004
+      is the next ready medium-risk candidate.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/SELECTED_CHANGE.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/ATOM_TASKS.yaml
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Complete delayed-compile stress fixtures for thin, blocked, and ready
+      vision sessions with full runtime-surface verification.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+      - 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - M84-vision-delayed-compile-proto-readiness
+    actor: agent
+    reason: >
+      Complete the bounded M84 queue after C001-C004 all reached done status;
+      downstream validation/proto/tune changes remain deferred as separate
+      bounded queues.
+    changed_at: 2026-05-22
+    before_status: active
+    after_status: completed
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml

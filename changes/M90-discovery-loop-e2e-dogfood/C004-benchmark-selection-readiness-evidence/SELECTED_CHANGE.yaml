@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: selected_change:M90-discovery-loop-e2e-dogfood:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C004
+change_id: C004-benchmark-selection-readiness-evidence
+title: Record benchmark-selection readiness evidence
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 through ow-select-change single-queue ranking. C001-C003
+  completed the canonical fixture, happy path, and failure routes; C004 is the
+  final ready M90 candidate and records the benchmark-selection handoff evidence
+  without implementing proto2html.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M90-discovery-loop-e2e-dogfood/
+dependencies:
+  - C001
+  - C002
+  - C003
+scope:
+  includes:
+    - decision audit fixture for benchmark accepted/needs-more-tune outcomes
+    - handoff readiness notes for future proto2html DTC
+    - verification that /ow:tune does not expose /ow:decision as a manual step
+    - summary evidence naming the accepted benchmark artifact refs
+  excludes:
+    - proto2html runtime exposure
+    - HTML reconstruction
+    - visual fidelity measurement
+    - production spec extraction
+forbidden_paths:
+  - proto2html runtime exposure
+  - HTML reconstruction artifacts
+  - visual fidelity measurement tooling
+  - production spec extraction artifacts
+acceptance:
+  - Decision evidence can identify the accepted benchmark prototype refs.
+  - The handoff is ready for a future proto2html queue but does not create proto2html artifacts.
+  - Generated /ow:tune still records decision audit internally instead of asking the user to run /ow:decision.
+  - M90 summary names the benchmark-selection evidence and remaining deferred work.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 is medium risk because it records local benchmark-selection readiness
+    checks and planning evidence only. It does not expose proto2html or create
+    HTML artifacts.
+completion:
+  completed_at: 2026-05-22
+  commit: 9f0c828
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml

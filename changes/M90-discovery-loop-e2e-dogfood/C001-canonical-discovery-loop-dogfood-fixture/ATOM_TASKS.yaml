@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M90-discovery-loop-e2e-dogfood:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C001
+change_id: C001-canonical-discovery-loop-dogfood-fixture
+title: Atom tasks for canonical discovery-loop dogfood fixture
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current fixture builders and validators
+    type: read
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Existing vision, validation, proto, tune, and decision fixture patterns are mapped.
+  - id: T002
+    title: Add canonical discovery-loop fixture chain
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - One coherent text-first product case includes vision, validation, strategic prompt pack, image metadata, refined tune prompt pack, and decision evidence.
+  - id: T003
+    title: Tighten validator repair output if fixture gaps are silent
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Missing fixture sections fail with repair-oriented artifact section names.
+  - id: T004
+    title: Verify canonical fixture chain
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-22
+  commit: aae8ed1
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml

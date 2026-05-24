@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: selected_change:M90-discovery-loop-e2e-dogfood:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C001
+change_id: C001-canonical-discovery-loop-dogfood-fixture
+title: Create canonical discovery-loop dogfood fixture
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 through ow-select-change single-queue ranking. It is the next
+  recommended ready candidate, has no dependencies, and creates the canonical
+  fixture chain required before M90 can verify happy-path or negative
+  discovery-loop routing.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M90-discovery-loop-e2e-dogfood/
+dependencies: []
+scope:
+  includes:
+    - fixture artifact content for one coherent product case
+    - helper builders for vision, validation, proto, prompt2proto metadata, tune, and decision records
+    - source validator coverage for all fixture artifacts
+    - fixture naming and comments that make the chain readable to agents
+  excludes:
+    - real image generation
+    - browser or visual review
+    - proto2html or downstream production specs
+    - async subagent runtime
+forbidden_paths:
+  - external image generation calls
+  - browser visual review fixtures
+  - proto2html or downstream production artifacts
+  - async subagent runtime behavior
+acceptance:
+  - A single dogfood fixture can validate vision, validation, strategic prompt pack, generated image metadata, refined tune prompt pack, and decision evidence together.
+  - Fixture artifact ids and refs make the chain traceable without reading unrelated repository state.
+  - The fixture remains text-first and does not require external image generation.
+  - Validation failures identify the artifact section that needs repair.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 is medium risk because it adds local text fixtures and verification
+    helpers only. It does not call external services, generate images, or alter
+    async runtime behavior.
+completion:
+  completed_at: 2026-05-22
+  commit: aae8ed1
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml

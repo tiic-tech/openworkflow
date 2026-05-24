@@ -1,0 +1,28 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-review-enhance-vision
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001-review-enhance-vision
+status: current
+source_plan_id: M74-front-chain-command-quality-review
+source_candidate_id: C001
+selected_change_id: C001-review-enhance-vision
+primary_commit: 3d585f0eacf415725275268f9f3ab95dd092caa7
+validation_evidence:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+known_validation_gap:
+  command: npm run verify:runtime-surface
+  status: failed_outside_selected_scope
+  note: >
+    The runtime-surface verifier still expects the old analyze-changes guidance
+    string. That AC verifier mismatch is outside the selected /ow:vision C001
+    scope and should be handled by a later AC/SC boundary cleanup candidate.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Generated ow-vision and artifact contracts were refreshed through openworkflow sync.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

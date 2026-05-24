@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-validation-generated-protocol
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-validation-generated-protocol
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C003
+title: Upgrade /ow:validation generated protocol for experiment compilation
+status: complete
+selection_reason: >
+  C003 follows C002 because generated /ow:validation should now reflect the
+  native build-validation contract and expanded validation_target shape.
+scope:
+  includes:
+    - command registry protocol updates
+    - generated ow-validation skill guidance through sync
+    - context packet drift checks
+    - return-to-vision and no-prototype anti-patterns
+  excludes:
+    - /ow:proto prompt generation
+    - downstream tune behavior
+    - validation_target schema shape changes
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-validation/SKILL.md
+  - .agents/skills/ow-validation/agents/openai.yaml
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M85-validation-proto-target-contract/
+forbidden_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - .agents/skills/ow-proto/SKILL.md
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+acceptance:
+  - /ow:validation generated skill names prototype validation target compiler behavior.
+  - The generated skill requires central uncertainty, experiment boundary, evidence, and decision rules.
+  - The generated skill returns to /ow:vision when vision gaps block a valid target.
+  - Verification catches generated-surface drift.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: 4e2f19f
+  evidence:
+    - changes/M85-validation-proto-target-contract/C003-validation-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary: >
+  Complete as one local commit because source protocol, generated adapters,
+  and drift verification must stay aligned.

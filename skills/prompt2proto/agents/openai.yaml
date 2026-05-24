@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prompt2Proto"
+  short_description: "Translate ready prompt packs into UI/UX prototype instructions"
+  default_prompt: "Use prompt2proto to consume a ready PROTO_PROMPT_PACK and produce credible UI/UX prototype translation instructions and evidence without starting provider generation."

@@ -83,6 +83,7 @@ const REQUIRED_FILES = [
   "packages/adapters/codex/src/templates.ts",
   "templates/openworkflow/README.md",
   "templates/codex/README.md",
+  "skills/build-vision/SKILL.md",
   "skills/build-validation/SKILL.md",
   "skills/build-validation/scripts/init_validation.py",
   "skills/build-prototype/SKILL.md",
@@ -293,7 +294,8 @@ async function validateYamlContracts(root: string, errors: string[]): Promise<vo
       validateDiscoveryArtifact(root, path, data, errors);
       validateWorkflowIndex(root, path, data, errors);
       validateContractGraph(root, path, data, errors);
-      validateCandidateChanges(root, path, data, errors);
+      await validateCandidateChanges(root, path, data, errors);
+      validateLocalCommitEvidence(root, path, data, errors);
     }
   }
 }
@@ -530,6 +532,11 @@ function countOccurrences(content: string, needle: string): number {
 function stringField(record: Record<string, unknown>, key: string): string | null {
   const value = record[key];
   return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function recordField(record: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = record[key];
+  return isRecord(value) ? value : {};
 }
 
 async function validateGeneratedSurfaceParity(root: string, errors: string[]): Promise<void> {
@@ -846,7 +853,7 @@ function validateCurrentState(root: string, path: string, data: Record<string, u
   }
 }
 
-function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+async function validateCandidateChanges(root: string, path: string, data: Record<string, unknown>, errors: string[]): Promise<void> {
   if (basename(path) !== "CANDIDATE_CHANGES.yaml") {
     return;
   }
@@ -858,6 +865,7 @@ function validateCandidateChanges(root: string, path: string, data: Record<strin
   if (isRecord(queuePolicy) && "branch_boundary" in queuePolicy) {
     validateBranchBoundary(label, queuePolicy.branch_boundary, errors);
   }
+  const strictCommitGate = isRecord(queuePolicy) && queuePolicy.selected_change_commit_gate === "strict";
   if (!Array.isArray(data.changes)) {
     errors.push(`${label} changes must be a list`);
     return;
@@ -867,7 +875,7 @@ function validateCandidateChanges(root: string, path: string, data: Record<strin
       errors.push(`${label} changes entries must be mappings`);
       continue;
     }
-    validateCandidateCompletionEvidence(label, candidate, errors);
+    validateCandidateCompletionEvidence(root, label, candidate, errors, { strictCommitGate });
   }
 }
 
@@ -883,9 +891,11 @@ function validateBranchBoundary(label: string, value: unknown, errors: string[])
 }
 
 function validateCandidateCompletionEvidence(
+  root: string,
   label: string,
   candidate: Record<string, unknown>,
   errors: string[],
+  options: { strictCommitGate: boolean },
 ): void {
   if (candidate.status !== "done") {
     return;
@@ -910,6 +920,98 @@ function validateCandidateCompletionEvidence(
       errors.push(`${label} ${id} completion commit evidence must use 'commit: <7-40 hex chars>'`);
     }
   }
+  const selectedChangeId = stringField(recordField(candidate, "selection"), "selected_change_id");
+  const implementationChangedFiles = completion.implementation_changed_files;
+  if (implementationChangedFiles === false) {
+    if (!nonEmptyString(completion.commit_not_required_reason)) {
+      errors.push(`${label} ${id} planning-only completion must include commit_not_required_reason`);
+    }
+    return;
+  }
+  if (implementationChangedFiles === true) {
+    validateRequiredLocalCommitEvidence(root, label, id, completion, evidence, errors);
+    return;
+  }
+  if (options.strictCommitGate && selectedChangeId) {
+    errors.push(`${label} ${id} strict selected-change completion must set implementation_changed_files true or false`);
+  }
+}
+
+function validateRequiredLocalCommitEvidence(
+  root: string,
+  label: string,
+  candidateId: string,
+  completion: Record<string, unknown>,
+  evidence: unknown[],
+  errors: string[],
+): void {
+  const evidencePath = localCommitEvidencePath(completion, evidence);
+  if (!evidencePath) {
+    errors.push(`${label} ${candidateId} implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml`);
+    return;
+  }
+  if (isExternalRef(evidencePath) || evidencePath.startsWith("commit:")) {
+    errors.push(`${label} ${candidateId} LOCAL_COMMIT_EVIDENCE.yaml path must be repo-relative`);
+    return;
+  }
+  const resolved = resolve(root, evidencePath);
+  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+    errors.push(`${label} ${candidateId} LOCAL_COMMIT_EVIDENCE.yaml path escapes repository root`);
+    return;
+  }
+  if (!existsSyncSafe(resolved)) {
+    errors.push(`${label} ${candidateId} references missing LOCAL_COMMIT_EVIDENCE.yaml ${evidencePath}`);
+  }
+}
+
+function localCommitEvidencePath(completion: Record<string, unknown>, evidence: unknown[]): string | null {
+  const explicit = stringField(completion, "local_commit_evidence_path") ?? stringField(completion, "local_commit_evidence");
+  if (explicit && explicit.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+    return explicit;
+  }
+  for (const item of evidence) {
+    if (typeof item === "string" && item.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+      return item;
+    }
+  }
+  return null;
+}
+
+function validateLocalCommitEvidence(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (basename(path) !== "LOCAL_COMMIT_EVIDENCE.yaml") {
+    return;
+  }
+  const label = relative(root, path);
+  const planId = stringField(data, "source_plan_id") ?? stringField(data, "plan_id");
+  const candidateId = stringField(data, "source_candidate_id") ?? stringField(data, "candidate_id");
+  const selectedChangeId = stringField(data, "selected_change_id") ?? stringField(data, "change_id");
+  const commit = stringField(data, "primary_commit") ?? stringField(data, "implementation_commit") ?? stringField(data, "commit");
+  if (!planId) {
+    errors.push(`${label} missing source_plan_id or plan_id`);
+  }
+  if (!candidateId) {
+    errors.push(`${label} missing source_candidate_id or candidate_id`);
+  }
+  if (!selectedChangeId) {
+    errors.push(`${label} missing selected_change_id or change_id`);
+  }
+  if (!commit || !/^[0-9a-f]{7,40}$/i.test(commit)) {
+    errors.push(`${label} must include primary_commit or implementation_commit with a 7-40 character git hash`);
+  }
+  if (!hasValidationEvidence(data)) {
+    errors.push(`${label} must include validation_evidence, validations, or validation.commands_run`);
+  }
+}
+
+function hasValidationEvidence(data: Record<string, unknown>): boolean {
+  if (Array.isArray(data.validation_evidence) && data.validation_evidence.some((item) => typeof item === "string" && item.trim().length > 0)) {
+    return true;
+  }
+  if (Array.isArray(data.validations) && data.validations.some((item) => typeof item === "string" && item.trim().length > 0)) {
+    return true;
+  }
+  const validation = recordField(data, "validation");
+  return Array.isArray(validation.commands_run) && validation.commands_run.some((item) => typeof item === "string" && item.trim().length > 0);
 }
 
 function validateCommonContract(root: string, path: string, data: unknown, errors: string[]): void {
@@ -1180,6 +1282,9 @@ function validateDisclosureLevels(root: string, path: string, data: Record<strin
 }
 
 function validateDiscoveryArtifact(root: string, path: string, data: Record<string, unknown>, errors: string[]): void {
+  if (data.contract_type === "planning") {
+    return;
+  }
   if (typeof data.artifact_type !== "string") {
     return;
   }
@@ -1215,12 +1320,21 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
   const requiredByType: Record<string, string[]> = {
     vision_session: ["current_question", "stable_answers", "unresolved_questions", "vision_delta", "handoff"],
     validation_target: [
+      "trigger",
       "core_question",
+      "central_uncertainty",
+      "hypothesis",
+      "target_behavior",
       "feature_classification",
       "critical_assumptions",
       "prototype_scope",
+      "prototype_experiment",
+      "observable_signals",
       "acceptance",
+      "decision_rules",
       "decision_options",
+      "vision_gaps",
+      "agent_readiness_gate",
     ],
     prototype_evidence: [
       "validation_target",
@@ -1297,6 +1411,7 @@ function artifactRequiredKeys(artifactType: string): string[] | null {
 }
 
 function validateValidationTarget(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validateValidationTrigger(label, data.trigger, errors);
   const featureClassification = data.feature_classification;
   if (isRecord(featureClassification)) {
     for (const key of ["existential", "supporting", "later", "out_of_scope"]) {
@@ -1306,6 +1421,62 @@ function validateValidationTarget(label: string, data: Record<string, unknown>, 
     }
   }
   validatePrototypeScope(label, data.prototype_scope, errors);
+  validatePrototypeExperiment(label, data.prototype_experiment, errors);
+  validateSignalSet(label, "observable_signals", data.observable_signals, ["pass", "fail", "ambiguous"], errors);
+  validateSignalSet(label, "decision_rules", data.decision_rules, ["continue", "revise", "pivot", "stop", "needs_more_evidence"], errors);
+  validateAgentReadinessGate(label, data.agent_readiness_gate, errors);
+}
+
+function validateValidationTrigger(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["mode", "requested_command", "reason"]) {
+    if (!(key in value)) {
+      errors.push(`${label} trigger missing ${key}`);
+    }
+  }
+  const mode = String(value.mode ?? "");
+  if (mode && !["user_explicit", "agent_auto"].includes(mode)) {
+    errors.push(`${label} trigger.mode has invalid value ${mode}`);
+  }
+}
+
+function validatePrototypeExperiment(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["scenario", "must_show", "must_not_show"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prototype_experiment missing ${key}`);
+    }
+  }
+}
+
+function validateSignalSet(label: string, field: string, value: unknown, keys: string[], errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of keys) {
+    if (!(key in value)) {
+      errors.push(`${label} ${field} missing ${key}`);
+    }
+  }
+}
+
+function validateAgentReadinessGate(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of ["status", "blockers", "warnings", "write_authority"]) {
+    if (!(key in value)) {
+      errors.push(`${label} agent_readiness_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["missing_validation", "thin_validation", "stale_validation", "ready_for_proto", "return_to_vision"].includes(status)) {
+    errors.push(`${label} agent_readiness_gate.status has invalid value ${status}`);
+  }
 }
 
 function validatePrototypeScope(label: string, value: unknown, errors: string[]): void {
@@ -1382,6 +1553,8 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   validateEvidenceRefs(root, label, data, errors);
   if ("validation_input" in data && !isRecord(data.validation_input)) {
     errors.push(`${label} validation_input must be a mapping`);
+  } else {
+    validatePrototypeValidationInput(label, data.validation_input, errors);
   }
   if ("source" in data && !isRecord(data.source)) {
     errors.push(`${label} source must be a mapping`);
@@ -1404,9 +1577,1059 @@ function validatePrototypeEvidence(root: string, label: string, data: Record<str
   if ("prompt_pack_type" in data && !["strategic_proto_prompt_pack", "refined_proto_prompt_pack", "proto_review_evidence"].includes(String(data.prompt_pack_type))) {
     errors.push(`${label} has invalid prompt_pack_type ${String(data.prompt_pack_type)}`);
   }
+  if (data.prompt_pack_type === "strategic_proto_prompt_pack") {
+    validateStrategicPrototypePromptPack(label, data, errors);
+  }
+  if (data.prompt_pack_type === "refined_proto_prompt_pack") {
+    validateRefinedPrototypePromptPack(label, data, errors);
+  }
   if (!["pass", "fail", "unclear", "not_reviewed"].includes(String(data.result))) {
     errors.push(`${label} has invalid result ${String(data.result)}`);
   }
+}
+
+function validateRefinedPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validateRequiredObjectFields(label, "tune_input", data.tune_input, ["baseline_source_type", "baseline_refs", "tune_request", "regeneration_scope"], errors);
+  validateRefinedBaselineResolution(label, data.baseline_resolution, errors);
+  validateRefinedCarryForward(label, data.carry_forward, errors);
+  validateRefinedBaselineAudit(label, data.baseline_audit, errors);
+  validateRequiredObjectFields(label, "product_system", data.product_system, REFINED_PRODUCT_SYSTEM_FIELDS, errors);
+  validateRefinedDeltaRules(label, data.delta_rules, data.tune_input, errors);
+  validateRefinedScreenDeltaMatrix(label, data.screen_delta_matrix, errors);
+  const manifestIds = validateRefinedScreenManifest(label, data.screen_manifest, errors);
+  validateRefinedScreenPrompts(label, data.screen_prompts, manifestIds, errors);
+  if (!Array.isArray(data.generation_order) || data.generation_order.length === 0) {
+    errors.push(`${label} generation_order must list target screen ids`);
+  }
+  if (!Array.isArray(data.acceptance_checklist) || data.acceptance_checklist.length === 0) {
+    errors.push(`${label} acceptance_checklist must be non-empty`);
+  }
+}
+
+const REFINED_BASELINE_AUDIT_FIELDS = [
+  "source_screen_id",
+  "screen_name",
+  "journey_stage",
+  "user_goal",
+  "system_state",
+  "components",
+  "must_preserve",
+];
+
+const REFINED_BASELINE_RESOLUTION_FIELDS = [
+  "latest_approved_baseline_group_id",
+  "latest_approved_baseline_ref",
+  "baseline_lineage",
+  "resolution_rule",
+  "stale_source_guard",
+];
+
+const REFINED_CARRY_FORWARD_FIELDS = [
+  "locked_screens",
+  "locked_elements",
+  "preserved_improvements",
+  "explicit_unlocks",
+  "cumulative_drift_guard",
+];
+
+const REFINED_PRODUCT_SYSTEM_FIELDS = [
+  "product_thesis",
+  "primary_loop",
+  "component_vocabulary",
+  "copywriting_style",
+  "trust_and_boundary_system",
+  "stable_constants",
+  "adaptable_variables",
+];
+
+const REFINED_DELTA_RULE_KEYS = ["must_inherit", "must_add", "must_remove", "flexible_change"];
+
+const REFINED_SCREEN_DELTA_FIELDS = [
+  "target_screen_id",
+  "source_screen_ids",
+  "preserve",
+  "add",
+  "remove",
+  "transform",
+  "flexible",
+  "acceptance_criteria",
+];
+
+const REFINED_SCREEN_MANIFEST_FIELDS = ["target_screen_id", "source_screen_ids", "screen_name", "generation_scope"];
+const REFINED_SCREEN_PROMPT_FIELDS = ["prompt_id", "target_screen_id", "source_screen_ids", "screen_name", "prompt", "negative_prompt", "acceptance_criteria"];
+
+function validateRefinedBaselineAudit(label: string, value: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} baseline_audit must contain source screen audits`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `baseline_audit[${index}]`, item, REFINED_BASELINE_AUDIT_FIELDS, errors);
+  });
+}
+
+function validateRefinedBaselineResolution(label: string, value: unknown, errors: string[]): void {
+  validateRequiredObjectFields(label, "baseline_resolution", value, REFINED_BASELINE_RESOLUTION_FIELDS, errors);
+  if (!isRecord(value)) {
+    return;
+  }
+  if (!Array.isArray(value.baseline_lineage)) {
+    errors.push(`${label} baseline_resolution.baseline_lineage must be an array`);
+  }
+  if (String(value.stale_source_guard ?? "").trim().length === 0) {
+    errors.push(`${label} baseline_resolution.stale_source_guard must forbid stale source-screen fallback`);
+  }
+}
+
+function validateRefinedCarryForward(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} carry_forward must be a mapping`);
+    return;
+  }
+  for (const key of REFINED_CARRY_FORWARD_FIELDS) {
+    if (!Object.hasOwn(value, key)) {
+      errors.push(`${label} carry_forward.${key} must be present`);
+    }
+  }
+  for (const key of ["locked_screens", "locked_elements", "preserved_improvements", "explicit_unlocks"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} carry_forward.${key} must be an array`);
+    }
+  }
+  if (String(value.cumulative_drift_guard ?? "").trim().length === 0) {
+    errors.push(`${label} carry_forward.cumulative_drift_guard must forbid cumulative tune drift`);
+  }
+}
+
+function validateRefinedDeltaRules(label: string, value: unknown, tuneInput: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} delta_rules must be a mapping`);
+    return;
+  }
+  for (const key of REFINED_DELTA_RULE_KEYS) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} delta_rules.${key} must be an array`);
+    }
+  }
+  if (Array.isArray(value.must_inherit) && value.must_inherit.length === 0) {
+    errors.push(`${label} delta_rules.must_inherit must preserve baseline product-system constants`);
+  }
+  const tuneRequest = isRecord(tuneInput) ? String(tuneInput.tune_request ?? "").toLowerCase() : "";
+  if (/\b(remove|delete|drop|eliminate|hide)\b/.test(tuneRequest) && Array.isArray(value.must_remove) && value.must_remove.length === 0) {
+    errors.push(`${label} delta_rules.must_remove must name requested removals from tune_input.tune_request`);
+  }
+}
+
+function validateRefinedScreenDeltaMatrix(label: string, value: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_delta_matrix must contain target screen delta rows`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_delta_matrix[${index}]`, item, REFINED_SCREEN_DELTA_FIELDS, errors);
+  });
+}
+
+function validateRefinedScreenManifest(label: string, value: unknown, errors: string[]): Set<string> {
+  const ids = new Set<string>();
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_manifest must contain target screens`);
+    return ids;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_manifest[${index}]`, item, REFINED_SCREEN_MANIFEST_FIELDS, errors);
+    if (isRecord(item) && nonEmptyString(item.target_screen_id)) {
+      ids.add(String(item.target_screen_id));
+    }
+  });
+  return ids;
+}
+
+function validateRefinedScreenPrompts(label: string, value: unknown, manifestIds: Set<string>, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_prompts must contain screen-bound refined prompts`);
+    return;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_prompts[${index}]`, item, REFINED_SCREEN_PROMPT_FIELDS, errors);
+    if (isRecord(item) && nonEmptyString(item.target_screen_id) && manifestIds.size > 0 && !manifestIds.has(String(item.target_screen_id))) {
+      errors.push(`${label} screen_prompts[${index}].target_screen_id must exist in screen_manifest`);
+    }
+  });
+}
+
+const STRATEGIC_NORMALIZED_FIELDS = [
+  "product_domain",
+  "primary_user",
+  "usage_context",
+  "current_alternative",
+  "core_pain",
+  "desired_behavior_change",
+  "strongest_success_signal",
+  "core_differentiator",
+  "emotional_value",
+  "functional_value",
+  "trust_requirements",
+  "privacy_requirements",
+  "non_goals",
+  "future_opportunities",
+  "validation_target",
+];
+
+const STRATEGIC_CORE_FIELDS = [
+  "target_user",
+  "behavior_change",
+  "mechanism",
+  "differentiator",
+  "boundary_conditions",
+  "central_uncertainty",
+];
+
+const PRODUCT_EXPERIENCE_MODEL_FIELDS = [
+  "product_archetype",
+  "primary_canvas",
+  "information_architecture",
+  "domain_object_model",
+  "primary_task_loop",
+  "interaction_state_model",
+  "data_realism_requirements",
+  "visual_language",
+  "anti_generic_constraints",
+];
+
+const PROTOTYPE_SYSTEM_CONTRACT_FIELDS = [
+  "stable_app_shell",
+  "navigation_taxonomy",
+  "data_vocabulary",
+  "domain_object_anatomy",
+  "object_detail_anatomy",
+  "action_bar_contract",
+  "audit_trust_pattern",
+  "copy_tone",
+  "allowed_screen_deltas",
+];
+
+const PROTOTYPE_REALITY_GATE_DIMENSIONS = [
+  "product_category_fit",
+  "primary_canvas_fit",
+  "domain_object_realism",
+  "task_loop_completeness",
+  "interaction_state_coverage",
+  "data_realism",
+  "anti_generic_constraints",
+];
+
+const PROMPT_PACK_INTEGRITY_GATE_DIMENSIONS = [
+  "direction_count_matches",
+  "prompt_text_refs_resolve",
+  "generated_image_refs_resolve",
+];
+
+const STRATEGIC_PROTOTYPE_BRIEF_FIELDS = [
+  "product_name",
+  "positioning",
+  "target_user",
+  "current_alternative",
+  "core_idea",
+  "primary_loop",
+  "trust_boundaries",
+  "non_goals",
+  "desired_feeling",
+];
+
+const STRATEGIC_SCREEN_MANIFEST_FIELDS = [
+  "target_screen_id",
+  "screen_name",
+  "journey_stage",
+  "user_goal",
+  "system_state",
+  "required_components",
+  "required_data_fields",
+  "primary_actions",
+  "trust_controls",
+  "example_copy",
+  "acceptance_criteria",
+];
+
+const STRATEGIC_GLOBAL_DESIGN_SYSTEM_PROMPT_FIELDS = [
+  "visual_language",
+  "layout_system",
+  "component_vocabulary",
+  "information_density",
+  "copy_tone",
+  "responsive_canvas_rules",
+  "negative_visual_patterns",
+];
+
+const STRATEGIC_SCREEN_PROMPT_FIELDS = [
+  "prompt_id",
+  "target_screen_id",
+  "screen_name",
+  "image_role",
+  "negative_prompt",
+  "example_copy",
+  "acceptance_criteria",
+];
+
+const STRATEGIC_QUALITY_RUBRIC_FIELDS = [
+  "prompt_executability",
+  "strategic_distinctness",
+  "product_specificity",
+  "state_coverage",
+  "trust_boundary_coverage",
+];
+
+const STRATEGIC_DIRECTION_FIELDS = [
+  "direction_id",
+  "name",
+  "strategic_hypothesis",
+  "validates",
+  "main_risk",
+  "distinctness_rationale",
+  "prototype_prompt",
+  "screen_prompts",
+  "pm_judgment",
+];
+
+const STRATEGIC_DISTINCTNESS_SIGNALS = [
+  "product form",
+  "trigger",
+  "interaction model",
+  "emotional driver",
+  "retention mechanism",
+  "metric",
+  "main risk",
+  "risk",
+  "user behavior",
+  "workflow",
+  "trust",
+  "privacy",
+];
+
+const STRATEGIC_FINGERPRINT_DIMENSIONS = [
+  "product_form",
+  "trigger",
+  "interaction_model",
+  "emotional_driver",
+  "retention_mechanism",
+  "metric",
+  "main_risk",
+  "trust_model",
+  "privacy_model",
+];
+
+function validatePrototypeValidationInput(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    return;
+  }
+  const mode = String(value.mode ?? "");
+  if (mode && !["validation_present", "agent_auto_generated"].includes(mode)) {
+    errors.push(`${label} validation_input.mode has invalid value ${mode}`);
+  }
+  if (mode === "vision_only" || mode === "internally_derived") {
+    errors.push(`${label} validation_input.mode must reference durable validation, not ${mode}`);
+  }
+  if (!Array.isArray(value.refs)) {
+    errors.push(`${label} validation_input.refs must be an array`);
+  } else if (mode && value.refs.length === 0) {
+    errors.push(`${label} validation_input.refs must include durable validation artifact refs`);
+  }
+}
+
+function validateStrategicPrototypePromptPack(label: string, data: Record<string, unknown>, errors: string[]): void {
+  validatePreflightQualityGate(label, data.preflight_quality_gate, errors);
+  validateInternalPipeline(label, data.internal_pipeline, errors);
+  validateDirectionCountPolicy(label, data.direction_count_policy, errors);
+  validateRequiredObjectFields(label, "normalized_input", data.normalized_input, STRATEGIC_NORMALIZED_FIELDS, errors);
+  validateRequiredObjectFields(label, "strategic_core", data.strategic_core, STRATEGIC_CORE_FIELDS, errors);
+  validateProductExperienceModel(label, data.product_experience_model, data, errors);
+  validatePrototypeSystemContract(label, data.prototype_system_contract, data, errors);
+  validatePrototypeRealityGate(label, data.prototype_reality_gate, data, errors);
+  validatePromptPackIntegrityGate(label, data.prompt_pack_integrity_gate, data, errors);
+  validateScreenBoundExecutability(label, data, errors);
+  validateStrategicDirections(label, data.directions, data.direction_count_policy, errors);
+  validateBuildRecommendation(label, data.build_recommendation, errors);
+  validatePromptTextManifest(label, data.prompt_text_manifest, errors);
+  validatePostValidate(label, data.post_validate, data.direction_count_policy, data.prompt_text_manifest, data.image_generation, data.directions, errors);
+  validateImageGeneration(label, data.image_generation, errors);
+}
+
+function validatePreflightQualityGate(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} preflight_quality_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["vision_status", "validation_status", "can_proceed", "blockers", "next_command_when_blocked"]) {
+    if (!(key in value)) {
+      errors.push(`${label} preflight_quality_gate missing ${key}`);
+    }
+  }
+  for (const key of ["vision_status", "validation_status"]) {
+    const status = String(value[key] ?? "");
+    if (status && !["missing", "thin", "ready"].includes(status)) {
+      errors.push(`${label} preflight_quality_gate.${key} has invalid value ${status}`);
+    }
+  }
+  if (value.can_proceed !== true && value.next_command_when_blocked !== "/ow:vision") {
+    errors.push(`${label} preflight_quality_gate must route blocked prototype work back to /ow:vision`);
+  }
+}
+
+function validateInternalPipeline(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} internal_pipeline must be a mapping`);
+    return;
+  }
+  if (value.orchestrator_command !== "/ow:proto" || value.user_visible_command !== "/ow:proto") {
+    errors.push(`${label} internal_pipeline must keep /ow:proto as the user-visible orchestrator`);
+  }
+  const stages = value.stages;
+  if (!Array.isArray(stages)) {
+    errors.push(`${label} internal_pipeline.stages must be an array`);
+    return;
+  }
+  const stageIds = new Set<string>();
+  for (const item of stages) {
+    if (!isRecord(item)) {
+      errors.push(`${label} internal_pipeline.stages entries must be mappings`);
+      continue;
+    }
+    const stageId = String(item.stage_id ?? "");
+    stageIds.add(stageId);
+    for (const key of ["stage_id", "command", "visibility", "status", "outputs"]) {
+      if (!(key in item)) {
+        errors.push(`${label} internal_pipeline stage missing ${key}`);
+      }
+    }
+    if ((stageId === "vision2prompt" || stageId === "prompt2proto") && item.visibility !== "internal") {
+      errors.push(`${label} internal pipeline stage ${stageId} must be internal`);
+    }
+  }
+  for (const required of ["proto-preflight", "vision2prompt", "prompt2proto"]) {
+    if (!stageIds.has(required)) {
+      errors.push(`${label} internal_pipeline missing stage ${required}`);
+    }
+  }
+}
+
+function validateDirectionCountPolicy(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} direction_count_policy must be a mapping`);
+    return;
+  }
+  const source = String(value.source ?? "");
+  if (source && !["user_input", "agent_default_after_user_delegation"].includes(source)) {
+    errors.push(`${label} direction_count_policy.source has invalid value ${source}`);
+  }
+  if (typeof value.resolved_count !== "number" || value.resolved_count < 1) {
+    errors.push(`${label} direction_count_policy.resolved_count must be a positive number`);
+  }
+  if (source === "agent_default_after_user_delegation" && value.resolved_count !== 3) {
+    errors.push(`${label} direction_count_policy delegated default must resolve to 3`);
+  }
+  if (value.ask_user_question_required === true && !nonEmptyString(value.ask_user_question)) {
+    errors.push(`${label} direction_count_policy.ask_user_question must be set when askUserQuestion is required`);
+  }
+}
+
+function validateRequiredObjectFields(label: string, field: string, value: unknown, keys: string[], errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} ${field} must be a mapping`);
+    return;
+  }
+  for (const key of keys) {
+    if (!hasUsefulValue(value[key])) {
+      errors.push(`${label} ${field}.${key} must be non-empty`);
+    }
+  }
+}
+
+function validateProductExperienceModel(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  if (!strategicPromptPackRequiresProductExperienceModel(data)) {
+    if ("product_experience_model" in data && !isRecord(value)) {
+      errors.push(`${label} product_experience_model must be a mapping when present`);
+    }
+    return;
+  }
+  validateRequiredObjectFields(label, "product_experience_model", value, PRODUCT_EXPERIENCE_MODEL_FIELDS, errors);
+}
+
+function strategicPromptPackRequiresProductExperienceModel(data: Record<string, unknown>): boolean {
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  return (
+    data.status !== "draft" ||
+    promptTextManifest.status === "ready_for_image_generation" ||
+    promptTextManifest.status === "generated" ||
+    (typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started")
+  );
+}
+
+function validatePrototypeSystemContract(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prototype_system_contract" in data && !isRecord(value)) {
+      errors.push(`${label} prototype_system_contract must be a mapping when present`);
+    }
+    return;
+  }
+  validateRequiredObjectFields(label, "prototype_system_contract", value, PROTOTYPE_SYSTEM_CONTRACT_FIELDS, errors);
+  if (!isRecord(value)) {
+    return;
+  }
+  for (const key of PROTOTYPE_SYSTEM_CONTRACT_FIELDS) {
+    if (key === "copy_tone") {
+      if (!nonEmptyString(value[key])) {
+        errors.push(`${label} prototype_system_contract.copy_tone must be a non-empty string`);
+      }
+      continue;
+    }
+    if (!Array.isArray(value[key]) || value[key].length === 0) {
+      errors.push(`${label} prototype_system_contract.${key} must be a non-empty array`);
+    }
+  }
+}
+
+function validatePrototypeRealityGate(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prototype_reality_gate" in data && !isRecord(value)) {
+      errors.push(`${label} prototype_reality_gate must be a mapping when present`);
+    }
+    return;
+  }
+  if (!isRecord(value)) {
+    errors.push(`${label} prototype_reality_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_prompt_text_ready", "dimensions", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prototype_reality_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail"].includes(status)) {
+    errors.push(`${label} prototype_reality_gate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "before_image_generation") {
+    errors.push(`${label} prototype_reality_gate.trigger must be before_image_generation`);
+  }
+  if (value.required_when_prompt_text_ready !== true) {
+    errors.push(`${label} prototype_reality_gate.required_when_prompt_text_ready must be true`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} prototype_reality_gate.repair_route must be /ow:vision2prompt`);
+  }
+  if (!Array.isArray(value.dimensions)) {
+    errors.push(`${label} prototype_reality_gate.dimensions must be an array`);
+  } else {
+    for (const dimension of PROTOTYPE_REALITY_GATE_DIMENSIONS) {
+      if (!value.dimensions.includes(dimension)) {
+        errors.push(`${label} prototype_reality_gate.dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} prototype_reality_gate.${key} must be an array`);
+    }
+  }
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  if (promptTextReady && status !== "pass") {
+    errors.push(`${label} prototype_reality_gate.status must be pass before image generation`);
+  }
+  if (status === "pass" && Array.isArray(value.failures) && value.failures.length > 0) {
+    errors.push(`${label} prototype_reality_gate.failures must be empty when status is pass`);
+  }
+  if (status === "fail" && typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started") {
+    errors.push(`${label} prototype_reality_gate failed gates must not start image_generation`);
+  }
+}
+
+function validatePromptPackIntegrityGate(label: string, value: unknown, data: Record<string, unknown>, errors: string[]): void {
+  const required = strategicPromptPackRequiresProductExperienceModel(data);
+  if (!required) {
+    if ("prompt_pack_integrity_gate" in data && !isRecord(value)) {
+      errors.push(`${label} prompt_pack_integrity_gate must be a mapping when present`);
+    }
+    return;
+  }
+  if (!isRecord(value)) {
+    errors.push(`${label} prompt_pack_integrity_gate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_prompt_text_ready", "dimensions", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} prompt_pack_integrity_gate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail"].includes(status)) {
+    errors.push(`${label} prompt_pack_integrity_gate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "before_image_generation") {
+    errors.push(`${label} prompt_pack_integrity_gate.trigger must be before_image_generation`);
+  }
+  if (value.required_when_prompt_text_ready !== true) {
+    errors.push(`${label} prompt_pack_integrity_gate.required_when_prompt_text_ready must be true`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} prompt_pack_integrity_gate.repair_route must be /ow:vision2prompt`);
+  }
+  if (!Array.isArray(value.dimensions)) {
+    errors.push(`${label} prompt_pack_integrity_gate.dimensions must be an array`);
+  } else {
+    for (const dimension of PROMPT_PACK_INTEGRITY_GATE_DIMENSIONS) {
+      if (!value.dimensions.includes(dimension)) {
+        errors.push(`${label} prompt_pack_integrity_gate.dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} prompt_pack_integrity_gate.${key} must be an array`);
+    }
+  }
+
+  validatePromptPackIntegrity(label, data, errors);
+
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  if (promptTextReady && status !== "pass") {
+    errors.push(`${label} prompt_pack_integrity_gate.status must be pass before image generation`);
+  }
+  if (status === "pass" && Array.isArray(value.failures) && value.failures.length > 0) {
+    errors.push(`${label} prompt_pack_integrity_gate.failures must be empty when status is pass`);
+  }
+  if (status === "fail" && typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started") {
+    errors.push(`${label} prompt_pack_integrity_gate failed gates must not start image_generation`);
+  }
+}
+
+function validatePromptPackIntegrity(label: string, data: Record<string, unknown>, errors: string[]): void {
+  const directions = Array.isArray(data.directions) ? data.directions.filter(isRecord) : [];
+  const directionIds = new Set<string>();
+  const promptIds = new Set<string>();
+  for (const direction of directions) {
+    if (nonEmptyString(direction.direction_id)) {
+      directionIds.add(String(direction.direction_id));
+    }
+    if (Array.isArray(direction.screen_prompts)) {
+      for (const prompt of direction.screen_prompts) {
+        if (isRecord(prompt) && nonEmptyString(prompt.prompt_id)) {
+          promptIds.add(String(prompt.prompt_id));
+        }
+      }
+    }
+  }
+
+  const countPolicy = isRecord(data.direction_count_policy) ? data.direction_count_policy : {};
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const promptTextReady = promptTextManifest.status === "ready_for_image_generation" || promptTextManifest.status === "generated";
+  const resolvedCount = typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  if (promptTextReady && resolvedCount !== null && directions.length !== resolvedCount) {
+    errors.push(`${label} directions length must equal direction_count_policy.resolved_count before image generation`);
+  }
+  if (promptTextReady && typeof promptTextManifest.direction_count !== "number") {
+    errors.push(`${label} prompt_text_manifest.direction_count must be a number before image generation`);
+  }
+  if (typeof promptTextManifest.direction_count === "number" && directions.length > 0 && promptTextManifest.direction_count !== directions.length) {
+    errors.push(`${label} prompt_text_manifest.direction_count must equal directions length`);
+  }
+
+  if (promptTextReady) {
+    const refs = Array.isArray(promptTextManifest.prompt_text_refs) ? promptTextManifest.prompt_text_refs : [];
+    if (refs.length === 0) {
+      errors.push(`${label} prompt_text_manifest.prompt_text_refs must include prompt refs before image generation`);
+    }
+    refs.forEach((ref, index) => {
+      if (!stringReferencesKnownPrompt(String(ref), directionIds, promptIds)) {
+        errors.push(`${label} prompt_text_manifest.prompt_text_refs[${index}] must reference an existing direction_id or prompt_id`);
+      }
+    });
+  }
+
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  const generatedImages = Array.isArray(imageGeneration.generated_images) ? imageGeneration.generated_images : [];
+  generatedImages.forEach((image, index) => {
+    if (!isRecord(image)) {
+      return;
+    }
+    const directionId = String(image.direction_id ?? "");
+    const promptId = String(image.prompt_id ?? "");
+    if (directionId && !directionIds.has(directionId)) {
+      errors.push(`${label} image_generation.generated_images[${index}].direction_id must exist in directions`);
+    }
+    if (promptId && !promptIds.has(promptId)) {
+      errors.push(`${label} image_generation.generated_images[${index}].prompt_id must exist in directions[].screen_prompts`);
+    }
+    const metadata = isRecord(image.metadata) ? image.metadata : {};
+    const sourcePromptRef = String(metadata.source_prompt_ref ?? "");
+    if (sourcePromptRef && !stringReferencesKnownPrompt(sourcePromptRef, directionIds, promptIds)) {
+      errors.push(`${label} image_generation.generated_images[${index}].metadata.source_prompt_ref must reference an existing direction_id or prompt_id`);
+    }
+  });
+}
+
+function validateScreenBoundExecutability(label: string, data: Record<string, unknown>, errors: string[]): void {
+  if (!strategicPromptPackRequiresScreenExecutability(data)) {
+    return;
+  }
+  validateRequiredObjectFields(label, "prototype_brief", data.prototype_brief, STRATEGIC_PROTOTYPE_BRIEF_FIELDS, errors);
+  validateRequiredObjectFields(label, "global_design_system_prompt", data.global_design_system_prompt, STRATEGIC_GLOBAL_DESIGN_SYSTEM_PROMPT_FIELDS, errors);
+  validateRequiredObjectFields(label, "quality_rubric", data.quality_rubric, STRATEGIC_QUALITY_RUBRIC_FIELDS, errors);
+  const manifestIds = validateStrategicScreenManifest(label, data.screen_manifest, errors);
+  validateStrategicDirectionScreenPrompts(label, data.directions, manifestIds, errors);
+}
+
+function strategicPromptPackRequiresScreenExecutability(data: Record<string, unknown>): boolean {
+  const promptTextManifest = isRecord(data.prompt_text_manifest) ? data.prompt_text_manifest : {};
+  const imageGeneration = isRecord(data.image_generation) ? data.image_generation : {};
+  return (
+    promptTextManifest.status === "ready_for_image_generation" ||
+    promptTextManifest.status === "generated" ||
+    (typeof imageGeneration.status === "string" && imageGeneration.status !== "not_started")
+  );
+}
+
+function validateStrategicScreenManifest(label: string, value: unknown, errors: string[]): Set<string> {
+  const ids = new Set<string>();
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} screen_manifest must contain screen-bound product states before image generation`);
+    return ids;
+  }
+  value.forEach((item, index) => {
+    validateRequiredObjectFields(label, `screen_manifest[${index}]`, item, STRATEGIC_SCREEN_MANIFEST_FIELDS, errors);
+    if (!isRecord(item)) {
+      return;
+    }
+    if (nonEmptyString(item.target_screen_id)) {
+      ids.add(String(item.target_screen_id));
+    }
+    if (!hasUsefulValue(item.ai_behavior) && !hasUsefulValue(item.non_ai_rationale)) {
+      errors.push(`${label} screen_manifest[${index}] must include ai_behavior or non_ai_rationale`);
+    }
+  });
+  return ids;
+}
+
+function validateStrategicDirectionScreenPrompts(label: string, directions: unknown, manifestIds: Set<string>, errors: string[]): void {
+  if (!Array.isArray(directions)) {
+    return;
+  }
+  directions.forEach((direction, directionIndex) => {
+    if (!isRecord(direction)) {
+      return;
+    }
+    const screenPrompts = direction.screen_prompts;
+    if (!Array.isArray(screenPrompts) || screenPrompts.length === 0) {
+      errors.push(`${label} directions[${directionIndex}].screen_prompts must contain screen-bound prompt text before image generation`);
+      return;
+    }
+    screenPrompts.forEach((prompt, promptIndex) => {
+      const fieldLabel = `directions[${directionIndex}].screen_prompts[${promptIndex}]`;
+      validateRequiredObjectFields(label, fieldLabel, prompt, STRATEGIC_SCREEN_PROMPT_FIELDS, errors);
+      if (!isRecord(prompt)) {
+        return;
+      }
+      if (!hasUsefulValue(prompt.prompt) && !hasUsefulValue(prompt.standalone_prompt)) {
+        errors.push(`${label} ${fieldLabel} must include prompt or standalone_prompt`);
+      }
+      if (nonEmptyString(prompt.target_screen_id) && manifestIds.size > 0 && !manifestIds.has(String(prompt.target_screen_id))) {
+        errors.push(`${label} ${fieldLabel}.target_screen_id must exist in screen_manifest`);
+      }
+    });
+  });
+}
+
+function stringReferencesKnownPrompt(value: string, directionIds: Set<string>, promptIds: Set<string>): boolean {
+  const normalized = normalizePromptRef(value);
+  if (normalized.length === 0) {
+    return false;
+  }
+  for (const id of [...directionIds, ...promptIds]) {
+    const token = normalizePromptRef(id);
+    if (token.length > 0 && normalized.includes(token)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function normalizePromptRef(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function validateStrategicDirections(label: string, value: unknown, countPolicy: unknown, errors: string[]): void {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push(`${label} directions must contain strategic prompt directions`);
+    return;
+  }
+  const resolvedCount = isRecord(countPolicy) && typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  if (resolvedCount !== null && value.length < resolvedCount) {
+    errors.push(`${label} directions must include at least direction_count_policy.resolved_count items`);
+  }
+  value.forEach((item, index) => {
+    if (!isRecord(item)) {
+      errors.push(`${label} directions[${index}] must be a mapping`);
+      return;
+    }
+    for (const key of STRATEGIC_DIRECTION_FIELDS) {
+      if (!hasUsefulValue(item[key])) {
+        errors.push(`${label} directions[${index}].${key} must be non-empty`);
+      }
+    }
+    const screenPrompts = item.screen_prompts;
+    if (Array.isArray(screenPrompts) && screenPrompts.length < 2) {
+      errors.push(`${label} directions[${index}].screen_prompts must include multi-image prompt text`);
+    }
+    const distinctness = String(item.distinctness_rationale ?? "").toLowerCase();
+    if (!STRATEGIC_DISTINCTNESS_SIGNALS.some((signal) => distinctness.includes(signal))) {
+      errors.push(`${label} directions[${index}].distinctness_rationale must name a strategic difference, not only visual style`);
+    }
+  });
+}
+
+function validateBuildRecommendation(label: string, value: unknown, errors: string[]): void {
+  validateRequiredObjectFields(label, "build_recommendation", value, ["first_direction_id", "why_first", "success_signals", "failure_signals", "next_test_if_it_works"], errors);
+}
+
+function validatePromptTextManifest(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} prompt_text_manifest must be a mapping`);
+    return;
+  }
+  const status = String(value.status ?? "");
+  if (status && !["draft", "ready_for_image_generation", "generated"].includes(status)) {
+    errors.push(`${label} prompt_text_manifest.status has invalid value ${status}`);
+  }
+  if (status !== "draft" && value.directions_ready !== true) {
+    errors.push(`${label} prompt_text_manifest.directions_ready must be true before image generation`);
+  }
+  if (!Array.isArray(value.prompt_text_refs)) {
+    errors.push(`${label} prompt_text_manifest.prompt_text_refs must be an array`);
+  }
+}
+
+function validatePostValidate(label: string, value: unknown, countPolicy: unknown, promptTextManifest: unknown, imageGeneration: unknown, directions: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} post_validate must be a mapping`);
+    return;
+  }
+  for (const key of ["status", "trigger", "required_when_direction_count_gte", "skip_when_resolved_count", "threshold_policy", "fingerprint_dimensions", "comparisons", "failures", "outcome_notes", "repair_route"]) {
+    if (!(key in value)) {
+      errors.push(`${label} post_validate missing ${key}`);
+    }
+  }
+  const status = String(value.status ?? "");
+  if (status && !["pending", "pass", "fail", "skipped"].includes(status)) {
+    errors.push(`${label} post_validate.status has invalid value ${status}`);
+  }
+  if (value.trigger !== "after_prompt_assets_ready") {
+    errors.push(`${label} post_validate.trigger must be after_prompt_assets_ready`);
+  }
+  if (value.required_when_direction_count_gte !== 2) {
+    errors.push(`${label} post_validate.required_when_direction_count_gte must be 2`);
+  }
+  if (value.skip_when_resolved_count !== 1) {
+    errors.push(`${label} post_validate.skip_when_resolved_count must be 1`);
+  }
+  if (value.repair_route !== "/ow:vision2prompt") {
+    errors.push(`${label} post_validate.repair_route must be /ow:vision2prompt`);
+  }
+  const thresholdPolicy = value.threshold_policy;
+  if (!isRecord(thresholdPolicy)) {
+    errors.push(`${label} post_validate.threshold_policy must be a mapping`);
+  } else {
+    if (thresholdPolicy.method !== "strategic_fingerprint_similarity") {
+      errors.push(`${label} post_validate.threshold_policy.method must be strategic_fingerprint_similarity`);
+    }
+    if (thresholdPolicy.comparison !== "pairwise") {
+      errors.push(`${label} post_validate.threshold_policy.comparison must be pairwise`);
+    }
+    if (typeof thresholdPolicy.max_pairwise_similarity !== "number" || thresholdPolicy.max_pairwise_similarity <= 0 || thresholdPolicy.max_pairwise_similarity >= 1) {
+      errors.push(`${label} post_validate.threshold_policy.max_pairwise_similarity must be between 0 and 1`);
+    }
+  }
+  if (!Array.isArray(value.fingerprint_dimensions)) {
+    errors.push(`${label} post_validate.fingerprint_dimensions must be an array`);
+  } else {
+    for (const dimension of STRATEGIC_FINGERPRINT_DIMENSIONS) {
+      if (!value.fingerprint_dimensions.includes(dimension)) {
+        errors.push(`${label} post_validate.fingerprint_dimensions missing ${dimension}`);
+      }
+    }
+  }
+  for (const key of ["comparisons", "failures", "outcome_notes"]) {
+    if (!Array.isArray(value[key])) {
+      errors.push(`${label} post_validate.${key} must be an array`);
+    }
+  }
+
+  const resolvedCount = isRecord(countPolicy) && typeof countPolicy.resolved_count === "number" ? countPolicy.resolved_count : null;
+  const promptStatus = isRecord(promptTextManifest) ? String(promptTextManifest.status ?? "") : "";
+  const promptReady = promptStatus === "ready_for_image_generation" || promptStatus === "generated";
+  if (resolvedCount === 1 && status !== "skipped") {
+    errors.push(`${label} post_validate.status must be skipped when direction_count_policy.resolved_count is 1`);
+  }
+  if (promptReady && resolvedCount !== null && resolvedCount >= 2 && !["pass", "fail"].includes(status)) {
+    errors.push(`${label} post_validate.status must be pass or fail before /ow:prompt2proto when resolved_count is 2 or more`);
+  }
+  if (status === "skipped" && resolvedCount !== 1) {
+    errors.push(`${label} post_validate.status can be skipped only when resolved_count is 1`);
+  }
+  if (status === "fail") {
+    const imageStatus = isRecord(imageGeneration) ? String(imageGeneration.status ?? "") : "";
+    if (["queued", "in_progress", "complete"].includes(imageStatus)) {
+      errors.push(`${label} post_validate failed gates must not start image_generation`);
+    }
+  }
+  if (status === "pass" && promptReady && resolvedCount !== null && resolvedCount >= 2) {
+    validateStrategicFingerprintSimilarity(label, directions, value.fingerprint_dimensions, thresholdPolicy, errors);
+  }
+}
+
+function validateStrategicFingerprintSimilarity(label: string, directions: unknown, dimensions: unknown, thresholdPolicy: unknown, errors: string[]): void {
+  if (!Array.isArray(directions) || !Array.isArray(dimensions) || !isRecord(thresholdPolicy)) {
+    return;
+  }
+  const threshold = typeof thresholdPolicy.max_pairwise_similarity === "number" ? thresholdPolicy.max_pairwise_similarity : null;
+  if (threshold === null) {
+    return;
+  }
+  const records = directions
+    .filter(isRecord)
+    .map((direction, index) => {
+      const directionId = nonEmptyString(direction.direction_id) ? String(direction.direction_id) : `index-${index}`;
+      const fingerprint = isRecord(direction.strategic_fingerprint) ? direction.strategic_fingerprint : null;
+      if (fingerprint === null) {
+        errors.push(`${label} directions[${index}].strategic_fingerprint must be set when post_validate.status is pass`);
+      }
+      return { directionId, index, fingerprint };
+    });
+  for (let left = 0; left < records.length; left += 1) {
+    for (let right = left + 1; right < records.length; right += 1) {
+      const leftRecord = records[left];
+      const rightRecord = records[right];
+      if (!leftRecord?.fingerprint || !rightRecord?.fingerprint) {
+        continue;
+      }
+      const result = compareStrategicFingerprints(leftRecord.fingerprint, rightRecord.fingerprint, dimensions);
+      if (result.comparedCount === 0) {
+        errors.push(`${label} post_validate cannot compare ${leftRecord.directionId} and ${rightRecord.directionId}: no populated strategic_fingerprint dimensions`);
+        continue;
+      }
+      if (result.score > threshold) {
+        errors.push(`${label} post_validate pair ${leftRecord.directionId}/${rightRecord.directionId} exceeds strategic fingerprint similarity threshold ${threshold}: score ${formatSimilarity(result.score)} shared dimensions ${result.sharedDimensions.join(", ")}`);
+      }
+    }
+  }
+}
+
+function compareStrategicFingerprints(left: Record<string, unknown>, right: Record<string, unknown>, dimensions: unknown[]): { score: number; comparedCount: number; sharedDimensions: string[] } {
+  let total = 0;
+  let comparedCount = 0;
+  const sharedDimensions: string[] = [];
+  for (const rawDimension of dimensions) {
+    const dimension = String(rawDimension);
+    const leftTokens = fingerprintTokens(left[dimension]);
+    const rightTokens = fingerprintTokens(right[dimension]);
+    if (leftTokens.size === 0 || rightTokens.size === 0) {
+      continue;
+    }
+    const similarity = jaccardSimilarity(leftTokens, rightTokens);
+    total += similarity;
+    comparedCount += 1;
+    if (similarity >= 0.8) {
+      sharedDimensions.push(dimension);
+    }
+  }
+  return {
+    score: comparedCount === 0 ? 0 : total / comparedCount,
+    comparedCount,
+    sharedDimensions,
+  };
+}
+
+function fingerprintTokens(value: unknown): Set<string> {
+  const raw = Array.isArray(value)
+    ? value.join(" ")
+    : isRecord(value)
+      ? Object.values(value).join(" ")
+      : String(value ?? "");
+  return new Set(raw.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length > 1));
+}
+
+function jaccardSimilarity(left: Set<string>, right: Set<string>): number {
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) {
+      intersection += 1;
+    }
+  }
+  const union = left.size + right.size - intersection;
+  return union === 0 ? 0 : intersection / union;
+}
+
+function formatSimilarity(value: number): string {
+  return value.toFixed(2);
+}
+
+function validateImageGeneration(label: string, value: unknown, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} image_generation must be a mapping`);
+    return;
+  }
+  const status = String(value.status ?? "");
+  if (status && !["not_started", "queued", "in_progress", "complete", "blocked"].includes(status)) {
+    errors.push(`${label} image_generation.status has invalid value ${status}`);
+  }
+  if (!nonEmptyString(value.batch_strategy)) {
+    errors.push(`${label} image_generation.batch_strategy must be non-empty`);
+  }
+  if (!Array.isArray(value.generated_images)) {
+    errors.push(`${label} image_generation.generated_images must be an array`);
+  } else {
+    value.generated_images.forEach((item, index) => validateGeneratedImageMetadata(label, item, index, errors));
+  }
+  if (!Array.isArray(value.collection_notes)) {
+    errors.push(`${label} image_generation.collection_notes must be an array`);
+  }
+}
+
+function validateGeneratedImageMetadata(label: string, value: unknown, index: number, errors: string[]): void {
+  if (!isRecord(value)) {
+    errors.push(`${label} image_generation.generated_images[${index}] must be a mapping`);
+    return;
+  }
+  for (const key of ["image_id", "direction_id", "prompt_id", "screen_name", "path", "metadata"]) {
+    if (!hasUsefulValue(value[key])) {
+      errors.push(`${label} image_generation.generated_images[${index}].${key} must be non-empty`);
+    }
+  }
+  const metadata = value.metadata;
+  if (!isRecord(metadata)) {
+    errors.push(`${label} image_generation.generated_images[${index}].metadata must be a mapping`);
+    return;
+  }
+  for (const key of ["source_prompt_ref", "generated_at", "generator", "generation_status", "review_status"]) {
+    if (!hasUsefulValue(metadata[key])) {
+      errors.push(`${label} image_generation.generated_images[${index}].metadata.${key} must be non-empty`);
+    }
+  }
+}
+
+function hasUsefulValue(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (isRecord(value)) {
+    return Object.keys(value).length > 0;
+  }
+  return nonEmptyString(value);
 }
 
 function validateVisualConceptPolicy(label: string, data: Record<string, unknown>, errors: string[]): void {

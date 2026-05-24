@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C011-codex-planning-adapter
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C011-codex-planning-adapter
+title: C011 Codex planning adapter atom tasks
+status: completed
+tasks:
+  - task_id: C011-A001
+    title: Add planning commands to source registry
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when:
+      - /ow:decompose-to-changes is registered with queue decomposition and maintenance protocol.
+      - /ow:analyze-changes is registered with read-only analysis protocol.
+      - /ow:select-change is registered with selected-change preparation protocol.
+  - task_id: C011-A002
+    title: Refresh generated Codex surfaces
+    status: completed
+    type: verify
+    owned_paths:
+      - .agents/
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - AGENTS.md
+    done_when:
+      - openworkflow sync generates the three planning skills from source registry data.
+      - Generated command audit, context packet, and manifest entries include the planning commands.
+  - task_id: C011-A003
+    title: Expand runtime surface checks
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/index.ts
+      - packages/core/src/onboarding/agentsGuide.ts
+      - references/planning-skill-runtime-exposure.md
+    done_when:
+      - Verification expects the three planning skills and checks their protocol guidance.
+      - CLI help and Agent guide list the generated planning command surfaces.
+  - task_id: C011-A004
+    title: Validate generated delivery
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/
+      - .openworkflow/audit/
+    done_when:
+      - "npm run validate passes."
+      - "npm run verify:runtime-surface passes."
+      - "npm run verify:agent-e2e passes."
+      - "git diff --check passes."

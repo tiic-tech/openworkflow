@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M90-discovery-loop-e2e-dogfood:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C004
+change_id: C004-benchmark-selection-readiness-evidence
+title: Atom tasks for benchmark-selection readiness evidence
+status: completed
+tasks:
+  - id: T001
+    title: Inspect benchmark decision and tune handoff checks
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing decision fixture, tune decision surface, and no-manual-decision checks are mapped.
+  - id: T002
+    title: Add benchmark-readiness assertions
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+    done_when:
+      - Verification proves benchmark refs exist and proto2html artifacts are not created.
+  - id: T003
+    title: Verify and record M90 completion
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M90-discovery-loop-e2e-dogfood/
+    done_when:
+      - Required validation commands pass and M90 summary records completion evidence.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-22
+  commit: 9f0c828
+  evidence:
+    - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml

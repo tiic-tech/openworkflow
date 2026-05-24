@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C003
+selected_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
+status: ready
+tasks:
+  - task_id: T001
+    title: Inspect current generated prompt guidance and handoff gates
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: Current generated guidance and gaps are known.
+  - task_id: T002
+    title: Add paragraph-quality wiring to generated protocol sources
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - skills/build-prototype/references/vision2prompt/05_prototype_prompt_schema.md
+      - skills/build-prototype/references/vision2prompt/07_quality_rubric.md
+    done_when: >
+      /ow:vision2prompt guidance requires dailin-grade prompt paragraphs with
+      journey, interaction behavior, system response, trust controls,
+      anti-goals, visual direction, desired user feeling, and C007 perspective
+      engine before /ow:prompt2proto handoff.
+  - task_id: T003
+    title: Regenerate managed skill and audit surfaces
+    status: completed
+    type: verify
+    owned_paths:
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: sync regenerates the expected surfaces and runtime-surface checks assert the new paragraph guidance.
+  - task_id: T004
+    title: Validate and record completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+    done_when: Validation passes and queue artifacts mark C003 complete with C004 ready.

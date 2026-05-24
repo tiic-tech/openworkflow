@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-validation-target-stress-fixtures
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-validation-target-stress-fixtures
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C004
+title: Add validation target stress fixtures
+status: complete
+selection_reason: >
+  C004 is the final M85 verification candidate. It should prove the runtime
+  read model distinguishes thin validation, return-to-vision validation, and
+  ready-for-proto validation.
+scope:
+  includes:
+    - thin validation fixture
+    - vision-gap blocked fixture
+    - proto-ready validation target fixture
+    - strict summary/readiness assertions
+  excludes:
+    - full proto prompt generation
+    - image generation or browser tests
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M85-validation-proto-target-contract/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - schemas/validation-target.schema.json
+  - schemas/validation.schema.json
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+acceptance:
+  - Tests cover a validation target that is too thin for /ow:proto.
+  - Tests cover a validation target blocked by vision gaps.
+  - Tests cover a validation target that is usable by /ow:proto.
+  - Runtime verification fails clearly if experiment fields are dropped.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+completion:
+  completed_at: 2026-05-22
+  commit: c56b3c9
+  evidence:
+    - changes/M85-validation-proto-target-contract/C004-validation-target-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary: >
+  Complete as one local commit because C004 is test-only verification plus
+  planning evidence.

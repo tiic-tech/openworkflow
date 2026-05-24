@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M92-smart-city-real-discovery-e2e-dogfood:C001
+contract_type: planning
+artifact_type: local_commit_evidence
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C001
+change_id: C001-run-smart-city-discovery-e2e
+title: Local evidence for smart city discovery E2E
+status: complete
+target_repo:
+  path: /Users/archy/Projects/StartUp/smart_city_copilot
+  branch: codex/smart-city-copilot-discovery-e2e
+  commit: 2b977be
+  commits:
+    - bcc2a47 Initialize OpenWorkflow
+    - 11ab042 Add smart city source plan
+    - 2b977be Add smart city discovery prototype artifacts
+validation:
+  commands:
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+    - git -C /Users/archy/Projects/StartUp/smart_city_copilot status --short --branch
+  result: pass
+generated_images:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-01-planning-approval.png
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-02-incident-response.png
+  - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-03-asset-capacity.png
+notes:
+  - "Stopped before /ow:tune and M91/proto2html."
+  - "Target repo git worktree was clean after commit."
+updated_at: 2026-05-22T15:18:00+08:00

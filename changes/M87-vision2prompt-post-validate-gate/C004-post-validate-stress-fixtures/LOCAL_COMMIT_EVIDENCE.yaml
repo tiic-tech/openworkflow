@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M87-vision2prompt-post-validate-gate:C004
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C004
+change_id: C004-post-validate-stress-fixtures
+title: Local commit evidence for post-validate stress fixtures
+status: completed
+completed_at: 2026-05-22
+commit: 75def71
+summary: >
+  Added the missing near-duplicate strategic fingerprint stress fixture for
+  post_validate. The stress matrix now rejects exact duplicate and rephrased
+  same-strategy prompt assets, passes distinct multi-direction prompt assets,
+  and preserves explicit single-direction skip behavior.
+implemented:
+  - Added NEAR_DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK runtime fixture.
+  - Asserted near-duplicate failures name threshold, score, and shared dimensions.
+  - Reused deterministic strategic_fingerprint comparison without changing validator semantics.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+queue_result:
+  status: completed
+  completed_candidate_ids:
+    - C001
+    - C002
+    - C003
+    - C004
+next_deferred_plan_refs:
+  - M88-tune-product-system-inheritance
+  - M89-built-in-agent-team-internal-stages
+  - M90-discovery-loop-e2e-dogfood

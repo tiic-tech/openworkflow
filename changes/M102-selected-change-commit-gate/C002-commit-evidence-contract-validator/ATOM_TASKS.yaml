@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M102-selected-change-commit-gate:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M102-C002-commit-evidence-contract-validator
+title: Atom tasks for commit evidence contract validator
+status: completed
+tasks:
+  - task_id: M102-C002-A001
+    title: Document selected-change commit evidence contract
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - schemas/candidate-changes.schema.json
+    done_when:
+      - LOCAL_COMMIT_EVIDENCE.yaml shape is documented.
+      - completion.implementation_changed_files and commit_not_required_reason semantics are documented.
+  - task_id: M102-C002-A002
+    title: Add queue-level validator
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/validators/
+    done_when:
+      - Strict selected-change queues fail when implementation completions lack local commit evidence.
+      - Planning-only completions fail without an explicit no-commit reason.
+      - LOCAL_COMMIT_EVIDENCE.yaml shape is validated.
+  - task_id: M102-C002-A003
+    title: Add runtime-surface regression fixtures
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Missing commit evidence for a completed implementation selected change fails.
+      - Planning-only completion without a reason fails.
+      - Valid planning-only and local evidence cases pass.
+  - task_id: M102-C002-A004
+    title: Verify C002 and record evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/
+    done_when:
+      - npm run build passes.
+      - npm run verify:runtime-surface passes.
+      - node dist/cli/src/index.js validate --root . --json passes.
+      - node dist/cli/src/index.js summaries --root . --strict --json passes.
+      - git diff --check passes.

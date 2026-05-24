@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C007-cross-queue-selection
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C007-cross-queue-selection
+status: current
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C007
+selected_change_id: C007-cross-queue-selection
+primary_commit: 3876fa41d0676c68caf99932b0b99e703708d645
+validation_evidence:
+  - quick_validate.py skills/select-change
+  - npm run validate
+  - git diff --check
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

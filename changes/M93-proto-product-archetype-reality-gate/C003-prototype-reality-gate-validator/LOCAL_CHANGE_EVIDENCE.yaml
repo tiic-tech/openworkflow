@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M93-proto-product-archetype-reality-gate:C003
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C003
+change_id: C003-prototype-reality-gate-validator
+title: Local change evidence for prototype reality gate validator
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Added prototype_reality_gate to strategic prompt-pack artifacts and validators
+  so generation-ready prompt packs must pass deterministic product-category,
+  canvas, domain-object, task-loop, state-coverage, data-realism, and
+  anti-generic checks before image generation.
+implemented:
+  - Extended the prototype evidence template and schemas with prototype_reality_gate.
+  - Added validator checks for gate shape, dimensions, repair route, pass-before-generation, and fail-before-image-generation behavior.
+  - Added runtime stress fixture coverage for passing prompt packs and generic dashboard failures.
+  - Synced ARTIFACT_CONTRACTS.yaml from the source registry.
+verification:
+  commands:
+    - node -e JSON.parse schemas/proto-prompt-pack.schema.json and schemas/prototype-evidence.schema.json
+    - npm run build
+    - npm run verify:runtime-surface
+    - npm run verify:e2e-workflow
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+known_unrelated_failure:
+  command: npm run validate
+  notes:
+    - Still fails on pre-existing M92 planning artifacts that set artifact_type to local_commit_evidence, atom_tasks, and selected_change.
+next_recommended_candidate_id: C004

@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M88-tune-product-system-inheritance:C004
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C004
+change_id: C004-multi-round-tune-baseline-inheritance
+title: Local commit evidence for multi-round tune baseline inheritance
+status: completed
+completed_at: 2026-05-22
+commit: cdc0114
+summary: >
+  Added multi-round /ow:tune inheritance support so refined prompt packs record
+  latest-baseline resolution and carry-forward rules, and generated /ow:tune
+  guidance forbids stale source-screen fallback across repeated tune passes.
+files_changed:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-tune/SKILL.md
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+acceptance_results:
+  - acceptance: Tune artifacts can identify the latest approved baseline group.
+    result: pass
+    evidence: baseline_resolution contract fields and validator checks
+  - acceptance: Locked screens or elements carry forward unless explicitly unlocked.
+    result: pass
+    evidence: carry_forward contract fields and generated /ow:tune protocol
+  - acceptance: Accepted improvements from prior tune passes are preserved.
+    result: pass
+    evidence: carry_forward.preserved_improvements and runtime-surface fixture
+  - acceptance: Multi-round tune guidance forbids cumulative product drift.
+    result: pass
+    evidence: carry_forward.cumulative_drift_guard and generated skill checks
+  - acceptance: Generated /ow:tune surfaces expose the latest-baseline rule.
+    result: pass
+    evidence: npm run verify:e2e-workflow and npm run verify:runtime-surface
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C004 is medium risk and required no high-risk approval.
+  - Sync refreshed .agents/skills/ow-tune/SKILL.md and managed audit packets from source changes.

@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C003-vision-generated-protocol
+contract_type: evidence
+planning_artifact_type: local_commit_evidence
+selected_change_id: C003-vision-generated-protocol
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C003
+title: Local commit evidence for /ow:vision generated protocol
+status: completed
+completed_at: 2026-05-22
+primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
+summary: >
+  Upgraded the source /ow:vision command protocol and regenerated the Codex
+  skill/context packet so vision explicitly acts as product partner,
+  requirements interrogator, and intent compiler with interview, checkpoint,
+  compile modes and proto-readiness as the compile gate.
+files_changed:
+  - packages/core/src/commands/registry.ts
+  - .agents/skills/ow-vision/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/SELECTED_CHANGE.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/ATOM_TASKS.yaml
+  - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/IMPLEMENTATION_BRIEF.md
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+  non_blocking_attempted_checks:
+    - command: npm run verify:runtime-surface
+      result: failed
+      reason: >
+        Existing analyze-changes runtime-surface assertion expects legacy
+        wording: "Analyze one or more candidate change queues and recommend the
+        next candidate without selecting it." Current generated wording is
+        outside the C003 vision scope.
+risk:
+  level: medium
+  high_risk_report: not_applicable
+  notes:
+    - This change updates generated guidance and context packets only; it does not create validation, prototype, spec, or runtime artifacts.

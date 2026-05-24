@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: selected_change:C006-record-no-go-criteria-for-future-visual-parity-work
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C006
+title: Record no-go criteria for future visual parity work
+status: selected
+selection_reason: >
+  C006 is the final ready candidate after C005 completed real smart city replay
+  evidence. It closes M100 by separating dailin-grade prompt text readiness
+  from future provider-backed image generation, visual parity scoring,
+  proto2html, and storyboard work.
+scope:
+  includes:
+    - downstream handoff report
+    - visual parity go/no-go facts
+    - M97 synthesis update distinguishing prompt text quality from image output quality
+    - queue completion state
+  excludes:
+    - provider-backed image generation
+    - human visual review
+    - visual reference parity scoring
+    - proto2html
+    - storyboard or motion modeling
+owned_paths:
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+  - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+forbidden_paths:
+  - provider image generation implementation
+  - generated image review artifacts
+  - proto2html implementation
+  - M101 command split implementation
+acceptance:
+  - The handoff report states that prompt paragraph quality is dailin-grade after C005.
+  - Downstream visual parity work is allowed only as a later queue with explicit provider or visual-review authorization.
+  - No image-generation or visual-review claims are made in M100.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - plan_id: M101-build-proto-prompt-command-split
+    candidate_id: C001
+    reason: M101 remains a separate high-risk command-boundary queue, not part of M100 prompt paragraph closure.
+  - plan_id: M102-prototype-visual-reference-parity-gate
+    reason: Visual parity requires generated images or rendered prototypes and explicit downstream authorization.

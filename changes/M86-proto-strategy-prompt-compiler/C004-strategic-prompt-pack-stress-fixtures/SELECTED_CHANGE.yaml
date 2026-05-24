@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: selected_change:M86-proto-strategy-prompt-compiler:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C004
+change_id: C004-strategic-prompt-pack-stress-fixtures
+title: Add strategic prompt-pack stress fixtures
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C004 through ow-select-change single-queue ranking. C004 is the only
+  active remaining M86 candidate, all dependencies are complete, and it verifies
+  that the decomposed proto pipeline rejects thin or style-only prompt packs
+  before M87 tune work begins.
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - changes/M86-proto-strategy-prompt-compiler/
+dependencies:
+  - C001
+  - C002
+  - C003
+  - C005
+scope:
+  includes:
+    - thin prompt-pack fixture
+    - style-only direction fixture
+    - proto-ready strategic prompt-pack fixture
+    - runtime or E2E assertions for prompt quality gates
+  excludes:
+    - generated prototype images
+    - browser or visual inspection
+    - tune refined prompt pack fixtures
+forbidden_paths:
+  - generated prototype image assets
+  - HTML prototype output
+  - /ow:tune command behavior
+acceptance:
+  - Tests cover prompt packs that are too thin for downstream generation.
+  - Tests reject directions that only differ by visual style.
+  - Tests cover a high-quality prompt pack with concrete screens, interactions, AI/system behavior, trust controls, and sample content.
+  - Runtime verification fails clearly if strategic fields or direction quality gates are dropped.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C004 adds verification fixtures for existing proto artifact quality gates.
+    It does not expose new runtime surfaces, call external image APIs, generate
+    prototype assets, or change tune behavior.

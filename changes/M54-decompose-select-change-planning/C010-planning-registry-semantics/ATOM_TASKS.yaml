@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C010-planning-registry-semantics
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C010-planning-registry-semantics
+title: C010 planning registry semantics atom tasks
+status: completed
+tasks:
+  - task_id: C010-A001
+    title: Record C010 high-risk approval
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+    done_when:
+      - The report names the approved C010 option.
+      - The report limits C010 to core command semantics and keeps generated surfaces gated.
+  - task_id: C010-A002
+    title: Define approved planning command ids
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+    done_when:
+      - /ow:decompose-to-changes is documented as the queue decomposition and maintenance command.
+      - /ow:analyze-changes is documented as the advisory cross-queue analysis command.
+      - /ow:select-change is documented as the selected-change preparation command.
+  - task_id: C010-A003
+    title: Record queue selection and completion
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+    done_when:
+      - C010 selection and completion are recorded.
+      - C011 is the next gated generated-surface follow-up.
+  - task_id: C010-A004
+    title: Validate semantic-only change
+    status: completed
+    type: verify
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

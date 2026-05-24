@@ -1,0 +1,20 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M92-smart-city-real-discovery-e2e-dogfood:C002
+contract_type: planning
+artifact_type: atom_tasks
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C002
+change_id: C002-audit-smart-city-discovery-artifacts
+title: Atom tasks for smart city discovery audit
+status: complete
+tasks:
+  - id: T001
+    title: Review target repo artifacts as first consumer
+    status: done
+  - id: T002
+    title: Classify OW discovery loop capabilities with KANO model
+    status: done
+  - id: T003
+    title: Record git governance evidence and next DTC candidates
+    status: done
+updated_at: 2026-05-22T15:18:00+08:00

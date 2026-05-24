@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { parse as parseYaml } from "yaml";
 import { commitSelectedChange, ensureLocalFeatBranch } from "../../../core/src/git/localGitAutomation.js";
 import { generatePrReadySummary } from "../../../core/src/git/prReadySummary.js";
 
@@ -15,6 +16,9 @@ const SKILL_NAMES = [
   "ow-context",
   "ow-vision",
   "ow-validation",
+  "ow-build-proto-prompt",
+  "ow-vision2prompt",
+  "ow-prompt2proto",
   "ow-proto",
   "ow-tune",
   "ow-decision",
@@ -22,6 +26,9 @@ const SKILL_NAMES = [
   "ow-spec",
   "ow-change",
   "ow-team",
+  "ow-decompose-to-changes",
+  "ow-analyze-changes",
+  "ow-select-change",
   "ow-git-automation",
 ] as const;
 
@@ -51,6 +58,9 @@ async function main(): Promise<number> {
     await verifyNoDefaultPrompts(codexHome);
     await verifyDesignContract(target);
     await verifyTuneDecisionSurface(target);
+    await verifyStrategicPromptPackStressFixtures(target, env);
+    await verifyRefinedPromptPackStressFixtures(target, env);
+    await verifyDiscoveryLoopDogfoodFixture(target, env);
     await verifyNoDefaultCodexCommands(target);
     await verifyNonDestructiveSyncMigration(tempRoot, env);
   } finally {
@@ -63,6 +73,7 @@ async function main(): Promise<number> {
   await verifySelectedChangeCommitAutomation();
   await verifyPrReadySummaryGeneration();
   await verifyGitAutomationManagedShell();
+  await verifyPlanningArtifactRegistrationContract();
   console.log("OpenWorkflow runtime surface verification passed.");
   return 0;
 }
@@ -208,6 +219,9 @@ async function verifyAgentsGuide(root: string): Promise<void> {
     "/ow:vision",
     "/ow:spec",
     "/ow:team",
+    "/ow:decompose-to-changes",
+    "/ow:analyze-changes",
+    "/ow:select-change",
     "/ow:git-automation",
     "Respect lazy creation",
   ]) {
@@ -237,6 +251,9 @@ async function verifyHelpSurface(env: NodeJS.ProcessEnv): Promise<void> {
     ".openworkflow/CURRENT_STATE.yaml",
     "/ow:vision",
     "/ow:team",
+    "/ow:decompose-to-changes",
+    "/ow:analyze-changes",
+    "/ow:select-change",
     "/ow:git-automation",
     "Lazy creation boundary",
     "Sync safety",
@@ -477,6 +494,82 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   const invalidModeReport = parseJsonReport(invalidMode.output, "context");
   assert(invalidModeReport.ok === false, "invalid context mode should return ok=false");
   await assertNoStageArtifacts(root);
+  await verifyVisionSummaryQualityFixtures(root, env);
+
+  const missingValidationCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(missingValidationCheck.code !== 0, "proto check should block before auto validation writes an artifact");
+  const missingValidationReport = parseJsonReport(missingValidationCheck.output, "check");
+  const missingValidationData = record(missingValidationReport.data, "missing validation check data");
+  const missingValidationSemantic = record(missingValidationData.semantic_readiness, "missing validation semantic readiness");
+  assert(missingValidationSemantic.gate_status === "missing_validation", "proto check should expose missing_validation before auto validation");
+  assert(Array.isArray(missingValidationReport.health_errors) && missingValidationReport.health_errors.some((item) => String(item).includes("auto-run /ow:validation")), "missing validation check should instruct auto validation");
+
+  const summaryValidationPath = ".openworkflow/validation/summary-val/VALIDATION.yaml";
+  await mkdir(join(root, ".openworkflow", "validation", "summary-val"), { recursive: true });
+  await writeFile(join(root, summaryValidationPath), [
+    "schema_version: 0.1.0",
+    "contract_id: validation:summary-val",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Summary fixture validation",
+    "status: active",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: runtime_surface_summary_fixture",
+    "core_question: Can prototype summary health remain advisory?",
+    "central_uncertainty: Whether unrelated prototype summary health should block proto readiness.",
+    "hypothesis: A ready validation target keeps missing prototype summaries advisory.",
+    "target_behavior: Agent can distinguish validation readiness from prototype summary freshness.",
+    "feature_classification:",
+    "  existential:",
+    "    - validation readiness",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - Validation exists before proto.",
+    "prototype_scope:",
+    "  include:",
+    "    - summary health check",
+    "  exclude: []",
+    "prototype_experiment:",
+    "  scenario: Agent checks /ow:proto with current validation set.",
+    "  must_show:",
+    "    - validation artifact is current",
+    "  must_not_show:",
+    "    - missing validation blocker",
+    "observable_signals:",
+    "  pass:",
+    "    - check remains ready when only prototype summary is missing",
+    "  fail:",
+    "    - check reports missing_validation",
+    "  ambiguous: []",
+    "acceptance:",
+    "  - prototype summary health is advisory",
+    "decision_rules:",
+    "  continue:",
+    "    - ready_for_proto",
+    "  revise:",
+    "    - summary warning only",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence: []",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+    "",
+  ].join("\n"), "utf8");
+  parseJsonReport(await runCapture(["node", CLI, "register", "--root", root, "--artifact", summaryValidationPath, "--current", "--write", "--json"], env), "register");
 
   const artifactDir = join(root, ".openworkflow", "prototypes", "proto-1");
   await mkdir(artifactDir, { recursive: true });
@@ -600,13 +693,72 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
 
   const validationDir = join(root, ".openworkflow", "validation", "val-1");
   await mkdir(validationDir, { recursive: true });
-  await writeFile(join(validationDir, "VALIDATION.yaml"), "artifact_type: validation_target\ncore_question: Test\nprototype_scope:\n  include:\n    - demo\nacceptance:\n  - works\n", "utf8");
+  await writeFile(join(validationDir, "VALIDATION.yaml"), [
+    "artifact_type: validation_target",
+    "status: active",
+    "title: Ready validation target",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: runtime_surface_fixture",
+    "core_question: Test",
+    "central_uncertainty: Whether the prototype target is specific enough.",
+    "hypothesis: A concrete target lets agents produce useful prototype prompts.",
+    "target_behavior: Agent can identify the prototype experiment without guessing.",
+    "feature_classification:",
+    "  existential:",
+    "    - prototype target",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - Validation can be read as an experiment brief.",
+    "prototype_scope:",
+    "  include:",
+    "    - demo",
+    "  exclude: []",
+    "prototype_experiment:",
+    "  scenario: Agent reviews a validation target before /ow:proto.",
+    "  must_show:",
+    "    - central uncertainty",
+    "  must_not_show:",
+    "    - silent validation artifact writes",
+    "observable_signals:",
+    "  pass:",
+    "    - agent reports ready_for_proto",
+    "  fail:",
+    "    - agent reports thin_validation",
+    "  ambiguous: []",
+    "acceptance:",
+    "  - works",
+    "decision_rules:",
+    "  continue:",
+    "    - ready_for_proto",
+    "  revise:",
+    "    - thin_validation",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence: []",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+    "",
+  ].join("\n"), "utf8");
   const missingSlice = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
   const missingSliceEntries = record(missingSlice.data, "summary health data").entries;
   assert(Array.isArray(missingSliceEntries), "summary health entries must be array");
   assert(missingSliceEntries.some((entry) => record(entry, "summary entry").artifact_type === "validation_target" && record(entry, "summary entry").status === "current"), "summary health did not report current validation current_slice");
   const protoContextStatus = await runCaptureStatus(["node", CLI, "context", "--root", root, "--for", "/ow:proto", "--json"], env);
-  assert(protoContextStatus.code === 0, "proto context should stay ready with vision-only semantics when no current validation pointer is set");
+  assert(protoContextStatus.code === 0, "proto context should stay ready when current validation pointer is set");
   const protoContext = parseJsonReport(protoContextStatus.output, "context");
   const protoContextData = record(protoContext.data, "proto context data");
   assert(Array.isArray(protoContextData.included) && protoContextData.included.some((item) => record(item, "included proto context").source === "current_slice" && record(item, "included proto context").path === ".openworkflow/validation/val-1/VALIDATION.yaml"), "proto context should include validation current_slice");
@@ -655,12 +807,192 @@ async function verifySummaryHealth(tempRoot: string, env: NodeJS.ProcessEnv): Pr
   assert(nonEmptyArray(inspect.health_errors), "inspect should expose health_errors when health fails");
 
   const checkStatus = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
-  assert(checkStatus.code === 0, "proto check should stay ready when summary health is advisory");
+  assert(checkStatus.code === 0, "proto check should stay ready after current validation is registered");
   const check = parseJsonReport(checkStatus.output, "check");
   const checkData = record(check.data, "check data");
-  assert(check.ok === true, "proto check should report ok=true without current validation blockers");
+  assert(check.ok === true, "proto check should report ok=true after current validation is registered");
   assert("summary_guidance" in checkData, "check output missing summary_guidance");
 
+}
+
+async function verifyVisionSummaryQualityFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const sessionsRoot = join(root, ".openworkflow", "vision", "sessions");
+  const thinDir = join(sessionsRoot, "vision-thin");
+  const blockedDir = join(sessionsRoot, "vision-blocked");
+  const readyDir = join(sessionsRoot, "vision-ready");
+  await mkdir(thinDir, { recursive: true });
+  await mkdir(blockedDir, { recursive: true });
+  await mkdir(readyDir, { recursive: true });
+
+  await writeFile(join(thinDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-thin",
+    status: "draft",
+    oneSentence: "A thin interview snapshot that should not be compiled.",
+    protoStatus: "missing",
+    full: false,
+  }), "utf8");
+  await writeFile(join(blockedDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-blocked",
+    status: "active",
+    oneSentence: "A blocked vision with explicit proto-readiness blockers.",
+    protoStatus: "blocked",
+    full: true,
+  }), "utf8");
+  await writeFile(join(readyDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "vision-ready",
+    status: "active",
+    oneSentence: "A proto-ready vision with enough strategy for prompt generation.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+
+  const report = parseJsonReport(await runCapture(["node", CLI, "summaries", "--root", root, "--json"], env), "summaries");
+  assert(report.ok === true, "vision current_slice summary health should stay freshness-ok");
+  const entries = record(report.data, "vision summaries data").entries;
+  assert(Array.isArray(entries), "vision summaries entries must be array");
+  const visionEntry = entries.find((entry) => record(entry, "summary entry").artifact_type === "vision_session");
+  assert(visionEntry !== undefined, "summary health missing vision_session entry");
+  const visionItems = record(visionEntry, "vision summary entry").items;
+  assert(Array.isArray(visionItems), "vision summary entry items must be array");
+
+  const thin = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-thin/VISION_SESSION.yaml");
+  assert(thin.status === "current", "thin vision fixture should keep current_slice current");
+  assert(thin.quality_status === "current_but_thin", "thin vision fixture should be current_but_thin");
+  assert(Array.isArray(thin.empty_key_fields) && thin.empty_key_fields.includes("strategic_core.target_user"), "thin vision fixture should report missing strategic_core fields");
+  assert(Array.isArray(thin.quality_warnings) && thin.quality_warnings.some((item) => String(item).includes("proto_readiness.status is not ready") && String(item).includes("missing")), "thin vision fixture should warn about missing proto-readiness");
+
+  const blocked = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-blocked/VISION_SESSION.yaml");
+  assert(blocked.status === "current", "blocked vision fixture should keep current_slice current");
+  assert(blocked.quality_status === "current_but_thin", "blocked vision fixture should be current_but_thin");
+  assert(Array.isArray(blocked.empty_key_fields) && blocked.empty_key_fields.length === 0, "blocked vision fixture should be blocked by readiness, not empty fields");
+  assert(Array.isArray(blocked.quality_warnings) && blocked.quality_warnings.some((item) => String(item).includes("proto_readiness.status is not ready") && String(item).includes("blocked")), "blocked vision fixture should warn about blocked proto-readiness");
+
+  const ready = summaryItemFor(visionItems, ".openworkflow/vision/sessions/vision-ready/VISION_SESSION.yaml");
+  assert(ready.status === "current", "ready vision fixture should keep current_slice current");
+  assert(ready.quality_status === "usable", "ready vision fixture should be usable");
+  assert(Array.isArray(ready.empty_key_fields) && ready.empty_key_fields.length === 0, "ready vision fixture should not have empty key fields");
+  assert(Array.isArray(ready.quality_warnings) && ready.quality_warnings.length === 0, "ready vision fixture should not report quality warnings");
+
+  const strict = await runCaptureStatus(["node", CLI, "summaries", "--root", root, "--strict", "--json"], env);
+  assert(strict.code !== 0, "summaries --strict should fail when vision has thin or blocked proto-readiness");
+  const strictReport = parseJsonReport(strict.output, "summaries");
+  assert(Array.isArray(strictReport.health_errors) && strictReport.health_errors.some((item) => String(item).includes("summary quality vision_session")), "strict summaries should name vision_session quality errors");
+}
+
+function summaryItemFor(items: unknown[], artifactPath: string): Record<string, unknown> {
+  const item = items.find((candidate) => record(candidate, "summary item").artifact_path === artifactPath);
+  assert(item !== undefined, `missing summary item for ${artifactPath}`);
+  return record(item, "summary item");
+}
+
+function visionSessionYaml(input: {
+  id: string;
+  status: string;
+  oneSentence: string;
+  protoStatus: "missing" | "blocked" | "ready";
+  full: boolean;
+}): string {
+  const strategicCore = input.full
+    ? `strategic_core:
+  target_user: "Time-constrained product founders"
+  context: "They are shaping an AI-native workflow before implementation"
+  current_alternative: "Unstructured chat prompts and scattered notes"
+  pain: "Weak product intent creates expensive downstream implementation churn"
+  desired_behavior_change: "Slow down just enough to clarify product truth before generation"
+  core_mechanism: "Conversation-first interrogation followed by structured compile"
+  core_differentiator: "Proto-readiness is treated as a vision acceptance gate"
+  strongest_success_signal: "A low-context Agent can generate strong prototype directions without inventing strategy"
+  failure_signals:
+    - "The Agent has to invent the target user"
+`
+    : "";
+  const productSystemSeed = input.full
+    ? `product_system_seed:
+  product_thesis: "Vision quality determines downstream generation quality"
+  primary_loop:
+    - "interview"
+    - "checkpoint"
+    - "compile"
+  interaction_model: "One focused question at a time"
+  feature_system:
+    - "coverage tracking"
+    - "proto-readiness gate"
+  emotional_value: "The human feels deeply understood without file-write interruptions"
+  functional_value: "The Agent receives structured strategy before prototype prompt generation"
+  trust_boundary: "Do not write durable artifacts after every answer"
+  privacy_boundary: "Keep raw brainstorming out of stable truth until checkpoint"
+  anti_goals:
+    - "fixed small question count"
+  future_opportunities:
+    - "discovery-loop E2E fixture"
+`
+    : "";
+  const protoReadiness = input.full
+    ? `proto_readiness:
+  status: ${input.protoStatus}
+  missing_for_proto:
+    - ${input.protoStatus === "blocked" ? "\"benchmark audience is conflicted\"" : "\"none\""}
+  prototype_direction_seeds:
+    - "conversation-first interview workspace"
+    - "proto-readiness dashboard"
+  prompt_constraints:
+    - "Do not invent product strategy"
+    - "Show trust and checkpoint controls"
+  validation_target: "Can the compiled vision drive distinct prototype prompts?"
+  downstream_notes:
+    - "Hand off to /ow:proto only when ready"
+`
+    : `proto_readiness:
+  status: ${input.protoStatus}
+  missing_for_proto:
+    - "strategic core"
+  prototype_direction_seeds: []
+  prompt_constraints: []
+  validation_target: ""
+  downstream_notes: []
+`;
+  return `schema_version: 0.1.0
+contract_id: vision:${input.id}
+contract_type: vision
+artifact_type: vision_session
+title: "${input.id}"
+status: ${input.status}
+current_question: ""
+stable_answers:
+  - "Vision should remain conversational until compile readiness."
+unresolved_questions:
+  - "What prototype directions are strongest?"
+vision_delta:
+  one_sentence: "${input.oneSentence}"
+  problem: "Current vision discovery can compile too early."
+  goals:
+    - "Protect delayed compile"
+  non_goals:
+    - "Generate prototype prompts inside vision"
+  users:
+    - "AI Agents consuming OpenWorkflow artifacts"
+  quality_bar:
+    - "Proto can consume the output without inventing strategy"
+  ai_native_role: "Product partner and intent compiler"
+  success_signals:
+    - "Low-context handoff is usable"
+  failure_signals:
+    - "The Agent invents core strategy"
+${strategicCore}${productSystemSeed}${protoReadiness}coverage:
+  proto_readiness:
+    status: ${input.protoStatus === "ready" ? "solid" : "thin"}
+    evidence:
+      - "runtime fixture"
+    follow_up_question: ""
+handoff:
+  ready: ${input.protoStatus === "ready" ? "true" : "false"}
+  next_command: ${input.protoStatus === "ready" ? "/ow:validation" : "null"}
+  blockers:
+    - ${input.protoStatus === "ready" ? "\"\"" : "\"proto-readiness is not ready\""}
+  readiness_notes:
+    - "runtime fixture"
+updated_at: null
+`;
 }
 
 async function verifyCommandCheck(root: string, env: NodeJS.ProcessEnv): Promise<void> {
@@ -775,6 +1107,82 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
   assert(draftProtoReport.ok === false, "draft optional current validation should make proto check ok=false");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("status must be beyond draft")), "proto check missing draft status blocker");
   assert(Array.isArray(draftProtoData.blockers) && draftProtoData.blockers.some((item) => String(item).includes("core_question must be non-empty")), "proto check missing core_question readiness blocker");
+  const draftSemanticReadiness = record(draftProtoData.semantic_readiness, "draft proto semantic readiness");
+  assert(draftSemanticReadiness.gate_status === "thin_validation", "draft proto check should expose thin_validation semantic readiness");
+
+  await writeFile(join(root, artifactPath), [
+    "schema_version: 0.1.0",
+    "contract_id: validation:val-draft",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Vision gap validation target",
+    "status: active",
+    "trigger:",
+    "  mode: agent_auto",
+    "  requested_command: /ow:proto",
+    "  reason: missing_current_validation",
+    "core_question: Can the prototype proceed without more vision detail?",
+    "central_uncertainty: Whether the missing user context would force strategy invention.",
+    "hypothesis: The prototype should not proceed until the vision gap is resolved.",
+    "target_behavior: Agent returns to /ow:vision instead of generating prototype prompts.",
+    "feature_classification:",
+    "  existential:",
+    "    - missing vision strategy",
+    "  supporting: []",
+    "  later: []",
+    "  out_of_scope: []",
+    "critical_assumptions:",
+    "  - The missing context changes the prototype direction.",
+    "prototype_scope:",
+    "  include:",
+    "    - Return-to-vision gate.",
+    "  exclude:",
+    "    - Prototype prompt generation.",
+    "prototype_experiment:",
+    "  scenario: Agent checks validation before /ow:proto.",
+    "  must_show:",
+    "    - Missing vision gap is explicit.",
+    "  must_not_show:",
+    "    - Prototype prompt generation.",
+    "observable_signals:",
+    "  pass:",
+    "    - /ow:proto check blocks and points back to /ow:vision.",
+    "  fail:",
+    "    - /ow:proto proceeds despite vision gaps.",
+    "  ambiguous: []",
+    "acceptance:",
+    "  - Agent does not invent product strategy.",
+    "decision_rules:",
+    "  continue: []",
+    "  revise:",
+    "    - Ask the next vision question.",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence:",
+    "    - Vision gap must be resolved.",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps:",
+    "  - target user context is unresolved",
+    "agent_readiness_gate:",
+    "  status: return_to_vision",
+    "  blockers:",
+    "    - target user context is unresolved",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+    "",
+  ].join("\n"), "utf8");
+  const blockedProtoCheck = await runCaptureStatus(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env);
+  assert(blockedProtoCheck.code !== 0, "proto check should block when validation returns to vision");
+  const blockedProtoReport = parseJsonReport(blockedProtoCheck.output, "check");
+  const blockedProtoData = record(blockedProtoReport.data, "blocked proto check data");
+  const blockedSemanticReadiness = record(blockedProtoData.semantic_readiness, "blocked proto semantic readiness");
+  assert(blockedSemanticReadiness.gate_status === "return_to_vision", "blocked proto check should expose return_to_vision semantic readiness");
+  assert(Array.isArray(blockedProtoData.blockers) && blockedProtoData.blockers.some((item) => String(item).includes("run /ow:vision")), "return-to-vision fixture should tell the agent to run /ow:vision");
 
   await writeFile(join(root, artifactPath), [
     "schema_version: 0.1.0",
@@ -783,7 +1191,14 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
     "artifact_type: validation_target",
     "title: Filled validation target",
     "status: active",
+    "trigger:",
+    "  mode: agent_auto",
+    "  requested_command: /ow:proto",
+    "  reason: missing_current_validation",
     "core_question: Does the first prototype answer the core workflow risk?",
+    "central_uncertainty: Whether agents can consume validation without inventing the prototype target.",
+    "hypothesis: A focused validation target lets /ow:proto generate useful prototype directions.",
+    "target_behavior: The agent starts /ow:proto with a concrete experiment brief.",
     "feature_classification:",
     "  existential:",
     "    - agent readiness",
@@ -796,20 +1211,53 @@ async function verifyRegisterCommand(root: string, env: NodeJS.ProcessEnv): Prom
     "  include:",
     "    - Build the smallest checkable readiness flow.",
     "  exclude: []",
+    "prototype_experiment:",
+    "  scenario: Agent runs /ow:proto after a validation target has been registered.",
+    "  must_show:",
+    "    - Central uncertainty is named before prompt generation.",
+    "    - Observable evidence rules constrain prototype directions.",
+    "  must_not_show:",
+    "    - Agent silently creates validation artifacts while running /ow:proto.",
+    "observable_signals:",
+    "  pass:",
+    "    - /ow:proto check reports ready_for_proto.",
+    "  fail:",
+    "    - /ow:proto must infer the missing experiment target.",
+    "  ambiguous:",
+    "    - Validation has a question but no observable behavior.",
     "acceptance:",
     "  - Agent can start /ow:proto without guessing the validation target.",
+    "decision_rules:",
+    "  continue:",
+    "    - Ready gate passes with no blockers.",
+    "  revise:",
+    "    - Experiment fields are present but too broad.",
+    "  pivot:",
+    "    - The prototype target no longer matches the vision.",
+    "  stop:",
+    "    - The validation target disproves the vision thesis.",
+    "  needs_more_evidence:",
+    "    - Evidence is observable but inconclusive.",
     "decision_options:",
     "  - continue",
     "  - revise",
     "  - pivot",
     "  - stop",
     "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
     "",
   ].join("\n"), "utf8");
   const filledProtoCheck = parseJsonReport(await runCapture(["node", CLI, "check", "/ow:proto", "--root", root, "--json"], env), "check");
   const filledProtoData = record(filledProtoCheck.data, "filled proto check data");
   assert(filledProtoCheck.ok === true, "filled current validation should make proto check ok=true");
   assert(Array.isArray(filledProtoData.blockers) && filledProtoData.blockers.length === 0, "filled proto check should have no blockers");
+  const filledSemanticReadiness = record(filledProtoData.semantic_readiness, "filled proto semantic readiness");
+  assert(filledSemanticReadiness.gate_status === "ready_for_proto", "filled proto check should expose ready_for_proto semantic readiness");
 
   const nextWithoutCurrent = await runCaptureStatus(["node", CLI, "register", "--root", root, "--artifact", artifactPath, "--next-command", "/ow:proto", "--json"], env);
   assert(nextWithoutCurrent.code !== 0, "register should reject --next-command without --current");
@@ -964,6 +1412,15 @@ async function verifySkills(root: string): Promise<void> {
     if (name === "ow-proto") {
       verifyProtoSkill(skillContent);
     }
+    if (name === "ow-vision2prompt") {
+      verifyVision2PromptSkill(skillContent);
+    }
+    if (name === "ow-build-proto-prompt") {
+      verifyBuildProtoPromptSkill(skillContent);
+    }
+    if (name === "ow-prompt2proto") {
+      verifyPrompt2ProtoSkill(skillContent);
+    }
     if (name === "ow-tune") {
       verifyTuneSkill(skillContent);
     }
@@ -981,6 +1438,15 @@ async function verifySkills(root: string): Promise<void> {
     }
     if (name === "ow-team") {
       verifyTeamSkill(skillContent);
+    }
+    if (name === "ow-decompose-to-changes") {
+      verifyDecomposeToChangesSkill(skillContent);
+    }
+    if (name === "ow-analyze-changes") {
+      verifyAnalyzeChangesSkill(skillContent);
+    }
+    if (name === "ow-select-change") {
+      verifySelectChangeSkill(skillContent);
     }
     if (name === "ow-git-automation") {
       verifyGitAutomationSkill(skillContent);
@@ -1000,12 +1466,14 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const commandAudit = join(REPO_ROOT, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml");
   const highRiskReport = join(REPO_ROOT, "changes", "M69-skill-system-lifecycle-planning", "HIGH_RISK_DECISION_REPORT.md");
   const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
+  const selectedCommitGateQueue = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "CANDIDATE_CHANGES.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
   const originalCommandAudit = await read(commandAudit);
   const originalHighRiskReport = await read(highRiskReport);
   const originalBranchGovernanceQueue = await read(branchGovernanceQueue);
+  const originalSelectedCommitGateQueue = await read(selectedCommitGateQueue);
   try {
     await writeFile(skill, original.replace('  generated_by: "openworkflow"\n', ""), "utf8");
     const missingMetadata = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
@@ -1036,13 +1504,119 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const malformedBranchBoundary = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(malformedBranchBoundary.code !== 0, "validate passed after branch boundary was malformed");
     assert(malformedBranchBoundary.output.includes("queue_policy.branch_boundary"), "branch boundary validation did not explain malformed branch boundary");
+    await writeFile(skill, original, "utf8");
+    await writeFile(manifest, originalManifest, "utf8");
+    await writeFile(commandAudit, originalCommandAudit, "utf8");
+    await writeFile(highRiskReport, originalHighRiskReport, "utf8");
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: true,
+      evidence: ["validation: npm run build"],
+    }), "utf8");
+    const missingCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingCommitEvidence.code !== 0, "validate passed after completed implementation selected change lacked local commit evidence");
+    assert(missingCommitEvidence.output.includes("implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "missing commit evidence validation did not explain required evidence path");
+
+    const nonStrictSummaries = await runCaptureStatus(["node", CLI, "summaries", "--root", REPO_ROOT, "--json"], process.env);
+    assert(nonStrictSummaries.code === 0, `non-strict summaries should not fail selected-change commit evidence audit: ${nonStrictSummaries.output}`);
+
+    const strictSummaries = await runCaptureStatus(["node", CLI, "summaries", "--root", REPO_ROOT, "--strict", "--json"], process.env);
+    assert(strictSummaries.code !== 0, "summaries --strict passed with missing selected-change commit evidence");
+    assert(strictSummaries.output.includes("selected-change commit evidence"), "summaries --strict missing selected-change commit evidence error");
+
+    const handoff = await runCaptureStatus(["node", CLI, "handoff", "--root", REPO_ROOT, "--json"], process.env);
+    assert(handoff.code !== 0, "handoff passed with missing selected-change commit evidence");
+    assert(handoff.output.includes("selected-change commit evidence"), "handoff missing selected-change commit evidence error");
+
+    const inspect = await runCaptureStatus(["node", CLI, "inspect", "--root", REPO_ROOT, "--strict", "--json"], process.env);
+    assert(inspect.code !== 0, "inspect --strict passed with missing selected-change commit evidence");
+    assert(inspect.output.includes("repair selected-change commit evidence"), "inspect --strict missing selected-change remediation guidance");
+
+    const context = await runCaptureStatus(["node", CLI, "context", "--root", REPO_ROOT, "--for", "/ow:vision", "--handoff", "--json"], process.env);
+    assert(context.code !== 0, "context --handoff passed with missing selected-change commit evidence");
+    assert(context.output.includes("selected-change commit evidence"), "context --handoff missing selected-change commit evidence error");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: false,
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml"],
+    }), "utf8");
+    const missingNoCommitReason = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingNoCommitReason.code !== 0, "validate passed after planning-only selected change lacked no-commit reason");
+    assert(missingNoCommitReason.output.includes("planning-only completion must include commit_not_required_reason"), "planning-only completion validation did not explain missing no-commit reason");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: false,
+      commitNotRequiredReason: "Planning-only fixture changed no implementation files.",
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml"],
+    }), "utf8");
+    const validPlanningOnly = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validPlanningOnly.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid planning-only selected change fixture reported missing no-commit reason");
+    assert(!validPlanningOnly.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid planning-only selected change fixture reported missing commit evidence");
+
+    await writeFile(selectedCommitGateQueue, selectedChangeCommitGateFixture({
+      implementationChangedFiles: true,
+      evidence: ["changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/LOCAL_COMMIT_EVIDENCE.yaml"],
+    }), "utf8");
+    const validCommitEvidence = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validCommitEvidence.output.includes("C900 planning-only completion must include commit_not_required_reason"), "valid local commit evidence fixture reported missing no-commit reason");
+    assert(!validCommitEvidence.output.includes("C900 implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml"), "valid local commit evidence fixture reported missing commit evidence");
   } finally {
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
     await writeFile(commandAudit, originalCommandAudit, "utf8");
     await writeFile(highRiskReport, originalHighRiskReport, "utf8");
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+    await writeFile(selectedCommitGateQueue, originalSelectedCommitGateQueue, "utf8");
   }
+}
+
+function selectedChangeCommitGateFixture(options: {
+  implementationChangedFiles: boolean;
+  commitNotRequiredReason?: string;
+  evidence: string[];
+}): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M102-selected-change-commit-gate-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M102-selected-change-commit-gate-fixture",
+    "title: Candidate changes for selected-change commit gate fixture",
+    "status: active",
+    "queue_policy:",
+    "  branch_boundary: codex/m102-selected-change-commit-gate",
+    "  selected_change_commit_gate: strict",
+    "changes:",
+    "  - id: C900",
+    "    status: done",
+    "    title: Selected change commit gate fixture",
+    "    purpose: Fixture for selected-change commit evidence validation.",
+    "    scope:",
+    "      includes:",
+    "        - fixture validation",
+    "      excludes: []",
+    "    owned_paths:",
+    "      - changes/M102-selected-change-commit-gate/",
+    "    dependencies: []",
+    "    unlocks: []",
+    "    risk: high",
+    "    size: small",
+    "    validation:",
+    "      - node dist/cli/src/index.js validate --root . --json",
+    "    acceptance:",
+    "      - Fixture validates commit evidence gate behavior.",
+    "    selection:",
+    "      selected_change_id: C900-selected-change-commit-gate-fixture",
+    "    completion:",
+    `      implementation_changed_files: ${options.implementationChangedFiles ? "true" : "false"}`,
+    ...(options.commitNotRequiredReason ? [
+      `      commit_not_required_reason: ${options.commitNotRequiredReason}`,
+    ] : []),
+    "      evidence:",
+    ...options.evidence.map((item) => `        - '${item}'`),
+    "",
+  ].join("\n");
 }
 
 async function verifyGitGovernanceDogfoodFixtures(): Promise<void> {
@@ -1172,6 +1746,83 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     assert(evidence.includes(`primary_commit: ${committed.primaryCommit}`), "commit evidence missing primary commit hash");
     const cleanStatus = await runCaptureInCwd(gitRoot, ["git", "status", "--porcelain"]);
     assert(cleanStatus.trim().length === 0, "commit automation fixture should finish clean");
+
+    const cliRoot = join(tempRoot, "selected-change-cli-commit");
+    await mkdir(join(cliRoot, "allowed"), { recursive: true });
+    await runInCwd(cliRoot, ["git", "init"]);
+    await runInCwd(cliRoot, ["git", "config", "user.name", "OpenWorkflow Test"]);
+    await runInCwd(cliRoot, ["git", "config", "user.email", "openworkflow@example.invalid"]);
+    await runInCwd(cliRoot, ["git", "commit", "--allow-empty", "-m", "initial"]);
+    await runInCwd(cliRoot, ["git", "switch", "-c", "codex/m102-cli-fixture"]);
+    await mkdir(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation"), { recursive: true });
+    await writeFile(join(cliRoot, "allowed", "change.txt"), "cli selected change\n", "utf8");
+    await writeFile(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "SELECTED_CHANGE.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: selected_change:M102-cli-fixture:C004",
+      "contract_type: planning",
+      "planning_artifact_type: selected_change",
+      "selected_change_id: M102-C004-git-automation",
+      "source_plan_id: M102-cli-fixture",
+      "source_candidate_id: C004",
+      "title: CLI selected change fixture",
+      "status: active",
+      "",
+    ].join("\n"), "utf8");
+    await writeFile(join(cliRoot, "changes", "M102-cli-fixture", "CANDIDATE_CHANGES.yaml"), [
+      "schema_version: 0.1.0",
+      "contract_id: candidate_changes:M102-cli-fixture",
+      "contract_type: planning",
+      "planning_artifact_type: candidate_changes",
+      "plan_id: M102-cli-fixture",
+      "title: Candidate changes for CLI fixture",
+      "status: active",
+      "queue_policy:",
+      "  branch_boundary: codex/m102-cli-fixture",
+      "changes:",
+      "  - id: C004",
+      "    status: selected",
+      "    title: Git automation selected-change evidence fixture",
+      "    risk: medium",
+      "    owned_paths:",
+      "      - allowed/",
+      "      - changes/M102-cli-fixture/",
+      "    selection:",
+      "      selected_change_id: M102-C004-git-automation",
+      "      evidence:",
+      "        - changes/M102-cli-fixture/C004-git-automation/SELECTED_CHANGE.yaml",
+      "",
+    ].join("\n"), "utf8");
+    await runInCwd(cliRoot, ["git", "add", "."]);
+    await runInCwd(cliRoot, ["git", "commit", "-m", "M102-cli-fixture initial"]);
+    await writeFile(join(cliRoot, "allowed", "change.txt"), "cli selected change\nupdated\n", "utf8");
+    const cliCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      cliRoot,
+      "--queue",
+      "changes/M102-cli-fixture/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C004",
+      "--message",
+      "M102-cli-fixture/C004 CLI inferred evidence path",
+      "--validation-evidence",
+      "validation: fixture",
+      "--commit-evidence",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(cliCommit.code === 0, `git-automation commit should infer selected-change evidence path: ${cliCommit.output}`);
+    const cliReport = parseJsonReport(cliCommit.output, "git-automation commit");
+    const cliData = record(cliReport.data, "git-automation commit data");
+    const cliResult = record(cliData.result, "git-automation commit result");
+    assert(cliResult.evidencePath === "changes/M102-cli-fixture/C004-git-automation/LOCAL_COMMIT_EVIDENCE.yaml", "git-automation commit did not infer selected-change evidence path");
+    const cliEvidence = await read(join(cliRoot, "changes", "M102-cli-fixture", "C004-git-automation", "LOCAL_COMMIT_EVIDENCE.yaml"));
+    assert(cliEvidence.includes("source_candidate_id: C004"), "CLI commit evidence missing source candidate id");
+    const cliCleanStatus = await runCaptureInCwd(cliRoot, ["git", "status", "--porcelain"]);
+    assert(cliCleanStatus.trim().length === 0, "CLI commit evidence fixture should finish clean");
   } finally {
     await rm(tempRoot, { recursive: true, force: true });
   }
@@ -1484,6 +2135,9 @@ function verifyGitAutomationSkill(content: string): void {
     "managed mode must gate remote push, PR, Issue, and merge operations behind explicit user approval while producing a clear operation plan.",
     "<evidence_policy>",
     "Remote approval handoff must include branch, target base, ordered local commits, PR-ready summary path, conflict-resolution checkpoint, and merge evidence expectations.",
+    "--commit-evidence",
+    "changes/&lt;plan_id&gt;/&lt;candidate-id&gt;-&lt;slug&gt;/LOCAL_COMMIT_EVIDENCE.yaml",
+    "Do not batch multiple completed selected changes into one checkpoint commit to satisfy commit evidence.",
     "openworkflow git-automation branch",
     "openworkflow git-automation commit",
     "openworkflow git-automation summary",
@@ -1495,13 +2149,70 @@ function verifyGitAutomationSkill(content: string): void {
   }
 }
 
+function verifyDecomposeToChangesSkill(content: string): void {
+  for (const required of [
+    "Create, update, query, or maintain an OpenWorkflow candidate change queue.",
+    "candidate-queue-decomposition-and-maintenance",
+    "skills/decompose-to-changes/references/decomposition-protocol.md",
+    "changes/&lt;plan_id&gt;/CANDIDATE_CHANGES.yaml",
+    "HIGH_RISK_DECISION_REPORT.md when the next actionable work is high risk",
+    "Do not select a candidate from decompose-to-changes.",
+    "/ow:analyze-changes",
+    "/ow:select-change",
+  ]) {
+    assert(content.includes(required), `ow-decompose-to-changes missing planning guidance: ${required}`);
+  }
+}
+
+function verifyAnalyzeChangesSkill(content: string): void {
+  for (const required of [
+    "Analyze multiple candidate change queues and recommend the next queue and candidate without selecting it.",
+    "read-only-cross-queue-priority-analysis",
+    "skills/analyze-changes/references/analysis-protocol.md",
+    "CHANGE_ANALYSIS.yaml",
+    "high-risk stop recommendation",
+    "Do not select candidates from analyze-changes.",
+    "/ow:select-change",
+  ]) {
+    assert(content.includes(required), `ow-analyze-changes missing planning guidance: ${required}`);
+  }
+}
+
+function verifySelectChangeSkill(content: string): void {
+  for (const required of [
+    "Select one implementable candidate change and create implementation-ready planning artifacts.",
+    "single-candidate-selection-and-atomization",
+    "skills/select-change/references/selection-protocol.md",
+    "SELECTED_CHANGE.yaml",
+    "ATOM_TASKS.yaml",
+    "IMPLEMENTATION_BRIEF.md",
+    "Do not silently select a high-risk candidate.",
+    "/ow:git-automation",
+  ]) {
+    assert(content.includes(required), `ow-select-change missing planning guidance: ${required}`);
+  }
+}
+
 function hasYamlScalar(content: string, key: string, value: string): boolean {
   return content.includes(`${key}: ${value}`) || content.includes(`${key}: "${value}"`);
 }
 
 function verifyVisionSkill(content: string): void {
   for (const required of [
-    "conversation-first-sustained-grill",
+    "delayed-compile-product-interrogation",
+    "<vision_role>",
+    "Act as product partner",
+    "Act as requirements interrogator",
+    "Act as intent compiler",
+    "<interaction_modes>",
+    "Interview mode is the default",
+    "Checkpoint mode writes",
+    "Compile mode writes",
+    "Do not write durable vision artifacts after every user answer.",
+    "<agent_first_consumer>",
+    "Treat the next implementing Agent as the first consumer of vision artifacts.",
+    "The vision_delta must preserve enough handoff intelligence",
+    "strategic_core and product_system_seed must let /ow:proto generate prototype directions",
     "<conversation_first>",
     "<mandatory_coverage>",
     "Cover target user and beneficiary.",
@@ -1509,23 +2220,47 @@ function verifyVisionSkill(content: string): void {
     "Cover AI-native role, boundaries, and failure modes.",
     "Cover privacy, data, sharing, and retention assumptions.",
     "Cover success signals and failure signals.",
+    "Cover prototype direction seeds and prompt constraints needed by /ow:proto.",
+    "<proto_readiness_gate>",
+    "VISION.md is ready only when /ow:proto can derive",
+    "If proto_readiness.status is missing or thin",
     "<readiness_gate>",
-    "Do not hand off to /ow:validation until mandatory coverage is addressed",
-    "Vision readiness is based on coverage and user confirmation, not on a fixed number of turns.",
+    "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness",
+    "Vision readiness is based on strategic depth, proto-readiness, and user confirmation",
     "Write VISION_SESSION.yaml, VISION_CONTRACT.yaml, VISION.md, or context updates only after stable answers",
+    "auditability is preserved through checkpoints and compile, not per-answer file churn",
   ]) {
-    assert(content.includes(required), `ow-vision missing M15 guidance: ${required}`);
+    assert(content.includes(required), `ow-vision missing delayed-compile guidance: ${required}`);
   }
 }
 
 function verifyProtoSkill(content: string): void {
   for (const required of [
     "image-first-strategic-proto-prompt-pack",
+    "<internal_proto_pipeline>",
+    "/ow:vision2prompt and /ow:prompt2proto are internal commands",
     "<validation_consumption>",
-    "validation_input.mode",
+    "trigger.mode: agent_auto",
+    "missing_current_validation",
+    "<preflight_quality_gate>",
+    "high-quality prototype prompt generation",
+    "<direction_count_policy>",
+    "askUserQuestion",
+    "resolved_count: 3",
     "<strategic_prompt_pack>",
     "prompt_pack_type: strategic_proto_prompt_pack",
+    "product_experience_model",
+    "anti_generic_constraints",
     "Each direction must include direction_id",
+    "<prompt_text_manifest>",
+    "prototype_system_contract",
+    "ready_for_image_generation",
+    "<post_validate_gate>",
+    "post_validate.status: pass",
+    "post_validate.status: skipped",
+    "post_validate.status is fail",
+    "<image_generation>",
+    "Batch-generate prototype images",
     "<image_only_boundary>",
     "Do not write HTML, CSS, runnable prototypes",
     "<review_evidence>",
@@ -1536,18 +2271,101 @@ function verifyProtoSkill(content: string): void {
   }
 }
 
+function verifyVision2PromptSkill(content: string): void {
+  for (const required of [
+    "internal-vision-to-strategic-prompt-text",
+    "<command_visibility>internal</command_visibility>",
+    "<internal_command_boundary>",
+    "/ow:vision2prompt is internal",
+    "<perspective_engine>",
+    "co-founder plus 15-year senior product-manager perspective",
+    "dailin-derived references as tools for judgment",
+    "product_thesis",
+    "user_transformation",
+    "reason_to_exist",
+    "<prompt_paragraph_quality>",
+    "dailin-grade long-form prototype-generation brief",
+    "prompt_text_manifest.paragraph_quality_status",
+    "quality_rubric.prompt_paragraph_quality",
+    "journey stage, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling",
+    "<product_experience_model>",
+    "prototype_system_contract",
+    "anti_generic_constraints",
+    "ready_for_image_generation",
+    "<post_validate_gate>",
+    "post_validate.status: pass",
+    "post_validate.status: skipped",
+    "post_validate.status: fail",
+    "Do not generate images",
+  ]) {
+    assert(content.includes(required), `ow-vision2prompt missing internal prompt guidance: ${required}`);
+  }
+}
+
+function verifyBuildProtoPromptSkill(content: string): void {
+  for (const required of [
+    "internal-build-proto-prompt-pack-compiler",
+    "<command_visibility>internal</command_visibility>",
+    "Co-Founder plus Chief PM",
+    "skills/build-proto-prompt/SKILL.md",
+    "prompt-pack compiler",
+    "prototype_system_contract",
+    "stable app shell",
+    "prompt_text_manifest.status ready_for_image_generation",
+    "prompt_text_manifest.paragraph_quality_status is pass",
+    "repair through /ow:build-proto-prompt",
+    "Do not generate images",
+    "Do not consume provider image output",
+    "Do not narrow build-prototype behavior",
+  ]) {
+    assert(content.includes(required), `ow-build-proto-prompt missing compiler guidance: ${required}`);
+  }
+}
+
+function verifyPrompt2ProtoSkill(content: string): void {
+  for (const required of [
+    "internal-prompt-text-to-prototype-images",
+    "<command_visibility>internal</command_visibility>",
+    "post_validate.status pass or skipped",
+    "prototype_system_contract",
+    "stable_app_shell",
+    "prompt_text_manifest.paragraph_quality_status pass",
+    "Refuse prompt packs whose prompt_text_manifest.paragraph_quality_status is not pass",
+    "journey, interaction behavior, system response, trust controls, anti-goals, visual direction, desired user feeling",
+    "<image_metadata_contract>",
+    "Every generated image must record image_id",
+    "source_prompt_ref",
+    "Do not expose /ow:prompt2proto as a user-facing workflow step",
+  ]) {
+    assert(content.includes(required), `ow-prompt2proto missing internal image guidance: ${required}`);
+  }
+}
+
 function verifyTuneSkill(content: string): void {
   for (const required of [
     "screen-bound-prototype-refinement",
     "<target_resolution>",
-    "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.",
+    "/ow:tune resolves to the latest approved prototype prompt pack",
     "/ow:tune:proto is an explicit alias",
+    "<multi_round_baseline_inheritance>",
+    "baseline_resolution with latest_approved_baseline_group_id",
+    "carry_forward with locked_screens",
+    "Never silently regenerate from stale source screens",
+    "<input_normalization>",
+    "Normalize baseline_source_type",
     "<baseline_screen_audit>",
     "Treat the screen group as one product system",
+    "<product_system_extraction>",
+    "Extract product thesis",
+    "<tune_request_interpretation>",
+    "Classify the request",
     "<inheritance_delta_rules>",
     "MUST_INHERIT, MUST_ADD, MUST_REMOVE, and FLEXIBLE_CHANGE",
+    "screen_delta_matrix rows",
     "<screen_manifest>",
     "Every screen prompt must include prompt_id",
+    "<refined_prompt_pack_output>",
+    "Generation Order, and Acceptance Checklist",
     "<internal_decision_audit>",
     "Every tune pass must write or update a decision audit record internally.",
     "Do not expose /ow:decision as the next manual user step",
@@ -1602,6 +2420,14 @@ async function verifyDesignContract(root: string): Promise<void> {
   assert(artifacts.includes("summary_policy:"), "artifact contracts missing summary policy metadata");
   assert(artifacts.includes("SUMMARY.yaml"), "artifact contracts missing summary file paths");
   assert(artifacts.includes("template:"), "artifact contracts missing embedded templates");
+  assert(artifacts.includes("preflight_quality_gate:"), "artifact contracts missing proto preflight quality gate");
+  assert(artifacts.includes("internal_pipeline:"), "artifact contracts missing proto internal pipeline");
+  assert(artifacts.includes("direction_count_policy:"), "artifact contracts missing proto direction count policy");
+  assert(artifacts.includes("prompt_text_manifest:"), "artifact contracts missing proto prompt text manifest");
+  assert(artifacts.includes("prototype_system_contract:"), "artifact contracts missing proto prototype system contract");
+  assert(artifacts.includes("post_validate:"), "artifact contracts missing proto post-validate gate");
+  assert(artifacts.includes("image_generation:"), "artifact contracts missing proto image generation state");
+  assert(artifacts.includes("generated_images:"), "artifact contracts missing generated image metadata container");
   assert(artifacts.includes("conditional_packets:"), "artifact contracts missing conditional packets");
 }
 
@@ -1613,6 +2439,9 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   const protoSection = commandIndex.split("trigger: /ow:proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const tuneSection = commandIndex.split("trigger: /ow:tune", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const decisionSection = commandIndex.split("trigger: /ow:decision", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const buildProtoPromptSection = commandIndex.split("trigger: /ow:build-proto-prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const vision2PromptSection = commandIndex.split("trigger: /ow:vision2prompt", 2)[1]?.split("  - id:", 1)[0] ?? "";
+  const prompt2ProtoSection = commandIndex.split("trigger: /ow:prompt2proto", 2)[1]?.split("  - id:", 1)[0] ?? "";
   const designSection = commandIndex.split("trigger: /ow:design", 2)[1]?.split("  - id:", 1)[0] ?? "";
   assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:decision"), "proto exposes manual decision handoff");
   assert(extractBlock(protoSection, "allowed_outputs").includes("PROTO_PROMPT_PACK.yaml"), "proto allowed outputs missing prompt pack");
@@ -1622,9 +2451,18 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   assert(extractBlock(tuneSection, "forbidden_outputs").includes("review.html"), "tune forbidden outputs missing HTML review surface");
   assert(!extractBlock(designSection, "handoff_commands").includes("/ow:decision"), "design exposes manual decision handoff");
   assert(decisionSection.includes("visibility: internal"), "decision command is not internal");
+  assert(buildProtoPromptSection.includes("visibility: internal"), "build-proto-prompt command is not internal");
+  assert(vision2PromptSection.includes("visibility: internal"), "vision2prompt command is not internal");
+  assert(prompt2ProtoSection.includes("visibility: internal"), "prompt2proto command is not internal");
+  assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:vision2prompt"), "proto exposes vision2prompt as user-facing handoff");
+  assert(!extractBlock(protoSection, "handoff_commands").includes("/ow:prompt2proto"), "proto exposes prompt2proto as user-facing handoff");
   assert(extractBlock(tuneSection, "allowed_outputs").includes(".openworkflow/decisions/"), "tune cannot write decision audit");
 
   const contextPackets = await read(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"));
+  const buildProtoPromptPacket = contextPackets.split("command: /ow:build-proto-prompt", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  const prompt2ProtoPacket = contextPackets.split("command: /ow:prompt2proto", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
+  assert(buildProtoPromptPacket.includes("prototype_system_contract"), "build-proto-prompt context packet missing prototype system contract guidance");
+  assert(prompt2ProtoPacket.includes("prototype_system_contract"), "prompt2proto context packet missing prototype system contract readiness gate");
   const tunePacket = contextPackets.split("command: /ow:tune", 2)[1]?.split("  - packet_id:", 1)[0] ?? "";
   assert(!extractBlock(tunePacket, "required").includes("PROTOTYPE_INDEX.yaml"), "tune requires prototype index");
   assert(extractBlock(tunePacket, "optional").includes("PROTOTYPE_INDEX.yaml"), "tune optional context missing prototype index");
@@ -1645,9 +2483,1951 @@ async function verifyTuneDecisionSurface(root: string): Promise<void> {
   }
 }
 
+async function verifyStrategicPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const fixtureDir = join(root, ".openworkflow", "prototypes", "proto-stress-fixtures");
+  await mkdir(fixtureDir, { recursive: true });
+
+  const thinPath = join(fixtureDir, "THIN_PROTO_PROMPT_PACK.yaml");
+  await writeFile(thinPath, thinStrategicPromptPackFixture(), "utf8");
+  const thin = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(thin.code !== 0, "thin strategic prompt-pack fixture should fail validation");
+  assert(thin.output.includes("normalized_input must be a mapping"), "thin strategic prompt-pack failure should name missing normalized input");
+  assert(thin.output.includes("directions must contain strategic prompt directions"), "thin strategic prompt-pack failure should name missing directions");
+  await unlink(thinPath);
+
+  const styleOnlyPath = join(fixtureDir, "STYLE_ONLY_PROTO_PROMPT_PACK.yaml");
+  await writeFile(styleOnlyPath, strategicPromptPackFixture("style-only"), "utf8");
+  const styleOnly = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(styleOnly.code !== 0, "style-only strategic prompt-pack fixture should fail validation");
+  await unlink(styleOnlyPath);
+
+  const genericDashboardPath = join(fixtureDir, "GENERIC_DASHBOARD_PROTO_PROMPT_PACK.yaml");
+  await writeFile(genericDashboardPath, strategicPromptPackFixture("generic-dashboard"), "utf8");
+  const genericDashboard = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(genericDashboard.code !== 0, "generic dashboard strategic prompt-pack fixture should fail prototype reality gate");
+  await unlink(genericDashboardPath);
+
+  const smartCityReadyPath = join(fixtureDir, "SMART_CITY_MAP_FIRST_PROTO_PROMPT_PACK.yaml");
+  await writeFile(smartCityReadyPath, smartCityStrategicPromptPackFixture("ready"), "utf8");
+  const smartCityReady = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(smartCityReady.code === 0, `smart city map-first fixture should pass product reality gate: ${smartCityReady.output}`);
+  await unlink(smartCityReadyPath);
+
+  const smartCityReplaySource = await read(join(REPO_ROOT, "examples", "m98-smart-city-replay", "PROTO_PROMPT_PACK.yaml"));
+  assertSmartCityReplayPromptPackCompleteness(smartCityReplaySource);
+  const smartCityReplayPath = join(fixtureDir, "SMART_CITY_REPLAY_M98_PROTO_PROMPT_PACK.yaml");
+  await writeFile(smartCityReplayPath, smartCityReplaySource, "utf8");
+  const smartCityReplay = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(smartCityReplay.code !== 0, "M98 smart city replay prompt pack should fail M100 paragraph quality gate");
+  assert(
+    smartCityReplay.output.includes("screen_prompts[0].prompt missing prompt paragraph quality dimensions"),
+    "M98 smart city replay failure should name prompt paragraph quality dimensions",
+  );
+  await unlink(smartCityReplayPath);
+
+  const smartCityGenericPath = join(fixtureDir, "SMART_CITY_GENERIC_AI_DASHBOARD_PROTO_PROMPT_PACK.yaml");
+  await writeFile(smartCityGenericPath, smartCityStrategicPromptPackFixture("generic-ai-dashboard"), "utf8");
+  const smartCityGeneric = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(smartCityGeneric.code !== 0, "smart city generic AI dashboard fixture should fail product reality gate");
+  await unlink(smartCityGenericPath);
+
+  const dailinGradePath = join(fixtureDir, "DAILIN_GRADE_POCKET_ENGLISH_FRIEND_PROTO_PROMPT_PACK.yaml");
+  await writeFile(dailinGradePath, strategicPromptPackFixture("ready"), "utf8");
+  const dailinGrade = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(dailinGrade.code === 0, `dailin-grade Pocket English Friend fixture should pass prompt-pack gates: ${dailinGrade.output}`);
+  await unlink(dailinGradePath);
+
+  const terseScreenStatePath = join(fixtureDir, "TERSE_SCREEN_STATE_PROMPT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(terseScreenStatePath, terseScreenStatePromptStrategicPromptPackFixture(), "utf8");
+  const terseScreenState = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(terseScreenState.code !== 0, "terse screen-state prompt fixture should fail paragraph quality validation");
+  assert(
+    terseScreenState.output.includes("screen_prompts[0].prompt missing prompt paragraph quality dimensions"),
+    "terse screen-state prompt failure should name prompt paragraph quality dimensions",
+  );
+  await unlink(terseScreenStatePath);
+
+  const longButStrategylessPath = join(fixtureDir, "LONG_BUT_STRATEGYLESS_PROTO_PROMPT_PACK.yaml");
+  await writeFile(longButStrategylessPath, longButStrategylessPromptPackFixture(), "utf8");
+  const longButStrategyless = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(longButStrategyless.code !== 0, "long but strategyless prompt fixture should fail strategic workflow validation");
+  assert(
+    longButStrategyless.output.includes("strategic_core must be a mapping"),
+    "long but strategyless failure should name missing strategic_core",
+  );
+  assert(
+    longButStrategyless.output.includes("build_recommendation must be a mapping"),
+    "long but strategyless failure should name missing build_recommendation",
+  );
+  await unlink(longButStrategylessPath);
+
+  const readyPath = join(fixtureDir, "READY_PROTO_PROMPT_PACK.yaml");
+  await writeFile(readyPath, strategicPromptPackFixture("ready"), "utf8");
+  const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(ready.code === 0, `proto-ready strategic prompt-pack fixture should pass validation: ${ready.output}`);
+  await unlink(readyPath);
+
+  const thinImagePromptPath = join(fixtureDir, "THIN_IMAGE_PROMPT_D1_PROTO_PROMPT_PACK.yaml");
+  await writeFile(thinImagePromptPath, thinImagePromptOnlyStrategicPromptPackFixture(), "utf8");
+  const thinImagePrompt = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(thinImagePrompt.code !== 0, "thin image-prompt D1 fixture should fail screen-bound executability validation");
+  assert(
+    thinImagePrompt.output.includes("screen_manifest must contain screen-bound product states before image generation"),
+    "thin image-prompt D1 failure should name missing screen_manifest",
+  );
+  assert(
+    thinImagePrompt.output.includes("directions[0].screen_prompts must contain screen-bound prompt text before image generation"),
+    "thin image-prompt D1 failure should name missing screen-bound prompt text",
+  );
+  await unlink(thinImagePromptPath);
+
+  const missingScreenManifestPath = join(fixtureDir, "MISSING_SCREEN_MANIFEST_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingScreenManifestPath, withoutYamlBlock(strategicPromptPackFixture("ready"), "screen_manifest", "global_design_system_prompt"), "utf8");
+  const missingScreenManifest = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingScreenManifest.code !== 0, "missing screen manifest fixture should fail validation");
+  assert(
+    missingScreenManifest.output.includes("screen_manifest must contain screen-bound product states before image generation"),
+    "missing screen manifest failure should name screen-bound product states",
+  );
+  await unlink(missingScreenManifestPath);
+
+  const missingPrototypeSystemContractPath = join(fixtureDir, "MISSING_PROTOTYPE_SYSTEM_CONTRACT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(
+    missingPrototypeSystemContractPath,
+    withoutYamlBlock(strategicPromptPackFixture("ready"), "prototype_system_contract", "screen_manifest"),
+    "utf8",
+  );
+  const missingPrototypeSystemContract = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingPrototypeSystemContract.code !== 0, "missing prototype system contract fixture should fail validation");
+  assert(
+    missingPrototypeSystemContract.output.includes("prototype_system_contract must be a mapping"),
+    "missing prototype system contract failure should name prototype_system_contract",
+  );
+  await unlink(missingPrototypeSystemContractPath);
+
+  const orphanStrategicScreenPath = join(fixtureDir, "ORPHAN_STRATEGIC_SCREEN_PROMPT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(orphanStrategicScreenPath, strategicPromptPackFixture("ready").replace("target_screen_id: practice-entry", "target_screen_id: missing-practice-entry"), "utf8");
+  const orphanStrategicScreen = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(orphanStrategicScreen.code !== 0, "orphan strategic screen prompt fixture should fail validation");
+  assert(
+    orphanStrategicScreen.output.includes("directions[0].screen_prompts[0].target_screen_id must exist in screen_manifest"),
+    "orphan strategic screen prompt failure should name screen_manifest linkage",
+  );
+  await unlink(orphanStrategicScreenPath);
+
+  const missingIntegrityGatePath = join(fixtureDir, "MISSING_INTEGRITY_GATE_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingIntegrityGatePath, withoutPromptPackIntegrityGate(strategicPromptPackFixture("ready")), "utf8");
+  const missingIntegrityGate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingIntegrityGate.code !== 0, "missing integrity gate fixture should fail validation");
+  assert(
+    missingIntegrityGate.output.includes("prompt_pack_integrity_gate must be a mapping"),
+    "missing integrity gate failure should name prompt_pack_integrity_gate",
+  );
+  await unlink(missingIntegrityGatePath);
+
+  const directionCountMismatchPath = join(fixtureDir, "DIRECTION_COUNT_MISMATCH_PROTO_PROMPT_PACK.yaml");
+  await writeFile(directionCountMismatchPath, strategicPromptPackFixture("ready").replace("  direction_count: 3", "  direction_count: 4"), "utf8");
+  const directionCountMismatch = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(directionCountMismatch.code !== 0, "direction count mismatch fixture should fail validation");
+  assert(
+    directionCountMismatch.output.includes("prompt_text_manifest.direction_count must equal directions length"),
+    "direction count mismatch failure should name prompt_text_manifest.direction_count",
+  );
+  await unlink(directionCountMismatchPath);
+
+  const missingPromptRefPath = join(fixtureDir, "MISSING_PROMPT_REF_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingPromptRefPath, strategicPromptPackFixture("ready").replace("prompts/D3.md", "prompts/DX.md"), "utf8");
+  const missingPromptRef = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingPromptRef.code !== 0, "missing prompt ref fixture should fail validation");
+  assert(
+    missingPromptRef.output.includes("prompt_text_manifest.prompt_text_refs[2] must reference an existing direction_id or prompt_id"),
+    "missing prompt ref failure should name the missing prompt text ref",
+  );
+  await unlink(missingPromptRefPath);
+
+  const failedIntegrityStartedPath = join(fixtureDir, "FAILED_INTEGRITY_STARTED_IMAGE_GENERATION_PROTO_PROMPT_PACK.yaml");
+  await writeFile(
+    failedIntegrityStartedPath,
+    strategicPromptPackFixture("ready")
+      .replace("prompt_pack_integrity_gate:\n  status: pass", "prompt_pack_integrity_gate:\n  status: fail")
+      .replace("image_generation:\n  status: not_started", "image_generation:\n  status: queued"),
+    "utf8",
+  );
+  const failedIntegrityStarted = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(failedIntegrityStarted.code !== 0, "failed integrity gate with queued image generation should fail validation");
+  assert(
+    failedIntegrityStarted.output.includes("prompt_pack_integrity_gate failed gates must not start image_generation"),
+    "failed integrity gate should block image generation",
+  );
+  await unlink(failedIntegrityStartedPath);
+
+  const duplicatePath = join(fixtureDir, "DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(duplicatePath, strategicPromptPackFixture("duplicate-fingerprint"), "utf8");
+  const duplicate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(duplicate.code !== 0, "duplicate strategic fingerprint fixture should fail validation");
+  assert(duplicate.output.includes("exceeds strategic fingerprint similarity threshold"), "duplicate strategic fingerprint failure should name threshold");
+  assert(duplicate.output.includes("shared dimensions"), "duplicate strategic fingerprint failure should name shared dimensions");
+  await unlink(duplicatePath);
+
+  const nearDuplicatePath = join(fixtureDir, "NEAR_DUPLICATE_FINGERPRINT_PROTO_PROMPT_PACK.yaml");
+  await writeFile(nearDuplicatePath, strategicPromptPackFixture("near-duplicate-fingerprint"), "utf8");
+  const nearDuplicate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(nearDuplicate.code !== 0, "near-duplicate strategic fingerprint fixture should fail validation");
+  assert(nearDuplicate.output.includes("exceeds strategic fingerprint similarity threshold"), "near-duplicate strategic fingerprint failure should name threshold");
+  assert(nearDuplicate.output.includes("score"), "near-duplicate strategic fingerprint failure should name similarity score");
+  assert(nearDuplicate.output.includes("shared dimensions"), "near-duplicate strategic fingerprint failure should name shared dimensions");
+  await unlink(nearDuplicatePath);
+
+  const singlePath = join(fixtureDir, "SINGLE_DIRECTION_PROTO_PROMPT_PACK.yaml");
+  await writeFile(singlePath, strategicPromptPackFixture("single-direction"), "utf8");
+  const single = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(single.code === 0, `single-direction strategic prompt-pack fixture should skip post-validation and pass: ${single.output}`);
+  await unlink(singlePath);
+}
+
+function withoutPromptPackIntegrityGate(fixture: string): string {
+  const start = fixture.indexOf("prompt_pack_integrity_gate:\n");
+  const end = fixture.indexOf("directions:\n", start);
+  if (start === -1 || end === -1) {
+    return fixture;
+  }
+  return `${fixture.slice(0, start)}${fixture.slice(end)}`;
+}
+
+function withoutYamlBlock(fixture: string, startKey: string, nextKey: string): string {
+  const start = fixture.indexOf(`${startKey}:\n`);
+  const end = fixture.indexOf(`${nextKey}:\n`, start);
+  if (start === -1 || end === -1) {
+    return fixture;
+  }
+  return `${fixture.slice(0, start)}${fixture.slice(end)}`;
+}
+
+function terseScreenStatePromptStrategicPromptPackFixture(): string {
+  return strategicPromptPackFixture("ready")
+    .replace(
+      "        standalone_prompt: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+      "        standalone_prompt: Show the same map shell with the incident detail panel open.",
+    )
+    .replace(
+      "        prompt_text: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+      "        prompt_text: Show the same map shell with the incident detail panel open.",
+    );
+}
+
+function longButStrategylessPromptPackFixture(): string {
+  const withoutStrategicCore = withoutYamlBlock(strategicPromptPackFixture("ready"), "strategic_core", "prototype_brief");
+  return withoutYamlBlock(withoutStrategicCore, "build_recommendation", "prompt_text_manifest");
+}
+
+function assertSmartCityReplayPromptPackCompleteness(source: string): void {
+  const document = parseYaml(source) as Record<string, unknown>;
+  const prototypeBrief = asRecord(document.prototype_brief, "smart city replay prototype_brief");
+  assert(prototypeBrief.product_name === "CityFlow Copilot", "smart city replay should name the product in prototype_brief");
+
+  const screenManifest = asArray(document.screen_manifest, "smart city replay screen_manifest");
+  const screenIds = new Set(
+    screenManifest.map((screen, index) => String(asRecord(screen, `smart city replay screen_manifest[${index}]`).target_screen_id ?? "")),
+  );
+  for (const requiredScreen of ["map-shell", "planning-review", "incident-response", "capacity-monitor"]) {
+    assert(screenIds.has(requiredScreen), `smart city replay screen_manifest missing ${requiredScreen}`);
+  }
+
+  const screenPrompts = asArray(asRecord(asArray(document.directions, "smart city replay directions")[0], "smart city replay directions[0]").screen_prompts, "smart city replay screen_prompts");
+  const promptTargets = new Set(
+    screenPrompts.map((prompt, index) => String(asRecord(prompt, `smart city replay screen_prompts[${index}]`).target_screen_id ?? "")),
+  );
+  for (const requiredScreen of screenIds) {
+    assert(promptTargets.has(requiredScreen), `smart city replay screen prompt missing target ${requiredScreen}`);
+  }
+
+  const designPrompt = asRecord(document.global_design_system_prompt, "smart city replay global_design_system_prompt");
+  assert(String(designPrompt.layout_system ?? "").includes("map canvas"), "smart city replay design prompt should keep map canvas primary");
+
+  const qualityRubric = asRecord(document.quality_rubric, "smart city replay quality_rubric");
+  for (const requiredRubric of ["prompt_executability", "product_specificity", "state_coverage", "trust_boundary_coverage"]) {
+    assert(Array.isArray(qualityRubric[requiredRubric]), `smart city replay quality_rubric missing ${requiredRubric}`);
+  }
+
+  assert(
+    source.includes("Planning, incident, and capacity are modules inside one map-first product shell."),
+    "smart city replay should explicitly model planning, incident, and capacity inside one product shell",
+  );
+  assert(source.includes("visual reference parity is deferred"), "smart city replay should avoid claiming visual parity");
+}
+
+function asRecord(value: unknown, label: string): Record<string, unknown> {
+  assert(typeof value === "object" && value !== null && !Array.isArray(value), `${label} must be a mapping`);
+  return value as Record<string, unknown>;
+}
+
+function asArray(value: unknown, label: string): unknown[] {
+  assert(Array.isArray(value), `${label} must be a sequence`);
+  return value;
+}
+
+async function verifyRefinedPromptPackStressFixtures(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const fixtureDir = join(root, ".openworkflow", "prototypes", "tune-stress-fixtures");
+  await mkdir(fixtureDir, { recursive: true });
+
+  const readyPath = join(fixtureDir, "READY_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(readyPath, refinedPromptPackFixture("ready"), "utf8");
+  const ready = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(ready.code === 0, `ready refined prompt-pack fixture should pass validation: ${ready.output}`);
+  await unlink(readyPath);
+
+  const missingBaselinePath = join(fixtureDir, "MISSING_BASELINE_AUDIT_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingBaselinePath, refinedPromptPackFixture("missing-baseline-audit"), "utf8");
+  const missingBaseline = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingBaseline.code !== 0, "missing baseline audit refined prompt-pack fixture should fail validation");
+  assert(missingBaseline.output.includes("baseline_audit must contain source screen audits"), "missing baseline audit failure should name baseline_audit");
+  await unlink(missingBaselinePath);
+
+  const orphanPath = join(fixtureDir, "ORPHAN_SCREEN_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(orphanPath, refinedPromptPackFixture("orphan-screen-prompt"), "utf8");
+  const orphan = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(orphan.code !== 0, "orphan target screen refined prompt-pack fixture should fail validation");
+  assert(orphan.output.includes("screen_prompts[0].target_screen_id must exist in screen_manifest"), "orphan target screen failure should name screen_manifest linkage");
+  await unlink(orphanPath);
+
+  const missingInheritPath = join(fixtureDir, "MISSING_MUST_INHERIT_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingInheritPath, refinedPromptPackFixture("missing-must-inherit"), "utf8");
+  const missingInherit = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingInherit.code !== 0, "missing must_inherit refined prompt-pack fixture should fail validation");
+  assert(missingInherit.output.includes("delta_rules.must_inherit must preserve baseline product-system constants"), "missing must_inherit failure should name delta_rules.must_inherit");
+  await unlink(missingInheritPath);
+
+  const missingRemovePath = join(fixtureDir, "MISSING_MUST_REMOVE_REFINED_PROTO_PROMPT_PACK.yaml");
+  await writeFile(missingRemovePath, refinedPromptPackFixture("missing-must-remove"), "utf8");
+  const missingRemove = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingRemove.code !== 0, "missing must_remove refined prompt-pack fixture should fail validation when tune request removes elements");
+  assert(missingRemove.output.includes("delta_rules.must_remove must name requested removals"), "missing must_remove failure should name delta_rules.must_remove");
+  await unlink(missingRemovePath);
+}
+
+async function verifyDiscoveryLoopDogfoodFixture(root: string, env: NodeJS.ProcessEnv): Promise<void> {
+  const visionDir = join(root, ".openworkflow", "vision", "sessions", "dogfood-english-companion");
+  const validationDir = join(root, ".openworkflow", "validation", "dogfood-validation");
+  const protoDir = join(root, ".openworkflow", "prototypes", "dogfood-proto");
+  const tuneDir = join(root, ".openworkflow", "prototypes", "dogfood-tune");
+  const decisionDir = join(root, ".openworkflow", "decisions", "dogfood-benchmark");
+  await mkdir(visionDir, { recursive: true });
+  await mkdir(validationDir, { recursive: true });
+  await mkdir(protoDir, { recursive: true });
+  await mkdir(tuneDir, { recursive: true });
+  await mkdir(decisionDir, { recursive: true });
+
+  await writeFile(join(visionDir, "VISION_SESSION.yaml"), visionSessionYaml({
+    id: "dogfood-english-companion",
+    status: "active",
+    oneSentence: "AI companion helps English learners turn emotional memory into daily spoken practice.",
+    protoStatus: "ready",
+    full: true,
+  }), "utf8");
+  await writeFile(join(validationDir, "VALIDATION.yaml"), discoveryLoopValidationFixture(), "utf8");
+  await writeFile(join(protoDir, "EVIDENCE.yaml"), discoveryLoopStrategicPromptPackFixture(), "utf8");
+  await writeFile(join(tuneDir, "REFINED_PROTO_PROMPT_PACK.yaml"), discoveryLoopRefinedPromptPackFixture(), "utf8");
+  await writeFile(join(decisionDir, "DECISION.yaml"), discoveryLoopDecisionFixture(), "utf8");
+
+  const validation = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(validation.code === 0, `canonical discovery-loop dogfood fixture should pass validation: ${validation.output}`);
+
+  const proto = await readFile(join(protoDir, "EVIDENCE.yaml"), "utf8");
+  const tune = await readFile(join(tuneDir, "REFINED_PROTO_PROMPT_PACK.yaml"), "utf8");
+  const decision = await readFile(join(decisionDir, "DECISION.yaml"), "utf8");
+  const commandAudit = await readFile(join(root, ".openworkflow", "audit", "COMMAND_AUDIT_INDEX.yaml"), "utf8");
+  const contextPackets = await readFile(join(root, ".openworkflow", "audit", "CONTEXT_PACKETS.yaml"), "utf8");
+  assert(proto.includes(".openworkflow/validation/dogfood-validation/VALIDATION.yaml"), "dogfood proto fixture should reference validation fixture");
+  assert(proto.includes("image_id: IMG_D1_01"), "dogfood proto fixture should include generated image metadata");
+  assert(tune.includes(".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml"), "dogfood tune fixture should reference proto fixture");
+  assert(tune.includes("latest_approved_baseline_group_id: dogfood-proto-accepted-v1"), "dogfood tune fixture should include latest baseline id");
+  assert(decision.includes(".openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml"), "dogfood decision fixture should reference tune fixture");
+  assert(decision.includes("accepted benchmark prototype image metadata"), "dogfood decision fixture should name benchmark readiness");
+  assert(decision.includes("outcome: continue"), "dogfood decision fixture should accept the benchmark for downstream handoff");
+  assert(decision.includes(".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml"), "dogfood decision fixture should retain original prototype evidence ref");
+  assert(!(await exists(join(root, ".openworkflow", "html-prototypes"))), "dogfood benchmark readiness must not create proto2html artifacts");
+  assert(!(await exists(join(root, ".openworkflow", "html2spec"))), "dogfood benchmark readiness must not create html2spec artifacts");
+  assert(commandAudit.indexOf("trigger: /ow:vision") < commandAudit.indexOf("trigger: /ow:validation"), "command audit should order vision before validation");
+  assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:build-proto-prompt"), "command audit should order validation before build-proto-prompt compilation");
+  assert(commandAudit.indexOf("trigger: /ow:build-proto-prompt") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should expose build-proto-prompt before legacy vision2prompt compatibility");
+  assert(commandAudit.indexOf("trigger: /ow:validation") < commandAudit.indexOf("trigger: /ow:vision2prompt"), "command audit should order validation before internal prompt compilation");
+  assert(commandAudit.indexOf("trigger: /ow:vision2prompt") < commandAudit.indexOf("trigger: /ow:prompt2proto"), "command audit should order vision2prompt before prompt2proto");
+  assert(commandAudit.indexOf("trigger: /ow:prompt2proto") < commandAudit.indexOf("trigger: /ow:proto"), "command audit should expose internal prompt2proto before user proto orchestration handoff");
+  assert(commandAudit.indexOf("trigger: /ow:proto") < commandAudit.indexOf("trigger: /ow:tune"), "command audit should order proto before tune");
+  assert(commandAudit.indexOf("trigger: /ow:tune") < commandAudit.indexOf("trigger: /ow:decision"), "command audit should order tune before internal decision audit");
+  assert(extractBlock(commandAudit.split("trigger: /ow:tune", 2)[1] ?? "", "handoff_commands").includes("/ow:design"), "tune handoff should reach design after benchmark decision");
+  assert(!commandAudit.includes("trigger: /ow:proto2html"), "happy-path dogfood should not enter proto2html");
+  assert(contextPackets.includes("packet_id: context:build-proto-prompt"), "context packets should include internal build-proto-prompt stage");
+  assert(contextPackets.includes("packet_id: context:vision2prompt"), "context packets should include internal vision2prompt stage");
+  assert(contextPackets.includes("packet_id: context:prompt2proto"), "context packets should include internal prompt2proto stage");
+  assert(extractBlock(contextPackets.split("packet_id: context:tune", 2)[1] ?? "", "optional").includes(".openworkflow/prototypes/PROTOTYPE_INDEX.yaml"), "tune context should allow prototype index handoff");
+
+  const failedPostValidatePath = join(protoDir, "FAILED_POST_VALIDATE.yaml");
+  await writeFile(
+    failedPostValidatePath,
+    discoveryLoopStrategicPromptPackFixture().replace("post_validate:\n  status: pass", "post_validate:\n  status: pending"),
+    "utf8",
+  );
+  const failedPostValidate = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(failedPostValidate.code !== 0, "failed post-validation dogfood fixture should block image handoff");
+  assert(failedPostValidate.output.includes("post_validate.status must be pass or fail before /ow:prompt2proto"), "failed post-validation should name prompt2proto gate");
+  await unlink(failedPostValidatePath);
+
+  const missingBaselineResolutionPath = join(tuneDir, "MISSING_BASELINE_RESOLUTION.yaml");
+  await writeFile(missingBaselineResolutionPath, discoveryLoopRefinedPromptPackFixture().replace("baseline_resolution:", "baseline_resolution_missing:"), "utf8");
+  const missingBaselineResolution = await runCaptureStatus(["node", CLI, "validate", "--root", root, "--json"], env);
+  assert(missingBaselineResolution.code !== 0, "missing baseline resolution dogfood fixture should block tune handoff");
+  assert(missingBaselineResolution.output.includes("baseline_resolution must be a mapping"), "missing baseline resolution should name repair section");
+  await unlink(missingBaselineResolutionPath);
+}
+
+type RefinedPromptPackFixtureKind = "ready" | "missing-baseline-audit" | "orphan-screen-prompt" | "missing-must-inherit" | "missing-must-remove";
+
+function discoveryLoopValidationFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: validation:dogfood-validation",
+    "contract_type: validation",
+    "artifact_type: validation_target",
+    "title: Dogfood discovery-loop validation",
+    "status: active",
+    "trigger:",
+    "  mode: user_explicit",
+    "  requested_command: /ow:validation",
+    "  reason: dogfood_fixture",
+    "core_question: Does emotional memory increase repeat spoken practice?",
+    "central_uncertainty: Whether companionship creates enough trust for daily English speaking.",
+    "hypothesis: Learners return when the AI remembers emotional context and gives one concrete social rehearsal.",
+    "target_behavior: User completes one short speaking mission and can name a real conversation to try.",
+    "feature_classification:",
+    "  existential:",
+    "    - emotional memory note",
+    "    - daily speaking mission",
+    "  supporting:",
+    "    - warm correction recap",
+    "  later:",
+    "    - travel mode",
+    "  out_of_scope:",
+    "    - exam preparation",
+    "critical_assumptions:",
+    "  - Emotional memory feels supportive rather than invasive.",
+    "  - Daily missions are short enough to repeat.",
+    "prototype_scope:",
+    "  include:",
+    "    - daily mission entry",
+    "    - warm correction recap",
+    "  exclude:",
+    "    - exam preparation",
+    "    - corporate learning dashboard",
+    "prototype_experiment:",
+    "  scenario: Learner opens the app before a casual social conversation.",
+    "  must_show:",
+    "    - remembered emotional note",
+    "    - concrete scenario rehearsal",
+    "    - privacy or memory control",
+    "  must_not_show:",
+    "    - grammar textbook lesson",
+    "    - generic score dashboard",
+    "observable_signals:",
+    "  pass:",
+    "    - User starts the daily mission.",
+    "    - User completes a spoken or typed response.",
+    "  fail:",
+    "    - User cannot connect practice to a real social moment.",
+    "  ambiguous:",
+    "    - User likes the tone but does not return.",
+    "acceptance:",
+    "  - Prototype makes the daily speaking mission concrete.",
+    "  - Prototype keeps memory controls visible.",
+    "decision_rules:",
+    "  continue:",
+    "    - User can identify the next real conversation.",
+    "  revise:",
+    "    - Product thesis is visible but screen flow is too dense.",
+    "  pivot:",
+    "    - Emotional memory feels unsafe or irrelevant.",
+    "  stop:",
+    "    - Prototype reinforces exam-prep behavior.",
+    "  needs_more_evidence:",
+    "    - User reaction to memory is unclear.",
+    "decision_options:",
+    "  - continue",
+    "  - revise",
+    "  - pivot",
+    "  - stop",
+    "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
+  ].join("\n");
+}
+
+function discoveryLoopStrategicPromptPackFixture(): string {
+  return strategicPromptPackFixture("ready")
+    .replaceAll("ready-proto-prompt-pack", "dogfood-strategic-prompt-pack")
+    .replace("title: ready strategic prompt-pack fixture", "title: Dogfood strategic prompt pack")
+    .replaceAll(".openworkflow/validation/validation-1/VALIDATION.yaml", ".openworkflow/validation/dogfood-validation/VALIDATION.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-stress-fixtures/prompts/", ".openworkflow/prototypes/dogfood-proto/prompts/")
+    .replace("  status: not_started", "  status: complete")
+    .replace("  generated_images: []", [
+      "  generated_images:",
+      "    - image_id: IMG_D1_01",
+      "      direction_id: D1",
+      "      prompt_id: screen-1",
+      "      screen_name: Today practice entry",
+      "      path: .openworkflow/prototypes/dogfood-proto/images/IMG_D1_01.png",
+      "      metadata:",
+      "        source_prompt_ref: .openworkflow/prototypes/dogfood-proto/prompts/D1.md",
+      "        generated_at: 2026-05-22T00:00:00Z",
+      "        generator: fixture",
+      "        generation_status: complete",
+      "        review_status: accepted_for_tune",
+    ].join("\n"));
+}
+
+function discoveryLoopRefinedPromptPackFixture(): string {
+  return refinedPromptPackFixture("ready")
+    .replaceAll("ready-refined-prompt-pack", "dogfood-refined-prompt-pack")
+    .replace("title: ready refined prompt-pack fixture", "title: Dogfood refined prompt pack")
+    .replaceAll(".openworkflow/validation/validation-1/VALIDATION.yaml", ".openworkflow/validation/dogfood-validation/VALIDATION.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-1/EVIDENCE.yaml", ".openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml")
+    .replaceAll(".openworkflow/prototypes/proto-1/images/daily-entry.png", ".openworkflow/prototypes/dogfood-proto/images/IMG_D1_01.png")
+    .replace("latest_approved_baseline_group_id: proto-1-accepted-v1", "latest_approved_baseline_group_id: dogfood-proto-accepted-v1");
+}
+
+function discoveryLoopDecisionFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: decision:dogfood-benchmark",
+    "contract_type: decision",
+    "artifact_type: decision_record",
+    "title: Dogfood benchmark prototype decision",
+    "status: active",
+    "reviewed_evidence:",
+    "  - .openworkflow/prototypes/dogfood-proto/EVIDENCE.yaml",
+    "  - .openworkflow/prototypes/dogfood-tune/REFINED_PROTO_PROMPT_PACK.yaml",
+    "outcome: continue",
+    "rationale: The tuned prompt pack preserves the emotional-memory product system and has accepted benchmark prototype image metadata.",
+    "accepted_scope:",
+    "  - accepted benchmark prototype image metadata",
+    "  - daily mission entry screen",
+    "  - memory trust control",
+    "rejected_scope:",
+    "  - exam dashboard",
+    "  - grammar textbook flow",
+    "revision_scope: []",
+    "next_command: /ow:design",
+    "follow_up_questions: []",
+    "updated_at: 2026-05-22T00:00:00Z",
+  ].join("\n");
+}
+
+function refinedPromptPackFixture(kind: RefinedPromptPackFixtureKind): string {
+  const baselineAudit =
+    kind === "missing-baseline-audit"
+      ? ["baseline_audit: []"]
+      : [
+          "baseline_audit:",
+          "  - source_screen_id: SRC_M01",
+          "    screen_name: Daily mission entry",
+          "    journey_stage: practice_start",
+          "    user_goal: Begin a low-pressure speaking practice session.",
+          "    system_state: AI remembers yesterday confidence and offers one scenario.",
+          "    components:",
+          "      - scenario card",
+          "      - remembered confidence note",
+          "      - speaking action",
+          "    copy_tone: warm, concise, encouraging",
+          "    represented_feature: remembered daily speaking mission",
+          "    ai_or_system_behavior: remembers emotional state and suggests concrete phrase options",
+          "    trust_controls:",
+          "      - memory visibility",
+          "      - correction boundary",
+          "    visual_cues:",
+          "      - calm mobile layout",
+          "      - progress marker",
+          "    must_preserve:",
+          "      - emotional memory note",
+          "      - primary speaking action",
+          "    transform_or_remove:",
+          "      - remove decorative badge clutter",
+          "    assumptions: []",
+        ];
+  const mustInherit = kind === "missing-must-inherit" ? [] : ["product thesis", "daily mission loop", "memory trust controls"];
+  const mustRemove = kind === "missing-must-remove" ? [] : ["decorative badge clutter"];
+  const promptTarget = kind === "orphan-screen-prompt" ? "WEB_S99" : "WEB_S01";
+  return [
+    "schema_version: 0.1.0",
+    `contract_id: prototype_evidence:${kind}-refined-prompt-pack`,
+    "contract_type: prototype",
+    `title: ${kind} refined prompt-pack fixture`,
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can tune preserve product system while refining screen prompts?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: refined_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:tune",
+    "  refs:",
+    "    - .openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+    "tune_input:",
+    "  baseline_source_type: images",
+    "  baseline_refs:",
+    "    - .openworkflow/prototypes/proto-1/images/daily-entry.png",
+    "  tune_request: Remove decorative badge clutter and convert the accepted mobile screen into a desktop web screen.",
+    "  target_form_factor: desktop_web",
+    "  regeneration_scope: selected_screens",
+    "  target_screen_count: 1",
+    "  locked_screens:",
+    "    - SRC_M01",
+    "  locked_elements:",
+    "    - emotional memory note",
+    "    - primary speaking action",
+    "  constraints:",
+    "    - keep privacy and memory controls visible",
+    "baseline_resolution:",
+    "  latest_approved_baseline_group_id: proto-1-accepted-v1",
+    "  latest_approved_baseline_ref: .openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+    "  baseline_lineage:",
+    "    - .openworkflow/prototypes/proto-1/EVIDENCE.yaml",
+    "  resolution_rule: Use the latest approved prototype group unless the user explicitly selects an older baseline.",
+    "  stale_source_guard: Do not silently revert to pre-tune mobile source screens.",
+    "carry_forward:",
+    "  locked_screens:",
+    "    - SRC_M01",
+    "  locked_elements:",
+    "    - emotional memory note",
+    "    - primary speaking action",
+    "  preserved_improvements:",
+    "    - safer memory visibility from previous accepted tune pass",
+    "  explicit_unlocks: []",
+    "  cumulative_drift_guard: Preserve accepted improvements and locked elements unless explicitly unlocked.",
+    ...baselineAudit,
+    "product_system:",
+    "  product_thesis: AI companion turns emotional memory into repeated spoken practice.",
+    "  target_user: English learner who freezes in real conversation.",
+    "  primary_loop: remember state, rehearse scenario, give warm correction, suggest real-world action",
+    "  brand_promise: speaking practice feels personal and safe",
+    "  interaction_model: guided companion rehearsal",
+    "  information_architecture:",
+    "    - mission entry",
+    "    - phrase practice",
+    "    - recap",
+    "  design_language:",
+    "    - calm",
+    "    - trust-forward",
+    "  component_vocabulary:",
+    "    - scenario card",
+    "    - confidence note",
+    "    - speaking action",
+    "  copywriting_style: warm and concrete",
+    "  feature_system:",
+    "    - emotional memory",
+    "    - scenario rehearsal",
+    "  trust_and_boundary_system:",
+    "    - visible memory controls",
+    "    - correction boundary",
+    "  anti_goals:",
+    "    - exam prep dashboard",
+    "  stable_constants:",
+    "    - companion memory",
+    "    - daily speaking loop",
+    "  adaptable_variables:",
+    "    - layout density",
+    "    - desktop navigation",
+    "delta_rules:",
+    "  must_inherit:",
+    ...yamlStringList(mustInherit, 4),
+    "  must_add:",
+    "    - desktop information hierarchy",
+    "  must_remove:",
+    ...yamlStringList(mustRemove, 4),
+    "  flexible_change:",
+    "    - visual spacing",
+    "    - secondary card order",
+    "screen_delta_matrix:",
+    "  - target_screen_id: WEB_S01",
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    preserve:",
+    "      - emotional memory note",
+    "      - primary speaking action",
+    "    add:",
+    "      - desktop side panel",
+    "    remove:",
+    "      - decorative badge clutter",
+    "    transform:",
+    "      - mobile stacked cards into desktop two-column layout",
+    "    flexible:",
+    "      - secondary metric placement",
+    "    acceptance_criteria:",
+    "      - Product thesis remains visible.",
+    "      - Removed clutter does not reappear.",
+    "screen_manifest:",
+    "  - target_screen_id: WEB_S01",
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    screen_name: Desktop daily mission entry",
+    "    target_form_factor: desktop_web",
+    "    generation_scope: selected_screen_regeneration",
+    "    dependencies:",
+    "      - baseline product system",
+    "global_design_prompt: Preserve the calm companion product system while adapting the screen to desktop web.",
+    "screen_prompts:",
+    "  - prompt_id: WEB_S01_PROMPT",
+    `    target_screen_id: ${promptTarget}`,
+    "    source_screen_ids:",
+    "      - SRC_M01",
+    "    screen_name: Desktop daily mission entry",
+    "    image_role: refined desktop web screen",
+    "    prompt: Create a desktop web screen that preserves the remembered emotional note, scenario rehearsal, speaking action, and privacy controls while removing decorative badge clutter.",
+    "    negative_prompt: Do not add exam dashboards, generic LMS navigation, or decorative badge clutter.",
+    "    acceptance_criteria:",
+    "      - target screen maps back to SRC_M01",
+    "      - primary speaking action remains prominent",
+    "generation_order:",
+    "  - WEB_S01",
+    "acceptance_checklist:",
+    "  - Baseline product thesis is preserved.",
+    "  - Requested removals are absent.",
+    "negative_constraints:",
+    "  - Do not generate HTML.",
+    "review_plan:",
+    "  method: validate tune inheritance and screen binding",
+    "result: pass",
+    "handoff:",
+    "  next_command: /ow:tune",
+  ].join("\n");
+}
+
+function yamlStringList(values: string[], indent: number): string[] {
+  const spaces = " ".repeat(indent);
+  return values.length === 0 ? [`${spaces}[]`] : values.map((value) => `${spaces}- ${value}`);
+}
+
+function prototypeSystemContractLines(options?: { shell?: string; navigation?: string[]; objects?: string[]; copyTone?: string }): string[] {
+  const shell = options?.shell ?? "mobile practice shell with scenario context, voice control, and feedback surface";
+  const navigation = options?.navigation ?? ["Daily practice", "Scenario", "Progress", "Memory"];
+  const objects = options?.objects ?? ["practice scenario", "remembered note", "correction card"];
+  const copyTone = options?.copyTone ?? "supportive, specific, and non-exam-like";
+  return [
+    "prototype_system_contract:",
+    "  stable_app_shell:",
+    `    - ${shell}`,
+    "  navigation_taxonomy:",
+    ...navigation.map((item) => `    - ${item}`),
+    "  data_vocabulary:",
+    "    - status labels, timestamps, owners, confidence, and selected object names stay consistent across screens",
+    "  domain_object_anatomy:",
+    ...objects.map((item) => `    - ${item}`),
+    "  object_detail_anatomy:",
+    "    - header, state, concrete data fields, AI/system response, trust controls, and available actions",
+    "  action_bar_contract:",
+    "    - primary action remains first, secondary revise or inspect actions remain adjacent, destructive actions stay separate",
+    "  audit_trust_pattern:",
+    "    - consent, confidence, citation, or audit controls remain visible near the affected decision",
+    `  copy_tone: ${copyTone}`,
+    "  allowed_screen_deltas:",
+    "    - selected object, journey state, evidence detail, and active action may change by screen",
+  ];
+}
+
+function thinStrategicPromptPackFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: prototype_evidence:thin-proto-prompt-pack",
+    "contract_type: prototype",
+    "title: Thin strategic prompt-pack fixture",
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can thin prompt packs be rejected?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "negative_constraints: []",
+    "review_plan:",
+    "  method: validate required strategic prompt-pack fields",
+    "result: not_reviewed",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "direction_count_policy:",
+    "  source: agent_default_after_user_delegation",
+    "  resolved_count: 3",
+    "directions: []",
+  ].join("\n");
+}
+
+function thinImagePromptOnlyStrategicPromptPackFixture(): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: prototype_evidence:thin-image-prompt-d1",
+    "contract_type: prototype",
+    "title: Thin image-prompt D1 fixture",
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/smart-city-validation/VALIDATION.yaml",
+    "core_question: Can a short D1 image prompt be rejected when it lacks screen-bound product prototype fields?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/smart-city-validation/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "  internal_stage: /ow:vision2prompt",
+    "negative_constraints:",
+    "  - Do not accept a single short screenshot prompt as a product prototype prompt pack.",
+    "review_plan:",
+    "  method: validate thin image prompt regression",
+    "result: not_reviewed",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "internal_pipeline:",
+    "  orchestrator_command: /ow:proto",
+    "  user_visible_command: /ow:proto",
+    "  stages:",
+    "    - stage_id: proto-preflight",
+    "      command: /ow:proto",
+    "      visibility: user",
+    "      status: complete",
+    "      outputs:",
+    "        - preflight_quality_gate",
+    "    - stage_id: vision2prompt",
+    "      command: /ow:vision2prompt",
+    "      visibility: internal",
+    "      status: complete",
+    "      outputs:",
+    "        - prototype_system_contract",
+    "        - prompt_text_manifest",
+    "    - stage_id: prompt2proto",
+    "      command: /ow:prompt2proto",
+    "      visibility: internal",
+    "      status: not_started",
+    "      outputs:",
+    "        - image_generation",
+    "direction_count_policy:",
+    "  source: user_input",
+    "  ask_user_question_required: false",
+    "  ask_user_question: null",
+    "  resolved_count: 1",
+    "normalized_input:",
+    "  product_domain: smart city operations copilot",
+    "  primary_user: City operations lead reviewing synthetic POC workflows",
+    "  usage_context: Static dashboard concept review",
+    "  current_alternative: GIS screenshots and report decks",
+    "  core_pain: Product topology collapses into a generic dashboard prompt",
+    "  desired_behavior_change: Reviewer should inspect a real product loop before image generation",
+    "  strongest_success_signal: Reviewer can name screen states, data fields, and actions from the prompt pack",
+    "  core_differentiator: Screen-bound product system beats a short image prompt",
+    "  emotional_value: Operational confidence",
+    "  functional_value: Actionable screen-level prompt source",
+    "  trust_requirements: Human confirmation and synthetic-data disclosure",
+    "  privacy_requirements: Synthetic POC data only",
+    "  non_goals: Provider-backed image generation",
+    "  future_opportunities: Smart city replay after fixture gates",
+    "  validation_target: Reject short D1 prompt before /ow:prompt2proto",
+    "strategic_core:",
+    "  target_user: City operations lead",
+    "  behavior_change: Move from report prompt to executable product prompt pack",
+    "  mechanism: Validator-enforced screen-bound contract",
+    "  differentiator: Prompt source must include states, data, actions, and trust controls",
+    "  boundary_conditions: No image generation until gates pass",
+    "  central_uncertainty: Whether validators catch short image-prompt regressions",
+    "product_experience_model:",
+    "  product_archetype: map-first smart city operations dashboard",
+    "  primary_canvas: digital twin city map",
+    "  information_architecture:",
+    "    - map shell",
+    "    - selected object drawer",
+    "    - HIL controls",
+    "  domain_object_model:",
+    "    - district",
+    "    - incident",
+    "    - department task",
+    "  primary_task_loop:",
+    "    - select map object",
+    "    - inspect recommendation",
+    "    - confirm or block action",
+    "  interaction_state_model:",
+    "    - selected object",
+    "    - pending human confirmation",
+    "  data_realism_requirements:",
+    "    - incident id",
+    "    - owner",
+    "    - timestamp",
+    "  visual_language:",
+    "    - map-first operations shell",
+    "  anti_generic_constraints:",
+    "    - no white-card AI governance dashboard",
+    "prototype_reality_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - product_category_fit",
+    "    - primary_canvas_fit",
+    "    - domain_object_realism",
+    "    - task_loop_completeness",
+    "    - interaction_state_coverage",
+    "    - data_realism",
+    "    - anti_generic_constraints",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - The intentionally thin fixture passes reality gate to isolate screen-bound executability failure.",
+    "  repair_route: /ow:vision2prompt",
+    "prompt_pack_integrity_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - direction_count_matches",
+    "    - prompt_text_refs_resolve",
+    "    - generated_image_refs_resolve",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - The intentionally thin fixture keeps refs consistent to isolate executability failure.",
+    "  repair_route: /ow:vision2prompt",
+    "directions:",
+    "  - direction_id: D1",
+    "    name: Short dashboard image prompt",
+    "    strategic_hypothesis: A short D1 prompt can produce a nice image, but not a reliable product prototype source.",
+    "    validates: Whether validators reject one-shot image prompts.",
+    "    main_risk: Downstream image generation invents the missing product system.",
+    "    distinctness_rationale: Strategic difference is workflow completeness versus a short screenshot prompt.",
+    "    strategic_fingerprint:",
+    "      product_form: map-first smart city operations dashboard",
+    "      trigger: operator selects a city object",
+    "      interaction_model: map selection and HIL controls",
+    "      emotional_driver: operational credibility",
+    "      retention_mechanism: audit-ready workflow",
+    "      metric: reviewer can name the task loop",
+    "      main_risk: generic dashboard image prompt",
+    "      trust_model: human confirms AI recommendation",
+    "      privacy_model: synthetic city POC data only",
+    "    prototype_prompt: Create a high-fidelity smart city AI dashboard with map, HIL, citations, and audit cards.",
+    "    screen_prompts: []",
+    "    pm_judgment: Not acceptable because it lacks screen-bound states, required components, data fields, actions, and acceptance criteria.",
+    "build_recommendation:",
+    "  first_direction_id: D1",
+    "  why_first: It isolates the short image-prompt regression.",
+    "  success_signals:",
+    "    - Validator rejects missing screen-bound fields.",
+    "  failure_signals:",
+    "    - Validator accepts a short image prompt as generation-ready.",
+    "  next_test_if_it_works: Add full dailin-grade fixtures.",
+    "prompt_text_manifest:",
+    "  status: ready_for_image_generation",
+    "  directions_ready: true",
+    "  direction_count: 1",
+    "  prompt_text_refs:",
+    "    - D1",
+    "post_validate:",
+    "  status: skipped",
+    "  trigger: after_prompt_assets_ready",
+    "  required_when_direction_count_gte: 2",
+    "  skip_when_resolved_count: 1",
+    "  threshold_policy:",
+    "    method: strategic_fingerprint_similarity",
+    "    max_pairwise_similarity: 0.65",
+    "    comparison: pairwise",
+    "  fingerprint_dimensions:",
+    "    - product_form",
+    "    - trigger",
+    "    - interaction_model",
+    "    - emotional_driver",
+    "    - retention_mechanism",
+    "    - metric",
+    "    - main_risk",
+    "    - trust_model",
+    "    - privacy_model",
+    "  comparisons: []",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Single-direction thin fixture skips diversity comparison.",
+    "  repair_route: /ow:vision2prompt",
+    "image_generation:",
+    "  status: not_started",
+    "  batch_strategy: Do not generate from this thin prompt pack.",
+    "  generated_images: []",
+    "  collection_notes: []",
+  ].join("\n");
+}
+
+type SmartCityFixtureKind = "ready" | "generic-ai-dashboard";
+
+function smartCityStrategicPromptPackFixture(kind: SmartCityFixtureKind): string {
+  const gateStatus = kind === "ready" ? "pass" : "fail";
+  return [
+    "schema_version: 0.1.0",
+    `contract_id: prototype_evidence:smart-city-${kind}`,
+    "contract_type: prototype",
+    `title: Smart city ${kind} product reality fixture`,
+    "status: active",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/smart-city-validation/VALIDATION.yaml",
+    "core_question: Can the prompt pack express a real smart city operations dashboard rather than a generic AI governance report?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/smart-city-validation/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "negative_constraints:",
+    "  - Do not make HIL, audit, and citations the visual main product.",
+    "  - Do not use a white-card AI governance report dashboard.",
+    "  - Do not split planning, incident, and capacity into scenario-only product directions.",
+    "review_plan:",
+    "  method: validate smart city product-category reality before image generation",
+    "result: pass",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "internal_pipeline:",
+    "  orchestrator_command: /ow:proto",
+    "  user_visible_command: /ow:proto",
+    "  stages:",
+    "    - stage_id: proto-preflight",
+    "      command: /ow:proto",
+    "      visibility: user",
+    "      status: complete",
+    "      outputs:",
+    "        - preflight_quality_gate",
+    "    - stage_id: vision2prompt",
+    "      command: /ow:vision2prompt",
+    "      visibility: internal",
+    "      status: complete",
+    "      outputs:",
+    "        - product_experience_model",
+    "        - prototype_system_contract",
+    "        - prompt_text_manifest",
+    "    - stage_id: prompt2proto",
+    "      command: /ow:prompt2proto",
+    "      visibility: internal",
+    "      status: not_started",
+    "      outputs:",
+    "        - image_generation",
+    "direction_count_policy:",
+    "  source: user_input",
+    "  ask_user_question_required: false",
+    "  ask_user_question: null",
+    "  resolved_count: 1",
+    "normalized_input:",
+    "  product_domain: smart city operations copilot",
+    "  primary_user: City operations lead reviewing synthetic POC workflows",
+    "  usage_context: Map-first digital twin command center for planning, incidents, and asset capacity",
+    "  current_alternative: GIS screenshots, spreadsheets, PDFs, chat threads, and manual approval notes",
+    "  core_pain: Spatial context, operational data, and responsible AI gates are disconnected",
+    "  desired_behavior_change: Operator reviews AI-assisted city workflow from map context before human action",
+    "  strongest_success_signal: Reviewer can identify the map-first operations loop and human decision boundary",
+    "  core_differentiator: Responsible AI controls are embedded in a city operations product shell",
+    "  emotional_value: The product feels operationally credible instead of speculative",
+    "  functional_value: Map layers, domain objects, evidence, HIL, and audit appear in one workflow",
+    "  trust_requirements: Synthetic data disclosure, citations, workflow trace, and human confirmation",
+    "  privacy_requirements: Synthetic POC data only",
+    "  non_goals: Production government integration, autonomous approval, compliance-grade audit",
+    "  future_opportunities: Real GIS connector, IAM/RBAC/SSO, department workflow integration",
+    "  validation_target: Test whether a static prompt pack can preserve smart city dashboard reality",
+    "strategic_core:",
+    "  target_user: City operations or solution-delivery leader evaluating a POC demo",
+    "  behavior_change: Move from report explanation to accountable map-first AI-assisted review",
+    "  mechanism: Digital twin map shell with layers, domain objects, evidence, HIL, and audit trace",
+    "  differentiator: Smart city operations topology is primary; AI governance is embedded as controls",
+    "  boundary_conditions: Synthetic data only, no autonomous approval, no production integration claim",
+    "  central_uncertainty: Whether the prototype feels like a real smart city operations product",
+    "prototype_brief:",
+    "  product_name: CityFlow Copilot",
+    "  positioning: Map-first responsible AI operations dashboard for synthetic smart city POC review",
+    "  target_user: City operations lead reviewing planning, incident, and asset capacity workflows",
+    "  current_alternative: GIS screenshots, spreadsheets, PDFs, chat threads, and manual approval notes",
+    "  core_idea: Keep AI recommendations inside a digital twin map workflow with citations, HIL, and audit trace.",
+    "  primary_loop:",
+    "    - Select city object or incident on the map",
+    "    - Inspect operational layers and detail metrics",
+    "    - Review Copilot recommendation and citations",
+    "    - Confirm or block the human-in-the-loop checkpoint",
+    "  trust_boundaries:",
+    "    - Synthetic POC data only",
+    "    - AI recommends but cannot autonomously approve actions",
+    "    - Human confirmation and audit trace stay visible",
+    "  non_goals:",
+    "    - production government integration",
+    "    - autonomous approval",
+    "    - compliance-grade audit",
+    "  desired_feeling: Operationally credible, accountable, and map-first",
+    "product_experience_model:",
+    `  product_archetype: ${kind === "ready" ? "map-first smart city operations dashboard" : "generic AI governance report dashboard"}`,
+    `  primary_canvas: ${kind === "ready" ? "digital twin city map with operational layers" : "white card summary dashboard"}`,
+    "  information_architecture:",
+    "    - city operations domains",
+    "    - map layers",
+    "    - selected object detail drawer",
+    "    - workflow trace",
+    "    - HIL controls",
+    "    - audit and POC boundary",
+    "  domain_object_model:",
+    "    - district",
+    "    - parcel",
+    "    - parking asset",
+    "    - hospital access incident",
+    "    - PM2.5 sensor",
+    "    - department task",
+    "    - map pin",
+    "    - capacity metric",
+    "  primary_task_loop:",
+    "    - Select a district, parcel, incident, or asset cluster on the map",
+    "    - Inspect map layers and selected object details",
+    "    - Run Copilot analysis",
+    "    - Review citations, assumptions, and impacted departments",
+    "    - Resolve human-in-the-loop checkpoint",
+    "    - Inspect audit result and next integration step",
+    "  interaction_state_model:",
+    "    - selected map object",
+    "    - active city layer",
+    "    - warning or risk state",
+    "    - pending human confirmation",
+    "    - data gap",
+    "    - right-side detail drawer",
+    "  data_realism_requirements:",
+    "    - parking spaces count",
+    "    - PM2.5 and PM10 readings",
+    "    - open or closed status",
+    "    - capacity percentage",
+    "    - risk level",
+    "    - department owner",
+    "    - timestamp",
+    "  visual_language:",
+    "    - map-first command shell",
+    "    - dense operational sidebars",
+    "    - layer toggles",
+    "    - map pins and alerts",
+    "    - detail drawer and workflow controls",
+    "  anti_generic_constraints:",
+    "    - no white-card AI governance report dashboard",
+    "    - no scenario-only direction split",
+    "    - no HIL/audit/citation as the visual main product",
+    ...prototypeSystemContractLines({
+      shell: "map-first desktop command shell with left domain rail, dominant city map, right detail drawer, and bottom workflow trace",
+      navigation: ["Planning", "Incidents", "Capacity", "Audit"],
+      objects: ["district", "parcel", "incident", "parking asset", "department task"],
+      copyTone: "concise city-operations language with explicit synthetic POC boundaries",
+    }),
+    "screen_manifest:",
+    "  - target_screen_id: map-shell",
+    "    screen_name: Smart city map operations shell",
+    "    journey_stage: orient and select",
+    "    user_goal: Understand live city context before trusting an AI recommendation",
+    "    system_state: map layer active with selected district and alerts",
+    "    selected_object: Binjiang District capacity cluster",
+    "    required_components:",
+    "      - city domain navigation",
+    "      - digital twin map",
+    "      - layer toggles",
+    "      - map pins and alerts",
+    "      - selected object detail drawer",
+    "    required_data_fields:",
+    "      - parking occupancy percentage",
+    "      - PM2.5 reading",
+    "      - department owner",
+    "      - timestamp",
+    "      - risk level",
+    "    primary_actions:",
+    "      - select map object",
+    "      - toggle layers",
+    "      - run Copilot analysis",
+    "    ai_behavior: Copilot summarizes selected-object risk and cites synthetic evidence before any action.",
+    "    trust_controls:",
+    "      - synthetic data badge",
+    "      - source citations",
+    "      - human confirmation required",
+    "    example_copy:",
+    "      - Capacity alert: 87% parking occupancy near Hospital A",
+    "      - Human approval required before department dispatch",
+    "    acceptance_criteria:",
+    "      - Map is the dominant canvas.",
+    "      - HIL and citations are controls inside the operations workflow.",
+    "  - target_screen_id: selected-object-detail",
+    "    screen_name: Selected object detail and HIL workflow",
+    "    journey_stage: review and confirm",
+    "    user_goal: Decide whether to confirm, revise, or block the AI-assisted workflow",
+    "    system_state: detail drawer open with pending human confirmation",
+    "    selected_object: Hospital access incident INC-2047",
+    "    required_components:",
+    "      - selected object drawer",
+    "      - evidence list",
+    "      - impacted departments",
+    "      - HIL confirmation controls",
+    "      - audit trace",
+    "    required_data_fields:",
+    "      - incident id",
+    "      - affected route",
+    "      - department owner",
+    "      - confidence score",
+    "      - last updated time",
+    "    primary_actions:",
+    "      - approve recommendation",
+    "      - request revision",
+    "      - inspect audit trace",
+    "    ai_behavior: Copilot explains uncertainty, stale data, and next action while waiting for human confirmation.",
+    "    trust_controls:",
+    "      - confidence disclosure",
+    "      - stale data warning",
+    "      - audit log",
+    "    example_copy:",
+    "      - Pending human confirmation",
+    "      - Confidence 0.78 based on synthetic traffic and hospital access data",
+    "    acceptance_criteria:",
+    "      - Selected object and pending confirmation are visible.",
+    "      - Operational fields are concrete and city-specific.",
+    "global_design_system_prompt:",
+    "  visual_language: dense GIS command center with restrained operational styling",
+    "  layout_system: left domain rail, full-bleed map canvas, right detail drawer, bottom workflow trace",
+    "  component_vocabulary:",
+    "    - layer toggles",
+    "    - map pins",
+    "    - risk badges",
+    "    - detail drawer",
+    "    - HIL action bar",
+    "  information_density: high-density operational dashboard, not marketing or report cards",
+    "  copy_tone: concise city-operations language with explicit POC boundaries",
+    "  responsive_canvas_rules:",
+    "    - desktop 16:9 primary canvas",
+    "    - map remains dominant at all supported sizes",
+    "  negative_visual_patterns:",
+    "    - white-card AI governance report dashboard",
+    "    - chatbot shell",
+    "    - disconnected scenario cards",
+    "quality_rubric:",
+    "  prompt_executability:",
+    "    - Another agent can generate the map shell without asking for missing product context.",
+    "  strategic_distinctness:",
+    "    - Product strategy is map-first operations workflow, not governance reporting.",
+    "  product_specificity:",
+    "    - Uses city assets, incidents, departments, layers, and synthetic POC data.",
+    "  state_coverage:",
+    "    - Covers selected object, active layer, alert, pending confirmation, and audit states.",
+    "  trust_boundary_coverage:",
+    "    - Shows citations, synthetic data disclosure, and human confirmation.",
+    "  prompt_paragraph_quality:",
+    "    - Direction and screen prompts include product context, target user, journey, interaction behavior, system response, concrete city data, trust controls, anti-goals, visual direction, and desired user feeling.",
+    "prototype_reality_gate:",
+    `  status: ${gateStatus}`,
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - product_category_fit",
+    "    - primary_canvas_fit",
+    "    - domain_object_realism",
+    "    - task_loop_completeness",
+    "    - interaction_state_coverage",
+    "    - data_realism",
+    "    - anti_generic_constraints",
+    ...(kind === "ready"
+      ? ["  failures: []"]
+      : [
+          "  failures:",
+          "    - Prompt centers generic HIL, audit, and citation cards instead of a map-first operations shell.",
+          "    - Planning, incident, and capacity are treated as scenario-only directions without shared product topology.",
+        ]),
+    "  outcome_notes:",
+    `    - Smart city product reality fixture status is ${gateStatus}.`,
+    "  repair_route: /ow:vision2prompt",
+    "prompt_pack_integrity_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - direction_count_matches",
+    "    - prompt_text_refs_resolve",
+    "    - generated_image_refs_resolve",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Prompt-pack direction count and prompt refs resolve to source directions.",
+    "  repair_route: /ow:vision2prompt",
+    "directions:",
+    "  - direction_id: D1",
+    "    name: Map-first operations shell",
+    "    strategic_hypothesis: A map-first operations shell can make smart city Copilot judgment credible because the user sees city context, domain objects, workflow controls, and HIL in one product loop.",
+    "    validates: Whether the product feels like a smart city dashboard rather than an AI governance report.",
+    "    main_risk: The screen may still overemphasize governance controls over the city operations surface.",
+    "    distinctness_rationale: Strategic difference is product form as a map-first operations dashboard with a city workflow loop, not a scenario-only AI report workflow.",
+    "    product_thesis: A smart city Copilot must prove trust inside the map-first operational loop instead of presenting detached AI governance cards.",
+    "    user_transformation: The operations lead moves from reading static reports to controlling AI-assisted decisions from selected city objects.",
+    "    reason_to_exist: This direction is worth prototyping because it tests whether map context, HIL controls, and audit trace can coexist in one credible product shell.",
+    "    strategic_fingerprint:",
+    "      product_form: map-first smart city operations dashboard",
+    "      trigger: operator selects a city object or active incident",
+    "      interaction_model: map layer selection with detail drawer and HIL workflow control",
+    "      emotional_driver: operational credibility and accountable control",
+    "      retention_mechanism: audit-ready city operations workflow",
+    "      metric: reviewer can explain the map-to-HIL task loop",
+    "      main_risk: generic AI governance report dashboard",
+    "      trust_model: AI recommends while human confirms actions",
+    "      privacy_model: synthetic city POC data only",
+    "    prototype_prompt: Design a high-fidelity desktop prototype for CityFlow Copilot, a map-first smart city operations dashboard for an operations lead who must review synthetic planning, incident, and capacity workflows without losing human control. The journey starts with the operator selecting a city object on the digital twin map, then reviewing concrete metrics, Copilot evidence, stale-data warnings, and HIL approval controls in a detail drawer. Use a dense desktop canvas with map-first layout, city domain rail, layer controls, audit citations, and operational data such as incident id, owner, confidence, timestamp, and capacity value. Do not make this a generic AI governance report, chatbot shell, or disconnected card wall. The user should feel credible control over AI-assisted city operations.",
+    "    screen_prompts:",
+    "      - prompt_id: map-shell",
+    "        target_screen_id: map-shell",
+    "        screen_name: Smart city map operations shell",
+    "        image_role: primary product reality screen",
+    "        prompt: Design the primary map shell screen for CityFlow Copilot at the first journey stage where a city operations lead enters the product and selects a live city object. Show a desktop map-first canvas with city domain rail, active planning/incident/capacity layers, map pins, selected district detail drawer, Copilot recommendation, HIL action controls, citations, and synthetic POC data boundary. When the operator selects a map object, the system should reveal metrics, owner, confidence, timestamp, and approval state without leaving the map. Do not show a white-card AI governance report, chatbot-first shell, or disconnected scenario cards. Acceptance criteria include map dominates the canvas, operational data is concrete, trust controls are visible, and the user feels in control.",
+    "        negative_prompt: Do not show a white-card AI governance report dashboard or chatbot-first shell.",
+    "        example_copy:",
+    "          - Capacity alert: 87% parking occupancy near Hospital A",
+    "          - Human approval required before department dispatch",
+    "        acceptance_criteria:",
+    "          - Map dominates the canvas.",
+    "          - Planning, incident, and capacity appear as modules or layers in one product shell.",
+    "      - prompt_id: selected-object-detail",
+    "        target_screen_id: selected-object-detail",
+    "        screen_name: Selected object detail and HIL workflow",
+    "        image_role: interaction state screen",
+    "        prompt: Design the selected-object detail screen for CityFlow Copilot after the operator clicks Parcel P-1182 or incident INC-2047 on the map. Keep the same map-first desktop layout while opening a detail drawer with zoning or route metrics, impacted departments, evidence rows, stale-data warning, pending human confirmation, and audit trace. The system response should explain the Copilot recommendation and require confirm, revise, or block before any dispatch or planning action. Include concrete copy such as confidence 0.78, traffic feed stale by 11 minutes, owner Operations Lead, and timestamp 09-42. Do not make the selected object a generic KPI card without map context. Acceptance criteria include selected object, system response, trust boundary, and user control are visible so the reviewer feels operational credibility.",
+    "        negative_prompt: Do not make the selected object a generic KPI card without map context.",
+    "        example_copy:",
+    "          - Incident INC-2047 blocks hospital access route B",
+    "          - Confidence 0.78, stale traffic feed warning",
+    "        acceptance_criteria:",
+    "          - Selected object and pending human confirmation are visible.",
+    "          - Operational data fields are concrete.",
+    "    pm_judgment: Strong enough because it preserves smart city product topology and treats governance as workflow controls.",
+    "build_recommendation:",
+    "  first_direction_id: D1",
+    "  why_first: It directly tests whether a map-first product shell fixes the rejected generic AI dashboard outcome.",
+    "  success_signals:",
+    "    - Reviewer sees map-first operations dashboard before governance controls.",
+    "    - Reviewer can identify city objects, layers, selected state, and HIL checkpoint.",
+    "  failure_signals:",
+    "    - Screen reads as AI governance report cards.",
+    "    - Planning, incident, and capacity appear as unrelated scenario slides.",
+    "  next_test_if_it_works: Run M97 smart city product-reality dogfood with new prompt compiler behavior.",
+    "prompt_text_manifest:",
+    "  status: ready_for_image_generation",
+    "  directions_ready: true",
+    "  direction_count: 1",
+    "  paragraph_quality_status: pass",
+    "  paragraph_quality_dimensions:",
+    "    - product_context",
+    "    - target_user",
+    "    - journey",
+    "    - screens_or_components",
+    "    - interaction_or_system_response",
+    "    - concrete_content",
+    "    - trust_or_user_control",
+    "    - visual_direction",
+    "    - anti_goals",
+    "    - desired_user_feeling",
+    "    - journey_or_screen_purpose",
+    "    - user_goal_or_system_state",
+    "    - components_or_domain_objects",
+    "    - actions_or_system_response",
+    "    - negative_constraints",
+    "    - acceptance_or_user_feeling",
+    "  prompt_text_refs:",
+    "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/smart-city-map-shell.md",
+    "post_validate:",
+    "  status: skipped",
+    "  trigger: after_prompt_assets_ready",
+    "  required_when_direction_count_gte: 2",
+    "  skip_when_resolved_count: 1",
+    "  threshold_policy:",
+    "    method: strategic_fingerprint_similarity",
+    "    max_pairwise_similarity: 0.65",
+    "    comparison: pairwise",
+    "  fingerprint_dimensions:",
+    "    - product_form",
+    "    - trigger",
+    "    - interaction_model",
+    "    - emotional_driver",
+    "    - retention_mechanism",
+    "    - metric",
+    "    - main_risk",
+    "    - trust_model",
+    "    - privacy_model",
+    "  comparisons: []",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Single smart city product-shell direction intentionally skips diversity comparison.",
+    "  repair_route: /ow:vision2prompt",
+    "image_generation:",
+    "  status: not_started",
+    "  batch_strategy: Generate map-first smart city product shell screens only after product reality gate passes.",
+    "  generated_images: []",
+    "  collection_notes: []",
+  ].join("\n");
+}
+
+type StrategicPromptPackFixtureKind = "ready" | "style-only" | "generic-dashboard" | "duplicate-fingerprint" | "near-duplicate-fingerprint" | "single-direction";
+
+function strategicPromptPackFixture(kind: StrategicPromptPackFixtureKind): string {
+  const rationales =
+    kind === "style-only"
+      ? [
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+          "Only changes visual style, color palette, card density, and illustration treatment.",
+        ]
+      : [
+          "Strategic difference: product form shifts from open chat to guided daily mission workflow.",
+          "Strategic difference: trigger changes from user-initiated practice to calendar-based social rehearsal.",
+          "Strategic difference: main risk and metric focus move to trust calibration before free speaking.",
+        ];
+  const directionCount = kind === "single-direction" ? 1 : 3;
+  const postValidateStatus = kind === "single-direction" ? "skipped" : "pass";
+  const realityGateStatus = kind === "generic-dashboard" ? "fail" : "pass";
+  const directionCountSource = kind === "single-direction" ? "user_input" : "agent_default_after_user_delegation";
+  const askUserQuestionRequired = kind === "single-direction" ? "false" : "true";
+  const directionRows =
+    kind === "single-direction"
+      ? directionLines("D1", "Daily Mission Companion", rationales[0] ?? "", kind)
+      : [
+          ...directionLines("D1", "Daily Mission Companion", rationales[0] ?? "", kind),
+          ...directionLines("D2", "Calendar Rehearsal Coach", rationales[1] ?? "", kind),
+          ...directionLines("D3", "Trust Calibration Lab", rationales[2] ?? "", kind),
+        ];
+  const promptRefs =
+    kind === "single-direction"
+      ? ["    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md"]
+      : [
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D1.md",
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D2.md",
+          "    - .openworkflow/prototypes/proto-stress-fixtures/prompts/D3.md",
+        ];
+  return [
+    "schema_version: 0.1.0",
+    `contract_id: prototype_evidence:${kind}-proto-prompt-pack`,
+    "contract_type: prototype",
+    `title: ${kind} strategic prompt-pack fixture`,
+    "status: draft",
+    "artifact_type: prototype_evidence",
+    "validation_target: .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "core_question: Can the validated strategy produce distinct prototype prompt packs?",
+    "prototype_mode: image_prompt_pack",
+    "prompt_pack_type: strategic_proto_prompt_pack",
+    "validation_input:",
+    "  mode: validation_present",
+    "  refs:",
+    "    - .openworkflow/validation/validation-1/VALIDATION.yaml",
+    "source:",
+    "  command: /ow:proto",
+    "  internal_stage: /ow:vision2prompt",
+    "negative_constraints:",
+    "  - Do not generate HTML.",
+    "  - Do not collapse directions into visual skins.",
+    "review_plan:",
+    "  method: Compare strategic difference, screen specificity, and downstream image readiness.",
+    "result: pass",
+    "handoff:",
+    "  next_command: /ow:tune",
+    "preflight_quality_gate:",
+    "  vision_status: ready",
+    "  validation_status: ready",
+    "  can_proceed: true",
+    "  blockers: []",
+    "  next_command_when_blocked: /ow:vision",
+    "internal_pipeline:",
+    "  orchestrator_command: /ow:proto",
+    "  user_visible_command: /ow:proto",
+    "  stages:",
+    "    - stage_id: proto-preflight",
+    "      command: /ow:proto",
+    "      visibility: user",
+    "      status: complete",
+    "      outputs:",
+    "        - preflight_quality_gate",
+    "    - stage_id: vision2prompt",
+    "      command: /ow:vision2prompt",
+    "      visibility: internal",
+    "      status: complete",
+    "      outputs:",
+    "        - prototype_system_contract",
+    "        - prompt_text_manifest",
+    "    - stage_id: prompt2proto",
+    "      command: /ow:prompt2proto",
+    "      visibility: internal",
+    "      status: not_started",
+    "      outputs:",
+    "        - image_generation",
+    "direction_count_policy:",
+    `  source: ${directionCountSource}`,
+    `  ask_user_question_required: ${askUserQuestionRequired}`,
+    "  ask_user_question: How many strategically different prototype directions should be generated?",
+    `  resolved_count: ${directionCount}`,
+    "normalized_input:",
+    "  product_domain: AI conversation practice",
+    "  primary_user: Adult English learner who avoids real social conversations",
+    "  usage_context: Daily mobile practice before or after real social moments",
+    "  current_alternative: Generic chatbots, phrase books, and short video lessons",
+    "  core_pain: Learners cannot transfer passive English knowledge into relaxed speaking",
+    "  desired_behavior_change: User starts short real conversations with less fear",
+    "  strongest_success_signal: User voluntarily returns after a real conversation and reports progress",
+    "  core_differentiator: AI companion remembers emotional state and turns practice into personal rehearsal",
+    "  emotional_value: User feels seen, encouraged, and gently stretched",
+    "  functional_value: User gets scenario prompts, corrective feedback, and next-step practice",
+    "  trust_requirements: Clear correction boundaries and transparent progress memory",
+    "  privacy_requirements: Private conversation history and opt-out memory controls",
+    "  non_goals: Exam prep, grammar textbook replacement, and corporate LMS",
+    "  future_opportunities: Travel mode, workplace mode, and relationship-specific practice",
+    "  validation_target: Test whether emotional companionship improves speaking practice retention",
+    "strategic_core:",
+    "  target_user: English learner who knows words but freezes in real conversation",
+    "  behavior_change: Move from passive learning to repeated spoken practice",
+    "  mechanism: Personal AI companion pairs emotional memory with scenario rehearsal",
+    "  differentiator: Progress feedback is relational and concrete, not generic scoring",
+    "  boundary_conditions: Must avoid feeling like an exam or scripted grammar lesson",
+    "  central_uncertainty: Whether companionship creates enough trust to increase speaking frequency",
+    "prototype_brief:",
+    "  product_name: Pocket English Friend",
+    "  positioning: Voice-first companion for low-pressure daily English rehearsal",
+    "  target_user: Adult English learner who understands lessons but freezes in real social moments",
+    "  current_alternative: Generic chatbot, phrase book, short video lesson, or exam-style grammar app",
+    "  core_idea: A remembered AI companion turns one real-life scenario into a short speaking loop with correction and confidence recap.",
+    "  primary_loop:",
+    "    - Pick a daily social scenario",
+    "    - Speak one answer",
+    "    - Receive warm correction",
+    "    - Save or decline memory",
+    "    - Return for the next real-world conversation",
+    "  trust_boundaries:",
+    "    - Memory is visible and optional",
+    "    - Corrections stay supportive and concrete",
+    "    - User can opt out of saved emotional notes",
+    "  non_goals:",
+    "    - exam prep",
+    "    - grammar textbook replacement",
+    "    - corporate LMS",
+    "  desired_feeling: Encouraged, seen, and ready to try one real conversation",
+    "product_experience_model:",
+    "  product_archetype: voice-first daily English companion app",
+    "  primary_canvas: mobile voice practice room",
+    "  information_architecture:",
+    "    - Daily practice entry",
+    "    - Scenario rehearsal",
+    "    - Correction moment",
+    "    - Progress recap",
+    "    - Memory controls",
+    "  domain_object_model:",
+    "    - practice scenario",
+    "    - remembered emotional note",
+    "    - phrase suggestion",
+    "    - spoken answer",
+    "    - correction card",
+    "    - progress recap",
+    "  primary_task_loop:",
+    "    - Pick a daily social scenario",
+    "    - Speak or rehearse one answer",
+    "    - Receive low-pressure correction",
+    "    - Save optional memory",
+    "    - Return for next practice",
+    "  interaction_state_model:",
+    "    - first-time entry",
+    "    - remembered user returning",
+    "    - user stuck",
+    "    - correction accepted",
+    "    - memory opt-out",
+    "  data_realism_requirements:",
+    "    - specific scenario title",
+    "    - sample phrase suggestions",
+    "    - concrete correction example",
+    "    - confidence progress note",
+    "  visual_language:",
+    "    - warm mobile companion interface",
+    "    - voice-first controls",
+    "    - soft correction cards",
+    "  anti_generic_constraints:",
+    "    - no generic chatbot shell",
+    "    - no exam dashboard",
+    "    - no card wall without a voice practice loop",
+    ...prototypeSystemContractLines(),
+    "screen_manifest:",
+    "  - target_screen_id: practice-entry",
+    "    screen_name: Today practice entry",
+    "    journey_stage: start daily rehearsal",
+    "    user_goal: Begin one realistic speaking practice without feeling tested",
+    "    system_state: remembered user returning with a suggested scenario",
+    "    selected_object: cafe small talk scenario",
+    "    required_components:",
+    "      - scenario title",
+    "      - remembered emotional note",
+    "      - phrase suggestions",
+    "      - voice action button",
+    "      - memory opt-out control",
+    "    required_data_fields:",
+    "      - scenario name",
+    "      - remembered confidence note",
+    "      - sample phrase",
+    "      - difficulty label",
+    "    primary_actions:",
+    "      - start speaking",
+    "      - switch scenario",
+    "      - edit memory",
+    "    ai_behavior: AI chooses a short scenario, recalls optional emotional context, and waits for user speech.",
+    "    trust_controls:",
+    "      - memory visibility",
+    "      - opt-out control",
+    "      - supportive correction promise",
+    "    example_copy:",
+    "      - Last time you said ordering coffee felt awkward.",
+    "      - Try: Could I get that with oat milk?",
+    "    acceptance_criteria:",
+    "      - Voice practice action is primary.",
+    "      - Memory and opt-out are visible.",
+    "  - target_screen_id: progress-recap",
+    "    screen_name: Progress recap",
+    "    journey_stage: close the practice loop",
+    "    user_goal: Understand one useful correction and one next real-world action",
+    "    system_state: answer submitted and warm feedback ready",
+    "    selected_object: spoken answer attempt",
+    "    required_components:",
+    "      - AI feedback message",
+    "      - correction card",
+    "      - confidence progress note",
+    "      - next conversation suggestion",
+    "      - saved memory toggle",
+    "    required_data_fields:",
+    "      - corrected phrase",
+    "      - confidence score",
+    "      - next scenario",
+    "      - saved memory text",
+    "    primary_actions:",
+    "      - save phrase",
+    "      - try again",
+    "      - plan next conversation",
+    "    ai_behavior: AI gives one gentle correction, records progress only with consent, and suggests a next real-world conversation.",
+    "    trust_controls:",
+    "      - editable memory",
+    "      - correction boundary",
+    "      - delete saved note",
+    "    example_copy:",
+    "      - Nice. Say could I get instead of give me for a softer tone.",
+    "      - Save confidence note? You sounded more natural today.",
+    "    acceptance_criteria:",
+    "      - Feedback is concrete and supportive.",
+    "      - Consent around memory is explicit.",
+    "global_design_system_prompt:",
+    "  visual_language: warm mobile companion with voice-first focus and restrained encouragement",
+    "  layout_system: compact mobile screen with primary voice control, scenario context, and one feedback surface",
+    "  component_vocabulary:",
+    "    - voice action button",
+    "    - scenario card",
+    "    - memory note",
+    "    - correction card",
+    "    - confidence recap",
+    "  information_density: low-friction mobile density with only one practice goal visible at a time",
+    "  copy_tone: supportive, specific, and non-exam-like",
+    "  responsive_canvas_rules:",
+    "    - mobile portrait primary",
+    "    - voice action remains thumb-reachable",
+    "  negative_visual_patterns:",
+    "    - generic chatbot shell",
+    "    - exam dashboard",
+    "    - card wall without a speaking loop",
+    "quality_rubric:",
+    "  prompt_executability:",
+    "    - Another agent can generate each mobile screen without asking for missing journey or component details.",
+    "  strategic_distinctness:",
+    "    - Directions differ by product form, trigger, interaction model, and main risk.",
+    "  product_specificity:",
+    "    - Prompt includes voice practice, emotional memory, correction, and opt-out controls.",
+    "  state_coverage:",
+    "    - Covers returning user, practice entry, answer submitted, correction, and memory consent states.",
+    "  trust_boundary_coverage:",
+    "    - Memory controls and correction boundaries are visible.",
+    "  prompt_paragraph_quality:",
+    "    - Direction and screen prompts include product context, target user, journey, screen purpose, interaction behavior, AI system response, concrete copy, memory controls, visual direction, anti-goals, and desired user feeling.",
+    "prototype_reality_gate:",
+    `  status: ${realityGateStatus}`,
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - product_category_fit",
+    "    - primary_canvas_fit",
+    "    - domain_object_realism",
+    "    - task_loop_completeness",
+    "    - interaction_state_coverage",
+    "    - data_realism",
+    "    - anti_generic_constraints",
+    ...(kind === "generic-dashboard"
+      ? [
+          "  failures:",
+          "    - Prompt pack collapses the target product into a generic AI dashboard.",
+          "    - Primary canvas and task loop are not credible for the product category.",
+        ]
+      : ["  failures: []"]),
+    "  outcome_notes:",
+    `    - Fixture prototype reality gate status is ${realityGateStatus}.`,
+    "  repair_route: /ow:vision2prompt",
+    "prompt_pack_integrity_gate:",
+    "  status: pass",
+    "  trigger: before_image_generation",
+    "  required_when_prompt_text_ready: true",
+    "  dimensions:",
+    "    - direction_count_matches",
+    "    - prompt_text_refs_resolve",
+    "    - generated_image_refs_resolve",
+    "  failures: []",
+    "  outcome_notes:",
+    "    - Prompt-pack direction count and prompt refs resolve to source directions.",
+    "  repair_route: /ow:vision2prompt",
+    "directions:",
+    ...directionRows,
+    "build_recommendation:",
+    "  first_direction_id: D1",
+    "  why_first: It tests the central retention hypothesis with the shortest daily loop.",
+    "  success_signals:",
+    "    - User records or types one practice answer for three consecutive days.",
+    "    - User can name one real conversation they feel ready to try.",
+    "  failure_signals:",
+    "    - User treats the flow like another lesson and skips emotional check-ins.",
+    "    - User cannot connect practice to a real social moment.",
+    "  next_test_if_it_works: Expand from daily missions into calendar-triggered rehearsal.",
+    "prompt_text_manifest:",
+    "  status: ready_for_image_generation",
+    "  directions_ready: true",
+    `  direction_count: ${directionCount}`,
+    "  paragraph_quality_status: pass",
+    "  paragraph_quality_dimensions:",
+    "    - product_context",
+    "    - target_user",
+    "    - journey",
+    "    - screens_or_components",
+    "    - interaction_or_system_response",
+    "    - concrete_content",
+    "    - trust_or_user_control",
+    "    - visual_direction",
+    "    - anti_goals",
+    "    - desired_user_feeling",
+    "    - journey_or_screen_purpose",
+    "    - user_goal_or_system_state",
+    "    - components_or_domain_objects",
+    "    - actions_or_system_response",
+    "    - negative_constraints",
+    "    - acceptance_or_user_feeling",
+    "  prompt_text_refs:",
+    ...promptRefs,
+    "post_validate:",
+    `  status: ${postValidateStatus}`,
+    "  trigger: after_prompt_assets_ready",
+    "  required_when_direction_count_gte: 2",
+    "  skip_when_resolved_count: 1",
+    "  threshold_policy:",
+    "    method: strategic_fingerprint_similarity",
+    "    max_pairwise_similarity: 0.65",
+    "    comparison: pairwise",
+    "  fingerprint_dimensions:",
+    "    - product_form",
+    "    - trigger",
+    "    - interaction_model",
+    "    - emotional_driver",
+    "    - retention_mechanism",
+    "    - metric",
+    "    - main_risk",
+    "    - trust_model",
+    "    - privacy_model",
+    "  comparisons: []",
+    "  failures: []",
+    "  outcome_notes:",
+    `    - Fixture post-validation status is ${postValidateStatus}.`,
+    "  repair_route: /ow:vision2prompt",
+    "image_generation:",
+    "  status: not_started",
+    "  batch_strategy: Generate each direction as two mobile screens with consistent product system metadata.",
+    "  generated_images: []",
+    "  collection_notes: []",
+  ].join("\n");
+}
+
+function directionLines(id: string, name: string, distinctness: string, fixtureKind: StrategicPromptPackFixtureKind): string[] {
+  const fingerprint = strategicFingerprintLines(id, fixtureKind);
+  return [
+    `  - direction_id: ${id}`,
+    `    name: ${name}`,
+    `    strategic_hypothesis: ${name} can turn validated emotional trust into repeat practice behavior.`,
+    "    validates: Whether this product strategy changes speaking practice frequency.",
+    "    main_risk: The user may like the concept but avoid actual speaking.",
+    `    distinctness_rationale: "${distinctness}"`,
+    "    product_thesis: A voice-first companion should make one safe speaking action easier than another passive lesson.",
+    "    user_transformation: The learner moves from freezing in imagined conversations to speaking one small sentence with consent-based memory support.",
+    "    reason_to_exist: This direction deserves a prototype because it tests whether emotional memory and concrete correction can create repeat practice.",
+    "    strategic_fingerprint:",
+    ...fingerprint,
+    "    prototype_prompt: Design a high-fidelity mobile prototype for Pocket English Friend, a voice-first social English practice app for a Chinese-speaking adult who wants low-pressure daily speaking confidence. The product journey should move from a remembered emotional check-in to a concrete daily scenario, one speaking action, AI rescue when the user freezes, a correction card, and a progress recap. Show the AI system response with easy and natural sentence options, visible memory consent, edit/delete controls, and supportive copy tied to real social situations. Use calm mobile visual direction with one primary action per screen and soft feedback, but do not show an exam dashboard, generic chatbot, leaderboard, or guilt streak. The user should feel safe, in control of memory, and ready to speak one small sentence.",
+    "    screen_prompts:",
+    "      - prompt_id: screen-1",
+    "        target_screen_id: practice-entry",
+    "        screen_name: Today practice entry",
+    "        image_role: primary practice entry screen",
+    "        standalone_prompt: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+    "        prompt_text: Design the Today practice entry screen for Pocket English Friend as the first journey stage for a Chinese-speaking adult who wants low-pressure social English practice. Show a mobile product surface with the remembered emotional note, daily scenario card, sample phrase suggestions, primary speak button, privacy opt-out, and calm visual direction. When the user starts practice, the AI should offer one easy sentence and one natural sentence so the user can speak without feeling judged. Do not show an exam dashboard, generic chatbot, leaderboard, or decorative card wall. Acceptance criteria include voice practice action, memory control, example copy, and safe feeling are visible.",
+    "        negative_prompt: Do not show an exam dashboard, generic chatbot, or card wall without voice practice.",
+    "        example_copy:",
+    "          - Last time you said ordering coffee felt awkward.",
+    "          - Try: Could I get that with oat milk?",
+    "        acceptance_criteria:",
+    "          - Voice practice action is primary.",
+    "          - Memory and opt-out are visible.",
+    "      - prompt_id: screen-2",
+    "        target_screen_id: progress-recap",
+    "        screen_name: Progress recap",
+    "        image_role: follow-up feedback screen",
+    "        standalone_prompt: Design the Progress recap screen for Pocket English Friend after the user finishes one voice practice answer. Show a mobile follow-up state with concrete AI feedback, one corrected sentence, confidence progress, memory-save consent, next conversation suggestion, and a calm visual layout that keeps the user in control. The system response should explain the correction gently, offer a try-again action, and ask before saving any memory. Include example copy and data such as one new phrase, confidence up from 2 to 3, and Save this memory for next time. Do not make feedback punitive, exam-like, privacy-opaque, or guilt-based. Acceptance criteria include correction, system response, memory control, and user feeling of progress are visible.",
+    "        prompt_text: Design the Progress recap screen for Pocket English Friend after the user finishes one voice practice answer. Show a mobile follow-up state with concrete AI feedback, one corrected sentence, confidence progress, memory-save consent, next conversation suggestion, and a calm visual layout that keeps the user in control. The system response should explain the correction gently, offer a try-again action, and ask before saving any memory. Include example copy and data such as one new phrase, confidence up from 2 to 3, and Save this memory for next time. Do not make feedback punitive, exam-like, privacy-opaque, or guilt-based. Acceptance criteria include correction, system response, memory control, and user feeling of progress are visible.",
+    "        negative_prompt: Do not make feedback punitive, exam-like, or privacy-opaque.",
+    "        example_copy:",
+    "          - Say could I get instead of give me for a softer tone.",
+    "          - Save this memory for next time?",
+    "        acceptance_criteria:",
+    "          - Feedback is concrete and supportive.",
+    "          - Consent around memory is explicit.",
+    "    pm_judgment: Strong enough for image prototype generation because it names user behavior, system response, trust control, and sample content.",
+  ];
+}
+
+function strategicFingerprintLines(id: string, fixtureKind: StrategicPromptPackFixtureKind): string[] {
+  if (fixtureKind === "duplicate-fingerprint") {
+    return [
+      "      product_form: daily companion mission",
+      "      trigger: user opens app for daily practice",
+      "      interaction_model: guided chat rehearsal",
+      "      emotional_driver: warm confidence support",
+      "      retention_mechanism: daily streak and recap",
+      "      metric: three day speaking practice return",
+      "      main_risk: user avoids real speaking",
+      "      trust_model: remembered encouragement with clear correction",
+      "      privacy_model: private conversation memory controls",
+    ];
+  }
+  if (fixtureKind === "near-duplicate-fingerprint") {
+    const nearDuplicates: Record<string, string[]> = {
+      D1: [
+        "      product_form: daily companion mission",
+        "      trigger: user opens app for daily practice",
+        "      interaction_model: guided chat rehearsal",
+        "      emotional_driver: warm confidence support",
+        "      retention_mechanism: daily streak and recap",
+        "      metric: three day speaking practice return",
+        "      main_risk: user avoids real speaking",
+        "      trust_model: remembered encouragement with clear correction",
+        "      privacy_model: private conversation memory controls",
+      ],
+      D2: [
+        "      product_form: daily companion practice mission",
+        "      trigger: user opens mobile app for daily practice",
+        "      interaction_model: guided chat speaking rehearsal",
+        "      emotional_driver: warm confidence encouragement",
+        "      retention_mechanism: daily streak plus recap",
+        "      metric: three day speaking practice return rate",
+        "      main_risk: user avoids real speaking moments",
+        "      trust_model: remembered encouragement with gentle correction",
+        "      privacy_model: private conversation memory controls",
+      ],
+      D3: [
+        "      product_form: daily companion rehearsal mission",
+        "      trigger: user opens app for daily speaking practice",
+        "      interaction_model: guided conversational rehearsal",
+        "      emotional_driver: warm support for confidence",
+        "      retention_mechanism: daily recap and streak",
+        "      metric: three day practice return",
+        "      main_risk: user still avoids real speaking",
+        "      trust_model: remembered encouragement with clear corrections",
+        "      privacy_model: private memory controls for conversations",
+      ],
+    };
+    return nearDuplicates[id] ?? nearDuplicates.D1 ?? [];
+  }
+  const byId: Record<string, string[]> = {
+    D1: [
+      "      product_form: daily companion mission",
+      "      trigger: user opens app for daily practice",
+      "      interaction_model: guided chat rehearsal",
+      "      emotional_driver: warm confidence support",
+      "      retention_mechanism: daily streak and recap",
+      "      metric: three day speaking practice return",
+      "      main_risk: user avoids real speaking",
+      "      trust_model: remembered encouragement with clear correction",
+      "      privacy_model: private conversation memory controls",
+    ],
+    D2: [
+      "      product_form: calendar rehearsal coach",
+      "      trigger: upcoming real social event",
+      "      interaction_model: scenario planning checklist",
+      "      emotional_driver: readiness before a specific moment",
+      "      retention_mechanism: event followup loop",
+      "      metric: completed rehearsal before event",
+      "      main_risk: calendar prompts feel intrusive",
+      "      trust_model: explicit event permission",
+      "      privacy_model: user controlled calendar context",
+    ],
+    D3: [
+      "      product_form: trust calibration lab",
+      "      trigger: user asks for correction confidence",
+      "      interaction_model: feedback slider and repair practice",
+      "      emotional_driver: safety before speaking freely",
+      "      retention_mechanism: visible confidence calibration",
+      "      metric: correction acceptance rate",
+      "      main_risk: feedback feels too clinical",
+      "      trust_model: transparent correction boundary",
+      "      privacy_model: ephemeral practice snippets",
+    ],
+  };
+  return byId[id] ?? byId.D1 ?? [];
+}
+
 async function verifyNoDefaultCodexCommands(root: string): Promise<void> {
   assert(!(await exists(join(root, ".codex", "commands", "ow"))), ".codex command references generated unexpectedly");
   assert(!(await exists(join(root, ".codex", "skills"))), ".codex skills generated unexpectedly");
+}
+
+async function verifyPlanningArtifactRegistrationContract(): Promise<void> {
+  const contracts = await read(join(REPO_ROOT, "references", "planning-artifact-contracts.md"));
+  const exposure = await read(join(REPO_ROOT, "references", "planning-skill-runtime-exposure.md"));
+  for (const required of [
+    "Planning Artifact Registration",
+    "`SUMMARY.yaml`: default queue handoff and read-model artifact",
+    "`CHANGE_ANALYSIS.yaml`: advisory cross-queue recommendation evidence",
+    "`SELECTED_CHANGE.yaml`: implementation boundary",
+    "`LOCAL_COMMIT_EVIDENCE.yaml`: local implementation evidence",
+    "`HIGH_RISK_DECISION_REPORT.md`: stop packet",
+    "Read-model order for planning work",
+    "`CANDIDATE_CHANGES.yaml` only when source truth is needed",
+  ]) {
+    assert(contracts.includes(required), `planning artifact registration contract missing: ${required}`);
+  }
+  assert(exposure.includes("must not load full planning history by default"), "runtime exposure reference lost summary-first read-model rule");
+  assert(exposure.includes("depend on that registration contract"), "runtime exposure reference does not depend on planning registration contract");
 }
 
 function extractBlock(content: string, key: string): string {

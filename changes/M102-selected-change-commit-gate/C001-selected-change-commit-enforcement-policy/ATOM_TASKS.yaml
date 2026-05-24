@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M102-selected-change-commit-gate:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M102-C001-selected-change-commit-enforcement-policy
+title: Atom tasks for selected-change commit enforcement policy
+status: completed
+tasks:
+  - task_id: M102-C001-A001
+    title: Confirm high-risk enforcement option
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+      - changes/M102-selected-change-commit-gate/C001-selected-change-commit-enforcement-policy/SELECTED_CHANGE.yaml
+    done_when:
+      - Option 1 is recorded as the selected enforcement policy.
+      - Strict gate targets and migration mode are explicit.
+  - task_id: M102-C001-A002
+    title: Record design-only queue selection
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.yaml
+      - changes/M102-selected-change-commit-gate/CANDIDATE_CHANGES.md
+      - changes/M102-selected-change-commit-gate/SUMMARY.yaml
+    done_when:
+      - C001 status is selected with selection evidence.
+      - Queue artifacts block implementation from advancing before C001 completion evidence.
+  - task_id: M102-C001-A003
+    title: Verify planning-only selection
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/
+    done_when:
+      - node dist/cli/src/index.js validate --root . --json passes.
+      - node dist/cli/src/index.js summaries --root . --strict --json passes.
+      - git diff --check passes.

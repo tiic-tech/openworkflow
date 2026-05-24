@@ -1,0 +1,94 @@
+schema_version: 0.1.0
+contract_id: summary:M54-decompose-select-change-planning
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M54-decompose-select-change-planning
+title: Summary for decompose-to-changes, analyze-changes, and select-change planning
+status: active
+source:
+  kind: planning_discussion
+  summary: >
+    Tracks the source planning work for decompose-to-changes, analyze-changes,
+    and select-change: durable candidate queues, change analysis artifacts,
+    selected-change artifacts, queue maintenance, and cross-queue selection
+    arbitration.
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - changes/M72-remaining-change-priority-analysis/CHANGE_ANALYSIS.yaml
+outputs:
+  candidate_changes_yaml: changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  summary: changes/M54-decompose-select-change-planning/SUMMARY.yaml
+  high_risk_decision_report: changes/M54-decompose-select-change-planning/HIGH_RISK_DECISION_REPORT.md
+branch_boundary: codex/m54-decompose-select-change-planning
+candidate_count: 13
+completed_candidate_id: C013
+completed_change_id: C013-runtime-exposure-reassessment
+previous_completed_candidate_id: C011
+previous_completed_change_id: C011-codex-planning-adapter
+next_recommended_candidate_id: null
+key_dependencies:
+  - C001 established planning artifact contracts.
+  - C002 implemented decompose-to-changes.
+  - C003 implemented select-change.
+  - C006 added queue maintenance behavior to both planning skills.
+  - C007 is ready and should precede C004 because C004 depends on it.
+  - C007 is complete and makes C004 dependency-satisfied.
+  - C004 remains high risk and should stop for a high-risk report or explicit approved option before selection.
+  - C004 high-risk report recommends Option B, design-only boundary first, before runtime exposure implementation.
+  - User approved C004 Option B; C008 is the medium-risk design-only boundary candidate that implements that approved path.
+  - C008 is complete and splits follow-up work into smaller candidates.
+  - C009 is the next non-high-risk candidate for planning artifact registration and summary contracts.
+  - C009 is complete and makes C012 ready.
+  - C010, C011, and C013 are high-risk or high-risk-dependent and require approval before selection.
+  - C012 is the next non-high-risk candidate because it adds verification fixtures without generated surface changes.
+  - C012 is complete and the next remaining ready candidate is C010, which is high risk.
+  - User approved C010 Narrow Core Command Semantics: DTC, AC, and SC should be formal /ow:* command ids.
+  - C010 is complete and C011 is the next generated-surface follow-up; C011 remains high risk.
+  - User approved C011; Codex generated planning skill surfaces are now delivered from source registry data.
+  - C011 is complete and C013 is the next high-risk reassessment candidate.
+  - User approved C013 workflow blueprint reassessment.
+  - C013 is complete: DTC, AC, and SC are complete for the /ow:change planning command slice, but full OW workflow runtime alignment belongs in a new queue.
+risks:
+  - id: R001
+    level: medium
+    description: Cross-queue arbitration could blur analysis and selection if rejected alternatives are not recorded.
+    mitigation: Keep analyze-changes read-only and require select-change to record plan id and candidate id for rejected alternatives.
+  - id: R002
+    level: medium
+    description: Legacy queue maintenance can happen from the wrong branch if no boundary is recorded.
+    mitigation: Record queue_policy.branch_boundary and use git-automation before implementation.
+unresolved_questions:
+  - Should all legacy active queues be retrofitted with branch boundaries before selection, or only when reactivated?
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js sync --root . --tools codex --json
+    - node dist/cli/src/index.js doctor --root . --tools codex --json
+    - node dist/cli/src/index.js validate --root . --json
+    - PYTHONPATH=/Users/archy/Projects/Develop/develop_notebooks/.venv/lib/python3.13/site-packages python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+    - npm run validate
+    - git diff --check
+  notes:
+    - OP005 retrofitted the M54 queue with branch_boundary before selecting C007.
+    - OP006 selected C007 and created implementation-ready planning artifacts.
+    - OP007 completed C007 cross-queue selection arbitration guidance and dogfood evidence.
+    - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml.
+    - OP008 created the C004 high-risk decision report without selecting or implementing C004.
+    - OP009 added C008 after user approval of C004 Option B.
+    - OP010 selected C008.
+    - OP011 completed C008 design-only runtime exposure boundary.
+    - OP012 added C009 as the next non-high-risk follow-up.
+    - OP013 selected C009.
+    - OP014 completed C009 planning artifact registration and summary contract.
+    - OP015 added C010, C011, C012, and C013 follow-up candidates.
+    - OP016 selected C012.
+    - OP017 completed C012 planning artifact read-model verification fixtures.
+    - OP018 selected C010 after explicit high-risk approval.
+    - OP019 completed C010 planning registry semantics for DTC, AC, and SC.
+    - OP020 selected C011 after explicit high-risk approval.
+    - OP021 completed C011 Codex generated planning skill delivery.
+    - OP022 selected C013 after explicit high-risk approval.
+    - OP023 completed C013 workflow blueprint reassessment and recommends a new full workflow alignment queue.
+    - Local commit evidence is expected at changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/LOCAL_COMMIT_EVIDENCE.yaml.

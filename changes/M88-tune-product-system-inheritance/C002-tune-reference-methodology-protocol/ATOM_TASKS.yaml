@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M88-tune-product-system-inheritance:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C002
+change_id: C002-tune-reference-methodology-protocol
+title: Atom tasks for tune reference methodology protocol
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current tune protocol and verifiers
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing /ow:tune protocol blocks and generated-surface assertions are mapped.
+  - id: T002
+    title: Add reference methodology protocol blocks
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when:
+      - /ow:tune protocol requires input normalization, baseline audit, product-system extraction, tune request interpretation, delta matrix, and refined prompt pack output.
+  - id: T003
+    title: Add generated-surface assertions
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification fails if generated /ow:tune loses reference methodology guidance.
+  - id: T004
+    title: Sync and verify /ow:tune surfaces
+    type: verify
+    status: completed
+    owned_paths:
+      - .agents/skills/ow-tune/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Sync regenerates managed /ow:tune skill and context packet from source.
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C002-vision-proto-readiness-artifacts
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C002-vision-proto-readiness-artifacts
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C002
+title: Atom tasks for vision proto-readiness artifacts
+status: completed
+tasks:
+  - task_id: T001
+    title: Extend vision artifact template and schema
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/vision-session.schema.json
+    done_when: >
+      Vision session templates and schemas include strategic_core,
+      product_system_seed, proto_readiness, and coverage structures.
+  - task_id: T002
+    title: Strengthen summary quality for proto-readiness
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+    done_when: >
+      Thin or missing proto-readiness fields are reported as handoff quality
+      warnings.
+  - task_id: T003
+    title: Refresh generated artifact contracts
+    status: done
+    type: verify
+    owned_paths:
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    done_when: >
+      openworkflow sync refreshes managed artifact contracts from source.
+  - task_id: T004
+    title: Update verification coverage
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Verification asserts that vision templates expose proto-readiness fields.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6

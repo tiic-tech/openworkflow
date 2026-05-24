@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M87-vision2prompt-post-validate-gate:C003
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C003
+change_id: C003-generated-protocol-post-validate-gate
+title: Local commit evidence for generated post-validate protocol wiring
+status: completed
+completed_at: 2026-05-22
+commit: 4221206
+summary: >
+  Wired the prompt asset post-validate gate into generated /ow:vision2prompt,
+  /ow:prompt2proto, and /ow:proto protocol surfaces. The source registry now
+  blocks image generation until post_validate is pass for multi-direction prompt
+  packs or skipped for explicit single-direction requests.
+implemented:
+  - Added post_validate gate requirements to /ow:proto orchestration.
+  - Added /ow:vision2prompt pass, skipped, and fail routing requirements.
+  - Added /ow:prompt2proto preflight blocking when post_validate is fail or missing.
+  - Synced generated Codex skills and context packets from source.
+  - Added E2E and runtime drift assertions for generated post_validate gate guidance.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+next_recommended_candidate_id: C004

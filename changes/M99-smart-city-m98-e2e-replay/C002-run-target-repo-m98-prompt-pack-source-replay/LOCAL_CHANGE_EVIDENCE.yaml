@@ -1,0 +1,91 @@
+schema_version: 0.1.0
+contract_id: local_change_evidence:M99-smart-city-m98-e2e-replay:C002
+contract_type: planning
+planning_artifact_type: local_change_evidence
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C002
+change_id: C002-run-target-repo-m98-prompt-pack-source-replay
+title: Local evidence for target-repo M98 prompt-pack source replay
+status: completed
+completed_at: 2026-05-22
+summary: >
+  Replayed the real smart_city_copilot target prompt-pack source through the
+  current M98 OpenWorkflow command surface. The target PROTO_PROMPT_PACK now
+  carries prototype brief, product experience model, screen manifest, global
+  design prompt, screen prompts, negative prompts, quality rubric, integrity
+  gate, and reality gate before image generation.
+target_repo:
+  original_repo_path: /Users/archy/Projects/StartUp/smart_city_copilot
+  worktree_path: /tmp/smart-city-m99-e2e-worktree
+  branch: codex/m99-smart-city-m98-e2e-replay
+  before_head: 2b977becf8c41de3d7cc3fcf555ce3cf9d50d5ea
+  after_head: 9a609cf901217cd1324e589459c90dfcddbad687
+  after_head_short: 9a609cf
+  commit_message: M99 C002 replay M98 prompt pack source
+  final_status_short_branch: "## codex/m99-smart-city-m98-e2e-replay"
+target_changed_paths:
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/prototypes/proto-001/EVIDENCE.yaml
+  - .openworkflow/prototypes/proto-001/NOTE.md
+  - .openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.md
+  - .openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+  - .openworkflow/prototypes/proto-001/REVIEW_PLAN.md
+  - .openworkflow/prototypes/proto-001/SUMMARY.yaml
+replay_outputs:
+  prompt_pack: .openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+  evidence: .openworkflow/prototypes/proto-001/EVIDENCE.yaml
+  readable_view: .openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.md
+  review_plan: .openworkflow/prototypes/proto-001/REVIEW_PLAN.md
+  note: .openworkflow/prototypes/proto-001/NOTE.md
+  summary: .openworkflow/prototypes/proto-001/SUMMARY.yaml
+source_completeness_scan:
+  present_fields:
+    - prototype_brief
+    - product_experience_model
+    - screen_manifest
+    - global_design_system_prompt
+    - directions[].screen_prompts[].target_screen_id
+    - directions[].screen_prompts[].negative_prompt
+    - directions[].screen_prompts[].example_copy
+    - quality_rubric
+    - prototype_reality_gate.status: pass
+    - prompt_pack_integrity_gate.status: pass
+    - image_generation.status: not_started
+  screen_states:
+    - map-shell
+    - planning-review
+    - incident-response
+    - capacity-monitor
+  interpretation: >
+    The target prompt pack is no longer pre-M98 thin. Planning, incident, and
+    asset capacity are modeled as states/modules inside one coherent map-first
+    CityFlow Copilot product shell.
+scope_controls:
+  provider_backed_image_generation: not_run
+  human_visual_review: not_run
+  visual_reference_parity: not_claimed
+  proto2html: not_run
+  storyboard_motion_modeling: not_run
+  openworkflow_source_code_changes: none
+  remote_push: not_run
+verification:
+  passed:
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js sync --root . --tools codex --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root . --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root . --strict --json
+    - target node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root . --json
+    - target git diff --check
+    - target git status --short --branch
+  notes:
+    - Target handoff now reports handoff_ok true, managed_surface_ok true, adapter_ok true, summary_freshness_ok true, and summary_quality_ok true.
+    - Target summaries strict reports prototype_evidence quality_status usable with no empty handoff fields.
+    - Target validate passed after direction_count_policy was marked as the explicit single replay direction and SUMMARY.yaml metadata was normalized.
+deferred:
+  - C003 comparison against examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml and M97 gap notes
+  - visual reference parity gate
+  - provider-backed image generation benchmark
+  - storyboard and motion modeling

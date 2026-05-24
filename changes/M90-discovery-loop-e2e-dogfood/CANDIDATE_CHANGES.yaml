@@ -1,0 +1,477 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M90-discovery-loop-e2e-dogfood
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M90-discovery-loop-e2e-dogfood
+title: Candidate changes for discovery-loop E2E dogfood
+status: completed
+source:
+  kind: mixed
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+    - changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.yaml
+    - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+    - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+    - changes/M88-tune-product-system-inheritance/SUMMARY.yaml
+    - user_direction:2026-05-22-continue-unless-high-risk
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - proves the synchronous discovery loop works as one agent-consumable chain
+    - uses generated command surfaces and source validators instead of bespoke mocks
+    - checks both happy path and failure routing at command boundaries
+    - keeps fixtures text-first and does not call external generation services
+    - creates evidence useful to the agent as first consumer
+  avoid:
+    - async built-in agent team execution
+    - external image generation or visual diff tooling
+    - proto2html, html2spec, build, or archive implementation
+    - broad manual dogfood transcripts that are hard to maintain
+scope_control:
+  current_boundary: >
+    Add a synchronous end-to-end dogfood verification slice for the upgraded
+    discovery loop from proto-ready vision through validation, strategic prompt
+    pack, refined tune prompt pack, and benchmark-selection readiness.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only fixtures and verification that prove the already upgraded
+    command contracts interoperate across vision, validation, proto,
+    vision2prompt, prompt2proto metadata, tune, and decision audit handoff.
+  out_of_scope_rule: >
+    Record asynchronous subagents, real image generation, visual review,
+    proto2html, html2spec, build, and archive as deferred refs. Do not include
+    them in M90.
+  deferred_features:
+    - title: Map internal commands to built-in subagents
+      reason: >
+        Async execution should wait until the synchronous command chain has
+        durable E2E dogfood evidence.
+      suggested_plan_id: M89-built-in-agent-team-internal-stages
+    - title: Rebuild proto2html around benchmark prototype input
+      reason: >
+        Proto2html should consume accepted benchmark prototype evidence after
+        discovery-loop artifacts are proven coherent.
+      suggested_plan_id: M91-proto2html-benchmark-input
+    - title: Add visual diff and real image generation regression harness
+      reason: >
+        Visual verification requires generated assets and provider/runtime
+        decisions outside this text-first synchronous dogfood slice.
+      suggested_plan_id: M92-visual-generation-dogfood-harness
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Create canonical discovery-loop dogfood fixture
+    purpose: >
+      Establish one maintainable text-first dogfood case that contains
+      proto-ready vision, validation target, strategic prompt pack, generated
+      image metadata, refined tune prompt pack, and benchmark decision evidence.
+    scope:
+      includes:
+        - fixture artifact content for one coherent product case
+        - helper builders for vision, validation, proto, prompt2proto metadata, tune, and decision records
+        - source validator coverage for all fixture artifacts
+        - fixture naming and comments that make the chain readable to agents
+      excludes:
+        - real image generation
+        - browser or visual review
+        - proto2html or downstream production specs
+        - async subagent runtime
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M90-discovery-loop-e2e-dogfood/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - A single dogfood fixture can validate vision, validation, strategic prompt pack, generated image metadata, refined tune prompt pack, and decision evidence together.
+      - Fixture artifact ids and refs make the chain traceable without reading unrelated repository state.
+      - The fixture remains text-first and does not require external image generation.
+      - Validation failures identify the artifact section that needs repair.
+    selection:
+      selected_change_id: C001-canonical-discovery-loop-dogfood-fixture
+      reason: >
+        Select C001 through ow-select-change single-queue ranking. It is the
+        next recommended ready candidate, has no dependencies, and creates the
+        canonical fixture chain required before M90 can verify happy-path or
+        negative discovery-loop routing.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C001-canonical-discovery-loop-dogfood-fixture
+      completed_at: 2026-05-22
+      commit: aae8ed1
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Verify happy-path discovery-loop command handoff
+    purpose: >
+      Add E2E checks proving the generated command surfaces and context packets
+      let an agent move from proto-ready vision to validation, proto prompt
+      assets, prompt2proto metadata, tune refinement, and decision handoff
+      without guessing.
+    scope:
+      includes:
+        - generated skill and context packet checks for the full discovery loop
+        - current pointer/read-order expectations for the fixture chain
+        - positive handoff assertions from vision through tune and decision audit
+        - command readiness checks where the CLI supports them
+      excludes:
+        - negative failure routing
+        - visual prototype inspection
+        - async subagent orchestration
+        - proto2html or downstream commands
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M90-discovery-loop-e2e-dogfood/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Generated command surfaces expose the expected discovery-loop order.
+      - Context packets contain enough optional/required context for agents to consume the next artifact.
+      - Happy-path fixture handoff reaches benchmark-selection readiness without entering proto2html.
+      - The checks fail if a command loses its generated handoff or artifact boundary.
+    selection:
+      selected_change_id: C002-happy-path-discovery-loop-handoff
+      reason: >
+        Select C002 through ow-select-change single-queue ranking. C001
+        completed the canonical fixture chain, and C002 is the next ready
+        candidate to prove generated command surfaces and context packets can
+        guide an agent through the happy-path discovery loop.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C002-happy-path-discovery-loop-handoff
+      completed_at: 2026-05-22
+      commit: c524446
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Verify discovery-loop failure routing
+    purpose: >
+      Add negative dogfood cases for thin vision, blocked validation, failed
+      prompt post-validation, and tune product drift so agents get explicit
+      repair routes instead of continuing with bad artifacts.
+    scope:
+      includes:
+        - thin or conflicted vision returns to /ow:vision
+        - validation blocks proto when the prototype target is not actionable
+        - post_validate fail blocks prompt2proto and routes to /ow:vision2prompt
+        - tune drift or missing baseline inheritance fails before handoff
+      excludes:
+        - full human interview transcript simulation
+        - generated images
+        - browser visual review
+        - production implementation
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - changes/M90-discovery-loop-e2e-dogfood/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Thin vision cannot silently proceed to proto.
+      - Blocked validation cannot silently proceed to prompt generation.
+      - Failed prompt post-validation cannot silently proceed to image generation.
+      - Tune artifacts missing inheritance or latest-baseline data cannot silently proceed.
+      - Each failure reports the repair command or artifact section.
+    selection:
+      selected_change_id: C003-discovery-loop-failure-routing
+      reason: >
+        Select C003 through ow-select-change single-queue ranking. C001 and
+        C002 proved the canonical fixture and happy path; C003 is the next ready
+        candidate to prove bad discovery-loop artifacts stop at the correct
+        repair route instead of continuing downstream.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C003-discovery-loop-failure-routing
+      completed_at: 2026-05-22
+      commit: 986727d
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C004
+    status: done
+    title: Record benchmark-selection readiness evidence
+    purpose: >
+      Close the synchronous dogfood slice by proving tuned prototype evidence
+      can produce a benchmark-selection decision record that downstream
+      proto2html can later consume without broadening M90 into proto2html.
+    scope:
+      includes:
+        - decision audit fixture for benchmark accepted/needs-more-tune outcomes
+        - handoff readiness notes for future proto2html DTC
+        - verification that /ow:tune does not expose /ow:decision as a manual step
+        - summary evidence naming the accepted benchmark artifact refs
+      excludes:
+        - proto2html runtime exposure
+        - HTML reconstruction
+        - visual fidelity measurement
+        - production spec extraction
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M90-discovery-loop-e2e-dogfood/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M91-proto2html-benchmark-input
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:e2e-workflow
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Decision evidence can identify the accepted benchmark prototype refs.
+      - The handoff is ready for a future proto2html queue but does not create proto2html artifacts.
+      - Generated /ow:tune still records decision audit internally instead of asking the user to run /ow:decision.
+      - M90 summary names the benchmark-selection evidence and remaining deferred work.
+    selection:
+      selected_change_id: C004-benchmark-selection-readiness-evidence
+      reason: >
+        Select C004 through ow-select-change single-queue ranking. C001-C003
+        completed the canonical fixture, happy path, and failure routes; C004 is
+        the final ready M90 candidate and records the benchmark-selection
+        handoff evidence without implementing proto2html.
+      selected_at: 2026-05-22
+    completion:
+      completed_change_id: C004-benchmark-selection-readiness-evidence
+      completed_at: 2026-05-22
+      commit: 9f0c828
+      evidence:
+        - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create a bounded DTC queue for text-first synchronous discovery-loop E2E
+      dogfood after M87 and M88 completed proto prompt gates and tune
+      product-system inheritance.
+    changed_at: 2026-05-22
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.md
+      - changes/M90-discovery-loop-e2e-dogfood/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the next recommended ready candidate in the single active
+      M90 queue; no analyze-changes run is needed for single-queue selection.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 added a canonical text-first discovery-loop fixture chain covering
+      vision, validation, strategic prompt pack, generated image metadata,
+      refined tune prompt pack, and benchmark decision evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C001-canonical-discovery-loop-dogfood-fixture/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Mark C002 ready after C001 completed the canonical fixture chain needed
+      for happy-path discovery-loop handoff verification.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 as the next ready M90 candidate after C001 completed the
+      canonical fixture chain; no analyze-changes run is needed for this single
+      active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 added generated command audit and context packet assertions proving
+      the happy-path discovery-loop order reaches benchmark-selection readiness
+      without entering proto2html.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C002-happy-path-discovery-loop-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Mark C003 ready after C002 completed happy-path handoff checks, enabling
+      negative discovery-loop failure routing verification.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 as the next ready M90 candidate after C002 completed
+      happy-path handoff verification; no analyze-changes run is needed for
+      this single active queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 added negative discovery-loop assertions for failed prompt
+      post-validation and missing tune baseline resolution, while preserving
+      existing thin vision and blocked validation route checks.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C003-discovery-loop-failure-routing/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Mark C004 ready after C003 completed negative failure routing checks,
+      leaving benchmark-selection readiness evidence as the final M90 candidate.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      Select C004 as the final ready M90 candidate after negative failure
+      routing landed; no analyze-changes run is needed for this single active
+      queue.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/SELECTED_CHANGE.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/ATOM_TASKS.yaml
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 added benchmark readiness assertions proving decision evidence names
+      accepted prototype refs and no proto2html/html2spec artifacts are created.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M90-discovery-loop-e2e-dogfood/C004-benchmark-selection-readiness-evidence/LOCAL_COMMIT_EVIDENCE.yaml

@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C008-runtime-exposure-design
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C008-runtime-exposure-design
+title: C008 runtime exposure design atom tasks
+status: completed
+tasks:
+  - task_id: C008-A001
+    title: Define runtime exposure boundary
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+    done_when:
+      - Core, artifact, adapter, generated-surface, and read-model responsibilities are separated.
+      - The design states invariants and non-goals for planning skill exposure.
+  - task_id: C008-A002
+    title: Define follow-up candidate split
+    status: completed
+    type: document
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/C008-runtime-exposure-design/
+    done_when:
+      - Follow-up slices are small enough for separate selected changes.
+      - High-risk follow-ups are explicitly labeled as approval-gated.
+  - task_id: C008-A003
+    title: Record queue completion evidence
+    status: completed
+    type: document
+    owned_paths:
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+      - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+      - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+    done_when:
+      - C008 selection and completion are recorded in the queue.
+      - The next recommended candidate is safe or explicitly high-risk-gated.
+  - task_id: C008-A004
+    title: Validate design-only change
+    status: completed
+    type: verify
+    owned_paths:
+      - references/planning-skill-runtime-exposure.md
+      - changes/M54-decompose-select-change-planning/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

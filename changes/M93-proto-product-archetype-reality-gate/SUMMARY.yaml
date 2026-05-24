@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: summary:M93-proto-product-archetype-reality-gate
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M93-proto-product-archetype-reality-gate
+title: Summary for proto product-archetype reality gate
+status: completed
+source:
+  kind: mixed
+  summary: >
+    Tracks the approved M93 queue to improve OW's VISION-only discovery-to-proto
+    thinking after the smart city first prototype was rejected as product-invalid.
+    The queue distills the dailin positive example into a product experience
+    model and prototype reality gate for /ow:vision2prompt before image
+    generation.
+  refs:
+    - user_direction:2026-05-22-approve-M93-after-smart-city-proto-rejection
+    - /Users/archy/Projects/StartUp/dailin/docs/RAW_INPUT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/prototype_tune_to_refined_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+    - changes/M92-smart-city-real-discovery-e2e-dogfood/SUMMARY.yaml
+scope_boundary: >
+  One workflow slice: first-pass /ow:proto internal prompt compilation from
+  durable VISION and validation into product-category-aware prompt packs, with
+  deterministic pre-image-generation reality gates.
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-smart-city-product-reality-fixture
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+deferred_feature_refs:
+  - M94-reference-pattern-input-gate
+  - M95-provider-image-generation-benchmark
+  - M96-prototype-visual-quality-review-gate
+  - M97-smart-city-product-reality-dogfood
+outputs:
+  candidate_changes_yaml: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.md
+  summary: changes/M93-proto-product-archetype-reality-gate/SUMMARY.yaml
+key_dependencies:
+  - C001 must land before protocol, gate, and fixture candidates because it defines the artifact fields.
+  - C002 must land before C003 and C004 so generated protocols know how to populate the model.
+  - C003 must land before C004 so the smart city fixture can target a real gate shape.
+risks:
+  - id: R001
+    level: medium
+    description: The product reality gate could become vague prose that validators cannot enforce.
+    mitigation: Start with contract fields and deterministic required dimensions in C001/C003.
+  - id: R002
+    level: medium
+    description: The protocol could overfit to smart city and harm other domains.
+    mitigation: Encode smart city only as a regression fixture after generic product experience model fields exist.
+  - id: R003
+    level: medium
+    description: The gate could create false confidence by claiming visual quality without inspecting images.
+    mitigation: Keep M93 limited to prompt-pack/product-model quality and defer visual inspection to M96.
+unresolved_questions:
+  - Whether future M97 smart city dogfood should re-run image generation or remain text-first until visual quality gates land.
+validation:
+  commands_run:
+    - git status --short --branch
+    - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root . --json
+  notes:
+    - M93 was created as a new DTC queue; no candidate was selected or implemented.
+    - The local PATH openworkflow CLI is known stale because npm has not been republished; repo dist CLI is the trusted dogfood surface.
+    - C001 was selected as the dependency-free artifact contract foundation.
+    - C001 completed product_experience_model contract fields and targeted validation.
+    - npm run validate still fails on pre-existing M92 files that use artifact_type for planning artifacts; no new C001 npm validation errors were observed.
+    - C002 selected to wire product-archetype inference into generated proto protocol guidance.
+    - C002 completed protocol wiring, sync, and drift checks.
+    - C003 selected to add deterministic prototype_reality_gate validation.
+    - C003 completed prototype_reality_gate contract, validators, and stress fixtures.
+    - C004 selected to encode the smart city product-reality regression.
+    - C004 completed smart city map-first pass and generic AI dashboard fail fixtures in runtime-surface verification.
+    - npm run validate now passes after repository validation stopped treating planning artifacts as discovery artifacts.

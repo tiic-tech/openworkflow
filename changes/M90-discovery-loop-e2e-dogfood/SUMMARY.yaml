@@ -1,0 +1,84 @@
+schema_version: 0.1.0
+contract_id: summary:M90-discovery-loop-e2e-dogfood
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M90-discovery-loop-e2e-dogfood
+title: Summary for discovery-loop E2E dogfood
+status: completed
+source:
+  kind: mixed
+  summary: >
+    Tracks a bounded synchronous dogfood verification slice for the upgraded
+    discovery loop, proving that proto-ready vision, validation, strategic
+    prompt packs, prompt2proto metadata, tune refined prompt packs, and
+    benchmark-selection readiness can interoperate before async subagents or
+    proto2html are introduced.
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+    - changes/M85-validation-proto-target-contract/CANDIDATE_CHANGES.yaml
+    - changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+    - changes/M87-vision2prompt-post-validate-gate/SUMMARY.yaml
+    - changes/M88-tune-product-system-inheritance/SUMMARY.yaml
+scope_boundary:
+  current_boundary: >
+    Text-first synchronous discovery-loop E2E dogfood only.
+  boundary_type: workflow_slice
+  note: >
+    The queue verifies the already upgraded discovery commands as one coherent
+    agent-consumable chain without adding async execution, real generation, or
+    downstream HTML/spec/build behavior.
+deferred_feature_refs:
+  - M89-built-in-agent-team-internal-stages
+  - M91-proto2html-benchmark-input
+  - M92-visual-generation-dogfood-harness
+outputs:
+  candidate_changes_yaml: changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M90-discovery-loop-e2e-dogfood/CANDIDATE_CHANGES.md
+  summary: changes/M90-discovery-loop-e2e-dogfood/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-benchmark-selection-readiness-evidence
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+key_dependencies:
+  - M84 made /ow:vision delayed-compile and proto-ready.
+  - M85 upgraded validation as a proto target compiler.
+  - M86 and M87 upgraded proto prompt compilation and post-validation gates.
+  - M88 upgraded /ow:tune product-system inheritance and multi-round baseline behavior.
+risks:
+  - id: R001
+    level: medium
+    description: E2E dogfood can become a broad workflow rewrite instead of a verification slice.
+    mitigation: Keep M90 text-first, fixture-based, and bounded to existing command contracts.
+  - id: R002
+    level: medium
+    description: Fixtures can become bespoke mocks that do not protect generated command surfaces.
+    mitigation: Verify generated skills, context packets, validators, and CLI runtime surfaces.
+  - id: R003
+    level: medium
+    description: Benchmark readiness can accidentally drift into proto2html implementation.
+    mitigation: C004 records handoff evidence only and defers proto2html to M91.
+unresolved_questions:
+  - Whether future real-image dogfood should use provider-backed generation or stored golden image assets.
+validation:
+  commands_run:
+    - git status --short --branch
+    - rg -n "dogfood|E2E|discovery-loop|sync|vision|validation|proto|tune|async|subagent|proto2html" docs/OW_DEVELOP_PLAN.md docs/OW_DEVELOP_PLAN_Phase2.md docs/DISCOVER_LOOP_UPGRATE_PLAN.md changes/M88-tune-product-system-inheritance/SUMMARY.yaml
+  notes:
+    - OP001 created the M90 queue with scope limited to synchronous text-first discovery-loop E2E dogfood.
+    - C001 is next because all later E2E checks need one canonical, maintainable fixture chain.
+    - OP002 selected C001 through ow-select-change single-queue ranking.
+    - OP003 completed C001 in commit aae8ed1.
+    - OP004 marked C002 ready after the canonical fixture chain landed.
+    - OP005 selected C002 through ow-select-change single-queue ranking.
+    - OP006 completed C002 in commit c524446.
+    - OP007 marked C003 ready after happy-path discovery-loop handoff checks landed.
+    - OP008 selected C003 through ow-select-change single-queue ranking.
+    - OP009 completed C003 in commit 986727d.
+    - OP010 marked C004 ready after negative discovery-loop failure routing landed.
+    - OP011 selected C004 through ow-select-change single-queue ranking.
+    - OP012 completed C004 in commit 9f0c828.

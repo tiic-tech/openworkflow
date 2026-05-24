@@ -1,0 +1,39 @@
+schema_version: 0.1.0
+contract_id: change_analysis:M73-workflow-blueprint-runtime-alignment
+contract_type: planning
+planning_artifact_type: change_analysis
+analysis_id: M73-workflow-blueprint-runtime-alignment
+title: Change analysis for workflow blueprint runtime alignment
+status: complete
+source:
+  kind: single_queue_analysis
+  analyzed_queues:
+    - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+git_state:
+  branch: codex/m73-workflow-blueprint-runtime-alignment
+  dirty: false
+  note: Analysis refreshed after C011 implementation evidence was recorded.
+recommendation:
+  target_plan_id: M73-workflow-blueprint-runtime-alignment
+  target_candidate_id: C012
+  action: handoff_to_select_change
+  reason: >
+    C012 is low risk, depends only on completed C011 taxonomy work, and defines
+    the stage graph needed before the /ow:change planning intelligence boundary
+    and deferred feature handoff map can be finalized.
+rejected_alternatives:
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C013
+    reason: Depends on C012 stage graph.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C014
+    reason: Depends on C012 and C013.
+high_risk_stop:
+  required: false
+  reason: Recommended candidate C012 is low risk and design-only.
+validation:
+  commands_run:
+    - git status --short --branch
+  notes:
+    - AC recommends C012 for selection.
+    - High-risk deferred features remain outside active M73 implementation.

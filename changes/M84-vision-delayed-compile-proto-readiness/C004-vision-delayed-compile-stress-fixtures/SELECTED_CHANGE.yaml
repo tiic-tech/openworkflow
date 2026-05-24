@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-vision-delayed-compile-stress-fixtures
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-vision-delayed-compile-stress-fixtures
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C004
+title: Add /ow:vision delayed-compile stress tests and fixtures
+status: completed
+selection_reason: >
+  C004 is the final M84 dependency. It pressure-tests the delayed-compile vision
+  contract after C001-C003 established source behavior, artifact structure, and
+  generated command protocol.
+scope:
+  includes:
+    - fixture or verification coverage for interview mode
+    - fixture or verification coverage for thin proto-readiness
+    - fixture or verification coverage for compile-ready vision
+    - generated surface drift checks after sync
+  excludes:
+    - full validation/proto/tune E2E dogfood
+    - browser UI automation
+    - prototype image generation
+owned_paths:
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - changes/M84-vision-delayed-compile-proto-readiness/
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - .agents/skills/ow-validation/**
+  - .agents/skills/ow-proto/**
+  - .agents/skills/ow-tune/**
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+  - .openworkflow/specs/**
+  - .openworkflow/runtime/**
+acceptance:
+  - Tests cover a vision session that is not compile-ready and must remain thin/blocked.
+  - Tests cover a compile-ready vision artifact with proto-readiness fields.
+  - Tests protect the no eager durable write rule at the protocol or generated skill level.
+  - Verification fails clearly if generated vision guidance drops the delayed-compile contract.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one coherent local commit unless the unrelated analyze-changes
+  runtime-surface drift blocks the full runtime verification command.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml

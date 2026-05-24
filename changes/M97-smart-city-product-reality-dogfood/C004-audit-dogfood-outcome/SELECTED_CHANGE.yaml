@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: selected_change:M97-smart-city-product-reality-dogfood:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M97-smart-city-product-reality-dogfood
+candidate_id: C004
+change_id: C004-audit-dogfood-outcome
+title: Audit M97 dogfood outcome and decompose follow-ups
+status: done
+selected_at: 2026-05-22
+selection_reason: >
+  C001-C003 completed the target repo baseline, prompt-pack reality gate, and
+  first local deterministic image batch. The remaining work was audit-only
+  closure at the user-defined E2E boundary.
+scope:
+  includes:
+    - first-consumer audit report through first image generation
+    - comparison against the rejected M92 generic-dashboard outcome
+    - deferred follow-up notes without implementing source fixes
+  excludes:
+    - product design handoff
+    - proto2html implementation
+    - OpenWorkflow source fixes
+owned_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md
+  - changes/M97-smart-city-product-reality-dogfood/
+validation:
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /Users/archy/Projects/StartUp/smart_city_copilot --strict --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
+  - git -C /Users/archy/Projects/StartUp/smart_city_copilot diff --check
+result: pass
+next: wait for user instruction on how to consume the audit report

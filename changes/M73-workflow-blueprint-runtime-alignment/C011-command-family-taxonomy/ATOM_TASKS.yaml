@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C011-command-family-taxonomy
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C011-command-family-taxonomy
+title: C011 command family taxonomy atom tasks
+status: pending
+tasks:
+  - task_id: C011-A001
+    title: Define primary workflow commands
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - Primary commands are listed.
+      - Primary commands are described as user-visible workflow stages.
+  - task_id: C011-A002
+    title: Define internal planning and decision commands
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - DTC, AC, SC, and decision behavior are classified as internal or planning intelligence.
+      - DTC, AC, and SC are not described as primary workflow stages.
+  - task_id: C011-A003
+    title: Define advanced and async command families
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - build-agent and build-skill are classified as advanced creation commands.
+      - review is classified as asynchronous support.
+  - task_id: C011-A004
+    title: Validate taxonomy-only boundary
+    status: pending
+    type: verify
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

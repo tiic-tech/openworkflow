@@ -1,0 +1,93 @@
+schema_version: 0.1.0
+contract_id: summary:M73-workflow-blueprint-runtime-alignment
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M73-workflow-blueprint-runtime-alignment
+title: Summary for workflow blueprint runtime alignment
+status: completed
+source:
+  kind: workflow_blueprint_reassessment
+  summary: >
+    Tracks a narrowed DTC queue for aligning OpenWorkflow command taxonomy and
+    stage graph with the overall product-to-implementation blueprint. DTC, AC,
+    and SC are treated as the planning intelligence layer inside /ow:change,
+    not as the whole workflow.
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - changes/M54-decompose-select-change-planning/C013-runtime-exposure-reassessment/WORKFLOW_BLUEPRINT_REASSESSMENT.md
+scope_boundary:
+  current_boundary: Workflow command taxonomy and stage graph only.
+  boundary_type: workflow_slice
+  note: >
+    M73 remains one workflow-slice queue. C001 was split into C011-C014 so the
+    taxonomy work can proceed in focused implementation-sized steps.
+deferred_feature_refs:
+  - M74-front-chain-command-quality-review
+  - M75-proto2html-runtime-contract
+  - M76-html2spec-artifact-contract
+  - M77-build-command-contract
+  - M78-change-planning-loop
+  - M79-review-async-pipeline
+  - M80-archive-completion-transaction
+  - M81-build-agent-skill-registry
+  - M82-workflow-lifecycle-transactions
+  - M83-expanded-workflow-read-model
+outputs:
+  candidate_changes_yaml: changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  change_analysis_yaml: changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+  change_analysis_md: changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.md
+  summary: changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 5
+active_candidate_count: 4
+superseded_candidate_id: C001
+completed_candidate_id: C014
+completed_change_id: C014-deferred-feature-handoff-map
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+key_dependencies:
+  - M54 completed DTC/AC/SC as Codex-delivered planning commands.
+  - C013 clarified that DTC/AC/SC belong inside /ow:change, not as the full OW workflow.
+  - OW_DEVELOP_PLAN defines the intended chain from vision through archive plus advanced build-agent, build-skill, and async review surfaces.
+  - C011 should happen first because command family taxonomy unlocks the stage graph and change-loop placement.
+  - After M73, the next DTC queue should re-review vision, validation, proto, and tune command quality before proto2html or downstream implementation stages.
+risks:
+  - id: R001
+    level: medium
+    description: A taxonomy queue could drift into a full workflow roadmap if deferred features are treated as active candidates.
+    mitigation: Keep M73 limited to C011-C014 and require separate DTC passes for deferred feature refs.
+  - id: R002
+    level: medium
+    description: Historical C001 selection artifacts could be mistaken for the next implementation boundary after the split.
+    mitigation: Treat C001 as superseded and run AC/SC against C011-C014 before implementation.
+  - id: R003
+    level: high
+    description: Implementing proto2html, html2spec, build, review, archive, build-agent, or build-skill before command taxonomy is stable could recreate runtime authority drift.
+    mitigation: Keep those surfaces as deferred feature refs until later DTC queues and high-risk approval where needed.
+  - id: R004
+    level: medium
+    description: Downstream implementation quality can degrade if existing vision, validation, proto, and tune commands are assumed complete without reassessment under the expanded workflow.
+    mitigation: Make front-chain command quality review the first deferred feature after M73.
+unresolved_questions:
+  - Should /ow:archive be user-facing, internal, or both depending on loop mode?
+  - Should /ow:review be represented as a command surface, a runtime service, or both?
+validation:
+  commands_run:
+    - git status --short --branch
+  notes:
+    - OP001 created the initial broad M73 workflow blueprint runtime alignment candidate queue.
+    - OP002 selected C001 from the queue after AC recommended it as the safest first step.
+    - OP003 narrowed M73 to C001 and converted C002-C010 into deferred feature refs.
+    - OP004 split C001 into C011-C014 and marked C001 superseded.
+    - OP005 updated C014 so front-chain command quality review precedes proto2html in the deferred handoff map.
+    - OP006 selected C011 after AC recommended it as the next low-risk candidate.
+    - OP007 completed C011 with local commit evidence.
+    - OP008 selected C012 after AC recommended it as the next low-risk candidate.
+    - OP009 completed C012 with local commit evidence.
+    - OP010 selected C013 directly with SC because M73 is the single active queue.
+    - OP011 completed C013 with local commit evidence.
+    - OP012 selected C014 directly with SC because M73 is the single active queue.
+    - OP013 completed C014 with local commit evidence; M73 active candidates are complete.

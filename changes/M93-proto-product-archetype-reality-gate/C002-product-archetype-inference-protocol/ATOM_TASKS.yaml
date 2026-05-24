@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M93-proto-product-archetype-reality-gate:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C002
+change_id: C002-product-archetype-inference-protocol
+title: Atom tasks for product-archetype inference protocol
+status: completed
+tasks:
+  - id: T001
+    title: Inspect current proto command protocol generation
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Existing proto and vision2prompt protocol insertion points are mapped.
+  - id: T002
+    title: Add product archetype inference protocol source
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+    done_when:
+      - /ow:proto and /ow:vision2prompt source guidance requires product_experience_model before directions.
+      - Guidance separates product forms from modules, scenarios, and states.
+  - id: T003
+    title: Add drift checks for generated protocol
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Verification fails if generated proto guidance loses product archetype inference requirements.
+  - id: T004
+    title: Sync generated adapters
+    type: verify
+    status: completed
+    owned_paths:
+      - .agents/skills/ow-proto/SKILL.md
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Repo-local sync regenerates managed protocol surfaces from source.
+  - id: T005
+    title: Verify protocol wiring
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/
+      - .agents/skills/
+      - .openworkflow/audit/
+    done_when:
+      - Required validation commands pass or unrelated existing failures are documented.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+results:
+  passed:
+    - npm run build
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  known_unrelated_failure:
+    - npm run validate still fails on pre-existing M92 planning files with artifact_type local_commit_evidence, atom_tasks, and selected_change.

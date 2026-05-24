@@ -1,0 +1,28 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001-build-validation-prototype-target-contract
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+selected_change_id: C001-build-validation-prototype-target-contract
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C001
+title: Local commit evidence for C001 build-validation compiler contract
+status: complete
+completed_at: 2026-05-22
+commit: 0acbf94
+summary: >
+  Rewrote the native build-validation skill as a prototype validation target
+  compiler and added reference guidance for experiment target quality and
+  return-to-vision gating.
+changed_paths:
+  - skills/build-validation/SKILL.md
+  - skills/build-validation/references/prototype-validation-target-rubric.md
+  - skills/build-validation/references/return-to-vision-gate.md
+validation:
+  commands_run:
+    - npm run validate
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+risk:
+  level: medium
+  high_risk_report: not_applicable

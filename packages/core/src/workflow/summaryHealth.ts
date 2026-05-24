@@ -36,6 +36,7 @@ export interface SummaryHealthModel {
   contracts_path: string;
   counts: Record<SummaryHealthStatus, number>;
   entries: SummaryHealthEntry[];
+  planning_queue_health_errors: string[];
   warnings: string[];
   next_actions: string[];
 }
@@ -88,19 +89,25 @@ export async function evaluateSummaryHealth(root: string): Promise<SummaryHealth
       contracts_path: ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
       counts: emptyCounts(),
       entries: [],
+      planning_queue_health_errors: [],
       warnings: ["missing OpenWorkflow artifact contracts: .openworkflow/audit/ARTIFACT_CONTRACTS.yaml"],
       next_actions: ["run openworkflow init <folder> --tools codex, or run openworkflow sync on an initialized project"],
     };
   }
   const entries = await Promise.all(contracts.map((contract) => evaluateContract(root, contract)));
+  const planningQueueAudit = await evaluatePlanningQueueCommitEvidence(root);
   const warnings = entries.flatMap((entry) => entry.warnings);
-  const nextActions = [...new Set(entries.flatMap((entry) => entry.next_actions))];
+  const nextActions = unique([
+    ...entries.flatMap((entry) => entry.next_actions),
+    ...planningQueueAudit.next_actions,
+  ]);
   return {
     ok: !entries.some((entry) => ["missing", "stale_unknown"].includes(entry.status)),
     initialized: true,
     contracts_path: ".openworkflow/audit/ARTIFACT_CONTRACTS.yaml",
     counts: countStatuses(entries),
     entries,
+    planning_queue_health_errors: planningQueueAudit.health_errors,
     warnings,
     next_actions: nextActions,
   };
@@ -116,17 +123,20 @@ export function evaluateSummaryQualityGate(health: SummaryHealthModel, strict: b
 }
 
 export function summaryQualityHealthErrors(health: SummaryHealthModel): string[] {
-  return unique(health.entries.flatMap((entry) =>
-    entry.items.flatMap((item) => {
-      if (item.quality_status !== "current_but_thin") {
-        return [];
-      }
-      const details = item.quality_warnings.length > 0
-        ? item.quality_warnings
-        : [`summary source quality is current_but_thin: ${item.artifact_path}`];
-      return details.map((detail) => `summary quality ${entry.artifact_type}: ${detail}`);
-    })
-  ));
+  return unique([
+    ...health.entries.flatMap((entry) =>
+      entry.items.flatMap((item) => {
+        if (item.quality_status !== "current_but_thin") {
+          return [];
+        }
+        const details = item.quality_warnings.length > 0
+          ? item.quality_warnings
+          : [`summary source quality is current_but_thin: ${item.artifact_path}`];
+        return details.map((detail) => `summary quality ${entry.artifact_type}: ${detail}`);
+      })
+    ),
+    ...health.planning_queue_health_errors,
+  ]);
 }
 
 export function buildSummaryQualitySummary(
@@ -176,6 +186,9 @@ function summaryQualityNextActions(health: SummaryHealthModel, strictQuality: Su
   }
   return unique([
     ...(!health.ok ? health.next_actions : []),
+    ...(health.planning_queue_health_errors.length > 0 ? [
+      "repair selected-change commit evidence before trusting handoff; run openworkflow git-automation commit for the affected candidate",
+    ] : []),
     ...(!strictQuality.ok ? ["run openworkflow summaries --root . --strict --json before trusting artifact handoff quality"] : []),
   ]);
 }
@@ -350,10 +363,12 @@ function qualityForArtifact(
     };
   }
   const sourceStatus = stringValue(source.status);
-  const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(source[field]));
+  const emptyKeyFields = qualityFieldsForArtifact(artifactType).filter((field) => !hasNonEmptyValue(valueAtPath(source, field)));
+  const readinessWarnings = readinessWarningsForArtifact(artifactPath, artifactType, source);
   const qualityWarnings = [
     ...(sourceStatus === "draft" ? [`source artifact is draft: ${artifactPath}`] : []),
     ...(emptyKeyFields.length > 0 ? [`source artifact has empty handoff fields in ${artifactPath}: ${emptyKeyFields.join(", ")}`] : []),
+    ...readinessWarnings,
   ];
   return {
     source_status: sourceStatus,
@@ -365,13 +380,88 @@ function qualityForArtifact(
 
 function qualityFieldsForArtifact(artifactType: string): string[] {
   if (artifactType === "vision_session") {
-    return ["vision_delta"];
+    return [
+      "vision_delta.one_sentence",
+      "vision_delta.problem",
+      "vision_delta.users",
+      "vision_delta.goals",
+      "vision_delta.non_goals",
+      "vision_delta.quality_bar",
+      "vision_delta.ai_native_role",
+      "vision_delta.success_signals",
+      "vision_delta.failure_signals",
+      "strategic_core.target_user",
+      "strategic_core.current_alternative",
+      "strategic_core.desired_behavior_change",
+      "strategic_core.core_mechanism",
+      "strategic_core.core_differentiator",
+      "strategic_core.strongest_success_signal",
+      "product_system_seed.product_thesis",
+      "product_system_seed.primary_loop",
+      "product_system_seed.trust_boundary",
+      "product_system_seed.anti_goals",
+      "proto_readiness.prototype_direction_seeds",
+      "proto_readiness.prompt_constraints",
+      "proto_readiness.validation_target",
+      "proto_readiness.status",
+    ];
   }
   if (artifactType === "validation_target") {
-    return ["core_question", "prototype_scope", "acceptance"];
+    return [
+      "core_question",
+      "central_uncertainty",
+      "target_behavior",
+      "prototype_scope",
+      "prototype_experiment.scenario",
+      "prototype_experiment.must_show",
+      "observable_signals.pass",
+      "observable_signals.fail",
+      "acceptance",
+      "decision_rules.continue",
+      "decision_rules.revise",
+      "agent_readiness_gate.status",
+    ];
   }
   if (artifactType === "prototype_evidence") {
-    return ["core_question", "prompt_pack_type", "review_plan", "result"];
+    return [
+      "core_question",
+      "prompt_pack_type",
+      "internal_pipeline.current_stage",
+      "preflight_quality_gate.can_proceed",
+      "direction_count_policy.resolved_count",
+      "normalized_input.primary_user",
+      "normalized_input.desired_behavior_change",
+      "normalized_input.strongest_success_signal",
+      "strategic_core.central_uncertainty",
+      "prototype_brief.product_name",
+      "prototype_brief.positioning",
+      "prototype_brief.primary_loop",
+      "product_experience_model.product_archetype",
+      "product_experience_model.primary_canvas",
+      "product_experience_model.domain_object_model",
+      "product_experience_model.primary_task_loop",
+      "product_experience_model.interaction_state_model",
+      "product_experience_model.anti_generic_constraints",
+      "screen_manifest",
+      "global_design_system_prompt.visual_language",
+      "global_design_system_prompt.layout_system",
+      "global_design_system_prompt.negative_visual_patterns",
+      "quality_rubric.prompt_executability",
+      "quality_rubric.prompt_paragraph_quality",
+      "quality_rubric.state_coverage",
+      "prototype_reality_gate.status",
+      "prototype_reality_gate.dimensions",
+      "prompt_pack_integrity_gate.status",
+      "prompt_pack_integrity_gate.dimensions",
+      "directions",
+      "build_recommendation.first_direction_id",
+      "prompt_text_manifest.status",
+      "prompt_text_manifest.paragraph_quality_status",
+      "prompt_text_manifest.paragraph_quality_dimensions",
+      "image_generation.status",
+      "review_plan",
+      "result",
+    ];
   }
   if (artifactType === "decision_record") {
     return ["outcome", "rationale", "next_command"];
@@ -387,6 +477,23 @@ function qualityFieldsForArtifact(artifactType: string): string[] {
   }
   if (artifactType === "team_runtime") {
     return ["active_work_item", "work_queue", "verification", "handoff"];
+  }
+  return [];
+}
+
+function readinessWarningsForArtifact(artifactPath: string, artifactType: string, source: Record<string, unknown>): string[] {
+  if (artifactType === "vision_session") {
+    const protoReadinessStatus = stringValue(valueAtPath(source, "proto_readiness.status"));
+    if (protoReadinessStatus !== "ready") {
+      return [`vision proto_readiness.status is not ready in ${artifactPath}: ${protoReadinessStatus || "missing"}`];
+    }
+    return [];
+  }
+  if (artifactType === "validation_target") {
+    const readinessStatus = stringValue(valueAtPath(source, "agent_readiness_gate.status"));
+    if (readinessStatus !== "ready_for_proto") {
+      return [`validation agent_readiness_gate.status is not ready_for_proto in ${artifactPath}: ${readinessStatus || "missing"}`];
+    }
   }
   return [];
 }
@@ -420,6 +527,92 @@ async function findFilesNamed(root: string, fileName: string): Promise<string[]>
     }
   }
   return found;
+}
+
+interface PlanningQueueAudit {
+  health_errors: string[];
+  next_actions: string[];
+}
+
+async function evaluatePlanningQueueCommitEvidence(root: string): Promise<PlanningQueueAudit> {
+  const changesRoot = join(root, "changes");
+  if (!(await statOptional(changesRoot))) {
+    return { health_errors: [], next_actions: [] };
+  }
+  const queuePaths = await findFilesNamed(changesRoot, "CANDIDATE_CHANGES.yaml");
+  const healthErrors: string[] = [];
+  for (const queuePath of queuePaths) {
+    const queue = await readYamlRecord(queuePath);
+    if (!queue || queue.planning_artifact_type !== "candidate_changes") {
+      continue;
+    }
+    const queuePolicy = recordValue(queue.queue_policy);
+    if (queuePolicy.selected_change_commit_gate !== "strict") {
+      continue;
+    }
+    healthErrors.push(...(await strictQueueCommitEvidenceErrors(root, queuePath, queue)));
+  }
+  return {
+    health_errors: unique(healthErrors),
+    next_actions: healthErrors.length > 0
+      ? ["repair selected-change commit evidence before trusting handoff; run openworkflow git-automation commit for the affected candidate"]
+      : [],
+  };
+}
+
+async function strictQueueCommitEvidenceErrors(root: string, queuePath: string, queue: Record<string, unknown>): Promise<string[]> {
+  const label = relative(root, queuePath);
+  const changes = Array.isArray(queue.changes) ? queue.changes : [];
+  const errors: string[] = [];
+  for (const candidate of changes) {
+    if (!isRecord(candidate) || candidate.status !== "done") {
+      continue;
+    }
+    const selection = recordValue(candidate.selection);
+    if (!stringValue(selection.selected_change_id)) {
+      continue;
+    }
+    const candidateId = stringValue(candidate.id) ?? "<unknown>";
+    const completion = recordValue(candidate.completion);
+    if (completion.implementation_changed_files === false) {
+      if (!stringValue(completion.commit_not_required_reason)) {
+        errors.push(`selected-change commit evidence ${label} ${candidateId}: planning-only completion must include commit_not_required_reason`);
+      }
+      continue;
+    }
+    if (completion.implementation_changed_files !== true) {
+      errors.push(`selected-change commit evidence ${label} ${candidateId}: strict completion must set implementation_changed_files true or false`);
+      continue;
+    }
+    const evidencePath = localCommitEvidencePath(completion);
+    if (!evidencePath) {
+      errors.push(`selected-change commit evidence ${label} ${candidateId}: implementation completion must include LOCAL_COMMIT_EVIDENCE.yaml`);
+      continue;
+    }
+    if (evidencePath.startsWith("/") || evidencePath.includes("://") || evidencePath.startsWith("..")) {
+      errors.push(`selected-change commit evidence ${label} ${candidateId}: LOCAL_COMMIT_EVIDENCE.yaml must be repo-relative`);
+      continue;
+    }
+    const absoluteEvidencePath = join(root, evidencePath);
+    if (!(await statOptional(absoluteEvidencePath))) {
+      errors.push(`selected-change commit evidence ${label} ${candidateId}: missing ${evidencePath}`);
+    }
+  }
+  return errors;
+}
+
+function localCommitEvidencePath(completion: Record<string, unknown>): string | null {
+  const direct = stringValue(completion.local_commit_evidence_path) ?? stringValue(completion.local_commit_evidence);
+  if (direct?.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+    return direct;
+  }
+  const evidence = Array.isArray(completion.evidence) ? completion.evidence : [];
+  for (const item of evidence) {
+    if (typeof item === "string" && item.endsWith("LOCAL_COMMIT_EVIDENCE.yaml")) {
+      return item;
+    }
+  }
+  return null;
 }
 
 function summaryPathForArtifact(artifactPath: string, contract: SummaryArtifactContract): string {
@@ -531,12 +724,25 @@ function hasNonEmptyValue(value: unknown): boolean {
   return true;
 }
 
+function valueAtPath(source: Record<string, unknown>, path: string): unknown {
+  return path.split(".").reduce<unknown>((current, part) => {
+    if (!isRecord(current)) {
+      return undefined;
+    }
+    return current[part];
+  }, source);
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function recordValue(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {};
+}
+
 function unique(values: string[]): string[] {
-  return [...new Set(values)];
+  return [...new Set(values.filter((value) => value.trim().length > 0))];
 }
 
 function stringValue(value: unknown): string | null {

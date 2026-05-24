@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C012-workflow-stage-graph
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C012-workflow-stage-graph
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C012
+title: Define workflow stage graph
+status: selected
+selection_reason:
+  - AC recommended C012 after C011 completed command family taxonomy.
+  - C012 is low risk and stays inside the M73 workflow-slice boundary.
+  - The stage graph is required before C013 can define /ow:change planning intelligence placement.
+rejected_alternatives:
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C013
+    reason: Depends on C012 stage graph.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: C014
+    reason: Depends on C012 and C013.
+scope:
+  includes:
+    - main workflow stage order
+    - tune loop placement
+    - proto2html and html2spec as future stage surfaces
+    - build, change, review, and archive attachment points
+  excludes:
+    - detailed artifact contracts for each future stage
+    - lifecycle transaction implementation
+    - runtime adapter changes
+owned_paths:
+  - references/workflow-blueprint-runtime-alignment.md
+  - changes/M73-workflow-blueprint-runtime-alignment/C012-workflow-stage-graph/
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.md
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Stage graph matches the user-approved blueprint.
+  - Optional tune behavior is represented without breaking the main chain.
+  - Future runtime stages remain deferred feature refs.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

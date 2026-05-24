@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M87-vision2prompt-post-validate-gate:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C002
+change_id: C002-strategic-fingerprint-evaluator
+title: Atom tasks for strategic fingerprint evaluator
+status: completed
+tasks:
+  - id: T001
+    title: Inspect validator duplication points
+    type: read
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Existing post_validate validation and strategic direction validation paths are mapped.
+  - id: T002
+    title: Implement deterministic pairwise evaluator
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when:
+      - Validators normalize strategic_fingerprint fields.
+      - Validators compute pairwise similarity and flag over-threshold pairs.
+      - Validators preserve skip behavior for resolved_count 1.
+  - id: T003
+    title: Add runtime evaluator fixtures
+    type: edit
+    status: completed
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers over-similar, distinct, and single-direction skipped outcomes.
+  - id: T004
+    title: Verify evaluator behavior
+    type: verify
+    status: completed
+    owned_paths:
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Required validation commands pass.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M90-discovery-loop-e2e-dogfood:C004
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M90-discovery-loop-e2e-dogfood
+candidate_id: C004
+change_id: C004-benchmark-selection-readiness-evidence
+title: Local commit evidence for benchmark-selection readiness
+status: completed
+completed_at: 2026-05-22
+commit: 9f0c828
+summary: >
+  Added benchmark-readiness assertions that decision evidence accepts the
+  benchmark, retains prototype and tune refs, and creates no proto2html or
+  html2spec artifacts.
+files_changed:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+acceptance_results:
+  - acceptance: Decision evidence can identify the accepted benchmark prototype refs.
+    result: pass
+    evidence: decision fixture assertions for proto and tune refs
+  - acceptance: The handoff is ready for a future proto2html queue but does not create proto2html artifacts.
+    result: pass
+    evidence: no html-prototypes or html2spec directories are created
+  - acceptance: Generated /ow:tune still records decision audit internally instead of asking the user to run /ow:decision.
+    result: pass
+    evidence: existing runtime-surface tune decision checks
+  - acceptance: M90 summary names the benchmark-selection evidence and remaining deferred work.
+    result: pass
+    evidence: completed M90 summary and deferred_feature_refs
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - C004 is medium risk and required no high-risk approval.
+  - M90 is complete; proto2html remains deferred to M91.

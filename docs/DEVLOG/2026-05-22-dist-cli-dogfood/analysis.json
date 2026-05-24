@@ -1,0 +1,107 @@
+{
+  "title": "我差点用错了 OpenWorkflow 的入口",
+  "scope_summary": "A focused dogfood devlog from 2026-05-22 about discovering that OpenWorkflow's current repo capability surface must be read through the repo-built dist CLI, not the globally installed openworkflow binary.",
+  "narrative_thesis": "In a self-hosted workflow repo, CLI capability discovery is not a convenience step; it is part of the Agent trust boundary.",
+  "output_language": "zh-CN",
+  "privacy_profile": "strict",
+  "decision_arcs": [
+    {
+      "title": "入口不是实现细节",
+      "situation": "The Agent followed AGENTS.md and first ran the globally installed openworkflow binary.",
+      "tension": "The global binary exposed only the older maintenance command surface, while the dogfood repo had newer Agent-facing commands in dist.",
+      "decision": "Treat the repo-built dist CLI as the current dogfood capability source for this repository.",
+      "evidence": [
+        {
+          "type": "command",
+          "pointer": "artifacts/command_outputs/global-cli-help.txt",
+          "summary": "Global openworkflow help lists only init, validate, sync, doctor, and clean."
+        },
+        {
+          "type": "command",
+          "pointer": "artifacts/command_outputs/dist-cli-help.txt",
+          "summary": "Repo dist CLI help lists handoff, status, inspect, context, draft, register, summaries, summarize, git-automation, and clean."
+        },
+        {
+          "type": "file",
+          "pointer": "package.json:22",
+          "summary": "The package bin maps openworkflow to dist/cli/src/index.js."
+        }
+      ],
+      "outcome": "The Agent used the correct command surface for handoff and context loading.",
+      "reusable_lesson": "In the OpenWorkflow dogfood repo, confirm capability source before trusting capability lists; use node dist/cli/src/index.js for current repo behavior.",
+      "agent_upgrade_category": ["evidence_first_debugging", "scope_control"],
+      "teaching_moment": "Show the global-vs-dist help output side by side."
+    },
+    {
+      "title": "AGENTS 指令需要运行时绑定",
+      "situation": "AGENTS.md tells Agents to run openworkflow commands and also says dogfood work should use OpenWorkflow commands as read model and trust gate.",
+      "tension": "The command name alone did not identify whether the Agent was invoking the installed package or the current repo build.",
+      "decision": "Interpret the semantic command through the repo dist CLI when working inside OpenWorkflow itself.",
+      "evidence": [
+        {
+          "type": "file",
+          "pointer": "AGENTS.md:4",
+          "summary": "AGENTS.md says to run openworkflow --help first."
+        },
+        {
+          "type": "file",
+          "pointer": "AGENTS.md:12",
+          "summary": "AGENTS.md says dogfooding should use OpenWorkflow commands as the read model and trust gate."
+        },
+        {
+          "type": "file",
+          "pointer": "packages/cli/src/index.ts:95",
+          "summary": "The repo source help text includes the expanded command surface and Agent quick start."
+        }
+      ],
+      "outcome": "The content distinguishes semantic command names from versioned execution entrypoints.",
+      "reusable_lesson": "Agent instructions should bind command semantics to the correct runtime entrypoint when a tool is dogfooding itself.",
+      "agent_upgrade_category": ["artifact_hygiene", "prompt_strategy"],
+      "teaching_moment": "Explain why a generated instruction can be semantically right while operationally under-specified in a dogfood repo."
+    },
+    {
+      "title": "handoff 是信任门",
+      "situation": "After switching to the dist CLI, the Agent ran handoff and context with JSON output.",
+      "tension": "Without the trust gate, the Agent would either over-read raw workflow files or rely on stale assumptions.",
+      "decision": "Use dist CLI handoff/context as the bounded startup packet before deeper exploration.",
+      "evidence": [
+        {
+          "type": "command",
+          "pointer": "artifacts/command_outputs/dist-status.json",
+          "summary": "Status reports a clean branch, active_stage workflow, next_command /ow:vision, and healthy managed surface."
+        },
+        {
+          "type": "command",
+          "pointer": "artifacts/command_outputs/dist-cli-help.txt",
+          "summary": "Help describes JSON report envelopes and how to read health_errors, errors, and warnings."
+        }
+      ],
+      "outcome": "The Agent had a clear continuation state without touching managed stage artifacts.",
+      "reusable_lesson": "Use the OpenWorkflow handoff/context pair to control trust and read scope before raw evidence exploration.",
+      "agent_upgrade_category": ["validation_loop", "evidence_first_debugging"],
+      "teaching_moment": "Turn handoff output into a small trust-gate checklist."
+    }
+  ],
+  "notable_artifacts": [
+    "devlog.md",
+    "devlog_deck.html",
+    "artifacts/evidence_notes.md",
+    "artifacts/command_outputs/global-cli-help.txt",
+    "artifacts/command_outputs/dist-cli-help.txt",
+    "artifacts/command_outputs/dist-status.json",
+    "artifacts/command_outputs/git-log-scope.txt"
+  ],
+  "privacy_actions": [
+    "No secrets, credentials, emails, customer identifiers, or private business data were included.",
+    "Local absolute user paths were avoided in published narrative content except repository-relative evidence pointers."
+  ],
+  "html_deck_outline": [
+    "Cover: one small dogfood failure",
+    "Scene: the wrong capability surface",
+    "Diff lens: global CLI vs dist CLI",
+    "Evidence board",
+    "Agent operating rule",
+    "Closing checklist"
+  ]
+}
+

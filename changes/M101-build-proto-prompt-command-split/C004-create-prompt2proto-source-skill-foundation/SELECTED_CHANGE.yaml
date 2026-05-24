@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: selected_change:C004-create-prompt2proto-source-skill-foundation
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C004-create-prompt2proto-source-skill-foundation
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C004
+title: Create prompt2proto source skill foundation
+status: completed
+selection_reason: >
+  C004 is selected after C001 completed the high-risk command split decision
+  and C002 completed the prompt2proto contract design. The user explicitly
+  approved implementation focused on prompt2proto SKILL creation and required
+  the user-provided skill_generator to be part of tool selection.
+scope:
+  includes:
+    - source prompt2proto SKILL.md
+    - references for input contract, visual decomposition, prototype system extraction, UI/UX translation, output template, and quality rubric
+    - explicit boundary between prompt2proto, provider generation, visual review, proto2html, and storyboard work
+    - local guidance reusable by build-prototype
+  excludes:
+    - generated command adapter sync unless required by approved command wiring
+    - provider-backed image generation
+    - visual parity scoring
+    - proto2html
+owned_paths:
+  - skills/prompt2proto/
+  - skills/build-prototype/
+  - changes/M101-build-proto-prompt-command-split/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - provider-backed image generation implementation
+  - visual parity scoring
+  - proto2html implementation
+acceptance:
+  - A prompt2proto source skill exists with reference quality comparable to vision2prompt.
+  - The skill starts from a Chief PM plus Principal UI/UX philosophy engine.
+  - The skill consumes ready prompt packs and translates them into visual prototype instructions and evidence without claiming generated image quality.
+validation:
+  - rg -n "prompt2proto|Chief PM|Principal UI|visual hierarchy|density|coherence" skills/prompt2proto skills/build-prototype
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+rejected_alternatives:
+  - id: C003
+    reason: command surface work is independent and should wait until source skill creation lands.
+  - id: C006
+    reason: build-prototype philosophy wiring depends on the prompt2proto source skill foundation.

@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M87-vision2prompt-post-validate-gate:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C001
+change_id: C001-post-validate-contract
+title: Define prompt asset post-validate contract
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M87-vision2prompt-post-validate-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C001 through ow-select-change single-queue ranking. It is the next
+  recommended ready candidate, has no dependencies, and defines the post-validate
+  artifact contract required before evaluator or generated protocol work.
+owned_paths:
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - changes/M87-vision2prompt-post-validate-gate/
+dependencies: []
+scope:
+  includes:
+    - post_validate prompt asset contract shape
+    - strategic fingerprint dimensions
+    - diversity threshold policy
+    - bypass rule when resolved direction count is 1
+    - failure routing back to /ow:vision2prompt
+    - audit fields for pass, fail, and skipped outcomes
+  excludes:
+    - implementing the comparison algorithm
+    - generated /ow:vision2prompt skill updates
+    - image generation
+    - tune behavior
+forbidden_paths:
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-proto/SKILL.md
+  - generated prototype image assets
+  - /ow:tune command behavior
+acceptance:
+  - Prompt-pack artifacts can record post_validate.status as pass, fail, or skipped.
+  - The contract defines fingerprint dimensions such as product form, trigger, interaction model, emotional driver, retention mechanism, metric, main risk, trust model, and privacy model.
+  - The contract requires post_validate to be skipped when the user requested exactly one strategic direction.
+  - The contract requires post_validate before /ow:prompt2proto when resolved direction count is 2 or more.
+  - Failed diversity gates route back to /ow:vision2prompt instead of starting image generation.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C001 defines artifact contract shape and validator expectations only. It
+    does not expose runtime commands, generate images, call external APIs, or
+    alter tune behavior.

@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.1.0",
+  "health_errors": [],
+  "command": "status",
+  "ok": true,
+  "data": {
+    "project": {
+      "title": "OpenWorkflow",
+      "slug": "openworkflow",
+      "tools": ["codex"],
+      "detected_tools": ["codex"]
+    },
+    "workflow": {
+      "active_stage": "workflow",
+      "next_command": "/ow:vision",
+      "blocked_by": []
+    },
+    "health": {
+      "ok": true,
+      "workflow": { "ok": true },
+      "adapters": {
+        "codex": { "ok": true }
+      },
+      "agents_md": { "ok": true },
+      "summaries": {
+        "ok": true,
+        "initialized": true,
+        "counts": {
+          "not_instantiated": 8,
+          "missing": 0,
+          "present": 0,
+          "current": 0
+        }
+      },
+      "recommended_maintenance": null
+    },
+    "git": {
+      "available": true,
+      "branch": "codex/feat-devlog-dist-cli-dogfood",
+      "dirty": false,
+      "changed_files": []
+    }
+  },
+  "warnings": [],
+  "errors": [],
+  "next_actions": ["continue with /ow:vision"]
+}
+

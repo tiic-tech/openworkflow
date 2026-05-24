@@ -1,0 +1,83 @@
+schema_version: 0.1.0
+contract_id: summary:M86-proto-strategy-prompt-compiler
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M86-proto-strategy-prompt-compiler
+title: Summary for proto strategy prompt compiler
+status: completed
+source:
+  kind: mixed
+  summary: >
+    Tracks the bounded /ow:proto upgrade after M85. Proto should become the
+    strategy-to-prompt compiler that consumes durable validation targets and
+    emits high-quality image-first prompt packs.
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M85-validation-proto-target-contract/SUMMARY.yaml
+scope_boundary:
+  current_boundary: >
+    /ow:proto strategy prompt compiler only.
+  boundary_type: command_surface
+  note: >
+    This queue handles the bridge from validation target to prototype prompt
+    pack: strategy normalization, distinct prototype directions, concrete image
+    prompts, recommendation criteria, and prompt-pack verification.
+deferred_feature_refs:
+  - M87-tune-product-system-inheritance
+  - M88-discovery-loop-read-model
+  - M89-discovery-loop-e2e-dogfood
+  - M90-proto2html-benchmark-input
+outputs:
+  candidate_changes_yaml: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.md
+  summary: changes/M86-proto-strategy-prompt-compiler/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-strategic-prompt-pack-stress-fixtures
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+key_dependencies:
+  - M84 completed proto-ready vision structures and generated /ow:vision guidance.
+  - M85 completed durable validation target artifacts and /ow:proto missing-validation gating.
+  - /ow:proto must consume validation instead of using ephemeral vision_only strategy.
+  - C001 aligned native build-prototype source behavior with M85 and reference skill evidence.
+  - C002 encoded preflight, direction count, prompt text readiness, and image generation collection into prototype artifacts.
+  - C003 upgraded generated /ow:proto protocol to execute the preflight, prompt-text, and image-generation flow.
+  - C005 was added before C004 so stress fixtures target the internal command pipeline instead of a monolithic proto command.
+  - C005 completed the internal /ow:vision2prompt and /ow:prompt2proto split while keeping /ow:proto user-facing.
+  - docs/OW_DEVELOP_PLAN_Phase2.md records the future direction of mapping internal command stages to built-in subagents after the synchronous command chain is stable.
+  - C004 completed stress fixtures for thin prompt packs, style-only directions, and proto-ready strategic prompt packs.
+  - Post-generation strategic fingerprint comparison is a plausible future post-validate gate, but was kept out of C004 to preserve scope.
+risks:
+  - id: R001
+    level: medium
+    description: Proto can regress into visual-style variants instead of strategic directions.
+    mitigation: Require distinctness across product form, trigger, interaction model, emotional driver, retention mechanism, metric, or main risk.
+  - id: R002
+    level: medium
+    description: Proto can silently invent missing strategy when validation or vision is thin.
+    mitigation: Preserve M85 validation gate and tighten prompt-pack strategy fields.
+  - id: R003
+    level: medium
+    description: Prompt-pack artifacts can drift into production backlog or HTML generation.
+    mitigation: Keep image-only boundaries and explicit anti-goals in source, generated protocol, and tests.
+validation:
+  commands_run:
+    - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
+    - node dist/cli/src/index.js sync --root . --json
+    - git status --short --branch
+  notes:
+    - OP001 created the M86 queue with scope limited to /ow:proto.
+    - OP002 selected C001 after cross-queue analysis recommended M86 as the direct continuation from M85.
+    - OP003 completed C001 in commit d277697.
+    - OP004 selected C002 directly inside the current M86 queue.
+    - OP005 completed C002 in commit b00a12b.
+    - OP006 selected C003 directly inside the current M86 queue.
+    - OP007 completed C003 in commit d67d05a.
+    - OP008 added and selected C005 to define the internal proto pipeline and image metadata before C004 stress fixtures.
+    - OP009 completed C005 in commit c766f8f.
+    - OP010 selected C004 via select-change single-queue ranking; analyze-changes was not used because there is only one active queue.
+    - OP011 completed C004 in commit 18bd294 and closed the M86 queue.

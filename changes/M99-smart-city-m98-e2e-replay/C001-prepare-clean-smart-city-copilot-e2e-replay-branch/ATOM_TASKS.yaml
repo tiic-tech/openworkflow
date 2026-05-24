@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M99-smart-city-m98-e2e-replay:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C001
+change_id: C001-prepare-clean-smart-city-copilot-e2e-replay-branch
+title: Atom tasks for clean smart_city_copilot E2E replay branch baseline
+status: completed
+tasks:
+  - id: T001
+    title: Confirm M99 main repo handoff and queue
+    type: verify
+    status: completed
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+    done_when:
+      - Main repo handoff passes through the dist CLI.
+      - M99 SUMMARY.yaml and CANDIDATE_CHANGES.yaml identify C001 as the next recommended candidate.
+      - Main repo branch matches the queue branch boundary.
+  - id: T002
+    title: Record clean target worktree git baseline
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/
+      - /Users/archy/Projects/StartUp/smart_city_copilot/
+    done_when:
+      - Target worktree path exists and is separate from the original smart_city_copilot worktree.
+      - Target branch, HEAD, and dirty-tree state are recorded.
+      - Original worktree is not cleaned, switched, reset, or otherwise modified.
+  - id: T003
+    title: Record target OpenWorkflow surface and readiness baseline
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/
+      - /tmp/smart-city-m99-e2e-worktree/.agents/
+      - /tmp/smart-city-m99-e2e-worktree/AGENTS.md
+    done_when:
+      - Target AGENTS.md and repo-local OpenWorkflow command surface are identified.
+      - Target handoff, validate, and strict summaries are run through the main repo dist CLI without writing target artifacts.
+      - Blocking readiness failures are recorded as baseline evidence for C002.
+  - id: T004
+    title: Scan target prompt-pack source completeness at baseline
+    type: verify
+    status: completed
+    owned_paths:
+      - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+    done_when:
+      - Existing target PROTO_PROMPT_PACK fields are scanned without running replay.
+      - Missing M98 fields are recorded before C002 starts.
+      - Evidence distinguishes source-completeness baseline from visual parity.
+  - id: T005
+    title: Update M99 queue evidence
+    type: edit
+    status: completed
+    owned_paths:
+      - changes/M99-smart-city-m98-e2e-replay/
+    done_when:
+      - C001 selection, atom tasks, implementation brief, and local evidence exist.
+      - CANDIDATE_CHANGES and SUMMARY record C001 completion and C002 as next.
+      - No OpenWorkflow source code or generated managed surfaces are changed.
+verification:
+  - git status --short --branch
+  - node dist/cli/src/index.js handoff --root . --json
+  - target repo git status --short --branch
+  - target repo handoff/readiness command
+  - target repo PROTO_PROMPT_PACK field scan
+results:
+  passed:
+    - main repo node dist/cli/src/index.js handoff --root . --json
+    - main repo git status --short --branch
+    - target repo git status --short --branch
+    - target repo worktree list confirms isolated /tmp/smart-city-m99-e2e-worktree branch
+    - target repo PROTO_PROMPT_PACK field scan completed without mutation
+  baseline_blockers_recorded:
+    - target repo handoff fails strict summary quality on thin prototype_evidence handoff fields
+    - target repo validate fails on missing or incorrectly shaped M98 prototype evidence fields
+    - target repo strict summaries fail on current-but-thin prototype_evidence

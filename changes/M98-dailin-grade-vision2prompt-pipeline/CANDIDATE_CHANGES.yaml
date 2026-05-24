@@ -1,0 +1,657 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M98-dailin-grade-vision2prompt-pipeline
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M98-dailin-grade-vision2prompt-pipeline
+title: Candidate changes for dailin-grade vision2prompt pipeline
+status: active
+source:
+  kind: mixed
+  refs:
+    - user_direction:2026-05-22-approve-dailin-grade-vision2prompt-execution
+    - latest_session_discussion:vision2prompt-vs-dailin-prompt-quality-gap
+    - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+    - changes/M97-smart-city-product-reality-dogfood/SUMMARY.yaml
+    - changes/M93-proto-product-archetype-reality-gate/SUMMARY.yaml
+    - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+    - /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+  summary: >
+    M97 proved that the repaired chain can preserve smart city product topology,
+    but the formal PROTO_PROMPT_PACK remains too thin and incomplete compared
+    with the dailin reference prompt. This queue turns dailin's reference
+    pipeline into an OW-native, schema-backed, validator-enforced
+    /ow:vision2prompt prompt-pack system.
+queue_policy:
+  branch_boundary: codex/m98-dailin-grade-vision2prompt-pipeline
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  next_selection_rule: >
+    Select the first dependency-free candidate that most reduces downstream
+    prompt-pack ambiguity. Do not select implementation work until the queue
+    source files are validated.
+  high_risk_rule: >
+    If a candidate would change remote behavior, release publishing, generated
+    adapter deletion, or broad workflow semantics beyond /ow:vision2prompt,
+    stop and write HIGH_RISK_DECISION_REPORT.md before selection.
+  recommended_first_candidate_id: C001
+scope_control:
+  current_boundary: >
+    Upgrade /ow:vision2prompt prompt-pack generation from thin image prompts to
+    dailin-grade, screen-bound product prototype prompt packs with deterministic
+    source integrity and executability gates.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include only strategic prompt-pack source contract, reference pipeline,
+    generated /ow:vision2prompt protocol guidance, validators, fixtures, and a
+    smart city replay needed to prove prompt-pack source quality.
+  out_of_scope_rule: >
+    Do not implement provider-backed image generation, automated visual review,
+    proto2html, production GIS integration, or broad workflow redesign in this
+    queue. Record those as deferred follow-up queues.
+  deferred_features:
+    - title: Visual quality and reference parity review gate
+      reason: >
+        M97 showed prototype images are product-structure evidence, not visual
+        reference parity evidence. This needs a separate visual review artifact
+        and likely browser/image inspection workflow.
+      suggested_plan_id: M99-prototype-visual-reference-parity-gate
+    - title: Storyboard and motion modeling for dashboard/video prototypes
+      reason: >
+        The dashboard reference is a state progression, not just a static
+        screen set. This queue can add screen-bound prompt depth but should not
+        own full storyboard or motion contracts.
+      suggested_plan_id: M100-prototype-storyboard-motion-model
+    - title: Reference-pattern ingestion from videos or image sets
+      reason: >
+        Pattern extraction from benchmark media should become a separate
+        upstream artifact feeding validation and prompt generation.
+      suggested_plan_id: M101-reference-pattern-ingestion
+    - title: Provider-backed image generation benchmark
+      reason: >
+        Local deterministic SVG/PNG evidence is useful for contract testing but
+        does not prove provider-backed generation quality.
+      suggested_plan_id: M95-provider-image-generation-benchmark
+    - title: Proto2html benchmark consumption
+      reason: >
+        Proto2html should consume an accepted benchmark after prompt-pack and
+        visual-quality gates are trustworthy.
+      suggested_plan_id: M91-proto2html-benchmark-input
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Add prompt-pack integrity gate
+    purpose: >
+      Make PROTO_PROMPT_PACK.yaml the single trusted source for downstream
+      generation by rejecting direction-count drift, missing prompt refs, and
+      evidence that references absent or incomplete directions.
+    scope:
+      includes:
+        - prompt_pack_integrity_gate contract fields for strategic prompt packs
+        - JSON schema coverage for integrity gate status, dimensions, failures, and repair route
+        - validator checks for direction_count_policy.resolved_count versus directions length
+        - validator checks that prompt_text_manifest refs resolve to existing direction and screen prompt ids
+        - validator checks that image_generation generated_images source refs point to existing prompts when generation has started
+        - summary or handoff health exposure for integrity failures when current prototype artifacts are invalid
+      excludes:
+        - dailin reference pipeline migration
+        - broad screen manifest schema expansion
+        - provider image generation
+        - visual quality scoring
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies: []
+    unlocks:
+      - C003
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+    acceptance:
+      - Validator fails when prompt_text_manifest.direction_count advertises more directions than PROTO_PROMPT_PACK.directions contains.
+      - Validator fails when generated image metadata references a missing direction_id or prompt_id.
+      - Validator fails when a generation-ready strategic prompt pack omits prompt_pack_integrity_gate or records a failing gate while image_generation has started.
+      - Existing valid M93/M97 strategic prompt-pack fixtures can be updated to pass without weakening the new gate.
+    selection:
+      selected_change_id: C001-prompt-pack-integrity-gate
+      selected_at: 2026-05-22
+      reason: >
+        C001 is the recommended dependency-free candidate and closes the
+        highest-risk ambiguity from M97: downstream agents can currently proceed
+        from internally inconsistent prompt-pack source refs. Integrity must
+        fail closed before richer dailin-grade screen contracts can be trusted.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C001 added prompt_pack_integrity_gate schema and validator coverage,
+          runtime stress fixtures, and summary health surface fields.
+        - >
+          npm run validate still fails on pre-existing M97 planning artifact
+          issues unrelated to C001; dist CLI validation and runtime surface
+          verification pass.
+  - id: C002
+    status: done
+    title: Migrate dailin reference pipeline into OW vision2prompt references
+    purpose: >
+      Bring the proven dailin vision_to_strategic_prototype_prompt method into
+      OpenWorkflow as OW-owned references that agents must execute before
+      writing strategic prompt packs.
+    scope:
+      includes:
+        - OW-native reference files for input contract, vision decomposition, strategic hypothesis generation, product system extraction, prototype prompt schema, output templates, and quality rubric
+        - preservation of dailin's emphasis on strategy before UI, distinct hypotheses, complete journeys, concrete copy/data, AI behavior, trust controls, anti-goals, and PM recommendation
+        - removal of English Friend-specific assumptions from the generic protocol
+        - source refs back to dailin artifacts for audit
+      excludes:
+        - schema or validator enforcement beyond what later candidates own
+        - generated .agents surfaces until protocol wiring is selected
+        - smart city replay
+    owned_paths:
+      - skills/build-prototype/references/vision2prompt/
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies: []
+    unlocks:
+      - C003
+      - C004
+      - C005
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - rg -n "vision2prompt|dailin-grade|screen_manifest|quality_rubric" skills/build-prototype/references
+    acceptance:
+      - OW references expose the same pipeline density as dailin's 01-06 reference set without binding to Pocket English Friend.
+      - The strategic prompt-pack protocol tells agents to run the reference pipeline in order before prompt text is marked ready.
+      - The protocol explicitly forbids collapsing vision into a single image prompt when a product prototype prompt pack is required.
+    selection:
+      selected_change_id: C002-dailin-reference-pipeline
+      selected_at: 2026-05-22
+      reason: >
+        C002 is the next ready candidate after C001. It migrates the proven
+        dailin method into OW-owned reference files so C003 can extend the
+        schema against a concrete execution pipeline rather than loose prose.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C002 added OW-owned vision2prompt references and updated the strategic
+          prompt-pack protocol to require the dailin-grade reference pipeline
+          before prompt text can be marked ready.
+        - >
+          npm run validate still fails on pre-existing M97 planning artifact
+          issues unrelated to C002; build, dist CLI validation, grep check, and
+          diff check pass.
+  - id: C003
+    status: done
+    title: Extend strategic prompt-pack contract for screen-bound executability
+    purpose: >
+      Expand PROTO_PROMPT_PACK so dailin-grade product prototype instructions
+      are structured in YAML, not hidden only in prose or downstream evidence.
+    scope:
+      includes:
+        - direction_map or equivalent direction-level strategic overview
+        - prototype_brief fields for product name, positioning, target user, current alternative, core idea, primary loop, trust boundaries, non-goals, and desired feeling
+        - screen_manifest fields for journey_stage, user_goal, system_state, selected_object, required_components, required_data_fields, primary_actions, ai_behavior, trust_controls, example_copy, and acceptance_criteria
+        - global_design_system_prompt fields for visual language, layout system, component vocabulary, information density, copy tone, responsive/canvas rules, and negative visual patterns
+        - screen_prompts fields for standalone prompt, negative_prompt, example_copy, and acceptance criteria tied to screen_manifest ids
+        - quality_rubric fields for prompt executability, strategic distinctness, product specificity, state coverage, and trust boundary coverage
+      excludes:
+        - refined tune prompt-pack redesign unless a field must stay compatible
+        - provider-backed generation
+        - visual parity scoring
+    owned_paths:
+      - schemas/proto-prompt-pack.schema.json
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+      - C005
+      - C006
+    risk: medium
+    size: large
+    validation:
+      - npm run build
+      - npm run validate
+      - npm run verify:runtime-surface
+      - node dist/cli/src/index.js validate --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+    acceptance:
+      - Generation-ready strategic prompt packs require screen-bound manifest and prompt fields rather than only freeform prototype_prompt text.
+      - Every screen prompt resolves to a screen_manifest entry.
+      - Every screen_manifest entry includes components, states/data, actions, system behavior or explicit non-AI rationale, and acceptance criteria.
+      - The schema still supports refined prompt-pack fields used by /ow:tune.
+    selection:
+      selected_change_id: C003-screen-bound-executability-contract
+      selected_at: 2026-05-22
+      reason: >
+        C003 is the next ready candidate after C001 and C002. The integrity
+        gate and OW-owned dailin reference pipeline are complete, so the next
+        dependency-ready slice is to make screen-bound executability a
+        schema-backed and validator-enforced prompt-pack contract.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C003 added structured prototype brief, screen manifest, design-system
+          prompt, screen prompt, and quality rubric contract fields for
+          generation-ready strategic prompt packs.
+        - >
+          C003 added validator and runtime stress coverage for missing
+          screen-bound manifest fields and orphan screen prompt refs while
+          preserving refined prompt-pack compatibility.
+        - >
+          npm run validate still fails on pre-existing M97 planning artifact
+          issues unrelated to C003; build, runtime surface, dist CLI validation,
+          strict summaries, and diff check pass.
+  - id: C004
+    status: done
+    title: Wire dailin-grade pipeline into generated vision2prompt protocol
+    purpose: >
+      Make generated /ow:vision2prompt guidance execute the OW reference
+      pipeline and block handoff to /ow:prompt2proto until prompt-pack
+      integrity and executability gates pass.
+    scope:
+      includes:
+        - source registry or template changes that generate .agents/skills/ow-vision2prompt/SKILL.md
+        - generated guidance for reference load order and required intermediate reasoning outputs
+        - post-validate handoff rules updated to include prompt_pack_integrity_gate and prompt executability requirements
+        - sync drift verification for generated adapter files
+      excludes:
+        - hand-editing generated .agents/skills/ow-vision2prompt/SKILL.md as the durable fix
+        - changing unrelated /ow commands
+        - image generation logic
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/templates.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - skills/build-prototype/SKILL.md
+      - skills/build-prototype/references/
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies:
+      - C002
+      - C003
+    unlocks:
+      - C005
+      - C006
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --tools codex --json
+      - npm run validate
+      - npm run verify:agent-e2e
+      - rg -n "prompt_pack_integrity_gate|screen_manifest|vision2prompt reference pipeline" .agents/skills/ow-vision2prompt/SKILL.md skills/build-prototype
+    acceptance:
+      - Generated /ow:vision2prompt says to run the OW vision2prompt reference pipeline before writing PROTO_PROMPT_PACK.
+      - Generated /ow:vision2prompt says prompt_text_manifest cannot become ready when integrity or executability gates fail.
+      - Generated /ow:prompt2proto refuses prompt packs whose integrity or reality gates fail.
+      - Generated files are produced through sync or source templates, not manual managed-surface patching.
+    selection:
+      selected_change_id: C004-generated-vision2prompt-protocol
+      selected_at: 2026-05-22
+      reason: >
+        C004 is the next ready candidate after C002 and C003. The OW-owned
+        dailin reference pipeline and screen-bound executability contract are
+        stable, so generated /ow:vision2prompt and /ow:prompt2proto protocol
+        guidance can now enforce the reference load order and prompt-pack
+        handoff gates.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C004-generated-vision2prompt-protocol/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C004 updated registry protocol source and build-prototype guidance so
+          generated /ow:vision2prompt runs the numbered OW vision2prompt
+          reference pipeline before PROTO_PROMPT_PACK writing.
+        - >
+          C004 regenerated /ow:vision2prompt, /ow:prompt2proto, /ow:proto, and
+          CONTEXT_PACKETS through dist CLI sync, adding readiness gates for
+          prompt_pack_integrity_gate, prototype_reality_gate,
+          quality_rubric.prompt_executability, screen_manifest linkage, and
+          post_validate.
+        - >
+          C004 aligned the verifyAgentE2E validation fixture with current
+          /ow:proto readiness fields so the agent e2e validation covers this
+          generated protocol surface.
+        - >
+          npm run validate still fails on the same pre-existing M97 planning
+          artifact issues unrelated to C004; build, sync, agent e2e, dist CLI
+          validation, strict summaries, grep check, and diff check pass.
+  - id: C005
+    status: done
+    title: Add dailin-grade prompt-pack fixtures and thin-prompt regressions
+    purpose: >
+      Prove the new contract and validators distinguish executable product
+      prototype briefs from short image prompts and internally inconsistent
+      prompt packs.
+    scope:
+      includes:
+        - positive fixture modeled on dailin's Pocket English Friend output
+        - negative fixture for current smart-city-style short D1 prompt that lacks screen-bound prototype brief fields
+        - negative fixture for direction_count and prompt ref mismatch
+        - runtime-surface or repository-contract verification coverage
+        - fixture notes explaining why the positive example is not domain-specific overfitting
+      excludes:
+        - provider image calls
+        - frontend prototype generation
+        - human visual review
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/cli/src/dev/verifyAgentE2E.ts
+      - examples/
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies:
+      - C001
+      - C002
+      - C003
+      - C004
+    unlocks:
+      - C006
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - npm run verify:agent-e2e
+      - npm run validate
+    acceptance:
+      - Positive dailin-grade fixture passes schema and validator gates.
+      - Thin image-prompt fixture fails on prompt executability or missing screen-bound fields.
+      - Direction-count mismatch fixture fails with an error naming the inconsistency.
+      - Missing prompt-ref fixture fails with an error naming the missing direction or prompt id.
+    selection:
+      selected_change_id: C005-dailin-grade-fixtures
+      selected_at: 2026-05-22
+      reason: >
+        C005 is the next ready candidate after C001-C004. The schema,
+        validators, OW-owned references, screen-bound executability contract,
+        and generated protocol gates are complete, so fixture coverage can now
+        prove positive dailin-grade prompt packs and negative thin prompt
+        regressions without changing workflow semantics.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C005-dailin-grade-fixtures/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C005 added an explicit dailin-grade Pocket English Friend positive
+          runtime fixture and asserted it passes schema and validator gates.
+        - >
+          C005 added a thin D1 image-prompt regression that keeps refs
+          consistent but fails on missing screen_manifest and missing
+          screen-bound prompt text before image generation.
+        - >
+          C005 preserved direction-count mismatch and missing prompt-ref
+          regressions that name the relevant manifest inconsistency.
+        - >
+          C005 added examples documentation for the fixture matrix without
+          storing intentionally invalid YAML in repo-wide validation scope.
+        - >
+          npm run validate is expected to continue failing on the same
+          pre-existing M97 planning artifact issues unrelated to C005; build,
+          runtime surface, agent e2e, dist CLI validation, strict summaries,
+          and diff check pass.
+  - id: C006
+    status: done
+    title: Replay smart city prompt pack with dailin-grade contract
+    purpose: >
+      Re-run the smart city prompt-pack source shape through the new M98
+      contract to prove the formal YAML prompt pack carries the complete product
+      prototype brief before image generation.
+    scope:
+      includes:
+        - updated or new smart city fixture prompt pack using the M98 schema
+        - verification that planning, incident, and asset capacity are modeled as screens/states/modules inside a coherent product shell when appropriate
+        - comparison against M97 prompt-pack gap notes
+        - audit note stating whether the prompt pack itself is now sufficient for downstream generation
+      excludes:
+        - regenerating provider-backed images
+        - automated visual reference parity
+        - changing smart_city_copilot active artifacts unless explicitly selected later
+    owned_paths:
+      - examples/
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+      - changes/M98-dailin-grade-vision2prompt-pipeline/
+    dependencies:
+      - C003
+      - C004
+      - C005
+    unlocks:
+      - M99-prototype-visual-reference-parity-gate
+      - M100-prototype-storyboard-motion-model
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run verify:runtime-surface
+      - npm run validate
+      - node dist/cli/src/index.js validate --root . --json
+    acceptance:
+      - Smart city replay prompt pack has complete prototype_brief, screen_manifest, global design prompt, screen prompts, negative prompts, and quality rubric.
+      - Replay evidence shows the formal PROTO_PROMPT_PACK is no longer thinner than downstream EVIDENCE.yaml.
+      - Replay does not claim visual parity; it only proves prompt-pack source completeness.
+    selection:
+      selected_change_id: C006-smart-city-replay
+      selected_at: 2026-05-22
+      reason: >
+        C006 is the final dependency-ready candidate after C003-C005. The
+        screen-bound contract, generated protocol gates, and fixture matrix are
+        complete, so the smart city replay can target the final M98 prompt-pack
+        source shape without entering image generation or visual review.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml
+      notes:
+        - >
+          C006 added a stored smart city replay PROTO_PROMPT_PACK example that
+          includes prototype_brief, screen_manifest, global design prompt,
+          screen prompts, negative prompts, quality rubric, integrity gate, and
+          reality gate before image_generation starts.
+        - >
+          C006 runtime verification now parses the stored replay YAML, asserts
+          planning, incident, and capacity screen coverage inside one map-first
+          product shell, and validates the prompt pack through the repo dist CLI.
+        - >
+          C006 records that prompt-pack source completeness is replayed, while
+          provider-backed image generation, visual reference parity, proto2html,
+          and storyboard/motion modeling remain deferred.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    actor: agent
+    reason: >
+      Create the M98 queue from the approved plan to make /ow:vision2prompt
+      produce dailin-grade, screen-bound prompt packs with deterministic
+      integrity and executability checks.
+    changed_at: 2026-05-22
+    evidence:
+      - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+      - changes/M97-smart-city-product-reality-dogfood/SUMMARY.yaml
+      - /Users/archy/Projects/StartUp/dailin/docs/DISTILLED_SKILLS/vision_to_strategic_prototype_prompt/SKILL.md
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    actor: agent
+    reason: >
+      Move the M98 feat queue from the inherited M73 branch boundary to the
+      dedicated M98 implementation branch before selecting candidates.
+    changed_at: 2026-05-22
+    evidence:
+      - git switch -c codex/m98-dailin-grade-vision2prompt-pipeline
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select C001 as the first M98 implementation candidate because it is ready,
+      dependency-free, medium risk, and unlocks schema/fixture work by making
+      prompt-pack source integrity deterministic.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete C001 after adding prompt-pack integrity schema, validators,
+      runtime fixtures, summary-health signals, and local evidence.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C001-prompt-pack-integrity-gate/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Select C002 after C001 completion because dailin reference migration is
+      the next dependency-free slice and unlocks the screen-bound schema and
+      generated protocol candidates.
+    changed_at: 2026-05-22
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      Complete C002 after migrating the dailin-grade reference pipeline into
+      OW-owned build-prototype references and updating the strategic prompt-pack
+      protocol.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C002-dailin-reference-pipeline/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Select C003 after C001 and C002 completion because the queue now has both
+      the prompt-pack integrity gate and the dailin-grade reference pipeline
+      needed to define a concrete screen-bound executability contract.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      Complete C003 after extending the strategic prompt-pack schema,
+      validators, summary-health fields, protocol reference, and runtime stress
+      fixtures for screen-bound executability.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C003-screen-bound-executability-contract/LOCAL_CHANGE_EVIDENCE.yaml
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Select C006 after C003-C005 completion because the final M98 prompt-pack
+      contract, generated protocol gates, and fixture matrix are ready for a
+      smart city source-completeness replay.
+    changed_at: 2026-05-22
+    before_status: candidate
+    after_status: selected
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/SELECTED_CHANGE.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/ATOM_TASKS.yaml
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      Complete C006 after adding the stored smart city replay prompt pack,
+      runtime validation, M97 gap comparison, and local evidence without
+      provider-backed generation or visual review.
+    changed_at: 2026-05-22
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M98-dailin-grade-vision2prompt-pipeline/C006-smart-city-replay/LOCAL_CHANGE_EVIDENCE.yaml

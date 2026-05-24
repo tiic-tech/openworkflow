@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M102-selected-change-commit-gate:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M102-C004-git-automation-commit-evidence-workflow
+title: Atom tasks for git-automation commit evidence workflow
+status: completed
+tasks:
+  - task_id: M102-C004-A001
+    title: Update git-automation guidance source
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - references/git-version-control-governance.md
+      - .agents/skills/ow-git-automation/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when:
+      - Generated guidance names the selected-change LOCAL_COMMIT_EVIDENCE.yaml path.
+      - Manual batching is documented as invalid completion.
+  - task_id: M102-C004-A002
+    title: Improve commit evidence command behavior
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/core/src/git/
+    done_when:
+      - git-automation commit can infer the selected-change evidence path when commit evidence is requested.
+      - Command output remains preview-first and local-only.
+  - task_id: M102-C004-A003
+    title: Verify generated guidance and evidence recording
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when:
+      - Runtime verification covers generated guidance and commit evidence recording.
+      - sync refreshes generated surfaces from source updates.
+  - task_id: M102-C004-A004
+    title: Verify C004 and record evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M102-selected-change-commit-gate/
+    done_when:
+      - C004 validation commands pass.
+      - C004 local commit evidence is recorded.

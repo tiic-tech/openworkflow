@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M87-vision2prompt-post-validate-gate:C002
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M87-vision2prompt-post-validate-gate
+candidate_id: C002
+change_id: C002-strategic-fingerprint-evaluator
+title: Local commit evidence for strategic fingerprint evaluator
+status: completed
+completed_at: 2026-05-22
+commit: 9d4a9ea
+summary: >
+  Implemented deterministic strategic fingerprint post-validation for
+  strategic prototype prompt packs. The evaluator compares direction
+  fingerprints pairwise over the artifact threshold policy, rejects
+  over-similar strategic directions, and preserves the explicit one-direction
+  skip path.
+implemented:
+  - Added pairwise strategic_fingerprint comparison to repository and runtime validators.
+  - Required populated strategic_fingerprint fields when post_validate.status is pass for prompt-ready multi-direction packs.
+  - Reported over-threshold direction pairs with similarity score and shared fingerprint dimensions.
+  - Added runtime stress fixtures for distinct, duplicate-fingerprint, style-only, and explicit single-direction prompt packs.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - npm run verify:runtime-surface
+    - npm run verify:e2e-workflow
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+next_recommended_candidate_id: C003

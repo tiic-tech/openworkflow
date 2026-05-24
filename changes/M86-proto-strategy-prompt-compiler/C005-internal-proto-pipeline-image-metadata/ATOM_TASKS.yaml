@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M86-proto-strategy-prompt-compiler:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C005
+change_id: C005-internal-proto-pipeline-image-metadata
+title: Atom tasks for internal proto pipeline and image metadata
+status: ready
+tasks:
+  - id: T001
+    title: Register internal proto pipeline commands
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    acceptance:
+      - /ow:vision2prompt is internal and produces prompt text artifacts.
+      - /ow:prompt2proto is internal and produces image groups from prompt text.
+      - /ow:proto remains the user-facing orchestrator.
+  - id: T002
+    title: Add pipeline and image metadata artifact shape
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    acceptance:
+      - Prototype artifacts include internal_pipeline stage metadata.
+      - Generated image entries require image_id, direction_id, prompt_id, path, and metadata.
+  - id: T003
+    title: Refresh generated surfaces and verification
+    owned_paths:
+      - .agents/skills/ow-vision2prompt/SKILL.md
+      - .agents/skills/ow-prompt2proto/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    acceptance:
+      - Generated skills exist for internal proto stages.
+      - Verification asserts internal visibility and no user-facing handoff exposure.
+verification:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

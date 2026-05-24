@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C013-change-planning-intelligence-boundary
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C013-change-planning-intelligence-boundary
+title: C013 /ow:change planning intelligence boundary atom tasks
+status: pending
+tasks:
+  - task_id: C013-A001
+    title: Define planning loop placement
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - DTC, AC, and SC are placed inside /ow:change.
+      - /ow:change remains the implementation orchestration boundary.
+  - task_id: C013-A002
+    title: Define planning loop inputs and outputs
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - DTC, AC, and SC inputs are named at the boundary level.
+      - Selected change artifacts and implementation handoff are named as outputs.
+  - task_id: C013-A003
+    title: Define risk stop semantics
+    status: pending
+    type: document
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+    done_when:
+      - High-risk reports are described as stop packets, not approval.
+      - User approval remains required before high-risk selection or implementation.
+  - task_id: C013-A004
+    title: Validate boundary-only change
+    status: pending
+    type: verify
+    owned_paths:
+      - references/workflow-blueprint-runtime-alignment.md
+      - changes/M73-workflow-blueprint-runtime-alignment/
+    done_when:
+      - "npm run validate passes."
+      - "git diff --check passes."

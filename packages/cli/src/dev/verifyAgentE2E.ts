@@ -31,6 +31,7 @@ async function main(): Promise<number> {
     await createValidationArtifact(target, env);
     await createThinPrototypeArtifact(target, env);
     await verifyThinSummaryTrustGates(target, env);
+    await verifyPlanningArtifactRegistrationContract();
 
     const sourceSnapshots = await readSnapshots(target, [
       VALIDATION_PATH,
@@ -102,6 +103,9 @@ async function createValidationArtifact(target: string, env: NodeJS.ProcessEnv):
     "title: Agent E2E validation target",
     "status: active",
     "core_question: Can an Agent continue from low-context OpenWorkflow handoff?",
+    "central_uncertainty: Whether a low-context Agent can trust managed OpenWorkflow read models before loading raw evidence.",
+    "hypothesis: A strict handoff and summary-quality gate lets the Agent continue safely from compact context.",
+    "target_behavior: The Agent starts from handoff, checks readiness, and refuses thin evidence before downstream work.",
     "feature_classification:",
     "  existential:",
     "    - first consumer trust",
@@ -114,14 +118,40 @@ async function createValidationArtifact(target: string, env: NodeJS.ProcessEnv):
     "  include:",
     "    - Build a thin prototype artifact to test strict handoff quality.",
     "  exclude: []",
+    "prototype_experiment:",
+    "  scenario: Agent resumes a repository after validation and then encounters thin prototype evidence.",
+    "  must_show:",
+    "    - Handoff succeeds after validation registration.",
+    "    - Strict summary quality blocks thin prototype evidence.",
+    "  must_not_show: []",
+    "observable_signals:",
+    "  pass:",
+    "    - /ow:proto readiness check passes after current validation is registered.",
+    "  fail:",
+    "    - /ow:proto readiness check reports thin_validation for the completed validation fixture.",
+    "  ambiguous: []",
     "acceptance:",
     "  - Strict handoff blocks current-but-thin evidence.",
+    "decision_rules:",
+    "  continue:",
+    "    - /ow:proto readiness passes and thin prototype summary is blocked by strict handoff.",
+    "  revise:",
+    "    - /ow:proto readiness fails because validation fixture lacks required prototype-readiness fields.",
+    "  pivot: []",
+    "  stop: []",
+    "  needs_more_evidence: []",
     "decision_options:",
     "  - continue",
     "  - revise",
     "  - pivot",
     "  - stop",
     "  - needs_more_evidence",
+    "vision_gaps: []",
+    "agent_readiness_gate:",
+    "  status: ready_for_proto",
+    "  blockers: []",
+    "  warnings: []",
+    "  write_authority: /ow:validation",
     "",
   ].join("\n"), "utf8");
 
@@ -194,6 +224,18 @@ async function verifyThinSummaryTrustGates(target: string, env: NodeJS.ProcessEn
   const doctorData = record(doctor.data, "doctor data");
   assert(doctor.ok === true, "doctor should keep maintenance ok for thin handoff quality");
   assert(doctorData.handoff_quality_ok === false, "doctor should expose handoff_quality_ok=false for thin summaries");
+}
+
+async function verifyPlanningArtifactRegistrationContract(): Promise<void> {
+  const contracts = await read(join(REPO_ROOT, "references", "planning-artifact-contracts.md"));
+  for (const required of [
+    "Planning Artifact Registration",
+    "must not load full planning history",
+    "`SUMMARY.yaml`: default queue handoff and read-model artifact",
+    "`CANDIDATE_CHANGES.yaml` only when source truth is needed",
+  ]) {
+    assert(contracts.includes(required), `planning registration contract missing for Agent E2E: ${required}`);
+  }
 }
 
 async function verifyCleanAndSyncRecovery(target: string, env: NodeJS.ProcessEnv, sourceSnapshots: Record<string, string>): Promise<void> {

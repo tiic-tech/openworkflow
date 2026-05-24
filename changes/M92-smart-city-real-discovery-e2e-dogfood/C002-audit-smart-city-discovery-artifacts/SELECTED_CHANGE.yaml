@@ -1,0 +1,19 @@
+schema_version: 0.1.0
+contract_id: selected_change:M92-smart-city-real-discovery-e2e-dogfood:C002
+contract_type: planning
+artifact_type: selected_change
+plan_id: M92-smart-city-real-discovery-e2e-dogfood
+candidate_id: C002
+change_id: C002-audit-smart-city-discovery-artifacts
+title: Audit smart city discovery artifacts
+status: complete
+selection_reason: >
+  C001 generated concrete target repo artifacts and images, so C002 could
+  perform the requested first-consumer audit without entering tune or M91.
+owned_paths:
+  - /Users/archy/Projects/StartUp/smart_city_copilot/docs/OW_DISCOVERY_LOOP_AUDIT_REPORT.md
+  - changes/M92-smart-city-real-discovery-e2e-dogfood/
+validation:
+  - audit report exists
+  - report names artifact paths, image paths, git evidence, KANO findings, risks, and next DTC candidates
+updated_at: 2026-05-22T15:18:00+08:00

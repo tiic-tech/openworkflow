@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C005-agent-auto-validation-artifacts
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C005-agent-auto-validation-artifacts
+source_plan_id: M85-validation-proto-target-contract
+source_candidate_id: C005
+title: Atom tasks for agent-auto validation artifacts
+status: complete
+tasks:
+  - task_id: T001
+    title: Add validation trigger provenance
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/artifacts/registry.ts
+      - schemas/validation-target.schema.json
+      - schemas/validation.schema.json
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when: >
+      validation_target exposes trigger.mode, requested_command, and reason.
+  - task_id: T002
+    title: Make missing validation a proto preflight blocker
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/artifacts/readiness.ts
+      - packages/core/src/commands/registry.ts
+    done_when: >
+      /ow:proto missing current_validation reports missing_validation as a
+      blocker and instructs the agent to write validation artifacts first.
+  - task_id: T003
+    title: Refresh generated surfaces and tests
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - .agents/skills/ow-proto/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+    done_when: >
+      Verifiers catch missing validation being treated as ephemeral vision_only
+      context.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check

@@ -1,0 +1,401 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M74-front-chain-command-quality-review
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M74-front-chain-command-quality-review
+title: Candidate changes for front-chain command quality review
+status: active
+source:
+  kind: mixed
+  refs:
+    - docs/OW_DEVELOP_PLAN.md
+    - docs/OW_DEVELOP_PLAN_Phase2.md
+    - references/workflow-blueprint-runtime-alignment.md
+    - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+    - user_direction:2026-05-21-agent-first-command-review
+queue_policy:
+  branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable ids are assigned once and referenced by select-change.
+  status_values:
+    - candidate
+    - ready
+    - selected
+    - in_progress
+    - done
+    - blocked
+    - deferred
+    - superseded
+selection_policy:
+  prefer:
+    - starts at the earliest command in the workflow chain
+    - improves low-context Agent consumption before downstream stages depend on it
+    - defines strict acceptance and stress tests before implementation
+    - produces repair and enhancement changes for existing commands
+    - keeps generated surfaces synchronized from source-of-truth changes
+  avoid:
+    - adding proto2html, html2spec, build, review, archive, build-agent, or build-skill to this queue
+    - bundling multiple command repairs into one candidate
+    - treating command review as prose-only documentation without tests
+    - using analyze-changes while this is the only active candidate queue
+scope_control:
+  current_boundary: >
+    Reassess and improve the existing front-chain commands /ow:vision,
+    /ow:validation, /ow:proto, and /ow:tune as Agent-first artifact production
+    surfaces.
+  boundary_type: workflow_slice
+  in_scope_rule: >
+    Include one candidate per existing front-chain command. Each candidate must
+    review the command from the perspective of an Agent as the first consumer of
+    OW artifacts, then repair or enhance the command so its outputs are
+    trustworthy, low-context, and implementation-useful.
+  out_of_scope_rule: >
+    Do not include new downstream command contracts or runtime exposure in this
+    queue. Do not implement proto2html, html2spec, build, review, archive,
+    build-agent, build-skill, lifecycle transactions, or expanded read models.
+  first_consumer_lens:
+    statement: >
+      OW artifacts should be designed for the implementing Agent first. A
+      successful command should make the Agent faster, safer, and better
+      informed with very little context; the best command outputs should feel
+      like a native development instrument rather than paperwork.
+    must_answer:
+      - What is the current state?
+      - What should the Agent read first?
+      - What context is required, optional, or forbidden?
+      - What artifact is source of truth, summary, evidence, or view?
+      - What can the Agent safely modify?
+      - What is blocked, stale, risky, or missing?
+      - What validation proves the command behaved correctly?
+      - What next command or handoff is appropriate?
+    quality_bar:
+      - A low-context Agent can use the command output without scanning the whole repo.
+      - JSON reports, summaries, and generated skill guidance tell one coherent story.
+      - Failure modes are explicit, structured, and actionable.
+      - The command produces artifacts that are satisfying and surprising in usefulness, not merely valid.
+  deferred_features:
+    - title: Define proto2html runtime contract
+      reason: Separate downstream command surface; depends on front-chain quality.
+      suggested_plan_id: M75-proto2html-runtime-contract
+    - title: Define html2spec artifact contract
+      reason: Separate artifact family after HTML prototype evidence is stable.
+      suggested_plan_id: M76-html2spec-artifact-contract
+    - title: Define build command team and milestone planning contract
+      reason: Separate command surface with team, skill, and planning implications.
+      suggested_plan_id: M77-build-command-contract
+    - title: Align /ow:change with DTC AC SC loop
+      reason: Separate orchestration feature after build and milestone boundaries are clearer.
+      suggested_plan_id: M78-change-planning-loop
+    - title: Design async review command pipeline
+      reason: Separate async support feature with monitoring and review findings behavior.
+      suggested_plan_id: M79-review-async-pipeline
+    - title: Design archive completion transaction
+      reason: Separate completion transaction depending on review and change-loop behavior.
+      suggested_plan_id: M80-archive-completion-transaction
+    - title: Define build-agent and build-skill registry semantics
+      reason: Separate advanced command registry feature with generated-surface risk.
+      suggested_plan_id: M81-build-agent-skill-registry
+    - title: Design workflow lifecycle transaction map
+      reason: Cross-surface transaction map should follow individual command contract queues.
+      suggested_plan_id: M82-workflow-lifecycle-transactions
+    - title: Define summary-first read model for expanded workflow
+      reason: Expanded read model should follow concrete command and artifact surfaces.
+      suggested_plan_id: M83-expanded-workflow-read-model
+next_recommended_candidate_id: C002
+changes:
+  - id: C001
+    status: done
+    title: Review and enhance /ow:vision for Agent-first consumption
+    purpose: >
+      Audit /ow:vision as the first workflow command and repair or enhance it so
+      its artifacts let a low-context Agent understand durable product intent,
+      current uncertainty, handoff readiness, and safe next action.
+    scope:
+      includes:
+        - registry command contract review for /ow:vision
+        - vision artifact source-of-truth and current-slice quality
+        - generated ow-vision adapter synchronization through openworkflow sync
+        - validation and stress tests for normal and failed vision flows
+      excludes:
+        - validation, proto, tune, or downstream command implementation
+        - new runtime command exposure
+        - broad lifecycle transaction design
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - schemas/vision-session.schema.json
+      - packages/adapters/codex/src/generateSkills.ts
+      - packages/adapters/codex/src/generateCommands.ts
+      - schemas/
+      - .agents/skills/ow-vision/
+      - .openworkflow/audit/
+    dependencies: []
+    unlocks:
+      - C002
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:vision explicitly tells an Agent required context, forbidden outputs, source-of-truth artifacts, summary/current-slice behavior, and next handoff.
+      - A first-consuming Agent can answer the front-chain state and next-action questions from compact artifacts without whole-repo scanning.
+      - Stress coverage includes normal vision creation, missing or malformed inputs, stale or thin current state, dirty-tree friction where relevant, and clear JSON ok:false failures.
+      - Generated ow-vision skill output is refreshed from source and remains coherent with registry and artifact contracts.
+      - The command output is not merely valid; it gives the Agent useful, confidence-building development intelligence.
+    selection:
+      selected_change_id: C001-review-enhance-vision
+      reason: >
+        Single-queue SC selected C001 because /ow:vision is the earliest
+        front-chain command, has no dependencies, and determines the quality of
+        every downstream Agent handoff.
+      selected_at: 2026-05-21
+    completion:
+      completed_change_id: C001-review-enhance-vision
+      completed_at: 2026-05-21
+      primary_commit: 3d585f0eacf415725275268f9f3ab95dd092caa7
+      evidence:
+        - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml
+        - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/AGENT_FIRST_AUDIT.md
+  - id: C002
+    status: ready
+    title: Review and enhance /ow:validation for Agent-first consumption
+    purpose: >
+      Audit /ow:validation as the risk-prioritization command and repair or
+      enhance it so an Agent can identify the highest-risk assumption, required
+      evidence, acceptance boundary, and next prototype action without guessing.
+    scope:
+      includes:
+        - source skill and command contract review for /ow:validation
+        - validation target artifact and current-slice quality
+        - generated ow-validation adapter synchronization through openworkflow sync
+        - validation and stress tests for normal and failed validation flows
+      excludes:
+        - vision command changes except compatibility fixes required by tests
+        - proto, tune, or downstream command implementation
+        - broad cross-stage read-model redesign
+    owned_paths:
+      - skills/build-validation/
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - schemas/validation-target.schema.json
+      - schemas/validation.schema.json
+      - schemas/
+      - .agents/skills/ow-validation/
+      - .openworkflow/audit/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C004
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:validation makes the selected assumption, evidence requirement, rejection criteria, and handoff to /ow:proto explicit for an Agent.
+      - A low-context Agent can tell whether validation is ready, blocked, stale, or under-specified from compact artifacts.
+      - Stress coverage includes absent vision context, conflicting or thin summaries, malformed validation targets, dirty-tree friction where relevant, and clear JSON ok:false failures.
+      - Generated ow-validation skill output is refreshed from source and remains coherent with registry and artifact contracts.
+      - The command reduces downstream ambiguity enough that prototype work can start with confidence.
+  - id: C003
+    status: candidate
+    title: Review and enhance /ow:proto for Agent-first consumption
+    purpose: >
+      Audit /ow:proto as the image-first prototype evidence command and repair
+      or enhance it so an Agent can generate, inspect, summarize, and hand off
+      prototype evidence with strong artifact quality and low-context guidance.
+    scope:
+      includes:
+        - source skill and command contract review for /ow:proto
+        - prototype prompt pack, evidence, summary, and current-pointer quality
+        - generated ow-proto adapter synchronization through openworkflow sync
+        - validation and stress tests for normal and failed prototype flows
+      excludes:
+        - tune implementation except compatibility expectations
+        - proto2html reconstruction contracts
+        - visual asset generation beyond command-quality test fixtures
+    owned_paths:
+      - skills/build-prototype/
+      - references/proto-redesign-artifact-contracts.md
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - schemas/
+      - .agents/skills/ow-proto/
+      - .openworkflow/audit/
+    dependencies:
+      - C001
+      - C002
+    unlocks:
+      - C004
+      - M75-proto2html-runtime-contract
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:proto makes prototype intent, image-first prompt evidence, expected outputs, review boundary, and next /ow:tune or /ow:proto2html handoff explicit.
+      - A low-context Agent can determine which prototype evidence is current, trustworthy, accepted, stale, or insufficient before loading raw assets.
+      - Stress coverage includes missing validation context, malformed prototype evidence, stale or thin summaries, conflicting current pointers, generated adapter drift, and clear JSON ok:false failures.
+      - Generated ow-proto skill output is refreshed from source and remains coherent with registry and artifact contracts.
+      - The command gives the Agent enough prototype intelligence to choose tune versus downstream reconstruction without guesswork.
+  - id: C004
+    status: candidate
+    title: Review and enhance /ow:tune for Agent-first consumption
+    purpose: >
+      Audit /ow:tune as the repeatable prototype refinement command and repair
+      or enhance it so an Agent can refine accepted prototype evidence without
+      silently changing the product thesis or losing decision traceability.
+    scope:
+      includes:
+        - source skill and command contract review for /ow:tune
+        - tune input, output, decision audit, and summary/current-pointer quality
+        - generated ow-tune adapter synchronization through openworkflow sync
+        - validation and stress tests for normal and failed tune flows
+      excludes:
+        - proto2html reconstruction contracts
+        - new decision command runtime exposure
+        - broad archive or review pipeline behavior
+    owned_paths:
+      - skills/tune-prototype/
+      - references/proto-redesign-artifact-contracts.md
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/validators/validateOpenWorkflow.ts
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - schemas/proto-prompt-pack.schema.json
+      - schemas/prototype-evidence.schema.json
+      - schemas/decision-record.schema.json
+      - schemas/
+      - .agents/skills/ow-tune/
+      - .agents/skills/ow-decision/
+      - .openworkflow/audit/
+    dependencies:
+      - C001
+      - C002
+      - C003
+    unlocks:
+      - M75-proto2html-runtime-contract
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - npm run build
+      - node dist/cli/src/index.js sync --root . --json
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - /ow:tune makes accepted input evidence, permitted refinement scope, decision recording, and repeatable loop exit criteria explicit for an Agent.
+      - A low-context Agent can tell whether tune should run again, hand off to proto2html, or stop for user decision.
+      - Stress coverage includes missing accepted prototype evidence, malformed tune artifacts, stale or conflicting decision summaries, loop-boundary ambiguity, generated adapter drift, and clear JSON ok:false failures.
+      - Generated ow-tune skill output is refreshed from source and remains coherent with registry, decision behavior, and artifact contracts.
+      - The command protects product intent while making prototype refinement feel precise and dependable to the implementing Agent.
+operations:
+  - operation_id: OP001
+    operation_type: add
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Create the M74 front-chain command quality review queue with one candidate
+      per existing command and an explicit Agent-first artifact consumer lens.
+    changed_at: 2026-05-21
+    before_status: null
+    after_status: active
+    evidence:
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.yaml
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.md
+      - changes/M74-front-chain-command-quality-review/SUMMARY.yaml
+  - operation_id: OP002
+    operation_type: update
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      Align candidate owned_paths with the current repository source layout
+      before selection.
+    changed_at: 2026-05-21
+    before_status: active
+    after_status: active
+    evidence:
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.yaml
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.md
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Select the dependency-free /ow:vision review first because it is the
+      first front-chain command and sets the Agent-first artifact quality bar
+      for validation, proto, and tune.
+    changed_at: 2026-05-21
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/SELECTED_CHANGE.yaml
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/ATOM_TASKS.yaml
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      Complete the /ow:vision Agent-first quality enhancement with local commit
+      evidence and passing required validation.
+    changed_at: 2026-05-21
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M74-front-chain-command-quality-review/C001-review-enhance-vision/LOCAL_COMMIT_EVIDENCE.yaml
+      - 3d585f0eacf415725275268f9f3ab95dd092caa7
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 becomes ready after C001 completed the upstream vision quality
+      dependency.
+    changed_at: 2026-05-21
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M74-front-chain-command-quality-review/CANDIDATE_CHANGES.yaml

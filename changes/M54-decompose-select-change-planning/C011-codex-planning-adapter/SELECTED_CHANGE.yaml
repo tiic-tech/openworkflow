@@ -1,0 +1,53 @@
+schema_version: 0.1.0
+contract_id: selected_change:C011-codex-planning-adapter
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C011-codex-planning-adapter
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C011
+title: Add Codex adapter generation for accepted planning surfaces
+status: completed
+selection_reason:
+  - User explicitly approved advancing C011 after C010 accepted DTC, AC, and SC as formal /ow:* command ids.
+  - C011 is the generated-surface follow-up that delivers those command ids through the Codex repo-local skill adapter.
+  - Generated surfaces are produced from source registries and sync, not hand-edited.
+rejected_alternatives:
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C013
+    reason: Full runtime exposure reassessment should wait until generated Codex delivery and parity checks are proven.
+scope:
+  includes:
+    - core command registry entries for /ow:decompose-to-changes, /ow:analyze-changes, and /ow:select-change
+    - Codex generated skill surfaces and manifest entries from source registry data
+    - refreshed managed command audit and context packet surfaces
+    - generated-surface parity and Agent E2E verification coverage
+  excludes:
+    - non-Codex adapters
+    - remote git or GitHub operations
+    - implementation changes outside planning command delivery
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/onboarding/agentsGuide.ts
+  - packages/cli/src/index.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - references/planning-skill-runtime-exposure.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .agents/
+  - AGENTS.md
+  - changes/M54-decompose-select-change-planning/C011-codex-planning-adapter/
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.yaml
+  - changes/M54-decompose-select-change-planning/CANDIDATE_CHANGES.md
+  - changes/M54-decompose-select-change-planning/SUMMARY.yaml
+acceptance:
+  - Codex generated surfaces come only from source templates and registries.
+  - Generated manifest includes ow-decompose-to-changes, ow-analyze-changes, and ow-select-change.
+  - Runtime surface verification covers the three generated planning skills.
+  - Agent E2E verification passes with the expanded generated surface set.
+validation:
+  - npm run validate
+  - npm run verify:runtime-surface
+  - npm run verify:agent-e2e
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

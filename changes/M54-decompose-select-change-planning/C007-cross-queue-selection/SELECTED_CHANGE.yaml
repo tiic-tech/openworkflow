@@ -1,0 +1,60 @@
+schema_version: 0.1.0
+contract_id: selected_change:C007-cross-queue-selection
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C007-cross-queue-selection
+source_plan_id: M54-decompose-select-change-planning
+source_candidate_id: C007
+title: Support cross-queue selection arbitration
+status: completed
+selection_reason:
+  - M72 remaining-work analysis recommended M54/C007 as the highest leverage next step.
+  - C007 is medium risk, dependency-satisfied, and directly improves the cross-queue selection behavior currently being dogfooded.
+  - C007 unlocks C004 planning skill runtime exposure while preserving one active queue as the default path.
+rejected_alternatives:
+  - plan_id: M70-high-risk-governance-planning
+    candidate_id: G005
+    reason: Useful design-only mitigation, but less directly tied to the current cross-queue selection gap.
+  - plan_id: M68-post-proto-workflow-planning
+    candidate_id: H003
+    reason: High risk and missing a local high-risk decision report before selection.
+  - plan_id: M54-decompose-select-change-planning
+    candidate_id: C004
+    reason: Depends on C007 and is high risk.
+scope:
+  includes:
+    - multi-queue discovery and arbitration guidance
+    - queue-level filtering for active, completed, stale, or superseded queues
+    - cross-queue rejected-alternative recording in SELECTED_CHANGE.yaml
+    - guidance for when to create a meta-selection artifact versus selecting inside one queue
+    - dogfood evidence from the M68 versus M69 decision
+  excludes:
+    - runtime command exposure
+    - autonomous implementation loop behavior
+    - changing candidate id semantics inside existing queues
+    - implementing a CLI queue selector
+owned_paths:
+  - skills/select-change/
+  - references/planning-artifact-contracts.md
+  - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/
+evidence:
+  - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/DOGFOOD_CROSS_QUEUE_EVIDENCE.md
+  - changes/M54-decompose-select-change-planning/C007-cross-queue-selection/LOCAL_COMMIT_EVIDENCE.yaml
+  - changes/M72-remaining-change-priority-analysis/CHANGE_ANALYSIS.yaml
+forbidden_paths:
+  - .agents/
+  - .openworkflow/
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - packages/adapters/
+  - packages/cli/src/commands/
+acceptance:
+  - select-change can explicitly arbitrate across multiple CANDIDATE_CHANGES queues when asked.
+  - The skill still states that one active queue is the preferred default.
+  - Cross-queue decisions record rejected alternatives by plan id and candidate id.
+  - The M68/H003 versus M69/S001 dogfood decision is captured as evidence.
+validation:
+  - npm run validate
+  - python3 /Users/archy/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/select-change
+created_at: 2026-05-21
+updated_at: 2026-05-21

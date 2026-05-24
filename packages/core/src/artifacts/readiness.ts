@@ -4,6 +4,7 @@ import { isNotFound, readTextFile } from "../fs/index.js";
 
 export interface ArtifactReadinessResult {
   ok: boolean;
+  gate_status?: "missing_validation" | "thin_validation" | "stale_validation" | "ready_for_proto" | "return_to_vision";
   blockers: string[];
   warnings: string[];
 }
@@ -36,15 +37,19 @@ async function assessOptionalCurrentArtifact(
   const artifactPath = stringValue(currentState?.[pointerKey]);
   if (!artifactPath) {
     return {
-      ok: true,
-      blockers: [],
-      warnings: [`CURRENT_STATE.${pointerKey} is not set; /ow:proto should derive validation_input.mode from vision-only context`],
+      ok: false,
+      gate_status: "missing_validation",
+      blockers: [
+        `CURRENT_STATE.${pointerKey} is not set; before /ow:proto, auto-run /ow:validation and write a validation artifact with trigger.mode agent_auto`,
+      ],
+      warnings: [],
     };
   }
   const artifact = await readArtifact(root, artifactPath);
   if (!artifact) {
     return {
       ok: false,
+      gate_status: "missing_validation",
       blockers: [`CURRENT_STATE.${pointerKey} references missing or unreadable artifact: ${artifactPath}`],
       warnings: [],
     };
@@ -79,16 +84,51 @@ async function assessCurrentArtifact(
 
 function validationTargetChecks(path: string, artifact: Record<string, unknown>): ArtifactReadinessResult {
   const blockers = commonArtifactBlockers(path, artifact, "validation_target");
+  const warnings: string[] = [];
   if (!nonEmptyString(artifact.core_question)) {
     blockers.push(`${path} core_question must be non-empty before /ow:proto`);
+  }
+  if (!nonEmptyString(artifact.central_uncertainty)) {
+    blockers.push(`${path} central_uncertainty must be non-empty before /ow:proto`);
+  }
+  if (!nonEmptyString(artifact.target_behavior)) {
+    blockers.push(`${path} target_behavior must be non-empty before /ow:proto`);
   }
   if (!hasNonEmptyPath(artifact, ["prototype_scope", "include"])) {
     blockers.push(`${path} prototype_scope.include must name at least one prototype scope item before /ow:proto`);
   }
+  if (!hasNonEmptyPath(artifact, ["prototype_experiment", "scenario"])) {
+    blockers.push(`${path} prototype_experiment.scenario must be non-empty before /ow:proto`);
+  }
+  if (!hasNonEmptyPath(artifact, ["prototype_experiment", "must_show"])) {
+    blockers.push(`${path} prototype_experiment.must_show must name at least one required prototype moment before /ow:proto`);
+  }
+  if (!hasNonEmptyPath(artifact, ["observable_signals", "pass"])) {
+    blockers.push(`${path} observable_signals.pass must name at least one pass signal before /ow:proto`);
+  }
+  if (!hasNonEmptyPath(artifact, ["observable_signals", "fail"])) {
+    blockers.push(`${path} observable_signals.fail must name at least one fail signal before /ow:proto`);
+  }
   if (!nonEmptyArray(artifact.acceptance)) {
     blockers.push(`${path} acceptance must name at least one success criterion before /ow:proto`);
   }
-  return result(blockers);
+  if (!hasNonEmptyPath(artifact, ["decision_rules", "continue"])) {
+    blockers.push(`${path} decision_rules.continue must be non-empty before /ow:proto`);
+  }
+  if (!hasNonEmptyPath(artifact, ["decision_rules", "revise"])) {
+    blockers.push(`${path} decision_rules.revise must be non-empty before /ow:proto`);
+  }
+  const declaredGateStatus = validationGateStatus(valueAtPath(artifact, ["agent_readiness_gate", "status"]));
+  if (declaredGateStatus === "return_to_vision") {
+    blockers.push(`${path} agent_readiness_gate.status is return_to_vision; run /ow:vision before /ow:proto`);
+  } else if (declaredGateStatus === "stale_validation") {
+    blockers.push(`${path} agent_readiness_gate.status is stale_validation; refresh /ow:validation before /ow:proto`);
+  } else if (declaredGateStatus === "thin_validation") {
+    blockers.push(`${path} agent_readiness_gate.status is thin_validation; complete the validation target before /ow:proto`);
+  } else if (!declaredGateStatus) {
+    warnings.push(`${path} agent_readiness_gate.status is missing; inferred readiness from validation fields`);
+  }
+  return result(blockers, warnings, blockers.length === 0 ? "ready_for_proto" : declaredGateStatus ?? "thin_validation");
 }
 
 function prototypeEvidenceChecks(path: string, artifact: Record<string, unknown>): ArtifactReadinessResult {
@@ -155,19 +195,16 @@ async function readArtifact(root: string, path: string): Promise<Record<string, 
   }
 }
 
-function result(blockers: string[]): ArtifactReadinessResult {
-  return { ok: blockers.length === 0, blockers, warnings: [] };
+function result(
+  blockers: string[],
+  warnings: string[] = [],
+  gateStatus?: ArtifactReadinessResult["gate_status"],
+): ArtifactReadinessResult {
+  return { ok: blockers.length === 0, gate_status: gateStatus, blockers, warnings };
 }
 
 function hasNonEmptyPath(record: Record<string, unknown>, path: string[]): boolean {
-  let current: unknown = record;
-  for (const part of path) {
-    if (!isRecord(current)) {
-      return false;
-    }
-    current = current[part];
-  }
-  return hasNonEmptyValue(current);
+  return hasNonEmptyValue(valueAtPath(record, path));
 }
 
 function hasBooleanPath(record: Record<string, unknown>, path: string[], expected: boolean): boolean {
@@ -215,4 +252,28 @@ function stringValue(value: unknown): string | null {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function valueAtPath(record: Record<string, unknown>, path: string[]): unknown {
+  let current: unknown = record;
+  for (const part of path) {
+    if (!isRecord(current)) {
+      return undefined;
+    }
+    current = current[part];
+  }
+  return current;
+}
+
+function validationGateStatus(value: unknown): ArtifactReadinessResult["gate_status"] | null {
+  if (
+    value === "missing_validation" ||
+    value === "thin_validation" ||
+    value === "stale_validation" ||
+    value === "ready_for_proto" ||
+    value === "return_to_vision"
+  ) {
+    return value;
+  }
+  return null;
 }

@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M88-tune-product-system-inheritance:C002
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M88-tune-product-system-inheritance
+candidate_id: C002
+change_id: C002-tune-reference-methodology-protocol
+title: Local commit evidence for tune reference methodology protocol
+status: completed
+completed_at: 2026-05-22
+commit: 9626f3b
+summary: >
+  Wired prototype_tune_to_refined_prompt methodology into native /ow:tune
+  generated protocol surfaces. /ow:tune now requires input normalization,
+  baseline audit, product-system extraction, tune request interpretation,
+  inheritance delta matrix, screen-bound refined prompt output, and explicit
+  no-image/no-html boundaries.
+implemented:
+  - Extended /ow:tune source protocol in command registry.
+  - Synced generated ow-tune skill and context packet.
+  - Added E2E and runtime drift assertions for the new protocol sections.
+verification:
+  commands:
+    - npm run build
+    - npm run validate
+    - npm run verify:e2e-workflow
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js sync --root . --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check
+  result: passed
+next_recommended_candidate_id: C003

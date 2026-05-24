@@ -1,0 +1,144 @@
+schema_version: 0.1.0
+contract_id: summary:M84-vision-delayed-compile-proto-readiness
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M84-vision-delayed-compile-proto-readiness
+title: Summary for vision delayed compile and proto readiness
+status: completed
+source:
+  kind: mixed
+  summary: >
+    Tracks the first bounded discovery-loop upgrade slice. The source plan says
+    /ow:vision must become a product partner, requirements interrogator, and
+    intent compiler; it should avoid per-answer durable writes and compile only
+    when the vision is ready for high-quality /ow:proto prompt generation. This
+    queue also adds the missing native skills/build-vision source skill.
+  refs:
+    - docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+    - changes/M74-front-chain-command-quality-review/SUMMARY.yaml
+    - /Users/archy/Downloads/vision_to_strategic_prototype_prompt_skill.zip
+    - /Users/archy/Downloads/prototype_tune_to_refined_prompt_skill.zip
+scope_boundary:
+  current_boundary: >
+    /ow:vision delayed compile and proto-readiness contract only.
+  boundary_type: command_surface
+  note: >
+    The full discovery loop is intentionally deferred. This queue handles the
+    root input quality problem first: vision must become deep, low-latency for
+    humans, and proto-ready for downstream Agents.
+deferred_feature_refs:
+  - M85-validation-proto-target-contract
+  - M86-proto-strategy-prompt-compiler
+  - M86 absorbs vision_to_strategic_prototype_prompt into native /ow:proto behavior
+  - M87-tune-product-system-inheritance
+  - M87 absorbs prototype_tune_to_refined_prompt into native /ow:tune behavior
+  - M88-discovery-loop-read-model
+  - M89-discovery-loop-e2e-dogfood
+  - M90-analyze-changes-command-quality-review
+outputs:
+  plan: docs/DISCOVER_LOOP_UPGRATE_PLAN.md
+  candidate_changes_yaml: changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M84-vision-delayed-compile-proto-readiness/CANDIDATE_CHANGES.md
+  summary: changes/M84-vision-delayed-compile-proto-readiness/SUMMARY.yaml
+branch_boundary: codex/m73-workflow-blueprint-runtime-alignment
+candidate_count: 4
+active_candidate_count: 0
+completed_candidate_id: C004
+completed_change_id: C004-vision-delayed-compile-stress-fixtures
+selected_candidate_id: null
+selected_change_id: null
+next_recommended_candidate_id: null
+key_dependencies:
+  - M74/C001 improved /ow:vision as an Agent-first artifact producer, but did not solve eager persistence or deep interview quality.
+  - The attached prompt-generation reference skills show that VISION.md must provide enough strategy for /ow:proto to generate high-quality prompts.
+  - The attached reference skills should be absorbed into native /ow:proto and /ow:tune behavior through later bounded DTC queues.
+  - Native skills/build-vision is missing and should be added in C001 as the source behavior for /ow:vision.
+  - DTC scope control requires the full vision-validation-proto-tune upgrade to be split into bounded queues.
+  - C003 verification exposed an unrelated AC runtime-surface drift where verify:runtime-surface expected legacy analyze-changes wording.
+risks:
+  - id: R001
+    level: medium
+    description: Delayed persistence can reduce audit evidence if a long interview is interrupted.
+    mitigation: Define checkpoint mode and pause/resume snapshots before implementation.
+  - id: R002
+    level: medium
+    description: Proto-readiness gates can become too strict and block useful exploratory discovery.
+    mitigation: Distinguish draft/interview state from final compile readiness.
+  - id: R003
+    level: medium
+    description: Vision artifact expansion can create noisy read models.
+    mitigation: Keep detailed coverage structured and expose compact summary-first readiness.
+  - id: R004
+    level: high
+    description: Rebuilding vision, validation, proto, and tune together would exceed a reasonable DTC queue boundary.
+    mitigation: Keep this queue limited to /ow:vision and defer downstream command changes.
+  - id: R005
+    level: medium
+    description: A generated ow-vision adapter without a native build-vision source skill creates source-behavior drift.
+    mitigation: Add skills/build-vision in C001 and require repository validation to keep it present.
+completed:
+  - candidate_id: C001
+    change_id: C001-build-vision-delayed-compile-contract
+    primary_commit: 0140a0109ff9da718952a37a422cfcf527264b51
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C001-build-vision-delayed-compile-contract/LOCAL_COMMIT_EVIDENCE.yaml
+      - skills/build-vision/SKILL.md
+  - candidate_id: C002
+    change_id: C002-vision-proto-readiness-artifacts
+    primary_commit: 83d3acc4113b45f860c2873649ef397285b361f6
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C002-vision-proto-readiness-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+      - packages/core/src/artifacts/registry.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - schemas/vision-session.schema.json
+  - candidate_id: C003
+    change_id: C003-vision-generated-protocol
+    primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+      - packages/core/src/commands/registry.ts
+      - .agents/skills/ow-vision/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - candidate_id: C004
+    change_id: C004-vision-delayed-compile-stress-fixtures
+    primary_commit: 7c6d30157f0deb2ee73bb651865f3ffc9d96993d
+    evidence:
+      - changes/M84-vision-delayed-compile-proto-readiness/C004-vision-delayed-compile-stress-fixtures/LOCAL_COMMIT_EVIDENCE.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+unresolved_questions:
+  - Should the typo-preserving plan filename later be aliased by a correctly spelled DISCOVERY_LOOP_UPGRADE_PLAN.md?
+  - Should M74 C002-C004 be superseded after M84 lands, or should they remain as command-quality follow-ups?
+known_issues:
+  - id: KI001
+    command: /ow:analyze-changes
+    source: npm run verify:runtime-surface
+    status: recorded_with_immediate_verifier_alignment
+    suggested_plan_id: M90-analyze-changes-command-quality-review
+    description: >
+      Runtime-surface verification currently expects the exact legacy guidance
+      "Analyze one or more candidate change queues and recommend the next
+      candidate without selecting it." The generated analyze-changes skill uses
+      different wording. C004 aligns the immediate verifier expectation so
+      vision stress fixtures can run; deeper AC command-quality review remains
+      outside M84's /ow:vision boundary.
+validation:
+  commands_run:
+    - sed -n '1,220p' .openworkflow/CURRENT_STATE.yaml
+    - node dist/cli/src/index.js sync --root . --json
+    - git status --short --branch
+  notes:
+    - OP001 created the M84 queue with scope limited to /ow:vision delayed compile and proto-readiness.
+    - OP002 updated C001 to include the missing native skills/build-vision source skill.
+    - OP003 selected C001 directly with SC because M84 is the single active queue.
+    - OP004 completed C001 with local commit evidence.
+    - OP005 marked C002 ready after C001 completed the source skill foundation.
+    - OP006 selected C002 directly with SC because M84 is the single active queue.
+    - OP007 completed C002 with local commit evidence.
+    - OP008 marked C003 ready as the next candidate.
+    - OP009 selected C003 directly with SC because M84 is the single active queue.
+    - OP010 completed C003 with local commit evidence.
+    - OP011 marked C004 ready as the next candidate.
+    - OP012 recorded the unrelated AC runtime-surface wording drift as a deferred M90 issue.
+    - OP013 selected C004 directly with SC because M84 is the single active queue.
+    - OP014 completed C004 with local commit evidence.
+    - OP015 marked M84 completed; validation, proto, tune, read model, and E2E dogfood work remain deferred.

@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+contract_type: planning
+planning_artifact_type: atom_tasks
+source_plan_id: M101-build-proto-prompt-command-split
+source_candidate_id: C003
+selected_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary
+status: completed
+tasks:
+  - task_id: T001
+    title: Add build-proto-prompt source command
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when: Registry exposes internal /ow:build-proto-prompt with prompt-pack compiler protocol and no provider-generation responsibilities.
+  - task_id: T002
+    title: Add build-proto-prompt source skill
+    status: completed
+    type: edit
+    owned_paths:
+      - skills/build-proto-prompt/
+    done_when: Source skill defines prompt-pack compiler boundary, Co-Founder plus Chief PM role engine, inputs, references, outputs, and no-go rules.
+  - task_id: T003
+    title: Regenerate and verify managed command surfaces
+    status: completed
+    type: verify
+    owned_paths:
+      - .agents/skills/ow-build-proto-prompt/
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: sync, build, runtime-surface verification, validate, summaries, and diff check pass.

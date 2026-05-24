@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: selected_change:M99-smart-city-m98-e2e-replay:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M99-smart-city-m98-e2e-replay
+candidate_id: C003
+change_id: C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes
+title: Compare real replay against C006 fixture and M97 gap notes
+status: completed
+selected_at: 2026-05-23
+selected_by: agent
+risk: medium
+size: small
+selection_source:
+  queue: changes/M99-smart-city-m98-e2e-replay/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C003 after C002 because the real target replay now exists at target
+  commit 9a609cf and can be compared against the M98 C006 fixture, M97 source
+  gap notes, and the dailin prompt quality benchmark.
+rejected_alternatives:
+  - id: follow-up-vision2prompt-generator-repair-if-needed
+    reason: >
+      C003 comparison is required before deciding whether a /ow:vision2prompt
+      repair is still needed.
+owned_paths:
+  - changes/M99-smart-city-m98-e2e-replay/
+  - docs/M97_PRODUCT_REALITY_E2E_SYNTHESIS_REPORT.md
+dependencies:
+  - C002
+scope:
+  includes:
+    - compare target PROTO_PROMPT_PACK against examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+    - compare outcome against M97 prompt-pack source gap findings
+    - compare prompt quality against /Users/archy/Projects/StartUp/dailin/docs/OUTPUT_PROMPT.md
+    - record go/no-go recommendation for visual reference parity queue
+    - document repair route if the target prompt pack is still thin
+  excludes:
+    - implementing any /ow:vision2prompt generator repair
+    - provider-backed image generation
+    - visual reference parity scoring
+    - human visual review
+    - proto2html
+    - storyboard or motion modeling
+forbidden_paths:
+  - provider-backed image generation outputs
+  - visual reference parity review artifacts
+  - proto2html artifacts
+  - OpenWorkflow source code
+acceptance:
+  - Evidence states whether the real replay prompt pack is source-complete.
+  - Evidence distinguishes topology/source completeness from visual reference parity.
+  - Next recommendation is either proceed to visual parity gate or repair /ow:vision2prompt generation.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C003 records local comparison and planning evidence only. It does not call
+    external providers, publish remote artifacts, or change production source
+    code.
+expected_commit_boundary: >
+  Complete C003 as one local evidence commit after comparison artifacts,
+  M97 report note, and M99 queue status are updated.
+completion:
+  completed_at: 2026-05-23
+  evidence:
+    - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/LOCAL_CHANGE_EVIDENCE.yaml
+    - changes/M99-smart-city-m98-e2e-replay/C003-compare-real-replay-against-c006-fixture-and-m97-gap-notes/COMPARISON_REPORT.md

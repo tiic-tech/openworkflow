@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
+source_plan_id: M100-dailin-grade-image-prompt-paragraphs
+source_candidate_id: C005
+title: Replay smart_city_copilot with dailin-grade prompt paragraphs
+status: selected
+selection_reason: >
+  C005 is the next recommended candidate after C004 completed paragraph-quality
+  fixtures and regressions. It proves the new bar against the real
+  smart_city_copilot target replay instead of only repository-local fixtures.
+scope:
+  includes:
+    - target smart_city_copilot replay prompt-pack update
+    - direction-level prototype_prompt paragraph upgrade
+    - screen_prompts[].prompt paragraph upgrade
+    - prompt_text_manifest paragraph-quality readiness evidence
+    - target validate, summaries, handoff, status, and commit evidence
+  excludes:
+    - provider-backed image generation
+    - human visual review
+    - visual reference parity scoring
+    - proto2html
+    - storyboard or motion modeling
+owned_paths:
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+  - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
+  - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
+  - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/SUMMARY.yaml
+forbidden_paths:
+  - provider image generation implementation
+  - generated image review artifacts
+  - proto2html implementation
+  - M101 command split implementation
+acceptance:
+  - Target prompt paragraphs include complete product context, journey step, screen purpose, components, user actions, system response, concrete copy/data, trust controls, anti-goals, visual direction, and desired user feeling.
+  - Direct comparison records the new smart city prompt text as at least dailin-grade on prompt paragraph density and generation usefulness.
+  - Target image_generation.status remains not_started.
+validation:
+  - node dist/cli/src/index.js handoff --root . --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js validate --root /tmp/smart-city-m99-e2e-worktree --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js summaries --root /tmp/smart-city-m99-e2e-worktree --strict --json
+  - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /tmp/smart-city-m99-e2e-worktree --json
+  - git diff --check
+rejected_alternatives:
+  - id: C006
+    reason: C006 depends on real target replay evidence from C005.
+  - plan_id: M101-build-proto-prompt-command-split
+    candidate_id: C001
+    reason: M101 is separate high-risk command-boundary work and remains outside M100 prompt paragraph replay.

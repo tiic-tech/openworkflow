@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:C003-vision-generated-protocol
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C003-vision-generated-protocol
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C003
+title: Upgrade /ow:vision generated protocol for product partner interrogation
+status: completed
+selection_reason: >
+  C003 is the next dependency after C002. It makes the generated /ow:vision
+  command and Codex skill consume the new build-vision contract: product partner,
+  requirements interrogator, intent compiler, delayed compile modes, and
+  proto-readiness as the compile gate.
+scope:
+  includes:
+    - command registry protocol updates for /ow:vision
+    - generated ow-vision skill guidance through sync
+    - anti-patterns against fixed question-count compile
+    - proto-readiness audit before durable artifact generation
+  excludes:
+    - validation, proto, or tune source skill changes
+    - UI or app-level interaction implementation
+    - new command registration
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-vision/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+forbidden_paths:
+  - skills/build-validation/**
+  - skills/build-prototype/**
+  - skills/tune-prototype/**
+  - .openworkflow/validation/**
+  - .openworkflow/prototypes/**
+  - .openworkflow/specs/**
+  - .openworkflow/runtime/**
+acceptance:
+  - /ow:vision generated skill names the three roles explicitly.
+  - The skill requires deep interview before compile and forbids eager durable writes in interview mode.
+  - The skill uses proto-readiness as a compile gate.
+  - Verification proves generated skill and context packets preserve the new protocol.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+risk:
+  level: medium
+  high_risk_report: not_applicable
+commit_boundary: >
+  Complete as one coherent local commit because the source protocol, generated
+  surfaces, and verification assertions are one behavior boundary.
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb
+  evidence:
+    - changes/M84-vision-delayed-compile-proto-readiness/C003-vision-generated-protocol/LOCAL_COMMIT_EVIDENCE.yaml

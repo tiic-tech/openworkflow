@@ -39,6 +39,7 @@ async function main(): Promise<number> {
     await verifyCurrentState(runtime);
     await verifyVisionPhase(runtime);
     await verifyValidationPhase(runtime);
+    await verifyInternalProtoPipelinePhase(runtime);
     await verifyPrototypePhase(runtime);
     await verifyTunePhase(runtime);
     await verifyInternalDecisionPhase(runtime);
@@ -83,13 +84,15 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   const phase = "vision";
   const source = command("vision", phase);
   const protocol = protocolFor(source, phase);
-  assertPhase(phase, protocol.interactionMode === "conversation-first-sustained-grill", "source protocol is not sustained grill");
+  assertPhase(phase, protocol.interactionMode === "delayed-compile-product-interrogation", "source protocol is not delayed-compile product interrogation");
   assertExactList(phase, protocol.handoffCommands, ["/ow:validation"], "vision source handoffs changed");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/validation/**", "vision can create validation artifacts");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/prototypes/**", "vision can create prototype artifacts");
-  assertListIncludes(phase, protocol.auditCheckpoints.before, "Start in conversation mode and ask the next useful vision question before writing artifacts.", "vision does not start conversation-first");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "product partner, requirements interrogator, and intent compiler", "vision source missing three-role framing");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "do not start by creating or updating durable vision files", "vision does not start conversation-first");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "make each question depend on the previous answer", "vision does not enforce progressive questioning");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "user confirms readiness", "vision handoff does not require user readiness confirmation");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "proto_readiness.status", "vision compile does not require proto-readiness");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "user readiness", "vision handoff does not require user readiness confirmation");
 
   const generated = commandRecord(runtime, "vision", phase);
   assertPhase(phase, stringField(generated, "visibility", phase) === "user", "generated vision command is not user visible");
@@ -97,31 +100,65 @@ async function verifyVisionPhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(generated, "forbidden_outputs", phase), ".openworkflow/prototypes/**", "generated vision can create prototypes");
 
   const packet = packetRecord(runtime, "/ow:vision", phase);
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "ask the next useful vision question", "context packet lost conversation-first checkpoint");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Cover mandatory vision dimensions", "context packet lost mandatory coverage checkpoint");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "user confirms readiness", "context packet lost readiness gate");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "Ask the next useful vision question", "context packet lost conversation-first checkpoint");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Cover mandatory vision and proto-readiness dimensions", "context packet lost mandatory proto-readiness checkpoint");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "proto-readiness", "context packet lost proto-readiness gate");
 
   const skill = await readSkill(runtime, "ow-vision");
   assertIncludes(phase, skill, ".openworkflow/CURRENT_STATE.yaml", "skill missing current state loading guidance");
   assertIncludes(phase, skill, "clear stale current_question", "skill missing stale question closure guidance");
   assertIncludes(phase, skill, "summary_policy", "skill missing summary policy guidance");
+  assertIncludes(phase, skill, "<vision_role>", "skill missing vision role block");
+  assertIncludes(phase, skill, "Act as product partner", "skill missing product partner role");
+  assertIncludes(phase, skill, "Act as requirements interrogator", "skill missing requirements interrogator role");
+  assertIncludes(phase, skill, "Act as intent compiler", "skill missing intent compiler role");
+  assertIncludes(phase, skill, "<interaction_modes>", "skill missing delayed compile modes");
+  assertIncludes(phase, skill, "Interview mode is the default", "skill missing interview mode");
+  assertIncludes(phase, skill, "Checkpoint mode writes", "skill missing checkpoint mode");
+  assertIncludes(phase, skill, "Compile mode writes", "skill missing compile mode");
+  assertIncludes(phase, skill, "<agent_first_consumer>", "skill missing Agent-first consumer guidance");
+  assertIncludes(phase, skill, "Treat the next implementing Agent as the first consumer", "skill missing first-consumer framing");
+  assertIncludes(phase, skill, "vision_delta must preserve enough handoff intelligence", "skill missing compact handoff intelligence guidance");
   assertIncludes(phase, skill, "<conversation_first>", "skill missing conversation_first block");
   assertIncludes(phase, skill, "Ask exactly one question", "skill no longer limits vision to one focused question");
   assertIncludes(phase, skill, "<mandatory_coverage>", "skill missing mandatory coverage block");
-  assertIncludes(phase, skill, "Do not hand off to /ow:validation until mandatory coverage is addressed", "skill lost validation handoff gate");
+  assertIncludes(phase, skill, "<proto_readiness_gate>", "skill missing proto-readiness gate");
+  assertIncludes(phase, skill, "VISION.md is ready only when /ow:proto can derive", "skill missing proto-readiness acceptance");
+  assertIncludes(phase, skill, "Do not hand off to /ow:validation until mandatory coverage is addressed, proto-readiness", "skill lost validation handoff gate");
   assertIncludes(phase, skill, "not on a fixed number of turns", "skill permits fixed-turn readiness");
   assertIncludes(phase, skill, "<artifact_checkpoint>", "skill missing artifact checkpoint separation");
 
   const template = recordField(artifactRecord(runtime, "vision_session", phase), "template", phase);
+  const visionDelta = recordField(template, "vision_delta", phase);
+  assertPhase(phase, Object.hasOwn(visionDelta, "problem"), "vision template missing problem field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "ai_native_role"), "vision template missing ai_native_role field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "success_signals"), "vision template missing success_signals field");
+  assertPhase(phase, Object.hasOwn(visionDelta, "failure_signals"), "vision template missing failure_signals field");
+  const strategicCore = recordField(template, "strategic_core", phase);
+  assertPhase(phase, Object.hasOwn(strategicCore, "target_user"), "vision template missing strategic_core.target_user");
+  assertPhase(phase, Object.hasOwn(strategicCore, "core_differentiator"), "vision template missing strategic_core.core_differentiator");
+  const productSystemSeed = recordField(template, "product_system_seed", phase);
+  assertPhase(phase, Object.hasOwn(productSystemSeed, "primary_loop"), "vision template missing product_system_seed.primary_loop");
+  assertPhase(phase, Object.hasOwn(productSystemSeed, "anti_goals"), "vision template missing product_system_seed.anti_goals");
+  const protoReadiness = recordField(template, "proto_readiness", phase);
+  assertPhase(phase, protoReadiness.status === "missing", "vision proto_readiness should default to missing");
+  assertPhase(phase, Object.hasOwn(protoReadiness, "missing_for_proto"), "vision template missing proto_readiness.missing_for_proto");
+  assertPhase(phase, Object.hasOwn(protoReadiness, "prototype_direction_seeds"), "vision template missing proto_readiness.prototype_direction_seeds");
+  assertPhase(phase, Object.hasOwn(protoReadiness, "validation_target"), "vision template missing proto_readiness.validation_target");
+  const coverage = recordField(template, "coverage", phase);
+  assertPhase(phase, Object.hasOwn(coverage, "proto_readiness"), "vision template missing coverage.proto_readiness");
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.ready === false, "vision template should default to not ready");
   assertPhase(phase, handoff.next_command === null, "vision template should not default to validation handoff");
+  assertPhase(phase, Object.hasOwn(handoff, "blockers"), "vision handoff template missing blockers field");
+  assertPhase(phase, Object.hasOwn(handoff, "readiness_notes"), "vision handoff template missing readiness_notes field");
 }
 
 async function verifyValidationPhase(runtime: Runtime): Promise<void> {
   const phase = "validation";
   const source = command("validation", phase);
   const protocol = protocolFor(source, phase);
+  assertPhase(phase, protocol.interactionMode === "prototype-validation-target-compiler", "validation source protocol is not prototype target compiler");
   assertListIncludes(phase, protocol.requiredContext, ".openworkflow/vision/VISION_CONTRACT.yaml", "validation no longer requires vision contract");
   assertListIncludes(phase, protocol.forbiddenOutputs, ".openworkflow/prototypes/**", "validation can create prototype artifacts");
   assertExactList(phase, protocol.handoffCommands, ["/ow:proto", "/ow:vision"], "validation source handoffs changed");
@@ -133,11 +170,35 @@ async function verifyValidationPhase(runtime: Runtime): Promise<void> {
 
   const packet = packetRecord(runtime, "/ow:validation", phase);
   assertListIncludes(phase, stringList(packet, "required", phase), ".openworkflow/vision/VISION_CONTRACT.yaml", "context packet does not require vision contract");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "single highest-risk validation question", "validation does not focus the core risk");
-  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "prototype brief", "validation does not produce prototype brief");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "force /ow:proto to invent product strategy", "validation does not return to vision when strategy is missing");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "central uncertainty", "validation does not focus the central uncertainty");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "prototype_experiment", "validation does not define prototype experiment");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "observable_signals", "validation does not define observable signals");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "agent_readiness_gate", "validation does not write readiness gate");
+
+  const skill = await readSkill(runtime, "ow-validation");
+  assertIncludes(phase, skill, "prototype-validation-target-compiler", "skill missing validation compiler mode");
+  assertIncludes(phase, skill, "central_uncertainty", "skill missing central uncertainty artifact guidance");
+  assertIncludes(phase, skill, "prototype_experiment", "skill missing prototype experiment artifact guidance");
+  assertIncludes(phase, skill, "observable_signals", "skill missing observable signals artifact guidance");
+  assertIncludes(phase, skill, "decision_rules", "skill missing decision rules artifact guidance");
+  assertIncludes(phase, skill, "Return to /ow:vision", "skill missing return-to-vision gate");
+  assertIncludes(phase, skill, "Do not generate prototype prompts", "skill missing no-prototype boundary");
 
   const template = recordField(artifactRecord(runtime, "validation_target", phase), "template", phase);
   assertPhase(phase, "prototype_scope" in template, "validation template missing prototype_scope");
+  assertPhase(phase, "central_uncertainty" in template, "validation template missing central_uncertainty");
+  assertPhase(phase, "target_behavior" in template, "validation template missing target_behavior");
+  assertPhase(phase, "prototype_experiment" in template, "validation template missing prototype_experiment");
+  assertPhase(phase, "observable_signals" in template, "validation template missing observable_signals");
+  assertPhase(phase, "decision_rules" in template, "validation template missing decision_rules");
+  assertPhase(phase, "vision_gaps" in template, "validation template missing vision_gaps");
+  const agentGate = recordField(template, "agent_readiness_gate", phase);
+  const trigger = recordField(template, "trigger", phase);
+  assertPhase(phase, trigger.mode === "user_explicit", "validation template should default trigger mode to user_explicit");
+  assertPhase(phase, trigger.requested_command === "/ow:validation", "validation template should default trigger requested_command to /ow:validation");
+  assertPhase(phase, agentGate.status === "thin_validation", "validation template should default agent readiness to thin_validation");
+  assertPhase(phase, agentGate.write_authority === "/ow:validation", "validation template should preserve /ow:validation write authority");
   assertPhase(phase, stringList(template, "decision_options", phase).includes("needs_more_evidence"), "validation template missing decision options");
 }
 
@@ -148,9 +209,18 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertPhase(phase, protocol.interactionMode === "image-first-strategic-proto-prompt-pack", "prototype source protocol is not image-first prompt pack");
   assertDiscoveryHandoffs(phase, protocol.handoffCommands, "source prototype handoffs");
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "prototype cannot write decision audit");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "validation_input.mode", "prototype does not record validation mode");
+  assertSomeIncludes(phase, protocol.conditionalOutputs ?? [], ".openworkflow/validation/<id>/VALIDATION.yaml", "prototype cannot auto-write validation artifacts");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "auto-run /ow:validation", "prototype does not auto-run validation when missing");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "trigger.mode agent_auto", "prototype auto validation does not record provenance");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "high-quality prototype prompts", "prototype does not verify vision and validation quality before prompt generation");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "askUserQuestion", "prototype does not ask for direction count when missing");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "5-8 strategic prototype hypotheses", "prototype does not generate strategic hypotheses");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "prompt_text_manifest.status is ready_for_image_generation", "prototype does not gate image generation on prompt text readiness");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "post_validate.status is pass", "prototype does not gate image generation on post_validate pass");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "post_validate.status is fail", "prototype does not route failed post_validate back to prompt repair");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Batch-generate prototype images", "prototype does not batch-generate images after prompt text");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "PROTO_PROMPT_PACK.yaml", "prototype does not write prompt pack");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.after, "image_generation collection state", "prototype does not write image generation collection state");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "decision audit record internally", "prototype does not write decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "prototype permits manual decision handoff");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not generate HTML", "prototype permits HTML generation");
@@ -159,15 +229,26 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   assertDiscoveryHandoffs(phase, stringList(generated, "handoff_commands", phase), "generated prototype handoffs");
   assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/decisions/<id>/DECISION.yaml", "generated prototype cannot write decision audit");
   assertListIncludes(phase, stringList(generated, "allowed_outputs", phase), ".openworkflow/prototypes/<id>/PROTO_PROMPT_PACK.yaml", "generated prototype missing prompt pack output");
+  assertListIncludes(phase, stringList(generated, "conditional_outputs", phase), ".openworkflow/validation/<id>/VALIDATION.yaml", "generated prototype missing conditional validation output");
 
   const packet = packetRecord(runtime, "/ow:proto", phase);
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "before"], phase), "askUserQuestion", "context packet lost direction-count question behavior");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "product_experience_model", "context packet lost product experience model behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "strategic prototype hypotheses", "context packet lost strategic prompt behavior");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "post_validate.status is pass", "context packet lost post_validate pass gate");
+  assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "during"], phase), "Batch-generate prototype images", "context packet lost image generation behavior");
   assertSomeIncludes(phase, nestedStringList(packet, ["audit_checkpoints", "after"], phase), "decision audit record internally", "context packet lost internal decision audit");
 
   const skill = await readSkill(runtime, "ow-proto");
   for (const tag of [
+    "internal_proto_pipeline",
     "validation_consumption",
+    "preflight_quality_gate",
+    "direction_count_policy",
     "strategic_prompt_pack",
+    "prompt_text_manifest",
+    "post_validate_gate",
+    "image_generation",
     "image_only_boundary",
     "review_evidence",
     "internal_decision_audit",
@@ -175,6 +256,16 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
   assertIncludes(phase, skill, "prompt_pack_type: strategic_proto_prompt_pack", "skill lost strategic prompt pack rule");
+  assertIncludes(phase, skill, "product_experience_model", "skill lost product experience model rule");
+  assertIncludes(phase, skill, "anti_generic_constraints", "skill lost anti-generic constraints rule");
+  assertIncludes(phase, skill, "/ow:vision2prompt and /ow:prompt2proto are internal commands", "skill lost internal proto pipeline rule");
+  assertIncludes(phase, skill, "trigger.mode: agent_auto", "skill lost auto validation provenance rule");
+  assertIncludes(phase, skill, "askUserQuestion", "skill lost direction-count question rule");
+  assertIncludes(phase, skill, "resolved_count: 3", "skill lost delegated default direction count");
+  assertIncludes(phase, skill, "post_validate.status: pass", "skill lost post_validate pass requirement");
+  assertIncludes(phase, skill, "post_validate.status: skipped", "skill lost post_validate skip requirement");
+  assertIncludes(phase, skill, "post_validate.status is fail", "skill lost post_validate failure route");
+  assertIncludes(phase, skill, "Batch-generate prototype images", "skill lost batch image generation rule");
   assertIncludes(phase, skill, "Do not write HTML, CSS, runnable prototypes", "skill lost image-only boundary");
   assertIncludes(phase, skill, "decision_record", "skill does not expose decision artifact contract for internal audit");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in prototype handoffs");
@@ -186,13 +277,69 @@ async function verifyPrototypePhase(runtime: Runtime): Promise<void> {
   const template = recordField(artifactRecord(runtime, "prototype_evidence", phase), "template", phase);
   assertPhase(phase, "prompt_pack_type" in template, "prototype template missing prompt pack type");
   assertPhase(phase, "validation_input" in template, "prototype template missing validation input");
+  assertPhase(phase, "internal_pipeline" in template, "prototype template missing internal pipeline");
+  assertPhase(phase, "preflight_quality_gate" in template, "prototype template missing preflight quality gate");
+  assertPhase(phase, "direction_count_policy" in template, "prototype template missing direction count policy");
+  assertPhase(phase, "normalized_input" in template, "prototype template missing normalized input");
+  assertPhase(phase, "strategic_core" in template, "prototype template missing strategic core");
+  assertPhase(phase, "product_experience_model" in template, "prototype template missing product experience model");
+  assertPhase(phase, "prototype_reality_gate" in template, "prototype template missing prototype reality gate");
   assertPhase(phase, "directions" in template, "prototype template missing directions");
   assertPhase(phase, "build_recommendation" in template, "prototype template missing build recommendation");
+  assertPhase(phase, "prompt_text_manifest" in template, "prototype template missing prompt text manifest");
+  assertPhase(phase, "post_validate" in template, "prototype template missing post-validate gate");
+  assertPhase(phase, "image_generation" in template, "prototype template missing image generation state");
   assertPhase(phase, "negative_constraints" in template, "prototype template missing negative constraints");
   assertPhase(phase, "review_plan" in template, "prototype template missing review plan");
+  const validationInput = recordField(template, "validation_input", phase);
+  assertPhase(phase, !String(validationInput.mode).includes("vision_only"), "prototype template still allows vision_only validation input");
+  const directionPolicy = recordField(template, "direction_count_policy", phase);
+  assertPhase(phase, directionPolicy.resolved_count === 3, "prototype template should default delegated direction count to 3");
+  assertPhase(phase, String(directionPolicy.ask_user_question).includes("strategically different prototype directions"), "prototype template missing direction count askUserQuestion");
   const handoff = recordField(template, "handoff", phase);
   assertPhase(phase, handoff.next_command !== "/ow:decision", "prototype template exposes manual decision as next command");
   assertListIncludes(phase, USER_FACING_DISCOVERY_HANDOFFS, String(handoff.next_command), "prototype template next command is not user-facing");
+}
+
+async function verifyInternalProtoPipelinePhase(runtime: Runtime): Promise<void> {
+  const phase = "internal-proto-pipeline";
+  const buildProtoPrompt = command("build-proto-prompt", phase);
+  const vision2Prompt = command("vision2prompt", phase);
+  const prompt2Proto = command("prompt2proto", phase);
+  assertPhase(phase, buildProtoPrompt.visibility === "internal", "source build-proto-prompt command is not internal");
+  assertPhase(phase, vision2Prompt.visibility === "internal", "source vision2prompt command is not internal");
+  assertPhase(phase, prompt2Proto.visibility === "internal", "source prompt2proto command is not internal");
+  assertPhase(phase, protocolFor(buildProtoPrompt, phase).interactionMode === "internal-build-proto-prompt-pack-compiler", "build-proto-prompt source protocol mismatch");
+  assertPhase(phase, protocolFor(vision2Prompt, phase).interactionMode === "internal-vision-to-strategic-prompt-text", "vision2prompt source protocol mismatch");
+  assertPhase(phase, protocolFor(prompt2Proto, phase).interactionMode === "internal-prompt-text-to-prototype-images", "prompt2proto source protocol mismatch");
+
+  const generatedBuildProtoPrompt = commandRecord(runtime, "build-proto-prompt", phase);
+  const generatedVision2Prompt = commandRecord(runtime, "vision2prompt", phase);
+  const generatedPrompt2Proto = commandRecord(runtime, "prompt2proto", phase);
+  assertPhase(phase, stringField(generatedBuildProtoPrompt, "visibility", phase) === "internal", "generated build-proto-prompt command is not internal");
+  assertPhase(phase, stringField(generatedVision2Prompt, "visibility", phase) === "internal", "generated vision2prompt command is not internal");
+  assertPhase(phase, stringField(generatedPrompt2Proto, "visibility", phase) === "internal", "generated prompt2proto command is not internal");
+
+  const protoHandoffs = stringList(commandRecord(runtime, "proto", phase), "handoff_commands", phase);
+  assertListExcludes(phase, protoHandoffs, "/ow:vision2prompt", "proto exposes vision2prompt as user handoff");
+  assertListExcludes(phase, protoHandoffs, "/ow:prompt2proto", "proto exposes prompt2proto as user handoff");
+
+  const buildProtoPromptSkill = await readSkill(runtime, "ow-build-proto-prompt");
+  const vision2PromptSkill = await readSkill(runtime, "ow-vision2prompt");
+  const prompt2ProtoSkill = await readSkill(runtime, "ow-prompt2proto");
+  assertIncludes(phase, buildProtoPromptSkill, "<command_visibility>internal</command_visibility>", "build-proto-prompt skill is not internal");
+  assertIncludes(phase, buildProtoPromptSkill, "internal-build-proto-prompt-pack-compiler", "build-proto-prompt skill missing compiler mode");
+  assertIncludes(phase, buildProtoPromptSkill, "Do not generate images", "build-proto-prompt skill missing image boundary");
+  assertIncludes(phase, vision2PromptSkill, "<command_visibility>internal</command_visibility>", "vision2prompt skill is not internal");
+  assertIncludes(phase, vision2PromptSkill, "ready_for_image_generation", "vision2prompt skill missing prompt readiness output");
+  assertIncludes(phase, vision2PromptSkill, "product_experience_model", "vision2prompt skill missing product experience model output");
+  assertIncludes(phase, vision2PromptSkill, "anti_generic_constraints", "vision2prompt skill missing anti-generic constraints output");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: pass", "vision2prompt skill missing post_validate pass requirement");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: skipped", "vision2prompt skill missing single-direction skip requirement");
+  assertIncludes(phase, vision2PromptSkill, "post_validate.status: fail", "vision2prompt skill missing post_validate failure repair route");
+  assertIncludes(phase, prompt2ProtoSkill, "<command_visibility>internal</command_visibility>", "prompt2proto skill is not internal");
+  assertIncludes(phase, prompt2ProtoSkill, "post_validate.status pass or skipped", "prompt2proto skill missing post_validate readiness gate");
+  assertIncludes(phase, prompt2ProtoSkill, "Every generated image must record image_id", "prompt2proto skill missing image metadata contract");
 }
 
 async function verifyTunePhase(runtime: Runtime): Promise<void> {
@@ -204,9 +351,17 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, protocol.allowedOutputs, ".openworkflow/decisions/<id>/DECISION.yaml", "tune cannot write decision audit");
   assertListExcludes(phase, protocol.requiredContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune requires prototype index and cannot bootstrap from validation");
   assertListIncludes(phase, protocol.optionalContext, ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "tune optional context missing prototype index");
-  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "accepted baseline screen group", "tune does not require baseline screens");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "latest approved", "tune does not resolve latest baseline");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Normalize tune inputs", "tune does not normalize inputs before audit");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "baseline_resolution", "tune does not record baseline resolution");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Carry forward locked screens", "tune does not carry forward locked elements");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.before, "Assign stable source screen ids", "tune does not assign stable source ids");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Interpret the tune request", "tune does not interpret tune request modes");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "Detect conflicts", "tune does not detect tune conflicts");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "MUST_INHERIT", "tune does not require delta rules");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "screen_delta_matrix", "tune does not require screen delta matrix");
   assertSomeIncludes(phase, protocol.auditCheckpoints.during, "target screen id", "tune does not bind screen prompts");
+  assertSomeIncludes(phase, protocol.auditCheckpoints.during, "generation_order", "tune does not require generation order");
   assertSomeIncludes(phase, protocol.auditCheckpoints.after, "internal decision audit record", "tune does not record decision audit internally");
   assertSomeIncludes(phase, protocol.antiPatterns, "Do not ask the user to manually invoke /ow:decision", "tune permits manual decision handoff");
 
@@ -219,11 +374,31 @@ async function verifyTunePhase(runtime: Runtime): Promise<void> {
   assertListIncludes(phase, stringList(packet, "optional", phase), ".openworkflow/prototypes/PROTOTYPE_INDEX.yaml", "context packet optional context missing prototype index");
 
   const skill = await readSkill(runtime, "ow-tune");
-  for (const tag of ["target_resolution", "baseline_screen_audit", "inheritance_delta_rules", "screen_manifest", "internal_decision_audit"]) {
+  for (const tag of [
+    "target_resolution",
+    "multi_round_baseline_inheritance",
+    "input_normalization",
+    "baseline_screen_audit",
+    "product_system_extraction",
+    "tune_request_interpretation",
+    "inheritance_delta_rules",
+    "screen_manifest",
+    "refined_prompt_pack_output",
+    "internal_decision_audit",
+  ]) {
     assertIncludes(phase, skill, `<${tag}>`, `skill missing ${tag} block`);
   }
-  assertIncludes(phase, skill, "/ow:tune resolves to the current prototype prompt pack or accepted baseline screen group by default.", "skill lost default target behavior");
+  assertIncludes(phase, skill, "/ow:tune resolves to the latest approved prototype prompt pack", "skill lost default target behavior");
+  assertIncludes(phase, skill, "<multi_round_baseline_inheritance>", "skill lost multi-round inheritance block");
+  assertIncludes(phase, skill, "baseline_resolution with latest_approved_baseline_group_id", "skill lost baseline resolution rule");
+  assertIncludes(phase, skill, "carry_forward with locked_screens", "skill lost carry-forward rule");
+  assertIncludes(phase, skill, "Never silently regenerate from stale source screens", "skill permits stale source fallback");
+  assertIncludes(phase, skill, "Normalize baseline_source_type", "skill lost input normalization rule");
+  assertIncludes(phase, skill, "Extract product thesis", "skill lost product system extraction rule");
+  assertIncludes(phase, skill, "Classify the request", "skill lost tune request interpretation rule");
+  assertIncludes(phase, skill, "screen_delta_matrix rows", "skill lost screen delta matrix rule");
   assertIncludes(phase, skill, "Every screen prompt must include prompt_id", "skill lost screen manifest rule");
+  assertIncludes(phase, skill, "Generation Order, and Acceptance Checklist", "skill lost refined prompt pack output structure");
   assertIncludes(phase, skill, "Every tune pass must write or update a decision audit record internally.", "skill lost decision audit requirement");
   assertIncludes(phase, skill, "Do not expose /ow:decision as the next manual user step", "skill exposes decision as user step");
   assertNotIncludes(phase, extractBlock(skill, "handoff_commands"), "/ow:decision", "skill exposes decision in tune handoffs");

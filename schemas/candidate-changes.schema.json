@@ -49,10 +49,71 @@
       "type": "object"
     },
     "queue_policy": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "branch_boundary": {
+          "type": "string"
+        },
+        "source_of_truth": {
+          "type": "string"
+        },
+        "readable_view": {
+          "type": "string"
+        },
+        "id_policy": {
+          "type": "string"
+        },
+        "selected_change_commit_gate": {
+          "enum": [
+            "strict",
+            "migration"
+          ]
+        }
+      },
+      "additionalProperties": true
     },
     "selection_policy": {
       "type": "object"
+    },
+    "scope_control": {
+      "type": "object",
+      "properties": {
+        "current_boundary": {
+          "type": "string"
+        },
+        "boundary_type": {
+          "type": "string"
+        },
+        "in_scope_rule": {
+          "type": "string"
+        },
+        "out_of_scope_rule": {
+          "type": "string"
+        },
+        "deferred_features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "reason"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "suggested_plan_id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
     },
     "next_recommended_candidate_id": {
       "type": [
@@ -149,7 +210,40 @@
             "type": "object"
           },
           "completion": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "completed_by_change_id": {
+                "type": "string"
+              },
+              "completed_at": {
+                "type": "string"
+              },
+              "implementation_changed_files": {
+                "type": "boolean"
+              },
+              "commit_not_required_reason": {
+                "type": "string"
+              },
+              "local_commit_evidence": {
+                "type": "string"
+              },
+              "local_commit_evidence_path": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "validation": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
           }
         },
         "additionalProperties": true

@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:C003-vision-generated-protocol
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: C003-vision-generated-protocol
+source_plan_id: M84-vision-delayed-compile-proto-readiness
+source_candidate_id: C003
+title: Atom tasks for /ow:vision generated protocol
+status: completed
+tasks:
+  - task_id: T001
+    title: Update source command protocol
+    status: done
+    type: edit
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+    done_when: >
+      /ow:vision source protocol names product partner, requirements
+      interrogator, intent compiler, delayed compile modes, and
+      proto-readiness compile gate.
+  - task_id: T002
+    title: Refresh generated OW surfaces
+    status: done
+    type: generate
+    owned_paths:
+      - .agents/skills/ow-vision/SKILL.md
+      - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+    done_when: >
+      openworkflow sync regenerates the /ow:vision skill and audit packets from
+      the source registry changes.
+  - task_id: T003
+    title: Strengthen verification
+    status: done
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyWorkflowE2E.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Verification asserts that source, context packet, and generated skill
+      preserve the new vision protocol.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-22
+  primary_commit: 010ab1af29850200987ad80a7023f27024a7e1eb

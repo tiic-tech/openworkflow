@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:C001-workflow-command-taxonomy
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: C001-workflow-command-taxonomy
+source_plan_id: M73-workflow-blueprint-runtime-alignment
+source_candidate_id: C001
+title: Define workflow command taxonomy and stage graph
+status: selected
+selection_reason:
+  - AC recommended C001 as the first non-high-risk change in M73.
+  - C001 prevents DTC, AC, and SC from being mistaken for the full OpenWorkflow workflow.
+  - C001 creates the design boundary required before high-risk runtime exposure candidates.
+rejected_alternatives:
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: null
+    reason: Proto2html is a deferred feature ref and should receive its own future DTC queue.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: null
+    reason: Build command planning is a deferred feature ref and should receive its own future DTC queue.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: null
+    reason: Async review is a deferred feature ref and should receive its own future DTC queue.
+  - plan_id: M73-workflow-blueprint-runtime-alignment
+    candidate_id: null
+    reason: Archive transaction is a deferred feature ref and should receive its own future DTC queue.
+scope:
+  includes:
+    - workflow command taxonomy
+    - stage graph for the full product-to-implementation path
+    - boundary between /ow:change and DTC/AC/SC
+    - deferred feature refs for remaining runtime surfaces
+  excludes:
+    - runtime command implementation
+    - adapter generation
+    - artifact registry implementation
+owned_paths:
+  - references/workflow-blueprint-runtime-alignment.md
+  - changes/M73-workflow-blueprint-runtime-alignment/C001-workflow-command-taxonomy/
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CANDIDATE_CHANGES.md
+  - changes/M73-workflow-blueprint-runtime-alignment/SUMMARY.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.yaml
+  - changes/M73-workflow-blueprint-runtime-alignment/CHANGE_ANALYSIS.md
+forbidden_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/adapters/
+  - .agents/
+  - .openworkflow/
+acceptance:
+  - Workflow graph matches the user-approved blueprint.
+  - Command taxonomy separates primary, internal, advanced, and async surfaces.
+  - DTC, AC, and SC are explicitly scoped to the /ow:change loop.
+  - Runtime implementation features remain deferred and require separate DTC queues.
+validation:
+  - npm run validate
+  - git diff --check
+created_at: 2026-05-21
+updated_at: 2026-05-21

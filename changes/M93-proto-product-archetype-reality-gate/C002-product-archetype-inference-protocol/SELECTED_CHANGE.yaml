@@ -1,0 +1,72 @@
+schema_version: 0.1.0
+contract_id: selected_change:M93-proto-product-archetype-reality-gate:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M93-proto-product-archetype-reality-gate
+candidate_id: C002
+change_id: C002-product-archetype-inference-protocol
+title: Wire product-archetype inference into /ow:vision2prompt
+status: completed
+selected_at: 2026-05-22
+selected_by: agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M93-proto-product-archetype-reality-gate/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Select C002 after C001 completed the product_experience_model contract. C002
+  is the next dependency-satisfied medium-risk candidate and wires that contract
+  into generated /ow:proto and /ow:vision2prompt behavior.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - skills/build-prototype/SKILL.md
+  - skills/build-prototype/references/strategic-prompt-pack-protocol.md
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-proto/SKILL.md
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M93-proto-product-archetype-reality-gate/
+dependencies:
+  - C001
+scope:
+  includes:
+    - command registry protocol updates for /ow:proto and /ow:vision2prompt
+    - generated ow-proto and ow-vision2prompt skill guidance through sync
+    - strategic prompt-pack protocol reference updates
+    - explicit rule that scenarios may be modules/states inside one product shell, not always separate directions
+    - generic AI dashboard anti-pattern rules
+  excludes:
+    - schema design already owned by C001
+    - deterministic gate implementation owned by C003
+    - smart city fixture assertions owned by C004
+    - external references or image input
+forbidden_paths:
+  - external image generation calls
+  - generated prototype image assets
+  - provider-specific runtime code
+  - proto2html or production implementation artifacts
+acceptance:
+  - Generated /ow:vision2prompt requires product_experience_model before directions.
+  - Generated /ow:proto explains that VISION-only input must infer target product category and product loop before image prompt text.
+  - Protocol guidance separates strategic directions from modules, scenarios, and interaction states inside one product shell.
+  - The protocol converts non-goals and category anti-patterns into negative prompt constraints.
+  - Runtime-surface verification catches loss of product-archetype inference guidance.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    C002 changes local command protocol source and generated adapter surfaces.
+    It does not introduce external service calls, image generation, runtime
+    execution, or production implementation.
+completion:
+  completed_at: 2026-05-22
+  evidence:
+    - changes/M93-proto-product-archetype-reality-gate/C002-product-archetype-inference-protocol/LOCAL_CHANGE_EVIDENCE.yaml

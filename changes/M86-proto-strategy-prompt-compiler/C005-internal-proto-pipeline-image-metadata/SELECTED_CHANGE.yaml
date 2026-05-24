@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: selected_change:M86-proto-strategy-prompt-compiler:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M86-proto-strategy-prompt-compiler
+candidate_id: C005
+change_id: C005-internal-proto-pipeline-image-metadata
+title: Define internal proto pipeline and image metadata
+status: selected
+selected_at: 2026-05-22
+selected_by: user+agent
+risk: medium
+size: medium
+selection_source:
+  queue: changes/M86-proto-strategy-prompt-compiler/CANDIDATE_CHANGES.yaml
+selection_reason: >
+  Internal command decomposition reduces per-command context and output pressure
+  for agents. It should land before C004 so stress fixtures verify the final
+  decomposed proto shape.
+owned_paths:
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/artifacts/registry.ts
+  - schemas/proto-prompt-pack.schema.json
+  - schemas/prototype-evidence.schema.json
+  - packages/core/src/validators/validateOpenWorkflow.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/cli/src/dev/verifyWorkflowE2E.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - .agents/skills/ow-vision2prompt/SKILL.md
+  - .agents/skills/ow-prompt2proto/SKILL.md
+  - .openworkflow/audit/COMMAND_AUDIT_INDEX.yaml
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .openworkflow/audit/ARTIFACT_CONTRACTS.yaml
+  - changes/M86-proto-strategy-prompt-compiler/
+dependencies:
+  - C001
+  - C002
+  - C003
+acceptance:
+  - /ow:vision2prompt and /ow:prompt2proto are registered as internal commands, not user-facing handoffs.
+  - /ow:proto remains the user-facing orchestrator for preflight, vision2prompt, and prompt2proto.
+  - Prototype artifacts record internal_pipeline stage ownership and outputs.
+  - Every generated image entry requires image_id, direction_id, prompt_id, path, and metadata.
+  - Generated skills and context packets include the internal pipeline boundary.
+  - Verification catches accidental user-facing exposure of internal proto commands.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:e2e-workflow
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --json
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+high_risk:
+  approval_required: false
+  reason: >
+    This registers internal command surfaces and artifact metadata only. It does
+    not expose a new user-facing command, connect an external image API, or
+    implement proto2html/runtime generation.

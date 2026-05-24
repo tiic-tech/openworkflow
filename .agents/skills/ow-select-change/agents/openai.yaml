@@ -1,0 +1,5 @@
+# generated-by: openworkflow; adapter: codex; adapter-version: 0.1.0; template-id: codex.skill-interface.ow.select-change
+interface:
+  display_name: "ow:select-change"
+  short_description: "Select one implementable candidate change and create implementation-ready planning artifacts."
+  default_prompt: "Use /ow:select-change for this OpenWorkflow repository."
