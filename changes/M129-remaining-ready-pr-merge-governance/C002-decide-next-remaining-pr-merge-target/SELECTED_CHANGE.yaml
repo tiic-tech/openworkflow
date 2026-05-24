@@ -1,0 +1,65 @@
+schema_version: 0.1.0
+contract_id: selected_change:M129-remaining-ready-pr-merge-governance:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C002
+title: Decide next remaining PR merge target and stop gates
+status: done
+selected_at: 2026-05-25T00:11:11+08:00
+selection_reason: >
+  C002 was the queue's next recommended ready candidate after C001 refreshed
+  current merge-readiness facts. It converts the read-only evidence into one
+  next merge-target recommendation without approving or executing a merge.
+source_candidate:
+  id: C002
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - compare remaining PRs by refreshed ancestry, mergeability, review/check state, dependency order, and blast radius
+    - recommend exactly one next merge target or stop with blockers
+    - define exact approval text required for the later merge decision packet candidate
+  excludes:
+    - executing gh pr merge
+    - changing PR state
+    - branch push, force-push, reset, rebase, branch deletion, revert, or split/surgery
+owned_paths:
+  - changes/M129-remaining-ready-pr-merge-governance/
+forbidden_operations:
+  - gh pr merge
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh issue edit
+  - git push
+  - git reset
+  - git rebase
+  - git checkout
+  - branch deletion
+  - force-push
+acceptance:
+  - Exactly one next merge target is recommended, or blockers are recorded.
+  - Deferred PRs remain open and untouched.
+  - The decision packet does not approve merge execution.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote origin refs/heads/main refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - git fetch origin main
+  - git merge-base --is-ancestor <candidate-a> <candidate-b>
+  - git rev-list --count origin/main..<head-oid>
+  - git rev-list --count <head-oid>..origin/main
+  - git merge-tree --write-tree origin/main <head-oid>
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+evidence:
+  - changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/MERGE_READINESS_REFRESH.md
+  - changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/NEXT_MERGE_TARGET_DECISION.md
+commit_boundary:
+  expected: one coherent local commit for M129 C002 planning evidence if the user requests commit
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C002 records governance decision evidence and queue maintenance only; no
+    product source or runtime implementation files changed.

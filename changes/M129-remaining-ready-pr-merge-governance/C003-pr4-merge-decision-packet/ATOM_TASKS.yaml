@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M129-remaining-ready-pr-merge-governance:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C003
+title: Atom tasks for C003 PR #4 merge decision packet
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm approval and selected PR
+    type: read
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      User approval text matches the C002-required C003 packet approval and
+      PR #4 is confirmed as the selected target.
+  - task_id: T002
+    title: Refresh PR #4 read-only metadata
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      PR #4 state, draft flag, head/base refs, OIDs, mergeability, review
+      decision, and checks are recorded.
+  - task_id: T003
+    title: Verify remote refs and merge checkpoint
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      Remote main and PR #4 head refs are verified, and merge-tree evidence is
+      recorded without remote mutation.
+  - task_id: T004
+    title: Write high-risk decision report
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/HIGH_RISK_DECISION_REPORT.md
+    done_when: >
+      The report names PR #4, the exact merge command, stop gates, rollback
+      limits, and the exact C004 approval text.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      YAML parses, OpenWorkflow validation passes, summary strict check passes,
+      and git diff whitespace is clean.

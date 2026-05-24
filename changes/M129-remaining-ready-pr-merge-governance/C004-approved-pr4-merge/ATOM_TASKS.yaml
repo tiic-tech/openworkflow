@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M129-remaining-ready-pr-merge-governance:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C004
+title: Atom tasks for C004 approved PR #4 merge
+status: done
+tasks:
+  - task_id: T001
+    title: Verify exact approval and PR #4 state
+    type: read
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      User approval matches the C003-required C004 text and PR #4 is open,
+      non-draft, mergeable, and at the expected head.
+  - task_id: T002
+    title: Execute only the approved merge command
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/
+    done_when: >
+      The exact approved gh pr merge command exits successfully and no
+      additional remote mutation command is run.
+  - task_id: T003
+    title: Record post-merge state
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/
+    done_when: >
+      PR #4 merged state, merge commit, remote main, local origin/main, and
+      remaining open PRs are recorded.
+  - task_id: T004
+    title: Update M129 queue and summary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      C004 is marked done, C005 is ready, and M129 records the remaining merge
+      governance boundary.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      YAML parses, OpenWorkflow validation passes, summary strict check passes,
+      and git diff whitespace is clean.

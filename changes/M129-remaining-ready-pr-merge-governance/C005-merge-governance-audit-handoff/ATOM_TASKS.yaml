@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M129-remaining-ready-pr-merge-governance:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C005
+title: Atom tasks for C005 final merge governance audit handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Read C001-C004 evidence
+    type: read
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      C001 refresh, C002 decision, C003 high-risk packet, and C004 merge
+      evidence are known.
+  - task_id: T002
+    title: Refresh remaining PR state
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/
+    done_when: >
+      Remaining PR #5 and PR #7 states, heads, mergeability, and remote main
+      are recorded.
+  - task_id: T003
+    title: Write final audit handoff
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/
+    done_when: >
+      M129 final audit records completed merge, remaining boundary, and
+      unauthorized operations not performed.
+  - task_id: T004
+    title: Update queue and summary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      C005 is marked done, the queue is complete, and future governance is
+      recorded as the next boundary.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      YAML parses, OpenWorkflow validation passes, summary strict check passes,
+      and git diff whitespace is clean.

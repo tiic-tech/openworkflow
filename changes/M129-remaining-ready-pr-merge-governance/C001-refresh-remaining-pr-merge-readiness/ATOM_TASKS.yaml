@@ -1,0 +1,55 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M129-remaining-ready-pr-merge-governance:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C001
+title: Atom tasks for C001 refresh remaining PR merge-readiness
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm C001 boundary and existing queue facts
+    type: read
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      The queue, branch exception, candidate dependencies, exclusions, and
+      validation expectations are known before collecting live evidence.
+  - task_id: T002
+    title: Capture current PR and remote head facts
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/
+    done_when: >
+      Current PR API metadata and remote branch OIDs are recorded for PR #4,
+      PR #5, PR #7, and origin/main.
+  - task_id: T003
+    title: Compute local ancestry and merge-tree signals
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/
+    done_when: >
+      Each PR head has local commit presence, merge-base, ahead/behind counts,
+      origin/main ancestry result, and merge-tree result recorded.
+  - task_id: T004
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      C001 is marked done, C002 is made ready, and the summary points to the
+      C001 evidence packet.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      YAML parses, OpenWorkflow validation passes, summary strict check passes
+      or known unrelated limitations are recorded, and git diff whitespace is
+      clean.

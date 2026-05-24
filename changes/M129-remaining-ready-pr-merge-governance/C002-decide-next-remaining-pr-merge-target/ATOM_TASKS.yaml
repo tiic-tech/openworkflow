@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M129-remaining-ready-pr-merge-governance:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C002
+title: Atom tasks for C002 decide next remaining PR merge target
+status: done
+tasks:
+  - task_id: T001
+    title: Reconfirm C001 evidence and C002 scope
+    type: read
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      C001 evidence, C002 acceptance criteria, exclusions, and queue status are
+      known before selecting a target.
+  - task_id: T002
+    title: Refresh current read-only PR and remote facts
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/
+    done_when: >
+      Current PR API state, remote heads, and local main state are confirmed
+      without mutating remote state.
+  - task_id: T003
+    title: Compare candidates by readiness and dependency order
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/
+    done_when: >
+      PR #4, PR #5, and PR #7 are compared by mergeability, checks, ancestry,
+      ahead/behind counts, and blast radius.
+  - task_id: T004
+    title: Record next target and approval gate
+    type: document
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/
+    done_when: >
+      Exactly one next merge target is recommended, deferred PRs remain
+      untouched, and the C003 approval text is explicit.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M129-remaining-ready-pr-merge-governance/
+    done_when: >
+      YAML parses, OpenWorkflow validation passes, summary strict check passes,
+      and git diff whitespace is clean.

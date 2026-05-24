@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:M129-remaining-ready-pr-merge-governance:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C005
+title: Complete remaining PR merge governance audit handoff
+status: done
+selected_at: 2026-05-25T00:25:26+08:00
+selection_reason: >
+  C005 was the next recommended ready candidate after C004 merged PR #4. It
+  closes M129 by recording final audit evidence, unauthorized operations not
+  performed, and the remaining PR boundary.
+source_candidate:
+  id: C005
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - summarize C001-C004 evidence
+    - record final PR states and unauthorized operations not performed
+    - recommend the next queue for any remaining PR merges or blockers
+  excludes:
+    - new merge execution
+    - PR edit, Issue mutation, push, branch surgery, revert, or product source change
+owned_paths:
+  - changes/M129-remaining-ready-pr-merge-governance/
+acceptance:
+  - M129 final audit explains whether merge remains blocked, deferred, or completed.
+  - Remaining open PRs are explicitly handed off to follow-up governance.
+  - No unauthorized operation is recorded.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+result:
+  status: complete
+  merged_pr:
+    number: 4
+    merge_commit: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  remote_main: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  remaining_open_prs:
+    - number: 5
+      mergeable: MERGEABLE
+    - number: 7
+      mergeable: MERGEABLE
+evidence:
+  - changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M129_MERGE_GOVERNANCE_AUDIT.md
+commit_boundary:
+  expected: one coherent local commit for M129 planning and merge evidence if the user requests commit
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C005 records audit handoff and planning queue maintenance only; no product
+    source or runtime implementation files changed locally.

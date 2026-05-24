@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+contract_id: selected_change:M129-remaining-ready-pr-merge-governance:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M129-remaining-ready-pr-merge-governance
+change_id: C004
+title: Execute approved PR #4 merge
+status: done
+selected_at: 2026-05-25T00:20:50+08:00
+selection_reason: >
+  User provided the exact C004 approval text from the C003 high-risk decision
+  report. C004 executed only the approved PR #4 merge command after confirming
+  PR #4 still matched the expected head and readiness state.
+approval_text: >
+  Approve M129 C004 merge PR #4: run gh pr merge 4 --repo
+  tiic-tech/openworkflow --merge --match-head-commit
+  bd2780b1d5b117b2734e5b732164e5d299bd521a
+approved_command: gh pr merge 4 --repo tiic-tech/openworkflow --merge --match-head-commit bd2780b1d5b117b2734e5b732164e5d299bd521a
+source_candidate:
+  id: C004
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C003
+scope:
+  includes:
+    - verify exact approval text
+    - verify selected PR still matches expected head/base state
+    - run only the approved gh pr merge command
+    - record resulting PR/base metadata and remaining merge boundary
+  excludes:
+    - merging any additional PR
+    - push, force-push, rebase, reset, branch deletion, revert, or split/surgery
+    - PR body edits, Issue mutation, or product source changes
+owned_paths:
+  - changes/M129-remaining-ready-pr-merge-governance/
+selected_pr:
+  number: 4
+  url: https://github.com/tiic-tech/openworkflow/pull/4
+  title: OpenWorkflow M102-selected-change-commit-gate
+  head_ref: codex/m102-selected-change-commit-gate
+  expected_head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  base_ref: main
+result:
+  state: MERGED
+  merged_at: 2026-05-24T16:20:31Z
+  merge_commit: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  remote_main_after_merge: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  local_origin_main_after_fetch: b77418e2fe9b1f6eda213e52f495364bb1861e94
+acceptance:
+  - Only the exact approved PR is merged.
+  - Local evidence records approval, command, result, and remaining merge boundary.
+  - No additional remote mutation occurs.
+validation:
+  - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,title
+  - git ls-remote origin refs/heads/main refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git fetch origin main
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+evidence:
+  - changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/MERGE_EVIDENCE.md
+commit_boundary:
+  expected: one coherent local commit for M129 C004 merge evidence if the user requests commit
+  implementation_changed_files: false
+  commit_not_required_reason: >
+    C004 records approved remote merge evidence and planning queue maintenance
+    only; no product source or runtime implementation files changed locally.

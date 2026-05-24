@@ -1,0 +1,244 @@
+schema_version: 0.1.0
+contract_id: summary:M129-remaining-ready-pr-merge-governance
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M129-remaining-ready-pr-merge-governance
+title: Summary for remaining ready PR merge governance
+status: complete
+source:
+  kind: mixed
+  summary: >
+    M129 was created after M128 merged PR #6 into main at merge commit
+    8656ed135c7a57c5b515572fa06bc082aabdcb95. C001 refreshed the remaining
+    open PRs against the new main, and C002 selected PR #4 as the next
+    merge-governance target. C003 prepared the PR #4 high-risk merge decision
+    packet and exact C004 approval gate. C004 merged PR #4 with exact approval
+    and recorded the remaining PR boundary. C005 completed final audit handoff.
+  refs:
+    - user_input:2026-05-24-create-m129-after-m128
+    - changes/M128-ready-pr-merge-governance/SUMMARY.yaml
+    - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M128_MERGE_GOVERNANCE_AUDIT.md
+scope_boundary: >
+  Merge governance for remaining open ready PRs after PR #6 merged: PR #4, PR
+  #5, and PR #7.
+branch_boundary: codex/m129-remaining-ready-pr-merge-governance
+branch_identity_exception:
+  mode: temporary_continuation_branch
+  current_branch: codex/m122-m71-historical-stack-publication
+  allowed_operations:
+    - local planning artifact creation
+    - local validation
+  reason: >
+    M129 was created as local DTC planning after M128 was committed on the
+    existing aggregate governance branch. No branch creation, checkout, push,
+    merge, PR edit, Issue mutation, or branch surgery occurred.
+target_base:
+  remote: origin
+  branch: main
+  head_oid: b77418e2fe9b1f6eda213e52f495364bb1861e94
+source_merge:
+  pr_number: 6
+  state: MERGED
+  merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+target_prs:
+  - number: 4
+    url: https://github.com/tiic-tech/openworkflow/pull/4
+    title: OpenWorkflow M102-selected-change-commit-gate
+    state: OPEN
+    draft: false
+    head_ref: codex/m102-selected-change-commit-gate
+    head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+  - number: 5
+    url: https://github.com/tiic-tech/openworkflow/pull/5
+    title: "M117: Git automation remote readiness governance"
+    state: OPEN
+    draft: false
+    head_ref: codex/m117-git-automation-remote-readiness
+    head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+  - number: 7
+    url: https://github.com/tiic-tech/openworkflow/pull/7
+    title: "M101 shared stack: M105/M106/M115 governance updates"
+    state: OPEN
+    draft: false
+    head_ref: codex/m101-build-proto-prompt-command-split
+    head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+candidate_count: 5
+completed_candidate_id: C005
+completed_change_id: null
+next_recommended_candidate_id: null
+selected_candidate_id: C005
+selected_change_id: C005
+outputs:
+  candidate_changes_yaml: changes/M129-remaining-ready-pr-merge-governance/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M129-remaining-ready-pr-merge-governance/CANDIDATE_CHANGES.md
+  summary: changes/M129-remaining-ready-pr-merge-governance/SUMMARY.yaml
+  c001_selected_change: changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/SELECTED_CHANGE.yaml
+  c001_atom_tasks: changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/ATOM_TASKS.yaml
+  c001_implementation_brief: changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/IMPLEMENTATION_BRIEF.md
+  c001_merge_readiness_refresh: changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/MERGE_READINESS_REFRESH.md
+  c002_selected_change: changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/SELECTED_CHANGE.yaml
+  c002_atom_tasks: changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/ATOM_TASKS.yaml
+  c002_implementation_brief: changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/IMPLEMENTATION_BRIEF.md
+  c002_next_merge_target_decision: changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/NEXT_MERGE_TARGET_DECISION.md
+  high_risk_decision_report: changes/M129-remaining-ready-pr-merge-governance/HIGH_RISK_DECISION_REPORT.md
+  c003_selected_change: changes/M129-remaining-ready-pr-merge-governance/C003-pr4-merge-decision-packet/SELECTED_CHANGE.yaml
+  c003_atom_tasks: changes/M129-remaining-ready-pr-merge-governance/C003-pr4-merge-decision-packet/ATOM_TASKS.yaml
+  c003_implementation_brief: changes/M129-remaining-ready-pr-merge-governance/C003-pr4-merge-decision-packet/IMPLEMENTATION_BRIEF.md
+  c004_selected_change: changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/SELECTED_CHANGE.yaml
+  c004_atom_tasks: changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/ATOM_TASKS.yaml
+  c004_implementation_brief: changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/IMPLEMENTATION_BRIEF.md
+  c004_merge_evidence: changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/MERGE_EVIDENCE.md
+  c005_selected_change: changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml
+  c005_atom_tasks: changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/ATOM_TASKS.yaml
+  c005_implementation_brief: changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  c005_audit_handoff: changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M129_MERGE_GOVERNANCE_AUDIT.md
+key_dependencies:
+  - M128 merged PR #6 into main at 8656ed135c7a57c5b515572fa06bc082aabdcb95.
+  - PR #4, PR #5, and PR #7 remain open and non-draft.
+  - C001 refreshed remaining PRs against the new main.
+  - C002 selected PR #4 as the next merge-governance target.
+  - C003 prepared the PR #4 high-risk merge decision packet.
+  - C004 merged PR #4 and remote main is now b77418e2fe9b1f6eda213e52f495364bb1861e94.
+  - C005 completed final M129 audit handoff.
+selected_target:
+  candidate_id: C002
+  pr_number: 4
+  url: https://github.com/tiic-tech/openworkflow/pull/4
+  title: OpenWorkflow M102-selected-change-commit-gate
+  head_ref: codex/m102-selected-change-commit-gate
+  head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+  required_c003_approval_text: >
+    Approve M129 C003 decision packet: prepare PR #4 merge high-risk decision
+    packet; do not run gh pr merge, push, edit PRs, mutate Issues, or perform
+    branch surgery.
+  proposed_merge_command: gh pr merge 4 --repo tiic-tech/openworkflow --merge --match-head-commit bd2780b1d5b117b2734e5b732164e5d299bd521a
+  required_c004_approval_text: >
+    Approve M129 C004 merge PR #4: run gh pr merge 4 --repo
+    tiic-tech/openworkflow --merge --match-head-commit
+    bd2780b1d5b117b2734e5b732164e5d299bd521a
+merge_result:
+  candidate_id: C004
+  pr_number: 4
+  state: MERGED
+  merged_at: 2026-05-24T16:20:31Z
+  merge_commit: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  remote_main_after_merge: b77418e2fe9b1f6eda213e52f495364bb1861e94
+remaining_open_prs_after_c004:
+  - number: 5
+    url: https://github.com/tiic-tech/openworkflow/pull/5
+    title: "M117: Git automation remote readiness governance"
+    state: OPEN
+    draft: false
+    head_ref: codex/m117-git-automation-remote-readiness
+    head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+    review_decision: ""
+    status_check_rollup: []
+  - number: 7
+    url: https://github.com/tiic-tech/openworkflow/pull/7
+    title: "M101 shared stack: M105/M106/M115 governance updates"
+    state: OPEN
+    draft: false
+    head_ref: codex/m101-build-proto-prompt-command-split
+    head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+    base_ref: main
+    base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    mergeable: MERGEABLE
+final_audit:
+  completed_at: 2026-05-25T00:25:26+08:00
+  status: complete
+  audit_path: changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M129_MERGE_GOVERNANCE_AUDIT.md
+  next_boundary: M130-remaining-pr5-pr7-merge-governance
+  next_boundary_reason: >
+    Remaining PR #5 and PR #7 must be refreshed against main at
+    b77418e2fe9b1f6eda213e52f495364bb1861e94 before any further merge
+    decision packet or merge execution.
+    review_decision: ""
+    status_check_rollup: []
+risks:
+  - id: R001
+    level: high
+    description: Merging any remaining PR mutates main and repository collaboration state.
+    mitigation: Require C003 high-risk decision packet and exact operation-level approval before C004.
+  - id: R002
+    level: medium
+    description: GitHub PR metadata still reports the pre-PR #6 base OID for remaining PRs.
+    mitigation: C001 must refresh against remote main head 8656ed135c7a57c5b515572fa06bc082aabdcb95.
+  - id: R003
+    level: high
+    description: PR #7 is the shared M101-derived stack and may still need split/surgery if review rejects the shared branch.
+    mitigation: Keep split/surgery out of M129 and require a separate high-risk queue if needed.
+unresolved_questions: []
+deferred_features:
+  - future-remaining-pr-merge-governance
+  - future-pr6-revert-governance
+  - future-m101-shared-stack-split-governance
+validation:
+  commands_run:
+    - git status --short --branch
+    - node dist/cli/src/index.js check /ow:decompose-to-changes --root . --json
+    - node dist/cli/src/index.js resume --root . --json
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+    - ruby -e "require 'yaml'; ARGV.each { |p| YAML.load_file(p); puts \"ok #{p}\" }" changes/M129-remaining-ready-pr-merge-governance/CANDIDATE_CHANGES.yaml changes/M129-remaining-ready-pr-merge-governance/SUMMARY.yaml changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/SELECTED_CHANGE.yaml changes/M129-remaining-ready-pr-merge-governance/C004-approved-pr4-merge/ATOM_TASKS.yaml
+    - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+    - ruby -e "require 'yaml'; ARGV.each { |p| YAML.load_file(p); puts \"ok #{p}\" }" changes/M129-remaining-ready-pr-merge-governance/CANDIDATE_CHANGES.yaml changes/M129-remaining-ready-pr-merge-governance/SUMMARY.yaml changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml changes/M129-remaining-ready-pr-merge-governance/C005-merge-governance-audit-handoff/ATOM_TASKS.yaml
+    - git ls-remote origin refs/heads/main refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+    - git fetch origin main
+    - git rev-parse origin/main
+    - git merge-base origin/main <head-oid>
+    - git merge-base --is-ancestor origin/main <head-oid>
+    - git rev-list --count origin/main..<head-oid>
+    - git rev-list --count <head-oid>..origin/main
+    - git merge-tree --write-tree origin/main <head-oid>
+    - git merge-base --is-ancestor <candidate-a> <candidate-b>
+    - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote origin refs/heads/main refs/heads/codex/m102-selected-change-commit-gate
+    - gh pr merge 4 --repo tiic-tech/openworkflow --merge --match-head-commit bd2780b1d5b117b2734e5b732164e5d299bd521a
+    - gh pr view 4 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup,title
+    - git ls-remote origin refs/heads/main refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+    - ruby -e "require 'yaml'; ARGV.each { |p| YAML.load_file(p); puts \"ok #{p}\" }" changes/M129-remaining-ready-pr-merge-governance/CANDIDATE_CHANGES.yaml changes/M129-remaining-ready-pr-merge-governance/SUMMARY.yaml changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/SELECTED_CHANGE.yaml changes/M129-remaining-ready-pr-merge-governance/C001-refresh-remaining-pr-merge-readiness/ATOM_TASKS.yaml changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/SELECTED_CHANGE.yaml changes/M129-remaining-ready-pr-merge-governance/C002-decide-next-remaining-pr-merge-target/ATOM_TASKS.yaml changes/M129-remaining-ready-pr-merge-governance/C003-pr4-merge-decision-packet/SELECTED_CHANGE.yaml changes/M129-remaining-ready-pr-merge-governance/C003-pr4-merge-decision-packet/ATOM_TASKS.yaml
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+    - git status --short --branch
+  notes: |
+    - DTC readiness returned ok:true with a warning that CURRENT_STATE next_command is /ow:vision;
+      the user explicitly requested M129 queue creation after committing M128.
+    - M129 queue creation performed no remote mutation.
+    - C001 created SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, IMPLEMENTATION_BRIEF.md, and
+      MERGE_READINESS_REFRESH.md inside the M129 queue.
+    - C001 performed no merge, push, PR edit, Issue mutation, branch creation, branch checkout,
+      branch surgery, destructive git operation, revert, or product source edit.
+    - C001 found PR #4, PR #5, and PR #7 open, non-draft, API-mergeable, with remote heads
+      matching PR API head OIDs. GitHub PR API baseRefOid still reports old d0e13f4..., while
+      refreshed origin/main is 8656ed135c7a57c5b515572fa06bc082aabdcb95.
+    - C002 was completed and selected PR #4 as the next merge target.
+    - C002 selected PR #4 as the next merge-governance target because it is independent
+      from PR #5/#7 in the observed ancestry matrix, has the smallest ahead count, and
+      has clean readiness signals.
+    - PR #7 is an ancestor of PR #5, so PR #5 is deferred unless a later decision
+      explicitly chooses a folded PR #7 plus PR #5 path.
+    - C003 prepared HIGH_RISK_DECISION_REPORT.md for PR #4. It did not run gh pr merge,
+      push, edit PRs, mutate Issues, or perform branch surgery.
+    - C004 merged PR #4 with exact user approval. No additional PR merge, push, PR edit,
+      Issue mutation, or branch surgery was performed.
+    - C005 completed final M129 audit handoff. Remaining PRs #5 and #7 require refreshed
+      governance against main b77418e2fe9b1f6eda213e52f495364bb1861e94 before any later merge.
