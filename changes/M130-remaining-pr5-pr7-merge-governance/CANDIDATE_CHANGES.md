@@ -4,13 +4,13 @@ Source of truth: `CANDIDATE_CHANGES.yaml`.
 
 M130 starts after M129 merged PR #4 into `main` at `b77418e2fe9b1f6eda213e52f495364bb1861e94`. It owns the next refreshed merge-governance slice for PR #5 and PR #7.
 
-C002 completed the next-target decision and recommends PR #7. No merge or remote mutation is authorized.
+C003 completed the high-risk decision packet for PR #7. No merge or remote mutation is authorized.
 
 ## Boundary
 
 - Branch boundary: `codex/m130-remaining-pr5-pr7-merge-governance`
 - Current branch exception: planning was created on `codex/m122-m71-historical-stack-publication`
-- Next recommended candidate: `C003`
+- Next recommended candidate: `C004`
 - Priority: active resume target on `codex/m130-remaining-pr5-pr7-merge-governance`
 - Remote/base: `origin` / `main`
 - Current remote main: `b77418e2fe9b1f6eda213e52f495364bb1861e94`
@@ -86,8 +86,22 @@ Acceptance:
 
 ### C003 - Prepare exact merge approval packet for selected PR
 
-Status: ready
+Status: done
 Risk: high
+
+Selected change artifacts:
+
+- `C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml`
+- `C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml`
+- `C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md`
+- `HIGH_RISK_DECISION_REPORT.md`
+
+Result:
+
+- Prepared the PR #7 high-risk merge decision packet.
+- Proposed C004 command: `gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4`
+- Required C004 approval text is recorded in `HIGH_RISK_DECISION_REPORT.md`.
+- C003 did not run `gh pr merge` and did not perform any remote mutation.
 
 Prepare the high-risk merge decision report for only the C002-selected PR.
 
@@ -99,7 +113,7 @@ Acceptance:
 
 ### C004 - Execute approved selected PR merge
 
-Status: candidate  
+Status: ready
 Risk: high
 
 Run only the exact approved merge command for the selected PR if the user later provides exact approval.

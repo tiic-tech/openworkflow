@@ -63,16 +63,17 @@ target_prs:
     review_decision: ""
     status_check_rollup: []
 candidate_count: 5
-completed_candidate_id: C001
-completed_change_id: C001
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: C003
+next_recommended_candidate_id: C004
 selected_candidate_id: null
 selected_change_id: null
 priority_note: >
   Refreshed on 2026-05-25T00:35:37+08:00 as the active resume target per user
   instruction by aligning the local branch with the M130 queue boundary. C001
-  and C002 have since completed and C003 is now the next recommended
-  candidate; no remote mutation was performed.
+  and C002 have since completed. C003 prepared the PR #7 high-risk decision
+  packet and C004 is now ready only if the user provides the exact merge
+  approval text; no remote mutation was performed.
 outputs:
   candidate_changes_yaml: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
@@ -86,6 +87,11 @@ outputs:
   implementation_brief_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/IMPLEMENTATION_BRIEF.md
   next_merge_target_decision: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
   local_commit_evidence_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+  atom_tasks_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml
+  implementation_brief_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md
+  high_risk_decision_report: changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+  local_commit_evidence_c003: changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - "M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94."
   - "PR #5 and PR #7 remain open and non-draft."
@@ -104,6 +110,25 @@ risks:
     description: "PR #7 is the shared M101-derived stack and may still need split/surgery if review rejects the shared branch."
     mitigation: Keep split/surgery out of M130 and require a separate high-risk queue if needed.
 unresolved_questions: []
+current_high_risk_decision:
+  candidate_id: C003
+  selected_pr:
+    number: 7
+    url: https://github.com/tiic-tech/openworkflow/pull/7
+    title: "M101 shared stack: M105/M106/M115 governance updates"
+    head_ref: codex/m101-build-proto-prompt-command-split
+    head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+    base_ref: main
+    api_base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+    remote_main_oid: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  proposed_merge_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+  required_c004_approval_text: >
+    Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+    tiic-tech/openworkflow --merge --match-head-commit
+    f8bf087211316506f48155859f3e18edbc7224e4
+  approval_boundary: >
+    C003 is evidence only. It does not authorize C004; C004 requires the exact
+    approval text and immediate pre-merge metadata verification.
 deferred_features:
   - future-remaining-pr-merge-governance
   - future-merged-pr-revert-governance
@@ -122,6 +147,11 @@ validation:
     - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
     - selection artifacts created for C002
     - C002 next-target decision recorded
+    - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+    - git ls-remote origin refs/heads/main refs/heads/codex/m101-build-proto-prompt-command-split
+    - git fetch origin main codex/m101-build-proto-prompt-command-split
+    - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
+    - C003 high-risk decision packet recorded
   notes: |
     - M129 was committed first as 716ade230733b24168457f0334b5d62d30967752.
     - M130 queue creation performed no remote mutation.
@@ -132,9 +162,10 @@ validation:
     - PR #7 remains an ancestor of PR #5.
     - C002 recommended PR #7 as the next merge-governance target.
     - PR #5 remains open and untouched.
-    - C003 is now ready to prepare the PR #7 high-risk merge decision packet
-      if the user approves packet preparation.
+    - C003 prepared the PR #7 high-risk merge decision packet.
+    - Proposed C004 command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+    - C004 requires exact approval text before any merge execution.
     - No merge, push, PR edit, Issue mutation, branch checkout, branch surgery,
       destructive git operation, revert, or product source edit was performed
-      during C001 or C002.
-    - C003 is the next recommended candidate.
+      during C001, C002, or C003.
+    - C004 is the next recommended candidate.

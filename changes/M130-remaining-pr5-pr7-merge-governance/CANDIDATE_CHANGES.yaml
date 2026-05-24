@@ -130,7 +130,7 @@ observed_state:
     M129 evidence also recorded that PR #7 was an ancestor of PR #5 before PR
     #4 merged. C001 must refresh ancestry and merge-readiness against the
     actual remote main before any target choice.
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: C004
 changes:
   - id: C001
     status: done
@@ -255,7 +255,7 @@ changes:
         - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
         - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: ready
+    status: done
     title: Prepare exact merge approval packet for selected PR
     purpose: >
       Prepare a high-risk decision report for merging only the C002-selected PR,
@@ -286,8 +286,41 @@ changes:
       - HIGH_RISK_DECISION_REPORT.md names the selected PR and exact merge command.
       - The report records required exact user approval text.
       - No merge or other remote mutation occurs.
+    selection:
+      selected_change_id: C003
+      selected_at: 2026-05-25T01:49:56+08:00
+      reason: >
+        User asked to advance C003. C003 was the queue's next recommended ready
+        candidate after C002 selected PR #7 as the next merge-governance target.
+        The request was treated as local-only decision-packet preparation and
+        did not authorize gh pr merge or any remote mutation.
+      artifacts:
+        - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T01:49:56+08:00
+      implementation_changed_files: true
+      selected_pr:
+        pr_number: 7
+        url: https://github.com/tiic-tech/openworkflow/pull/7
+        title: "M101 shared stack: M105/M106/M115 governance updates"
+        head_ref: codex/m101-build-proto-prompt-command-split
+        head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+      proposed_merge_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+      required_c004_approval_text: >
+        Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+        tiic-tech/openworkflow --merge --match-head-commit
+        f8bf087211316506f48155859f3e18edbc7224e4
+      result: >
+        C003 prepared the PR #7 high-risk merge decision packet and recorded
+        the exact later C004 approval gate. No gh pr merge, push, PR edit,
+        Issue mutation, branch surgery, or other remote mutation was performed.
+      evidence:
+        - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+        - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C004
-    status: candidate
+    status: ready
     title: Execute approved selected PR merge
     purpose: >
       If C003 recommends merge and the user approves the exact command, run only
@@ -477,3 +510,48 @@ operations:
     after_status: ready
     evidence:
       - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User asked to advance C003. C003 was ready after C002 selected PR #7 as
+      the next merge-governance target. The operation is local-only decision
+      packet preparation and does not authorize merge execution.
+    changed_at: 2026-05-25T01:49:56+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 high-risk decision packet for PR #7 was prepared with current
+      read-only metadata, exact proposed merge command, stop gates, rollback
+      limits, and exact C004 approval text. No remote mutation was performed.
+    changed_at: 2026-05-25T01:49:56+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+      - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C003-prepare-exact-merge-approval-packet/ATOM_TASKS.yaml
+  - operation_id: OP011
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C003 recorded the exact PR #7 merge command and approval gate, so C004 is
+      ready only if the user provides the exact C004 merge approval text.
+    changed_at: 2026-05-25T01:49:56+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md

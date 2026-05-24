@@ -1,0 +1,97 @@
+schema_version: 0.1.0
+contract_id: selected_change:M130-remaining-pr5-pr7-merge-governance:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C003
+title: Prepare exact merge approval packet for selected PR
+status: done
+selected_at: 2026-05-25T01:49:56+08:00
+selection_reason: >
+  User asked to advance C003. C003 is the queue's next recommended ready
+  candidate after C002 selected PR #7 as the next merge-governance target. This
+  selection is interpreted only as approval to prepare the local high-risk
+  decision packet; it does not authorize merge execution or any remote
+  mutation.
+approval_basis: "user request: 推进c003"
+approved_option: local-only merge decision packet
+source_candidate:
+  id: C003
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C002
+scope:
+  includes:
+    - refresh selected PR metadata immediately before packet creation
+    - record exact gh pr merge command, merge method, stop gates, and rollback limits
+    - state that evidence is not approval
+  excludes:
+    - running gh pr merge
+    - editing PRs, closing PRs, mutating Issues, or pushing branches
+    - preparing merge packets for additional PRs
+owned_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/
+forbidden_operations:
+  - gh pr merge
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - git push
+  - git reset
+  - git rebase
+  - git checkout
+  - branch deletion
+  - force-push
+selected_pr:
+  number: 7
+  url: https://github.com/tiic-tech/openworkflow/pull/7
+  title: "M101 shared stack: M105/M106/M115 governance updates"
+  head_ref: codex/m101-build-proto-prompt-command-split
+  head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+  base_ref: main
+  api_base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  remote_main_oid: b77418e2fe9b1f6eda213e52f495364bb1861e94
+  state: OPEN
+  draft: false
+  mergeable: MERGEABLE
+  review_decision: ""
+  status_check_rollup: []
+proposed_merge_command: gh pr merge 7 --repo tiic-tech/openworkflow --merge --match-head-commit f8bf087211316506f48155859f3e18edbc7224e4
+required_c004_approval_text: >
+  Approve M130 C004 merge PR #7: run gh pr merge 7 --repo
+  tiic-tech/openworkflow --merge --match-head-commit
+  f8bf087211316506f48155859f3e18edbc7224e4
+acceptance:
+  - HIGH_RISK_DECISION_REPORT.md names PR #7 and exact merge command.
+  - The report records required exact user approval text.
+  - No merge or other remote mutation occurs.
+validation:
+  - gh pr view 7 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+  - git ls-remote origin refs/heads/main refs/heads/codex/m101-build-proto-prompt-command-split
+  - git fetch origin main codex/m101-build-proto-prompt-command-split
+  - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+stop_conditions:
+  - PR #7 is no longer open or becomes draft.
+  - PR #7 head OID changes from f8bf087211316506f48155859f3e18edbc7224e4.
+  - Remote main changes from b77418e2fe9b1f6eda213e52f495364bb1861e94 without refreshed C004 evidence.
+  - PR #7 is no longer mergeable.
+  - User asks to merge without the exact C004 approval text.
+evidence:
+  - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+completion:
+  completed_at: 2026-05-25T01:49:56+08:00
+  implementation_changed_files: true
+  result: >
+    C003 prepared the PR #7 high-risk merge decision packet and recorded the
+    exact later C004 approval gate. No gh pr merge, push, PR edit, Issue
+    mutation, branch surgery, or other remote mutation was performed.
+  evidence:
+    - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+commit_boundary:
+  expected: one coherent local commit for M130 C003 planning evidence
+  implementation_changed_files: true

@@ -1,0 +1,63 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M130-remaining-pr5-pr7-merge-governance:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C003
+title: Atom tasks for C003 PR #7 merge decision packet
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm selected PR and local-only scope
+    type: read
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C002-selected PR #7 is confirmed as the target and C003 is scoped only to
+      local decision-packet preparation.
+  - task_id: T002
+    title: Refresh PR #7 read-only metadata
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      PR #7 state, draft flag, head/base refs, OIDs, mergeability, review
+      decision, and checks are recorded.
+  - task_id: T003
+    title: Verify remote refs and merge checkpoint
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      Remote main and PR #7 head refs are verified, and merge-tree evidence is
+      recorded without remote mutation.
+  - task_id: T004
+    title: Write high-risk decision report
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/HIGH_RISK_DECISION_REPORT.md
+    done_when: >
+      The report names PR #7, the exact merge command, stop gates, rollback
+      limits, and the exact C004 approval text.
+  - task_id: T005
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C003 is marked done, C004 is made ready, and the summary/readable view
+      point to the high-risk decision report.
+  - task_id: T006
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      OpenWorkflow validation passes, summary strict check passes, and git diff
+      whitespace is clean.
