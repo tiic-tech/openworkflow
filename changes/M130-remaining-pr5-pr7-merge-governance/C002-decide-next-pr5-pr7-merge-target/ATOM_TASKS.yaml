@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M130-remaining-pr5-pr7-merge-governance:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C002
+title: "Atom tasks for C002 decide next PR #5/#7 merge target"
+status: done
+tasks:
+  - task_id: T001
+    title: Reconfirm C001 evidence and C002 scope
+    type: read
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C001 evidence, C002 acceptance criteria, exclusions, and queue status are
+      known before selecting a target.
+  - task_id: T002
+    title: Compare PR candidates by readiness and dependency order
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/
+    done_when: >
+      PR #5 and PR #7 are compared by mergeability, checks, ancestry,
+      ahead/behind counts, dependency order, and blast radius.
+  - task_id: T003
+    title: Record next target and approval gate
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/
+    done_when: >
+      Exactly one next merge target is recommended, deferred PR remains
+      untouched, and the C003 approval text is explicit.
+  - task_id: T004
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C002 is marked done, C003 is made ready, and the summary/readable view
+      point to the C002 decision packet.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      OpenWorkflow validation passes, summary strict check passes, and git diff
+      whitespace is clean.

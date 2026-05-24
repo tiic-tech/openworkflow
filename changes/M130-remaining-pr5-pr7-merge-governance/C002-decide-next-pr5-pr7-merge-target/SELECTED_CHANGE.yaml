@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M130-remaining-pr5-pr7-merge-governance:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C002
+title: "Decide next PR #5/#7 merge target and stop gates"
+status: done
+selected_at: 2026-05-25T00:48:22+08:00
+selection_reason: >
+  C002 was the queue's next recommended ready candidate after C001 refreshed
+  current merge-readiness facts for PR #5 and PR #7. It converts the read-only
+  evidence into one next merge-target recommendation without approving or
+  executing a merge.
+source_candidate:
+  id: C002
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - "compare PR #5 and PR #7 by refreshed ancestry, mergeability, review/check state, dependency order, and blast radius"
+    - recommend exactly one next merge target or stop with blockers
+    - define exact approval text required for the later merge decision packet candidate
+  excludes:
+    - executing gh pr merge
+    - changing PR state
+    - branch push, force-push, reset, rebase, branch deletion, revert, or split/surgery
+owned_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/
+forbidden_operations:
+  - gh pr merge
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - git push
+  - git reset
+  - git rebase
+  - branch deletion
+  - force-push
+acceptance:
+  - Exactly one next merge target is recommended, or blockers are recorded.
+  - Deferred PR remains open and untouched.
+  - The decision packet does not approve merge execution.
+validation:
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+evidence:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+completion:
+  completed_at: 2026-05-25T00:48:22+08:00
+  implementation_changed_files: true
+  result: >
+    C002 recommends PR #7 as the next merge-governance target. PR #7 is the
+    ancestor of PR #5, so selecting PR #7 preserves staged shared-stack review
+    before PR #5's M117 readiness work. This decision does not approve or
+    execute a merge.
+  evidence:
+    - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+commit_boundary:
+  expected: one coherent local commit for M130 C002 planning evidence if the user requests commit
+  implementation_changed_files: true

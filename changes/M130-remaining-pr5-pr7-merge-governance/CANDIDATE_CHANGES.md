@@ -4,13 +4,13 @@ Source of truth: `CANDIDATE_CHANGES.yaml`.
 
 M130 starts after M129 merged PR #4 into `main` at `b77418e2fe9b1f6eda213e52f495364bb1861e94`. It owns the next refreshed merge-governance slice for PR #5 and PR #7.
 
-C001 completed the read-only merge-readiness refresh. No merge or remote mutation is authorized.
+C002 completed the next-target decision and recommends PR #7. No merge or remote mutation is authorized.
 
 ## Boundary
 
 - Branch boundary: `codex/m130-remaining-pr5-pr7-merge-governance`
 - Current branch exception: planning was created on `codex/m122-m71-historical-stack-publication`
-- Next recommended candidate: `C002`
+- Next recommended candidate: `C003`
 - Priority: active resume target on `codex/m130-remaining-pr5-pr7-merge-governance`
 - Remote/base: `origin` / `main`
 - Current remote main: `b77418e2fe9b1f6eda213e52f495364bb1861e94`
@@ -59,8 +59,22 @@ Acceptance:
 
 ### C002 - Decide next PR #5/#7 merge target and stop gates
 
-Status: ready
+Status: done
 Risk: medium
+
+Selected change artifacts:
+
+- `C002-decide-next-pr5-pr7-merge-target/SELECTED_CHANGE.yaml`
+- `C002-decide-next-pr5-pr7-merge-target/ATOM_TASKS.yaml`
+- `C002-decide-next-pr5-pr7-merge-target/IMPLEMENTATION_BRIEF.md`
+- `C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md`
+
+Result:
+
+- Recommended next target: PR #7, `M101 shared stack: M105/M106/M115 governance updates`.
+- PR #5 remains open and untouched.
+- The decision does not approve merge execution.
+- Exact C003 packet-preparation approval text is recorded in the decision packet.
 
 Use C001 evidence to recommend exactly one next merge target or stop with blockers.
 
@@ -72,7 +86,7 @@ Acceptance:
 
 ### C003 - Prepare exact merge approval packet for selected PR
 
-Status: candidate
+Status: ready
 Risk: high
 
 Prepare the high-risk merge decision report for only the C002-selected PR.

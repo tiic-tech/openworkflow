@@ -65,14 +65,14 @@ target_prs:
 candidate_count: 5
 completed_candidate_id: C001
 completed_change_id: C001
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 selected_candidate_id: null
 selected_change_id: null
 priority_note: >
   Refreshed on 2026-05-25T00:35:37+08:00 as the active resume target per user
   instruction by aligning the local branch with the M130 queue boundary. C001
-  has since completed and C002 is now the next recommended candidate; no remote
-  mutation was performed.
+  and C002 have since completed and C003 is now the next recommended
+  candidate; no remote mutation was performed.
 outputs:
   candidate_changes_yaml: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
@@ -81,6 +81,10 @@ outputs:
   atom_tasks: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/ATOM_TASKS.yaml
   implementation_brief: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/IMPLEMENTATION_BRIEF.md
   merge_readiness_refresh: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+  selected_change_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/SELECTED_CHANGE.yaml
+  atom_tasks_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/ATOM_TASKS.yaml
+  implementation_brief_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/IMPLEMENTATION_BRIEF.md
+  next_merge_target_decision: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
 key_dependencies:
   - "M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94."
   - "PR #5 and PR #7 remain open and non-draft."
@@ -115,6 +119,8 @@ validation:
     - git fetch origin main codex/m117-git-automation-remote-readiness codex/m101-build-proto-prompt-command-split
     - git merge-tree --write-tree origin/main 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
     - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
+    - selection artifacts created for C002
+    - C002 next-target decision recorded
   notes: |
     - M129 was committed first as 716ade230733b24168457f0334b5d62d30967752.
     - M130 queue creation performed no remote mutation.
@@ -123,8 +129,11 @@ validation:
     - C001 completed the read-only merge-readiness refresh.
     - PR #5 and PR #7 remain open, non-draft, and MERGEABLE.
     - PR #7 remains an ancestor of PR #5.
-    - C002 is now ready for next target sequencing.
+    - C002 recommended PR #7 as the next merge-governance target.
+    - PR #5 remains open and untouched.
+    - C003 is now ready to prepare the PR #7 high-risk merge decision packet
+      if the user approves packet preparation.
     - No merge, push, PR edit, Issue mutation, branch checkout, branch surgery,
       destructive git operation, revert, or product source edit was performed
-      during C001.
-    - C002 is the next recommended candidate.
+      during C001 or C002.
+    - C003 is the next recommended candidate.
