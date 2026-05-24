@@ -3,7 +3,7 @@ contract_id: candidate_changes:M130-remaining-pr5-pr7-merge-governance
 contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M130-remaining-pr5-pr7-merge-governance
-title: Candidate changes for remaining PR #5/#7 merge governance
+title: "Candidate changes for remaining PR #5/#7 merge governance"
 status: active
 source:
   kind: mixed
@@ -74,7 +74,7 @@ scope_control:
       reason: >
         After one approved M130 merge, base OIDs and mergeability for any
         remaining PR must be refreshed again before any later merge packet.
-    - title: PR #4 or PR #6 revert governance
+    - title: "PR #4 or PR #6 revert governance"
       suggested_plan_id: future-merged-pr-revert-governance
       reason: >
         Reverting a merged PR is a separate high-risk operation and is out of
@@ -130,11 +130,11 @@ observed_state:
     M129 evidence also recorded that PR #7 was an ancestor of PR #5 before PR
     #4 merged. C001 must refresh ancestry and merge-readiness against the
     actual remote main before any target choice.
-next_recommended_candidate_id: C001
+next_recommended_candidate_id: C002
 changes:
   - id: C001
-    status: ready
-    title: Refresh PR #5/#7 merge-readiness against new main
+    status: done
+    title: "Refresh PR #5/#7 merge-readiness against new main"
     purpose: >
       Produce current read-only merge-readiness facts for PR #5 and PR #7
       after PR #4 changed main.
@@ -143,7 +143,7 @@ changes:
         - inspect PR state, draft flag, head/base refs, OIDs, mergeability, review decision, and status checks
         - verify each remaining remote head branch still exists at the PR head OID
         - refresh or fetch enough remote main data to compute read-only ancestry and merge-tree signals against b77418e2fe9b1f6eda213e52f495364bb1861e94
-        - record whether PR #7 remains an ancestor of PR #5
+        - "record whether PR #7 remains an ancestor of PR #5"
         - record whether GitHub PR base metadata has caught up to the new main head
       excludes:
         - gh pr merge
@@ -165,19 +165,41 @@ changes:
       - node dist/cli/src/index.js validate --root . --json
       - git diff --check
     acceptance:
-      - Current merge-readiness facts are recorded for PR #5 and PR #7.
+      - "Current merge-readiness facts are recorded for PR #5 and PR #7."
       - The packet states whether C002 can choose a next merge target.
       - No remote mutation or destructive git operation occurs.
+    selection:
+      selected_change_id: C001
+      selected_at: 2026-05-25T00:39:28+08:00
+      reason: >
+        C001 is the queue's next recommended candidate, has no dependencies,
+        and is required before C002 can choose the next merge target between PR
+        #5 and PR #7.
+      artifacts:
+        - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/SELECTED_CHANGE.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/ATOM_TASKS.yaml
+        - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T00:39:28+08:00
+      implementation_changed_files: true
+      result: >
+        PR #5 and PR #7 remain open, non-draft, and MERGEABLE. Both PR metadata
+        records still report the older base OID, but local merge-tree checks
+        against origin/main at b77418e2fe9b1f6eda213e52f495364bb1861e94
+        produced clean tree OIDs. PR #7 remains an ancestor of PR #5. C002 can
+        proceed to decide the next merge target or stop with blockers.
+      evidence:
+        - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
   - id: C002
-    status: candidate
-    title: Decide next PR #5/#7 merge target and stop gates
+    status: ready
+    title: "Decide next PR #5/#7 merge target and stop gates"
     purpose: >
       Convert C001 refresh evidence into a local decision packet that
       recommends exactly one next merge target between PR #5 and PR #7, or
       stops with blockers.
     scope:
       includes:
-        - compare PR #5 and PR #7 by refreshed ancestry, mergeability, review/check state, dependency order, and blast radius
+        - "compare PR #5 and PR #7 by refreshed ancestry, mergeability, review/check state, dependency order, and blast radius"
         - recommend exactly one next merge target or stop with blockers
         - define exact approval text required for the later merge decision packet candidate
       excludes:
@@ -265,7 +287,7 @@ changes:
       - No additional remote mutation occurs.
   - id: C005
     status: candidate
-    title: Complete PR #5/#7 merge governance audit handoff
+    title: "Complete PR #5/#7 merge governance audit handoff"
     purpose: >
       Record final M130 audit state, whether a remaining PR merge was executed
       or deferred, and the next safe governance boundary.
@@ -315,3 +337,66 @@ operations:
       - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
       - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
       - git status --short --branch
+  - operation_id: OP002
+    operation_type: priority_change
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      User asked to point the priority queue to M130 after refreshing the dist
+      CLI and reading resume. Preserve C001 as the next recommended candidate
+      and align the local branch with the queue boundary so resume reports this
+      queue as the active target without selecting a candidate or performing
+      remote mutation.
+    changed_at: 2026-05-25T00:35:37+08:00
+    before_status: active
+    after_status: active
+    evidence:
+      - node dist/cli/src/index.js resume --root . --json
+      - git switch -c codex/m130-remaining-pr5-pr7-merge-governance
+      - git status --short --branch
+  - operation_id: OP003
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      User asked to advance C001. C001 is ready, has no dependencies, matches
+      the queue branch boundary, and is required before PR #5/#7 target
+      sequencing.
+    changed_at: 2026-05-25T00:39:28+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/ATOM_TASKS.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP004
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 read-only merge-readiness refresh completed. The evidence packet
+      gives enough current PR #5/#7 facts for C002 to decide the next merge
+      target or stop with blockers.
+    changed_at: 2026-05-25T00:39:28+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/SELECTED_CHANGE.yaml
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/ATOM_TASKS.yaml
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C001 evidence is current enough for C002 to compare PR #5 and PR #7 by
+      ancestry, mergeability, metadata freshness, and sequencing tradeoffs.
+    changed_at: 2026-05-25T00:39:28+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md

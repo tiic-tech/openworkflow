@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M130-remaining-pr5-pr7-merge-governance:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C001
+title: "Atom tasks for C001 refresh PR #5/#7 merge-readiness"
+status: done
+tasks:
+  - task_id: T001
+    title: Confirm C001 boundary and queue facts
+    type: read
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      The M130 queue, C001 selection, branch boundary, exclusions, validation
+      expectations, and no-remote-mutation constraints are known.
+  - task_id: T002
+    title: Capture current PR and remote head facts
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/
+    done_when: >
+      Current PR API metadata and remote branch OIDs are recorded for PR #5,
+      PR #7, and origin/main.
+  - task_id: T003
+    title: Compute local ancestry and merge-tree signals
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/
+    done_when: >
+      Each PR head has local commit presence, merge-base, ahead/behind counts,
+      origin/main ancestry result, merge-tree result, and PR #7 to PR #5
+      ancestry recorded.
+  - task_id: T004
+    title: Update queue, summary, and readable view
+    type: document
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      C001 completion evidence is recorded, C002 readiness is updated only if
+      the refresh supports target sequencing, and the summary/readable view
+      point to the C001 evidence packet.
+  - task_id: T005
+    title: Validate planning artifacts
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M130-remaining-pr5-pr7-merge-governance/
+    done_when: >
+      OpenWorkflow validation passes, summary strict check passes, and git diff
+      whitespace checks are clean.

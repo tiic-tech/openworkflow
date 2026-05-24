@@ -1,0 +1,79 @@
+schema_version: 0.1.0
+contract_id: selected_change:M130-remaining-pr5-pr7-merge-governance:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C001
+title: "Refresh PR #5/#7 merge-readiness against new main"
+status: done
+selected_at: 2026-05-25T00:39:28+08:00
+selection_reason: >
+  C001 is the queue's next recommended candidate, has no dependencies, and is
+  required before C002 can choose the next merge target between PR #5 and PR
+  #7. It is medium risk and limited to read-only remote inspection plus local
+  governance evidence under the M130 queue folder.
+source_candidate:
+  id: C001
+  status_at_selection: ready
+  risk: medium
+  dependencies: []
+scope:
+  includes:
+    - inspect PR state, draft flag, head/base refs, OIDs, mergeability, review decision, and status checks
+    - verify each remaining remote head branch still exists at the PR head OID
+    - refresh or fetch enough remote main data to compute read-only ancestry and merge-tree signals against b77418e2fe9b1f6eda213e52f495364bb1861e94
+    - "record whether PR #7 remains an ancestor of PR #5"
+    - record whether GitHub PR base metadata has caught up to the new main head
+  excludes:
+    - gh pr merge
+    - PR edit, close, retarget, review request, or comment mutation
+    - Issue mutation, push, force-push, branch deletion, rebase, reset, split/surgery, revert, or product source changes
+owned_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+  - skills/**
+  - references/**
+  - templates/**
+  - dist/**
+forbidden_operations:
+  - gh pr merge
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - git push
+  - git reset
+  - git rebase
+  - branch deletion
+  - force-push
+acceptance:
+  - "Current merge-readiness facts are recorded for PR #5 and PR #7."
+  - The packet states whether C002 can choose a next merge target.
+  - No remote mutation or destructive git operation occurs.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - git fetch origin main
+  - git merge-tree --write-tree origin/main <head-oid>
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+evidence:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+completion:
+  completed_at: 2026-05-25T00:39:28+08:00
+  implementation_changed_files: true
+  result: >
+    PR #5 and PR #7 remain open, non-draft, and MERGEABLE. Both PR metadata
+    records still report the older base OID, but local merge-tree checks
+    against origin/main at b77418e2fe9b1f6eda213e52f495364bb1861e94 produced
+    clean tree OIDs. PR #7 remains an ancestor of PR #5. C002 can proceed to
+    decide the next merge target or stop with blockers.
+  evidence:
+    - changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
+commit_boundary:
+  expected: one coherent local commit for M130 C001 governance evidence if the user requests commit
+  implementation_changed_files: true

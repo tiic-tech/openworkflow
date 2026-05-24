@@ -3,7 +3,7 @@ contract_id: summary:M130-remaining-pr5-pr7-merge-governance
 contract_type: planning
 planning_artifact_type: summary
 plan_id: M130-remaining-pr5-pr7-merge-governance
-title: Summary for remaining PR #5/#7 merge governance
+title: "Summary for remaining PR #5/#7 merge governance"
 status: active
 source:
   kind: mixed
@@ -63,18 +63,27 @@ target_prs:
     review_decision: ""
     status_check_rollup: []
 candidate_count: 5
-completed_candidate_id: null
-completed_change_id: null
-next_recommended_candidate_id: C001
+completed_candidate_id: C001
+completed_change_id: C001
+next_recommended_candidate_id: C002
 selected_candidate_id: null
 selected_change_id: null
+priority_note: >
+  Refreshed on 2026-05-25T00:35:37+08:00 as the active resume target per user
+  instruction by aligning the local branch with the M130 queue boundary. C001
+  has since completed and C002 is now the next recommended candidate; no remote
+  mutation was performed.
 outputs:
   candidate_changes_yaml: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
   summary: changes/M130-remaining-pr5-pr7-merge-governance/SUMMARY.yaml
+  selected_change: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/SELECTED_CHANGE.yaml
+  atom_tasks: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/ATOM_TASKS.yaml
+  implementation_brief: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/IMPLEMENTATION_BRIEF.md
+  merge_readiness_refresh: changes/M130-remaining-pr5-pr7-merge-governance/C001-refresh-pr5-pr7-merge-readiness/MERGE_READINESS_REFRESH.md
 key_dependencies:
-  - M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94.
-  - PR #5 and PR #7 remain open and non-draft.
+  - "M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94."
+  - "PR #5 and PR #7 remain open and non-draft."
   - Remaining PRs must be refreshed against the new main before target sequencing.
 risks:
   - id: R001
@@ -87,7 +96,7 @@ risks:
     mitigation: C001 must refresh against remote main head b77418e2fe9b1f6eda213e52f495364bb1861e94.
   - id: R003
     level: high
-    description: PR #7 is the shared M101-derived stack and may still need split/surgery if review rejects the shared branch.
+    description: "PR #7 is the shared M101-derived stack and may still need split/surgery if review rejects the shared branch."
     mitigation: Keep split/surgery out of M130 and require a separate high-risk queue if needed.
 unresolved_questions: []
 deferred_features:
@@ -99,10 +108,23 @@ validation:
     - git status --short --branch
     - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
     - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+    - npm run build
+    - node dist/cli/src/index.js resume --root . --json
+    - git switch -c codex/m130-remaining-pr5-pr7-merge-governance
+    - selection artifacts created for C001
+    - git fetch origin main codex/m117-git-automation-remote-readiness codex/m101-build-proto-prompt-command-split
+    - git merge-tree --write-tree origin/main 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+    - git merge-tree --write-tree origin/main f8bf087211316506f48155859f3e18edbc7224e4
   notes: |
     - M129 was committed first as 716ade230733b24168457f0334b5d62d30967752.
     - M130 queue creation performed no remote mutation.
-    - No SELECTED_CHANGE.yaml, ATOM_TASKS.yaml, IMPLEMENTATION_BRIEF.md, merge, push, PR edit,
-      Issue mutation, branch creation, branch checkout, branch surgery, destructive git operation,
-      revert, or product source edit was performed.
-    - C001 is the next recommended candidate and is read-only/local evidence only.
+    - M130 was refreshed as the priority resume target without selecting a candidate.
+    - Local branch now matches the M130 queue boundary.
+    - C001 completed the read-only merge-readiness refresh.
+    - PR #5 and PR #7 remain open, non-draft, and MERGEABLE.
+    - PR #7 remains an ancestor of PR #5.
+    - C002 is now ready for next target sequencing.
+    - No merge, push, PR edit, Issue mutation, branch checkout, branch surgery,
+      destructive git operation, revert, or product source edit was performed
+      during C001.
+    - C002 is the next recommended candidate.
