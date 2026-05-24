@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M128-ready-pr-merge-governance:C002-decide-first-merge-target-and-stop-gates
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C002
+selected_change_id: C002-decide-first-merge-target-and-stop-gates
+status: complete
+tasks:
+  - task_id: T001
+    title: Refresh current PR facts
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/
+    done_when: >
+      Current open PR metadata is compared with C001 inventory.
+  - task_id: T002
+    title: Compare branch ancestry and blast radius
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/
+    done_when: >
+      Candidate PR heads are compared for ancestry and commit counts.
+  - task_id: T003
+    title: Write first merge target decision
+    status: done
+    type: document
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/FIRST_MERGE_TARGET_DECISION.md
+    done_when: >
+      Decision packet recommends one first merge target and records stop gates.
+  - task_id: T004
+    title: Update queue and verify
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    done_when: >
+      Queue, readable view, and summary are updated for C002 completion and
+      validation passes.

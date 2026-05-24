@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: selected_change:M128-ready-pr-merge-governance:C002-decide-first-merge-target-and-stop-gates
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C002
+selected_change_id: C002-decide-first-merge-target-and-stop-gates
+title: Decide first merge target and stop gates
+status: selected
+selected_at: 2026-05-24T12:35:33+08:00
+selection_reason: >
+  User asked to advance C002. C001 completed read-only merge-readiness
+  inventory and made C002 ready. C002 is medium risk, requires no remote
+  mutation, and must choose one first merge target before any high-risk merge
+  approval packet can be prepared.
+source_candidate:
+  title: Decide first merge target and stop gates
+  risk: medium
+  size: small
+scope:
+  includes:
+    - compare PR #4, PR #5, PR #6, and PR #7 by publication order, base staleness, mergeability, review/check state, and blast radius
+    - recommend exactly one first merge target or stop with blockers
+    - define exact approval text required for the later merge packet candidate
+  excludes:
+    - executing gh pr merge
+    - changing PR state
+    - branch push, force-push, reset, rebase, branch deletion, or split/surgery
+owned_paths:
+  - changes/M128-ready-pr-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+git_boundary:
+  current_branch: codex/m122-m71-historical-stack-publication
+  queue_branch_boundary: codex/m128-ready-pr-merge-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    reason: >
+      C002 is a local decision artifact under the M128 queue folder. It does not
+      run merge, push, PR edit, Issue mutation, checkout, branch surgery, or
+      destructive git operations.
+expected_commit_boundary: >
+  C002 may be committed later with the owning M128 queue evidence as one
+  coherent local planning commit. It must not include remote mutation or product
+  source changes.
+acceptance:
+  - Exactly one first merge target is recommended, or blockers are recorded.
+  - Deferred PRs remain open and untouched.
+  - The decision packet does not approve merge execution.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git merge-base --is-ancestor <candidate-head> <other-head>
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+stop_conditions:
+  - Current PR state changes before C003 is prepared.
+  - User requests merge execution without an exact high-risk merge approval packet.
+  - PR #6 is no longer open, non-draft, mergeable, or at head OID a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1.

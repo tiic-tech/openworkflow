@@ -1,0 +1,82 @@
+schema_version: 0.1.0
+contract_id: selected_change:M128-ready-pr-merge-governance:C004-approved-pr6-merge
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C004
+selected_change_id: C004-approved-pr6-merge
+title: Execute approved PR #6 merge
+status: selected
+selected_at: 2026-05-24T17:32:18+08:00
+selection_reason: >
+  User provided the exact C004 approval text recorded by C003. C004 verified
+  PR #6 still matched the expected open, non-draft, mergeable, head/base state,
+  ran only the approved gh pr merge command, and recorded the result.
+approval_text: >
+  Approve M128 C004 merge PR #6: run gh pr merge 6 --repo
+  tiic-tech/openworkflow --merge --match-head-commit
+  a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+approved_command: >
+  gh pr merge 6 --repo tiic-tech/openworkflow --merge --match-head-commit
+  a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+source_candidate:
+  title: Execute approved first PR merge
+  risk: high
+  size: small
+scope:
+  includes:
+    - verify exact approval text
+    - verify selected PR still matches expected head/base state
+    - run only the approved gh pr merge command
+    - record resulting PR/base metadata and remaining PR follow-up boundary
+  excludes:
+    - merging any additional PR
+    - push, force-push, rebase, reset, branch deletion, or split/surgery
+    - PR body edits, Issue mutation, or product source changes
+owned_paths:
+  - changes/M128-ready-pr-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+pre_merge_pr_state:
+  number: 6
+  url: https://github.com/tiic-tech/openworkflow/pull/6
+  state: OPEN
+  draft: false
+  merged_at: null
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  mergeable: MERGEABLE
+post_merge_pr_state:
+  number: 6
+  url: https://github.com/tiic-tech/openworkflow/pull/6
+  state: MERGED
+  draft: false
+  merged_at: 2026-05-24T09:31:55Z
+  merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid_reported_by_pr_api: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  origin_main_after_merge: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+acceptance:
+  - Only the exact approved PR is merged.
+  - Local evidence records approval, command, result, and remaining merge boundary.
+  - No additional remote mutation occurs.
+validation:
+  - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup
+  - git ls-remote origin refs/heads/main refs/heads/codex/m71-git-version-governance
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+follow_up_boundary: >
+  PR #4, PR #5, and PR #7 remain open after PR #6 merged. Because origin/main
+  changed to 8656ed135c7a57c5b515572fa06bc082aabdcb95, remaining PR
+  mergeability and base state must be refreshed before any additional merge
+  packet or merge execution.

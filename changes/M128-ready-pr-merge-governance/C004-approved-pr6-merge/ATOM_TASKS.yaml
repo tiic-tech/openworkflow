@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M128-ready-pr-merge-governance:C004-approved-pr6-merge
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C004
+selected_change_id: C004-approved-pr6-merge
+status: complete
+tasks:
+  - task_id: T001
+    title: Verify exact C004 approval and stop gates
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/
+    done_when: >
+      Approval text matches the C003-required command and PR #6 pre-merge state
+      matches expected head/base/mergeable facts.
+  - task_id: T002
+    title: Run approved PR #6 merge command
+    status: done
+    type: command
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/
+    done_when: >
+      Only the exact approved gh pr merge command has been run.
+  - task_id: T003
+    title: Verify merge result
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/
+    done_when: >
+      PR #6 state, merge commit, origin/main head, remaining open PRs, and
+      branch preservation are recorded.
+  - task_id: T004
+    title: Write merge evidence and queue updates
+    status: done
+    type: document
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    done_when: >
+      C004 evidence, queue, readable view, and summary record the approved merge
+      and make C005 ready.

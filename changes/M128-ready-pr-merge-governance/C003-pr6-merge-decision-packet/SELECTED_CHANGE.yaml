@@ -1,0 +1,85 @@
+schema_version: 0.1.0
+contract_id: selected_change:M128-ready-pr-merge-governance:C003-pr6-merge-decision-packet
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C003
+selected_change_id: C003-pr6-merge-decision-packet
+title: Prepare exact merge approval packet for PR #6
+status: selected
+selected_at: 2026-05-24T16:57:13+08:00
+selection_reason: >
+  User provided the exact approval text recorded by C002 for the local-only
+  C003 decision packet. C003 prepares a high-risk PR #6 merge decision packet
+  and records the exact later C004 approval gate without running gh pr merge.
+approved_option: local-only merge decision packet
+approval_text: >
+  Approve M128 C003 decision packet: prepare PR #6 merge high-risk decision
+  packet; do not run gh pr merge, push, edit PRs, mutate Issues, or perform
+  branch surgery.
+source_candidate:
+  title: Prepare exact merge approval packet for first target
+  risk: high
+  size: small
+scope:
+  includes:
+    - refresh selected PR metadata immediately before packet creation
+    - record exact gh pr merge command, merge method, stop gates, and rollback limits
+    - state that evidence is not approval
+  excludes:
+    - running gh pr merge
+    - editing PRs, closing PRs, mutating Issues, or pushing branches
+    - preparing merge packets for additional PRs
+owned_paths:
+  - changes/M128-ready-pr-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+git_boundary:
+  current_branch: codex/m122-m71-historical-stack-publication
+  queue_branch_boundary: codex/m128-ready-pr-merge-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    reason: >
+      C003 is a local decision packet under the M128 queue folder. It does not
+      run merge, push, PR edit, Issue mutation, checkout, branch surgery, or
+      destructive git operations.
+expected_commit_boundary: >
+  C003 may be committed later with the owning M128 queue evidence as one
+  coherent local planning commit. It must not include remote mutation or product
+  source changes.
+selected_pr:
+  number: 6
+  url: https://github.com/tiic-tech/openworkflow/pull/6
+  title: "M71: Git version control governance"
+  head_ref: codex/m71-git-version-governance
+  head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  base_ref: main
+  base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+  state: OPEN
+  draft: false
+  mergeable: MERGEABLE
+acceptance:
+  - HIGH_RISK_DECISION_REPORT.md names PR #6 and exact merge command.
+  - The report records required exact user approval text.
+  - No merge or other remote mutation occurs.
+validation:
+  - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup,mergedAt
+  - git ls-remote --heads origin codex/m71-git-version-governance
+  - git merge-tree --write-tree d0e13f4bba3a847b763d2db3f771659aac3a4fe5 a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+stop_conditions:
+  - PR #6 is no longer open or becomes draft.
+  - PR #6 head OID changes from a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1.
+  - PR #6 base OID changes from d0e13f4bba3a847b763d2db3f771659aac3a4fe5.
+  - PR #6 is no longer mergeable.
+  - User asks to merge without the exact C004 approval text.

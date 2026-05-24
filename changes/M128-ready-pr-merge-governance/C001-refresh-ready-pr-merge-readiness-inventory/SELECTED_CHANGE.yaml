@@ -1,0 +1,69 @@
+schema_version: 0.1.0
+contract_id: selected_change:M128-ready-pr-merge-governance:C001-refresh-ready-pr-merge-readiness-inventory
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C001
+selected_change_id: C001-refresh-ready-pr-merge-readiness-inventory
+title: Refresh ready PR merge-readiness inventory
+status: selected
+selected_at: 2026-05-24T12:25:02+08:00
+selection_reason: >
+  User asked to advance C001. C001 is the next recommended candidate, has no
+  dependencies, is medium risk, and must refresh read-only merge-readiness
+  evidence before any merge target sequencing or approval packet can proceed.
+source_candidate:
+  title: Refresh ready PR merge-readiness inventory
+  risk: medium
+  size: small
+scope:
+  includes:
+    - inspect PR state, draft flag, head/base refs, OIDs, mergeability, review decision, and status checks
+    - verify each remote head branch still exists at the PR head OID
+    - inspect base ancestry or merge-tree conflict signal without mutating the worktree
+    - record whether any PR has a current blocker for sequencing
+  excludes:
+    - gh pr merge
+    - PR edit, close, retarget, review request, or comment mutation
+    - Issue mutation, push, force-push, branch deletion, rebase, reset, split/surgery, or product source changes
+owned_paths:
+  - changes/M128-ready-pr-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+git_boundary:
+  current_branch: codex/m122-m71-historical-stack-publication
+  queue_branch_boundary: codex/m128-ready-pr-merge-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    reason: >
+      Selection and C001 evidence are planning-only/local validation artifacts
+      under the M128 queue folder. No branch checkout, commit, push, merge, PR
+      mutation, Issue mutation, or branch surgery is part of C001.
+expected_commit_boundary: >
+  C001 may be committed later with the owning M128 queue evidence as one
+  coherent local planning commit. It must not include remote mutation or product
+  source changes.
+acceptance:
+  - Current merge-readiness facts are recorded for all four open ready PRs.
+  - The packet states whether C002 can choose a first merge target.
+  - No remote mutation or destructive git operation occurs.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote --heads origin codex/m102-selected-change-commit-gate codex/m117-git-automation-remote-readiness codex/m71-git-version-governance codex/m101-build-proto-prompt-command-split
+  - git merge-tree --write-tree origin/main <head-ref-or-oid>
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+stop_conditions:
+  - Any PR is no longer open, is draft again, or has a changed head/base OID from the observed queue state.
+  - Any remote head branch is missing or does not match the PR head OID.
+  - Any read-only conflict probe reports merge conflicts or cannot be computed.
+  - User asks to merge, push, edit PRs, mutate Issues, or perform branch surgery without a later exact approval gate.

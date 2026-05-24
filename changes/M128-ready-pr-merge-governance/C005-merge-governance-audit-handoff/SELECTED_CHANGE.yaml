@@ -1,0 +1,57 @@
+schema_version: 0.1.0
+contract_id: selected_change:M128-ready-pr-merge-governance:C005-merge-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C005
+selected_change_id: C005-merge-governance-audit-handoff
+title: Complete merge governance audit handoff
+status: selected
+selected_at: 2026-05-24T17:35:42+08:00
+selection_reason: >
+  User asked to advance C005 after C004 merged PR #6. C005 is the ready final
+  audit handoff candidate, requires only read-only verification and local
+  evidence, and records the next safe governance boundary for remaining PRs.
+source_candidate:
+  title: Complete merge governance audit handoff
+  risk: medium
+  size: small
+scope:
+  includes:
+    - summarize C001-C004 evidence
+    - record final PR states and unauthorized operations not performed
+    - recommend the next queue for remaining PR merges or blockers
+  excludes:
+    - new merge execution
+    - PR edit, Issue mutation, push, branch surgery, or product source change
+owned_paths:
+  - changes/M128-ready-pr-merge-governance/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - src/**
+  - test/**
+  - package.json
+  - package-lock.json
+acceptance:
+  - M128 final audit explains whether merge remains blocked, deferred, or completed.
+  - Remaining ready PRs are explicitly handed off to follow-up governance.
+  - No unauthorized operation is recorded.
+validation:
+  - gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup
+  - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+  - git ls-remote origin refs/heads/main refs/heads/codex/m71-git-version-governance refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+final_state:
+  m128_status: complete
+  merged_pr:
+    number: 6
+    state: MERGED
+    merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+  remaining_open_prs:
+    - 4
+    - 5
+    - 7
+  next_recommended_queue: M129-remaining-ready-pr-merge-governance

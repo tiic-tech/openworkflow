@@ -1,0 +1,669 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M128-ready-pr-merge-governance
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M128-ready-pr-merge-governance
+title: Candidate changes for ready PR merge governance
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-24-analyze-next-git-governance-cc
+    - changes/M123-pr-ready-review-governance/SUMMARY.yaml
+    - changes/M125-m102-pr4-readiness-governance/SUMMARY.yaml
+    - changes/M126-m71-ready-review-governance/SUMMARY.yaml
+    - changes/M127-m101-shared-stack-ready-review-governance/SUMMARY.yaml
+    - changes/M120-historical-branch-repair/SUMMARY.yaml
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+  summary: >
+    PR #4, PR #5, PR #6, and PR #7 are open ready-for-review PRs after the
+    recent publication and readiness-governance queues. Earlier queues deferred
+    merge governance as a separate approval-gated boundary. M128 owns the next
+    git-governance slice: read-only merge-readiness inventory, merge target
+    sequencing, exact merge decision packets, approved merge execution if later
+    authorized, and audit handoff.
+queue_policy:
+  branch_boundary: codex/m128-ready-pr-merge-governance
+  branch_identity_exception:
+    mode: temporary_continuation_branch
+    approved: true
+    allowed_operations:
+      - local planning artifact creation
+      - local validation
+    current_branch: codex/m122-m71-historical-stack-publication
+    reason: >
+      M128 is being created as local DTC planning after M127 was committed on
+      the existing aggregate governance branch. No branch creation, checkout,
+      push, merge, PR edit, Issue mutation, or branch surgery is part of this
+      decompose-to-changes pass.
+  target_remote: origin
+  target_base_branch: main
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. Merge governance must refresh current read-only PR,
+    branch, base, review, and check status before any merge sequencing or exact
+    merge approval packet is prepared.
+  high_risk_rule: >
+    C003 and C004 prepare or execute a GitHub PR merge mutation. They require
+    current C001/C002 evidence and exact operation-level user approval before
+    any merge command can run.
+scope_control:
+  current_boundary: >
+    Merge governance for the currently open ready-for-review historical PR set:
+    PR #4, PR #5, PR #6, and PR #7.
+  boundary_type: merge_governance_workflow_slice
+  in_scope_rule: >
+    Include read-only merge-readiness inventory, first-merge target sequencing,
+    exact approval packet preparation, approved merge execution for one selected
+    target if later authorized, and local audit handoff.
+  out_of_scope_rule: >
+    Do not merge any PR during DTC. Do not push, edit PR bodies, retarget PRs,
+    close PRs, request reviews, mutate Issues, force-push, rebase, reset, delete
+    branches, perform split/surgery, or change product source. Subsequent PR
+    merges after the first approved target require later queue maintenance or a
+    follow-up queue.
+  deferred_features:
+    - title: Subsequent PR merge governance
+      suggested_plan_id: future-ready-pr-merge-governance
+      reason: >
+        After one approved merge, base OIDs and mergeability for the remaining
+        PRs must be refreshed before any later merge packet.
+    - title: Shared-stack split or branch-surgery execution
+      suggested_plan_id: future-m101-shared-stack-split-governance
+      reason: >
+        If PR #7 review rejects the shared-stack path, split/surgery remains a
+        separate high-risk branch-history operation.
+observed_state:
+  captured_at: 2026-05-24T07:39:03+08:00
+  current_branch: codex/m122-m71-historical-stack-publication
+  working_tree_clean_before_queue_creation: true
+  latest_local_commit: 5c49e355d6386f3a0781df9239383f01978abcd9
+  open_ready_prs:
+    - number: 4
+      url: https://github.com/tiic-tech/openworkflow/pull/4
+      title: OpenWorkflow M102-selected-change-commit-gate
+      state: OPEN
+      draft: false
+      head_ref: codex/m102-selected-change-commit-gate
+      head_oid: bd2780b1d5b117b2734e5b732164e5d299bd521a
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeable: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+    - number: 5
+      url: https://github.com/tiic-tech/openworkflow/pull/5
+      title: "M117: Git automation remote readiness governance"
+      state: OPEN
+      draft: false
+      head_ref: codex/m117-git-automation-remote-readiness
+      head_oid: 898f0152a4e3e026ee5dcc78d4ef585c722a37b7
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeable: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+    - number: 6
+      url: https://github.com/tiic-tech/openworkflow/pull/6
+      title: "M71: Git version control governance"
+      state: OPEN
+      draft: false
+      head_ref: codex/m71-git-version-governance
+      head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeable: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+    - number: 7
+      url: https://github.com/tiic-tech/openworkflow/pull/7
+      title: "M101 shared stack: M105/M106/M115 governance updates"
+      state: OPEN
+      draft: false
+      head_ref: codex/m101-build-proto-prompt-command-split
+      head_oid: f8bf087211316506f48155859f3e18edbc7224e4
+      base_ref: main
+      base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+      mergeable: MERGEABLE
+      review_decision: ""
+      status_check_rollup: []
+  recommended_first_readonly_focus: PR #5, then PR #4, PR #6, PR #7
+  recommendation_reason: >
+    M120 repaired publication ordering ranked M117 before M71 and the shared
+    M101 group. PR #5 is the M117 publication PR. PR #4 is already open and
+    ready from the earlier M102 pilot, so C002 must explicitly confirm whether
+    first merge should follow repaired publication order or older PR creation
+    order before any merge packet.
+next_recommended_candidate_id: M129-remaining-ready-pr-merge-governance
+changes:
+  - id: C001
+    status: done
+    title: Refresh ready PR merge-readiness inventory
+    purpose: >
+      Produce current read-only merge-readiness facts for PR #4, PR #5, PR #6,
+      and PR #7 before any merge target is chosen.
+    scope:
+      includes:
+        - inspect PR state, draft flag, head/base refs, OIDs, mergeability, review decision, and status checks
+        - verify each remote head branch still exists at the PR head OID
+        - inspect base ancestry or merge-tree conflict signal without mutating the worktree
+        - record whether any PR has a current blocker for sequencing
+      excludes:
+        - gh pr merge
+        - PR edit, close, retarget, review request, or comment mutation
+        - Issue mutation, push, force-push, branch deletion, rebase, reset, split/surgery, or product source changes
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    dependencies: []
+    unlocks:
+      - C002
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+      - git ls-remote --heads origin codex/m102-selected-change-commit-gate codex/m117-git-automation-remote-readiness codex/m71-git-version-governance codex/m101-build-proto-prompt-command-split
+      - git merge-tree --write-tree origin/main <head-ref-or-oid>
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Current merge-readiness facts are recorded for all four open ready PRs.
+      - The packet states whether C002 can choose a first merge target.
+      - No remote mutation or destructive git operation occurs.
+    selection:
+      selected_change_id: C001-refresh-ready-pr-merge-readiness-inventory
+      reason: >
+        User asked to advance C001. C001 is the next recommended candidate, has
+        no dependencies, is medium risk, and must refresh read-only
+        merge-readiness evidence before C002 can choose a first merge target.
+      selected_at: 2026-05-24T12:25:02+08:00
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/SELECTED_CHANGE.yaml
+        - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/ATOM_TASKS.yaml
+        - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T12:26:24+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C001 produced read-only merge-readiness inventory and local planning
+        evidence only; no product source, generated surface, remote PR, Issue,
+        merge, push, branch surgery, or destructive git operation was mutated.
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/MERGE_READINESS_INVENTORY.md
+        - "validation: gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20"
+        - "validation: git ls-remote --heads origin codex/m102-selected-change-commit-gate codex/m117-git-automation-remote-readiness codex/m71-git-version-governance codex/m101-build-proto-prompt-command-split"
+        - "validation: git merge-tree --write-tree origin/main <head-oid> for PR #4, #5, #6, and #7"
+  - id: C002
+    status: done
+    title: Decide first merge target and stop gates
+    purpose: >
+      Convert C001 inventory into a local decision packet that recommends the
+      first PR merge target and records why alternatives are deferred.
+    scope:
+      includes:
+        - compare PR #4, PR #5, PR #6, and PR #7 by publication order, base staleness, mergeability, review/check state, and blast radius
+        - recommend exactly one first merge target or stop with blockers
+        - define exact approval text required for the later merge packet candidate
+      excludes:
+        - executing gh pr merge
+        - changing PR state
+        - branch push, force-push, reset, rebase, branch deletion, or split/surgery
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Exactly one first merge target is recommended, or blockers are recorded.
+      - Deferred PRs remain open and untouched.
+      - The decision packet does not approve merge execution.
+    selection:
+      selected_change_id: C002-decide-first-merge-target-and-stop-gates
+      reason: >
+        User asked to advance C002. C001 completed read-only merge-readiness
+        inventory and made C002 ready. C002 is medium risk and local-only; it
+        chooses the first merge target and stop gates without executing a merge.
+      selected_at: 2026-05-24T12:35:33+08:00
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/SELECTED_CHANGE.yaml
+        - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/ATOM_TASKS.yaml
+        - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T12:35:33+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C002 produced a local merge-target decision packet and planning
+        evidence only; no product source, generated surface, remote PR, Issue,
+        merge, push, branch surgery, or destructive git operation was mutated.
+      selected_first_merge_target:
+        pr_number: 6
+        pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+        head_ref: codex/m71-git-version-governance
+        head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+        reason: >
+          PR #6 is the 66-commit common historical stack whose head is an
+          ancestor of PR #4, PR #5, and PR #7. Merging it first preserves the
+          smaller M71 review boundary before larger dependent historical stacks.
+      required_c003_approval_text: >
+        Approve M128 C003 decision packet: prepare PR #6 merge high-risk
+        decision packet; do not run gh pr merge, push, edit PRs, mutate Issues,
+        or perform branch surgery.
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/FIRST_MERGE_TARGET_DECISION.md
+        - "validation: gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20"
+        - "validation: git merge-base --is-ancestor a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1 <PR4/PR5/PR7 head>"
+  - id: C003
+    status: done
+    title: Prepare exact merge approval packet for first target
+    purpose: >
+      Prepare a high-risk decision report for merging only the C002-selected PR,
+      using current read-only evidence and exact command text.
+    scope:
+      includes:
+        - refresh selected PR metadata immediately before packet creation
+        - record exact gh pr merge command, merge method, stop gates, and rollback limits
+        - state that evidence is not approval
+      excludes:
+        - running gh pr merge
+        - editing PRs, closing PRs, mutating Issues, or pushing branches
+        - preparing merge packets for additional PRs
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr view <selected-pr> --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - HIGH_RISK_DECISION_REPORT.md names the selected PR and exact merge command.
+      - The report records required exact user approval text.
+      - No merge or other remote mutation occurs.
+    selection:
+      selected_change_id: C003-pr6-merge-decision-packet
+      reason: >
+        User provided the exact C003 approval text recorded by C002. C003
+        prepares the high-risk PR #6 merge decision packet and records the
+        exact later C004 merge approval gate without running gh pr merge.
+      selected_at: 2026-05-24T16:57:13+08:00
+      approved_option: local-only merge decision packet
+      approval_text: >
+        Approve M128 C003 decision packet: prepare PR #6 merge high-risk
+        decision packet; do not run gh pr merge, push, edit PRs, mutate Issues,
+        or perform branch surgery.
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/SELECTED_CHANGE.yaml
+        - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/ATOM_TASKS.yaml
+        - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T16:57:13+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C003 produced a local high-risk merge decision packet and planning
+        evidence only; no product source, generated surface, remote PR, Issue,
+        merge, push, branch surgery, or destructive git operation was mutated.
+      selected_merge_target:
+        pr_number: 6
+        pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+        state: OPEN
+        draft: false
+        head_ref: codex/m71-git-version-governance
+        head_oid: a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+        base_ref: main
+        base_oid: d0e13f4bba3a847b763d2db3f771659aac3a4fe5
+        mergeable: MERGEABLE
+      recommended_c004_command: >
+        gh pr merge 6 --repo tiic-tech/openworkflow --merge --match-head-commit
+        a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+      required_c004_approval_text: >
+        Approve M128 C004 merge PR #6: run gh pr merge 6 --repo
+        tiic-tech/openworkflow --merge --match-head-commit
+        a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+      evidence:
+        - changes/M128-ready-pr-merge-governance/HIGH_RISK_DECISION_REPORT.md
+        - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup,mergedAt"
+        - "validation: git ls-remote --heads origin codex/m71-git-version-governance"
+        - "validation: git merge-tree --write-tree d0e13f4bba3a847b763d2db3f771659aac3a4fe5 a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1"
+  - id: C004
+    status: done
+    title: Execute approved first PR merge
+    purpose: >
+      If C003 recommends merge and the user approves the exact command, run only
+      the approved merge command for the selected PR and record evidence.
+    scope:
+      includes:
+        - verify exact approval text
+        - verify selected PR still matches expected head/base state
+        - run only the approved gh pr merge command
+        - record resulting PR/base metadata and remaining PR follow-up boundary
+      excludes:
+        - merging any additional PR
+        - push, force-push, rebase, reset, branch deletion, or split/surgery
+        - PR body edits, Issue mutation, or product source changes
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    dependencies:
+      - C003
+    unlocks:
+      - C005
+    risk: high
+    size: small
+    validation:
+      - gh pr view <selected-pr> --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - Only the exact approved PR is merged.
+      - Local evidence records approval, command, result, and remaining merge boundary.
+      - No additional remote mutation occurs.
+    selection:
+      selected_change_id: C004-approved-pr6-merge
+      reason: >
+        User provided the exact C004 approval text recorded by C003. C004
+        verified PR #6 still matched the expected stop gates, ran only the
+        approved gh pr merge command, and recorded the result.
+      selected_at: 2026-05-24T17:32:18+08:00
+      approval_text: >
+        Approve M128 C004 merge PR #6: run gh pr merge 6 --repo
+        tiic-tech/openworkflow --merge --match-head-commit
+        a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+      approved_command: >
+        gh pr merge 6 --repo tiic-tech/openworkflow --merge
+        --match-head-commit a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/SELECTED_CHANGE.yaml
+        - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/ATOM_TASKS.yaml
+        - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T17:32:18+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C004 executed the exact approved GitHub PR #6 merge and recorded local
+        governance evidence only; no product source, generated surface, Issue,
+        push, branch surgery, branch deletion, or additional PR mutation was
+        performed.
+      merge_result:
+        pr_number: 6
+        pr_url: https://github.com/tiic-tech/openworkflow/pull/6
+        state: MERGED
+        merged_at: 2026-05-24T09:31:55Z
+        merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+        origin_main_after_merge: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+        head_branch_preserved: true
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/MERGE_EVIDENCE.md
+        - "approval: Approve M128 C004 merge PR #6: run gh pr merge 6 --repo tiic-tech/openworkflow --merge --match-head-commit a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1"
+        - "command: gh pr merge 6 --repo tiic-tech/openworkflow --merge --match-head-commit a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1"
+        - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup"
+        - "validation: git ls-remote origin refs/heads/main refs/heads/codex/m71-git-version-governance"
+  - id: C005
+    status: done
+    title: Complete merge governance audit handoff
+    purpose: >
+      Record final M128 audit state, whether merge was executed or deferred,
+      and the next safe governance boundary.
+    scope:
+      includes:
+        - summarize C001-C004 evidence
+        - record final PR states and unauthorized operations not performed
+        - recommend the next queue for remaining PR merges or blockers
+      excludes:
+        - new merge execution
+        - PR edit, Issue mutation, push, branch surgery, or product source change
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    dependencies:
+      - C001
+    unlocks:
+      - future-ready-pr-merge-governance
+    risk: medium
+    size: small
+    validation:
+      - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - M128 final audit explains whether merge remains blocked, deferred, or completed.
+      - Remaining ready PRs are explicitly handed off to follow-up governance.
+      - No unauthorized operation is recorded.
+    selection:
+      selected_change_id: C005-merge-governance-audit-handoff
+      reason: >
+        User asked to advance C005 after C004 merged PR #6. C005 is the final
+        audit handoff candidate and records the next safe governance boundary
+        for PR #4, PR #5, and PR #7.
+      selected_at: 2026-05-24T17:35:42+08:00
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml
+        - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/ATOM_TASKS.yaml
+        - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-24T17:35:42+08:00
+      implementation_changed_files: false
+      commit_not_required_reason: >
+        C005 produced final local audit handoff evidence only; no product
+        source, generated surface, remote PR mutation, Issue mutation, push,
+        merge, branch surgery, or destructive git operation was performed.
+      final_state:
+        m128_complete: true
+        merged_pr: 6
+        merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+        remaining_open_prs:
+          - 4
+          - 5
+          - 7
+        next_recommended_queue: M129-remaining-ready-pr-merge-governance
+      evidence:
+        - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M128_MERGE_GOVERNANCE_AUDIT.md
+        - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup"
+        - "validation: gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20"
+        - "validation: git ls-remote origin refs/heads/main refs/heads/codex/m71-git-version-governance refs/heads/codex/m102-selected-change-commit-gate refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split"
+operations:
+  - operation_id: OP001
+    operation_type: create
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      User asked to use DTC to analyze the next git-governance candidate changes
+      after M127 was committed.
+    changed_at: 2026-05-24T07:39:03+08:00
+    before_status: null
+    after_status: active
+    evidence:
+      - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+      - node dist/cli/src/index.js resume --root . --json
+      - git status --short --branch
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      User asked to advance C001; C001 was the ready next recommended candidate
+      and is required before merge target sequencing.
+    changed_at: 2026-05-24T12:25:02+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/SELECTED_CHANGE.yaml
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/ATOM_TASKS.yaml
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+    actor: agent
+    reason: >
+      C001 read-only inventory completed with all target PRs open, non-draft,
+      mergeable, matching remote heads, and clean merge-tree probes; C002 is now
+      ready to decide the first merge target.
+    changed_at: 2026-05-24T12:26:24+08:00
+    before_status: selected/candidate
+    after_status: done/ready
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/MERGE_READINESS_INVENTORY.md
+      - "validation: gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20"
+      - "validation: git merge-tree --write-tree origin/main <head-oid> for PR #4, #5, #6, and #7"
+  - operation_id: OP004
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User asked to advance C002; C002 was the ready next recommended candidate
+      after C001 completed.
+    changed_at: 2026-05-24T12:35:33+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/SELECTED_CHANGE.yaml
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/ATOM_TASKS.yaml
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP005
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+      - C003
+    actor: agent
+    reason: >
+      C002 selected PR #6 as the first merge target because its 66-commit head
+      is the common ancestor of the larger PR #4, PR #5, and PR #7 stacks. C003
+      is ready only as an approval-gated high-risk merge decision packet.
+    changed_at: 2026-05-24T12:35:33+08:00
+    before_status: selected/candidate
+    after_status: done/ready
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C002-decide-first-merge-target-and-stop-gates/FIRST_MERGE_TARGET_DECISION.md
+      - "required approval: Approve M128 C003 decision packet: prepare PR #6 merge high-risk decision packet; do not run gh pr merge, push, edit PRs, mutate Issues, or perform branch surgery."
+  - operation_id: OP006
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User provided the exact C003 approval text for the local-only high-risk
+      decision packet. No merge execution was approved.
+    changed_at: 2026-05-24T16:57:13+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/SELECTED_CHANGE.yaml
+      - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/ATOM_TASKS.yaml
+      - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+      - C004
+    actor: agent
+    reason: >
+      C003 refreshed PR #6 facts, wrote the high-risk merge decision report, and
+      recorded the exact C004 approval gate. C004 is ready only if the user
+      approves the exact gh pr merge command.
+    changed_at: 2026-05-24T16:57:13+08:00
+    before_status: selected/candidate
+    after_status: done/ready
+    evidence:
+      - changes/M128-ready-pr-merge-governance/HIGH_RISK_DECISION_REPORT.md
+      - "required approval: Approve M128 C004 merge PR #6: run gh pr merge 6 --repo tiic-tech/openworkflow --merge --match-head-commit a0ddcf94b0f856a92218ef07fd323d3eb5bae0a1"
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      User provided the exact C004 approval text for the PR #6 merge command.
+      C004 verified stop gates before executing the approved command.
+    changed_at: 2026-05-24T17:32:18+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/SELECTED_CHANGE.yaml
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/ATOM_TASKS.yaml
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      C004 merged only PR #6 with the exact approved command. Origin main now
+      points at merge commit 8656ed135c7a57c5b515572fa06bc082aabdcb95, and
+      C005 is ready for final audit handoff.
+    changed_at: 2026-05-24T17:32:18+08:00
+    before_status: selected/candidate
+    after_status: done/ready
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C004-approved-pr6-merge/MERGE_EVIDENCE.md
+      - "validation: gh pr view 6 --repo tiic-tech/openworkflow --json number,url,state,isDraft,mergedAt,mergeCommit,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,statusCheckRollup"
+      - "validation: git ls-remote origin refs/heads/main refs/heads/codex/m71-git-version-governance"
+  - operation_id: OP010
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      User asked to advance C005 after C004 merged PR #6; C005 is the final
+      audit handoff candidate for M128.
+    changed_at: 2026-05-24T17:35:42+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/ATOM_TASKS.yaml
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP011
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 completed final M128 audit handoff. PR #6 is merged, PR #4/#5/#7
+      remain open, and remaining merge governance is deferred to M129.
+    changed_at: 2026-05-24T17:35:42+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M128_MERGE_GOVERNANCE_AUDIT.md
+  - operation_id: OP012
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+    actor: agent
+    reason: >
+      All M128 candidates are complete. The queue merged exactly PR #6 and
+      handed off remaining open PRs to a future refreshed governance queue.
+    changed_at: 2026-05-24T17:35:42+08:00
+    before_status: active
+    after_status: complete
+    evidence:
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M128_MERGE_GOVERNANCE_AUDIT.md

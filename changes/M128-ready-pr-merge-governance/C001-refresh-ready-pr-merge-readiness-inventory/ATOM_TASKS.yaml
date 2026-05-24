@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M128-ready-pr-merge-governance:C001-refresh-ready-pr-merge-readiness-inventory
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C001
+selected_change_id: C001-refresh-ready-pr-merge-readiness-inventory
+status: complete
+tasks:
+  - task_id: T001
+    title: Refresh open PR metadata
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/
+    done_when: >
+      PR #4, #5, #6, and #7 state, draft flag, head/base refs, OIDs,
+      mergeability, review decision, and check rollup are captured.
+  - task_id: T002
+    title: Verify remote head refs
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/
+    done_when: >
+      Each target remote branch is present and matches the PR head OID.
+  - task_id: T003
+    title: Probe merge-readiness locally
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/
+    done_when: >
+      Read-only ancestry and merge-tree signals are recorded for each target PR.
+  - task_id: T004
+    title: Write C001 inventory evidence
+    status: done
+    type: document
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C001-refresh-ready-pr-merge-readiness-inventory/MERGE_READINESS_INVENTORY.md
+    done_when: >
+      Inventory evidence states whether C002 can choose a first merge target and
+      records that no remote mutation was performed.
+  - task_id: T005
+    title: Update queue and verify
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    done_when: >
+      Queue, readable view, and summary are updated for C001 completion and
+      validation passes.

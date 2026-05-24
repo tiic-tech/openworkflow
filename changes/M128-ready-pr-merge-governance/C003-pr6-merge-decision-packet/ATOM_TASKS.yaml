@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M128-ready-pr-merge-governance:C003-pr6-merge-decision-packet
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C003
+selected_change_id: C003-pr6-merge-decision-packet
+status: complete
+tasks:
+  - task_id: T001
+    title: Verify C003 approval gate
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/
+    done_when: >
+      User approval text matches the C002-required local-only C003 decision
+      packet approval and does not approve merge execution.
+  - task_id: T002
+    title: Refresh PR #6 readiness facts
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C003-pr6-merge-decision-packet/
+    done_when: >
+      Current PR #6 state, head/base OIDs, mergeability, status checks, remote
+      head, and merge-tree signal are recorded.
+  - task_id: T003
+    title: Write high-risk merge decision report
+    status: done
+    type: document
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/HIGH_RISK_DECISION_REPORT.md
+    done_when: >
+      Report names PR #6, the exact later C004 merge command, stop gates, and
+      rollback limits while stating it is not approval.
+  - task_id: T004
+    title: Update queue and verify
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    done_when: >
+      Queue, readable view, and summary are updated for C003 completion and
+      validation passes.

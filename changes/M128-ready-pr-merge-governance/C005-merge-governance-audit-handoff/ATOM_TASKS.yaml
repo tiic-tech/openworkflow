@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M128-ready-pr-merge-governance:C005-merge-governance-audit-handoff
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M128-ready-pr-merge-governance
+candidate_id: C005
+selected_change_id: C005-merge-governance-audit-handoff
+status: complete
+tasks:
+  - task_id: T001
+    title: Verify final PR and remote state
+    status: done
+    type: read
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/
+    done_when: >
+      PR #6 merged state, origin/main head, preserved head branch, and remaining
+      open PRs are confirmed.
+  - task_id: T002
+    title: Write final audit handoff
+    status: done
+    type: document
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/C005-merge-governance-audit-handoff/M128_MERGE_GOVERNANCE_AUDIT.md
+    done_when: >
+      Audit handoff summarizes C001-C004 evidence, final state, unauthorized
+      operations not performed, and next governance boundary.
+  - task_id: T003
+    title: Complete queue and verify
+    status: done
+    type: verify
+    owned_paths:
+      - changes/M128-ready-pr-merge-governance/
+    done_when: >
+      Queue, readable view, and summary mark M128 complete and validation
+      passes.
