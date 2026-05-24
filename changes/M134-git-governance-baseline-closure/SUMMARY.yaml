@@ -25,9 +25,9 @@ target_base:
   branch: main
   head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
 candidate_count: 8
-completed_candidate_id: C002
-completed_change_id: C002
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: C003
+next_recommended_candidate_id: C004
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -43,6 +43,11 @@ outputs:
   atom_tasks_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
   implementation_brief_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
   m131_delta_extraction_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+  local_commit_evidence_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/SELECTED_CHANGE.yaml
+  atom_tasks_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/ATOM_TASKS.yaml
+  implementation_brief_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/IMPLEMENTATION_BRIEF.md
+  m132_delta_extraction_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
 key_dependencies:
   - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
   - "PR #8 remains open and draft."
@@ -80,4 +85,5 @@ validation:
     - PR #8 is the only remaining open PR and needs explicit disposition.
     - M131/M132 contain source deltas that must be extracted onto M134.
     - C002 extracted the M131 selected-change commit-evidence gate onto M134.
-    - C003 is the next recommended candidate.
+    - C003 extracted the M132 strict git lifecycle branch and PR gate onto M134.
+    - C004 is the next recommended candidate.

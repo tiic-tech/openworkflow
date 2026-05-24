@@ -9,7 +9,7 @@ M134 starts from `origin/main` at `6612aa3e06996ad0151e3686d0c972677fc892c6`, th
 - Branch boundary: `codex/m134-git-governance-baseline-closure`
 - Branch base: `origin/main`
 - Current base commit: `6612aa3e06996ad0151e3686d0c972677fc892c6`
-- Next recommended candidate: `C003`
+- Next recommended candidate: `C004`
 
 In scope: post-merge git/PR inventory, extracting necessary M131/M132 git-governance deltas onto a fresh branch, PR #8 disposition planning, M134 publication planning, and final baseline handoff.
 
@@ -88,7 +88,7 @@ Result:
 
 ### C003 - Extract M132 CC branch and PR lifecycle gate delta onto M134
 
-Status: ready
+Status: done
 Risk: high
 
 Reapply branch-per-CC and completed-CC PR lifecycle gates without importing old stacked history.
@@ -99,9 +99,16 @@ Acceptance:
 - Completed CC queues surface an explicit PR/publication gate before baseline-ready state.
 - Generated surfaces are updated only through source/sync paths.
 
+Result:
+
+- `queue_policy.git_lifecycle_gate: strict` now requires a plan-owned branch boundary.
+- Completed strict lifecycle queues require repo-relative `DRAFT_PR_OPERATION_EVIDENCE.yaml` before baseline-ready trust.
+- `summaries --strict` and handoff quality include strict lifecycle blockers.
+- Decompose-to-changes source guidance now instructs new queues to set strict lifecycle and branch boundary before selected work.
+
 ### C004 - Decide PR #8 disposition after PR #5 merge
 
-Status: candidate
+Status: ready
 Risk: high
 
 Prepare a local decision packet for PR #8.
