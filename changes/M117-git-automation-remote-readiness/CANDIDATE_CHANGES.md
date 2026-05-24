@@ -2,11 +2,24 @@
 
 Source of truth: `CANDIDATE_CHANGES.yaml`
 
-Status: active
+Status: completed
 
 Branch boundary: `codex/m117-git-automation-remote-readiness`
 
-Next recommended candidate: C001.
+Completed candidates: C001, C002, C003, C004, C005.
+
+Next recommended target: none; M117 is cleared.
+
+High-risk decision report:
+`HIGH_RISK_DECISION_REPORT.md`
+
+Decision status: approved Option D on 2026-05-23.
+
+Recommended option: Option D, approve C003 then C004 as local/read-only
+hardening only. This does not authorize push, PR mutation, Issue mutation,
+merge, rebase, reset, force-push, or working-tree conflict resolution.
+
+Selected candidate: none.
 
 ## Scope
 
@@ -49,7 +62,7 @@ Out of scope:
 
 ### C001 - Normalize Git-Automation Local Evidence Readers
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -67,9 +80,19 @@ Acceptance focus:
 - Legacy `commit:` evidence remains supported.
 - No remote mutation is enabled.
 
+Selection artifacts:
+
+- `C001-normalize-git-automation-local-evidence-readers/SELECTED_CHANGE.yaml`
+- `C001-normalize-git-automation-local-evidence-readers/ATOM_TASKS.yaml`
+- `C001-normalize-git-automation-local-evidence-readers/IMPLEMENTATION_BRIEF.md`
+
+Completion: shared local evidence reader added and wired into PR-ready summary,
+remote-plan, and simulator. Targeted RED/GREEN fixture is now part of runtime
+surface verification.
+
 ### C002 - Apply Branch Identity Governance Across Git-Automation Modes
 
-Status: ready
+Status: done
 
 Risk: medium
 
@@ -85,9 +108,19 @@ Acceptance focus:
 - Stale branch identities fail closed unless a scoped exception applies.
 - Existing C008 commit behavior remains green.
 
+Selection artifacts:
+
+- `C002-apply-branch-identity-governance-across-git-automation-modes/SELECTED_CHANGE.yaml`
+- `C002-apply-branch-identity-governance-across-git-automation-modes/ATOM_TASKS.yaml`
+- `C002-apply-branch-identity-governance-across-git-automation-modes/IMPLEMENTATION_BRIEF.md`
+
+Completion: branch, remote-plan, simulate, and draft-pr now report and enforce
+feat-scoped branch identity. Stale branch identity fails closed unless a scoped
+temporary continuation exception applies.
+
 ### C003 - Harden Draft PR Pilot Approval And Local Audit Evidence
 
-Status: candidate
+Status: done
 
 Risk: high
 
@@ -104,9 +137,32 @@ Acceptance focus:
 - Missing approval fails closed.
 - Preview mode remains read-only.
 
+Selection artifacts:
+
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/SELECTED_CHANGE.yaml`
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/ATOM_TASKS.yaml`
+- `C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/IMPLEMENTATION_BRIEF.md`
+
+Completion: draft PR pilot write mode now requires `--approval-evidence` in
+addition to `--write --allow-draft-pr`, reports operation kind/outcome in JSON,
+and writes local draft PR operation audit evidence for approved write-mode paths.
+Runtime-surface coverage uses fake `gh` and did not execute real PR create or
+edit.
+
 ### C004 - Define Structured Merge-Conflict Readiness Checkpoint
 
-Status: candidate
+Status: done
+
+Selection artifacts:
+
+- `C004-define-structured-merge-conflict-readiness-checkpoint/SELECTED_CHANGE.yaml`
+- `C004-define-structured-merge-conflict-readiness-checkpoint/ATOM_TASKS.yaml`
+- `C004-define-structured-merge-conflict-readiness-checkpoint/IMPLEMENTATION_BRIEF.md`
+
+Completion: remote-plan and simulator now expose structured merge-readiness
+checkpoint data. Clean cases report fast-forward state and no conflict files;
+conflict cases stop with named files and isolated worktree evidence
+requirements. No merge, rebase, reset, force-push, or PR merge was executed.
 
 Risk: high
 
@@ -125,7 +181,7 @@ Acceptance focus:
 
 ### C005 - Add Full Remote-Readiness Story Verifier
 
-Status: candidate
+Status: done
 
 Risk: medium
 
@@ -139,3 +195,8 @@ Acceptance focus:
 - Verifier fails if commit evidence, branch identity, draft PR approval, or
   conflict checkpoint fields disappear.
 - The later autonomous queue has concrete evidence to consume.
+
+Completion: integrated verifier now covers local evidence, branch identity,
+PR-ready summary generation, remote refs, remote-plan, draft-pr preview and
+approval refusal, merge-readiness checkpoint, and remote merge refusal using
+temporary local repositories only.

@@ -1,0 +1,26 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M117-C004-define-structured-merge-conflict-readiness-checkpoint
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M117-C004-define-structured-merge-conflict-readiness-checkpoint
+status: current
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C004
+selected_change_id: M117-C004-define-structured-merge-conflict-readiness-checkpoint
+primary_commit: c41def51b4d002fc2c91ad87ec82f9124cbe849e
+validation_evidence:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

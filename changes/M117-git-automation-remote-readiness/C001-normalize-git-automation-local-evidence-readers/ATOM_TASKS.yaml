@@ -1,0 +1,77 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M117-git-automation-remote-readiness:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M117-C001-normalize-git-automation-local-evidence-readers
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C001
+title: Atom tasks for M117 C001 local evidence reader normalization
+status: completed
+tasks:
+  - task_id: T001
+    title: Map existing git automation evidence consumers
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - changes/M114-engineering-quality-foundation/
+    done_when: >
+      The current evidence inputs and output fields are mapped for PR-ready
+      summary, remote-plan, simulator, and legacy completion evidence.
+  - task_id: T002
+    title: Add RED modern local-commit evidence fixture
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      A targeted fixture fails because at least one git-automation report path
+      misses M114-style LOCAL_COMMIT_EVIDENCE.yaml commit or validation data.
+  - task_id: T003
+    title: Implement shared local evidence reader
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/
+    done_when: >
+      One shared reader resolves queue completion evidence, selected-change
+      LOCAL_COMMIT_EVIDENCE.yaml records, primary implementation commits,
+      evidence commits, head commits, validation commands, selected-change ids,
+      and evidence paths while preserving legacy `commit:` strings.
+  - task_id: T004
+    title: Wire reader into summary, remote-plan, and simulator
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/prReadySummary.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      PR-ready summary, remote-plan, and simulator use the shared reader and
+      expose ordered modern local commit evidence without enabling remote
+      mutation.
+  - task_id: T005
+    title: Run GREEN validation and record completion evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      RED fixture is green, build/runtime validation passes, queue and
+      selected-change completion evidence reference LOCAL_COMMIT_EVIDENCE.yaml,
+      and git diff check is clean.
+verification:
+  red:
+    - "RED: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs failed because summary did not render primary_commit from LOCAL_COMMIT_EVIDENCE.yaml"
+  green:
+    - npm run build
+    - "GREEN: node changes/M117-git-automation-remote-readiness/C001-normalize-git-automation-local-evidence-readers/local_evidence_reader_fixture.mjs"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js git-automation summary --root . --queue changes/M114-engineering-quality-foundation/CANDIDATE_CHANGES.yaml --json
+    - node dist/cli/src/index.js validate --root . --json
+    - git diff --check

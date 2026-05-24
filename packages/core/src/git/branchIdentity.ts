@@ -1,4 +1,4 @@
-export type BranchIdentityOperation = "planning" | "select" | "commit" | "resume" | "validate";
+export type BranchIdentityOperation = "planning" | "select" | "branch" | "commit" | "resume" | "validate" | "remote-plan" | "simulate" | "draft-pr";
 
 export interface BranchIdentityException {
   mode: string | null;

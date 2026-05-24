@@ -1,0 +1,113 @@
+schema_version: 0.1.0
+contract_id: selected_change:M117-git-automation-remote-readiness:C003
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M117-C003-harden-draft-pr-pilot-approval-and-local-audit-evidence
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C003
+title: Harden draft PR pilot approval and local audit evidence
+status: completed
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after the user approved high-risk Option D. C003 closes the immediate
+  draft PR write-mode approval gap before future remote PR automation can rely
+  on the pilot.
+risk_decision:
+  risk: high
+  approved_option: Option D
+  approval_source: user_input:2026-05-23-approve-option-d
+  report_path: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  selected_option: >
+    Implement local/read-only hardening only: require explicit approval evidence
+    for any write-mode draft PR pilot path, write local audit evidence only when
+    a future approved write path is used, and keep preview mode non-mutating.
+scope:
+  includes:
+    - require explicit high-risk approval evidence for write-mode draft PR create or edit
+    - record operation kind, target PR URL or number, branch, base, body digest, approval source, timestamp, and rollback guidance locally
+    - keep preview mode non-mutating and useful without approval
+    - distinguish create, edit, and no-op outcomes in JSON
+  excludes:
+    - ready-for-review PR mutation
+    - PR merge
+    - issue mutation
+    - pushing branches
+    - real gh pr create or gh pr edit execution in this candidate
+owned_paths:
+  - references/gh-operation-governance.md
+  - packages/core/src/git/draftPrPilot.ts
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M117-git-automation-remote-readiness/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+acceptance:
+  - "`--write --allow-draft-pr` is insufficient without explicit local approval evidence."
+  - Successful draft PR mutation writes local audit evidence.
+  - Missing approval fails closed with an actionable error.
+  - Preview mode remains read-only.
+validation:
+  - npm run build
+  - targeted draft-pr approval/evidence fixture
+  - npm run verify:runtime-surface
+  - git diff --check
+coder_governance:
+  required: true
+  protocol_source: skills/coder/SKILL.md
+  quality_benchmark: /Users/archy/.codex/skills/ow-code-quality-governor/SKILL.md
+  required_evidence:
+    - trust recovery
+    - owner/file/dependency map
+    - RED draft-pr approval fixture before production edits
+    - GREEN draft-pr approval fixture after production edits
+    - post-write self-check
+    - validation ladder
+    - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
+expected_commit_boundary: >
+  C003 should complete as one local implementation commit plus local commit
+  evidence, containing draft PR approval evidence validation, local audit
+  evidence shape, targeted fixture coverage, queue updates, and coder evidence.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - references/gh-operation-governance.md
+    - packages/core/src/git/draftPrPilot.ts
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M117-git-automation-remote-readiness/C003-harden-draft-pr-pilot-approval-and-local-audit-evidence/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Draft PR pilot write mode now requires --approval-evidence in addition to
+    --write --allow-draft-pr, reports create/edit/no-op operation state in JSON,
+    and writes local draft PR operation audit evidence after an approved
+    write-mode path. The verifier uses fake gh coverage and does not execute
+    real remote PR creation or editing.
+  validation:
+    - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because draft-pr approval blocker did not name approval evidence"
+    - npm run build
+    - "GREEN: node dist/cli/src/dev/verifyRuntimeSurface.js covered blocked --write --allow-draft-pr without --approval-evidence and fake-gh approved audit evidence"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  coder_evidence:
+    status: recorded
+    enforcement: guidance_only
+    preflight:
+      - Recovered trust with repo-local resume/context and git status before source edits.
+      - Confirmed C003 owned paths and forbidden generated .agents/.openworkflow surfaces.
+      - Kept approval/audit behavior in packages/core/src/git/draftPrPilot.ts with CLI flag wiring only in gitAutomation.ts.
+    red_green:
+      - RED runtime-surface assertion failed because --write --allow-draft-pr did not require explicit approval evidence.
+      - GREEN runtime-surface assertion passed after --approval-evidence was required and fake-gh approved writes produced local audit evidence.
+    self_check:
+      - Preview mode remains non-mutating and useful without approval evidence.
+      - Missing approval fails before gh PR mutation is invoked.
+      - No push, real gh PR create/edit, Issue mutation, merge, rebase, reset, or force-push was executed.
+stop_conditions:
+  - Fix requires push, real PR create/edit, Issue mutation, merge, rebase, reset, or force-push.
+  - Implementation would treat --write --allow-draft-pr as sufficient approval.
+  - Scope expands into C004 merge-conflict checkpointing.
+  - Durable fix would require hand-editing generated .agents/** or .openworkflow/** surfaces.

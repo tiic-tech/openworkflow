@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M117-C001-normalize-git-automation-local-evidence-readers
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M117-C001-normalize-git-automation-local-evidence-readers
+status: current
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C001
+selected_change_id: M117-C001-normalize-git-automation-local-evidence-readers
+primary_commit: a058640d69817040988f1ad99f55970ead060b41
+validation_evidence:
+  - RED fixture failed before reader
+  - npm run build
+  - GREEN local_evidence_reader_fixture
+  - git-automation summary M114
+  - npm run verify:runtime-surface
+  - validate --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

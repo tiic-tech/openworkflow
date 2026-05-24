@@ -1,0 +1,80 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M117-git-automation-remote-readiness:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M117-C002-apply-branch-identity-governance-across-git-automation-modes
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C002
+title: Atom tasks for M117 C002 branch identity governance across git automation
+status: completed
+tasks:
+  - task_id: T001
+    title: Map branch identity consumers and operation scopes
+    status: completed
+    type: read
+    owned_paths:
+      - packages/core/src/git/branchIdentity.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      The current gap is mapped for branch, remote-plan, simulate, and draft-pr,
+      including which operation names can use temporary continuation exceptions.
+  - task_id: T002
+    title: Add RED stale-branch remote-readiness fixture
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      A targeted fixture fails because stale branch identity is not reported or
+      does not fail closed in at least one queue-bound git-automation mode.
+  - task_id: T003
+    title: Implement shared branch identity report fields
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/branchIdentity.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      Queue-bound modes expose branch_matches_current, branch_owns_plan, and a
+      structured branch_identity assessment without conflating current-branch
+      equality with feat ownership.
+  - task_id: T004
+    title: Fail closed for stale branch identity in remote-readiness modes
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/core/src/git/remoteReadonlyPlanner.ts
+      - packages/core/src/git/autonomousSimulator.ts
+      - packages/core/src/git/draftPrPilot.ts
+      - packages/cli/src/commands/gitAutomation.ts
+    done_when: >
+      Mismatched plan token branch boundaries block remote-plan, simulate, and
+      draft-pr unless a scoped temporary continuation exception applies.
+  - task_id: T005
+    title: Run GREEN validation and record completion evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      RED fixture is green, build/runtime validation passes, resume confirms
+      trust, and local commit evidence records C002 completion.
+verification:
+  red:
+    - "RED: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs failed because branch mode accepted stale branch identity"
+  green:
+    - npm run build
+    - "GREEN: node changes/M117-git-automation-remote-readiness/C002-apply-branch-identity-governance-across-git-automation-modes/branch_identity_remote_modes_fixture.mjs"
+    - "GREEN: node changes/M114-engineering-quality-foundation/C008-enforce-feat-scoped-branch-identity/branch_identity_fixture.mjs"
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js resume --root . --json
+    - git diff --check

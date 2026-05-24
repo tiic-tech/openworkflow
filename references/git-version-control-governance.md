@@ -181,6 +181,20 @@ Remote operations are outside the approved local boundary. Push, remote PR
 creation or update, Issue mutation, and merge require explicit operation-level
 approval and must follow `references/gh-operation-governance.md`.
 
+## Merge Readiness And Conflict Checkpoints
+
+Remote readiness may compute a structured merge checkpoint with read-only git
+commands such as `git merge-base`, `git merge-base --is-ancestor`, and
+`git merge-tree --write-tree`. This checkpoint may report target base, target
+branch, merge base, fast-forward state, conflict files, required validations,
+and stop reasons.
+
+The checkpoint is not permission to merge and must not run `git merge`, modify
+the user's working tree, auto-resolve conflicts, rebase, reset, force-push, or
+mark a PR ready. If conflicts are reported, future work must use an isolated
+worktree, explicit operation-level user approval, conflict-resolution evidence,
+validation reruns, and local audit evidence before any later approved merge.
+
 ## Evidence
 
 When a selected change completes, the owning queue should record enough

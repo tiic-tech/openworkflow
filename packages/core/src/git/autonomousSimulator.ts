@@ -3,6 +3,9 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
+import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
+import { buildMergeReadinessCheckpoint, type MergeReadinessCheckpoint } from "./mergeReadinessCheckpoint.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -23,13 +26,16 @@ export interface SimulateAutonomousGitResult {
   planId: string;
   branchBoundary: string | null;
   currentBranch: string | null;
+  branchMatchesCurrent: boolean | null;
+  branchOwnsPlan: boolean | null;
+  branchIdentity: BranchIdentityAssessment;
   targetRemote: string;
   targetBase: string;
   baseRef: string | null;
   localHead: string | null;
   dirtyPaths: string[];
   orderedLocalCommits: Array<{ hash: string; subject: string }>;
-  commitEvidence: Array<{ candidate_id: string; hash: string }>;
+  commitEvidence: LocalGitCommitEvidence[];
   prSummaryPath: string;
   prSummaryExists: boolean;
   validationEvidence: string[];
@@ -39,6 +45,7 @@ export interface SimulateAutonomousGitResult {
     remoteHead: string | null;
     baseHead: string | null;
   };
+  mergeReadiness: MergeReadinessCheckpoint;
   simulatedPlan: string[];
   rollbackPlan: string[];
 }
@@ -46,31 +53,49 @@ export interface SimulateAutonomousGitResult {
 export async function simulateAutonomousGit(options: SimulateAutonomousGitOptions): Promise<SimulateAutonomousGitResult> {
   const queue = await loadQueue(options.root, options.queuePath);
   const planId = stringValue(queue.plan_id) ?? "unknown-plan";
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
+  const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy), "simulate");
   const targetRemote = options.targetRemote ?? "origin";
   const targetBase = options.targetBase ?? options.baseRef ?? "main";
   const baseRef = options.baseRef ?? targetBase;
   const prSummaryPath = options.prSummaryPath ?? defaultPrSummaryPath(options.queuePath);
   const currentBranch = await gitCaptureTrim(options.root, ["branch", "--show-current"]);
+  const branchMatchesCurrent = branchBoundary ? currentBranch === branchBoundary : null;
   const localHead = await gitCaptureTrim(options.root, ["rev-parse", "HEAD"]);
   const dirtyPaths = await readDirtyPaths(options.root);
   const orderedLocalCommits = await readOrderedCommits(options.root, baseRef);
-  const commitEvidence = commitEvidenceFromQueue(queue);
+  const localEvidence = await readLocalGitEvidence(options.root, queue);
+  const commitEvidence = localEvidence.commitEvidence;
   const prSummaryExists = await exists(join(options.root, prSummaryPath));
-  const validationEvidence = collectValidationEvidence(queue);
+  const validationEvidence = localEvidence.validationEvidence.map((item) => item.value);
   const remoteHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, branchBoundary ?? currentBranch ?? "HEAD"]);
   const baseHead = await gitCaptureTrim(options.root, ["ls-remote", "--heads", targetRemote, targetBase]);
+  const targetBranch = branchBoundary ?? currentBranch ?? "HEAD";
+  const mergeReadiness = await buildMergeReadinessCheckpoint({
+    root: options.root,
+    targetRemote,
+    targetBase,
+    targetBranch,
+    baseHead,
+    branchHead: remoteHead,
+    validationEvidence,
+  });
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
+    ...branchIdentity.errors,
     ...(branchBoundary && currentBranch !== branchBoundary ? [`current branch ${currentBranch ?? "(detached)"} does not match branch boundary ${branchBoundary}`] : []),
     ...(dirtyPaths.length > 0 ? ["working tree is not clean"] : []),
     ...(orderedLocalCommits.length === 0 && commitEvidence.length === 0 ? ["no local commits or commit evidence available for autonomous plan"] : []),
     ...(!prSummaryExists ? [`PR-ready summary is missing: ${prSummaryPath}`] : []),
     ...(validationEvidence.length === 0 ? ["validation evidence is missing"] : []),
+    ...mergeReadiness.stopReasons.filter((reason) => reason.includes("merge conflict checkpoint")),
   ];
   const warnings = [
     ...(!remoteHead ? [`remote branch head is unknown for ${targetRemote}/${branchBoundary ?? currentBranch ?? "HEAD"}`] : []),
     ...(!baseHead ? [`remote base head is unknown for ${targetRemote}/${targetBase}`] : []),
+    ...branchIdentity.warnings,
+    ...localEvidence.warnings,
     "simulator is read-only and did not push, create PRs, merge, or mutate Issues",
   ];
 
@@ -82,6 +107,9 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
     planId,
     branchBoundary,
     currentBranch,
+    branchMatchesCurrent,
+    branchOwnsPlan: branchIdentity.owns_plan,
+    branchIdentity,
     targetRemote,
     targetBase,
     baseRef,
@@ -98,11 +126,13 @@ export async function simulateAutonomousGit(options: SimulateAutonomousGitOption
       remoteHead,
       baseHead,
     },
+    mergeReadiness,
     simulatedPlan: [
       "verify clean working tree and branch boundary",
       "verify validation evidence and PR-ready summary are current",
       `push ${branchBoundary ?? currentBranch ?? "<branch>"} to ${targetRemote}`,
       `create or update PR from ${branchBoundary ?? currentBranch ?? "<branch>"} into ${targetBase}`,
+      "review structured merge readiness checkpoint before any merge approval",
       "wait for checks and repository protection",
       "stop for conflict evidence if merge cannot be cleanly planned",
       "merge only after autonomous merge policy is separately approved",
@@ -162,31 +192,6 @@ async function exists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-function collectValidationEvidence(queue: Record<string, unknown>): string[] {
-  const values = new Set<string>();
-  for (const item of array(record(queue.validation).commands_run)) {
-    values.add(String(item));
-  }
-  for (const change of array(queue.changes).map(record)) {
-    for (const item of array(record(change.completion).evidence).map(String)) {
-      if (item.startsWith("validation:")) {
-        values.add(item.replace(/^validation:\s*/, ""));
-      }
-    }
-  }
-  return [...values];
-}
-
-function commitEvidenceFromQueue(queue: Record<string, unknown>): Array<{ candidate_id: string; hash: string }> {
-  return array(queue.changes).map(record).flatMap((candidate) => {
-    const candidateId = stringValue(candidate.id) ?? "unknown";
-    return array(record(candidate.completion).evidence)
-      .map(String)
-      .filter((item) => item.startsWith("commit:"))
-      .map((item) => ({ candidate_id: candidateId, hash: item.replace(/^commit:\s*/, "") }));
-  });
 }
 
 function defaultPrSummaryPath(queuePath: string): string {

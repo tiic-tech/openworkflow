@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { promisify } from "node:util";
 import { dumpYaml, parseYaml } from "../contracts/yaml.js";
-import { assessBranchIdentity, type BranchIdentityException } from "./branchIdentity.js";
+import { assessBranchIdentity, type BranchIdentityAssessment, type BranchIdentityException } from "./branchIdentity.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -17,8 +17,10 @@ export interface LocalGitCommandPreview {
 
 export interface EnsureLocalFeatBranchOptions {
   root: string;
+  planId?: string;
   branchBoundary: string;
   dryRun?: boolean;
+  branchIdentityException?: BranchIdentityException | null;
 }
 
 export interface EnsureLocalFeatBranchResult {
@@ -26,6 +28,9 @@ export interface EnsureLocalFeatBranchResult {
   dryRun: boolean;
   branchBoundary: string;
   currentBranch: string | null;
+  branchMatchesCurrent: boolean | null;
+  branchOwnsPlan: boolean | null;
+  branchIdentity: BranchIdentityAssessment | null;
   dirtyPaths: string[];
   action: LocalFeatBranchAction | null;
   preview: LocalGitCommandPreview | null;
@@ -96,7 +101,22 @@ export async function ensureLocalFeatBranch(options: EnsureLocalFeatBranchOption
     ? currentBranchResult.stdout.trim()
     : null;
   const dirtyPaths = await readDirtyPaths(options.root);
-  const withState = { ...base, currentBranch, dirtyPaths };
+  const branchMatchesCurrent = currentBranch === branchBoundary;
+  const branchIdentity = options.planId
+    ? assessBranchIdentity(options.planId, branchBoundary, options.branchIdentityException, "branch")
+    : null;
+  const withState = {
+    ...base,
+    currentBranch,
+    branchMatchesCurrent,
+    branchOwnsPlan: branchIdentity?.owns_plan ?? null,
+    branchIdentity,
+    dirtyPaths,
+  };
+
+  if (branchIdentity && !branchIdentity.ok) {
+    return { ...withState, errors: branchIdentity.errors };
+  }
 
   if (dirtyPaths.length > 0) {
     return {
@@ -414,6 +434,9 @@ function emptyResult(dryRun: boolean, branchBoundary: string): EnsureLocalFeatBr
     dryRun,
     branchBoundary,
     currentBranch: null,
+    branchMatchesCurrent: null,
+    branchOwnsPlan: null,
+    branchIdentity: null,
     dirtyPaths: [],
     action: null,
     preview: null,

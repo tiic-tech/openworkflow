@@ -3,6 +3,9 @@ import { access, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { parseYaml } from "../contracts/yaml.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom, type BranchIdentityAssessment } from "./branchIdentity.js";
+import { readLocalGitEvidence, type LocalGitCommitEvidence } from "./localEvidenceReader.js";
+import { buildMergeReadinessCheckpoint, type MergeReadinessCheckpoint } from "./mergeReadinessCheckpoint.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -29,13 +32,16 @@ export interface PlanRemoteReadonlyResult {
     branch: string;
     currentBranch: string | null;
     branchBoundary: string | null;
+    branchMatchesCurrent: boolean | null;
+    branchOwnsPlan: boolean | null;
+    branchIdentity: BranchIdentityAssessment;
   };
   localState: {
     head: string | null;
     baseRef: string | null;
     dirtyPaths: string[];
     orderedCommits: Array<{ hash: string; subject: string }>;
-    commitEvidence: Array<{ candidate_id: string; hash: string }>;
+    commitEvidence: LocalGitCommitEvidence[];
     validationEvidence: string[];
     simulatorEvidencePresent: boolean;
     prSummaryPath: string;
@@ -51,6 +57,7 @@ export interface PlanRemoteReadonlyResult {
     items: Array<Record<string, unknown>>;
     warning: string | null;
   };
+  mergeReadiness: MergeReadinessCheckpoint;
   blockers: string[];
   warnings: string[];
   readOnlyPlan: string[];
@@ -60,8 +67,11 @@ export interface PlanRemoteReadonlyResult {
 export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Promise<PlanRemoteReadonlyResult> {
   const queue = await loadQueue(options.root, options.queuePath);
   const planId = stringValue(queue.plan_id) ?? "unknown-plan";
-  const branchBoundary = stringValue(record(queue.queue_policy).branch_boundary);
+  const queuePolicy = record(queue.queue_policy);
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
   const currentBranch = await gitCaptureTrim(options.root, ["branch", "--show-current"]);
+  const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy), "remote-plan");
+  const branchMatchesCurrent = branchBoundary ? currentBranch === branchBoundary : null;
   const targetRemote = options.targetRemote ?? "origin";
   const targetBase = options.targetBase ?? options.baseRef ?? "main";
   const targetBranch = options.targetBranch ?? branchBoundary ?? currentBranch ?? "HEAD";
@@ -71,15 +81,26 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
   const localHead = await gitCaptureTrim(options.root, ["rev-parse", "HEAD"]);
   const dirtyPaths = await readDirtyPaths(options.root);
   const orderedCommits = await readOrderedCommits(options.root, baseRef);
-  const commitEvidence = commitEvidenceFromQueue(queue);
-  const validationEvidence = collectValidationEvidence(queue);
+  const localEvidence = await readLocalGitEvidence(options.root, queue);
+  const commitEvidence = localEvidence.commitEvidence;
+  const validationEvidence = localEvidence.validationEvidence.map((item) => item.value);
   const simulatorEvidencePresent = hasSimulatorEvidence(queue);
   const prSummaryExists = await exists(join(options.root, prSummaryPath));
   const branchHead = parseLsRemoteHead(await gitCapture(options.root, ["ls-remote", "--heads", targetRemote, targetBranch]));
   const baseHead = parseLsRemoteHead(await gitCapture(options.root, ["ls-remote", "--heads", targetRemote, targetBase]));
   const prState = await readPrState(options.root, targetBranch, targetBase);
+  const mergeReadiness = await buildMergeReadinessCheckpoint({
+    root: options.root,
+    targetRemote,
+    targetBase,
+    targetBranch,
+    baseHead,
+    branchHead,
+    validationEvidence,
+  });
   const blockers = [
     ...(!branchBoundary ? ["queue_policy.branch_boundary is missing"] : []),
+    ...branchIdentity.errors,
     ...(branchBoundary && currentBranch !== branchBoundary ? [`current branch ${currentBranch ?? "(detached)"} does not match branch boundary ${branchBoundary}`] : []),
     ...(dirtyPaths.length > 0 ? ["working tree is not clean"] : []),
     ...(!remoteUrl ? [`target remote is unknown: ${targetRemote}`] : []),
@@ -88,9 +109,12 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
     ...(!simulatorEvidencePresent ? ["simulator evidence is missing"] : []),
     ...(!prSummaryExists ? [`PR-ready summary is missing: ${prSummaryPath}`] : []),
     ...(validationEvidence.length === 0 ? ["validation evidence is missing"] : []),
+    ...mergeReadiness.stopReasons.filter((reason) => reason.includes("merge conflict checkpoint")),
   ];
   const warnings = [
     ...(!branchHead ? [`remote branch head is absent or unreadable for ${targetRemote}/${targetBranch}`] : []),
+    ...branchIdentity.warnings,
+    ...localEvidence.warnings,
     ...(prState.warning ? [prState.warning] : []),
     "remote-readonly-plan is read-only and did not push, create PRs, edit PRs, merge, or mutate Issues",
   ];
@@ -108,6 +132,9 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
       branch: targetBranch,
       currentBranch,
       branchBoundary,
+      branchMatchesCurrent,
+      branchOwnsPlan: branchIdentity.owns_plan,
+      branchIdentity,
     },
     localState: {
       head: localHead,
@@ -125,12 +152,14 @@ export async function planRemoteReadonly(options: PlanRemoteReadonlyOptions): Pr
       baseHead,
     },
     prState,
+    mergeReadiness,
     blockers,
     warnings,
     readOnlyPlan: [
       "verify target remote, branch, and base identity",
       "compare local HEAD, ordered commits, and queue commit evidence",
       "compare remote branch head and target base head",
+      "compute read-only merge readiness checkpoint without running git merge",
       "inspect existing draft PR metadata when gh is available",
       "produce a push and draft PR operation preview for a later approved mutation candidate",
       "stop before any git push, gh pr create, gh pr edit, merge, or Issue mutation",
@@ -229,31 +258,6 @@ function parseLsRemoteHead(output: string): string | null {
     return null;
   }
   return first.split(/\s+/)[0] ?? null;
-}
-
-function collectValidationEvidence(queue: Record<string, unknown>): string[] {
-  const values = new Set<string>();
-  for (const item of array(record(queue.validation).commands_run)) {
-    values.add(String(item));
-  }
-  for (const change of array(queue.changes).map(record)) {
-    for (const item of array(record(change.completion).evidence).map(String)) {
-      if (item.startsWith("validation:")) {
-        values.add(item.replace(/^validation:\s*/, ""));
-      }
-    }
-  }
-  return [...values];
-}
-
-function commitEvidenceFromQueue(queue: Record<string, unknown>): Array<{ candidate_id: string; hash: string }> {
-  return array(queue.changes).map(record).flatMap((candidate) => {
-    const candidateId = stringValue(candidate.id) ?? "unknown";
-    return array(record(candidate.completion).evidence)
-      .map(String)
-      .filter((item) => item.startsWith("commit:"))
-      .map((item) => ({ candidate_id: candidateId, hash: item.replace(/^commit:\s*/, "") }));
-  });
 }
 
 function hasSimulatorEvidence(queue: Record<string, unknown>): boolean {

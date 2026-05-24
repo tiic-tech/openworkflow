@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M117-C002-apply-branch-identity-governance-across-git-automation-modes
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for M117-C002-apply-branch-identity-governance-across-git-automation-modes
+status: current
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C002
+selected_change_id: M117-C002-apply-branch-identity-governance-across-git-automation-modes
+primary_commit: 81fefc1eafbb0b2ccc562d943a1d116733212210
+validation_evidence:
+  - RED branch_identity_remote_modes_fixture failed before implementation
+  - npm run build
+  - GREEN branch_identity_remote_modes_fixture
+  - GREEN M114 C008 branch_identity_fixture
+  - npm run verify:runtime-surface
+  - resume --json
+  - validate --json
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

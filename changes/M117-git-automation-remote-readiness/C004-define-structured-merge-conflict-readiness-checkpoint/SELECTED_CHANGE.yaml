@@ -1,0 +1,113 @@
+schema_version: 0.1.0
+contract_id: selected_change:M117-git-automation-remote-readiness:C004
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M117-C004-define-structured-merge-conflict-readiness-checkpoint
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C004
+title: Define structured merge-conflict readiness checkpoint
+status: completed
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after C003 completed because M117 must continue until the current
+  queue is cleared. The user corrected the queue boundary and approved Option D
+  already authorizes C004 as local/read-only merge-conflict readiness
+  checkpointing.
+risk_decision:
+  risk: high
+  approved_option: Option D
+  approval_source: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  report_path: changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  selected_option: >
+    Implement structured merge-conflict readiness checkpointing without merge,
+    rebase, reset, force-push, PR merge, or working-tree conflict resolution.
+scope:
+  includes:
+    - define remote merge readiness fields for target base, branch head, merge base, fast-forward status, conflict probe, conflict files, required validations, and stop reasons
+    - add read-only conflict probe coverage using temporary repositories
+    - update remote-plan and simulator to expose conflict checkpoint fields
+    - document how conflict resolution must use isolated worktrees, explicit user approval, validation reruns, and local evidence before merge
+  excludes:
+    - running git merge against the user's working tree
+    - auto-resolving conflicts
+    - merging PRs
+    - force-push or rebase operations
+owned_paths:
+  - references/git-version-control-governance.md
+  - references/gh-operation-governance.md
+  - packages/core/src/git/mergeReadinessCheckpoint.ts
+  - packages/core/src/git/remoteReadonlyPlanner.ts
+  - packages/core/src/git/autonomousSimulator.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M117-git-automation-remote-readiness/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+acceptance:
+  - Remote readiness reports include structured conflict checkpoint data.
+  - Conflict cases stop with conflict files and required next evidence.
+  - Clean cases distinguish fast-forward, non-fast-forward clean merge, and unknown states.
+  - No merge, rebase, reset, force-push, or PR merge is executed.
+validation:
+  - npm run build
+  - targeted merge-conflict checkpoint fixture
+  - npm run verify:runtime-surface
+  - git diff --check
+coder_governance:
+  required: true
+  protocol_source: skills/coder/SKILL.md
+  required_evidence:
+    - trust recovery
+    - owner/file/dependency map
+    - RED merge-conflict checkpoint fixture before production edits
+    - GREEN merge-conflict checkpoint fixture after production edits
+    - post-write self-check
+    - validation ladder
+    - LOCAL_COMMIT_EVIDENCE.yaml coder_evidence binding
+expected_commit_boundary: >
+  C004 should complete as one local implementation commit plus local commit
+  evidence, containing merge-readiness checkpoint source, remote-plan/simulator
+  report wiring, verifier coverage, governance docs, and queue updates.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - packages/core/src/git/mergeReadinessCheckpoint.ts
+    - packages/core/src/git/remoteReadonlyPlanner.ts
+    - packages/core/src/git/autonomousSimulator.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M117-git-automation-remote-readiness/C004-define-structured-merge-conflict-readiness-checkpoint/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Remote-plan and simulator now expose a structured merge-readiness checkpoint
+    with target heads, merge base, fast-forward state, read-only merge-tree
+    conflict probe, conflict files, required validations, and stop reasons. The
+    implementation does not run merge, rebase, reset, force-push, PR merge, or
+    conflict resolution in the user's working tree.
+  validation:
+    - "RED: npm run build && node dist/cli/src/dev/verifyRuntimeSurface.js failed because simulator merge readiness checkpoint was missing"
+    - npm run build
+    - "GREEN: npm run verify:runtime-surface covered fast-forward clean checkpoint and conflicting merge checkpoint with conflict.txt"
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  coder_evidence:
+    status: recorded
+    enforcement: guidance_only
+    preflight:
+      - Recovered trust with M117 branch boundary and clean git state before source edits.
+      - Kept merge readiness source in packages/core/src/git/mergeReadinessCheckpoint.ts and wired only remote-plan/simulator consumers.
+      - Preserved generated .agents and .openworkflow surfaces as intentionally untouched.
+    red_green:
+      - RED runtime-surface assertion failed because simulator and remote-plan had no merge readiness checkpoint.
+      - GREEN runtime-surface assertion passed for fast-forward clean and conflicting temporary repositories.
+    self_check:
+      - Conflict probing uses read-only git merge-tree and does not mutate the user's working tree.
+      - Conflict cases stop with named conflict files and isolated worktree evidence requirements.
+      - No push, PR merge, git merge, rebase, reset, force-push, or Issue mutation was enabled.
+stop_conditions:
+  - Fix requires git merge, rebase, reset, force-push, push, PR merge, or user working-tree conflict resolution.
+  - Scope expands into C005 integrated remote-readiness story verification.
+  - Durable fix would require hand-editing generated .agents/** or .openworkflow/** surfaces.

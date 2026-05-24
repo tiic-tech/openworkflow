@@ -1,0 +1,47 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M117-git-automation-remote-readiness:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+selected_change_id: M117-C005-add-full-remote-readiness-story-verifier
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C005
+title: Atom tasks for M117 C005 full remote-readiness story verifier
+status: completed
+tasks:
+  - task_id: T001
+    title: Add RED missing full-story verifier check
+    status: completed
+    type: verify
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      Runtime-surface validation fails because the integrated full remote-readiness
+      story verifier is missing.
+  - task_id: T002
+    title: Implement integrated non-mutating remote-readiness fixture
+    status: completed
+    type: edit
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+    done_when: >
+      The verifier covers local evidence, branch identity, PR-ready summary,
+      remote-plan, draft-pr preview/approval refusal, merge readiness, and remote
+      merge refusal without real remote mutation.
+  - task_id: T003
+    title: Run GREEN validation and record queue completion evidence
+    status: completed
+    type: verify
+    owned_paths:
+      - changes/M117-git-automation-remote-readiness/
+    done_when: >
+      Runtime-surface validation passes, M117 points to no remaining candidates,
+      and LOCAL_COMMIT_EVIDENCE.yaml records C005 completion.
+verification:
+  red:
+    - "RED: npm run build failed because verifyFullRemoteReadinessStory was missing"
+  green:
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check

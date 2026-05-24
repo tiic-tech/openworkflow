@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M117-git-automation-remote-readiness:C005
+contract_type: planning
+planning_artifact_type: selected_change
+selected_change_id: M117-C005-add-full-remote-readiness-story-verifier
+source_plan_id: M117-git-automation-remote-readiness
+source_candidate_id: C005
+title: Add full remote-readiness story verifier
+status: completed
+selected_at: 2026-05-23
+selection_reason: >
+  Selected after C004 completed because C005 is the final dependency-ready
+  M117 candidate and proves the full non-mutating remote-readiness story before
+  the queue can be considered cleared.
+scope:
+  includes:
+    - add one integrated verifier fixture with a bare remote and local feat branch
+    - assert ordered commits, evidence records, branch identity, PR summary, remote refs, PR preview, conflict checkpoint, and refusal boundaries
+    - keep the fixture non-mutating except for temporary local repositories
+  excludes:
+    - real GitHub network mutation
+    - user repository remote mutation
+    - full autonomous execution
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - changes/M117-git-automation-remote-readiness/
+forbidden_paths:
+  - .agents/**
+  - .openworkflow/**
+  - packages/adapters/**
+acceptance:
+  - The verifier demonstrates the complete future handoff order without real remote mutation.
+  - The verifier fails if commit evidence, branch identity, draft PR approval, or conflict checkpoint fields disappear.
+  - The next autonomous queue has concrete evidence to consume instead of prose-only policy.
+validation:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js validate --root . --json
+  - git diff --check
+expected_commit_boundary: >
+  C005 should complete as one local verifier/evidence commit plus local commit
+  evidence, containing only runtime-surface verifier coverage and M117 queue
+  completion updates.
+completion:
+  completed_at: 2026-05-23
+  implementation_changed_files: true
+  evidence:
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M117-git-automation-remote-readiness/C005-add-full-remote-readiness-story-verifier/LOCAL_COMMIT_EVIDENCE.yaml
+  summary: >
+    Added an integrated full remote-readiness runtime fixture that uses
+    temporary local repositories and a bare remote to prove local evidence,
+    branch identity, PR-ready summary generation, remote refs, remote-plan,
+    draft-pr preview and approval refusal, merge-readiness checkpoint, and
+    remote merge refusal without real remote mutation.
+  validation:
+    - "RED: npm run build failed because verifyFullRemoteReadinessStory was missing"
+    - npm run build
+    - npm run verify:runtime-surface
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
