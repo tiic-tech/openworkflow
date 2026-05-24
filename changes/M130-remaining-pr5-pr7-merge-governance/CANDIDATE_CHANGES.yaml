@@ -253,6 +253,7 @@ changes:
         or perform branch surgery.
       evidence:
         - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+        - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
     status: ready
     title: Prepare exact merge approval packet for selected PR

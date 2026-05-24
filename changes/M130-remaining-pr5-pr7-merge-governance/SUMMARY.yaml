@@ -85,6 +85,7 @@ outputs:
   atom_tasks_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/ATOM_TASKS.yaml
   implementation_brief_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/IMPLEMENTATION_BRIEF.md
   next_merge_target_decision: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+  local_commit_evidence_c002: changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - "M129 merged PR #4 into main at b77418e2fe9b1f6eda213e52f495364bb1861e94."
   - "PR #5 and PR #7 remain open and non-draft."

@@ -62,6 +62,7 @@ completion:
     execute a merge.
   evidence:
     - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/NEXT_MERGE_TARGET_DECISION.md
+    - changes/M130-remaining-pr5-pr7-merge-governance/C002-decide-next-pr5-pr7-merge-target/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for M130 C002 planning evidence if the user requests commit
   implementation_changed_files: true
