@@ -62,6 +62,7 @@ completion:
     governance.
   evidence:
     - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/M130_MERGE_GOVERNANCE_AUDIT.md
+    - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one coherent local commit for M130 C005 audit handoff
   implementation_changed_files: true

@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M130-remaining-pr5-pr7-merge-governance:C005
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+plan_id: M130-remaining-pr5-pr7-merge-governance
+change_id: C005
+selected_change_path: changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml
+created_at: 2026-05-25T02:03:08+08:00
+branch: codex/m130-remaining-pr5-pr7-merge-governance
+primary_commit:
+  hash: 7c0bb5cda27b485cc4d28b78071b3c8c98ff8c69
+  subject: M130-remaining-pr5-pr7-merge-governance C005 audit handoff
+  scope: >
+    Recorded final M130 local audit handoff, selected change artifacts, atom
+    tasks, implementation brief, queue updates, summary updates, readable queue
+    view, and M130_MERGE_GOVERNANCE_AUDIT.md.
+evidence_commit:
+  expected: true
+  reason: >
+    This evidence file is recorded after the primary commit so it can reference
+    the actual commit hash without amending history.
+changed_paths:
+  - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/SELECTED_CHANGE.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/ATOM_TASKS.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/IMPLEMENTATION_BRIEF.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/C005-merge-governance-audit-handoff/M130_MERGE_GOVERNANCE_AUDIT.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.yaml
+  - changes/M130-remaining-pr5-pr7-merge-governance/CANDIDATE_CHANGES.md
+  - changes/M130-remaining-pr5-pr7-merge-governance/SUMMARY.yaml
+validation_evidence:
+  final_remote_refresh:
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 20
+    - git ls-remote origin refs/heads/main refs/heads/codex/m117-git-automation-remote-readiness refs/heads/codex/m101-build-proto-prompt-command-split
+  local_validation:
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+remote_mutation_performed: false
+remote_mutation_note: >
+  C005 performed no remote mutation. PR #7 merge was performed in C004 with
+  exact user approval and is recorded in C004 evidence.
+forbidden_operations_not_performed:
+  - gh pr merge
+  - git push
+  - gh pr edit
+  - gh pr close
+  - gh pr review
+  - gh pr comment
+  - gh issue edit
+  - branch surgery
+  - destructive git operation
