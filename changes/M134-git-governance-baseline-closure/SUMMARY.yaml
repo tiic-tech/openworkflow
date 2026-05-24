@@ -25,15 +25,20 @@ target_base:
   branch: main
   head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
 candidate_count: 8
-completed_candidate_id: null
-completed_change_id: null
-next_recommended_candidate_id: C001
+completed_candidate_id: C001
+completed_change_id: C001
+next_recommended_candidate_id: C002
 selected_candidate_id: null
 selected_change_id: null
 outputs:
   candidate_changes_yaml: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.md
   summary: changes/M134-git-governance-baseline-closure/SUMMARY.yaml
+  selected_change_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+  atom_tasks_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+  implementation_brief_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md
+  baseline_inventory_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+  local_commit_evidence_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/LOCAL_COMMIT_EVIDENCE.yaml
 key_dependencies:
   - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
   - "PR #8 remains open and draft."
@@ -61,7 +66,13 @@ validation:
     - git branch --list --format='%(refname:short) %(objectname:short) %(upstream:short)'
     - git switch -c codex/m134-git-governance-baseline-closure origin/main
     - git status --short --branch
+    - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,title,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeCommit,mergedAt --limit 50
+    - git branch --list --format='%(refname:short) %(objectname) %(upstream:short)'
+    - git merge-base --is-ancestor <branch-head> origin/main
   notes: |
     - M134 branch was created from current origin/main, not from M130/M131/M132/M133 stacked branches.
     - No remote mutation was performed while creating M134.
-    - C001 is the next recommended candidate.
+    - C001 classified the remaining git-governance baseline state.
+    - PR #8 is the only remaining open PR and needs explicit disposition.
+    - M131/M132 contain source deltas that must be extracted onto M134.
+    - C002 is the next recommended candidate.

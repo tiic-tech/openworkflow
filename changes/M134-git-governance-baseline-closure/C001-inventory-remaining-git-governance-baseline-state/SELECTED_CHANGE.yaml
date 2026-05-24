@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C001
+title: "Inventory remaining git governance baseline state"
+status: done
+selected_at: 2026-05-25T03:18:00+08:00
+selection_reason: >
+  User asked to complete all remaining M134 git-governance changes. C001 is the
+  queue's next recommended ready candidate and is required before extracting
+  source deltas or mutating remote PR state.
+source_candidate:
+  id: C001
+  status_at_selection: ready
+  risk: medium
+  dependencies: []
+scope:
+  includes:
+    - inspect current open PRs and merged git-governance PRs
+    - inspect local M130/M131/M132/M133 governance branches and ancestry against origin/main
+    - classify remaining work into source delta extraction, PR #8 disposition, M133 audit publication, or no-op
+    - record branch state without changing history
+  excludes:
+    - code changes
+    - push, PR creation/edit/close/merge, Issue mutation, branch deletion, force-push, rebase, reset, revert, or branch surgery
+owned_paths:
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - Remaining governance branches and open PRs are classified.
+  - The inventory states which work is still required for a formal code-development baseline.
+  - No remote mutation or branch surgery occurs.
+validation:
+  - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,title,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeCommit,mergedAt --limit 50
+  - git branch --list --format='%(refname:short) %(objectname) %(upstream:short)'
+  - git merge-base --is-ancestor <branch-head> origin/main
+  - node dist/cli/src/index.js validate --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+evidence:
+  - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+completion:
+  completed_at: 2026-05-25T03:18:00+08:00
+  implementation_changed_files: true
+  result: >
+    C001 classified the post-PR-#5 git governance baseline state. PR #8 is the
+    only open PR and needs separate disposition governance. M131 and M132
+    contain source behavior deltas not present on current origin/main and must
+    be extracted onto M134 rather than merged via old stacked branches. M130
+    and M133 contain local audit evidence that may need explicit publication
+    gates. No remote mutation or branch surgery was performed.
+  evidence:
+    - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+    - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary:
+  expected: one coherent local commit for M134 C001 inventory evidence, plus a follow-up evidence commit
+  implementation_changed_files: true

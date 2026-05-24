@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C001
+title: Atom tasks for C001 remaining git governance inventory
+status: done
+tasks:
+  - task_id: T001
+    title: Verify branch boundary and clean worktree
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Current branch is codex/m134-git-governance-baseline-closure and worktree
+      is clean before C001 writes evidence.
+  - task_id: T002
+    title: Refresh PR state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      GitHub PR list identifies merged git-governance PRs and remaining open
+      PRs.
+  - task_id: T003
+    title: Inspect local governance branches
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Local M130/M131/M132/M133/M134 branch heads are classified against
+      origin/main without changing branch history.
+  - task_id: T004
+    title: Classify remaining work
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Remaining work is classified into source delta extraction, PR #8
+      disposition, audit publication, and final baseline handoff.
+  - task_id: T005
+    title: Update queue and validate
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      C001 is marked done, C002 is ready, and validation passes after commit
+      evidence is recorded.

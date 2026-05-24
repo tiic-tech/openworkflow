@@ -9,7 +9,7 @@ M134 starts from `origin/main` at `6612aa3e06996ad0151e3686d0c972677fc892c6`, th
 - Branch boundary: `codex/m134-git-governance-baseline-closure`
 - Branch base: `origin/main`
 - Current base commit: `6612aa3e06996ad0151e3686d0c972677fc892c6`
-- Next recommended candidate: `C001`
+- Next recommended candidate: `C002`
 
 In scope: post-merge git/PR inventory, extracting necessary M131/M132 git-governance deltas onto a fresh branch, PR #8 disposition planning, M134 publication planning, and final baseline handoff.
 
@@ -41,8 +41,22 @@ Relevant local branches not ancestor of current `origin/main`:
 
 ### C001 - Inventory remaining git governance baseline state
 
-Status: ready
+Status: done
 Risk: medium
+
+Selected change artifacts:
+
+- `C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml`
+- `C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml`
+- `C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md`
+- `C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md`
+
+Result:
+
+- PR #8 is the only remaining open PR and needs a disposition decision.
+- M131/M132 contain source behavior deltas not present on current `origin/main`.
+- M130/M133 contain local audit evidence that may need explicit publication gates.
+- Old stacked branches should not be merged, rebased, reset, or force-pushed as the baseline path.
 
 Classify remaining local branches, open PRs, and unmerged governance work.
 
@@ -54,7 +68,7 @@ Acceptance:
 
 ### C002 - Extract M131 selected-change commit gate delta onto M134
 
-Status: candidate
+Status: ready
 Risk: high
 
 Reapply only the necessary M131 source behavior onto the fresh M134 branch.
