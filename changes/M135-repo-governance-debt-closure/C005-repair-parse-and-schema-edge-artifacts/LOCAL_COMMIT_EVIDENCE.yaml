@@ -8,7 +8,7 @@ selected_change_id: C005
 title: Local commit evidence for C005 parse and schema edge repair
 status: complete
 branch: codex/m135-repo-governance-debt-closure
-primary_commit: 4083e23
+primary_commit: 4083e23e994371f557c755e21ce9d38fca285ac4
 commit_message: M135-repo-governance-debt-closure/C005 Repair parse and schema edge artifacts
 implementation_changed_files: true
 affected_paths:
