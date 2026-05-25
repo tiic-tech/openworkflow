@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C005
+- Next recommended candidate: C006
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -101,7 +101,7 @@ Result:
 
 ### C005 - Repair parse and schema edge artifacts
 
-Status: ready
+Status: done
 Risk: medium
 
 Resolve the isolated M113 YAML parse failure and M98 prompt-pack schema edge failure.
@@ -110,6 +110,12 @@ Acceptance:
 
 - M113 parses as YAML.
 - M98 either matches the current schema or is explicitly deferred with rationale.
+
+Result:
+
+- Quoted the M113 backtick-starting YAML scalar.
+- Added a mapping-shaped M98 `prototype_system_contract` from existing prompt-pack content.
+- Did not relax parser or validator behavior.
 
 ### C006 - Add governance debt regression guardrails if needed
 

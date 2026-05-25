@@ -75,7 +75,7 @@ observed_state:
       - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
         mismatch
       - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
-next_recommended_candidate_id: C005
+next_recommended_candidate_id: C006
 changes:
   - id: C001
     status: done
@@ -303,7 +303,7 @@ changes:
         - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/HIGH_RISK_REPORT_COMPLIANCE_REPAIR.md
         - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C005
-    status: ready
+    status: done
     title: Repair parse and schema edge artifacts
     purpose: >
       Resolve isolated parse/schema failures that prevent whole-repo validation from becoming a
@@ -334,6 +334,26 @@ changes:
       - M113 parses as YAML.
       - The M98 example matches the current prompt-pack schema or is explicitly deferred with a
         validator-false-positive rationale.
+    selection:
+      selected_change_id: C005
+      selected_at: 2026-05-25T09:55:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C005 is the next repair
+        after C004 because repository validation still failed on one invalid YAML scalar in M113 and
+        one M98 prompt-pack schema shape.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:55:00+08:00
+      implementation_changed_files: true
+      result: >
+        C005 fixed the M113 YAML quoting failure and added a schema-compatible M98 prototype system
+        contract derived from existing prompt-pack content.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C006
     status: ready
     title: Add governance debt regression guardrails if needed
@@ -549,3 +569,30 @@ operations:
     after_status: done
     evidence:
       - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/HIGH_RISK_REPORT_COMPLIANCE_REPAIR.md
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: |
+      C005 repairs the final parse/schema edge artifacts after C004 cleared high-risk report debt.
+    changed_at: 2026-05-25T09:55:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 removed the remaining parse/schema validation failures without relaxing parser or
+      validator behavior.
+    changed_at: 2026-05-25T09:55:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md

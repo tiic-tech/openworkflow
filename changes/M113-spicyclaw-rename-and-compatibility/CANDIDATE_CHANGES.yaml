@@ -252,7 +252,7 @@ changes:
       - git diff --check
     acceptance:
       - Generated branding is source-driven and reproducible through sync.
-      - `openworkflow` compatibility remains visible during migration.
+      - "`openworkflow` compatibility remains visible during migration."
       - Generated outputs are not patched by hand.
   - id: C005
     status: deferred
