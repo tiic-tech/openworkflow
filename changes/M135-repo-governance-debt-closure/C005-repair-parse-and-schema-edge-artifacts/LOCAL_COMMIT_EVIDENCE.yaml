@@ -1,0 +1,31 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C005
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C005
+change_id: C005
+selected_change_id: C005
+title: Local commit evidence for C005 parse and schema edge repair
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: 4083e23
+commit_message: M135-repo-governance-debt-closure/C005 Repair parse and schema edge artifacts
+implementation_changed_files: true
+affected_paths:
+  - changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.yaml
+  - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+  - changes/M135-repo-governance-debt-closure/
+validation_evidence:
+  - npm run validate: expected fail after C005 only because C005 LOCAL_COMMIT_EVIDENCE.yaml did not exist yet
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - git diff --check
+  result: >
+    C005-owned M113 YAML and M98 prompt-pack schema failures were removed. The only validation
+    failure after the primary commit was the expected missing C005 local commit evidence file.
+notes:
+  - >
+    The M98 prototype_system_contract was derived from existing prompt-pack fields and did not
+    change product strategy or relax validation.
