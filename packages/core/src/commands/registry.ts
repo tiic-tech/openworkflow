@@ -889,8 +889,8 @@ function prototypeProtocol(): CommandProtocol {
         "Do not internally trigger /ow:prompt2proto until prompt_text_manifest.status is ready_for_image_generation and every selected direction has concrete screen prompts.",
         "Do not internally trigger /ow:prompt2proto until prototype_system_contract exists, prompt_pack_integrity_gate.status and prototype_reality_gate.status are pass and quality_rubric.prompt_executability is pass.",
         "Do not internally trigger /ow:prompt2proto until post_validate.status is pass for resolved_count 2 or more, or skipped when the user explicitly requested exactly one strategic direction.",
-        "If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, prototype_system_contract, paragraph quality, or philosophy readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt repair instead of starting image generation.",
-        "Internally trigger /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist; build-prototype consumes the ready pack and must not recompile vision into prompt text.",
+        "If post_validate.status is fail, or if prompt_pack_integrity_gate, prototype_reality_gate, prompt executability, prototype_system_contract, paragraph quality, or philosophy readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt repair instead of starting image generation.",
+        "After prompt_text_manifest.status is ready_for_image_generation and post_validate.status is pass or skipped, Batch-generate prototype images by internally triggering /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist; build-prototype consumes the ready pack and must not recompile vision into prompt text.",
         "Recommend the first direction to generate based on risk reduction, observability, feasibility, and closeness to the success signal.",
       ],
       after: [
@@ -913,6 +913,7 @@ function prototypeProtocol(): CommandProtocol {
         tag: "internal_proto_pipeline",
         items: [
           "/ow:proto is the only user-facing command in this chain; /ow:build-proto-prompt, /ow:vision2prompt compatibility, and /ow:prompt2proto are internal commands.",
+          "/ow:vision2prompt and /ow:prompt2proto are internal commands; do not expose them as normal user-facing handoffs from /ow:proto.",
           "Run proto-preflight first, then /ow:build-proto-prompt or compatible /ow:vision2prompt compiler path, then /ow:prompt2proto/build-prototype consumption.",
           "Record internal_pipeline.stages with stage ids proto-preflight, build-proto-prompt or vision2prompt-compatible compiler, and prompt2proto in EVIDENCE.yaml.",
           "Do not expose /ow:build-proto-prompt, /ow:vision2prompt, or /ow:prompt2proto as normal user-facing handoffs.",

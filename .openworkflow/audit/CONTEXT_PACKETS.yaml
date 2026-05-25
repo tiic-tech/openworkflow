@@ -409,13 +409,14 @@ packets:
         - Do not internally trigger /ow:prompt2proto until post_validate.status is pass for
           resolved_count 2 or more, or skipped when the user explicitly requested exactly one
           strategic direction.
-        - If post_validate, prompt_pack_integrity_gate, prototype_reality_gate, prompt
-          executability, prototype_system_contract, paragraph quality, or philosophy readiness
-          fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt prompt
-          repair instead of starting image generation.
-        - Internally trigger /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts
-          exist; build-prototype consumes the ready pack and must not recompile vision into prompt
-          text.
+        - If post_validate.status is fail, or if prompt_pack_integrity_gate, prototype_reality_gate,
+          prompt executability, prototype_system_contract, paragraph quality, or philosophy
+          readiness fails, route back through /ow:build-proto-prompt or compatible /ow:vision2prompt
+          prompt repair instead of starting image generation.
+        - After prompt_text_manifest.status is ready_for_image_generation and post_validate.status
+          is pass or skipped, Batch-generate prototype images by internally triggering
+          /ow:prompt2proto/build-prototype only after ready prompt-pack artifacts exist;
+          build-prototype consumes the ready pack and must not recompile vision into prompt text.
         - Recommend the first direction to generate based on risk reduction, observability,
           feasibility, and closeness to the success signal.
       after:

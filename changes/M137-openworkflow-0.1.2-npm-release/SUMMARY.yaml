@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+contract_id: summary:M137-openworkflow-0.1.2-npm-release
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M137-openworkflow-0.1.2-npm-release
+title: Summary for OpenWorkflow 0.1.2 npm release
+status: active
+source:
+  kind: user_request
+  refs:
+    - changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.yaml
+  summary: >
+    OpenWorkflow 0.1.2 is prepared locally and installed as the system CLI. Public npm publication
+    is blocked by npm authentication or organization package permission after all prepublishOnly
+    checks passed.
+scope_boundary: >
+  OpenWorkflow 0.1.2 release preparation, npm publication attempt, and local system CLI update.
+branch_boundary: codex/m137-openworkflow-0.1.2-npm-release
+target_base:
+  remote: origin
+  branch: main
+candidate_count: 3
+completed_candidate_id: C002
+completed_change_id: C002
+next_recommended_candidate_id: C003
+selected_candidate_id: C003
+selected_change_id: C003
+outputs:
+  candidate_changes_yaml: changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.md
+  summary: changes/M137-openworkflow-0.1.2-npm-release/SUMMARY.yaml
+  publication_evidence: changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/PUBLICATION_EVIDENCE.md
+risks:
+  - id: R001
+    level: high
+    description: npm registry upload requires an authenticated npm identity with publish rights for the @tiic-tech scope.
+    mitigation: Authenticate npm or provide an npm publish token, then rerun npm publish --access public from this branch.
+  - id: R002
+    level: medium
+    description: Local system CLI is linked to the repository rather than installed from the unpublished npm artifact.
+    mitigation: Reinstall from npm after public 0.1.2 is published.
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm pack --dry-run --json
+    - npm publish --access public
+    - npm run verify:e2e-workflow
+    - npm run verify:clean
+    - openworkflow sync --root . --tools codex --json
+    - npm install -g .
+    - openworkflow --help
+    - openworkflow resume --root . --json
+    - npm list -g @tiic-tech/openworkflow --depth=0
+  result: >
+    Release checks pass and local CLI is updated. Public npm upload is externally blocked.
