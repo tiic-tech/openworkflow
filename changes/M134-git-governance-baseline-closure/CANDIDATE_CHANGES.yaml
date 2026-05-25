@@ -519,6 +519,7 @@ changes:
       evidence:
         - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
         - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C008
     status: ready
     title: Complete formal git governance baseline handoff
@@ -874,7 +875,7 @@ operations:
     target_candidate_ids:
       - C008
     actor: agent
-    reason: >
+    reason: |
       C001-C007 are complete, so the formal M134 git governance baseline handoff is ready.
     changed_at: 2026-05-25T08:19:49+08:00
     before_status: candidate

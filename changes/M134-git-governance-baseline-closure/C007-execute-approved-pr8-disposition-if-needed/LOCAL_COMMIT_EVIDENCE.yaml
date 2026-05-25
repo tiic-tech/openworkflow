@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C007
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C007
+status: current
+source_plan_id: M134-git-governance-baseline-closure
+source_candidate_id: C007
+selected_change_id: C007
+primary_commit: 0e2e473f2fcd8eab3cd568833d0e79f09e9674ce
+validation_evidence:
+  - gh pr view 8 --repo tiic-tech/openworkflow --json number
+  - url
+  - state
+  - isDraft
+  - title
+  - headRefName
+  - baseRefName
+  - headRefOid
+  - baseRefOid
+  - mergedAt
+  - closedAt; git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.
