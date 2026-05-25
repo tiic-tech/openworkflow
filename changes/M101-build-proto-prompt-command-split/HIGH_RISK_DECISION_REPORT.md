@@ -1,5 +1,33 @@
 # M101 High-Risk Decision Report
 
+## Trigger
+
+M100 completed the prompt paragraph foundation, which made the prototype command split actionable.
+The risk is that command boundaries, generated skills, and prompt2proto architecture could be
+changed before the migration direction is explicitly approved.
+
+## Change
+
+Approve only a design-level internal command split direction for M101 C001. This report does not
+authorize implementation source edits, generated adapter sync, registry edits, provider-backed
+generation, or remote mutation.
+
+## Concrete Risks
+
+- `/ow:proto` compatibility could break if internal command boundaries become user-visible too soon.
+- `build-prototype` could be narrowed before a comparable prompt2proto skill exists.
+- Generated skills and context packets could drift from source contracts if implementation starts in
+  the wrong candidate.
+
+## Decision Options
+
+The decision options are recorded below under Options.
+
+## Recommended Path
+
+Proceed with the design-only internal split direction recorded below under Recommended Option.
+Implementation resumes only after explicit approval of a selected implementation candidate.
+
 ## Decision
 
 Do not implement command splitting until C001 approves both the command boundary
@@ -143,3 +171,10 @@ reference parity, proto2html readiness, storyboard coverage, or motion modeling.
 - build-prototype would be narrowed before prompt2proto exists.
 - The work expands into provider image generation, human visual review, visual
   parity scoring, proto2html, storyboard, or motion modeling.
+
+## Validation Expectations
+
+- `npm run build`
+- `npm run validate`
+- `npm run verify:runtime-surface`
+- `git diff --check`

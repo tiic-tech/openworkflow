@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C004
+- Next recommended candidate: C005
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -82,7 +82,7 @@ Result:
 
 ### C004 - Repair high-risk decision report compliance debt
 
-Status: ready
+Status: done
 Risk: medium
 
 Bring M101, M102, M105, and M117 high-risk reports into the current section contract.
@@ -92,6 +92,12 @@ Acceptance:
 - High-risk report section failures are removed or explicitly deferred.
 - Reports remain faithful to historical decision scope.
 - No new implementation approval is implied.
+
+Result:
+
+- Added required section headings to M101, M105, and M117 high-risk reports.
+- Added explicit approval-boundary language where required.
+- Preserved each report's original decision scope and did not add new implementation approval.
 
 ### C005 - Repair parse and schema edge artifacts
 

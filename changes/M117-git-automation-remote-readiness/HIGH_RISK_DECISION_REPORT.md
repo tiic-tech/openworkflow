@@ -25,7 +25,15 @@ The remaining risk is not whether the Agent can read local evidence or identify
 the owning branch. The remaining risk is whether future remote-impacting
 automation can be prepared without accidentally becoming remote mutation.
 
+## Change
+
+Approve C003 and C004 as local/read-only hardening only. The change prepares approval evidence and
+merge-conflict readiness contracts without executing push, PR mutation, Issue mutation, merge,
+rebase, reset, force-push, or conflict resolution.
+
 ## High-Risk Surface
+
+## Concrete Risks
 
 ### C003 Draft PR Pilot Approval And Audit
 
@@ -127,6 +135,11 @@ Reason:
   autonomous merge queue exists.
 - Both can be implemented without executing remote mutation.
 
+## Recommended Path
+
+Select and complete C003 first, then C004, under the local/read-only hardening limits. Any future
+remote write operation still requires explicit operation-level approval naming the exact target.
+
 ## Approved Decision
 
 Status: `approved`
@@ -159,6 +172,13 @@ operation.
   source, timestamp, result, and rollback guidance.
 - C003 and C004 must complete through local commit evidence before C005 can be
   selected.
+
+## Go Criteria
+
+- C001 and C002 are complete.
+- The selected candidate is C003 or C004.
+- The implementation is local/read-only and produces commit evidence.
+- Any remote write path remains blocked without explicit operation-level approval.
 
 ## Stop Criteria
 
