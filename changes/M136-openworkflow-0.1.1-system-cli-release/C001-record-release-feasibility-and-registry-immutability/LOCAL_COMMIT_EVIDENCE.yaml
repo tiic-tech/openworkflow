@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M136-openworkflow-0.1.1-system-cli-release:C001
+contract_type: evidence
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+candidate_id: C001
+change_id: C001
+selected_change_id: C001
+title: Local commit evidence for C001 release feasibility
+status: complete
+branch: codex/m136-openworkflow-0.1.1-system-cli-release
+primary_commit: f916bcd
+commit_message: M136-openworkflow-0.1.1-system-cli-release/C001 Record registry release feasibility
+implementation_changed_files: true
+affected_paths:
+  - changes/M136-openworkflow-0.1.1-system-cli-release/
+validation_evidence:
+  - npm view @tiic-tech/openworkflow@0.1.1 version dist.tarball gitHead time --json: pass
+  - npm run validate: expected fail before this evidence file existed
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm view @tiic-tech/openworkflow@0.1.1 version dist.tarball gitHead time --json
+    - npm run validate
+    - git diff --check
+  result: >
+    Registry 0.1.1 exists and cannot be overwritten. The only validation failure before this
+    evidence file was the expected missing C001 LOCAL_COMMIT_EVIDENCE.yaml.
+notes:
+  - "No npm publish was run for 0.1.1."
