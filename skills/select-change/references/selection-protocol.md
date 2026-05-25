@@ -210,6 +210,13 @@ Include:
 
 Do not copy the entire candidate queue into this artifact.
 
+When the selected change will be dispatched by an Orchestrator, include enough
+dispatch context in `IMPLEMENTATION_BRIEF.md` for a subagent to work without
+loading the whole queue: selected plan id, candidate id, owned paths, forbidden
+paths, required reads, validation commands, expected return evidence, and stop
+conditions. Use `references/orchestrator-selected-change-dispatch.md` as the
+coordination contract.
+
 ## ATOM_TASKS.yaml
 
 Break the selected change into tasks in this order:

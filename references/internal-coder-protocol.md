@@ -175,6 +175,8 @@ These are integration points, not C001 implementation tasks.
   boundaries.
 - `/ow:team`: require team execution to preserve RED/GREEN/self-check evidence
   before completion.
+- Orchestrator dispatch: require subagent returns to bind coder evidence to the
+  SC that was assigned, while the Orchestrator reviews and commits the result.
 - `git-automation`: attach coder validation evidence to local commit evidence
   when implementation files changed.
 - `resume`: report whether coder governance is required, complete, skipped, or

@@ -2,6 +2,11 @@
 
 Use this reference when creating `AGENT.md` and `.codex/agents/*.md`.
 
+For CC/SC-level dogfood delegation outside `.codex/runtime/**`, use
+`references/orchestrator-selected-change-dispatch.md`. That protocol governs
+manual Orchestrator dispatch from `CANDIDATE_CHANGES.yaml` and
+`SELECTED_CHANGE.yaml`; this Team protocol governs runtime Agent Team state.
+
 ## Operating Priorities
 
 P0 Orchestrator focus and delegation boundary:

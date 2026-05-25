@@ -1,0 +1,132 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M138-orchestrator-sc-dispatch-protocol
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M138-orchestrator-sc-dispatch-protocol
+title: Candidate changes for Orchestrator selected-change dispatch protocol
+status: complete
+source:
+  kind: user_request
+  refs:
+    - user_input:2026-05-25-orchestrator-cc-sc-dispatch-mode
+    - references/planning-artifact-contracts.md
+    - references/git-version-control-governance.md
+    - references/internal-coder-protocol.md
+    - skills/build-team/references/team-protocol.md
+  summary: >
+    User asked to formalize a work mode where one Orchestrator owns CC creation,
+    SC selection and dispatch, subagent result recovery, validation, git
+    evidence, and queue completion while subagents operate only within
+    selected-change boundaries.
+queue_policy:
+  branch_boundary: codex/m138-orchestrator-sc-dispatch-protocol
+  git_lifecycle_gate: strict
+  target_remote: origin
+  target_base_branch: main
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  selected_change_commit_gate: strict
+scope_control:
+  current_boundary: >
+    Manual Orchestrator protocol for CC-level authority and SC-level subagent
+    dispatch.
+  boundary_type: governance_protocol
+  in_scope_rule: >
+    Define the coordination contract, authority hierarchy, dispatch packet
+    shape, evidence contract, stop conditions, completion gates, and integration
+    points with existing planning, git, coder, and team references.
+  out_of_scope_rule: >
+    Do not implement a new CLI command, schema, validator, automatic scheduler,
+    runtime Agent Team state machine, or remote mutation behavior.
+observed_state:
+  captured_at: 2026-05-25T10:05:00+08:00
+  starting_branch: codex/m137-openworkflow-0.1.2-npm-release
+  m138_branch: codex/m138-orchestrator-sc-dispatch-protocol
+  working_tree_clean_before_branch: true
+  base_head: 47507bb
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Define manual Orchestrator SC dispatch protocol
+    purpose: >
+      Make the user's proposed Orchestrator mode an explicit OW governance
+      protocol that can be followed by future Agents without relying on chat
+      memory.
+    scope:
+      includes:
+        - protocol source reference
+        - CC authority and SC subagent authority hierarchy
+        - dispatch packet shape
+        - worktree, branch, evidence, completion, and stop gates
+        - links from planning, selection, git, coder, and team references
+      excludes:
+        - new CLI command
+        - new generated adapter surface
+        - runtime Agent Team implementation
+        - schema or validator enforcement
+        - remote mutation automation
+    owned_paths:
+      - references/orchestrator-selected-change-dispatch.md
+      - references/planning-artifact-contracts.md
+      - references/git-version-control-governance.md
+      - references/internal-coder-protocol.md
+      - skills/decompose-to-changes/references/decomposition-protocol.md
+      - skills/select-change/references/selection-protocol.md
+      - skills/build-team/references/team-protocol.md
+      - changes/M138-orchestrator-sc-dispatch-protocol/
+    forbidden_paths:
+      - .openworkflow/**
+      - .agents/**
+      - packages/**
+    dependencies: []
+    unlocks:
+      - future-orchestrator-dispatch-schema
+      - future-subagent-assignment-artifact
+      - future-cc-completion-gate
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - openworkflow handoff --root . --json
+      - git diff --check
+    acceptance:
+      - A single reference defines the manual Orchestrator dispatch protocol.
+      - Existing planning, git, coder, selection, decomposition, and team references point to that protocol.
+      - The protocol preserves CC as the queue boundary and SC as the subagent authority boundary.
+      - The protocol states remote, publish, merge, Issue mutation, and final CC completion gates remain Orchestrator-controlled.
+      - No CLI runtime or generated surface changes are introduced.
+    selection:
+      selected_change_id: C001
+      selected_at: 2026-05-25T10:08:00+08:00
+      reason: >
+        C001 is the only required candidate for the first stage because the
+        request is to establish the protocol contract before adding runtime
+        enforcement or assignment artifacts.
+      artifacts:
+        - changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/SELECTED_CHANGE.yaml
+        - changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/ATOM_TASKS.yaml
+        - changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T10:15:00+08:00
+      implementation_changed_files: true
+      result: >
+        Added the manual Orchestrator selected-change dispatch protocol and
+        linked it from existing OW planning, selection, git, coder, and team
+        references.
+      evidence:
+        - changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: create
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      User granted CC-level authority and asked to open a protocol queue and
+      complete it.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: null
+    after_status: complete
+    evidence:
+      - references/orchestrator-selected-change-dispatch.md

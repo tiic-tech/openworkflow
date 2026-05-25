@@ -1,0 +1,54 @@
+schema_version: 0.1.0
+contract_id: selected_change:M138-orchestrator-sc-dispatch-protocol:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M138-orchestrator-sc-dispatch-protocol
+candidate_id: C001
+selected_change_id: C001
+title: Define manual Orchestrator SC dispatch protocol
+status: complete
+selection_reason: >
+  The user explicitly asked to create and complete a CC for the proposed
+  Orchestrator work mode. A docs/protocol selected change is the correct first
+  stage before schema, CLI, or runtime enforcement.
+scope:
+  includes:
+    - protocol source reference
+    - CC authority and SC subagent authority hierarchy
+    - dispatch packet shape
+    - worktree, branch, evidence, completion, and stop gates
+    - links from planning, selection, git, coder, and team references
+  excludes:
+    - new CLI command
+    - new generated adapter surface
+    - runtime Agent Team implementation
+    - schema or validator enforcement
+    - remote mutation automation
+owned_paths:
+  - references/orchestrator-selected-change-dispatch.md
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - references/internal-coder-protocol.md
+  - skills/decompose-to-changes/references/decomposition-protocol.md
+  - skills/select-change/references/selection-protocol.md
+  - skills/build-team/references/team-protocol.md
+  - changes/M138-orchestrator-sc-dispatch-protocol/
+forbidden_paths:
+  - .openworkflow/**
+  - .agents/**
+  - packages/**
+acceptance:
+  - A single reference defines the manual Orchestrator dispatch protocol.
+  - Existing planning, git, coder, selection, decomposition, and team references point to that protocol.
+  - The protocol preserves CC as the queue boundary and SC as the subagent authority boundary.
+  - The protocol states remote, publish, merge, Issue mutation, and final CC completion gates remain Orchestrator-controlled.
+  - No CLI runtime or generated surface changes are introduced.
+validation:
+  - npm run validate
+  - openworkflow handoff --root . --json
+  - git diff --check
+dispatch:
+  mode: orchestrator_direct
+  reason: >
+    This selected change defines the dispatch protocol itself, so the
+    Orchestrator performed the small docs/protocol implementation directly.
