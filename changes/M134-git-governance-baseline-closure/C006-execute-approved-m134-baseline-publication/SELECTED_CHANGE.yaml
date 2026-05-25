@@ -4,12 +4,12 @@ contract_type: planning
 planning_artifact_type: selected_change
 plan_id: M134-git-governance-baseline-closure
 change_id: C006
-title: "Execute approved M134 baseline publication"
+title: Execute approved M134 baseline publication
 status: done
 selected_at: 2026-05-25T03:40:00+08:00
 selection_reason: >
-  User broadly authorized all M134 git-governance commands, and C005 recorded
-  the exact branch push and draft PR creation handle.
+  User broadly authorized all M134 git-governance commands, and C005 recorded the exact branch push
+  and draft PR creation handle.
 source_candidate:
   id: C006
   status_at_selection: ready
@@ -23,7 +23,7 @@ scope:
     - record PR URL and publication evidence
   excludes:
     - merge
-    - PR #8 mutation unless separately approved
+    - PR
     - Issue mutation, force-push, branch deletion, rebase, reset, or revert
 owned_paths:
   - changes/M134-git-governance-baseline-closure/
@@ -33,19 +33,22 @@ acceptance:
   - No merge occurs.
 validation:
   - git push -u origin codex/m134-git-governance-baseline-closure
-  - gh pr create --repo tiic-tech/openworkflow --base main --head codex/m134-git-governance-baseline-closure --draft --title "M134 git governance baseline closure" --body-file changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
-  - gh pr view 9 --repo tiic-tech/openworkflow --json number,url,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid
+  - gh pr create --repo tiic-tech/openworkflow --base main --head
+    codex/m134-git-governance-baseline-closure --draft --title "M134 git governance baseline
+    closure" --body-file changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+  - gh pr view 9 --repo tiic-tech/openworkflow --json
+    number,url,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid
   - git diff --check
 completion:
   completed_at: 2026-05-25T03:40:00+08:00
   implementation_changed_files: true
   result: >
-    C006 pushed the M134 branch to origin and created draft PR #9. No merge,
-    PR #8 mutation, Issue mutation, branch deletion, force-push, rebase, reset,
-    or revert was performed.
+    C006 pushed the M134 branch to origin and created draft PR #9. No merge, PR #8 mutation, Issue
+    mutation, branch deletion, force-push, rebase, reset, or revert was performed.
   evidence:
     - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
     - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+    - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
 commit_boundary:
   expected: one local commit recording C006 publication evidence, plus a follow-up evidence commit
   implementation_changed_files: true

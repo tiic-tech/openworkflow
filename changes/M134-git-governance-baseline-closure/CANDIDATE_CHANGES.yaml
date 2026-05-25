@@ -453,8 +453,8 @@ changes:
       selected_change_id: C006
       selected_at: 2026-05-25T03:40:00+08:00
       reason: >
-        User broadly authorized all M134 git-governance commands, and C005 recorded the exact
-        branch push and draft PR creation handle.
+        User broadly authorized all M134 git-governance commands, and C005 recorded the exact branch
+        push and draft PR creation handle.
       artifacts:
         - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
         - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/ATOM_TASKS.yaml
@@ -468,6 +468,7 @@ changes:
       evidence:
         - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
         - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C007
     status: ready
     title: "Execute approved PR #8 disposition if needed"
