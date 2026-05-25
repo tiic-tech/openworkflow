@@ -15,9 +15,9 @@ source:
     - references/git-version-control-governance.md
   summary: >
     M134 closed the blocking git/PR lifecycle baseline, but repository validation still fails on
-    historical non-M134 governance artifacts. M135 decomposes the remaining repo-wide governance debt
-    into auditable, candidate-sized repairs so future development can rely on repository validation
-    rather than only handoff/resume trust.
+    historical non-M134 governance artifacts. M135 decomposes the remaining repo-wide governance
+    debt into auditable, candidate-sized repairs so future development can rely on repository
+    validation rather than only handoff/resume trust.
 queue_policy:
   branch_boundary: codex/m135-repo-governance-debt-closure
   git_lifecycle_gate: strict
@@ -47,7 +47,8 @@ scope_control:
   out_of_scope_rule: >
     Do not implement unrelated product features. Do not merge PRs, mutate remote Issues, delete
     branches, force-push, rebase, reset, revert, or rewrite git history. Do not weaken validators to
-    hide real debt unless C001 proves a validator false positive and a focused candidate is selected.
+    hide real debt unless C001 proves a validator false positive and a focused candidate is
+    selected.
 observed_state:
   captured_at: 2026-05-25T08:25:00+08:00
   current_branch: codex/m134-git-governance-baseline-closure
@@ -67,10 +68,12 @@ observed_state:
     npm_run_validate: fail
     failure_families:
       - missing ATOM_TASKS.yaml title keys in historical queues M100, M101, M105, and M97
-      - non-string completion.evidence or missing completion evidence in historical queues M100, M101, and M97
+      - non-string completion.evidence or missing completion evidence in historical queues M100,
+        M101, and M97
       - invalid YAML in M113 CANDIDATE_CHANGES.yaml
       - incomplete historical LOCAL_COMMIT_EVIDENCE.yaml records in M87, M88, and M92
-      - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape mismatch
+      - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
+        mismatch
       - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
 next_recommended_candidate_id: C002
 changes:
@@ -131,6 +134,7 @@ changes:
         parse/schema edge repairs, and optional regression guardrail work.
       evidence:
         - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
     status: ready
     title: Normalize historical planning artifact shape debt
@@ -364,7 +368,7 @@ operations:
     target_candidate_ids:
       - C001
     actor: agent
-    reason: >
+    reason: |
       C001 is the required inventory step before repairing historical validation debt.
     changed_at: 2026-05-25T08:32:25+08:00
     before_status: ready
@@ -395,7 +399,7 @@ operations:
       - C005
       - C006
     actor: agent
-    reason: >
+    reason: |
       C001 classified current validation failures and unlocked the focused repair candidates.
     changed_at: 2026-05-25T08:32:25+08:00
     before_status: candidate
