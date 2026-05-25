@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C004-create-prompt2proto-source-skill-foundation
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C004 create prompt2proto source skill foundation
 source_plan_id: M101-build-proto-prompt-command-split
 source_candidate_id: C004
 selected_change_id: C004-create-prompt2proto-source-skill-foundation

@@ -7,6 +7,7 @@ candidate_id: C002
 change_id: C002-audit-smart-city-discovery-artifacts
 title: Local evidence for discovery loop artifact audit
 status: complete
+primary_commit: bfde4d36e981f2254b847956be6ba46c0041ce4d
 target_repo:
   path: /Users/archy/Projects/StartUp/smart_city_copilot
   branch: codex/smart-city-copilot-discovery-e2e
@@ -30,4 +31,8 @@ validation:
   result: pass
   evidence:
     - "Target repo validate, summaries --strict, and handoff passed after repairs."
+validation_evidence:
+  - "Existing validation.evidence recorded target-repo validate, summaries --strict, and handoff passing after repairs."
+notes:
+  - "primary_commit is the repo-local evidence commit for this file; target_repo.commit records the external target repository delivery commit."
 updated_at: 2026-05-22T15:18:00+08:00

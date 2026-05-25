@@ -9,6 +9,8 @@ title: Local commit evidence for generated post-validate protocol wiring
 status: completed
 completed_at: 2026-05-22
 commit: 4221206
+implementation_commit: 4221206ff613195001545abc4c4e550019339b30
+evidence_commit: e12ae0eb1d3aab8b7a16ae40da2f05e41147bdb4
 summary: >
   Wired the prompt asset post-validate gate into generated /ow:vision2prompt,
   /ow:prompt2proto, and /ow:proto protocol surfaces. The source registry now
@@ -30,4 +32,6 @@ verification:
     - node dist/cli/src/index.js validate --root . --json
     - git diff --check
   result: passed
+validation_evidence:
+  - "Existing verification.commands recorded: npm run build; npm run validate; npm run verify:e2e-workflow; npm run verify:runtime-surface; node dist/cli/src/index.js sync --root . --json; node dist/cli/src/index.js validate --root . --json; git diff --check."
 next_recommended_candidate_id: C004

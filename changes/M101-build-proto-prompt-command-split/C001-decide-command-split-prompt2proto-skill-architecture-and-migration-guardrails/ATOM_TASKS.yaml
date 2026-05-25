@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C001 decide command split prompt2proto skill architecture and migration guardrails
 source_plan_id: M101-build-proto-prompt-command-split
 source_candidate_id: C001
 selected_change_id: C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails

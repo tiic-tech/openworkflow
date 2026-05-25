@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C003 wire dailin grade prompt paragraph generation into vision2prompt
 source_plan_id: M100-dailin-grade-image-prompt-paragraphs
 source_candidate_id: C003
 selected_change_id: C003-wire-dailin-grade-prompt-paragraph-generation-into-vision2prompt

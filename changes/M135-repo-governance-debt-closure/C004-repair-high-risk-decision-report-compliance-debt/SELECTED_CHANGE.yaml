@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C004
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C004
+title: Repair high-risk decision report compliance debt
+status: done
+selected_at: 2026-05-25T09:42:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C004 is the next ready repair
+  after C003 because repository validation still failed on historical HIGH_RISK_DECISION_REPORT.md
+  section compliance in M101, M102, M105, and M117.
+source_candidate:
+  id: C004
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - repair missing required high-risk report sections in M101, M105, and M117
+    - add explicit implementation-resumes-only-after-approval language where required in M102
+    - preserve original decision outcome and risk posture
+  excludes:
+    - retroactive approval of work not previously approved
+    - source behavior changes
+    - remote mutation
+owned_paths:
+  - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+  - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+  - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - High-risk report section failures are removed or explicitly deferred.
+  - Reports remain faithful to their historical decision scope.
+  - No new implementation approval is implied.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:42:00+08:00
+  implementation_changed_files: true
+  result: >
+    C004 repaired historical high-risk report section compliance failures while preserving the
+    original decision boundaries and without adding new implementation or remote approval.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/HIGH_RISK_REPORT_COMPLIANCE_REPAIR.md
+    - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/LOCAL_COMMIT_EVIDENCE.yaml

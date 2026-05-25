@@ -1,5 +1,33 @@
 # M105 High Risk Decision Report
 
+## Trigger
+
+M104 exposed a strict handoff friction point: local commit evidence could be written by
+`git-automation`, while queue and selected-change completion records still did not reference the
+new evidence path.
+
+## Change
+
+Approve only the narrow C003 backfill behavior described below. Implementation resumes only after
+explicit approval of this selected option and must stay inside `git-automation commit` evidence
+metadata handling.
+
+## Concrete Risks
+
+- A broad backfill could silently mutate planning artifacts beyond evidence arrays.
+- Historical queues could appear healthier than their actual audit record supports.
+- Status transitions could be hidden inside git automation instead of remaining explicit Agent
+  actions.
+
+## Decision Options
+
+The decision options are recorded below as Option A, Option B, and Option C.
+
+## Recommended Path
+
+Proceed with Option A, Narrow Safe Backfill, because it repairs the M104 evidence-link loop while
+preserving explicit status ownership.
+
 ## Candidate
 
 C003 - Auto-backfill commit evidence into selected-change completion
@@ -59,3 +87,32 @@ friction remains unfixed.
 
 Approve Option A for C003. It is the smallest durable fix that removes the
 manual evidence-link repair loop while preserving strict status ownership.
+
+## Guardrails
+
+- Only append the selected evidence path to existing completion evidence arrays.
+- Do not create completion sections, mark candidates done, or change validation results.
+- Do not mutate generated `.agents/**` or `.openworkflow/**` surfaces by hand.
+- Do not rewrite historical git commits or remote state.
+
+## Go Criteria
+
+- `--commit-evidence` is present.
+- The evidence path is inside the selected candidate folder.
+- The selected candidate and selected-change artifact already contain completion records.
+- The evidence path is absent and can be appended without changing status semantics.
+
+## Stop Criteria
+
+- Backfill would need to create completion state.
+- Backfill would change candidate status, validation results, scope, or owned paths.
+- The candidate lacks an explicit selected-change folder or evidence path.
+- The repair would require remote mutation or git history rewriting.
+
+## Validation Expectations
+
+- `npm run build`
+- `npm run validate`
+- targeted runtime fixture for the M104-style missing-evidence repair loop
+- `npm run verify:runtime-surface`
+- `git diff --check`

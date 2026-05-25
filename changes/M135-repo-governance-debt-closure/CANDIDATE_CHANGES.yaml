@@ -1,0 +1,742 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M135-repo-governance-debt-closure
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M135-repo-governance-debt-closure
+title: Candidate changes for repo-wide governance debt closure
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-25-create-cc-for-remaining-repo-governance
+    - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+    - npm_run_validate:2026-05-25T08:25:00+08:00
+    - references/planning-artifact-contracts.md
+    - references/git-version-control-governance.md
+  summary: >
+    M134 closed the blocking git/PR lifecycle baseline, but repository validation still fails on
+    historical non-M134 governance artifacts. M135 decomposes the remaining repo-wide governance
+    debt into auditable, candidate-sized repairs so future development can rely on repository
+    validation rather than only handoff/resume trust.
+queue_policy:
+  branch_boundary: codex/m135-repo-governance-debt-closure
+  git_lifecycle_gate: strict
+  target_remote: origin
+  target_base_branch: main
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. The validation failures must be inventoried and classified before repairing
+    historical artifacts, because some failures are artifact-shape debt while others may indicate
+    validator false positives or obsolete contract expectations.
+  high_risk_rule: >
+    Any repair that fabricates or rewrites historical commit evidence, changes historical intent, or
+    relaxes validator behavior requires explicit high-risk approval and must preserve original audit
+    meaning.
+scope_control:
+  current_boundary: |
+    Repo-wide historical governance and validation debt after M134 git baseline closure.
+  boundary_type: repo_governance_debt_closure
+  in_scope_rule: >
+    Include historical planning artifact shape repairs, local commit evidence metadata repairs,
+    high-risk decision report compliance, parse/schema edge artifacts, and final validation/handoff
+    evidence needed to make `npm run validate` actionable for the current repository.
+  out_of_scope_rule: >
+    Do not implement unrelated product features. Do not merge PRs, mutate remote Issues, delete
+    branches, force-push, rebase, reset, revert, or rewrite git history. Do not weaken validators to
+    hide real debt unless C001 proves a validator false positive and a focused candidate is
+    selected.
+observed_state:
+  captured_at: 2026-05-25T08:25:00+08:00
+  current_branch: codex/m134-git-governance-baseline-closure
+  working_tree_clean_before_queue_creation: true
+  m134_status: complete
+  m134_pr:
+    number: 9
+    state: OPEN
+    draft: true
+    head_oid: f66ceb9b0e577e370b5617b33a874962f0b38aca
+  handoff:
+    resume_ok: true
+    handoff_ok: true
+    summaries_strict_ok: true
+  validation_status:
+    npm_run_build: pass
+    npm_run_validate: fail
+    failure_families:
+      - missing ATOM_TASKS.yaml title keys in historical queues M100, M101, M105, and M97
+      - non-string completion.evidence or missing completion evidence in historical queues M100,
+        M101, and M97
+      - invalid YAML in M113 CANDIDATE_CHANGES.yaml
+      - incomplete historical LOCAL_COMMIT_EVIDENCE.yaml records in M87, M88, and M92
+      - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
+        mismatch
+      - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Inventory and classify remaining repo governance validation debt
+    purpose: >
+      Produce a precise, source-backed inventory of current `npm run validate` failures and classify
+      each as historical artifact repair, evidence repair, validator false positive, or deferred
+      obsolete artifact.
+    scope:
+      includes:
+        - rerun current validation and capture failure families
+        - group failures by queue, artifact type, and repair strategy
+        - identify which repairs can be mechanical versus which need high-risk approval
+        - record explicit non-goals and stop conditions for historical evidence repair
+      excludes:
+        - modifying historical artifacts
+        - relaxing validators
+        - remote mutation
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - Every current validation failure is assigned to a repair family.
+      - The inventory identifies high-risk evidence repairs that need explicit approval before edit.
+      - No historical artifact or validator behavior changes in C001.
+    selection:
+      selected_change_id: C001
+      selected_at: 2026-05-25T08:32:25+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C001 is the required first
+        candidate because current validation failures must be classified before historical artifact
+        repair.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T08:32:25+08:00
+      implementation_changed_files: true
+      result: >
+        C001 classified current repository validation failures into planning artifact shape repairs,
+        local commit evidence metadata repairs, high-risk decision report compliance repairs,
+        parse/schema edge repairs, and optional regression guardrail work.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+        - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Normalize historical planning artifact shape debt
+    purpose: >
+      Repair mechanical planning artifact shape failures such as missing atom-task titles and
+      invalid completion.evidence item shapes while preserving historical meaning.
+    scope:
+      includes:
+        - add missing `title` keys to historical ATOM_TASKS.yaml files in M100, M101, M105, and M97
+        - normalize non-string completion.evidence entries in M100
+        - add missing completion evidence references in M101 and M97 only when existing artifacts
+          already support the claim
+        - record any unresolved historical evidence gaps instead of inventing evidence
+      excludes:
+        - changing source behavior
+        - fabricating commit hashes or validation commands
+        - remote mutation
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+      - changes/M101-build-proto-prompt-command-split/
+      - changes/M105-m104-direct-trust-gate-fixes/
+      - changes/M97-smart-city-product-reality-dogfood/
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C007
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Mechanical artifact-shape failures for the owned queues are removed or explicitly deferred.
+      - Historical intent is preserved.
+      - No commit evidence is fabricated.
+    selection:
+      selected_change_id: C002
+      selected_at: 2026-05-25T09:05:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C002 is the next ready
+        repair candidate after C001 because the remaining validation failures include mechanical
+        historical planning artifact shape debt that can be corrected without changing source
+        behavior.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:05:00+08:00
+      implementation_changed_files: true
+      result: >
+        C002 repaired scoped historical planning artifact shape failures in M100, M101, M105, and
+        M97 while preserving historical intent. Remaining validation failures are assigned to
+        C003-C005.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Repair historical local commit evidence metadata
+    purpose: >
+      Make historical LOCAL_COMMIT_EVIDENCE.yaml records validation-compatible where existing git
+      history and local artifacts provide enough evidence, while marking unknown evidence honestly.
+    scope:
+      includes:
+        - inspect M87, M88, and M92 local commit evidence records
+        - bind missing primary_commit values only to verifiable existing commits
+        - add validation_evidence only from existing recorded validation or rerunnable evidence
+        - record unresolved evidence gaps without pretending historical validation occurred
+      excludes:
+        - inventing commit hashes
+        - rewriting git history
+        - changing selected-change semantics
+        - remote mutation
+    owned_paths:
+      - changes/M87-vision2prompt-post-validate-gate/
+      - changes/M88-tune-product-system-inheritance/
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C007
+    risk: high
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Evidence records are repaired only where verifiable.
+      - Any unverifiable historical evidence remains explicitly documented as unresolved debt.
+      - No false historical audit claim is introduced.
+    selection:
+      selected_change_id: C003
+      selected_at: 2026-05-25T09:28:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C003 is the next repair
+        after C002 because repository validation still failed on historical LOCAL_COMMIT_EVIDENCE.yaml
+        metadata in M87, M88, and M92.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:28:00+08:00
+      implementation_changed_files: true
+      result: >
+        C003 repaired historical M87, M88, and M92 local commit evidence metadata using existing
+        recorded commands, target-repo evidence, and verifiable git history.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/LOCAL_COMMIT_EVIDENCE_METADATA_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C004
+    status: done
+    title: Repair high-risk decision report compliance debt
+    purpose: >
+      Bring historical HIGH_RISK_DECISION_REPORT.md artifacts into the current required section
+      contract without changing the decisions they originally recorded.
+    scope:
+      includes:
+        - repair missing sections in M101, M105, and M117 high-risk reports
+        - add explicit implementation-resumes-only-after-approval language where required in M102
+        - preserve original decision outcome and risk posture
+      excludes:
+        - retroactive approval of work not previously approved
+        - source behavior changes
+        - remote mutation
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+      - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+      - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+      - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C007
+    risk: medium
+    size: medium
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - High-risk report section failures are removed or explicitly deferred.
+      - Reports remain faithful to their historical decision scope.
+      - No new implementation approval is implied.
+    selection:
+      selected_change_id: C004
+      selected_at: 2026-05-25T09:42:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C004 is the next repair
+        after C003 because repository validation still failed on historical HIGH_RISK_DECISION_REPORT.md
+        section compliance in M101, M102, M105, and M117.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:42:00+08:00
+      implementation_changed_files: true
+      result: >
+        C004 repaired historical high-risk decision report compliance failures while preserving
+        original decision boundaries and adding no new implementation or remote approval.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/HIGH_RISK_REPORT_COMPLIANCE_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C005
+    status: done
+    title: Repair parse and schema edge artifacts
+    purpose: >
+      Resolve isolated parse/schema failures that prevent whole-repo validation from becoming a
+      reliable governance gate.
+    scope:
+      includes:
+        - fix invalid YAML quoting in M113 CANDIDATE_CHANGES.yaml
+        - repair examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract
+          shape if C001 confirms the current validator expectation is correct
+      excludes:
+        - changing product strategy in historical prompt packs
+        - relaxing parser behavior
+        - source behavior changes unless C001 proves a validator false positive
+    owned_paths:
+      - changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.yaml
+      - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C007
+    risk: medium
+    size: small
+    validation:
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - M113 parses as YAML.
+      - The M98 example matches the current prompt-pack schema or is explicitly deferred with a
+        validator-false-positive rationale.
+    selection:
+      selected_change_id: C005
+      selected_at: 2026-05-25T09:55:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C005 is the next repair
+        after C004 because repository validation still failed on one invalid YAML scalar in M113 and
+        one M98 prompt-pack schema shape.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:55:00+08:00
+      implementation_changed_files: true
+      result: >
+        C005 fixed the M113 YAML quoting failure and added a schema-compatible M98 prototype system
+        contract derived from existing prompt-pack content.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C006
+    status: done
+    title: Add governance debt regression guardrails if needed
+    purpose: >
+      Add or refine focused validation fixtures only if C001 finds that current validators allow
+      newly repaired debt to regress silently.
+    scope:
+      includes:
+        - focused validator or fixture updates for repaired governance debt families
+        - minimal source changes needed to make regression intent executable
+      excludes:
+        - broad validator rewrites
+        - relaxing validation to pass historical artifacts without repair
+        - generated .agents or .openworkflow edits
+    owned_paths:
+      - packages/core/src/validators/
+      - packages/cli/src/dev/
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C007
+    risk: medium
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - git diff --check
+    acceptance:
+      - Any source change is tied to a concrete C001 regression gap.
+      - Validators remain strict for real governance debt.
+      - No generated surfaces are manually patched.
+    selection:
+      selected_change_id: C006
+      selected_at: 2026-05-25T10:05:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C006 follows C002-C005 to
+        decide whether additional validator or fixture guardrails are needed after the historical
+        debt repairs.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T10:05:00+08:00
+      implementation_changed_files: true
+      result: >
+        C006 found no source validator or fixture change was needed. Existing validators already
+        caught the repaired debt families, and `npm run validate` passed after C002-C005 repairs and
+        evidence normalization.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C007
+    status: done
+    title: Complete repo governance validation debt handoff
+    purpose: >
+      Record the final repo governance debt status after C002-C006 and state whether whole-repo
+      validation is clean enough to become the default development baseline.
+    scope:
+      includes:
+        - summarize repaired failure families
+        - record remaining deferred debts, if any
+        - run final validation and handoff checks
+        - state next development baseline and any remaining explicit gates
+      excludes:
+        - new product feature work
+        - remote mutation unless separately approved through git automation
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    dependencies:
+      - C002
+      - C003
+      - C004
+      - C005
+    unlocks:
+      - repo-wide-validation-baseline
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The handoff states whether `npm run validate` is clean.
+      - Any remaining debt is explicit, bounded, and not hidden.
+      - No unauthorized remote operation is recorded.
+    selection:
+      selected_change_id: C007
+      selected_at: 2026-05-25T10:18:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C007 is the final handoff
+        after C002-C006 repaired the repository governance validation debt and `npm run validate`
+        passed.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T10:18:00+08:00
+      implementation_changed_files: true
+      result: >
+        C007 completed the M135 handoff. Whole-repo validation is clean, resume and summaries strict
+        trust gates pass, and no remaining M135 governance debt is deferred.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: create
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+    actor: agent
+    reason: >
+      User asked to create a CC for the remaining whole-repo governance debt after M134 completed
+      the git/PR lifecycle baseline. Current validation still fails on historical non-M134
+      artifacts, so M135 scopes the remaining governance debt into auditable repair candidates.
+    changed_at: 2026-05-25T08:25:00+08:00
+    before_status: null
+    after_status: active
+    evidence:
+      - node dist/cli/src/index.js resume --root . --json
+      - npm run validate
+      - git status --short --branch
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: |
+      C001 is the required inventory step before repairing historical validation debt.
+    changed_at: 2026-05-25T08:32:25+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 classified validation failures into focused M135 repair families without changing
+      historical artifacts.
+    changed_at: 2026-05-25T08:32:25+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+    actor: agent
+    reason: |
+      C001 classified current validation failures and unlocked the focused repair candidates.
+    changed_at: 2026-05-25T08:32:25+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: |
+      C002 is the first focused repair after C001 and covers mechanical planning artifact shape debt.
+    changed_at: 2026-05-25T09:05:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 removed the scoped historical planning artifact shape failures without changing source
+      behavior or fabricating evidence.
+    changed_at: 2026-05-25T09:05:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: |
+      C003 is the high-risk evidence metadata repair after C002 cleared mechanical planning shape debt.
+    changed_at: 2026-05-25T09:28:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 removed M87, M88, and M92 local commit evidence metadata validation failures without
+      fabricating commit hashes or validation commands.
+    changed_at: 2026-05-25T09:28:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/LOCAL_COMMIT_EVIDENCE_METADATA_REPAIR.md
+  - operation_id: OP009
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: |
+      C004 repairs historical high-risk report compliance after C003 cleared local evidence metadata debt.
+    changed_at: 2026-05-25T09:42:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP010
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 removed high-risk report section compliance failures without changing historical decision
+      outcomes or adding new approvals.
+    changed_at: 2026-05-25T09:42:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C004-repair-high-risk-decision-report-compliance-debt/HIGH_RISK_REPORT_COMPLIANCE_REPAIR.md
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: |
+      C005 repairs the final parse/schema edge artifacts after C004 cleared high-risk report debt.
+    changed_at: 2026-05-25T09:55:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 removed the remaining parse/schema validation failures without relaxing parser or
+      validator behavior.
+    changed_at: 2026-05-25T09:55:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: |
+      C006 records whether additional regression guardrails are needed after validation passed.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C006 determined no source guardrail changes are needed because existing validation catches the
+      repaired debt families and now passes cleanly.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+  - operation_id: OP015
+    operation_type: status_change
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      C002-C006 are complete, so final repo governance validation debt handoff is ready.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - npm run validate
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      C007 is the final handoff after C002-C006 completed and validation passed.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C007 recorded the final governance debt handoff with clean build, validate, resume, summaries
+      strict, and diff whitespace checks.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+  - operation_id: OP018
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+    actor: agent
+    reason: |
+      All M135 candidates are complete and whole-repo validation is clean.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: active
+    after_status: complete
+    evidence:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+  - operation_id: OP019
+    operation_type: remote_draft_pr
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      User granted highest authorization for M135 git governance work; branch was pushed and draft PR was opened after local validation passed.
+    changed_at: 2026-05-25T10:30:00+08:00
+    before_status: local_complete
+    after_status: draft_pr_open
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+      - https://github.com/tiic-tech/openworkflow/pull/10

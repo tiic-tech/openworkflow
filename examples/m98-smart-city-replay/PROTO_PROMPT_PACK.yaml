@@ -172,6 +172,60 @@ product_experience_model:
     - no chatbot-first shell
     - no disconnected scenario cards
     - no HIL, audit, or citation controls as the visual main product
+prototype_system_contract:
+  stable_app_shell:
+    - left city domain rail
+    - top layer and scenario bar
+    - central digital twin map canvas
+    - right selected-object drawer
+    - bottom human-in-the-loop and audit strip
+  navigation_taxonomy:
+    - overview
+    - planning
+    - incident response
+    - asset capacity
+    - audit trace
+  data_vocabulary:
+    - district
+    - planning parcel
+    - incident id
+    - route overlay
+    - parking capacity cluster
+    - department owner
+    - confidence score
+    - citation freshness
+  domain_object_anatomy:
+    - map pin or polygon
+    - object identifier
+    - risk level
+    - owner department
+    - timestamp
+    - linked workflow state
+  object_detail_anatomy:
+    - selected object title
+    - key metrics
+    - evidence and citations
+    - Copilot recommendation
+    - uncertainty or stale-data warning
+    - audit history
+  action_bar_contract:
+    - confirm human action
+    - request revised assumptions
+    - inspect cited source
+    - defer with audit note
+    - block recommendation
+  audit_trust_pattern:
+    - synthetic POC data badge
+    - confidence disclosure
+    - stale-data warning when applicable
+    - human confirmation before operational action
+    - audit note for deferral or override
+  copy_tone: concise city-operations language with explicit synthetic POC boundaries
+  allowed_screen_deltas:
+    - active layer and selected object may change per screen
+    - detail drawer content changes to match planning, incident, or capacity state
+    - Copilot recommendation and trust controls change with workflow risk
+    - stable map-first shell, navigation, and HIL/audit placement remain consistent
 screen_manifest:
   - target_screen_id: map-shell
     screen_name: Smart city operations shell

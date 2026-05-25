@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C001
+title: Inventory and classify remaining repo governance validation debt
+status: done
+selected_at: 2026-05-25T08:32:25+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C001 is the required first
+  candidate because current validation failures must be classified before historical artifact
+  repair.
+source_candidate:
+  id: C001
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    []
+scope:
+  includes:
+    - rerun current validation and capture failure families
+    - group failures by queue, artifact type, and repair strategy
+    - identify mechanical repairs and high-risk evidence repairs
+    - record non-goals and stop conditions for historical evidence repair
+  excludes:
+    - modifying historical artifacts
+    - relaxing validators
+    - remote mutation
+owned_paths:
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - Every current validation failure is assigned to a repair family.
+  - The inventory identifies high-risk evidence repairs that need explicit approval before edit.
+  - No historical artifact or validator behavior changes in C001.
+validation:
+  - npm run validate
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T08:32:25+08:00
+  implementation_changed_files: true
+  result: >
+    C001 classified current repository validation failures into planning artifact shape repairs,
+    local commit evidence metadata repairs, high-risk decision report compliance repairs,
+    parse/schema edge repairs, and optional regression guardrail work.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+    - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/LOCAL_COMMIT_EVIDENCE.yaml

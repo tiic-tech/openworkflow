@@ -1,0 +1,24 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C001
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C001
+status: current
+source_plan_id: M135-repo-governance-debt-closure
+source_candidate_id: C001
+selected_change_id: C001
+primary_commit: a0a4076d78991e502dfd37cbbb984d0cab479329
+validation_evidence:
+  - npm run validate (expected fail
+  - classified); node dist/cli/src/index.js summaries --root . --strict --json; git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

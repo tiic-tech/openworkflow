@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:M97-smart-city-product-reality-dogfood:C004
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C004 audit dogfood outcome
 plan_id: M97-smart-city-product-reality-dogfood
 change_id: C004-audit-dogfood-outcome
 status: done

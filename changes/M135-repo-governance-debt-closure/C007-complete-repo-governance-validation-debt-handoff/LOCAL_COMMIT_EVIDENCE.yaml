@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C007
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C007
+change_id: C007
+selected_change_id: C007
+title: Local commit evidence for C007 final governance debt handoff
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: 3434b63
+commit_message: M135-repo-governance-debt-closure/C007 Complete governance debt handoff
+implementation_changed_files: true
+affected_paths:
+  - changes/M135-repo-governance-debt-closure/
+validation_evidence:
+  - npm run build: pass
+  - npm run validate: pass before C007 evidence file was referenced; expected missing C007 evidence failure after queue completion until this file exists
+  - node dist/cli/src/index.js resume --root . --json: pass, handoff_ok true, current work item C007 before final commit
+  - node dist/cli/src/index.js summaries --root . --strict --json: pass before C007 evidence file was referenced
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - node dist/cli/src/index.js resume --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  result: >
+    Final validation gates passed before C007 queue completion. The only validation failure after
+    marking C007 done was the expected missing C007 local commit evidence file, now recorded here.
+notes:
+  - "M135 has no remaining deferred governance validation debt."
+  - "No remote mutation is recorded by C007."

@@ -100,6 +100,12 @@ changes:
       - Baseline evidence names whether existing M92 prototype artifacts are incompatible with M93 handoff quality.
       - Target repo managed surfaces are current with the local dist CLI or blockers are documented.
       - The next action is explicit: repair old artifacts, archive them, or run a fresh discovery/proto chain.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/decisions/dec-m97-c003/DECISION.yaml
+        - changes/M97-smart-city-product-reality-dogfood/CANDIDATE_CHANGES.yaml
   - id: C002
     status: done
     title: Re-run smart city discovery to prompt-pack reality gate
@@ -139,6 +145,12 @@ changes:
       - Prompt pack contains a map-first smart city operations dashboard product_archetype.
       - Prompt pack records digital-twin map canvas, city operations IA, domain objects, task loop, interaction states, data realism, and anti-generic constraints.
       - prototype_reality_gate.status is pass before image generation starts, or failure evidence routes back to /ow:vision2prompt.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/EVIDENCE.yaml
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/decisions/dec-m97-c003/DECISION.yaml
+        - changes/M97-smart-city-product-reality-dogfood/CANDIDATE_CHANGES.yaml
   - id: C003
     status: done
     title: Generate local deterministic product-reality prototype batch
@@ -173,6 +185,13 @@ changes:
       - Prototype batch shows map-first operations shell before governance controls.
       - Planning, incident, and asset capacity appear as modules, layers, states, or workflows inside one product shell.
       - Any visual shortcomings are recorded as audit evidence, not silently converted into source fixes.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d1-planning-approval-shell.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d2-incident-response-state.png
+        - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-m97/images/d3-asset-capacity-layer.png
+        - changes/M97-smart-city-product-reality-dogfood/C003-local-deterministic-product-reality-prototype-batch/LOCAL_CHANGE_EVIDENCE.yaml
   - id: C004
     status: done
     title: Audit M97 dogfood outcome and decompose follow-ups
@@ -210,6 +229,11 @@ changes:
       - Audit report states whether the vision-to-proto first image-generation slice passed the product-reality bar.
       - Follow-up source fixes are decomposed as deferred refs instead of patched inside M97.
       - Target repo evidence is clean enough for handoff or blockers are concrete.
+    completion:
+      completed_at: 2026-05-22
+      evidence:
+        - /Users/archy/Projects/StartUp/smart_city_copilot/docs/M97_PRODUCT_REALITY_E2E_AUDIT_REPORT.md
+        - changes/M97-smart-city-product-reality-dogfood/C004-audit-dogfood-outcome/LOCAL_CHANGE_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: add

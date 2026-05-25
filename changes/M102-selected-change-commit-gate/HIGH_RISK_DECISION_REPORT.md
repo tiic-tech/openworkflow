@@ -67,6 +67,9 @@ commit evidence.
 
 Proceed with Option 1.
 
+Implementation resumes only after explicit approval of the selected implementation candidate and
+its bounded validation plan.
+
 Implementation order:
 
 1. Implement C002 to add the evidence contract and queue audit validator.

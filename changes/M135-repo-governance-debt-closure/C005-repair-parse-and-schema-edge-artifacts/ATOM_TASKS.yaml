@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C005
+title: Atom tasks for C005 parse and schema edge repair
+status: done
+tasks:
+  - task_id: T001
+    title: Fix M113 YAML scalar quoting
+    type: edit
+    status: done
+    owned_paths:
+      - changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.yaml
+    done_when: >
+      The backtick-starting acceptance item is quoted and the queue parses as YAML.
+  - task_id: T002
+    title: Add M98 prototype system contract mapping
+    type: edit
+    status: done
+    owned_paths:
+      - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+    done_when: >
+      The prompt pack includes a mapping-shaped prototype_system_contract with required fields
+      derived from the existing product experience model and screen manifest.
+  - task_id: T003
+    title: Preserve strategy and validator strictness
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      C005 evidence states that no parser or validator relaxation was used.

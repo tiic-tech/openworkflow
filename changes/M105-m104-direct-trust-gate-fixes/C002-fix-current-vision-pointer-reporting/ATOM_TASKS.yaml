@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:M105-m104-direct-trust-gate-fixes:C002
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C002 fix current vision pointer reporting
 selected_change_id: M105-C002-fix-current-vision-pointer-reporting
 source_plan_id: M105-m104-direct-trust-gate-fixes
 source_candidate_id: C002

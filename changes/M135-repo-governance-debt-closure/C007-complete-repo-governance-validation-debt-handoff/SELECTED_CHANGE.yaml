@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C007
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C007
+title: Complete repo governance validation debt handoff
+status: done
+selected_at: 2026-05-25T10:18:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C007 is the final handoff after
+  C002-C006 repaired the repository governance validation debt and `npm run validate` passed.
+source_candidate:
+  id: C007
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C002
+    - C003
+    - C004
+    - C005
+scope:
+  includes:
+    - summarize repaired failure families
+    - record remaining deferred debts, if any
+    - run final validation and handoff checks
+    - state next development baseline and any remaining explicit gates
+  excludes:
+    - new product feature work
+    - remote mutation unless separately approved through git automation
+owned_paths:
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - The handoff states whether `npm run validate` is clean.
+  - Any remaining debt is explicit, bounded, and not hidden.
+  - No unauthorized remote operation is recorded.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T10:18:00+08:00
+  implementation_changed_files: true
+  result: >
+    C007 completed the M135 handoff. Whole-repo validation is clean, resume and summaries strict
+    trust gates pass, and no remaining M135 governance debt is deferred.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+    - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+    - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/LOCAL_COMMIT_EVIDENCE.yaml

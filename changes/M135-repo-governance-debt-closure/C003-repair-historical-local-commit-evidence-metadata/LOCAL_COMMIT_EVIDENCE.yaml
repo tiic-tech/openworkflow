@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C003
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C003
+change_id: C003
+selected_change_id: C003
+title: Local commit evidence for C003 historical local commit evidence metadata repair
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: ecc9c92
+commit_message: M135-repo-governance-debt-closure/C003 Repair historical commit evidence metadata
+implementation_changed_files: true
+affected_paths:
+  - changes/M87-vision2prompt-post-validate-gate/
+  - changes/M88-tune-product-system-inheritance/
+  - changes/M92-smart-city-real-discovery-e2e-dogfood/
+  - changes/M135-repo-governance-debt-closure/
+validation_evidence:
+  - npm run validate: expected fail after C003, with C003-owned M87/M88/M92 failures removed and remaining failures assigned to C004-C005
+  - node dist/cli/src/index.js summaries --root . --strict --json: expected fail before C003 LOCAL_COMMIT_EVIDENCE.yaml existed
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  result: >
+    C003-owned historical local commit evidence metadata failures were removed. Remaining repository
+    validation failures are C004 high-risk report compliance and C005 parse/schema edge artifacts.
+notes:
+  - >
+    C003 preserved historical target-repo commit fields and added repo-local commit metadata only
+    where git history or existing short commit ids provided verifiable support.

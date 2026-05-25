@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C001
+title: Atom tasks for C001 repo governance debt inventory
+status: done
+tasks:
+  - task_id: T001
+    title: Capture current validation output
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      `npm run validate` output is captured and grouped by failure family.
+  - task_id: T002
+    title: Classify repair families
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      Each failure family is mapped to a candidate and risk posture.
+  - task_id: T003
+    title: Identify high-risk evidence repairs
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      Commit evidence repairs are explicitly marked high-risk and must not fabricate audit claims.
+  - task_id: T004
+    title: Record unlocks
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      C002-C006 are ready for focused repair work after C001.

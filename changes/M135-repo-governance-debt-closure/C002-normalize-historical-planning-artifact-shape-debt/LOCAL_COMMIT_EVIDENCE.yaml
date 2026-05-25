@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C002
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C002
+change_id: C002
+selected_change_id: C002
+title: Local commit evidence for C002 planning artifact shape repair
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: 60f5af3341e553f3553ab0ee0890153126ce5b30
+commit_message: M135-repo-governance-debt-closure/C002 Normalize planning artifact shape debt
+implementation_changed_files: true
+affected_paths:
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+  - changes/M101-build-proto-prompt-command-split/
+  - changes/M105-m104-direct-trust-gate-fixes/
+  - changes/M97-smart-city-product-reality-dogfood/
+  - changes/M135-repo-governance-debt-closure/
+excluded_dirty_paths:
+  - docs/INDEPENDENT_AGENT_RUNTIME_APP_PLAN_2026_05_25.md
+validation_evidence:
+  - npm run validate: expected fail after C002, with remaining failures assigned to C003-C005
+  - node dist/cli/src/index.js summaries --root . --strict --json: expected fail before evidence file existed
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  result: >
+    C002-owned planning artifact shape failures were removed. Remaining repository validation
+    failures are C003 historical local commit evidence metadata, C004 high-risk report compliance,
+    and C005 parse/schema edge artifacts. The unrelated untracked docs file was excluded from the
+    C002 commit.
+notes:
+  - >
+    git-automation dry-run refused to commit because an unrelated untracked docs file was present
+    outside the selected change scope. The C002 primary commit was created with exact pathspecs so
+    that unrelated file remained untouched and uncommitted.

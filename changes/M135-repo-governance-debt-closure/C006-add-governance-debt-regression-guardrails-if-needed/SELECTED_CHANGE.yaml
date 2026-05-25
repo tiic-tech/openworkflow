@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C006
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C006
+title: Add governance debt regression guardrails if needed
+status: done
+selected_at: 2026-05-25T10:05:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C006 follows C002-C005 to decide
+  whether additional validator or fixture guardrails are needed after the historical debt repairs.
+source_candidate:
+  id: C006
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - review whether repaired debt families require new validator or fixture updates
+    - record the guardrail decision
+  excludes:
+    - broad validator rewrites
+    - relaxing validation to pass historical artifacts without repair
+    - generated .agents or .openworkflow edits
+owned_paths:
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - Any source change is tied to a concrete C001 regression gap.
+  - Validators remain strict for real governance debt.
+  - No generated surfaces are manually patched.
+validation:
+  - npm run build
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T10:05:00+08:00
+  implementation_changed_files: true
+  result: >
+    C006 found no source validator or fixture change was needed. Existing validators already caught
+    the repaired debt families, and `npm run validate` passed after C002-C005 repairs and evidence
+    normalization.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+    - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/LOCAL_COMMIT_EVIDENCE.yaml

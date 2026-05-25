@@ -9,6 +9,7 @@ title: Local commit evidence for post-validate stress fixtures
 status: completed
 completed_at: 2026-05-22
 commit: 75def71
+implementation_commit: 75def71132cde39e26d8111b09408f60714ea5d0
 summary: >
   Added the missing near-duplicate strategic fingerprint stress fixture for
   post_validate. The stress matrix now rejects exact duplicate and rephrased
@@ -27,6 +28,8 @@ verification:
     - node dist/cli/src/index.js validate --root . --json
     - git diff --check
   result: passed
+validation_evidence:
+  - "Existing verification.commands recorded: npm run build; npm run validate; npm run verify:e2e-workflow; npm run verify:runtime-surface; node dist/cli/src/index.js validate --root . --json; git diff --check."
 queue_result:
   status: completed
   completed_candidate_ids:

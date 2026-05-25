@@ -7,6 +7,7 @@ candidate_id: C001
 change_id: C001-run-smart-city-discovery-e2e
 title: Local evidence for smart city discovery E2E
 status: complete
+primary_commit: bfde4d36e981f2254b847956be6ba46c0041ce4d
 target_repo:
   path: /Users/archy/Projects/StartUp/smart_city_copilot
   branch: codex/smart-city-copilot-discovery-e2e
@@ -22,6 +23,8 @@ validation:
     - node /Users/archy/Projects/StartUp/openworkflow/dist/cli/src/index.js handoff --root /Users/archy/Projects/StartUp/smart_city_copilot --json
     - git -C /Users/archy/Projects/StartUp/smart_city_copilot status --short --branch
   result: pass
+validation_evidence:
+  - "Existing validation.commands recorded target-repo validation, summaries --strict, handoff, and git status checks."
 generated_images:
   - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-01-planning-approval.png
   - /Users/archy/Projects/StartUp/smart_city_copilot/.openworkflow/prototypes/proto-001/images/screen-02-incident-response.png
@@ -29,4 +32,5 @@ generated_images:
 notes:
   - "Stopped before /ow:tune and M91/proto2html."
   - "Target repo git worktree was clean after commit."
+  - "primary_commit is the repo-local evidence commit for this file; target_repo.commit records the external target repository delivery commit."
 updated_at: 2026-05-22T15:18:00+08:00

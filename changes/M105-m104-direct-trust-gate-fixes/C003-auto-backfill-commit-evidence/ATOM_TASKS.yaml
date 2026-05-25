@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:M105-m104-direct-trust-gate-fixes:C003
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C003 auto backfill commit evidence
 selected_change_id: M105-C003-auto-backfill-commit-evidence
 source_plan_id: M105-m104-direct-trust-gate-fixes
 source_candidate_id: C003

@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C005
+title: Repair parse and schema edge artifacts
+status: done
+selected_at: 2026-05-25T09:55:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C005 is the next ready repair
+  after C004 because repository validation still failed on one invalid YAML scalar in M113 and one
+  M98 prompt-pack schema shape.
+source_candidate:
+  id: C005
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - fix invalid YAML quoting in M113 CANDIDATE_CHANGES.yaml
+    - repair examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml prototype_system_contract shape
+  excludes:
+    - changing product strategy in historical prompt packs
+    - relaxing parser behavior
+    - unrelated source behavior changes
+owned_paths:
+  - changes/M113-spicyclaw-rename-and-compatibility/CANDIDATE_CHANGES.yaml
+  - examples/m98-smart-city-replay/PROTO_PROMPT_PACK.yaml
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - M113 parses as YAML.
+  - The M98 example matches the current prompt-pack schema or is explicitly deferred with a validator-false-positive rationale.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:55:00+08:00
+  implementation_changed_files: true
+  result: >
+    C005 fixed the M113 YAML quoting failure and added a schema-compatible M98 prototype system
+    contract derived from the existing smart city prompt-pack content.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
+    - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
