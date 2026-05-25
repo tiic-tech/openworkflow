@@ -47,3 +47,4 @@ completion:
     committed.
   evidence:
     - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+    - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/LOCAL_COMMIT_EVIDENCE.yaml
