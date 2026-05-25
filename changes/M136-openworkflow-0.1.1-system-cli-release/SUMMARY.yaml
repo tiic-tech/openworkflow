@@ -1,0 +1,61 @@
+schema_version: 0.1.0
+contract_id: summary:M136-openworkflow-0.1.1-system-cli-release
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+title: Summary for OpenWorkflow 0.1.1 system CLI release
+status: complete
+source:
+  kind: mixed
+  summary: >
+    M136 records the post-M134/M135 release state. npm registry already has 0.1.1, so this queue
+    makes the current main 0.1.1 build available through the system-level CLI and documents that any
+    future registry release requires a new version number.
+  refs:
+    - changes/M136-openworkflow-0.1.1-system-cli-release/CANDIDATE_CHANGES.yaml
+scope_boundary: >
+  OpenWorkflow 0.1.1 release availability after M134/M135 merge.
+branch_boundary: codex/m136-openworkflow-0.1.1-system-cli-release
+target_base:
+  remote: origin
+  branch: main
+candidate_count: 3
+completed_candidate_id: C003
+completed_change_id: C003
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M136-openworkflow-0.1.1-system-cli-release/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M136-openworkflow-0.1.1-system-cli-release/CANDIDATE_CHANGES.md
+  summary: changes/M136-openworkflow-0.1.1-system-cli-release/SUMMARY.yaml
+  selected_change_c001: changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/SELECTED_CHANGE.yaml
+  registry_release_feasibility_c001: changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
+  selected_change_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SELECTED_CHANGE.yaml
+  system_cli_install_evidence_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
+  selected_change_c003: changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/SELECTED_CHANGE.yaml
+  final_release_handoff_c003: changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+  draft_pr_operation_evidence_c003: changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+  pr_ready_summary: changes/M136-openworkflow-0.1.1-system-cli-release/PR_READY_SUMMARY.md
+risks:
+  - id: R001
+    level: high
+    description: npm does not allow overwriting an existing 0.1.1 package.
+    mitigation: Do not run `npm publish` for 0.1.1; install locally or bump a later release.
+  - id: R002
+    level: medium
+    description: System CLI may still point to stale global package if install is skipped.
+    mitigation: Verify `openworkflow --help` and `openworkflow resume --root . --json`.
+validation:
+  commands_run:
+    - npm view @tiic-tech/openworkflow@0.1.1 version dist.tarball gitHead time --json
+    - npm run build
+    - npm run validate
+  notes: |
+    - M134 and M135 are merged to main.
+    - Local package version is 0.1.1.
+    - Registry 0.1.1 exists and cannot be overwritten.
+    - C001 selected the system CLI install route for current main 0.1.1.
+    - C002 installed and verified the system-level `openworkflow` command.
+    - C003 completed the system CLI release handoff.
+    - M136 branch was pushed and draft PR #11 was opened.

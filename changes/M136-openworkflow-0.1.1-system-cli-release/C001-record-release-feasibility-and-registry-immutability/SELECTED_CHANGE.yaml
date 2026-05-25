@@ -1,0 +1,44 @@
+schema_version: 0.1.0
+contract_id: selected_change:M136-openworkflow-0.1.1-system-cli-release:C001
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+change_id: C001
+title: Record 0.1.1 release feasibility and registry immutability
+status: done
+selected_at: 2026-05-25T09:12:00+08:00
+selection_reason: >
+  C001 must run first because npm registry already reports @tiic-tech/openworkflow@0.1.1, and
+  release work must not attempt to overwrite an immutable published version.
+source_candidate:
+  id: C001
+  status_at_selection: ready
+  risk: medium
+scope:
+  includes:
+    - verify package version and registry version
+    - record that npm cannot republish an existing version
+    - decide that M136 will install current main as system-level 0.1.1 CLI rather than overwrite npm
+  excludes:
+    - npm publish of an already-existing version
+    - version bump to 0.1.2
+owned_paths:
+  - changes/M136-openworkflow-0.1.1-system-cli-release/
+acceptance:
+  - Registry state is recorded.
+  - No attempt is made to overwrite 0.1.1 on npm.
+  - The route to system CLI availability is explicit.
+validation:
+  - npm view @tiic-tech/openworkflow@0.1.1 version dist.tarball gitHead time --json
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:12:00+08:00
+  implementation_changed_files: true
+  result: >
+    C001 confirmed that npm registry already contains @tiic-tech/openworkflow@0.1.1 with gitHead
+    b460bca063aa3c67855dd0f7512613c70c0f6195. M136 will not publish over that version and will
+    install the current main build as the system-level 0.1.1 CLI.
+  evidence:
+    - changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
+    - changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/LOCAL_COMMIT_EVIDENCE.yaml

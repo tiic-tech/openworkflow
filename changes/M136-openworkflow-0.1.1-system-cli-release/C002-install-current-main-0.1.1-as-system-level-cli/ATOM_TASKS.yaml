@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M136-openworkflow-0.1.1-system-cli-release:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+change_id: C002
+title: Atom tasks for C002 system CLI install
+status: done
+tasks:
+  - task_id: T001
+    title: Build and validate before install
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      `npm run build` and `npm run validate` pass before global install.
+  - task_id: T002
+    title: Install globally from current repository
+    type: command
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      `npm install -g .` succeeds and global npm lists @tiic-tech/openworkflow@0.1.1.
+  - task_id: T003
+    title: Verify system command surface
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      `openworkflow --help` includes the current command surface and `openworkflow resume --root .
+      --json` succeeds.
