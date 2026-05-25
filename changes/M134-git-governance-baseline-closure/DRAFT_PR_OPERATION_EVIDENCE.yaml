@@ -1,6 +1,6 @@
 schema_version: 0.1.0
 contract_id: draft_pr_operation_evidence:M134-git-governance-baseline-closure
-contract_type: audit
+contract_type: planning
 artifact_type: draft_pr_operation_evidence
 planning_artifact_type: remote_operation_evidence
 title: Draft PR operation evidence for M134 git governance baseline closure

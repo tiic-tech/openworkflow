@@ -1,6 +1,6 @@
 schema_version: 0.1.0
 contract_id: pr8_disposition_evidence:M134-git-governance-baseline-closure:C007
-contract_type: audit
+contract_type: planning
 artifact_type: pr_disposition_evidence
 planning_artifact_type: remote_operation_evidence
 title: PR #8 disposition evidence for M134 git governance baseline closure

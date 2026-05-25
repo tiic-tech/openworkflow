@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C008
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C008
+title: Atom tasks for C008 final baseline handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Summarize completed evidence
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Final handoff references C001-C007 evidence and states the baseline outcome.
+  - task_id: T002
+    title: Run final validation
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Build, validate, resume, strict summaries, and diff check outcomes are recorded.
+  - task_id: T003
+    title: Record remaining risk and remote gates
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Any remaining remote/open-branch risks are explicit and not implied as authorized.
+  - task_id: T004
+    title: Mark queue baseline complete
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      C008 completion and queue operations record the formal baseline handoff.

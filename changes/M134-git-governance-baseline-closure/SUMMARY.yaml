@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M134-git-governance-baseline-closure
 title: "Summary for git governance baseline closure"
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -25,9 +25,9 @@ target_base:
   branch: main
   head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
 candidate_count: 8
-completed_candidate_id: C005
-completed_change_id: C005
-next_recommended_candidate_id: C006
+completed_candidate_id: C008
+completed_change_id: C008
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -59,9 +59,17 @@ outputs:
   atom_tasks_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
   implementation_brief_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
   publication_packet_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  selected_change_c006: changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
+  local_commit_evidence_c006: changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
+  draft_pr_operation_evidence_c006: changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+  selected_change_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+  local_commit_evidence_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
+  pr8_disposition_evidence_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+  selected_change_c008: changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+  final_baseline_handoff_c008: changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
 key_dependencies:
   - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
-  - "PR #8 remains open and draft."
+  - "PR #8 is closed as superseded by M134 and was not merged."
   - "M131/M132 local governance branches are not ancestors of origin/main."
 risks:
   - id: R001
@@ -99,4 +107,6 @@ validation:
     - C003 extracted the M132 strict git lifecycle branch and PR gate onto M134.
     - C004 decided PR #8 should be closed as superseded after M134 publication exists.
     - C005 prepared PR_READY_SUMMARY.md and the exact M134 push/draft-PR publication handle.
-    - C006 is the next recommended candidate.
+    - C006 published draft PR #9 for M134.
+    - C007 closed stale draft PR #8 as superseded by M134.
+    - C008 recorded the final baseline handoff and remaining final branch synchronization gate.

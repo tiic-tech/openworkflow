@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M134-git-governance-baseline-closure
 title: Candidate changes for git governance baseline closure
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -107,7 +107,7 @@ observed_state:
     - branch: codex/m133-remaining-pr5-merge-governance
       head: 040f20e
       note: Contains local M133 audit evidence after PR
-next_recommended_candidate_id: C008
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -521,7 +521,7 @@ changes:
         - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
         - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C008
-    status: ready
+    status: done
     title: Complete formal git governance baseline handoff
     purpose: >
       Record the final OW git governance baseline status after local governance deltas, M134
@@ -553,6 +553,26 @@ changes:
       - The handoff states whether git governance is complete enough for formal code development.
       - Any remaining remote operation is explicitly gated and not implied.
       - No unauthorized operation is recorded.
+    selection:
+      selected_change_id: C008
+      selected_at: 2026-05-25T08:21:17+08:00
+      reason: >
+        C001-C007 are complete, PR #9 exists for M134, stale PR #8 is closed, and the queue is ready
+        for final baseline handoff.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T08:23:00+08:00
+      implementation_changed_files: true
+      result: >
+        C008 recorded the final M134 git governance baseline handoff. Build, strict summaries, and
+        diff check pass. Repository validation remains red only on historical non-M134 artifacts.
+        The final remaining remote gate is branch synchronization to update PR #9 after C008 local
+        evidence is committed.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
 operations:
   - operation_id: OP001
     operation_type: create
@@ -882,3 +902,31 @@ operations:
     after_status: ready
     evidence:
       - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+  - operation_id: OP023
+    operation_type: select
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      C001-C007 are complete, PR #9 exists for M134, stale PR #8 is closed, and the queue is ready
+      for final baseline handoff.
+    changed_at: 2026-05-25T08:21:17+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP024
+    operation_type: complete
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      C008 recorded the final M134 git governance baseline handoff, validation status, remaining
+      remote synchronization gate, and forbidden operations not performed.
+    changed_at: 2026-05-25T08:23:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md

@@ -178,7 +178,7 @@ Result:
 
 ### C008 - Complete formal git governance baseline handoff
 
-Status: ready
+Status: done
 Risk: medium
 
 Record whether OW git governance is complete enough for formal code development.
@@ -188,3 +188,10 @@ Acceptance:
 - The handoff states whether git governance is complete enough for formal code development.
 - Any remaining remote operation is explicitly gated and not implied.
 - No unauthorized operation is recorded.
+
+Result:
+
+- Wrote `C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md`.
+- Build, strict summaries, and diff check pass.
+- Repository validate remains red on historical non-M134 artifacts.
+- Final remaining remote gate is branch synchronization to update PR #9 after C008 local evidence is committed.
