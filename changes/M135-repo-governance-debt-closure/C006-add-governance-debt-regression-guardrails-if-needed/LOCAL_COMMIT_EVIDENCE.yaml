@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C006
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C006
+change_id: C006
+selected_change_id: C006
+title: Local commit evidence for C006 regression guardrail decision
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: 76cb045
+commit_message: M135-repo-governance-debt-closure/C006 Record regression guardrail decision
+implementation_changed_files: true
+affected_paths:
+  - changes/M135-repo-governance-debt-closure/
+validation_evidence:
+  - npm run validate: pass after C002-C005 repairs and C005 evidence hash normalization
+  - node dist/cli/src/index.js summaries --root . --strict --json: expected fail before C006 LOCAL_COMMIT_EVIDENCE.yaml existed
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+  result: >
+    C006 required no source validator or fixture changes. Existing validation catches the repaired
+    debt families and passed cleanly before the C006 planning evidence commit.
+notes:
+  - "No generated `.agents/**` or `.openworkflow/**` files were manually patched."
