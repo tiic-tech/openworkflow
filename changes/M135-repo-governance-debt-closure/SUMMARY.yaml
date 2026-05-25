@@ -1,0 +1,67 @@
+schema_version: 0.1.0
+contract_id: summary:M135-repo-governance-debt-closure
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M135-repo-governance-debt-closure
+title: Summary for repo-wide governance debt closure
+status: active
+source:
+  kind: mixed
+  summary: >
+    M135 decomposes remaining whole-repo historical governance validation debt after M134 completed
+    the git/PR lifecycle baseline. The queue targets current `npm run validate` failures in
+    historical artifacts and finalizes whether whole-repo validation can become the default
+    development baseline.
+  refs:
+    - user_input:2026-05-25-create-cc-for-remaining-repo-governance
+    - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+scope_boundary: >
+  Repo-wide historical governance and validation debt after M134 git baseline closure.
+branch_boundary: codex/m135-repo-governance-debt-closure
+target_base:
+  remote: origin
+  branch: main
+candidate_count: 7
+completed_candidate_id: C001
+completed_change_id: C001
+next_recommended_candidate_id: C002
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M135-repo-governance-debt-closure/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M135-repo-governance-debt-closure/CANDIDATE_CHANGES.md
+  summary: changes/M135-repo-governance-debt-closure/SUMMARY.yaml
+  selected_change_c001: changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/SELECTED_CHANGE.yaml
+  debt_inventory_c001: changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+key_dependencies:
+  - "M134 is complete and PR #9 contains the git-governance baseline closure."
+  - "`npm run validate` still fails on historical non-M134 artifacts."
+  - "C001 must classify failures before historical artifact repair begins."
+risks:
+  - id: R001
+    level: high
+    description: Historical commit evidence repair can accidentally fabricate audit claims.
+    mitigation: Require verifiable git history or explicitly mark evidence unresolved.
+  - id: R002
+    level: medium
+    description: Mechanical artifact repair can alter historical intent if edits are not bounded.
+    mitigation: Preserve original meaning and limit edits to contract shape unless selected otherwise.
+  - id: R003
+    level: medium
+    description: Validator changes can hide real governance debt.
+    mitigation: Only change validators after C001 proves a concrete false positive or regression gap.
+unresolved_questions:
+  - "Which historical local commit evidence records can be proven from git history versus must remain unresolved?"
+deferred_features:
+  - product feature development unrelated to governance validation debt
+  - remote PR/merge operations for M135 unless separately approved
+validation:
+  commands_run:
+    - node dist/cli/src/index.js resume --root . --json
+    - npm run validate
+    - git status --short --branch
+  notes: |
+    - Current handoff is trusted.
+    - Working tree was clean before creating M135.
+    - Validation failure families are recorded in CANDIDATE_CHANGES.yaml observed_state.
+    - C001 classified current validation failures into focused repair families.

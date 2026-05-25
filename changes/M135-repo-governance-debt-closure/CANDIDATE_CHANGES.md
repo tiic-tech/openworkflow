@@ -1,0 +1,120 @@
+# M135 Repo Governance Debt Closure
+
+Status: active
+
+## Scope
+
+M135 covers the remaining repository-wide historical governance and validation debt after M134
+finished the git/PR lifecycle baseline. It does not implement product features and does not mutate
+remote state.
+
+Current validation still fails on historical non-M134 artifacts. The queue is scoped to making those
+failures explicit, repairable, and eventually clean enough for `npm run validate` to become the
+default development baseline.
+
+## Queue Policy
+
+- Branch boundary: `codex/m135-repo-governance-debt-closure`
+- Git lifecycle gate: strict
+- Next recommended candidate: C002
+- Selected-change commit gate: strict
+
+## Candidates
+
+### C001 - Inventory and classify remaining repo governance validation debt
+
+Status: done
+Risk: medium
+
+Produce a precise inventory of current validation failures and classify each repair family.
+
+Acceptance:
+
+- Every current validation failure is assigned to a repair family.
+- High-risk evidence repairs are identified before edit.
+- No historical artifact or validator behavior changes in C001.
+
+Result:
+
+- Wrote `C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md`.
+- Classified validation failures into C002-C006 repair families.
+- Did not modify historical debt artifacts.
+
+### C002 - Normalize historical planning artifact shape debt
+
+Status: ready
+Risk: medium
+
+Repair mechanical planning artifact shape failures in M100, M101, M105, and M97.
+
+Acceptance:
+
+- Mechanical artifact-shape failures for the owned queues are removed or explicitly deferred.
+- Historical intent is preserved.
+- No commit evidence is fabricated.
+
+### C003 - Repair historical local commit evidence metadata
+
+Status: ready
+Risk: high
+
+Repair M87, M88, and M92 local commit evidence only where existing git history and artifacts support
+the audit claim.
+
+Acceptance:
+
+- Evidence records are repaired only where verifiable.
+- Unverifiable historical evidence remains explicitly documented.
+- No false historical audit claim is introduced.
+
+### C004 - Repair high-risk decision report compliance debt
+
+Status: ready
+Risk: medium
+
+Bring M101, M102, M105, and M117 high-risk reports into the current section contract.
+
+Acceptance:
+
+- High-risk report section failures are removed or explicitly deferred.
+- Reports remain faithful to historical decision scope.
+- No new implementation approval is implied.
+
+### C005 - Repair parse and schema edge artifacts
+
+Status: ready
+Risk: medium
+
+Resolve the isolated M113 YAML parse failure and M98 prompt-pack schema edge failure.
+
+Acceptance:
+
+- M113 parses as YAML.
+- M98 either matches the current schema or is explicitly deferred with rationale.
+
+### C006 - Add governance debt regression guardrails if needed
+
+Status: ready
+Risk: medium
+
+Add focused validator or fixture guardrails only if C001 finds a real regression gap.
+
+Acceptance:
+
+- Any source change is tied to a concrete C001 regression gap.
+- Validators remain strict for real governance debt.
+- Generated surfaces are not manually patched.
+
+### C007 - Complete repo governance validation debt handoff
+
+Status: candidate
+Risk: medium
+
+Record the final repo governance debt state after repairs and state whether whole-repo validation is
+clean.
+
+Acceptance:
+
+- The handoff states whether `npm run validate` is clean.
+- Any remaining debt is explicit and bounded.
+- No unauthorized remote operation is recorded.
