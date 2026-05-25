@@ -8,7 +8,7 @@ selected_change_id: C002
 title: Local commit evidence for release-gate repair
 status: complete
 branch: codex/m137-openworkflow-0.1.2-npm-release
-primary_commit: "0000000"
+primary_commit: 364341d
 implementation_changed_files: true
 affected_paths:
   - packages/core/src/commands/registry.ts

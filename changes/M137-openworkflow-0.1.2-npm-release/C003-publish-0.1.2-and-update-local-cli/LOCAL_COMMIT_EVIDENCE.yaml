@@ -8,7 +8,7 @@ selected_change_id: C003
 title: Local commit evidence for 0.1.2 publish attempt and local CLI update
 status: blocked
 branch: codex/m137-openworkflow-0.1.2-npm-release
-primary_commit: "0000000"
+primary_commit: 364341d
 implementation_changed_files: true
 affected_paths:
   - package.json
