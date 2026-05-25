@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C004
+contract_type: evidence
+plan_id: M135-repo-governance-debt-closure
+candidate_id: C004
+change_id: C004
+selected_change_id: C004
+title: Local commit evidence for C004 high-risk report compliance repair
+status: complete
+branch: codex/m135-repo-governance-debt-closure
+primary_commit: 0b1d09d
+commit_message: M135-repo-governance-debt-closure/C004 Repair high-risk report compliance
+implementation_changed_files: true
+affected_paths:
+  - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+  - changes/M102-selected-change-commit-gate/HIGH_RISK_DECISION_REPORT.md
+  - changes/M105-m104-direct-trust-gate-fixes/HIGH_RISK_DECISION_REPORT.md
+  - changes/M117-git-automation-remote-readiness/HIGH_RISK_DECISION_REPORT.md
+  - changes/M135-repo-governance-debt-closure/
+validation_evidence:
+  - npm run validate: expected fail after C004, with C004-owned high-risk report compliance failures removed and remaining failures assigned to C005
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - git diff --check
+  result: >
+    C004-owned high-risk report compliance failures were removed. Remaining repository validation
+    failures are C005 parse/schema edge artifacts.
+notes:
+  - >
+    C004 added required section headings and approval-boundary language only; it did not introduce
+    new implementation approval, source behavior changes, or remote mutation approval.
