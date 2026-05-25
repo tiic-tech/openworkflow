@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M136-openworkflow-0.1.1-system-cli-release:C002
+contract_type: evidence
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+candidate_id: C002
+change_id: C002
+selected_change_id: C002
+title: Local commit evidence for C002 system CLI install
+status: complete
+branch: codex/m136-openworkflow-0.1.1-system-cli-release
+primary_commit: 9df75d5
+commit_message: M136-openworkflow-0.1.1-system-cli-release/C002 Install system CLI
+implementation_changed_files: true
+affected_paths:
+  - changes/M136-openworkflow-0.1.1-system-cli-release/
+system_install:
+  command_path: /opt/homebrew/bin/openworkflow
+  global_root: /opt/homebrew/lib/node_modules
+  installed_package: "@tiic-tech/openworkflow@0.1.1"
+  install_source: /Users/archy/Projects/StartUp/openworkflow
+validation_evidence:
+  - npm run build: pass
+  - npm run validate: pass before C002 evidence file existed except expected missing evidence gate
+  - npm install -g .: pass
+  - openworkflow --help: pass, current command surface present
+  - openworkflow resume --root . --json: pass
+  - npm list -g @tiic-tech/openworkflow --depth=0: shows @tiic-tech/openworkflow@0.1.1 linked to current repository
+validation:
+  commands_run:
+    - npm run build
+    - npm run validate
+    - npm install -g .
+    - openworkflow --help
+    - openworkflow resume --root . --json
+    - npm list -g @tiic-tech/openworkflow --depth=0
+  result: >
+    The system-level OpenWorkflow CLI now exposes the current command surface and resume works from
+    `/opt/homebrew/bin/openworkflow`.
+notes:
+  - "No npm registry publish was run."
