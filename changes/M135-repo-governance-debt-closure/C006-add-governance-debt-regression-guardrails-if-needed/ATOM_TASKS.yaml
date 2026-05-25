@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C006
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C006
+title: Atom tasks for C006 regression guardrail decision
+status: done
+tasks:
+  - task_id: T001
+    title: Verify repaired debt families are validator-covered
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      The historical failures from C002-C005 disappeared because artifacts were repaired, not
+      because validators were relaxed.
+  - task_id: T002
+    title: Decide whether source guardrails are needed
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      The decision names whether validator or fixture source changes are needed.
+  - task_id: T003
+    title: Preserve generated surface boundary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      The decision records that generated `.agents/**` and `.openworkflow/**` surfaces were not
+      manually patched.

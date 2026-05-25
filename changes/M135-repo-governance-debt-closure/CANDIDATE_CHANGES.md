@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C006
+- Next recommended candidate: C007
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -119,7 +119,7 @@ Result:
 
 ### C006 - Add governance debt regression guardrails if needed
 
-Status: ready
+Status: done
 Risk: medium
 
 Add focused validator or fixture guardrails only if C001 finds a real regression gap.
@@ -130,9 +130,15 @@ Acceptance:
 - Validators remain strict for real governance debt.
 - Generated surfaces are not manually patched.
 
+Result:
+
+- No validator or fixture source change was needed.
+- Existing validation already caught the repaired debt families.
+- `npm run validate` passed after C002-C005 repairs and evidence normalization.
+
 ### C007 - Complete repo governance validation debt handoff
 
-Status: candidate
+Status: ready
 Risk: medium
 
 Record the final repo governance debt state after repairs and state whether whole-repo validation is

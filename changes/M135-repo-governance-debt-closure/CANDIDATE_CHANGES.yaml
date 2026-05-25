@@ -75,7 +75,7 @@ observed_state:
       - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
         mismatch
       - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
-next_recommended_candidate_id: C006
+next_recommended_candidate_id: C007
 changes:
   - id: C001
     status: done
@@ -355,7 +355,7 @@ changes:
         - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
         - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C006
-    status: ready
+    status: done
     title: Add governance debt regression guardrails if needed
     purpose: >
       Add or refine focused validation fixtures only if C001 finds that current validators allow
@@ -386,8 +386,29 @@ changes:
       - Any source change is tied to a concrete C001 regression gap.
       - Validators remain strict for real governance debt.
       - No generated surfaces are manually patched.
+    selection:
+      selected_change_id: C006
+      selected_at: 2026-05-25T10:05:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C006 follows C002-C005 to
+        decide whether additional validator or fixture guardrails are needed after the historical
+        debt repairs.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T10:05:00+08:00
+      implementation_changed_files: true
+      result: >
+        C006 found no source validator or fixture change was needed. Existing validators already
+        caught the repaired debt families, and `npm run validate` passed after C002-C005 repairs and
+        evidence normalization.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+        - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C007
-    status: candidate
+    status: ready
     title: Complete repo governance validation debt handoff
     purpose: >
       Record the final repo governance debt status after C002-C006 and state whether whole-repo
@@ -596,3 +617,42 @@ operations:
     after_status: done
     evidence:
       - changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
+  - operation_id: OP013
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: |
+      C006 records whether additional regression guardrails are needed after validation passed.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP014
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C006 determined no source guardrail changes are needed because existing validation catches the
+      repaired debt families and now passes cleanly.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+  - operation_id: OP015
+    operation_type: status_change
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      C002-C006 are complete, so final repo governance validation debt handoff is ready.
+    changed_at: 2026-05-25T10:05:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - npm run validate
