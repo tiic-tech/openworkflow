@@ -50,7 +50,7 @@ observed_state:
       The existing system command showed only init, validate, sync, doctor, and clean; it did not
       expose current commands such as resume, handoff, inspect, context, summaries, or
       git-automation.
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -102,7 +102,7 @@ changes:
         - changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
         - changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: ready
+    status: done
     title: Install current main 0.1.1 as system-level CLI
     purpose: >
       Make `/opt/homebrew/bin/openworkflow` resolve to the current main build so future local
@@ -132,6 +132,26 @@ changes:
     acceptance:
       - System `openworkflow --help` includes current command surface.
       - "`openworkflow resume --root . --json` works from the system command."
+    selection:
+      selected_change_id: C002
+      selected_at: 2026-05-25T09:20:00+08:00
+      reason: >
+        C002 is the feasible release action after C001 confirmed npm 0.1.1 cannot be overwritten.
+        It installs the current main build as the system-level `openworkflow` command.
+      artifacts:
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SELECTED_CHANGE.yaml
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/ATOM_TASKS.yaml
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:20:00+08:00
+      implementation_changed_files: true
+      result: >
+        C002 installed the current repository package globally. `/opt/homebrew/bin/openworkflow`
+        now exposes the current command surface and system-level `openworkflow resume --root .
+        --json` succeeds.
+      evidence:
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
     status: ready
     title: Complete 0.1.1 system CLI release handoff
@@ -216,3 +236,27 @@ operations:
     after_status: ready
     evidence:
       - changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: |
+      C002 installs current main 0.1.1 as the system CLI after C001 ruled out npm overwrite.
+    changed_at: 2026-05-25T09:20:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SELECTED_CHANGE.yaml
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 installed and verified the system-level `openworkflow` command.
+    changed_at: 2026-05-25T09:20:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md

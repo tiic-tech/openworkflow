@@ -20,9 +20,9 @@ target_base:
   remote: origin
   branch: main
 candidate_count: 3
-completed_candidate_id: C001
-completed_change_id: C001
-next_recommended_candidate_id: C002
+completed_candidate_id: C002
+completed_change_id: C002
+next_recommended_candidate_id: C003
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -31,6 +31,8 @@ outputs:
   summary: changes/M136-openworkflow-0.1.1-system-cli-release/SUMMARY.yaml
   selected_change_c001: changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/SELECTED_CHANGE.yaml
   registry_release_feasibility_c001: changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
+  selected_change_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SELECTED_CHANGE.yaml
+  system_cli_install_evidence_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
 risks:
   - id: R001
     level: high
@@ -50,3 +52,4 @@ validation:
     - Local package version is 0.1.1.
     - Registry 0.1.1 exists and cannot be overwritten.
     - C001 selected the system CLI install route for current main 0.1.1.
+    - C002 installed and verified the system-level `openworkflow` command.

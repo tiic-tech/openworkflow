@@ -26,10 +26,18 @@ Result:
 
 ### C002 - Install current main 0.1.1 as system-level CLI
 
-Status: ready
+Status: done
 
 Install the current repository build globally so `/opt/homebrew/bin/openworkflow` exposes the current
 command surface.
+
+Result:
+
+- `npm run build` passed.
+- `npm run validate` passed.
+- `npm install -g .` succeeded.
+- `/opt/homebrew/bin/openworkflow` now exposes current commands including `resume`, `handoff`,
+  `context`, `summaries`, and `git-automation`.
 
 ### C003 - Complete 0.1.1 system CLI release handoff
 
