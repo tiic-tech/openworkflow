@@ -94,6 +94,23 @@ Opening, editing, or merging PRs is not implied by either the planning contract
 or `PR_READY_SUMMARY.md`. Those remote operations are governed by
 `references/gh-operation-governance.md`.
 
+## Orchestrator Dispatch Boundary
+
+When `references/orchestrator-selected-change-dispatch.md` is active, the
+Orchestrator may coordinate multiple SCs under one CC branch, but the git
+hierarchy does not change:
+
+- subagents do not own the CC branch or PR boundary
+- each SC should still complete as a coherent commit or explicitly recorded
+  non-implementation evidence
+- the Orchestrator reviews returned diffs, runs validation, and records local
+  commit evidence
+- remote push, PR creation, merge, release, or Issue mutation remain
+  Orchestrator-only gates requiring the normal explicit approval
+
+If subagents need parallel execution, prefer isolated worktrees or branches and
+let the Orchestrator integrate the result back into the CC branch.
+
 ## Issue Boundary
 
 Issues sit before decomposition in the governance hierarchy:

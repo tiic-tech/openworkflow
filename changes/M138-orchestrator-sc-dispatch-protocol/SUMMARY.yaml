@@ -1,0 +1,51 @@
+schema_version: 0.1.0
+contract_id: summary:M138-orchestrator-sc-dispatch-protocol
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M138-orchestrator-sc-dispatch-protocol
+title: Summary for Orchestrator selected-change dispatch protocol
+status: complete
+source:
+  kind: user_request
+  refs:
+    - changes/M138-orchestrator-sc-dispatch-protocol/CANDIDATE_CHANGES.yaml
+  summary: >
+    M138 establishes a manual Orchestrator protocol for CC-level planning and
+    SC-level subagent dispatch without adding runtime automation.
+scope_boundary: >
+  Manual Orchestrator protocol for CC-level authority and SC-level subagent
+  dispatch.
+branch_boundary: codex/m138-orchestrator-sc-dispatch-protocol
+target_base:
+  remote: origin
+  branch: main
+candidate_count: 1
+completed_candidate_id: C001
+completed_change_id: C001
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  protocol_reference: references/orchestrator-selected-change-dispatch.md
+  candidate_changes_yaml: changes/M138-orchestrator-sc-dispatch-protocol/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M138-orchestrator-sc-dispatch-protocol/CANDIDATE_CHANGES.md
+  summary: changes/M138-orchestrator-sc-dispatch-protocol/SUMMARY.yaml
+  selected_change_c001: changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/SELECTED_CHANGE.yaml
+  atom_tasks_c001: changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/ATOM_TASKS.yaml
+  implementation_brief_c001: changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/IMPLEMENTATION_BRIEF.md
+  local_commit_evidence_c001: changes/M138-orchestrator-sc-dispatch-protocol/C001-define-manual-orchestrator-sc-dispatch-protocol/LOCAL_COMMIT_EVIDENCE.yaml
+risks:
+  - id: R001
+    level: medium
+    description: The first protocol stage is advisory and not yet enforced by a schema or CLI assignment artifact.
+    mitigation: Future candidates should add a dispatch artifact schema only after manual dogfood evidence proves the field shape.
+  - id: R002
+    level: low
+    description: Existing /ow:team runtime protocol also uses the word Orchestrator.
+    mitigation: The new reference explicitly distinguishes CC/SC dispatch from runtime Agent Team state.
+validation:
+  commands_run:
+    - npm run validate
+    - openworkflow handoff --root . --json
+    - git diff --check
+  result: pass

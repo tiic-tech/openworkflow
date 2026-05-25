@@ -1,0 +1,36 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M138-orchestrator-sc-dispatch-protocol:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M138-orchestrator-sc-dispatch-protocol
+candidate_id: C001
+selected_change_id: C001
+title: Atom tasks for manual Orchestrator SC dispatch protocol
+status: complete
+tasks:
+  - id: T001
+    type: read
+    status: complete
+    title: Inspect existing planning, git, coder, and team governance
+    acceptance:
+      - Existing Orchestrator runtime wording and SC commit boundaries are understood.
+  - id: T002
+    type: document
+    status: complete
+    title: Add Orchestrator selected-change dispatch reference
+    acceptance:
+      - Protocol defines authority, packet shape, evidence, completion gates, and stop conditions.
+  - id: T003
+    type: document
+    status: complete
+    title: Link protocol from existing references
+    acceptance:
+      - Planning, selection, decomposition, git, coder, and team docs point at the new reference.
+  - id: T004
+    type: verify
+    status: complete
+    title: Validate repository contracts and trust gate
+    acceptance:
+      - npm run validate passes.
+      - openworkflow handoff --root . --json passes.
+      - git diff --check passes.

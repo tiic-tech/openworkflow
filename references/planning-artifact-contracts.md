@@ -65,6 +65,26 @@ one selected change to one local commit, and local `PR_READY_SUMMARY.md`
 generation. Remote push, remote PR creation, Issue mutation, and merge require
 separate explicit approval.
 
+## Orchestrator Dispatch Link
+
+Use `references/orchestrator-selected-change-dispatch.md` when the user grants
+one Agent CC-level authority to create or maintain a queue, select SCs, dispatch
+subagents, and recover their results.
+
+In that model:
+
+- the CC remains the feature-sized planning and branch boundary
+- each SC remains the implementation authority boundary for one subagent
+- the Orchestrator owns queue state, assignment packets, review, validation,
+  evidence binding, local commits, and final CC completion
+- subagents receive only SC-level authority and must not push, publish, merge,
+  mutate Issues, close the CC, or bypass owned paths
+
+Orchestrator dispatch is a coordination protocol, not a new runtime command.
+Record assignment, return, blocker, and completion facts in queue-local
+artifacts so a later Agent can resume from `openworkflow resume --root .
+--json` without relying on chat history.
+
 ## Issue Governance Link
 
 Use `references/issue-governance.md` as the source contract for Issue

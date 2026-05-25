@@ -97,6 +97,12 @@ Open a new top-level feat folder only when a new decomposition queue is needed.
 Otherwise, update the existing queue by candidate id and let each completed
 candidate land as a normal git commit.
 
+When the user grants Orchestrator authority for a broad goal, use
+`references/orchestrator-selected-change-dispatch.md` to keep the CC as the
+Orchestrator-owned boundary and each candidate as the SC-level dispatch
+boundary. Do not inflate one candidate to cover several subagent assignments
+just because one Orchestrator owns the queue.
+
 ## Branch Boundary
 
 When creating a new queue, capture the branch context from

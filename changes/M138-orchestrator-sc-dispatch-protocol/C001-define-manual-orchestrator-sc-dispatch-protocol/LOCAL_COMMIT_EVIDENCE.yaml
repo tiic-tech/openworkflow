@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M138-orchestrator-sc-dispatch-protocol:C001
+contract_type: evidence
+plan_id: M138-orchestrator-sc-dispatch-protocol
+candidate_id: C001
+change_id: C001
+selected_change_id: C001
+title: Local commit evidence for manual Orchestrator SC dispatch protocol
+status: complete
+branch: codex/m138-orchestrator-sc-dispatch-protocol
+primary_commit: "0000000"
+implementation_changed_files: true
+affected_paths:
+  - references/orchestrator-selected-change-dispatch.md
+  - references/planning-artifact-contracts.md
+  - references/git-version-control-governance.md
+  - references/internal-coder-protocol.md
+  - skills/decompose-to-changes/references/decomposition-protocol.md
+  - skills/select-change/references/selection-protocol.md
+  - skills/build-team/references/team-protocol.md
+  - changes/M138-orchestrator-sc-dispatch-protocol/
+validation:
+  commands_run:
+    - npm run validate
+    - openworkflow handoff --root . --json
+    - git diff --check
+  result: pass
+notes:
+  - "Docs/protocol change only; no generated .agents or .openworkflow surfaces changed."
+  - "No CLI command, schema, validator, or runtime scheduler was added."
