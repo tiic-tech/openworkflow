@@ -1,0 +1,49 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C003
+title: Atom tasks for C003 local commit evidence metadata repair
+status: done
+tasks:
+  - task_id: T001
+    title: Inspect historical evidence files
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M87-vision2prompt-post-validate-gate/
+      - changes/M88-tune-product-system-inheritance/
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+    done_when: >
+      Existing commit, target_repo, verification, and validation fields are read before editing.
+  - task_id: T002
+    title: Verify local commits from git history
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M87-vision2prompt-post-validate-gate/
+      - changes/M88-tune-product-system-inheritance/
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+    done_when: >
+      Added commit fields are backed by `git rev-parse` or path-specific `git log` output.
+  - task_id: T003
+    title: Add validator-recognized validation evidence
+    type: edit
+    status: done
+    owned_paths:
+      - changes/M87-vision2prompt-post-validate-gate/
+      - changes/M88-tune-product-system-inheritance/
+      - changes/M92-smart-city-real-discovery-e2e-dogfood/
+    done_when: >
+      Files with old `verification.commands`, `validation.commands`, or `validation.evidence`
+      shapes also expose top-level `validation_evidence`.
+  - task_id: T004
+    title: Preserve historical truth boundary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      C003 repair evidence states that target-repo commits remain target-repo commits and are not
+      represented as local implementation commits.

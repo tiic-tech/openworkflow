@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C003
+title: Repair historical local commit evidence metadata
+status: done
+selected_at: 2026-05-25T09:28:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C003 is the next repair after
+  C002 because repository validation still failed on historical LOCAL_COMMIT_EVIDENCE.yaml metadata
+  in M87, M88, and M92.
+source_candidate:
+  id: C003
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C001
+scope:
+  includes:
+    - inspect M87, M88, and M92 local commit evidence records
+    - bind missing commit fields only to verifiable existing commits
+    - add validator-recognized validation_evidence fields from existing recorded commands or evidence
+    - preserve target-repo commit fields as target-repo evidence rather than local implementation commits
+  excludes:
+    - inventing commit hashes
+    - rewriting git history
+    - changing selected-change semantics
+    - remote mutation
+owned_paths:
+  - changes/M87-vision2prompt-post-validate-gate/
+  - changes/M88-tune-product-system-inheritance/
+  - changes/M92-smart-city-real-discovery-e2e-dogfood/
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - Evidence records are repaired only where verifiable.
+  - Any unverifiable historical evidence remains explicitly documented as unresolved debt.
+  - No false historical audit claim is introduced.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:28:00+08:00
+  implementation_changed_files: true
+  result: >
+    C003 added validator-recognized commit and validation evidence metadata to historical M87, M88,
+    and M92 records using existing recorded commands, target-repo evidence, and verifiable git
+    history.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/LOCAL_COMMIT_EVIDENCE_METADATA_REPAIR.md
+    - changes/M135-repo-governance-debt-closure/C003-repair-historical-local-commit-evidence-metadata/LOCAL_COMMIT_EVIDENCE.yaml

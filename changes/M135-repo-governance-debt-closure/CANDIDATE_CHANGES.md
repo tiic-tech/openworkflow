@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C003
+- Next recommended candidate: C004
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -62,7 +62,7 @@ Result:
 
 ### C003 - Repair historical local commit evidence metadata
 
-Status: ready
+Status: done
 Risk: high
 
 Repair M87, M88, and M92 local commit evidence only where existing git history and artifacts support
@@ -73,6 +73,12 @@ Acceptance:
 - Evidence records are repaired only where verifiable.
 - Unverifiable historical evidence remains explicitly documented.
 - No false historical audit claim is introduced.
+
+Result:
+
+- Added validator-recognized commit metadata to historical M87, M88, and M92 evidence files.
+- Added top-level `validation_evidence` from existing recorded verification or validation fields.
+- Preserved target-repo commits as target-repo evidence rather than local OpenWorkflow commits.
 
 ### C004 - Repair high-risk decision report compliance debt
 
