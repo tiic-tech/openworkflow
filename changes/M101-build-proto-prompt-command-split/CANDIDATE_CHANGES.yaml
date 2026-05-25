@@ -126,6 +126,14 @@ changes:
         user-facing orchestration surface, introduce build-proto-prompt as the
         prompt-pack compiler stage, and narrow build-prototype only after
         prompt2proto has a comparable skill contract and foundation.
+    completion:
+      completed_change_id: C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails
+      completed_at: 2026-05-23
+      evidence:
+        - changes/M101-build-proto-prompt-command-split/HIGH_RISK_DECISION_REPORT.md
+        - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/SELECTED_CHANGE.yaml
+        - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/ATOM_TASKS.yaml
+        - changes/M101-build-proto-prompt-command-split/C001-decide-command-split-prompt2proto-skill-architecture-and-migration-guardrails/IMPLEMENTATION_BRIEF.md
   - id: C002
     status: done
     title: Design prompt2proto skill contract and reference architecture

@@ -75,7 +75,7 @@ observed_state:
       - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
         mismatch
       - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
-next_recommended_candidate_id: C002
+next_recommended_candidate_id: C003
 changes:
   - id: C001
     status: done
@@ -136,7 +136,7 @@ changes:
         - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
         - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C002
-    status: ready
+    status: done
     title: Normalize historical planning artifact shape debt
     purpose: >
       Repair mechanical planning artifact shape failures such as missing atom-task titles and
@@ -171,6 +171,28 @@ changes:
       - Mechanical artifact-shape failures for the owned queues are removed or explicitly deferred.
       - Historical intent is preserved.
       - No commit evidence is fabricated.
+    selection:
+      selected_change_id: C002
+      selected_at: 2026-05-25T09:05:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C002 is the next ready
+        repair candidate after C001 because the remaining validation failures include mechanical
+        historical planning artifact shape debt that can be corrected without changing source
+        behavior.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:05:00+08:00
+      implementation_changed_files: true
+      result: >
+        C002 repaired scoped historical planning artifact shape failures in M100, M101, M105, and
+        M97 while preserving historical intent. Remaining validation failures are assigned to
+        C003-C005.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md
+        - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
     status: ready
     title: Repair historical local commit evidence metadata
@@ -406,3 +428,30 @@ operations:
     after_status: ready
     evidence:
       - changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: |
+      C002 is the first focused repair after C001 and covers mechanical planning artifact shape debt.
+    changed_at: 2026-05-25T09:05:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C002 removed the scoped historical planning artifact shape failures without changing source
+      behavior or fabricating evidence.
+    changed_at: 2026-05-25T09:05:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md

@@ -22,9 +22,9 @@ target_base:
   remote: origin
   branch: main
 candidate_count: 7
-completed_candidate_id: C001
-completed_change_id: C001
-next_recommended_candidate_id: C002
+completed_candidate_id: C002
+completed_change_id: C002
+next_recommended_candidate_id: C003
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -33,6 +33,8 @@ outputs:
   summary: changes/M135-repo-governance-debt-closure/SUMMARY.yaml
   selected_change_c001: changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/SELECTED_CHANGE.yaml
   debt_inventory_c001: changes/M135-repo-governance-debt-closure/C001-inventory-and-classify-remaining-repo-governance-validation-debt/REPO_GOVERNANCE_DEBT_INVENTORY.md
+  selected_change_c002: changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/SELECTED_CHANGE.yaml
+  planning_artifact_shape_repair_c002: changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md
 key_dependencies:
   - "M134 is complete and PR #9 contains the git-governance baseline closure."
   - "`npm run validate` still fails on historical non-M134 artifacts."
@@ -65,3 +67,5 @@ validation:
     - Working tree was clean before creating M135.
     - Validation failure families are recorded in CANDIDATE_CHANGES.yaml observed_state.
     - C001 classified current validation failures into focused repair families.
+    - C002 removed the scoped mechanical planning artifact shape failures; remaining validation
+      debt is assigned to C003-C005.

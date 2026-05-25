@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C003-introduce-build-proto-prompt-command-and-source-skill-boundary
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C003 introduce build proto prompt command and source skill boundary
 source_plan_id: M101-build-proto-prompt-command-split
 source_candidate_id: C003
 selected_change_id: C003-introduce-build-proto-prompt-command-and-source-skill-boundary

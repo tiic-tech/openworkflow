@@ -490,7 +490,7 @@ changes:
         - changes/M100-dailin-grade-image-prompt-paragraphs/C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs/IMPLEMENTATION_EVIDENCE.md
         - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/PROTO_PROMPT_PACK.yaml
         - /tmp/smart-city-m99-e2e-worktree/.openworkflow/prototypes/proto-001/EVIDENCE.yaml
-        - target_commit: 66f6a38
+        - "target_commit: 66f6a38"
   - id: C006
     status: done
     title: Record no-go criteria for future visual parity work

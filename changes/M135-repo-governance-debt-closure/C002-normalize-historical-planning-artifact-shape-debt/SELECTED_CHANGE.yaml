@@ -1,0 +1,52 @@
+schema_version: 0.1.0
+contract_id: selected_change:M135-repo-governance-debt-closure:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M135-repo-governance-debt-closure
+change_id: C002
+title: Normalize historical planning artifact shape debt
+status: done
+selected_at: 2026-05-25T09:05:00+08:00
+selection_reason: >
+  User granted highest authorization for all M135 governance work. C002 is the next ready repair
+  candidate after C001 because the remaining validation failures include mechanical historical
+  planning artifact shape debt that can be corrected without changing source behavior.
+source_candidate:
+  id: C002
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - add missing `title` keys to historical ATOM_TASKS.yaml files in M100, M101, M105, and M97
+    - normalize non-string completion.evidence entries in M100
+    - add missing completion evidence references in M101 and M97 only where existing artifacts support the claim
+    - record repair boundaries without inventing commit evidence
+  excludes:
+    - changing source behavior
+    - fabricating commit hashes or validation commands
+    - remote mutation
+owned_paths:
+  - changes/M100-dailin-grade-image-prompt-paragraphs/
+  - changes/M101-build-proto-prompt-command-split/
+  - changes/M105-m104-direct-trust-gate-fixes/
+  - changes/M97-smart-city-product-reality-dogfood/
+  - changes/M135-repo-governance-debt-closure/
+acceptance:
+  - Mechanical artifact-shape failures for the owned queues are removed or explicitly deferred.
+  - Historical intent is preserved.
+  - No commit evidence is fabricated.
+validation:
+  - npm run validate
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:05:00+08:00
+  implementation_changed_files: true
+  result: >
+    C002 repaired the historical planning artifact shape failures assigned to M100, M101, M105, and
+    M97. Remaining validation failures are outside the C002 repair family and are assigned to
+    C003-C005.
+  evidence:
+    - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/PLANNING_ARTIFACT_SHAPE_REPAIR.md
+    - changes/M135-repo-governance-debt-closure/C002-normalize-historical-planning-artifact-shape-debt/LOCAL_COMMIT_EVIDENCE.yaml

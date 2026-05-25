@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C005 replay smart city copilot with dailin grade prompt paragraphs
 source_plan_id: M100-dailin-grade-image-prompt-paragraphs
 source_candidate_id: C005
 selected_change_id: C005-replay-smart-city-copilot-with-dailin-grade-prompt-paragraphs

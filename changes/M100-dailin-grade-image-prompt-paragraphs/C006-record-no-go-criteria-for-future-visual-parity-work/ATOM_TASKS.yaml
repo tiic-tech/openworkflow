@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: atom_tasks:C006-record-no-go-criteria-for-future-visual-parity-work
 contract_type: planning
 planning_artifact_type: atom_tasks
+title: Atom tasks for C006 record no go criteria for future visual parity work
 source_plan_id: M100-dailin-grade-image-prompt-paragraphs
 source_candidate_id: C006
 selected_change_id: C006-record-no-go-criteria-for-future-visual-parity-work

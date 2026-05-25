@@ -1,0 +1,48 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C002
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C002
+title: Atom tasks for C002 planning artifact shape repair
+status: done
+tasks:
+  - task_id: T001
+    title: Normalize historical atom-task titles
+    type: edit
+    status: done
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/
+      - changes/M101-build-proto-prompt-command-split/
+      - changes/M105-m104-direct-trust-gate-fixes/
+      - changes/M97-smart-city-product-reality-dogfood/
+    done_when: >
+      Historical ATOM_TASKS.yaml files in the scoped queues include top-level title keys without
+      changing their task content.
+  - task_id: T002
+    title: Normalize M100 completion evidence shape
+    type: edit
+    status: done
+    owned_paths:
+      - changes/M100-dailin-grade-image-prompt-paragraphs/CANDIDATE_CHANGES.yaml
+    done_when: >
+      M100 completion evidence entries are strings or path references rather than nested mappings.
+  - task_id: T003
+    title: Bind existing completion evidence for M101 and M97
+    type: edit
+    status: done
+    owned_paths:
+      - changes/M101-build-proto-prompt-command-split/CANDIDATE_CHANGES.yaml
+      - changes/M97-smart-city-product-reality-dogfood/CANDIDATE_CHANGES.yaml
+    done_when: >
+      Completion evidence references only existing historical artifacts or target-repo outputs
+      already named by the historical work.
+  - task_id: T004
+    title: Validate remaining failures are outside C002
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      Validation no longer reports the C002-owned planning artifact shape failures, and remaining
+      failures are assigned to C003-C005.

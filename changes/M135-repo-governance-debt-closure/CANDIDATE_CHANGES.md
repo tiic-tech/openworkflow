@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C002
+- Next recommended candidate: C003
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -42,7 +42,7 @@ Result:
 
 ### C002 - Normalize historical planning artifact shape debt
 
-Status: ready
+Status: done
 Risk: medium
 
 Repair mechanical planning artifact shape failures in M100, M101, M105, and M97.
@@ -52,6 +52,13 @@ Acceptance:
 - Mechanical artifact-shape failures for the owned queues are removed or explicitly deferred.
 - Historical intent is preserved.
 - No commit evidence is fabricated.
+
+Result:
+
+- Added missing top-level `title` keys to scoped historical atom-task files.
+- Normalized the M100 C005 completion evidence item shape.
+- Added M101 C001 and M97 C001-C004 completion evidence only from existing historical artifacts.
+- Remaining validation debt is outside C002 and assigned to C003-C005.
 
 ### C003 - Repair historical local commit evidence metadata
 
