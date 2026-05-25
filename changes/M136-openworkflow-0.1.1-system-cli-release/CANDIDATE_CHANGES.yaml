@@ -201,6 +201,7 @@ changes:
         2026-05-19 publication, so a future public registry release needs a new version number.
       evidence:
         - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
         - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
@@ -320,3 +321,16 @@ operations:
       - npm run validate
       - openworkflow resume --root . --json
       - git diff --check
+  - operation_id: OP010
+    operation_type: remote_draft_pr
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: |
+      M136 release evidence branch was pushed and draft PR opened after local system CLI validation passed.
+    changed_at: 2026-05-25T09:35:00+08:00
+    before_status: local_complete
+    after_status: draft_pr_open
+    evidence:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+      - https://github.com/tiic-tech/openworkflow/pull/11

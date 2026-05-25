@@ -43,4 +43,5 @@ completion:
     2026-05-19 publication, so a future public registry release needs a new version number.
   evidence:
     - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+    - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
     - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/LOCAL_COMMIT_EVIDENCE.yaml

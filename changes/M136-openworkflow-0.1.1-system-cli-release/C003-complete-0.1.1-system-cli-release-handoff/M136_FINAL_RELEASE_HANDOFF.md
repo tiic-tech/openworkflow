@@ -48,3 +48,12 @@ The system command now exposes current commands including:
 M136 did not run `npm publish` for `0.1.1` because published npm versions are immutable. A future
 public registry release for the current capability surface should use a new version number, such as
 `0.1.2`.
+
+## Remote Evidence
+
+M136 release evidence was pushed and draft PR #11 was opened:
+
+- https://github.com/tiic-tech/openworkflow/pull/11
+
+No merge, ready-for-review mutation, Issue mutation, rebase, reset, force-push, destructive branch
+operation, or npm publish was performed as part of the draft PR operation.
