@@ -1,0 +1,25 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M136-openworkflow-0.1.1-system-cli-release:C001
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+change_id: C001
+title: Atom tasks for C001 release feasibility
+status: done
+tasks:
+  - task_id: T001
+    title: Verify registry state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      npm registry metadata for @tiic-tech/openworkflow@0.1.1 is recorded.
+  - task_id: T002
+    title: Record release route
+    type: document
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      M136 states that current work will install the system CLI and will not overwrite npm 0.1.1.
