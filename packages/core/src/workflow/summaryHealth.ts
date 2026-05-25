@@ -2,6 +2,7 @@ import { readdir, stat } from "node:fs/promises";
 import { basename, dirname, join, relative } from "node:path";
 import { parseYaml } from "../contracts/yaml.js";
 import { isNotFound, readTextFile } from "../fs/index.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom } from "../git/branchIdentity.js";
 
 export type SummaryHealthStatus = "not_applicable" | "not_instantiated" | "missing" | "present" | "stale_unknown" | "current";
 export type SummaryQualityStatus = "unknown" | "usable" | "current_but_thin";
@@ -555,19 +556,66 @@ async function evaluatePlanningQueueCommitEvidence(root: string): Promise<Planni
       continue;
     }
     const queuePolicy = recordValue(queue.queue_policy);
-    if (queuePolicy.selected_change_commit_gate !== "strict") {
-      continue;
+    if (queuePolicy.selected_change_commit_gate === "strict") {
+      healthErrors.push(...(await strictQueueCommitEvidenceErrors(root, queuePath, queue)));
+      guidance.push(...coderGateGuidance(root, queuePath, queue));
     }
-    healthErrors.push(...(await strictQueueCommitEvidenceErrors(root, queuePath, queue)));
-    guidance.push(...coderGateGuidance(root, queuePath, queue));
+    if (queuePolicy.git_lifecycle_gate === "strict") {
+      healthErrors.push(...(await strictQueueLifecycleErrors(root, queuePath, queue)));
+    }
   }
   return {
     health_errors: unique(healthErrors),
     guidance: unique(guidance),
     next_actions: healthErrors.length > 0
-      ? ["repair selected-change commit evidence before trusting handoff; run openworkflow git-automation commit for the affected candidate"]
+      ? ["repair selected-change commit evidence or git lifecycle evidence before trusting handoff"]
       : [],
   };
+}
+
+async function strictQueueLifecycleErrors(root: string, queuePath: string, queue: Record<string, unknown>): Promise<string[]> {
+  const label = relative(root, queuePath);
+  const queuePolicy = recordValue(queue.queue_policy);
+  const errors: string[] = [];
+  const planId = stringValue(queue.plan_id) ?? basename(dirname(queuePath));
+  const branchBoundary = stringValue(queuePolicy.branch_boundary);
+  if (!branchBoundary) {
+    errors.push(`git lifecycle gate ${label}: queue_policy.branch_boundary is required`);
+  } else {
+    const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy.branch_identity_exception), "validate");
+    errors.push(...branchIdentity.errors.map((error) => `git lifecycle gate ${label}: ${error}`));
+  }
+
+  const status = stringValue(queue.status);
+  if (status === "completed" || status === "done") {
+    const evidencePath = queuePrEvidencePath(queue);
+    if (!evidencePath) {
+      errors.push(`git lifecycle gate ${label}: completed queue must include DRAFT_PR_OPERATION_EVIDENCE.yaml`);
+    } else if (evidencePath.startsWith("/") || evidencePath.includes("://") || evidencePath.startsWith("..")) {
+      errors.push(`git lifecycle gate ${label}: DRAFT_PR_OPERATION_EVIDENCE.yaml must be repo-relative`);
+    } else if (!(await statOptional(join(root, evidencePath)))) {
+      errors.push(`git lifecycle gate ${label}: missing ${evidencePath}`);
+    }
+  }
+  return errors;
+}
+
+function queuePrEvidencePath(queue: Record<string, unknown>): string | null {
+  const completion = recordValue(queue.completion);
+  const direct = stringValue(completion.draft_pr_evidence_path)
+    ?? stringValue(completion.draft_pr_evidence)
+    ?? stringValue(completion.pr_evidence_path)
+    ?? stringValue(completion.pr_evidence);
+  if (direct?.endsWith("DRAFT_PR_OPERATION_EVIDENCE.yaml")) {
+    return direct;
+  }
+  const evidence = Array.isArray(completion.evidence) ? completion.evidence : [];
+  for (const item of evidence) {
+    if (typeof item === "string" && item.endsWith("DRAFT_PR_OPERATION_EVIDENCE.yaml")) {
+      return item;
+    }
+  }
+  return null;
 }
 
 function coderGateGuidance(root: string, queuePath: string, queue: Record<string, unknown>): string[] {

@@ -1,0 +1,30 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C003
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C003
+status: current
+source_plan_id: M134-git-governance-baseline-closure
+source_candidate_id: C003
+selected_change_id: C003
+primary_commit: 52566afdd5025d58f3f5937f6c498453d968e810
+validation_evidence:
+  - npm run build
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - node dist/cli/src/index.js resume --root . --json (pre-commit expected C003
+    LOCAL_COMMIT_EVIDENCE blocker)
+  - node dist/cli/src/index.js summaries --root . --strict --json (pre-commit expected C003
+    LOCAL_COMMIT_EVIDENCE blocker)
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

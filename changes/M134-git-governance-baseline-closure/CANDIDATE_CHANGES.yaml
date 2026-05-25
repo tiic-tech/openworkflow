@@ -1,0 +1,933 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M134-git-governance-baseline-closure
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M134-git-governance-baseline-closure
+title: Candidate changes for git governance baseline closure
+status: complete
+source:
+  kind: mixed
+  refs:
+    - user_input:2026-05-25-complete-remaining-git-governance
+    - changes/M133-remaining-pr5-merge-governance/M133_FINAL_AUDIT_HANDOFF.md
+    - changes/M131-git-automation-selected-change-commit-gate-hotfix/CANDIDATE_CHANGES.yaml
+    - changes/M132-cc-branch-pr-lifecycle-gate/CANDIDATE_CHANGES.yaml
+    - references/git-version-control-governance.md
+    - references/gh-operation-governance.md
+    - references/planning-artifact-contracts.md
+    - skills/decompose-to-changes/references/decomposition-protocol.md
+  summary: >
+    After M133 merged PR #5 into main at 6612aa3e06996ad0151e3686d0c972677fc892c6, the remaining git
+    governance baseline work is no longer another ready-PR merge. It is a closure slice: inventory
+    the post-merge git/PR state, rebase-free extract any necessary M131/M132 governance deltas onto
+    a fresh main-based branch, resolve PR #8 and M133 audit publication as explicit remote gates,
+    and produce a clean baseline handoff before normal code development resumes.
+queue_policy:
+  branch_boundary: codex/m134-git-governance-baseline-closure
+  git_lifecycle_gate: strict
+  target_remote: origin
+  target_base_branch: main
+  target_base_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  id_policy: Stable C-prefixed ids are assigned once and referenced by select-change.
+  selected_change_commit_gate: strict
+selection_policy:
+  next_selection_rule: >
+    Select C001 first. The remaining git governance state must be inventoried from the current main
+    baseline before extracting old branch deltas or preparing any remote publication or PR #8
+    disposition.
+  high_risk_rule: >
+    Remote push, PR creation, PR edit/close/merge, Issue mutation, branch deletion, force-push,
+    rebase, reset, or revert require exact operation-level user approval and a current high-risk
+    decision packet.
+scope_control:
+  current_boundary: |
+    Git governance baseline closure after PR #5 merged.
+  boundary_type: governance_baseline_closure
+  in_scope_rule: >
+    Include post-merge git/PR inventory, M131/M132 delta extraction planning and implementation onto
+    the fresh M134 branch, validation of selected-change commit and branch/PR lifecycle gates, PR #8
+    disposition planning, M133 audit publication planning, and final baseline handoff.
+  out_of_scope_rule: >
+    Do not implement unrelated product features. Do not rebase/reset existing historical branches.
+    Do not push, open PRs, edit/close/merge PRs, mutate Issues, delete branches, force-push, revert,
+    or perform other remote mutation without exact approval. Do not hand-edit generated
+    .openworkflow/** or .agents/** surfaces; update source contracts/templates and regenerate
+    through approved commands when needed.
+observed_state:
+  captured_at: 2026-05-25T03:07:53+08:00
+  current_branch: codex/m134-git-governance-baseline-closure
+  branch_base: origin/main
+  current_head: 6612aa3e06996ad0151e3686d0c972677fc892c6
+  origin_main: 6612aa3e06996ad0151e3686d0c972677fc892c6
+  working_tree_clean_before_queue_creation: true
+  merged_git_governance_prs:
+    - number: 4
+      title: OpenWorkflow M102-selected-change-commit-gate
+      merge_commit: b77418e2fe9b1f6eda213e52f495364bb1861e94
+    - number: 5
+      title: "M117: Git automation remote readiness governance"
+      merge_commit: 6612aa3e06996ad0151e3686d0c972677fc892c6
+    - number: 6
+      title: "M71: Git version control governance"
+      merge_commit: 8656ed135c7a57c5b515572fa06bc082aabdcb95
+    - number: 7
+      title: "M101 shared stack: M105/M106/M115 governance updates"
+      merge_commit: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+  open_prs:
+    - number: 8
+      url: https://github.com/tiic-tech/openworkflow/pull/8
+      title: "M130 remaining PR #5/#7 merge governance"
+      state: OPEN
+      draft: true
+      head_ref: codex/m130-remaining-pr5-pr7-merge-governance
+      head_oid: d69eefca8b7d9ae3d510ed47f3e4815a07b74613
+      base_ref: main
+      base_oid_reported_by_pr_api: f98c2013bdb0a50fa5983c6f0ee08cd3fa32e444
+      mergeable: MERGEABLE
+      review_decision: ""
+      status_check_rollup:
+        []
+      disposition_required: true
+      reason: >
+        PR #8 is a draft M130 audit PR created before PR #5 merged. It is the only remaining open PR
+        and needs explicit follow-up governance.
+  local_unmerged_governance_branches:
+    - branch: codex/m130-remaining-pr5-pr7-merge-governance
+      head: a6376ec
+      note: Contains local draft PR evidence commit not pushed to PR
+    - branch: codex/m131-git-automation-selected-change-commit-gate-hotfix
+      head: cbea244
+      note: Contains selected-change commit-evidence hotfix not ancestor of origin/main.
+    - branch: codex/m132-cc-branch-pr-lifecycle-gate
+      head: 5c256ab
+      note: Contains M131 plus branch/PR lifecycle gate changes and an additional docs report; not
+        ancestor of origin/main.
+    - branch: codex/m133-remaining-pr5-merge-governance
+      head: 040f20e
+      note: Contains local M133 audit evidence after PR
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Inventory remaining git governance baseline state
+    purpose: >
+      Produce a precise post-PR-#5 inventory of remaining git governance work so M134 can separate
+      source deltas, stale draft PRs, local audit branches, and remote publication gates before
+      implementation.
+    scope:
+      includes:
+        - inspect current open PRs and merged git-governance PRs
+        - inspect local M130/M131/M132/M133 governance branches and ancestry against origin/main
+        - classify remaining work into source delta extraction, PR
+        - record branch state without changing history
+      excludes:
+        - code changes
+        - push, PR creation/edit/close/merge, Issue mutation, branch deletion, force-push, rebase,
+          reset, revert, or branch surgery
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      []
+    unlocks:
+      - C002
+      - C004
+      - C005
+    risk: medium
+    size: small
+    validation:
+      - gh pr list --repo tiic-tech/openworkflow --state all --json
+        number,url,title,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeCommit,mergedAt
+        --limit 50
+      - git branch --list --format='%(refname:short) %(objectname:short) %(upstream:short)'
+      - git merge-base --is-ancestor <branch-head> origin/main
+      - node dist/cli/src/index.js validate --root . --json
+      - git diff --check
+    acceptance:
+      - Remaining governance branches and open PRs are classified.
+      - The inventory states which work is still required for a formal code-development baseline.
+      - No remote mutation or branch surgery occurs.
+    selection:
+      selected_change_id: C001
+      selected_at: 2026-05-25T03:18:00+08:00
+      reason: >
+        User authorized completing all M134 git-governance changes. C001 is the next recommended
+        ready candidate and is required before extracting old branch deltas or preparing remote
+        operation packets.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:18:00+08:00
+      implementation_changed_files: true
+      result: >
+        C001 classified the post-PR-#5 git governance baseline state. PR #8 is the only open PR and
+        needs separate disposition governance. M131 and M132 contain source behavior deltas not
+        present on current origin/main and must be extracted onto M134 rather than merged via old
+        stacked branches. M130 and M133 contain local audit evidence that may need explicit
+        publication gates. No remote mutation or branch surgery was performed.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+        - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Extract M131 selected-change commit gate delta onto M134
+    purpose: >
+      Reapply only the necessary M131 selected-change commit-evidence behavior onto the fresh M134
+      branch without bringing old stacked governance history.
+    scope:
+      includes:
+        - compare M131 source changes against current origin/main
+        - update source files that enforce selected-change commit evidence
+        - add or refresh focused validation fixtures for missing LOCAL_COMMIT_EVIDENCE detection
+        - preserve generated-surface boundaries
+      excludes:
+        - cherry-picking the full historical branch blindly
+        - PR
+        - branch rebase/reset/force-push
+    owned_paths:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/core/src/workflow/
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C003
+      - C006
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - A selected change with implementation_changed_files cannot pass strict handoff without
+        LOCAL_COMMIT_EVIDENCE.yaml.
+      - Git-automation commit evidence is linked to selected-change completion.
+      - Existing M133/M134 strict summary checks still pass.
+    selection:
+      selected_change_id: C002
+      selected_at: 2026-05-25T03:17:21+08:00
+      reason: >
+        User explicitly authorized completing all M134 git-governance changes with highest
+        permission. C002 is the next recommended ready candidate and extracts the M131
+        selected-change commit gate onto M134 without importing old stacked branch history.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:17:21+08:00
+      implementation_changed_files: true
+      result: >
+        C002 reintroduced the M131 strict selected-change commit-evidence gate on the M134 branch.
+        Strict completed implementation candidates now require --commit-evidence, selected-change
+        artifact inference supports list-shaped selection.artifacts, and required evidence backfill
+        fails closed when queue or selected-change completion records cannot be updated.
+      evidence:
+        - packages/cli/src/commands/gitAutomation.ts
+        - packages/core/src/git/localGitAutomation.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+        - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Extract M132 CC branch and PR lifecycle gate delta onto M134
+    purpose: >
+      Reapply only the necessary M132 branch-per-CC and completed-CC PR lifecycle gates onto the
+      fresh M134 branch without importing old stacked history or manually patching generated
+      surfaces.
+    scope:
+      includes:
+        - compare M132 source changes against current origin/main
+        - enforce branch-boundary ownership for active CC queues
+        - surface completed-queue PR readiness/publication gate clearly in resume or validation
+        - update generator source/templates rather than hand-editing generated .agents or
+          .openworkflow surfaces
+      excludes:
+        - blind cherry-pick of M132
+        - deleting or rewriting historical branches
+        - remote PR mutation
+    owned_paths:
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - packages/core/src/commands/registry.ts
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - references/git-version-control-governance.md
+      - .agents/skills/ow-decompose-to-changes/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C002
+    unlocks:
+      - C004
+      - C006
+    risk: high
+    size: medium
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - New CC queues are required to have independent branch identity.
+      - Completed CC queues produce an explicit PR/publication gate before being treated as
+        baseline-ready.
+      - Generated surfaces are updated only through approved source/sync paths.
+    selection:
+      selected_change_id: C003
+      selected_at: 2026-05-25T03:24:10+08:00
+      reason: >
+        User authorized completing all M134 git-governance changes with highest permission. C003 is
+        the next ready candidate after C002 and extracts the M132 branch-per-CC and completed-queue
+        PR lifecycle gates onto M134 without importing historical branch artifacts.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:24:10+08:00
+      implementation_changed_files: true
+      result: >
+        C003 reintroduced the M132 strict git lifecycle gate onto M134. Strict lifecycle queues now
+        require a plan-owned branch boundary, completed queues require
+        DRAFT_PR_OPERATION_EVIDENCE.yaml before baseline-ready trust, and decompose-to-changes
+        source guidance tells Agents to create independent branch-governed queues.
+      evidence:
+        - packages/core/src/validators/validateRepositoryContracts.ts
+        - packages/core/src/workflow/summaryHealth.ts
+        - packages/core/src/commands/registry.ts
+        - packages/cli/src/dev/verifyRuntimeSurface.ts
+        - references/git-version-control-governance.md
+        - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+        - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C004
+    status: done
+    title: "Decide PR #8 disposition after PR #5 merge"
+    purpose: >
+      Produce a local decision packet for the only remaining open PR, PR #8, after PR #5 merged and
+      M133 completed.
+    scope:
+      includes:
+        - "refresh PR #8 metadata and compare against current main"
+        - "decide whether PR #8 should remain draft, be updated, be closed as superseded, or be
+          replaced by M134 publication"
+        - record exact approval text for any future remote mutation
+      excludes:
+        - "editing, closing, marking ready, merging, or commenting on PR #8"
+        - push or branch deletion
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - C005
+      - C007
+    risk: high
+    size: small
+    validation:
+      - gh pr view 8 --repo tiic-tech/openworkflow --json
+        number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+      - git diff --check
+    acceptance:
+      - "PR #8 disposition is explicit."
+      - "Any future PR #8 mutation has exact approval text and stop gates."
+      - No remote mutation occurs in C004.
+    selection:
+      selected_change_id: C004
+      selected_at: 2026-05-25T03:31:00+08:00
+      reason: >
+        C004 is the next ready M134 candidate after local M131/M132 governance source deltas were
+        extracted and committed. It records the PR #8 disposition decision without mutating the
+        remote PR.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:31:00+08:00
+      implementation_changed_files: true
+      result: >
+        PR #8 is an open draft M130 audit PR whose body and branch describe a pre-PR-#5
+        merge-governance handoff. PR #5 has since merged into main and M134 supersedes the remaining
+        git-governance baseline closure. C004 recommends leaving PR #8 untouched until M134
+        publication exists, then closing PR #8 as superseded with a local audit record. No remote
+        mutation was performed in C004.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+        - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C005
+    status: done
+    title: Prepare M134 baseline publication packet
+    purpose: >
+      Prepare a high-risk publication decision packet for the M134 baseline branch after local
+      source governance and PR #8 disposition are known.
+    scope:
+      includes:
+        - summarize completed C001-C004 evidence
+        - generate PR_READY_SUMMARY.md for M134
+        - record exact push and draft PR creation approval text
+        - state merge is not authorized by publication
+      excludes:
+        - git push
+        - gh pr create/edit/merge
+        - Issue mutation
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C003
+      - C004
+    unlocks:
+      - C006
+      - C007
+    risk: high
+    size: small
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - M134 branch is locally PR-ready.
+      - Exact remote publication approval handle is recorded.
+      - No remote mutation occurs in C005.
+    selection:
+      selected_change_id: C005
+      selected_at: 2026-05-25T03:36:00+08:00
+      reason: >
+        C005 is the next ready candidate after C004 decided PR #8 disposition. It prepares the local
+        publication packet and exact remote operation handle without pushing or creating a PR.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:36:00+08:00
+      implementation_changed_files: true
+      result: >
+        C005 generated the M134 local PR-ready summary and publication packet. It records exact push
+        and draft PR creation commands, states that merge is not authorized, and leaves all remote
+        mutation to C006.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+        - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C006
+    status: done
+    title: Execute approved M134 baseline publication
+    purpose: >
+      If the user gives exact approval, push only the M134 baseline branch and open a draft PR for
+      final review.
+    scope:
+      includes:
+        - verify exact approval text
+        - run only approved git push and gh pr create commands
+        - record PR URL and publication evidence
+      excludes:
+        - merge
+        - "PR #8 mutation unless separately approved"
+        - Issue mutation, force-push, branch deletion, rebase, reset, or revert
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C005
+    unlocks:
+      - C008
+    risk: high
+    size: small
+    validation:
+      - gh pr view <created-pr> --repo tiic-tech/openworkflow --json
+        number,url,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid
+      - git diff --check
+    acceptance:
+      - Only the exact approved M134 branch push and draft PR creation occur.
+      - Publication evidence records command, result, PR URL, and forbidden operations not performed.
+      - No merge occurs.
+    selection:
+      selected_change_id: C006
+      selected_at: 2026-05-25T03:40:00+08:00
+      reason: >
+        User broadly authorized all M134 git-governance commands, and C005 recorded the exact branch
+        push and draft PR creation handle.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T03:40:00+08:00
+      implementation_changed_files: true
+      result: >
+        C006 pushed the M134 branch to origin and created draft PR #9. No merge, PR #8 mutation,
+        Issue mutation, branch deletion, force-push, rebase, reset, or revert was performed.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
+        - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+        - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C007
+    status: done
+    title: "Execute approved PR #8 disposition if needed"
+    purpose: >
+      If C004 determines PR #8 requires remote cleanup and the user gives exact approval, execute
+      only the approved PR #8 disposition action.
+    scope:
+      includes:
+        - verify exact approval text
+        - "run only the approved PR #8 action, such as close with supersession note or leave
+          untouched with audit evidence"
+        - record result
+      excludes:
+        - "merging PR #8 unless separately approved with merge command"
+        - branch deletion, force-push, rebase, reset, or revert
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C004
+    unlocks:
+      - C008
+    risk: high
+    size: small
+    validation:
+      - gh pr view 8 --repo tiic-tech/openworkflow --json
+        number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+      - git diff --check
+    acceptance:
+      - "PR #8 final disposition matches exact user approval."
+      - No unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C007
+      selected_at: 2026-05-25T08:18:36+08:00
+      reason: >
+        User granted highest authorization for all M134 git-governance commands, and C004 recorded
+        the exact PR #8 supersession close handle to execute after M134 draft PR publication.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T08:19:49+08:00
+      implementation_changed_files: true
+      result: >
+        C007 closed stale draft PR #8 with the exact C004-approved supersession comment. PR #8 was
+        not merged, its branch was not deleted, and no Issue mutation, force-push, rebase, reset,
+        revert, or unrelated remote mutation occurred.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C008
+    status: done
+    title: Complete formal git governance baseline handoff
+    purpose: >
+      Record the final OW git governance baseline status after local governance deltas, M134
+      publication, and PR #8 disposition are complete or explicitly deferred.
+    scope:
+      includes:
+        - summarize C001-C007 evidence
+        - state whether formal code development can begin on the new baseline
+        - record remaining remote/open branch risks if any
+        - provide exact next approval handles for deferred publication or PR cleanup
+      excludes:
+        - new source changes
+        - new remote mutation
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    dependencies:
+      - C001
+    unlocks:
+      - formal-code-development-baseline
+    risk: medium
+    size: small
+    validation:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check
+    acceptance:
+      - The handoff states whether git governance is complete enough for formal code development.
+      - Any remaining remote operation is explicitly gated and not implied.
+      - No unauthorized operation is recorded.
+    selection:
+      selected_change_id: C008
+      selected_at: 2026-05-25T08:21:17+08:00
+      reason: >
+        C001-C007 are complete, PR #9 exists for M134, stale PR #8 is closed, and the queue is ready
+        for final baseline handoff.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T08:23:00+08:00
+      implementation_changed_files: true
+      result: >
+        C008 recorded the final M134 git governance baseline handoff. Build, strict summaries, and
+        diff check pass. Repository validation remains red only on historical non-M134 artifacts.
+        The final remaining remote gate is branch synchronization to update PR #9 after C008 local
+        evidence is committed.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+        - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: create
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+      - C008
+    actor: agent
+    reason: >
+      User asked to continue remaining git governance CCs and finish OW git governance as the
+      baseline for later formal code development. M134 starts from current origin/main after PR #5
+      merged, rather than continuing on old stacked local branches.
+    changed_at: 2026-05-25T03:07:53+08:00
+    before_status: null
+    after_status: active
+    evidence:
+      - node dist/cli/src/index.js resume --root . --json
+      - gh pr list --repo tiic-tech/openworkflow --state open --json
+        number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup
+        --limit 30
+      - git branch --list --format='%(refname:short) %(objectname:short) %(upstream:short)'
+      - git switch -c codex/m134-git-governance-baseline-closure origin/main
+      - git status --short --branch
+  - operation_id: OP002
+    operation_type: select
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 is the required inventory step before extracting M131/M132 source deltas or deciding PR
+      #8 disposition.
+    changed_at: 2026-05-25T03:18:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP003
+    operation_type: complete
+    target_candidate_ids:
+      - C001
+    actor: agent
+    reason: >
+      C001 inventory classified PR #8, M130/M131/M132/M133 local branches, source deltas, remote
+      publication gates, and no-op historical branch surgery.
+    changed_at: 2026-05-25T03:18:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+  - operation_id: OP004
+    operation_type: status_change
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      C001 found M131 selected-change commit gate source deltas are still required on current
+      origin/main, so C002 is ready.
+    changed_at: 2026-05-25T03:18:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+  - operation_id: OP005
+    operation_type: select
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      User granted highest permission for all M134 git-governance commands. C002 was the next ready
+      candidate and C001 established that M131 source deltas were still required on current
+      origin/main.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP006
+    operation_type: complete
+    target_candidate_ids:
+      - C002
+    actor: agent
+    reason: >
+      The M131 selected-change commit-evidence gate was extracted onto M134 as source changes and
+      runtime fixture coverage without cherry-picking the old stacked branch.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/cli/src/commands/gitAutomation.ts
+      - packages/core/src/git/localGitAutomation.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+  - operation_id: OP007
+    operation_type: status_change
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C002 completed the selected-change commit-evidence gate extraction, so the M132 branch and PR
+      lifecycle gate extraction is now ready.
+    changed_at: 2026-05-25T03:17:21+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+  - operation_id: OP008
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      User granted highest permission for all M134 git-governance commands. C003 was the next ready
+      candidate and C002 completed the prerequisite selected-change commit evidence gate.
+    changed_at: 2026-05-25T03:24:10+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP009
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      The M132 branch-per-CC and completed-queue PR lifecycle gate was extracted onto M134 as
+      validator, summary health, source protocol, reference, and runtime fixture changes.
+    changed_at: 2026-05-25T03:24:10+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+      - packages/core/src/workflow/summaryHealth.ts
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+      - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+  - operation_id: OP010
+    operation_type: status_change
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C003 completed local source lifecycle gate extraction, so PR #8 disposition can now be decided
+      from the current remote state.
+    changed_at: 2026-05-25T03:24:10+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+  - operation_id: OP011
+    operation_type: select
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      C004 was the next ready candidate after M134 local source governance deltas were extracted and
+      strict handoff was clean.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP012
+    operation_type: complete
+    target_candidate_ids:
+      - C004
+    actor: agent
+    reason: >
+      PR #8 was classified as a stale draft M130 audit PR superseded by M134 after PR #5 merged.
+      C004 recorded the future close handle and did not mutate the remote PR.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+  - operation_id: OP013
+    operation_type: status_change
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: |
+      C004 resolved PR #8 disposition planning, so M134 baseline publication can be prepared.
+    changed_at: 2026-05-25T03:31:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+  - operation_id: OP014
+    operation_type: select
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 was the next ready candidate after PR #8 disposition was decided and local M134
+      governance deltas were complete.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP015
+    operation_type: complete
+    target_candidate_ids:
+      - C005
+    actor: agent
+    reason: >
+      C005 wrote PR_READY_SUMMARY.md and M134_PUBLICATION_PACKET.md with exact push and draft PR
+      creation commands. It performed no remote mutation.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  - operation_id: OP016
+    operation_type: status_change
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C005 prepared the publication packet and exact approved remote handle, so C006 can execute the
+      approved branch push and draft PR creation.
+    changed_at: 2026-05-25T03:36:00+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  - operation_id: OP017
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      User granted highest permission for all M134 git-governance commands and C005 recorded the
+      exact approved branch push and draft PR creation handle.
+    changed_at: 2026-05-25T03:40:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP018
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C006 pushed the M134 branch to origin and created draft PR #9 without merge, PR #8 mutation,
+      Issue mutation, branch deletion, force-push, rebase, reset, or revert.
+    changed_at: 2026-05-25T03:40:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
+      - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP019
+    operation_type: status_change
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C006 published the M134 draft PR, so the C004-approved PR #8 supersession disposition is now
+      ready to execute.
+    changed_at: 2026-05-25T08:18:36+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
+      - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+  - operation_id: OP020
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      User granted highest authorization for all M134 git-governance commands, and C004 recorded the
+      exact PR #8 close-with-supersession-comment handle.
+    changed_at: 2026-05-25T08:18:36+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP021
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C007 closed stale draft PR #8 with the exact C004-approved supersession comment after M134
+      draft PR publication. The PR was not merged and its branch was not deleted.
+    changed_at: 2026-05-25T08:19:49+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
+  - operation_id: OP022
+    operation_type: status_change
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: |
+      C001-C007 are complete, so the formal M134 git governance baseline handoff is ready.
+    changed_at: 2026-05-25T08:19:49+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+  - operation_id: OP023
+    operation_type: select
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      C001-C007 are complete, PR #9 exists for M134, stale PR #8 is closed, and the queue is ready
+      for final baseline handoff.
+    changed_at: 2026-05-25T08:21:17+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP024
+    operation_type: complete
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      C008 recorded the final M134 git governance baseline handoff, validation status, remaining
+      remote synchronization gate, and forbidden operations not performed.
+    changed_at: 2026-05-25T08:23:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md

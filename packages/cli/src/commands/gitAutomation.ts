@@ -100,6 +100,15 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
   const allowedPaths = listFlag(flags, "allowed-paths");
   const candidateOwnedPaths = array(candidate.owned_paths).map(String);
   const commitEvidence = booleanFlag(flags, "commit-evidence");
+  const strictCompletedImplementation = stringValue(queuePolicy.selected_change_commit_gate) === "strict"
+    && candidate.status === "done"
+    && record(candidate.completion).implementation_changed_files === true
+    && Boolean(selectedChangeId);
+  if (strictCompletedImplementation && !commitEvidence) {
+    return finishGitAutomationError(root, json, "strict selected-change commit gate requires --commit-evidence for completed implementation candidates", [
+      "rerun with --commit-evidence so LOCAL_COMMIT_EVIDENCE.yaml is written and backfilled",
+    ]);
+  }
   const evidencePath = stringFlag(flags, "evidence-path") ?? (commitEvidence ? inferLocalCommitEvidencePath(candidate) : undefined);
   if (commitEvidence && !evidencePath) {
     return finishGitAutomationError(root, json, "commit evidence requires --evidence-path or selection evidence ending in SELECTED_CHANGE.yaml", [
@@ -118,6 +127,7 @@ async function gitAutomationCommit(root: string, flags: Map<string, string | boo
     commitMessage,
     evidencePath,
     commitEvidence,
+    requireEvidenceBackfill: strictCompletedImplementation,
     queuePath,
     selectedChangePath,
     branchIdentityException,
@@ -357,6 +367,11 @@ function inferSelectedChangePath(candidate: Record<string, unknown>): string | u
   const artifactPath = stringValue(record(selection.artifacts).selected_change);
   if (artifactPath?.endsWith("/SELECTED_CHANGE.yaml")) {
     return artifactPath;
+  }
+  const artifactList = array(selection.artifacts).map(String);
+  const artifactListPath = artifactList.find((item) => item.endsWith("/SELECTED_CHANGE.yaml"));
+  if (artifactListPath) {
+    return artifactListPath;
   }
   const selectionEvidence = array(selection.evidence).map(String);
   return selectionEvidence.find((item) => item.endsWith("/SELECTED_CHANGE.yaml"));

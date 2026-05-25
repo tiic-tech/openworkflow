@@ -1,0 +1,50 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C008
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C008
+title: Complete formal git governance baseline handoff
+status: done
+selected_at: 2026-05-25T08:21:17+08:00
+selection_reason: >
+  C001-C007 are complete, PR #9 exists for M134, stale PR #8 is closed, and the queue is ready for
+  final baseline handoff.
+source_candidate:
+  id: C008
+  status_at_selection: ready
+  risk: medium
+  dependencies:
+    - C001
+scope:
+  includes:
+    - summarize C001-C007 evidence
+    - state whether formal code development can begin on the new baseline
+    - record remaining remote/open branch risks if any
+    - provide exact next approval handles for deferred publication or PR cleanup
+  excludes:
+    - new source changes
+    - new remote mutation
+owned_paths:
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - The handoff states whether git governance is complete enough for formal code development.
+  - Any remaining remote operation is explicitly gated and not implied.
+  - No unauthorized operation is recorded.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T08:23:00+08:00
+  implementation_changed_files: true
+  result: >
+    C008 recorded the final M134 git governance baseline handoff. Build, strict summaries, and diff
+    check pass. Repository validation remains red only on historical non-M134 artifacts. The final
+    remaining remote gate is branch synchronization to update PR #9 after C008 local evidence is
+    committed.
+  evidence:
+    - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+    - changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/LOCAL_COMMIT_EVIDENCE.yaml

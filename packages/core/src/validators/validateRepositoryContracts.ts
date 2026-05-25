@@ -5,6 +5,7 @@ import { getWorkflowCommands, type WorkflowCommand } from "../commands/registry.
 import { SCHEMA_VERSION } from "../contracts/index.js";
 import { parseYaml } from "../contracts/yaml.js";
 import { isExternalReference, isNotFound, resolveLocalReference } from "../fs/index.js";
+import { assessBranchIdentity, branchIdentityExceptionFrom } from "../git/branchIdentity.js";
 import type { ValidationResult } from "./validateOpenWorkflow.js";
 
 const REQUIRED_FILES = [
@@ -869,6 +870,10 @@ async function validateCandidateChanges(root: string, path: string, data: Record
     validateBranchIdentityException(label, queuePolicy.branch_identity_exception, errors);
   }
   const strictCommitGate = isRecord(queuePolicy) && queuePolicy.selected_change_commit_gate === "strict";
+  const strictLifecycleGate = isRecord(queuePolicy) && queuePolicy.git_lifecycle_gate === "strict";
+  if (strictLifecycleGate) {
+    validateStrictGitLifecycle(root, label, data, queuePolicy, errors);
+  }
   if (!Array.isArray(data.changes)) {
     errors.push(`${label} changes must be a list`);
     return;
@@ -880,6 +885,66 @@ async function validateCandidateChanges(root: string, path: string, data: Record
     }
     validateCandidateCompletionEvidence(root, label, candidate, errors, { strictCommitGate });
   }
+}
+
+function validateStrictGitLifecycle(
+  root: string,
+  label: string,
+  data: Record<string, unknown>,
+  queuePolicy: Record<string, unknown>,
+  errors: string[],
+): void {
+  const planId = stringField(data, "plan_id");
+  const branchBoundary = stringField(queuePolicy, "branch_boundary");
+  if (!branchBoundary) {
+    errors.push(`${label} strict git lifecycle requires queue_policy.branch_boundary`);
+  } else if (planId) {
+    const branchIdentity = assessBranchIdentity(planId, branchBoundary, branchIdentityExceptionFrom(queuePolicy.branch_identity_exception), "validate");
+    errors.push(...branchIdentity.errors.map((error) => `${label} ${error}`));
+  }
+
+  const status = stringField(data, "status");
+  if (status === "completed" || status === "done") {
+    validateCompletedQueuePrEvidence(root, label, data, errors);
+  }
+}
+
+function validateCompletedQueuePrEvidence(root: string, label: string, data: Record<string, unknown>, errors: string[]): void {
+  const evidencePath = queuePrEvidencePath(data);
+  if (!evidencePath) {
+    errors.push(`${label} strict git lifecycle completed queue must include DRAFT_PR_OPERATION_EVIDENCE.yaml`);
+    return;
+  }
+  if (isExternalRef(evidencePath) || evidencePath.startsWith("commit:")) {
+    errors.push(`${label} DRAFT_PR_OPERATION_EVIDENCE.yaml path must be repo-relative`);
+    return;
+  }
+  const resolved = resolve(root, evidencePath);
+  if (resolved !== root && !resolved.startsWith(`${root}/`)) {
+    errors.push(`${label} DRAFT_PR_OPERATION_EVIDENCE.yaml path escapes repository root`);
+    return;
+  }
+  if (!existsSyncSafe(resolved)) {
+    errors.push(`${label} references missing DRAFT_PR_OPERATION_EVIDENCE.yaml ${evidencePath}`);
+  }
+}
+
+function queuePrEvidencePath(data: Record<string, unknown>): string | null {
+  const completion = recordField(data, "completion");
+  const explicit = stringField(completion, "draft_pr_evidence_path")
+    ?? stringField(completion, "draft_pr_evidence")
+    ?? stringField(completion, "pr_evidence_path")
+    ?? stringField(completion, "pr_evidence");
+  if (explicit && explicit.endsWith("DRAFT_PR_OPERATION_EVIDENCE.yaml")) {
+    return explicit;
+  }
+  const evidence = Array.isArray(completion.evidence) ? completion.evidence : [];
+  for (const item of evidence) {
+    if (typeof item === "string" && item.endsWith("DRAFT_PR_OPERATION_EVIDENCE.yaml")) {
+      return item;
+    }
+  }
+  return null;
 }
 
 function validateBranchIdentityException(label: string, value: unknown, errors: string[]): void {

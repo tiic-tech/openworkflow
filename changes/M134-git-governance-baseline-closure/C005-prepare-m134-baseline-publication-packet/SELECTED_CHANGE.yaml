@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C005
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C005
+title: Prepare M134 baseline publication packet
+status: done
+selected_at: 2026-05-25T03:36:00+08:00
+selection_reason: >
+  C005 is the next ready candidate after C004 decided PR #8 disposition. It prepares the local
+  publication packet and exact remote operation handle without pushing or creating a PR.
+source_candidate:
+  id: C005
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C003
+    - C004
+scope:
+  includes:
+    - summarize completed C001-C004 evidence
+    - generate PR_READY_SUMMARY.md for M134
+    - record exact push and draft PR creation approval text
+    - state merge is not authorized by publication
+  excludes:
+    - git push
+    - gh pr create/edit/merge
+    - Issue mutation
+owned_paths:
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - M134 branch is locally PR-ready.
+  - Exact remote publication approval handle is recorded.
+  - No remote mutation occurs in C005.
+validation:
+  - npm run build
+  - npm run validate
+  - node dist/cli/src/index.js git-automation summary --root . --queue
+    changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml --write --json
+  - node dist/cli/src/index.js git-automation simulate --root . --queue
+    changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml --base origin/main --remote
+    origin --target-base main --json
+  - node dist/cli/src/index.js git-automation remote-plan --root . --queue
+    changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml --base origin/main --remote
+    origin --target-base main --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T03:36:00+08:00
+  implementation_changed_files: true
+  result: >
+    C005 generated the M134 local PR-ready summary and publication packet. It records exact push and
+    draft PR creation commands, states that merge is not authorized, and leaves all remote mutation
+    to C006.
+  evidence:
+    - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+    - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+    - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary:
+  expected: one coherent local commit for C005 publication packet, plus a follow-up evidence commit
+  implementation_changed_files: true

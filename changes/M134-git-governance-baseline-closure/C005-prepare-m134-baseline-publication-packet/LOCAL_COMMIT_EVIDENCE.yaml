@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:C005
+contract_type: planning
+planning_artifact_type: implementation_evidence
+title: Local commit evidence for C005
+status: current
+source_plan_id: M134-git-governance-baseline-closure
+source_candidate_id: C005
+selected_change_id: C005
+primary_commit: 8a0bf0942064dc0b224616046b01cc70be1334a1
+validation_evidence:
+  - npm run build
+  - npm run validate (expected historical failures plus pre-commit C005 evidence blocker)
+  - node dist/cli/src/index.js git-automation summary --root . --queue
+    changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml --write --json
+  - node dist/cli/src/index.js git-automation simulate --root . --queue
+    changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml --base origin/main --remote
+    origin --target-base main --json (read-only expected dirty PR_READY_SUMMARY blocker)
+  - node dist/cli/src/index.js summaries --root . --strict --json (pre-commit expected C005
+    LOCAL_COMMIT_EVIDENCE blocker)
+  - git diff --check
+coder_gate:
+  status: recorded
+  enforcement: guidance_only
+  evidence_binding: LOCAL_COMMIT_EVIDENCE.yaml
+  validation_evidence_ref: validation_evidence
+  summary: Coder governance evidence is bound to this local commit evidence record when the selected
+    change involves source edits.
+audit_notes:
+  - Selected changes must have at least one local commit.
+  - Additional evidence commits are allowed when they preserve selected-change traceability.
+  - Remote push, PR creation, Issue mutation, and merge are not part of this local automation.

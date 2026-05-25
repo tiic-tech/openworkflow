@@ -1,0 +1,45 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C004
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C004
+title: Atom tasks for C004 PR #8 disposition decision
+status: done
+tasks:
+  - task_id: T001
+    title: Refresh PR #8 metadata
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      PR #8 state, draft flag, title, branch, head, base, body, and mergeable
+      metadata are captured without remote mutation.
+  - task_id: T002
+    title: Compare PR #8 against current main
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      PR #8 branch ancestry and diff are classified against origin/main after
+      PR #5 merged.
+  - task_id: T003
+    title: Decide disposition
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      The decision states whether PR #8 should remain open, be updated, closed,
+      merged, or replaced.
+  - task_id: T004
+    title: Record future approval handle
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Any later PR #8 remote mutation has an exact command handle and forbidden
+      operations list.

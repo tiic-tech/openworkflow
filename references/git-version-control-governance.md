@@ -69,6 +69,15 @@ Queue maintenance can happen before strict branch validation exists, but the
 maintenance operation should record the current branch and reason when it
 touches a branch-governed queue from a different branch.
 
+New branch-governed queues should opt into
+`queue_policy.git_lifecycle_gate: strict`. In strict lifecycle mode, the queue
+must record a plan-owned `queue_policy.branch_boundary` before selected work is
+treated as ready. When the whole queue is marked `completed` or `done`, it must
+also record PR/publication evidence such as `DRAFT_PR_OPERATION_EVIDENCE.yaml`,
+or remain explicitly blocked/deferred before PR creation. This keeps the branch
+and PR boundary visible to low-context Agents instead of relying on chat
+memory.
+
 ## Pull Request Boundary
 
 A pull request should normally represent one feat branch, not one atom task.

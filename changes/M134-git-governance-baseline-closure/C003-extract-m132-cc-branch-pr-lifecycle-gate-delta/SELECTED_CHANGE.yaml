@@ -1,0 +1,70 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C003
+title: Extract M132 CC branch and PR lifecycle gate delta onto M134
+status: done
+selected_at: 2026-05-25T03:24:10+08:00
+selection_reason: >
+  User authorized completing all M134 git-governance changes with highest permission. C003 is the
+  next ready candidate after C002 and extracts the M132 branch-per-CC and completed-queue PR
+  lifecycle gates onto M134 without importing historical branch artifacts.
+source_candidate:
+  id: C003
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C002
+scope:
+  includes:
+    - compare M132 source changes against current origin/main
+    - enforce branch-boundary ownership for active CC queues
+    - surface completed-queue PR readiness/publication gate clearly in resume or validation
+    - update generator source/templates rather than hand-editing generated .agents or .openworkflow
+      surfaces
+  excludes:
+    - blind cherry-pick of M132
+    - deleting or rewriting historical branches
+    - remote PR mutation
+owned_paths:
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/commands/registry.ts
+  - packages/core/src/validators/validateRepositoryContracts.ts
+  - packages/core/src/workflow/summaryHealth.ts
+  - references/git-version-control-governance.md
+  - .agents/skills/ow-decompose-to-changes/SKILL.md
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - New CC queues are required to have independent branch identity.
+  - Completed CC queues produce an explicit PR/publication gate before being treated as
+    baseline-ready.
+  - Generated surfaces are updated only through approved source/sync paths.
+validation:
+  - npm run build
+  - node dist/cli/src/index.js sync --root . --tools codex --json
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js resume --root . --json
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T03:24:10+08:00
+  implementation_changed_files: true
+  result: >
+    C003 reintroduced the M132 strict git lifecycle gate onto M134. Strict lifecycle queues now
+    require a plan-owned branch boundary, completed queues require DRAFT_PR_OPERATION_EVIDENCE.yaml
+    before baseline-ready trust, and decompose-to-changes source guidance tells Agents to create
+    independent branch-governed queues.
+  evidence:
+    - packages/core/src/validators/validateRepositoryContracts.ts
+    - packages/core/src/workflow/summaryHealth.ts
+    - packages/core/src/commands/registry.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - references/git-version-control-governance.md
+    - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+    - changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary:
+  expected: one coherent local implementation commit for M134 C003, plus a follow-up evidence commit
+  implementation_changed_files: true

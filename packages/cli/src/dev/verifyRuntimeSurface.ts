@@ -1767,6 +1767,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
   const branchGovernanceQueue = join(REPO_ROOT, "changes", "M71-git-version-control-governance", "CANDIDATE_CHANGES.yaml");
   const selectedCommitGateQueue = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "CANDIDATE_CHANGES.yaml");
   const selectedCommitGateEvidence = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "C001-selected-change-commit-enforcement-policy", "LOCAL_COMMIT_EVIDENCE.yaml");
+  const lifecyclePrEvidence = join(REPO_ROOT, "changes", "M102-selected-change-commit-gate", "DRAFT_PR_OPERATION_EVIDENCE.yaml");
   const validator = join(REPO_ROOT, "dist", "cli", "src", "dev", "validateRepositoryContractsCli.js");
   const original = await read(skill);
   const originalManifest = await read(manifest);
@@ -1805,6 +1806,58 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     const malformedBranchBoundary = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
     assert(malformedBranchBoundary.code !== 0, "validate passed after branch boundary was malformed");
     assert(malformedBranchBoundary.output.includes("queue_policy.branch_boundary"), "branch boundary validation did not explain malformed branch boundary");
+    await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
+
+    await writeFile(selectedCommitGateQueue, gitLifecycleGateFixture({
+      branchBoundary: null,
+      status: "active",
+      evidence: [],
+    }), "utf8");
+    const missingLifecycleBranch = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingLifecycleBranch.code !== 0, "validate passed after strict lifecycle queue lacked branch boundary");
+    assert(missingLifecycleBranch.output.includes("strict git lifecycle requires queue_policy.branch_boundary"), "strict lifecycle missing branch did not explain branch boundary requirement");
+
+    await writeFile(selectedCommitGateQueue, gitLifecycleGateFixture({
+      branchBoundary: "codex/m999-wrong-lifecycle-fixture",
+      status: "active",
+      evidence: [],
+    }), "utf8");
+    const mismatchedLifecycleBranch = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(mismatchedLifecycleBranch.code !== 0, "validate passed after strict lifecycle branch did not own plan");
+    assert(mismatchedLifecycleBranch.output.includes("branch identity mismatch"), "strict lifecycle branch mismatch did not explain plan ownership");
+
+    await writeFile(selectedCommitGateQueue, gitLifecycleGateFixture({
+      branchBoundary: "codex/m102-selected-change-commit-gate",
+      status: "completed",
+      evidence: [],
+    }), "utf8");
+    const missingLifecyclePr = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(missingLifecyclePr.code !== 0, "validate passed after completed strict lifecycle queue lacked PR evidence");
+    assert(missingLifecyclePr.output.includes("DRAFT_PR_OPERATION_EVIDENCE.yaml"), "strict lifecycle missing PR evidence did not explain draft PR evidence requirement");
+
+    const strictLifecycleSummaries = await runCaptureStatus(["node", CLI, "summaries", "--root", REPO_ROOT, "--strict", "--json"], process.env);
+    assert(strictLifecycleSummaries.code !== 0, "summaries --strict passed with missing strict lifecycle PR evidence");
+    assert(strictLifecycleSummaries.output.includes("git lifecycle gate"), "summaries --strict missing lifecycle gate error");
+
+    await writeFile(lifecyclePrEvidence, [
+      "schema_version: 0.1.0",
+      "contract_type: audit",
+      "artifact_type: draft_pr_operation_evidence",
+      "plan_id: M102-selected-change-commit-gate-fixture",
+      "result:",
+      "  mutation_performed: true",
+      "  outcome: created",
+      "  pr_url: https://example.invalid/openworkflow/pull/102",
+      "",
+    ].join("\n"), "utf8");
+    await writeFile(selectedCommitGateQueue, gitLifecycleGateFixture({
+      branchBoundary: "codex/m102-selected-change-commit-gate",
+      status: "completed",
+      evidence: ["changes/M102-selected-change-commit-gate/DRAFT_PR_OPERATION_EVIDENCE.yaml"],
+    }), "utf8");
+    const validLifecycleGate = await runCaptureStatus(["node", validator, "--root", REPO_ROOT], process.env);
+    assert(!validLifecycleGate.output.includes("git lifecycle"), "valid strict lifecycle queue reported lifecycle errors");
+
     await writeFile(skill, original, "utf8");
     await writeFile(manifest, originalManifest, "utf8");
     await writeFile(commandAudit, originalCommandAudit, "utf8");
@@ -1882,6 +1935,7 @@ async function verifyGeneratedSkillRepositoryValidation(): Promise<void> {
     await writeFile(branchGovernanceQueue, originalBranchGovernanceQueue, "utf8");
     await writeFile(selectedCommitGateQueue, originalSelectedCommitGateQueue, "utf8");
     await writeFile(selectedCommitGateEvidence, originalSelectedCommitGateEvidence, "utf8");
+    await rm(lifecyclePrEvidence, { force: true });
   }
 }
 
@@ -1929,6 +1983,40 @@ function selectedChangeCommitGateFixture(options: {
     ] : []),
     "      evidence:",
     ...options.evidence.map((item) => `        - '${item}'`),
+    "",
+  ].join("\n");
+}
+
+function gitLifecycleGateFixture(options: {
+  branchBoundary: string | null;
+  status: "active" | "completed";
+  evidence: string[];
+}): string {
+  return [
+    "schema_version: 0.1.0",
+    "contract_id: candidate_changes:M102-selected-change-commit-gate-fixture",
+    "contract_type: planning",
+    "planning_artifact_type: candidate_changes",
+    "plan_id: M102-selected-change-commit-gate-fixture",
+    "title: Candidate changes for git lifecycle fixture",
+    `status: ${options.status}`,
+    "queue_policy:",
+    "  git_lifecycle_gate: strict",
+    ...(options.branchBoundary ? [
+      `  branch_boundary: ${options.branchBoundary}`,
+    ] : []),
+    ...(options.status === "completed" ? [
+      "completion:",
+      "  completed_at: 2026-05-25",
+      "  evidence:",
+      ...options.evidence.map((item) => `    - ${item}`),
+    ] : []),
+    "changes:",
+    "  - id: C900",
+    "    status: candidate",
+    "    title: Git lifecycle gate fixture",
+    "    owned_paths:",
+    "      - changes/M102-selected-change-commit-gate/",
     "",
   ].join("\n");
 }
@@ -2229,6 +2317,7 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
       "status: active",
       "queue_policy:",
       "  branch_boundary: codex/m105-backfill",
+      "  selected_change_commit_gate: strict",
       "changes:",
       "  - id: C003",
       "    status: done",
@@ -2240,7 +2329,7 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
       "    selection:",
       "      selected_change_id: M105-C003-evidence-backfill",
       "      artifacts:",
-      "        selected_change: changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
+      "        - changes/M105-backfill/C003-evidence-backfill/SELECTED_CHANGE.yaml",
       "    completion:",
       "      completed_at: 2026-05-23",
       "      implementation_changed_files: true",
@@ -2252,6 +2341,28 @@ async function verifySelectedChangeCommitAutomation(): Promise<void> {
     await runInCwd(backfillRoot, ["git", "commit", "-m", "M105-backfill initial"]);
     await runInCwd(backfillRoot, ["git", "switch", "-c", "codex/m105-backfill"]);
     await writeFile(join(backfillRoot, "allowed", "change.txt"), "before\nafter\n", "utf8");
+    const missingEvidenceCommit = await runCaptureStatus([
+      "node",
+      CLI,
+      "git-automation",
+      "commit",
+      "--root",
+      backfillRoot,
+      "--queue",
+      "changes/M105-backfill/CANDIDATE_CHANGES.yaml",
+      "--candidate",
+      "C003",
+      "--message",
+      "M105-backfill/C003 missing evidence fixture",
+      "--validation-evidence",
+      "validation: fixture",
+      "--write",
+      "--json",
+    ], process.env);
+    assert(missingEvidenceCommit.code !== 0, "strict git-automation commit passed without --commit-evidence");
+    assert(missingEvidenceCommit.output.includes("strict selected-change commit gate requires --commit-evidence"), "strict commit evidence failure did not explain required flag");
+    const failedCommitStatus = await runCaptureInCwd(backfillRoot, ["git", "status", "--porcelain"]);
+    assert(failedCommitStatus.includes("allowed/change.txt"), "strict failed commit should leave source change uncommitted");
     const backfillCommit = await runCaptureStatus([
       "node",
       CLI,

@@ -264,7 +264,8 @@ function decomposeToChangesProtocol(): CommandProtocol {
         "Read existing queue YAML before changing candidate ids or statuses.",
       ],
       during: [
-        "Preserve stable candidate ids and branch_boundary when updating an existing queue.",
+        "For every new CANDIDATE_CHANGES queue, set queue_policy.git_lifecycle_gate: strict and a plan-owned queue_policy.branch_boundary before selecting work.",
+        "Preserve stable candidate ids, git_lifecycle_gate, and branch_boundary when updating an existing queue.",
         "Record features outside the current queue boundary as deferred refs instead of current candidates.",
         "Keep candidates focused, dependency-aware, and bounded by owned paths.",
         "Append an operation entry for every queue maintenance edit.",
@@ -272,6 +273,7 @@ function decomposeToChangesProtocol(): CommandProtocol {
       after: [
         "Refresh CANDIDATE_CHANGES.md as a readable view of YAML source truth.",
         "Refresh SUMMARY.yaml with candidate count, next recommended candidate, risks, and validation evidence.",
+        "Do not mark a queue completed until PR evidence is recorded through DRAFT_PR_OPERATION_EVIDENCE.yaml or the queue is explicitly blocked before PR creation.",
         "Stop with a high-risk report instead of selecting or implementing risk: high candidates.",
       ],
     },

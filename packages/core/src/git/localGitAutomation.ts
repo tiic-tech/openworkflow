@@ -50,6 +50,7 @@ export interface CommitSelectedChangeOptions {
   dryRun?: boolean;
   evidencePath?: string;
   commitEvidence?: boolean;
+  requireEvidenceBackfill?: boolean;
   queuePath?: string;
   selectedChangePath?: string;
   branchIdentityException?: BranchIdentityException | null;
@@ -198,6 +199,21 @@ export async function commitSelectedChange(options: CommitSelectedChangeOptions)
     };
   }
 
+  const normalizedEvidencePath = options.evidencePath ? normalizeRepoPath(options.evidencePath) : null;
+  if (options.commitEvidence && options.requireEvidenceBackfill) {
+    if (!normalizedEvidencePath) {
+      return { ...withState, errors: ["strict selected-change commit evidence requires an evidence path"] };
+    }
+    const backfillPreflight = await resolveCommitEvidenceBackfillTargets(options, normalizedEvidencePath);
+    if (!backfillPreflight.ok) {
+      return {
+        ...withState,
+        evidencePath: normalizedEvidencePath,
+        errors: [`strict selected-change commit evidence backfill is required: ${backfillPreflight.reason}`],
+      };
+    }
+  }
+
   const commitArgs = ["commit", "-m", options.commitMessage];
   const preview: LocalGitCommandPreview = { command: "git", args: commitArgs };
   if (dryRun) {
@@ -273,21 +289,56 @@ async function backfillCommitEvidence(
   options: CommitSelectedChangeOptions,
   evidencePath: string,
 ): Promise<{ updatedPaths: string[]; warnings: string[] }> {
+  const targets = await resolveCommitEvidenceBackfillTargets(options, evidencePath);
+  if (!targets.ok) {
+    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: ${targets.reason}`] };
+  }
+
+  const updatedPaths: string[] = [];
+  if (!targets.queueEvidence.includes(evidencePath)) {
+    targets.queueEvidence.push(evidencePath);
+    await writeFile(`${options.root}/${targets.queuePath}`, dumpYaml(targets.queue), "utf8");
+    updatedPaths.push(targets.queuePath);
+  }
+  if (!targets.selectedEvidence.includes(evidencePath)) {
+    targets.selectedEvidence.push(evidencePath);
+    await writeFile(`${options.root}/${targets.selectedChangePath}`, dumpYaml(targets.selectedChange), "utf8");
+    updatedPaths.push(targets.selectedChangePath);
+  }
+  return { updatedPaths, warnings: [] };
+}
+
+type CommitEvidenceBackfillTargets = {
+  ok: true;
+  queuePath: string;
+  selectedChangePath: string;
+  queue: Record<string, unknown>;
+  selectedChange: Record<string, unknown>;
+  queueEvidence: unknown[];
+  selectedEvidence: unknown[];
+} | {
+  ok: false;
+  reason: string;
+};
+
+async function resolveCommitEvidenceBackfillTargets(
+  options: CommitSelectedChangeOptions,
+  evidencePath: string,
+): Promise<CommitEvidenceBackfillTargets> {
   const queuePath = options.queuePath ? normalizeRepoPath(options.queuePath) : null;
   const selectedChangePath = options.selectedChangePath ? normalizeRepoPath(options.selectedChangePath) : null;
-  const warnings: string[] = [];
   if (!queuePath) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: queue path was not provided"] };
+    return { ok: false, reason: "queue path was not provided" };
   }
   if (!selectedChangePath) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change path was not provided"] };
+    return { ok: false, reason: "selected-change path was not provided" };
   }
   if (pathEscapesRepo(queuePath) || pathEscapesRepo(selectedChangePath) || pathEscapesRepo(evidencePath)) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: queue, selected-change, and evidence paths must be repo-relative"] };
+    return { ok: false, reason: "queue, selected-change, and evidence paths must be repo-relative" };
   }
   const selectedChangeDir = dirname(selectedChangePath);
   if (!(evidencePath === `${selectedChangeDir}/LOCAL_COMMIT_EVIDENCE.yaml` || evidencePath.startsWith(`${selectedChangeDir}/`))) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: evidence path is outside the selected-change folder"] };
+    return { ok: false, reason: "evidence path is outside the selected-change folder" };
   }
 
   let queue: Record<string, unknown>;
@@ -296,48 +347,42 @@ async function backfillCommitEvidence(
     queue = readYamlRecord(await readFile(`${options.root}/${queuePath}`, "utf8"));
     selectedChange = readYamlRecord(await readFile(`${options.root}/${selectedChangePath}`, "utf8"));
   } catch (error) {
-    return {
-      updatedPaths: [],
-      warnings: [`commit evidence backfill skipped: could not read planning artifacts: ${error instanceof Error ? error.message : String(error)}`],
-    };
+    return { ok: false, reason: `could not read planning artifacts: ${error instanceof Error ? error.message : String(error)}` };
   }
 
   const candidate = array(queue.changes).map(record).find((item) => item.id === options.candidateId);
   if (!candidate) {
-    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} was not found in queue`] };
+    return { ok: false, reason: `candidate ${options.candidateId} was not found in queue` };
   }
   if (candidate.status !== "done") {
-    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} status is not done`] };
+    return { ok: false, reason: `candidate ${options.candidateId} status is not done` };
   }
   const queueCompletion = recordOrNull(candidate.completion);
   if (!queueCompletion) {
-    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} has no completion object`] };
+    return { ok: false, reason: `candidate ${options.candidateId} has no completion object` };
   }
   const selectedCompletion = recordOrNull(selectedChange.completion);
   if (!selectedCompletion) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change artifact has no completion object"] };
+    return { ok: false, reason: "selected-change artifact has no completion object" };
   }
   const queueEvidence = arrayOrNull(queueCompletion.evidence);
   if (!queueEvidence) {
-    return { updatedPaths: [], warnings: [`commit evidence backfill skipped: candidate ${options.candidateId} completion.evidence is not an array`] };
+    return { ok: false, reason: `candidate ${options.candidateId} completion.evidence is not an array` };
   }
   const selectedEvidence = arrayOrNull(selectedCompletion.evidence);
   if (!selectedEvidence) {
-    return { updatedPaths: [], warnings: ["commit evidence backfill skipped: selected-change completion.evidence is not an array"] };
+    return { ok: false, reason: "selected-change completion.evidence is not an array" };
   }
 
-  const updatedPaths: string[] = [];
-  if (!queueEvidence.includes(evidencePath)) {
-    queueEvidence.push(evidencePath);
-    await writeFile(`${options.root}/${queuePath}`, dumpYaml(queue), "utf8");
-    updatedPaths.push(queuePath);
-  }
-  if (!selectedEvidence.includes(evidencePath)) {
-    selectedEvidence.push(evidencePath);
-    await writeFile(`${options.root}/${selectedChangePath}`, dumpYaml(selectedChange), "utf8");
-    updatedPaths.push(selectedChangePath);
-  }
-  return { updatedPaths, warnings };
+  return {
+    ok: true,
+    queuePath,
+    selectedChangePath,
+    queue,
+    selectedChange,
+    queueEvidence,
+    selectedEvidence,
+  };
 }
 
 async function validateGitRoot(root: string): Promise<{ ok: boolean; errors: string[] }> {

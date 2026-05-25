@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C005
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C005
+title: Atom tasks for C005 M134 publication packet
+status: done
+tasks:
+  - task_id: T001
+    title: Generate PR-ready summary
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+    done_when: >
+      `openworkflow git-automation summary --write` writes the local PR-ready
+      summary for M134.
+  - task_id: T002
+    title: Run read-only publication planning
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Simulator and remote-plan evidence is captured without push, PR creation,
+      PR edit, merge, or Issue mutation.
+  - task_id: T003
+    title: Record exact remote handle
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+    done_when: >
+      The publication packet contains the exact push and draft PR creation
+      commands and forbidden operations.
+  - task_id: T004
+    title: Validate local readiness
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Build, strict summaries, and diff check are current; repository-wide
+      validate limitations are recorded precisely if historical artifacts remain
+      red.

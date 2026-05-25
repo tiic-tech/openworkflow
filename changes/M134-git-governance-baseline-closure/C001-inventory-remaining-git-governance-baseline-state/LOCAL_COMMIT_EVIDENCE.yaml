@@ -1,0 +1,59 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M134-git-governance-baseline-closure:C001
+contract_type: planning
+planning_artifact_type: local_commit_evidence
+title: Local commit evidence for M134 C001
+status: current
+plan_id: M134-git-governance-baseline-closure
+source_plan_id: M134-git-governance-baseline-closure
+change_id: C001
+source_candidate_id: C001
+selected_change_id: C001
+selected_change_path: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+created_at: 2026-05-25T03:21:00+08:00
+branch: codex/m134-git-governance-baseline-closure
+implementation_commit: c55fe13ec76af7beb1c6a15f6ee8e4c677139cfd
+primary_commit:
+  hash: c55fe13ec76af7beb1c6a15f6ee8e4c677139cfd
+  subject: M134-git-governance-baseline-closure C001 inventory baseline
+  scope: >
+    Selected and completed C001, recorded remaining PR and local branch
+    inventory, classified M131/M132 source deltas, PR #8 disposition, local
+    audit publication gates, and updated the M134 queue, summary, and readable
+    view.
+evidence_commit:
+  expected: true
+  reason: >
+    This evidence file is recorded after the primary commit so it can reference
+    the actual commit hash without amending history.
+changed_paths:
+  - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+  - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+  - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md
+  - changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+  - changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml
+  - changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.md
+  - changes/M134-git-governance-baseline-closure/SUMMARY.yaml
+validation:
+  commands_run:
+    - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,title,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeCommit,mergedAt --limit 50
+    - git branch --list --format='%(refname:short) %(objectname) %(upstream:short)'
+    - git merge-base --is-ancestor <branch-head> origin/main
+    - git diff --name-status origin/main..codex/m132-cc-branch-pr-lifecycle-gate -- packages references changes/M131-git-automation-selected-change-commit-gate-hotfix changes/M132-cc-branch-pr-lifecycle-gate docs
+    - node dist/cli/src/index.js validate --root . --json
+    - node dist/cli/src/index.js summaries --root . --strict --json
+    - git diff --check
+remote_mutation_performed: false
+forbidden_operations_not_performed:
+  - git push
+  - gh pr create
+  - gh pr edit
+  - gh pr close
+  - gh pr merge
+  - gh issue edit
+  - branch deletion
+  - force-push
+  - rebase
+  - reset
+  - revert
+  - branch surgery

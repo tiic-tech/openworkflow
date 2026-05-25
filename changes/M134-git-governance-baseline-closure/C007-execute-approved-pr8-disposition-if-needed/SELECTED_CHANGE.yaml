@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C007
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C007
+title: "Execute approved PR #8 disposition if needed"
+status: done
+selected_at: 2026-05-25T08:18:36+08:00
+selection_reason: >
+  User granted highest authorization for all M134 git-governance commands, and C004 recorded the
+  exact PR #8 supersession close handle to execute after M134 draft PR publication.
+source_candidate:
+  id: C007
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C004
+scope:
+  includes:
+    - verify exact approval text
+    - run only the approved PR
+    - record result
+  excludes:
+    - merging PR
+    - branch deletion, force-push, rebase, reset, or revert
+owned_paths:
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - PR
+  - No unrelated remote mutation occurs.
+validation:
+  - gh pr view 8 --repo tiic-tech/openworkflow --json
+    number,url,state,isDraft,title,headRefName,baseRefName,headRefOid,baseRefOid
+  - git diff --check
+remote_operation:
+  approved_command: >
+    gh pr close 8 --repo tiic-tech/openworkflow --comment "Superseded by the M134 git governance
+    baseline closure draft PR after PR #5 merged. M134 re-extracts the still-needed governance
+    deltas onto a fresh main-based branch and keeps local audit evidence under
+    changes/M134-git-governance-baseline-closure/."
+  approval_source:
+    - changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+    - user_message:2026-05-25-m134-highest-git-governance-authorization
+  forbidden_operations:
+    - merge PR
+    - delete the PR
+    - force-push
+    - edit Issues
+    - rebase, reset, revert, or branch surgery
+    - any other remote mutation
+completion:
+  completed_at: 2026-05-25T08:19:49+08:00
+  implementation_changed_files: true
+  result: >
+    C007 closed stale draft PR #8 with the exact C004-approved supersession comment. PR #8 was not
+    merged, its branch was not deleted, and no Issue mutation, force-push, rebase, reset, revert, or
+    unrelated remote mutation occurred.
+  evidence:
+    - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+    - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
+    - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml

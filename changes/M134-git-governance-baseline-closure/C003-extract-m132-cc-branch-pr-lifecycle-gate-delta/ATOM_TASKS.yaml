@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C003
+title: Atom tasks for C003 M132 CC branch and PR lifecycle gate extraction
+status: done
+tasks:
+  - task_id: T001
+    title: Compare M132 source delta
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      M132 source deltas are reviewed and historical branch artifacts are
+      excluded from M134 extraction.
+  - task_id: T002
+    title: Add strict lifecycle validator gate
+    type: implement
+    status: done
+    owned_paths:
+      - packages/core/src/validators/validateRepositoryContracts.ts
+    done_when: >
+      Strict lifecycle queues require a plan-owned branch boundary and completed
+      queues require repo-relative DRAFT_PR_OPERATION_EVIDENCE.yaml.
+  - task_id: T003
+    title: Add strict lifecycle summary gate
+    type: implement
+    status: done
+    owned_paths:
+      - packages/core/src/workflow/summaryHealth.ts
+    done_when: >
+      summaries --strict and handoff trust fail when strict lifecycle evidence
+      is missing.
+  - task_id: T004
+    title: Update source guidance and fixtures
+    type: implement
+    status: done
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - packages/cli/src/dev/verifyRuntimeSurface.ts
+      - references/git-version-control-governance.md
+    done_when: >
+      Decompose-to-changes source guidance and runtime-surface verification
+      cover independent branch and completed queue PR lifecycle gates.
+  - task_id: T005
+    title: Sync generated surfaces and validate
+    type: verify
+    status: done
+    owned_paths:
+      - .agents/skills/ow-decompose-to-changes/SKILL.md
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Generated surfaces are refreshed through repo-local sync and C003 is
+      committed with LOCAL_COMMIT_EVIDENCE.yaml.

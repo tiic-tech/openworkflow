@@ -1,0 +1,41 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C007
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C007
+title: Atom tasks for C007 PR #8 disposition
+status: done
+tasks:
+  - task_id: T001
+    title: Verify PR #8 current state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      GitHub reports PR #8 metadata before disposition.
+  - task_id: T002
+    title: Close PR #8 with supersession comment
+    type: remote_mutation
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      The exact C004-approved `gh pr close 8` command succeeds and does not delete the branch.
+  - task_id: T003
+    title: Verify closed state
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      GitHub reports PR #8 as closed and not merged.
+  - task_id: T004
+    title: Record disposition evidence
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Local evidence records command, result, PR URL, and forbidden operations not performed.

@@ -1,0 +1,62 @@
+schema_version: 0.1.0
+contract_id: selected_change:M134-git-governance-baseline-closure:C002
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M134-git-governance-baseline-closure
+change_id: C002
+title: Extract M131 selected-change commit gate delta onto M134
+status: done
+selected_at: 2026-05-25T03:17:21+08:00
+selection_reason: >
+  User explicitly authorized completing all M134 git-governance changes with highest permission.
+  C002 is the queue's next recommended ready candidate and extracts the M131 selected-change
+  commit-evidence gate onto the fresh M134 branch without importing old stacked branch history.
+source_candidate:
+  id: C002
+  status_at_selection: ready
+  risk: high
+  dependencies:
+    - C001
+scope:
+  includes:
+    - compare M131 source changes against current origin/main
+    - update source files that enforce selected-change commit evidence
+    - add or refresh focused validation fixtures for missing LOCAL_COMMIT_EVIDENCE detection
+    - preserve generated-surface boundaries
+  excludes:
+    - cherry-picking the full historical branch blindly
+    - PR
+    - branch rebase/reset/force-push
+owned_paths:
+  - packages/cli/src/commands/gitAutomation.ts
+  - packages/cli/src/dev/verifyRuntimeSurface.ts
+  - packages/core/src/git/localGitAutomation.ts
+  - changes/M134-git-governance-baseline-closure/
+acceptance:
+  - A selected change with implementation_changed_files cannot pass strict handoff without
+    LOCAL_COMMIT_EVIDENCE.yaml.
+  - Git-automation commit evidence is linked to selected-change completion.
+  - Existing M133/M134 strict summary checks still pass.
+validation:
+  - npm run build
+  - npm run validate
+  - npm run verify:runtime-surface
+  - node dist/cli/src/index.js summaries --root . --strict --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T03:17:21+08:00
+  implementation_changed_files: true
+  result: >
+    C002 reintroduced the M131 strict selected-change commit-evidence gate on the M134 branch.
+    Strict completed implementation candidates now require --commit-evidence, selected-change
+    artifact inference supports list-shaped selection.artifacts, and required evidence backfill
+    fails closed when queue or selected-change completion records cannot be updated.
+  evidence:
+    - packages/cli/src/commands/gitAutomation.ts
+    - packages/core/src/git/localGitAutomation.ts
+    - packages/cli/src/dev/verifyRuntimeSurface.ts
+    - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+    - changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+commit_boundary:
+  expected: one coherent local implementation commit for M134 C002, plus a follow-up evidence commit
+  implementation_changed_files: true

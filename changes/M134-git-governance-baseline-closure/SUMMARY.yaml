@@ -1,0 +1,112 @@
+schema_version: 0.1.0
+contract_id: summary:M134-git-governance-baseline-closure
+contract_type: planning
+planning_artifact_type: summary
+plan_id: M134-git-governance-baseline-closure
+title: "Summary for git governance baseline closure"
+status: complete
+source:
+  kind: mixed
+  summary: >
+    M134 starts after PR #5 merged into main at
+    6612aa3e06996ad0151e3686d0c972677fc892c6. It closes remaining OW git
+    governance before formal code development resumes: inventory remaining
+    local governance branches, extract necessary M131/M132 deltas onto a fresh
+    branch, decide PR #8 disposition, prepare publication gates, and record a
+    final baseline handoff.
+  refs:
+    - user_input:2026-05-25-complete-remaining-git-governance
+    - changes/M133-remaining-pr5-merge-governance/M133_FINAL_AUDIT_HANDOFF.md
+scope_boundary: >
+  Git governance baseline closure after PR #5 merged.
+branch_boundary: codex/m134-git-governance-baseline-closure
+target_base:
+  remote: origin
+  branch: main
+  head_oid: 6612aa3e06996ad0151e3686d0c972677fc892c6
+candidate_count: 8
+completed_candidate_id: C008
+completed_change_id: C008
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
+outputs:
+  candidate_changes_yaml: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.yaml
+  candidate_changes_md: changes/M134-git-governance-baseline-closure/CANDIDATE_CHANGES.md
+  summary: changes/M134-git-governance-baseline-closure/SUMMARY.yaml
+  selected_change_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/SELECTED_CHANGE.yaml
+  atom_tasks_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/ATOM_TASKS.yaml
+  implementation_brief_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/IMPLEMENTATION_BRIEF.md
+  baseline_inventory_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/GIT_GOVERNANCE_BASELINE_INVENTORY.md
+  local_commit_evidence_c001: changes/M134-git-governance-baseline-closure/C001-inventory-remaining-git-governance-baseline-state/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/SELECTED_CHANGE.yaml
+  atom_tasks_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/ATOM_TASKS.yaml
+  implementation_brief_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/IMPLEMENTATION_BRIEF.md
+  m131_delta_extraction_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/M131_DELTA_EXTRACTION.md
+  local_commit_evidence_c002: changes/M134-git-governance-baseline-closure/C002-extract-m131-selected-change-commit-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/SELECTED_CHANGE.yaml
+  atom_tasks_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/ATOM_TASKS.yaml
+  implementation_brief_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/IMPLEMENTATION_BRIEF.md
+  m132_delta_extraction_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/M132_DELTA_EXTRACTION.md
+  local_commit_evidence_c003: changes/M134-git-governance-baseline-closure/C003-extract-m132-cc-branch-pr-lifecycle-gate-delta/LOCAL_COMMIT_EVIDENCE.yaml
+  selected_change_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/SELECTED_CHANGE.yaml
+  atom_tasks_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/ATOM_TASKS.yaml
+  implementation_brief_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/IMPLEMENTATION_BRIEF.md
+  pr8_disposition_decision_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/PR8_DISPOSITION_DECISION.md
+  local_commit_evidence_c004: changes/M134-git-governance-baseline-closure/C004-decide-pr8-disposition-after-pr5-merge/LOCAL_COMMIT_EVIDENCE.yaml
+  pr_ready_summary: changes/M134-git-governance-baseline-closure/PR_READY_SUMMARY.md
+  selected_change_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/SELECTED_CHANGE.yaml
+  atom_tasks_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/ATOM_TASKS.yaml
+  implementation_brief_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/IMPLEMENTATION_BRIEF.md
+  publication_packet_c005: changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  selected_change_c006: changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
+  local_commit_evidence_c006: changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
+  draft_pr_operation_evidence_c006: changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+  selected_change_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+  local_commit_evidence_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
+  pr8_disposition_evidence_c007: changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+  selected_change_c008: changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/SELECTED_CHANGE.yaml
+  final_baseline_handoff_c008: changes/M134-git-governance-baseline-closure/C008-complete-formal-git-governance-baseline-handoff/M134_FINAL_BASELINE_HANDOFF.md
+key_dependencies:
+  - "PR #5 merged into main at 6612aa3e06996ad0151e3686d0c972677fc892c6."
+  - "PR #8 is closed as superseded by M134 and was not merged."
+  - "M131/M132 local governance branches are not ancestors of origin/main."
+risks:
+  - id: R001
+    level: high
+    description: Extracting M131/M132 deltas from stacked branches can accidentally import stale historical governance artifacts.
+    mitigation: Use rebase-free source comparison and apply only necessary deltas onto M134.
+  - id: R002
+    level: high
+    description: PR #8 disposition and M134 publication are remote mutations.
+    mitigation: Require high-risk decision packets and exact operation-level approval.
+  - id: R003
+    level: medium
+    description: Generated .agents/.openworkflow surfaces can drift if patched manually.
+    mitigation: Update source contracts/templates and regenerate with approved commands only.
+unresolved_questions: []
+deferred_features:
+  - formal-code-development-after-baseline
+validation:
+  commands_run:
+    - node dist/cli/src/index.js resume --root . --json
+    - gh pr list --repo tiic-tech/openworkflow --state open --json number,url,title,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeable,reviewDecision,statusCheckRollup --limit 30
+    - git branch --list --format='%(refname:short) %(objectname:short) %(upstream:short)'
+    - git switch -c codex/m134-git-governance-baseline-closure origin/main
+    - git status --short --branch
+    - gh pr list --repo tiic-tech/openworkflow --state all --json number,url,title,state,isDraft,headRefName,baseRefName,headRefOid,baseRefOid,mergeCommit,mergedAt --limit 50
+    - git branch --list --format='%(refname:short) %(objectname) %(upstream:short)'
+    - git merge-base --is-ancestor <branch-head> origin/main
+  notes: |
+    - M134 branch was created from current origin/main, not from M130/M131/M132/M133 stacked branches.
+    - No remote mutation was performed while creating M134.
+    - C001 classified the remaining git-governance baseline state.
+    - PR #8 is the only remaining open PR and needs explicit disposition.
+    - M131/M132 contain source deltas that must be extracted onto M134.
+    - C002 extracted the M131 selected-change commit-evidence gate onto M134.
+    - C003 extracted the M132 strict git lifecycle branch and PR gate onto M134.
+    - C004 decided PR #8 should be closed as superseded after M134 publication exists.
+    - C005 prepared PR_READY_SUMMARY.md and the exact M134 push/draft-PR publication handle.
+    - C006 published draft PR #9 for M134.
+    - C007 closed stale draft PR #8 as superseded by M134.
+    - C008 recorded the final baseline handoff and remaining final branch synchronization gate.
