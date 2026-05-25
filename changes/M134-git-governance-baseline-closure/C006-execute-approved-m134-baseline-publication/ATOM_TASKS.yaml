@@ -1,0 +1,42 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M134-git-governance-baseline-closure:C006
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M134-git-governance-baseline-closure
+change_id: C006
+title: Atom tasks for C006 approved M134 publication
+status: done
+tasks:
+  - task_id: T001
+    title: Push branch
+    type: remote_mutation
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      `git push -u origin codex/m134-git-governance-baseline-closure` succeeds.
+  - task_id: T002
+    title: Create draft PR
+    type: remote_mutation
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      `gh pr create` creates a draft PR from M134 to main.
+  - task_id: T003
+    title: Verify PR metadata
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      GitHub reports PR #9 as open, draft, base main, and head M134.
+  - task_id: T004
+    title: Record publication evidence
+    type: document
+    status: done
+    owned_paths:
+      - changes/M134-git-governance-baseline-closure/
+    done_when: >
+      Local evidence records commands, result, PR URL, and forbidden operations
+      not performed.
