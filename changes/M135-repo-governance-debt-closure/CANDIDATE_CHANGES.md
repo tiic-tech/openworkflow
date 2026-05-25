@@ -1,6 +1,6 @@
 # M135 Repo Governance Debt Closure
 
-Status: active
+Status: complete
 
 ## Scope
 
@@ -16,7 +16,7 @@ default development baseline.
 
 - Branch boundary: `codex/m135-repo-governance-debt-closure`
 - Git lifecycle gate: strict
-- Next recommended candidate: C007
+- Next recommended candidate: none
 - Selected-change commit gate: strict
 
 ## Candidates
@@ -138,7 +138,7 @@ Result:
 
 ### C007 - Complete repo governance validation debt handoff
 
-Status: ready
+Status: done
 Risk: medium
 
 Record the final repo governance debt state after repairs and state whether whole-repo validation is
@@ -149,3 +149,9 @@ Acceptance:
 - The handoff states whether `npm run validate` is clean.
 - Any remaining debt is explicit and bounded.
 - No unauthorized remote operation is recorded.
+
+Result:
+
+- Recorded `M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md`.
+- `npm run build`, `npm run validate`, `summaries --strict`, `resume`, and `git diff --check` passed.
+- No remaining M135 governance validation debt is deferred.

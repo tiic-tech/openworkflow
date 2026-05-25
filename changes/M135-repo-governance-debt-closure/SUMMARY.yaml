@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M135-repo-governance-debt-closure
 title: Summary for repo-wide governance debt closure
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -22,9 +22,9 @@ target_base:
   remote: origin
   branch: main
 candidate_count: 7
-completed_candidate_id: C006
-completed_change_id: C006
-next_recommended_candidate_id: C007
+completed_candidate_id: C007
+completed_change_id: C007
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -43,6 +43,8 @@ outputs:
   parse_schema_edge_repair_c005: changes/M135-repo-governance-debt-closure/C005-repair-parse-and-schema-edge-artifacts/PARSE_SCHEMA_EDGE_REPAIR.md
   selected_change_c006: changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/SELECTED_CHANGE.yaml
   regression_guardrail_decision_c006: changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
+  selected_change_c007: changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
+  final_governance_debt_handoff_c007: changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
 key_dependencies:
   - "M134 is complete and PR #9 contains the git-governance baseline closure."
   - "`npm run validate` still fails on historical non-M134 artifacts."
@@ -84,3 +86,4 @@ validation:
     - C005 removed the scoped parse/schema edge failures; C006 will decide whether additional
       regression guardrails are needed.
     - C006 determined no source guardrail changes are needed because `npm run validate` now passes.
+    - C007 completed M135 with clean build, validate, summaries strict, resume, and diff checks.

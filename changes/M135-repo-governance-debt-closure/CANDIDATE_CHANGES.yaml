@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M135-repo-governance-debt-closure
 title: Candidate changes for repo-wide governance debt closure
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -75,7 +75,7 @@ observed_state:
       - examples/m98-smart-city-replay PROTO_PROMPT_PACK.yaml prototype_system_contract shape
         mismatch
       - incomplete HIGH_RISK_DECISION_REPORT.md sections in M101, M102, M105, and M117
-next_recommended_candidate_id: C007
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -408,7 +408,7 @@ changes:
         - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
         - changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C007
-    status: ready
+    status: done
     title: Complete repo governance validation debt handoff
     purpose: >
       Record the final repo governance debt status after C002-C006 and state whether whole-repo
@@ -443,6 +443,26 @@ changes:
       - The handoff states whether `npm run validate` is clean.
       - Any remaining debt is explicit, bounded, and not hidden.
       - No unauthorized remote operation is recorded.
+    selection:
+      selected_change_id: C007
+      selected_at: 2026-05-25T10:18:00+08:00
+      reason: >
+        User granted highest authorization for all M135 governance work. C007 is the final handoff
+        after C002-C006 repaired the repository governance validation debt and `npm run validate`
+        passed.
+      artifacts:
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/ATOM_TASKS.yaml
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T10:18:00+08:00
+      implementation_changed_files: true
+      result: >
+        C007 completed the M135 handoff. Whole-repo validation is clean, resume and summaries strict
+        trust gates pass, and no remaining M135 governance debt is deferred.
+      evidence:
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: create
@@ -656,3 +676,52 @@ operations:
     after_status: ready
     evidence:
       - npm run validate
+  - operation_id: OP016
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      C007 is the final handoff after C002-C006 completed and validation passed.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/ATOM_TASKS.yaml
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP017
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C007 recorded the final governance debt handoff with clean build, validate, resume, summaries
+      strict, and diff whitespace checks.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+  - operation_id: OP018
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+      - C004
+      - C005
+      - C006
+      - C007
+    actor: agent
+    reason: |
+      All M135 candidates are complete and whole-repo validation is clean.
+    changed_at: 2026-05-25T10:18:00+08:00
+    before_status: active
+    after_status: complete
+    evidence:
+      - npm run build
+      - npm run validate
+      - node dist/cli/src/index.js resume --root . --json
+      - node dist/cli/src/index.js summaries --root . --strict --json
+      - git diff --check

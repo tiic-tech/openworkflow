@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M135-repo-governance-debt-closure:C007
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M135-repo-governance-debt-closure
+change_id: C007
+title: Atom tasks for C007 final governance debt handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Run final validation gates
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      Build, repository validation, summaries strict, resume, and diff whitespace checks have
+      passing evidence.
+  - task_id: T002
+    title: Record final governance baseline
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      The final handoff states whether whole-repo validation is clean and whether remaining debt is
+      deferred.
+  - task_id: T003
+    title: Close M135 queue
+    type: document
+    status: done
+    owned_paths:
+      - changes/M135-repo-governance-debt-closure/
+    done_when: >
+      M135 queue status is complete with C007 as the completed candidate.
