@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+contract_id: selected_change:M136-openworkflow-0.1.1-system-cli-release:C003
+contract_type: planning
+planning_artifact_type: selected_change
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+change_id: C003
+title: Complete 0.1.1 system CLI release handoff
+status: done
+selected_at: 2026-05-25T09:28:00+08:00
+selection_reason: >
+  C003 closes M136 after C001 recorded npm registry immutability and C002 installed the current
+  main build as the system-level CLI.
+source_candidate:
+  id: C003
+  status_at_selection: ready
+  risk: low
+  dependencies:
+    - C001
+    - C002
+scope:
+  includes:
+    - record final validation
+    - record system CLI path and command surface
+    - state that future public registry release needs a new version number
+  excludes:
+    - publishing 0.1.1 over the existing npm artifact
+    - merging or publishing unrelated work
+owned_paths:
+  - changes/M136-openworkflow-0.1.1-system-cli-release/
+acceptance:
+  - M136 states whether 0.1.1 is available through the system CLI.
+  - Remaining registry publication constraint is explicit.
+validation:
+  - npm run validate
+  - openworkflow resume --root . --json
+  - git diff --check
+completion:
+  completed_at: 2026-05-25T09:28:00+08:00
+  implementation_changed_files: true
+  result: >
+    M136 is complete locally. The system-level `openworkflow` command now uses the current 0.1.1
+    build from this repository. The npm registry artifact for 0.1.1 remains the immutable
+    2026-05-19 publication, so a future public registry release needs a new version number.
+  evidence:
+    - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+    - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/LOCAL_COMMIT_EVIDENCE.yaml

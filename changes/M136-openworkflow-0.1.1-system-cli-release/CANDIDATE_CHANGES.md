@@ -1,6 +1,6 @@
 # M136 OpenWorkflow 0.1.1 System CLI Release
 
-Status: active
+Status: complete
 
 ## Scope
 
@@ -41,6 +41,12 @@ Result:
 
 ### C003 - Complete 0.1.1 system CLI release handoff
 
-Status: ready
+Status: done
 
 Record final validation, system CLI evidence, and next-version guidance.
+
+Result:
+
+- System `openworkflow` is available at `/opt/homebrew/bin/openworkflow`.
+- `openworkflow resume --root . --json` passes.
+- npm registry `0.1.1` remains immutable; future public registry release needs a new version.

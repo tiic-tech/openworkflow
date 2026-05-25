@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M136-openworkflow-0.1.1-system-cli-release
 title: Summary for OpenWorkflow 0.1.1 system CLI release
-status: active
+status: complete
 source:
   kind: mixed
   summary: >
@@ -20,9 +20,9 @@ target_base:
   remote: origin
   branch: main
 candidate_count: 3
-completed_candidate_id: C002
-completed_change_id: C002
-next_recommended_candidate_id: C003
+completed_candidate_id: C003
+completed_change_id: C003
+next_recommended_candidate_id: null
 selected_candidate_id: null
 selected_change_id: null
 outputs:
@@ -33,6 +33,8 @@ outputs:
   registry_release_feasibility_c001: changes/M136-openworkflow-0.1.1-system-cli-release/C001-record-release-feasibility-and-registry-immutability/REGISTRY_RELEASE_FEASIBILITY.md
   selected_change_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SELECTED_CHANGE.yaml
   system_cli_install_evidence_c002: changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
+  selected_change_c003: changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/SELECTED_CHANGE.yaml
+  final_release_handoff_c003: changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
 risks:
   - id: R001
     level: high
@@ -53,3 +55,4 @@ validation:
     - Registry 0.1.1 exists and cannot be overwritten.
     - C001 selected the system CLI install route for current main 0.1.1.
     - C002 installed and verified the system-level `openworkflow` command.
+    - C003 completed the system CLI release handoff.

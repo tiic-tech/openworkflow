@@ -1,0 +1,26 @@
+schema_version: 0.1.0
+contract_id: atom_tasks:M136-openworkflow-0.1.1-system-cli-release:C003
+contract_type: planning
+planning_artifact_type: atom_tasks
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+change_id: C003
+title: Atom tasks for C003 release handoff
+status: done
+tasks:
+  - task_id: T001
+    title: Run final validation
+    type: verify
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      `npm run validate`, system `openworkflow resume --root . --json`, and `git diff --check`
+      have passing evidence.
+  - task_id: T002
+    title: Record final handoff
+    type: document
+    status: done
+    owned_paths:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/
+    done_when: >
+      The handoff states the installed system CLI state and npm registry constraint.

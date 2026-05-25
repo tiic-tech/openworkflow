@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M136-openworkflow-0.1.1-system-cli-release
 title: Candidate changes for OpenWorkflow 0.1.1 system CLI release
-status: active
+status: complete
 source:
   kind: mixed
   refs:
@@ -50,7 +50,7 @@ observed_state:
       The existing system command showed only init, validate, sync, doctor, and clean; it did not
       expose current commands such as resume, handoff, inspect, context, summaries, or
       git-automation.
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -153,7 +153,7 @@ changes:
         - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
         - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: ready
+    status: done
     title: Complete 0.1.1 system CLI release handoff
     purpose: >
       Close M136 with validation, installed CLI evidence, and next-version guidance for any future
@@ -182,6 +182,26 @@ changes:
     acceptance:
       - M136 states whether 0.1.1 is available through the system CLI.
       - Remaining registry publication constraint is explicit.
+    selection:
+      selected_change_id: C003
+      selected_at: 2026-05-25T09:28:00+08:00
+      reason: >
+        C003 closes M136 after C001 recorded npm registry immutability and C002 installed the
+        current main build as the system-level CLI.
+      artifacts:
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/SELECTED_CHANGE.yaml
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/ATOM_TASKS.yaml
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T09:28:00+08:00
+      implementation_changed_files: true
+      result: >
+        M136 is complete locally. The system-level `openworkflow` command now uses the current
+        0.1.1 build from this repository. The npm registry artifact for 0.1.1 remains the immutable
+        2026-05-19 publication, so a future public registry release needs a new version number.
+      evidence:
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+        - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: create
@@ -260,3 +280,43 @@ operations:
     after_status: done
     evidence:
       - changes/M136-openworkflow-0.1.1-system-cli-release/C002-install-current-main-0.1.1-as-system-level-cli/SYSTEM_CLI_INSTALL_EVIDENCE.md
+  - operation_id: OP007
+    operation_type: select
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: |
+      C003 closes M136 after system CLI install and final validation.
+    changed_at: 2026-05-25T09:28:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/SELECTED_CHANGE.yaml
+  - operation_id: OP008
+    operation_type: complete
+    target_candidate_ids:
+      - C003
+    actor: agent
+    reason: >
+      C003 recorded final system CLI release handoff.
+    changed_at: 2026-05-25T09:28:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M136-openworkflow-0.1.1-system-cli-release/C003-complete-0.1.1-system-cli-release-handoff/M136_FINAL_RELEASE_HANDOFF.md
+  - operation_id: OP009
+    operation_type: status_change
+    target_candidate_ids:
+      - C001
+      - C002
+      - C003
+    actor: agent
+    reason: |
+      All M136 release candidates are complete.
+    changed_at: 2026-05-25T09:28:00+08:00
+    before_status: active
+    after_status: complete
+    evidence:
+      - npm run validate
+      - openworkflow resume --root . --json
+      - git diff --check
