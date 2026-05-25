@@ -147,7 +147,7 @@ Result:
 
 ### C006 - Execute approved M134 baseline publication
 
-Status: ready
+Status: done
 Risk: high
 
 Run only approved M134 push and draft PR creation if explicitly authorized.
@@ -160,7 +160,7 @@ Acceptance:
 
 ### C007 - Execute approved PR #8 disposition if needed
 
-Status: candidate
+Status: done
 Risk: high
 
 Run only the approved PR #8 cleanup action if C004 recommends one and the user approves it.
@@ -170,9 +170,15 @@ Acceptance:
 - PR #8 final disposition matches exact user approval.
 - No unrelated remote mutation occurs.
 
+Result:
+
+- Closed stale draft PR #8 as superseded by M134.
+- Did not merge PR #8 or delete its branch.
+- Wrote C007 PR #8 disposition evidence.
+
 ### C008 - Complete formal git governance baseline handoff
 
-Status: candidate
+Status: ready
 Risk: medium
 
 Record whether OW git governance is complete enough for formal code development.

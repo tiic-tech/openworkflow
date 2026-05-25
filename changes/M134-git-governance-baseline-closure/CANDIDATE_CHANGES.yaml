@@ -107,7 +107,7 @@ observed_state:
     - branch: codex/m133-remaining-pr5-merge-governance
       head: 040f20e
       note: Contains local M133 audit evidence after PR
-next_recommended_candidate_id: C007
+next_recommended_candidate_id: C008
 changes:
   - id: C001
     status: done
@@ -470,7 +470,7 @@ changes:
         - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
         - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C007
-    status: ready
+    status: done
     title: "Execute approved PR #8 disposition if needed"
     purpose: >
       If C004 determines PR #8 requires remote cleanup and the user gives exact approval, execute
@@ -499,8 +499,28 @@ changes:
     acceptance:
       - "PR #8 final disposition matches exact user approval."
       - No unrelated remote mutation occurs.
+    selection:
+      selected_change_id: C007
+      selected_at: 2026-05-25T08:18:36+08:00
+      reason: >
+        User granted highest authorization for all M134 git-governance commands, and C004 recorded
+        the exact PR #8 supersession close handle to execute after M134 draft PR publication.
+      artifacts:
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/ATOM_TASKS.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/IMPLEMENTATION_BRIEF.md
+    completion:
+      completed_at: 2026-05-25T08:19:49+08:00
+      implementation_changed_files: true
+      result: >
+        C007 closed stale draft PR #8 with the exact C004-approved supersession comment. PR #8 was
+        not merged, its branch was not deleted, and no Issue mutation, force-push, rebase, reset,
+        revert, or unrelated remote mutation occurred.
+      evidence:
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+        - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
   - id: C008
-    status: candidate
+    status: ready
     title: Complete formal git governance baseline handoff
     purpose: >
       Record the final OW git governance baseline status after local governance deltas, M134
@@ -776,3 +796,88 @@ operations:
     after_status: ready
     evidence:
       - changes/M134-git-governance-baseline-closure/C005-prepare-m134-baseline-publication-packet/M134_PUBLICATION_PACKET.md
+  - operation_id: OP017
+    operation_type: select
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      User granted highest permission for all M134 git-governance commands and C005 recorded the
+      exact approved branch push and draft PR creation handle.
+    changed_at: 2026-05-25T03:40:00+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP018
+    operation_type: complete
+    target_candidate_ids:
+      - C006
+    actor: agent
+    reason: >
+      C006 pushed the M134 branch to origin and created draft PR #9 without merge, PR #8 mutation,
+      Issue mutation, branch deletion, force-push, rebase, reset, or revert.
+    changed_at: 2026-05-25T03:40:00+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
+      - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/LOCAL_COMMIT_EVIDENCE.yaml
+  - operation_id: OP019
+    operation_type: status_change
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C006 published the M134 draft PR, so the C004-approved PR #8 supersession disposition is now
+      ready to execute.
+    changed_at: 2026-05-25T08:18:36+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C006-execute-approved-m134-baseline-publication/PUBLICATION_EVIDENCE.md
+      - changes/M134-git-governance-baseline-closure/DRAFT_PR_OPERATION_EVIDENCE.yaml
+  - operation_id: OP020
+    operation_type: select
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      User granted highest authorization for all M134 git-governance commands, and C004 recorded the
+      exact PR #8 close-with-supersession-comment handle.
+    changed_at: 2026-05-25T08:18:36+08:00
+    before_status: ready
+    after_status: selected
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/SELECTED_CHANGE.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/ATOM_TASKS.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/IMPLEMENTATION_BRIEF.md
+  - operation_id: OP021
+    operation_type: complete
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: >
+      C007 closed stale draft PR #8 with the exact C004-approved supersession comment after M134
+      draft PR publication. The PR was not merged and its branch was not deleted.
+    changed_at: 2026-05-25T08:19:49+08:00
+    before_status: selected
+    after_status: done
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.md
+  - operation_id: OP022
+    operation_type: status_change
+    target_candidate_ids:
+      - C008
+    actor: agent
+    reason: >
+      C001-C007 are complete, so the formal M134 git governance baseline handoff is ready.
+    changed_at: 2026-05-25T08:19:49+08:00
+    before_status: candidate
+    after_status: ready
+    evidence:
+      - changes/M134-git-governance-baseline-closure/C007-execute-approved-pr8-disposition-if-needed/PR8_DISPOSITION_EVIDENCE.yaml
