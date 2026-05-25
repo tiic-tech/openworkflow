@@ -48,4 +48,5 @@ completion:
     trust gates pass, and no remaining M135 governance debt is deferred.
   evidence:
     - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+    - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
     - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/LOCAL_COMMIT_EVIDENCE.yaml

@@ -462,6 +462,7 @@ changes:
         trust gates pass, and no remaining M135 governance debt is deferred.
       evidence:
         - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+        - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
         - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
@@ -703,6 +704,7 @@ operations:
     after_status: done
     evidence:
       - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
   - operation_id: OP018
     operation_type: status_change
     target_candidate_ids:
@@ -725,3 +727,16 @@ operations:
       - node dist/cli/src/index.js resume --root . --json
       - node dist/cli/src/index.js summaries --root . --strict --json
       - git diff --check
+  - operation_id: OP019
+    operation_type: remote_draft_pr
+    target_candidate_ids:
+      - C007
+    actor: agent
+    reason: |
+      User granted highest authorization for M135 git governance work; branch was pushed and draft PR was opened after local validation passed.
+    changed_at: 2026-05-25T10:30:00+08:00
+    before_status: local_complete
+    after_status: draft_pr_open
+    evidence:
+      - changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+      - https://github.com/tiic-tech/openworkflow/pull/10

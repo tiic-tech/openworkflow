@@ -49,5 +49,6 @@ Separate user-requested docs commit:
 M135 is complete locally. No remaining M135 governance validation debt is deferred. The next
 development baseline is clean whole-repo validation plus per-candidate local commit evidence.
 
-Remote push and draft PR are tracked separately as git-governance operations and do not imply merge
-approval.
+Remote push and draft PR are tracked as git-governance operations and do not imply merge approval.
+
+Draft PR: https://github.com/tiic-tech/openworkflow/pull/10

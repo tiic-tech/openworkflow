@@ -45,6 +45,8 @@ outputs:
   regression_guardrail_decision_c006: changes/M135-repo-governance-debt-closure/C006-add-governance-debt-regression-guardrails-if-needed/REGRESSION_GUARDRAIL_DECISION.md
   selected_change_c007: changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/SELECTED_CHANGE.yaml
   final_governance_debt_handoff_c007: changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/M135_FINAL_GOVERNANCE_DEBT_HANDOFF.md
+  draft_pr_operation_evidence_c007: changes/M135-repo-governance-debt-closure/C007-complete-repo-governance-validation-debt-handoff/DRAFT_PR_OPERATION_EVIDENCE.md
+  pr_ready_summary: changes/M135-repo-governance-debt-closure/PR_READY_SUMMARY.md
 key_dependencies:
   - "M134 is complete and PR #9 contains the git-governance baseline closure."
   - "`npm run validate` still fails on historical non-M134 artifacts."
@@ -87,3 +89,4 @@ validation:
       regression guardrails are needed.
     - C006 determined no source guardrail changes are needed because `npm run validate` now passes.
     - C007 completed M135 with clean build, validate, summaries strict, resume, and diff checks.
+    - M135 branch was pushed and draft PR #10 was opened.
