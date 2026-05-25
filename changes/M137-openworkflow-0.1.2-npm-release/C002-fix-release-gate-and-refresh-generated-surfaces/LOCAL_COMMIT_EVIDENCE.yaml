@@ -1,0 +1,26 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M137-openworkflow-0.1.2-npm-release:C002
+contract_type: evidence
+plan_id: M137-openworkflow-0.1.2-npm-release
+candidate_id: C002
+change_id: C002
+selected_change_id: C002
+title: Local commit evidence for release-gate repair
+status: complete
+branch: codex/m137-openworkflow-0.1.2-npm-release
+primary_commit: 364341d
+implementation_changed_files: true
+affected_paths:
+  - packages/core/src/commands/registry.ts
+  - .openworkflow/audit/CONTEXT_PACKETS.yaml
+  - .agents/skills/ow-proto/SKILL.md
+validation:
+  commands_run:
+    - npm run verify:e2e-workflow
+    - npm run verify:clean
+    - openworkflow sync --root . --tools codex --json
+    - openworkflow handoff --root . --json
+  result: pass
+notes:
+  - The initial publish attempt exposed source protocol drift before registry upload.
+  - Source registry text was updated first; generated surfaces were refreshed with openworkflow sync.

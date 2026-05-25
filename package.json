@@ -1,6 +1,6 @@
 {
   "name": "@tiic-tech/openworkflow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Contract-first workflow system for AI-assisted software development.",
   "license": "MIT",
   "repository": {

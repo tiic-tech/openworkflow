@@ -1,0 +1,171 @@
+schema_version: 0.1.0
+contract_id: candidate_changes:M137-openworkflow-0.1.2-npm-release
+contract_type: planning
+planning_artifact_type: candidate_changes
+plan_id: M137-openworkflow-0.1.2-npm-release
+title: Candidate changes for OpenWorkflow 0.1.2 npm release
+status: complete
+source:
+  kind: user_request
+  refs:
+    - user_input:2026-05-25-publish-0.1.2-and-update-local
+    - npm_registry:@tiic-tech/openworkflow@0.1.2
+  summary: >
+    User requested publishing OpenWorkflow 0.1.2 and updating the local system CLI. The package
+    version was bumped to 0.1.2, release-gate drift was repaired, all publish preflight scripts
+    passed, the package was published to npm, and the local system CLI was updated from the
+    registry package.
+queue_policy:
+  branch_boundary: codex/m137-openworkflow-0.1.2-npm-release
+  git_lifecycle_gate: strict
+  target_remote: origin
+  target_base_branch: main
+  source_of_truth: CANDIDATE_CHANGES.yaml
+  readable_view: CANDIDATE_CHANGES.md
+  selected_change_commit_gate: strict
+scope_control:
+  current_boundary: >
+    OpenWorkflow 0.1.2 release preparation, npm publication attempt, and local system CLI update.
+  boundary_type: release_governance
+  in_scope_rule: >
+    Bump package version to 0.1.2, fix any release-gate blocker required by prepublishOnly, refresh
+    generated OpenWorkflow surfaces from source, attempt npm publish, and update the local system
+    CLI to the current 0.1.2 build.
+  out_of_scope_rule: >
+    Do not bypass prepublishOnly, publish from an unvalidated tarball, force registry credentials,
+    or mutate unrelated queues.
+observed_state:
+  captured_at: 2026-05-25T09:24:00+08:00
+  branch: codex/m137-openworkflow-0.1.2-npm-release
+  base_main_head: 8ecadbb9b68fe50b0bd4d41763abc4d5075b0baf
+  package_version_before: 0.1.1
+  package_version_after: 0.1.2
+  registry_0_1_2:
+    status: published
+    version: 0.1.2
+    git_head: cb767e5ffe3c5dd93b4f3b5b182c5b5d9da77425
+    published_at: 2026-05-25T01:44:22.571Z
+    evidence: "npm view @tiic-tech/openworkflow@0.1.2 version gitHead time --json"
+  npm_identity:
+    status: authorized
+    evidence: "npm whoami returned tiic-tech; npm access list packages @tiic-tech returned @tiic-tech/openworkflow read-write"
+  local_system_cli:
+    status: updated
+    installed_package: "@tiic-tech/openworkflow@0.1.2"
+    install_source: npm_registry
+    command_path: /opt/homebrew/bin/openworkflow
+next_recommended_candidate_id: null
+changes:
+  - id: C001
+    status: done
+    title: Bump package version to 0.1.2 and verify package readiness
+    purpose: >
+      Prepare the package metadata and dist output for a new immutable npm version.
+    owned_paths:
+      - package.json
+      - package-lock.json
+      - dist/**
+      - changes/M137-openworkflow-0.1.2-npm-release/
+    risk: medium
+    validation:
+      - npm view @tiic-tech/openworkflow@0.1.2 version dist.tarball gitHead time --json
+      - npm version 0.1.2 --no-git-tag-version
+      - npm run build
+      - npm run validate
+      - npm pack --dry-run --json
+    acceptance:
+      - package.json and package-lock.json both declare 0.1.2.
+      - Dist builds from current source.
+      - npm pack dry-run reports @tiic-tech/openworkflow@0.1.2.
+    completion:
+      completed_at: 2026-05-25T09:21:00+08:00
+      result: >
+        Version metadata was bumped to 0.1.2. Build, repository validation, and pack dry-run passed.
+      evidence:
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/PUBLICATION_EVIDENCE.md
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C002
+    status: done
+    title: Repair 0.1.2 release-gate drift and refresh generated surfaces
+    purpose: >
+      Fix source protocol drift discovered by prepublishOnly so the public package is not released
+      with stale proto orchestration guidance.
+    owned_paths:
+      - packages/core/src/commands/registry.ts
+      - .openworkflow/audit/CONTEXT_PACKETS.yaml
+      - .agents/skills/ow-proto/SKILL.md
+      - changes/M137-openworkflow-0.1.2-npm-release/
+    risk: medium
+    validation:
+      - npm run verify:e2e-workflow
+      - npm run verify:clean
+      - openworkflow sync --root . --tools codex --json
+      - openworkflow handoff --root . --json
+    acceptance:
+      - /ow:proto source protocol explicitly routes post_validate.status fail back to prompt repair.
+      - /ow:proto source protocol explicitly states batch prototype image generation readiness.
+      - Generated Codex ow-proto skill and context packet are refreshed from source.
+    completion:
+      completed_at: 2026-05-25T09:29:00+08:00
+      result: >
+        Release-gate drift was repaired in the command registry. `openworkflow sync` refreshed the
+        generated proto skill and context packet; handoff returned ok.
+      evidence:
+        - changes/M137-openworkflow-0.1.2-npm-release/C002-fix-release-gate-and-refresh-generated-surfaces/LOCAL_COMMIT_EVIDENCE.yaml
+  - id: C003
+    status: done
+    title: Publish 0.1.2 to npm and update local system CLI
+    purpose: >
+      Publish the validated 0.1.2 tarball to npm and make the system-level openworkflow command use
+      the same version.
+    owned_paths:
+      - changes/M137-openworkflow-0.1.2-npm-release/
+    risk: high
+    validation:
+      - npm publish --access public
+      - npm install -g .
+      - openworkflow --help
+      - openworkflow resume --root . --json
+      - npm list -g @tiic-tech/openworkflow --depth=0
+    acceptance:
+      - Public npm registry exposes @tiic-tech/openworkflow@0.1.2.
+      - Local system CLI resolves to @tiic-tech/openworkflow@0.1.2.
+    completion:
+      completed_at: 2026-05-25T09:45:00+08:00
+      result: >
+        Public npm publication is complete. The system-level CLI was reinstalled from
+        @tiic-tech/openworkflow@0.1.2 on the npm registry and `openworkflow resume --root . --json`
+        succeeds.
+      evidence:
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/PUBLICATION_EVIDENCE.md
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/LOCAL_COMMIT_EVIDENCE.yaml
+operations:
+  - operation_id: OP001
+    operation_type: release_preflight
+    target_candidate_ids:
+      - C001
+      - C002
+    actor: agent
+    changed_at: 2026-05-25T09:29:00+08:00
+    result: prepublishOnly checks pass after source protocol repair
+  - operation_id: OP002
+    operation_type: publish_attempt
+    target_candidate_ids:
+      - C003
+    actor: agent
+    changed_at: 2026-05-25T09:32:00+08:00
+    result: initially_blocked_by_npm_registry_permission
+  - operation_id: OP003
+    operation_type: local_install
+    target_candidate_ids:
+      - C003
+    actor: agent
+    changed_at: 2026-05-25T09:33:00+08:00
+    result: local_system_cli_updated_to_0.1.2
+  - operation_id: OP004
+    operation_type: publish_complete
+    target_candidate_ids:
+      - C003
+    actor: user_and_agent
+    changed_at: 2026-05-25T09:45:00+08:00
+    result: npm_registry_published_and_system_cli_reinstalled_from_registry
