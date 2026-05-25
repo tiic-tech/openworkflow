@@ -8,7 +8,7 @@ selected_change_id: C001
 title: Local commit evidence for manual Orchestrator SC dispatch protocol
 status: complete
 branch: codex/m138-orchestrator-sc-dispatch-protocol
-primary_commit: "0000000"
+primary_commit: a336c42
 implementation_changed_files: true
 affected_paths:
   - references/orchestrator-selected-change-dispatch.md
