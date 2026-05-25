@@ -5,8 +5,8 @@ plan_id: M137-openworkflow-0.1.2-npm-release
 candidate_id: C003
 change_id: C003
 selected_change_id: C003
-title: Local commit evidence for 0.1.2 publish attempt and local CLI update
-status: blocked
+title: Local commit evidence for 0.1.2 publish and local CLI update
+status: complete
 branch: codex/m137-openworkflow-0.1.2-npm-release
 primary_commit: 364341d
 implementation_changed_files: true
@@ -18,13 +18,14 @@ publish:
   package: "@tiic-tech/openworkflow"
   target_version: 0.1.2
   prepublish_only: pass
-  registry_upload: blocked
-  blocker: npm_registry_auth_or_org_permission
+  registry_upload: pass
+  git_head: cb767e5ffe3c5dd93b4f3b5b182c5b5d9da77425
+  published_at: 2026-05-25T01:44:22.571Z
 local_install:
   command_path: /opt/homebrew/bin/openworkflow
   global_root: /opt/homebrew/lib/node_modules
   installed_package: "@tiic-tech/openworkflow@0.1.2"
-  install_source: /Users/archy/Projects/StartUp/openworkflow
+  install_source: npm_registry
 validation:
   commands_run:
     - npm run build
@@ -35,8 +36,10 @@ validation:
     - openworkflow --help
     - openworkflow resume --root . --json
     - npm list -g @tiic-tech/openworkflow --depth=0
+    - npm view @tiic-tech/openworkflow@0.1.2 version gitHead time --json
   result: >
-    Local CLI update passed. Public npm upload is blocked after successful prepublishOnly checks.
+    Public npm upload passed after user completed npm CLI browser authentication. Local CLI update
+    from the registry package passed.
 notes:
-  - "`npm whoami` returned E401 before publish."
-  - "`npm publish --access public` returned E404 at registry upload: package not found or no permission."
+  - "Initial unauthenticated publish attempts failed before user re-authenticated npm."
+  - "`npm publish --access public` completed with + @tiic-tech/openworkflow@0.1.2."

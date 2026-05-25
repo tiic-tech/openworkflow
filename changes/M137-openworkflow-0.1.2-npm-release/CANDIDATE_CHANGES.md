@@ -1,6 +1,6 @@
 # M137 OpenWorkflow 0.1.2 npm release
 
-Status: active, blocked only on npm registry authentication or scope permission.
+Status: complete.
 
 ## Completed
 
@@ -11,12 +11,10 @@ Status: active, blocked only on npm registry authentication or scope permission.
 - Ran `openworkflow sync --root . --tools codex --json` to refresh generated proto surfaces.
 - Installed the local repository globally with `npm install -g .`.
 - Verified system `openworkflow` resolves to `@tiic-tech/openworkflow@0.1.2`.
+- Published `@tiic-tech/openworkflow@0.1.2` to npm.
+- Reinstalled the system CLI from the npm registry package.
 
-## Blocked
+## Publication
 
-`npm publish --access public` passed `prepublishOnly` and reached registry upload, then failed with
-E404 for `PUT https://registry.npmjs.org/@tiic-tech%2fopenworkflow`: not found or no permission.
-Earlier `npm whoami` returned E401.
-
-Public npm release requires an authenticated npm identity with publish rights for
-`@tiic-tech/openworkflow`.
+`npm view @tiic-tech/openworkflow@0.1.2 version gitHead time --json` confirms the package is
+published with gitHead `cb767e5ffe3c5dd93b4f3b5b182c5b5d9da77425`.

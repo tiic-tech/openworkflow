@@ -4,15 +4,14 @@ contract_type: planning
 planning_artifact_type: summary
 plan_id: M137-openworkflow-0.1.2-npm-release
 title: Summary for OpenWorkflow 0.1.2 npm release
-status: active
+status: complete
 source:
   kind: user_request
   refs:
     - changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.yaml
   summary: >
-    OpenWorkflow 0.1.2 is prepared locally and installed as the system CLI. Public npm publication
-    is blocked by npm authentication or organization package permission after all prepublishOnly
-    checks passed.
+    OpenWorkflow 0.1.2 is published to npm and installed as the system CLI from the registry.
+    Release-gate drift was repaired before publication.
 scope_boundary: >
   OpenWorkflow 0.1.2 release preparation, npm publication attempt, and local system CLI update.
 branch_boundary: codex/m137-openworkflow-0.1.2-npm-release
@@ -20,11 +19,11 @@ target_base:
   remote: origin
   branch: main
 candidate_count: 3
-completed_candidate_id: C002
-completed_change_id: C002
-next_recommended_candidate_id: C003
-selected_candidate_id: C003
-selected_change_id: C003
+completed_candidate_id: C003
+completed_change_id: C003
+next_recommended_candidate_id: null
+selected_candidate_id: null
+selected_change_id: null
 outputs:
   candidate_changes_yaml: changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.yaml
   candidate_changes_md: changes/M137-openworkflow-0.1.2-npm-release/CANDIDATE_CHANGES.md
@@ -32,13 +31,13 @@ outputs:
   publication_evidence: changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/PUBLICATION_EVIDENCE.md
 risks:
   - id: R001
-    level: high
-    description: npm registry upload requires an authenticated npm identity with publish rights for the @tiic-tech scope.
-    mitigation: Authenticate npm or provide an npm publish token, then rerun npm publish --access public from this branch.
+    level: low
+    description: npm publication is immutable; future fixes require a later version.
+    mitigation: Use 0.1.3 or later for any follow-up package changes.
   - id: R002
-    level: medium
-    description: Local system CLI is linked to the repository rather than installed from the unpublished npm artifact.
-    mitigation: Reinstall from npm after public 0.1.2 is published.
+    level: low
+    description: Local system CLI must remain installed from registry rather than stale local links for release verification.
+    mitigation: "npm list -g @tiic-tech/openworkflow --depth=0 shows the registry package at 0.1.2."
 validation:
   commands_run:
     - npm run build
@@ -53,4 +52,5 @@ validation:
     - openworkflow resume --root . --json
     - npm list -g @tiic-tech/openworkflow --depth=0
   result: >
-    Release checks pass and local CLI is updated. Public npm upload is externally blocked.
+    Release checks passed, npm registry publication succeeded, and the local system CLI is updated
+    from @tiic-tech/openworkflow@0.1.2.

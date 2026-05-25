@@ -4,7 +4,7 @@ contract_type: planning
 planning_artifact_type: candidate_changes
 plan_id: M137-openworkflow-0.1.2-npm-release
 title: Candidate changes for OpenWorkflow 0.1.2 npm release
-status: active
+status: complete
 source:
   kind: user_request
   refs:
@@ -13,8 +13,8 @@ source:
   summary: >
     User requested publishing OpenWorkflow 0.1.2 and updating the local system CLI. The package
     version was bumped to 0.1.2, release-gate drift was repaired, all publish preflight scripts
-    passed, and the local system CLI was updated to the current repository build. Public npm
-    upload is blocked by registry authentication or organization package permission.
+    passed, the package was published to npm, and the local system CLI was updated from the
+    registry package.
 queue_policy:
   branch_boundary: codex/m137-openworkflow-0.1.2-npm-release
   git_lifecycle_gate: strict
@@ -41,17 +41,20 @@ observed_state:
   package_version_before: 0.1.1
   package_version_after: 0.1.2
   registry_0_1_2:
-    status: not_published_or_not_visible
-    evidence: "npm view @tiic-tech/openworkflow@0.1.2 version gitHead time --json returned E404"
+    status: published
+    version: 0.1.2
+    git_head: cb767e5ffe3c5dd93b4f3b5b182c5b5d9da77425
+    published_at: 2026-05-25T01:44:22.571Z
+    evidence: "npm view @tiic-tech/openworkflow@0.1.2 version gitHead time --json"
   npm_identity:
-    status: unauthenticated_or_not_authorized
-    evidence: "npm whoami returned E401 before publish; npm publish PUT returned E404 not found or no permission"
+    status: authorized
+    evidence: "npm whoami returned tiic-tech; npm access list packages @tiic-tech returned @tiic-tech/openworkflow read-write"
   local_system_cli:
     status: updated
     installed_package: "@tiic-tech/openworkflow@0.1.2"
-    install_source: /Users/archy/Projects/StartUp/openworkflow
+    install_source: npm_registry
     command_path: /opt/homebrew/bin/openworkflow
-next_recommended_candidate_id: C003
+next_recommended_candidate_id: null
 changes:
   - id: C001
     status: done
@@ -110,7 +113,7 @@ changes:
       evidence:
         - changes/M137-openworkflow-0.1.2-npm-release/C002-fix-release-gate-and-refresh-generated-surfaces/LOCAL_COMMIT_EVIDENCE.yaml
   - id: C003
-    status: blocked
+    status: done
     title: Publish 0.1.2 to npm and update local system CLI
     purpose: >
       Publish the validated 0.1.2 tarball to npm and make the system-level openworkflow command use
@@ -127,21 +130,15 @@ changes:
     acceptance:
       - Public npm registry exposes @tiic-tech/openworkflow@0.1.2.
       - Local system CLI resolves to @tiic-tech/openworkflow@0.1.2.
-    blocker:
-      blocked_at: 2026-05-25T09:32:00+08:00
-      blocking_condition: npm_registry_auth_or_org_permission
-      evidence: >
-        `npm publish --access public` completed prepublishOnly, created the 0.1.2 tarball, then
-        failed at PUT https://registry.npmjs.org/@tiic-tech%2fopenworkflow with E404 "not found or
-        you do not have permission to access it". Earlier `npm whoami` returned E401.
-      unblocked_by:
-        - Log in with an npm account that can publish @tiic-tech/openworkflow.
-        - Or provide an npm token with publish rights for the @tiic-tech scope.
     completion:
-      completed_at: 2026-05-25T09:33:00+08:00
+      completed_at: 2026-05-25T09:45:00+08:00
       result: >
-        Local system CLI update is complete. Public npm publication remains blocked by external
-        registry credentials or scope permission.
+        Public npm publication is complete. The system-level CLI was reinstalled from
+        @tiic-tech/openworkflow@0.1.2 on the npm registry and `openworkflow resume --root . --json`
+        succeeds.
+      evidence:
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/PUBLICATION_EVIDENCE.md
+        - changes/M137-openworkflow-0.1.2-npm-release/C003-publish-0.1.2-and-update-local-cli/LOCAL_COMMIT_EVIDENCE.yaml
 operations:
   - operation_id: OP001
     operation_type: release_preflight
@@ -157,7 +154,7 @@ operations:
       - C003
     actor: agent
     changed_at: 2026-05-25T09:32:00+08:00
-    result: blocked_by_npm_registry_permission
+    result: initially_blocked_by_npm_registry_permission
   - operation_id: OP003
     operation_type: local_install
     target_candidate_ids:
@@ -165,3 +162,10 @@ operations:
     actor: agent
     changed_at: 2026-05-25T09:33:00+08:00
     result: local_system_cli_updated_to_0.1.2
+  - operation_id: OP004
+    operation_type: publish_complete
+    target_candidate_ids:
+      - C003
+    actor: user_and_agent
+    changed_at: 2026-05-25T09:45:00+08:00
+    result: npm_registry_published_and_system_cli_reinstalled_from_registry
