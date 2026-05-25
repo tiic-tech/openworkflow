@@ -2,6 +2,7 @@ schema_version: 0.1.0
 contract_id: local_commit_evidence:M135-repo-governance-debt-closure:C002
 contract_type: evidence
 plan_id: M135-repo-governance-debt-closure
+candidate_id: C002
 change_id: C002
 selected_change_id: C002
 title: Local commit evidence for C002 planning artifact shape repair
