@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+contract_id: local_commit_evidence:M136-openworkflow-0.1.1-system-cli-release:C003
+contract_type: evidence
+plan_id: M136-openworkflow-0.1.1-system-cli-release
+candidate_id: C003
+change_id: C003
+selected_change_id: C003
+title: Local commit evidence for C003 release handoff
+status: complete
+branch: codex/m136-openworkflow-0.1.1-system-cli-release
+primary_commit: c3980a5
+commit_message: M136-openworkflow-0.1.1-system-cli-release/C003 Complete release handoff
+implementation_changed_files: true
+affected_paths:
+  - changes/M136-openworkflow-0.1.1-system-cli-release/
+validation_evidence:
+  - npm run validate: expected fail before this evidence file existed
+  - openworkflow resume --root . --json: pass
+  - openworkflow --help: current command surface visible
+  - git diff --check: pass
+validation:
+  commands_run:
+    - npm run validate
+    - openworkflow resume --root . --json
+    - openworkflow --help
+    - git diff --check
+  result: >
+    M136 final handoff recorded the installed system CLI state. The only validation failure before
+    this evidence file was the expected missing C003 LOCAL_COMMIT_EVIDENCE.yaml.
+notes:
+  - "System `openworkflow` now uses the current repository 0.1.1 build."
+  - "No npm publish was run for immutable registry version 0.1.1."
